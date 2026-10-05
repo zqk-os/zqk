@@ -242,9 +242,6 @@ func (hr *HashRegistry) processBatch(batch []*saveRequest) {
 // This is called by the background worker, ensuring all saves are serialized.
 // Uses json.Marshal (not MarshalIndent) for speed and smaller I/O on large registries.
 func (hr *HashRegistry) processSave(hashes map[string]string) error {
-	if StreamStorageEnabledForKind(hr.kind) {
-		return nil
-	}
 	if len(hashes) == 0 {
 		if _, statErr := fileutil.Stat(filepath.Dir(hr.filePath)); statErr != nil && fileutil.IsNotExist(statErr) {
 			return nil

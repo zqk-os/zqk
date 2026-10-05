@@ -81,9 +81,6 @@ func (hr *HashRegistry) Load() error {
 // Use during WAL replay so apply path stays fast; the background worker persists when it can.
 // Caller must not rely on durability before the next synchronous Save() or process exit.
 func (hr *HashRegistry) SaveAsync() {
-	if StreamStorageEnabledForKind(hr.kind) {
-		return
-	}
 	if hr.ctx.Err() != nil {
 		return
 	}
@@ -122,9 +119,6 @@ func (hr *HashRegistry) SaveAsync() {
 // Wakes worker if needed (on-demand pattern)
 // Returns ErrShutdownInProgress if shutdown has been initiated
 func (hr *HashRegistry) Save() error {
-	if StreamStorageEnabledForKind(hr.kind) {
-		return nil
-	}
 	req, err := hr.prepareSaveRequest()
 	if err != nil {
 		return err
@@ -186,9 +180,6 @@ func (hr *HashRegistry) Save() error {
 // Use this during storage init so the daemon does not hang indefinitely on HashRegistry I/O.
 // If ctx is nil, behaves as Save() (no timeout).
 func (hr *HashRegistry) SaveWithContext(ctx context.Context) error {
-	if StreamStorageEnabledForKind(hr.kind) {
-		return nil
-	}
 	if ctx == nil {
 		return hr.Save()
 	}

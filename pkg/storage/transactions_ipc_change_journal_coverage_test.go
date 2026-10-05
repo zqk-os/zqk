@@ -189,7 +189,9 @@ func TestStorageExtended_Wave19_HashRegistryAndQueueShutdown(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("HashRegistryManager_ShutdownHandler", func(t *testing.T) {
-		manager := GetGlobalHashRegistryManager()
+		manager := &HashRegistryManager{
+			registries: make(map[string]*HashRegistry),
+		}
 		require.NotNil(t, manager)
 
 		assert.Equal(t, ConstMiscHashRegistryManager, manager.GetName())
