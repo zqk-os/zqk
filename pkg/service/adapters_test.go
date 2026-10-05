@@ -2,7 +2,6 @@ package service_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -55,7 +54,7 @@ func TestLaunchdAdapter_FileOperations(t *testing.T) {
 	}
 
 	// Install creates plist file
-	err = adapter.Install(ctx, spec)
+	err := adapter.Install(ctx, spec)
 	require.NoError(t, err)
 
 	plistFile := filepath.Join(tempDir, spec.ID+".plist")
@@ -110,7 +109,7 @@ func TestSystemdAdapter_FileOperations(t *testing.T) {
 		Executable: "/bin/true",
 	}
 
-	err = adapter.Install(ctx, spec)
+	err := adapter.Install(ctx, spec)
 	require.NoError(t, err)
 
 	unitFile := filepath.Join(tempDir, "example-systemd-test.service")

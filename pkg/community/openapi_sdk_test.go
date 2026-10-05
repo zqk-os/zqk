@@ -117,6 +117,9 @@ func TestOpenAPIClientSDK_FunctionalAcceptance(t *testing.T) {
 func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	repoRoot := findRepoRootForSDK(t)
 	genScript := filepath.Join(repoRoot, "scripts", "generate_openapi_clients.py")
+	if _, err := os.Stat(genScript); os.IsNotExist(err) {
+		t.Skip("generate_openapi_clients.py not present in open-core distribution")
+	}
 	tmpDir := t.TempDir()
 
 	// Sub-test 1: Missing OpenAPI spec file

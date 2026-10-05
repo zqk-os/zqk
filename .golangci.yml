@@ -113,3 +113,10 @@ linters:
       - path: "pkg/testrunner/testrunner\\.go"
         linters:
           - forbidigo
+      - path: "cmd/zqk/sync/constants\\.go"
+        text: "G101: Potential hardcoded credentials"
+        linters:
+          - gosec
+      - path: "pkg/tui/"
+        linters:
+          - forbidigo

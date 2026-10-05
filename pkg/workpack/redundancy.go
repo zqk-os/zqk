@@ -2,7 +2,6 @@ package workpack
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"sort"
 	"strings"
