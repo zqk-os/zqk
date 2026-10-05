@@ -286,7 +286,7 @@ func BuildCanonicalCEFPack(cefSourceDir string, destPackDir string, privKey ed25
 		}
 	}
 
-	if _, err := pack.SealPack(destPackDir, privKey, "cef-curator@zqkos.com"); err != nil {
+	if _, err := pack.SealPack(destPackDir, privKey, "support@zqkos.com"); err != nil {
 		return nil, fmt.Errorf("failed to seal code-eval pack: %w", err)
 	}
 

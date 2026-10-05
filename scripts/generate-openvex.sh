@@ -96,7 +96,7 @@ cat <<EOF > "$OUTPUT_FILE"
 {
   "@context": "https://openvex.dev/ns/v0.2.0",
   "@id": "https://openvex.dev/docs/public/vex/zqk-${VER_NUM}",
-  "author": "Zen Quantum Kernel Security Response Team <security@zqk-os.org>",
+  "author": "Zen Quantum Kernel Security Response Team <support@zqkos.com>",
   "role": "Project Maintainer",
   "timestamp": "${TIMESTAMP}",
   "version": 1,

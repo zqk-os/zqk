@@ -41,7 +41,7 @@ BUILD_DIR="$(pwd -P)"
 cd "${BUILD_DIR}"
 git init -b main
 git config user.name "zqk-bot"
-git config user.email "bot@zqkos.com"
+git config user.email "support@zqkos.com"
 git add -A
 
 COMMIT_SHA=$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo "core")
