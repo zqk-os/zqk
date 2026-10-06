@@ -119,12 +119,12 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 
 ## Documentation & Guides
 
-- **[Community First-Run Guide](https://docs.zqk.dev/docs/onboarding/COMMUNITY_FIRST_RUN)** — Recommended starting point for humans and agents.
-- **[First-Run Object Tutorial](https://docs.zqk.dev/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL)** — Creating and managing kernel objects.
-- **[Quickstart & MCP Setup](https://docs.zqk.dev/docs/onboarding/QUICKSTART)** — Connecting Cursor, Claude Code, and other LLMs.
-- **[Architecture Guide](https://docs.zqk.dev/docs/architecture/README)** — Deep dive into the cellular microkernel architecture.
-- **[Contributing](./CONTRIBUTING.md)** — Development guidelines and PR policies.
-- **[Security Policy](./SECURITY.md)** — Vulnerability reporting and fail-closed security guarantees.
+- **[Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/COMMUNITY_FIRST_RUN.html)) — Recommended starting point for humans and agents.
+- **[First-Run Object Tutorial](docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html)) — Creating and managing kernel objects.
+- **[Quickstart & MCP Setup](docs/onboarding/QUICKSTART.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/QUICKSTART.html)) — Connecting Cursor, Claude Code, and other LLMs.
+- **[Architecture Guide](docs/architecture/README.md)** ([Web Portal](https://docs.zqk.dev/docs/architecture/README.html)) — Deep dive into the cellular microkernel architecture.
+- **[Contributing](CONTRIBUTING.md)** — Development guidelines and PR policies.
+- **[Security Policy](SECURITY.md)** — Vulnerability reporting and fail-closed security guarantees.
 
 ## Connect & Community
 

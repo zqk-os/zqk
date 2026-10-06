@@ -22,6 +22,7 @@ Documents governing state transitions, provenance enforcement, and fail-closed v
 
 - **[Membrane Mutation Governance & Integrity Specification](./MUTATION_GOVERNANCE.md)**: System provenance fields (`created_at`, `cas_address`, `hash`), directed state graph transitions, audited `--override` elevation, and interactive TTY friction controls.
 - **[Lifecycle State Machine Architecture](./LIFECYCLE_STATE_MACHINE.md)**: Formal lifecycle definitions, state transitions, and precondition verification engines.
+- **[Verifiable Decomposition Spine (VDS)](./VERIFIABLE_DECOMPOSITION_SPINE.md)**: Done-gates, requirement-to-criteria traceability cascades, Definition of Done enforcement, and three-fold proof invariants.
 - **[Fail-Closed Error Propagation](./FAIL_CLOSED_ERROR_PROPAGATION.md)**: Core error handling and propagation strategy.
 - **[Fail-Closed Error Propagation & Transaction Resilience](./FAIL_CLOSED_ERROR_PROPAGATION_AND_TRANSACTION_RESILIENCE.md)**: Fail-closed boundary guarantees across storage, networking, and validation boundaries.
 - **[Fail-Closed Panic Resilience](./FAIL_CLOSED_PANIC_RESILIENCE.md)**: Subprocess and thread isolation preventing daemon crashes and unhandled panic propagation.
@@ -32,6 +33,7 @@ Documents governing state transitions, provenance enforcement, and fail-closed v
 Documents governing the Cobra CLI command surface, taxonomy standards, builders, and verb mappings.
 
 - **[CLI Command Taxonomy Standards](./CLI_COMMAND_TAXONOMY_STANDARDS.md)**: Canonical noun-verb command standards, grammar rules, YAML specification inventory, and regression guardrails.
+- **[Polyglot AST Code Search Architecture & Roadmap (`zqk grep`)](./POLYGLOT_AST_SEARCH_ROADMAP.md)**: In-process trigram and polyglot AST code search engine with strict token budgeting.
 - **[Orphan Verbs Retirement & Canonical Domain Mapping](./ORPHAN_VERBS_RETIREMENT_AND_CANONICAL_DOMAIN_MAPPING.md)**: Ergonomic root shortcuts (`zqk do`, `zqk inspect`, `zqk mutate`) mapped to canonical domain commands (`zqk workflow do`, `zqk object inspect`, etc.).
 - **[Acronym Vocabulary Scheme & Progressive Disclosure](./ACRONYM_VOCABULARY_SCHEME_AND_PROGRESSIVE_DISCLOSURE.md)**: Glossary scheme for technical acronyms (CAS, VDS, DoD, BLI, REQ, CRIT) and cognitive load management.
 - **[Diagnostics Auto Remedy](./ergonomics/DIAGNOSTICS_AUTO_REMEDY.md)**: Ergonomic flows for diagnosing and fixing issues.
@@ -55,6 +57,7 @@ Documents governing persistent host processes, background watchers, and job conc
 Documents governing multi-agent coordination, bounded domain packages, and extensible modules.
 
 - **[Pack Composition & Extensibility Architecture](./PACK_COMPOSITION_AND_EXTENSIBILITY.md)**: Architectural distinction between Go Code Packs (`packs/<domain>`) and Runtime Swarm Orchestration Packs (`swarm.yaml`), and composition rules.
+- **[Kernel-to-Vendor Instruction Projection](./KERNEL_VENDOR_INSTRUCTION_PROJECTION.md)**: Automated projection of kernel directives, behavioral policies, and context into vendor-specific agent instructions (`AGENTS.md`, `.cursorrules`, `.windsurfrules`).
 - **[Composite Execution Organizer Verification](./COMPOSITE_EXECUTION_ORGANIZER_VERIFICATION.md)**: End-to-end trace pipelines, deterministic goal hierarchy composition, and verification gates.
 - **[Adaptive Task Supervision Specification](./ADAPTIVE_TASK_SUPERVISION_SPECIFICATION.md)**: Multi-agent supervisor coordination, heartbeat monitoring, and automated unsticking protocols.
 - **[Adaptive Agent Disambiguation](./ADAPTIVE_AGENT_DISAMBIGUATION.md)**: Persona resolution, skill linkage, and intent disambiguation for agent execution seats.

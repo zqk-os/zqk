@@ -292,3 +292,101 @@ func TestDocCoherency_CRIT_GettingStarted_Crossrefs(t *testing.T) {
 		t.Errorf("docs/getting-started.md missing cross-reference to ZQK_GETTING_STARTED.md")
 	}
 }
+
+// CRIT-1791265960945192000-4682060b & CRIT-1791265960945193000-f37b7ca2 & CRIT-1791265960945194000-e9e8433f:
+// Architecture Documentation MUST Be Internally Consistent and Non-Contradictory
+func TestDocCoherency_CRIT_ArchitectureConsistency(t *testing.T) {
+	root := resolveTestProjectRoot(t)
+
+	// [H-4] CLI taxonomy must cover all root command tiers
+	taxContent, err := fileutil.ReadFile(filepath.Join(root, "docs", "architecture", "CLI_COMMAND_TAXONOMY_STANDARDS.md"))
+	if err != nil {
+		t.Fatalf("failed to read CLI_COMMAND_TAXONOMY_STANDARDS.md: %v", err)
+	}
+	taxText := string(taxContent)
+	expectedTiers := []string{"Tier 1: Core Architectural Domains", "Tier 2: Day-0 Onboarding", "Tier 3: Everyday Utilities", "Tier 4: Approved Ergonomics Shortcuts", "Tier 5: Specialized & Extension Domains"}
+	for _, tier := range expectedTiers {
+		if !strings.Contains(taxText, tier) {
+			t.Errorf("CLI_COMMAND_TAXONOMY_STANDARDS.md missing expected tier header: %s", tier)
+		}
+	}
+	expectedTaxCmds := []string{"`zqk auth`", "`zqk explain`", "`zqk pplan`", "`zqk matrix`", "`zqk kind-pack`", "`zqk inbox`"}
+	for _, cmd := range expectedTaxCmds {
+		if !strings.Contains(taxText, cmd) {
+			t.Errorf("CLI_COMMAND_TAXONOMY_STANDARDS.md missing documented entry for %s", cmd)
+		}
+	}
+
+	// [H-5] Pack composition harmonization
+	packContent, err := fileutil.ReadFile(filepath.Join(root, "docs", "architecture", "PACK_COMPOSITION_AND_EXTENSIBILITY.md"))
+	if err != nil {
+		t.Fatalf("failed to read PACK_COMPOSITION_AND_EXTENSIBILITY.md: %v", err)
+	}
+	packText := string(packContent)
+	if !strings.Contains(packText, "Dynamic loading without rebuild") {
+		t.Errorf("PACK_COMPOSITION_AND_EXTENSIBILITY.md missing dynamic loading distinction")
+	}
+	if !strings.Contains(packText, "Recompilation required") {
+		t.Errorf("PACK_COMPOSITION_AND_EXTENSIBILITY.md missing recompilation requirement for Go code")
+	}
+
+	// [M-8] Architecture INDEX completeness
+	indexContent, err := fileutil.ReadFile(filepath.Join(root, "docs", "architecture", "INDEX.md"))
+	if err != nil {
+		t.Fatalf("failed to read INDEX.md: %v", err)
+	}
+	indexText := string(indexContent)
+	expectedDocs := []string{
+		"VERIFIABLE_DECOMPOSITION_SPINE.md",
+		"POLYGLOT_AST_SEARCH_ROADMAP.md",
+		"KERNEL_VENDOR_INSTRUCTION_PROJECTION.md",
+	}
+	for _, d := range expectedDocs {
+		if !strings.Contains(indexText, d) {
+			t.Errorf("docs/architecture/INDEX.md missing expected link to %s", d)
+		}
+	}
+}
+
+// CRIT-1791265968445338000-8233a661 & CRIT-1791265968445339000-4ba0d5c7 & CRIT-1791265968445340000-5eaa5a66:
+// Auto-Generated and Structural Documentation MUST Be Clean and Non-Misleading
+func TestDocCoherency_CRIT_StructuralDocCleanliness(t *testing.T) {
+	root := resolveTestProjectRoot(t)
+
+	// [M-7] testdiscovery description clean
+	pkgContent, err := fileutil.ReadFile(filepath.Join(root, "pkg", "README.md"))
+	if err != nil {
+		t.Fatalf("failed to read pkg/README.md: %v", err)
+	}
+	pkgText := string(pkgContent)
+	if strings.Contains(pkgText, "Go:build") || strings.Contains(pkgText, "+build") {
+		t.Errorf("pkg/README.md contains raw build tags in descriptions")
+	}
+	if !strings.Contains(pkgText, "Automated discovery of unit, integration, and criteria-linked test targets") {
+		t.Errorf("pkg/README.md missing accurate testdiscovery description")
+	}
+
+	// [L-1] No orphaned <p> tags
+	if strings.Contains(pkgText, "<p>") || strings.Contains(pkgText, "</p>") {
+		t.Errorf("pkg/README.md contains raw HTML paragraph tags")
+	}
+
+	// [M-5] internal/README.md no internal/cli
+	internalContent, err := fileutil.ReadFile(filepath.Join(root, "internal", "README.md"))
+	if err != nil {
+		t.Fatalf("failed to read internal/README.md: %v", err)
+	}
+	if strings.Contains(string(internalContent), "internal/cli") {
+		t.Errorf("internal/README.md references obsolete internal/cli path")
+	}
+
+	// [L-4] README.md documentation links
+	readmeContent, err := fileutil.ReadFile(filepath.Join(root, "README.md"))
+	if err != nil {
+		t.Fatalf("failed to read README.md: %v", err)
+	}
+	readmeText := string(readmeContent)
+	if !strings.Contains(readmeText, "docs/onboarding/COMMUNITY_FIRST_RUN.md") {
+		t.Errorf("README.md missing relative path to COMMUNITY_FIRST_RUN.md")
+	}
+}

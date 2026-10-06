@@ -199,7 +199,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [tde](./tde/) | `github.com/zqk-os/zqk/pkg/tde` | 5+4 | 4 | - | ❌ - | Tde component and domain abstractions for ZQK Core. |
 | [tdval](./tdval/) | `github.com/zqk-os/zqk/pkg/tdval` | 1+1 | 1 | - | ❌ - | Test-driven validation engines, acceptance criteria gates, and verification suites. |
 | [telemetry](./telemetry/) | `github.com/zqk-os/zqk/pkg/telemetry` | 10+9 | 9 | - | ✅ [README](./telemetry/README.md) | This package provides telemetry tracking, diagnostics hooks, and daemon synchronization capabilities to monitor Knowledge Kerne... |
-| [testdiscovery](./testdiscovery/) | `github.com/zqk-os/zqk/pkg/testdiscovery` | 7+8 | 8 | - | ❌ - | Go:build integration && !race +build integration,!race |
+| [testdiscovery](./testdiscovery/) | `github.com/zqk-os/zqk/pkg/testdiscovery` | 7+8 | 8 | - | ❌ - | Automated discovery of unit, integration, and criteria-linked test targets across Go, Python, and TypeScript. |
 | [testenvroot](./testenvroot/) | `github.com/zqk-os/zqk/pkg/testenvroot` | 4+5 | 5 | - | ❌ - | A minimal test project layout (.zqk/process + test-settings) without importing pkg/testing (import-cycle hygiene for packages l... |
 | [testing](./testing/) | `github.com/zqk-os/zqk/pkg/testing` | 11+1 | 1 | - | ✅ [README](./testing/README.md) | This package provides test configuration support to isolate test data from actual project data. |
 | [testkit](./testkit/) | `github.com/zqk-os/zqk/pkg/testkit` | 18+18 | 18 | dummy_policy | ❌ - | Reusable test helpers intended for extraction into a shared Go testing library later. It composes storage/CAS/audit teardown us... |
@@ -545,7 +545,7 @@ pkg/
 ├── tde/          # Tde component and domain abstractions for ZQK Core.
 ├── tdval/          # Test-driven validation engines, acceptance criteria gates, a
 ├── telemetry/          # This package provides telemetry tracking, diagnostics hooks,
-├── testdiscovery/          # Go:build integration && !race +build integration,!race
+├── testdiscovery/          # Automated discovery of unit, integration, and criteria-linke
 ├── testenvroot/          # A minimal test project layout (.zqk/process + test-settings)
 ├── testing/          # This package provides test configuration support to isolate 
 ├── testkit/          # Reusable test helpers intended for extraction into a shared 
