@@ -72,11 +72,11 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		apiKeyVal, err := generateIssuedAPIKey()
+		issuedCode, err := generateSeatCode()
 		if err != nil {
 			return err
 		}
-		fingerprintHash := authcred.HashAPIKey(apiKeyVal)
+		fingerprintHash := authcred.HashIdentity(issuedCode)
 
 		entry := map[string]any{
 			objects.FieldKeyKind:           objects.KindKeystoreEntry,
@@ -109,7 +109,7 @@ func runIssue(cmd *cobra.Command, args []string) error {
 
 		seatingPath := ""
 		if !noSeating {
-			if err := authcred.WriteSeatKey(proc.ProjectRoot(), accountID, apiKeyVal); err != nil {
+			if err := authcred.WriteSeatKey(proc.ProjectRoot(), accountID, issuedCode); err != nil {
 				return errfmt.Newf("write seating key").Wrap(err)
 			}
 			seatingPath = authcred.SeatKeyPath(proc.ProjectRoot(), accountID)
@@ -120,10 +120,10 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			objects.FieldKeyAccountID: accountID,
 			objects.FieldKeyKeyType:   "api_key",
 			objects.FieldKeyTitle:     title,
-			"api_key":                 apiKeyVal,
+			"api_key":                 issuedCode,
 			"fingerprint":             fingerprintHash,
 			"seating_file":            seatingPath,
-			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), apiKeyVal),
+			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), issuedCode),
 		}
 
 		switch cli.GetFormat(cmd) {
@@ -135,12 +135,12 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			fmt.Fprintf(&buf, "Key ID:       %s\n", keyID)
 			fmt.Fprintf(&buf, "Account:      %s\n", accountID)
 			fmt.Fprintf(&buf, "Fingerprint:  %s\n", fingerprintHash)
-			fmt.Fprintf(&buf, "API Key:      %s\n", apiKeyVal)
+			fmt.Fprintf(&buf, "API Key:      %s\n", issuedCode)
 			if seatingPath != "" {
 				fmt.Fprintf(&buf, "Seating file: %s\n", seatingPath)
 			}
 			buf.WriteString("\nExport for this seat:\n")
-			fmt.Fprintf(&buf, "  export %s=%s\n", zqkenv.APIKey(), apiKeyVal)
+			fmt.Fprintf(&buf, "  export %s=%s\n", zqkenv.APIKey(), issuedCode)
 			return cli.WriteOutput(cmd, []byte(buf.String()))
 		}
 	})(cmd, args)
@@ -161,12 +161,12 @@ func authorizeIssueForAccount(secCtx *pkgctx.SecurityContext, accountID string) 
 	return errfmt.Errorf("permission denied: only admins (or the account owner) can issue keys for %s", accountID)
 }
 
-func generateIssuedAPIKey() (string, error) {
+func generateSeatCode() (string, error) {
 	var b [24]byte
 	if _, err := rand.Read(b[:]); err != nil {
-		return "", errfmt.Newf("generate api key").Wrap(err)
+		return "", errfmt.Newf("generate key").Wrap(err)
 	}
-	return authcred.APIKeyPrefix + hex.EncodeToString(b[:]), nil
+	return authcred.AgentPrefix + hex.EncodeToString(b[:]), nil
 }
 
 func appendAccountTokenFingerprint(proc *cli.Processor, accountID, keyID, fingerprint, expiresAt string) error {

@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	// APIKeyPrefix marks generated agent API keys (never an ACC-* id).
-	APIKeyPrefix = "zqk_ak_"
+	// AgentPrefix marks generated agent keys (never an ACC-* id).
+	AgentPrefix = "zqk_ak_"
+	// APIKeyPrefix is an alias for AgentPrefix.
+	APIKeyPrefix = AgentPrefix
 
 	keyTypeAPIKey              = "api_key"
 	keyTypePersonalAccessToken = "personal_access_token"
@@ -23,10 +25,15 @@ const (
 	tokenMetaExpiration        = "expiration"
 )
 
-// HashAPIKey returns the stored credential_hash form for an API key / PAT secret.
-func HashAPIKey(rawKey string) string {
-	sum := sha256.Sum256([]byte(rawKey))
+// HashIdentity returns the stored digest form for an identity or key string.
+func HashIdentity(raw string) string {
+	sum := sha256.Sum256([]byte(raw))
 	return sha256HashPrefix + hex.EncodeToString(sum[:])
+}
+
+// HashAPIKey returns the stored credential_hash form for an API key / PAT token.
+func HashAPIKey(rawKey string) string {
+	return HashIdentity(rawKey)
 }
 
 // NormalizeCredentialHash returns the hex digest for comparison.
@@ -51,7 +58,7 @@ func ResolveAPIKey(projectRoot, rawKey string) (Match, error) {
 	if rawKey == "" {
 		return Match{}, errfmt.Errorf("empty credential")
 	}
-	want := NormalizeCredentialHash(HashAPIKey(rawKey))
+	want := NormalizeCredentialHash(HashIdentity(rawKey))
 	recs, err := ListKeystoreRecords(projectRoot)
 	if err != nil {
 		return Match{}, errfmt.Newf("keystore unavailable").Wrap(err)
