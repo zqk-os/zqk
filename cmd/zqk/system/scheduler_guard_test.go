@@ -84,7 +84,7 @@ func TestRequirementForSystemCommand(t *testing.T) {
 }
 
 func TestRunSystemSchedulerGuard_BlockAndOverride(t *testing.T) {
-	t.Parallel()
+	// Do not use t.Parallel(): mutates package-level function pointers.
 	origChecker := schedulerRunningChecker
 	origResolver := resolveProjectRootForSchedulerGuard
 	t.Cleanup(func() {

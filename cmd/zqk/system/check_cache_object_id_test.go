@@ -732,12 +732,21 @@ func TestObjectIDCache_BuildCache_BuildsReverseReferenceIndex(t *testing.T) {
 		t.Fatalf("SetupTestEnvironment: %v", err)
 	}
 	t.Cleanup(func() {
-		_ = storage.FlushAllListingIndexesForProjectRoot(projectRoot)
-		if q := caspkg.GetListingIndexWriteQueueForProjectRoot(projectRoot); q != nil {
+		q := caspkg.GetListingIndexWriteQueueForProjectRoot(projectRoot)
+		if q != nil {
+			_ = q.FlushAll(2 * time.Second)
 			_ = q.Shutdown()
 		}
-		storage.FlushGlobalAuditBufferForProjectRoot(projectRoot)
-		time.Sleep(50 * time.Millisecond)
+		_ = storage.FlushAllListingIndexesForProjectRoot(projectRoot)
+		_ = storage.WaitForWALProcessing(projectRoot, 15*time.Second)
+		resetDir, err := fileutil.MkdirTemp("", "zqk-audit-global-reset")
+		if err == nil {
+			defer fileutil.RemoveAll(resetDir)
+			_ = storage.TearDownGlobalAuditBufferForTestProjectRoot(projectRoot, resetDir, &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID})
+		} else {
+			storage.FlushGlobalAuditBufferForProjectRoot(projectRoot)
+		}
+		_ = fileutil.RemoveAll(filepath.Join(projectRoot, paths.ProjectDataDir))
 	})
 
 	// Create at least one kind dir so object ID cache build has something to scan
