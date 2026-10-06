@@ -52,6 +52,9 @@ type fileState struct {
 	EventType string       // Event type to emit (e.g., "config_id_prefixes_changed")
 }
 
+// DefaultConfigPollInterval is the default polling interval for checking config changes
+const DefaultConfigPollInterval = 1 * time.Second
+
 // NewConfigFileWatcher creates a new config file watcher
 func NewConfigFileWatcher(projectRoot string, coordinator coordination.EventCoordinator, logger logging.Logger) *ConfigFileWatcher {
 	internalDir := filepath.Join(projectRoot, paths.ProcessInternalDir)
@@ -60,6 +63,7 @@ func NewConfigFileWatcher(projectRoot string, coordinator coordination.EventCoor
 		internalDir:  internalDir,
 		coordinator:  coordinator,
 		logger:       logger,
+		pollInterval: DefaultConfigPollInterval,
 		watchedFiles: make(map[string]fileState),
 		stopChan:     make(chan struct{}),
 	}
@@ -69,6 +73,9 @@ func NewConfigFileWatcher(projectRoot string, coordinator coordination.EventCoor
 func (w *ConfigFileWatcher) SetPollInterval(interval time.Duration) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	if interval <= 0 {
+		interval = DefaultConfigPollInterval
+	}
 	w.pollInterval = interval
 }
 
@@ -161,9 +168,18 @@ func (w *ConfigFileWatcher) Stop() {
 	)
 }
 
+func (w *ConfigFileWatcher) getPollInterval() time.Duration {
+	w.mu.RLock()
+	defer w.mu.RUnlock()
+	if w.pollInterval <= 0 {
+		return DefaultConfigPollInterval
+	}
+	return w.pollInterval
+}
+
 // watchLoop polls files for changes and emits events
 func (w *ConfigFileWatcher) watchLoop(ctx context.Context) {
-	ticker := time.NewTicker(w.pollInterval)
+	ticker := time.NewTicker(w.getPollInterval())
 	defer ticker.Stop()
 
 	for {
