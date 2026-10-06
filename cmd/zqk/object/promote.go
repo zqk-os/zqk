@@ -223,6 +223,19 @@ func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContex
 	// Do not skip planned→in_progress (or any execution hop) to complete just
 	// because the nearer hop failed validation (e.g. PRI still grooming).
 	probeOrder = promoteForwardProbeOrder(currentStatus, probeOrder)
+	toStatus, _ := cmd.Flags().GetString("to")
+	toStatus = strings.TrimSpace(strings.ToLower(toStatus))
+	if toStatus != "" {
+		targetPercent := objects.LifecycleProgressPercent(toStatus, lifecycle.PercentComplete)
+		var filtered []string
+		for _, cand := range probeOrder {
+			candPercent := objects.LifecycleProgressPercent(cand, lifecycle.PercentComplete)
+			if candPercent <= targetPercent || strings.EqualFold(cand, toStatus) {
+				filtered = append(filtered, cand)
+			}
+		}
+		probeOrder = filtered
+	}
 	diag.ProbeOrder = append([]string(nil), probeOrder...)
 
 	// Find next valid status (one hop). Keep rejection reasons so a stuck
