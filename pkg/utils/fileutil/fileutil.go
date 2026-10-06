@@ -136,8 +136,15 @@ func EnsureDir(path string) error {
 
 // Exists reports whether path exists (file or directory).
 func Exists(path string) bool {
+	trimmed := strings.TrimSpace(path)
+	if trimmed == "" {
+		return false
+	}
+	if err := ValidateSafePath(trimmed); err != nil {
+		return false
+	}
 	t0 := nowIfMetricsEnabled()
-	cleanPath := filepath.Clean(path)
+	cleanPath := filepath.Clean(trimmed)
 	_, err := os.Stat(cleanPath)
 	recordIOOp(OpExists, cleanPath, 0, t0, err)
 	return err == nil

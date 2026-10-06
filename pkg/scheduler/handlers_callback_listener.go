@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -332,9 +333,9 @@ func (h *CallbackListenerHandler) handleCallback(w http.ResponseWriter, r *http.
 
 // handleJobComplete handles job completion callbacks
 func (h *CallbackListenerHandler) handleJobComplete(w http.ResponseWriter, _ *http.Request, payload map[string]any, job *ScheduledJob) {
-	jobID, _ := payload["job_id"].(string)
-	if jobID == emptyValue {
-		http.Error(w, "job_id required", http.StatusBadRequest)
+	jobID, err := validateCallbackJobID(payload["job_id"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -377,9 +378,9 @@ func (h *CallbackListenerHandler) handleJobComplete(w http.ResponseWriter, _ *ht
 
 // handleJobError handles job error callbacks
 func (h *CallbackListenerHandler) handleJobError(w http.ResponseWriter, _ *http.Request, payload map[string]any, job *ScheduledJob) {
-	jobID, _ := payload["job_id"].(string)
-	if jobID == emptyValue {
-		http.Error(w, "job_id required", http.StatusBadRequest)
+	jobID, idErr := validateCallbackJobID(payload["job_id"])
+	if idErr != nil {
+		http.Error(w, idErr.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -421,7 +422,11 @@ func (h *CallbackListenerHandler) handleJobError(w http.ResponseWriter, _ *http.
 
 // handleJobStatus handles incremental status updates
 func (h *CallbackListenerHandler) handleJobStatus(w http.ResponseWriter, _ *http.Request, payload map[string]any, job *ScheduledJob) {
-	jobID, _ := payload["job_id"].(string)
+	jobID, err := validateCallbackJobID(payload["job_id"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	status, _ := payload[objects.FieldKeyStatus].(string)
 
 	CallbackListenerLog(h.logger).Debug(LogEventCallbackListenerJobStatusReceived).
@@ -454,9 +459,9 @@ func (h *CallbackListenerHandler) handleJobStatus(w http.ResponseWriter, _ *http
 
 // handleTriggerJob handles job trigger requests
 func (h *CallbackListenerHandler) handleTriggerJob(w http.ResponseWriter, r *http.Request, payload map[string]any, job *ScheduledJob) {
-	jobID, _ := payload["job_id"].(string)
-	if jobID == emptyValue {
-		http.Error(w, "job_id required", http.StatusBadRequest)
+	jobID, err := validateCallbackJobID(payload["job_id"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -490,8 +495,8 @@ func (h *CallbackListenerHandler) handleTriggerJob(w http.ResponseWriter, r *htt
 // handleEmitEvent handles event emission requests
 func (h *CallbackListenerHandler) handleEmitEvent(w http.ResponseWriter, r *http.Request, payload map[string]any, job *ScheduledJob) {
 	eventType, _ := payload[objects.FieldKeyEventType].(string)
-	if eventType == emptyValue {
-		http.Error(w, "event_type required", http.StatusBadRequest)
+	if strings.TrimSpace(eventType) == emptyValue || strings.Contains(eventType, "/") || strings.Contains(eventType, `\`) || strings.Contains(eventType, "..") {
+		http.Error(w, "event_type required and must not contain path separators", http.StatusBadRequest)
 		return
 	}
 
@@ -567,15 +572,17 @@ func (h *CallbackListenerHandler) updateActivity(payload map[string]any) {
 	}
 
 	// Track active jobs if job_id is present
-	if jobID, ok := payload["job_id"].(string); ok && jobID != emptyValue {
-		if err := concurrency.RunInLockWithLogger(
-			&h.activeJobsMu, LockNameCallbackListenerTrackJob, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-			func() error {
-				h.activeJobs[jobID] = time.Now()
-				return nil
-			},
-		); err != nil {
-			SLog(h.logger).Debug("Failed to track job under lock").WithError(err).Log()
+	if rawID, ok := payload["job_id"]; ok {
+		if jobID, err := validateCallbackJobID(rawID); err == nil {
+			if err := concurrency.RunInLockWithLogger(
+				&h.activeJobsMu, LockNameCallbackListenerTrackJob, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+				func() error {
+					h.activeJobs[jobID] = time.Now()
+					return nil
+				},
+			); err != nil {
+				SLog(h.logger).Debug("Failed to track job under lock").WithError(err).Log()
+			}
 		}
 	}
 }
@@ -656,4 +663,17 @@ func (h *CallbackListenerHandler) shutdownServer() {
 			WithFields(logErrField(err)...).
 			Log()
 	}).Run()
+}
+
+// validateCallbackJobID ensures that job_id is present and does not contain path separators or traversal sequences.
+func validateCallbackJobID(val any) (string, error) {
+	s, ok := val.(string)
+	if !ok || strings.TrimSpace(s) == "" {
+		return "", errfmt.Errorf("job_id required")
+	}
+	s = strings.TrimSpace(s)
+	if strings.Contains(s, "/") || strings.Contains(s, `\`) || strings.Contains(s, "..") {
+		return "", errfmt.Errorf("invalid job_id: path traversal prohibited")
+	}
+	return s, nil
 }
