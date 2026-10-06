@@ -18,7 +18,8 @@ func NewPPlanCmd() *cobra.Command {
 		AddExample("View backlog items for current priority plan", "%s pplan current")
 
 	pplanCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewObjectPplanCommandBuilder(), &cobra.Command{
-		Use: "pplan",
+		Use:     "pplan",
+		Aliases: []string{"plan"},
 	})
 
 	helpBuilder.ApplyToCommand(pplanCmd)

@@ -16,7 +16,7 @@ echo "Extracting CLI manifest..."
 # Also add known aliases and shorthand commands
 ./bin/zqk --help | grep -oE 'zqk [a-z][a-z0-9-]*' | awk '{print $2}' | sort -u >> "$MANIFEST"
 # Well-known root command aliases
-printf "%s\n" "auto-exec" "auto-do" "glossary" "zgrep" >> "$MANIFEST"
+printf "%s\n" "auto-exec" "auto-do" "glossary" "zgrep" "plan" >> "$MANIFEST"
 sort -u -o "$MANIFEST" "$MANIFEST"
 
 CMD_COUNT=$(wc -l < "$MANIFEST" | tr -d ' ')
