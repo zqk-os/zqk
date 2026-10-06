@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
-
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -80,21 +78,33 @@ func TestObjectIDCache_GetEntriesByKind(t *testing.T) {
 
 	secCtx := &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID}
 	t.Cleanup(func() {
-		q := caspkg.GetListingIndexWriteQueueForProjectRoot(projectRoot)
-		if q != nil {
-			_ = q.FlushAll(2 * time.Second)
-			_ = q.Shutdown()
-		}
-		_ = storage.FlushAllListingIndexesForProjectRoot(projectRoot)
-		_ = storage.WaitForWALProcessing(projectRoot, 15*time.Second)
 		resetDir, err := fileutil.MkdirTemp("", "zqk-audit-global-reset")
-		if err == nil {
-			defer fileutil.RemoveAll(resetDir)
-			_ = storage.TearDownGlobalAuditBufferForTestProjectRoot(projectRoot, resetDir, secCtx)
-		} else {
-			storage.FlushGlobalAuditBufferForProjectRoot(projectRoot)
+		if err != nil {
+			_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+				ProjectRoot:                       projectRoot,
+				StripProcessArtifacts:             true,
+				WALTimeout:                        15 * time.Second,
+				ShutdownTimeout:                   15 * time.Second,
+				DrainGlobalListingIndexQueueFirst: true,
+				GlobalListingIndexFlushTimeout:    5 * time.Second,
+				AggressiveTempProjectCleanup:      true,
+			})
+			return
 		}
-		_ = fileutil.RemoveAll(filepath.Join(projectRoot, paths.ProjectDataDir))
+		defer fileutil.RemoveAll(resetDir)
+
+		_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+			ProjectRoot:                       projectRoot,
+			StripProcessArtifacts:             true,
+			WALTimeout:                        15 * time.Second,
+			ShutdownTimeout:                   15 * time.Second,
+			TearDownGlobalAuditBuffer:         true,
+			SecCtx:                            secCtx,
+			AuditBufferResetRoot:              resetDir,
+			DrainGlobalListingIndexQueueFirst: true,
+			GlobalListingIndexFlushTimeout:    5 * time.Second,
+			AggressiveTempProjectCleanup:      true,
+		})
 	})
 
 	criteriaDir := datacell.CellCASPrimaryDir(projectRoot, "criteria")
@@ -573,31 +583,40 @@ func TestEnsureObjectIDCacheReady_StorageForWarm(t *testing.T) {
 	}
 	secCtx := &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID}
 	t.Cleanup(func() {
-		q := caspkg.GetListingIndexWriteQueueForProjectRoot(projectRoot)
-		if q != nil {
-			_ = q.FlushAll(2 * time.Second)
-			_ = q.Shutdown()
-		}
-		_ = storage.FlushAllListingIndexesForProjectRoot(projectRoot)
-		_ = storage.WaitForWALProcessing(projectRoot, 15*time.Second)
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-		defer cancel()
+		var fileStorage *storage.FileObjectStorage
 		if fs, ok := storageProvider.(*storage.FileObjectStorage); ok {
-			_ = fs.Shutdown(shutdownCtx)
+			fileStorage = fs
 		}
+
 		resetDir, err := fileutil.MkdirTemp("", "zqk-audit-global-reset")
-		if err == nil {
-			defer fileutil.RemoveAll(resetDir)
-			_ = storage.TearDownGlobalAuditBufferForTestProjectRoot(projectRoot, resetDir, secCtx)
-		} else {
-			storage.FlushGlobalAuditBufferForProjectRoot(projectRoot)
+		if err != nil {
+			_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+				ProjectRoot:                       projectRoot,
+				FileStorage:                       fileStorage,
+				StripProcessArtifacts:             true,
+				WALTimeout:                        15 * time.Second,
+				ShutdownTimeout:                   15 * time.Second,
+				DrainGlobalListingIndexQueueFirst: true,
+				GlobalListingIndexFlushTimeout:    5 * time.Second,
+				AggressiveTempProjectCleanup:      true,
+			})
+			return
 		}
-		_ = fileutil.RemoveAll(filepath.Join(projectRoot, paths.ProjectDataDir))
-		if fs, ok := storageProvider.(*storage.FileObjectStorage); ok {
-			if cleanup := fs.GetTestCleanup(); cleanup != nil {
-				cleanup()
-			}
-		}
+		defer fileutil.RemoveAll(resetDir)
+
+		_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+			ProjectRoot:                       projectRoot,
+			FileStorage:                       fileStorage,
+			StripProcessArtifacts:             true,
+			WALTimeout:                        15 * time.Second,
+			ShutdownTimeout:                   15 * time.Second,
+			TearDownGlobalAuditBuffer:         true,
+			SecCtx:                            secCtx,
+			AuditBufferResetRoot:              resetDir,
+			DrainGlobalListingIndexQueueFirst: true,
+			GlobalListingIndexFlushTimeout:    5 * time.Second,
+			AggressiveTempProjectCleanup:      true,
+		})
 	})
 
 	// Ensure cache ready with this storage so it gets warmed
@@ -732,21 +751,33 @@ func TestObjectIDCache_BuildCache_BuildsReverseReferenceIndex(t *testing.T) {
 		t.Fatalf("SetupTestEnvironment: %v", err)
 	}
 	t.Cleanup(func() {
-		q := caspkg.GetListingIndexWriteQueueForProjectRoot(projectRoot)
-		if q != nil {
-			_ = q.FlushAll(2 * time.Second)
-			_ = q.Shutdown()
-		}
-		_ = storage.FlushAllListingIndexesForProjectRoot(projectRoot)
-		_ = storage.WaitForWALProcessing(projectRoot, 15*time.Second)
 		resetDir, err := fileutil.MkdirTemp("", "zqk-audit-global-reset")
-		if err == nil {
-			defer fileutil.RemoveAll(resetDir)
-			_ = storage.TearDownGlobalAuditBufferForTestProjectRoot(projectRoot, resetDir, &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID})
-		} else {
-			storage.FlushGlobalAuditBufferForProjectRoot(projectRoot)
+		if err != nil {
+			_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+				ProjectRoot:                       projectRoot,
+				StripProcessArtifacts:             true,
+				WALTimeout:                        15 * time.Second,
+				ShutdownTimeout:                   15 * time.Second,
+				DrainGlobalListingIndexQueueFirst: true,
+				GlobalListingIndexFlushTimeout:    5 * time.Second,
+				AggressiveTempProjectCleanup:      true,
+			})
+			return
 		}
-		_ = fileutil.RemoveAll(filepath.Join(projectRoot, paths.ProjectDataDir))
+		defer fileutil.RemoveAll(resetDir)
+
+		_ = testkit.RunStandardTeardown(testkit.TeardownOptions{
+			ProjectRoot:                       projectRoot,
+			StripProcessArtifacts:             true,
+			WALTimeout:                        15 * time.Second,
+			ShutdownTimeout:                   15 * time.Second,
+			TearDownGlobalAuditBuffer:         true,
+			SecCtx:                            &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID},
+			AuditBufferResetRoot:              resetDir,
+			DrainGlobalListingIndexQueueFirst: true,
+			GlobalListingIndexFlushTimeout:    5 * time.Second,
+			AggressiveTempProjectCleanup:      true,
+		})
 	})
 
 	// Create at least one kind dir so object ID cache build has something to scan
