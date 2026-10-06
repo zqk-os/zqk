@@ -176,6 +176,13 @@ func isIgnoredNestedProjectRoot(dir string) bool {
 			return true
 		}
 	}
+	if evalTemp, err := filepath.EvalSymlinks(tempDir); err == nil && evalTemp != tempDir {
+		for p := filepath.Clean(evalTemp); p != "/" && p != "." && p != filepath.Dir(p); p = filepath.Dir(p) {
+			if d == p {
+				return true
+			}
+		}
+	}
 	slash := filepath.ToSlash(d)
 	for _, part := range strings.Split(slash, "/") {
 		if part == "testdata" || strings.HasPrefix(part, ".tmp") {
