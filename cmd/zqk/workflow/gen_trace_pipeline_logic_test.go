@@ -248,3 +248,86 @@ func TestGenerateTracePipelineBundle_MandatoryDocumentationCriteria(t *testing.T
 		t.Error("expected base criteria to include mandatory documentation and doc_entry criterion (POL-DOC-001)")
 	}
 }
+
+// TestGenerateTracePipelineBundle_Issue504_GoalSetsGoalRefsAndNoDummyPath guards against
+// Issue #504 where BLIs lacked goal_refs and test cases contained hardcoded dummy paths.
+func TestGenerateTracePipelineBundle_Issue504_GoalSetsGoalRefsAndNoDummyPath(t *testing.T) {
+	goalObj := map[string]any{
+		"_kind":               objects.KindGoal,
+		objects.FieldKeyTitle: "Enterprise Integration Engine",
+	}
+
+	bundle, _, _ := generateTracePipelineBundle("GOAL-ENTERPRISE-001", goalObj, nil)
+	if bundle == nil {
+		t.Fatal("expected bundle for Goal target")
+	}
+
+	if len(bundle.Objects.BacklogItems) != 1 {
+		t.Fatalf("expected 1 BacklogItem, got %d", len(bundle.Objects.BacklogItems))
+	}
+	bli := bundle.Objects.BacklogItems[0]
+	if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-ENTERPRISE-001" {
+		t.Errorf("expected BacklogItem GoalRefs ['GOAL-ENTERPRISE-001'], got %v", bli.GoalRefs)
+	}
+
+	if len(bundle.Objects.TestCases) != 1 {
+		t.Fatalf("expected 1 TestCase, got %d", len(bundle.Objects.TestCases))
+	}
+	tc := bundle.Objects.TestCases[0]
+	if tc.PathOrID != "" {
+		t.Errorf("expected empty PathOrID (no dummy path), got %q", tc.PathOrID)
+	}
+}
+
+// TestGenerateTracePipelineBundle_Issue504_ReusesExistingRequirementsAndComponents
+// guards against duplicate slice synthesis when requirements or test cases already exist.
+func TestGenerateTracePipelineBundle_Issue504_ReusesExistingRequirementsAndComponents(t *testing.T) {
+	goalObj := map[string]any{
+		"_kind":               objects.KindGoal,
+		objects.FieldKeyTitle: "Existing Pipeline Goal",
+	}
+
+	// Neighbors contain an already existing requirement, testcase, and bli
+	neighbors := []map[string]any{
+		{
+			"_kind":            objects.KindRequirement,
+			objects.FieldKeyID: "REQ-EXISTING-001",
+		},
+		{
+			"_kind":            objects.KindTestCase,
+			objects.FieldKeyID: "TST-EXISTING-001",
+		},
+		{
+			"_kind":            objects.KindBacklogItem,
+			objects.FieldKeyID: "BLI-EXISTING-001",
+		},
+	}
+
+	bundle, _, needCriteria := generateTracePipelineBundle("GOAL-EXISTING-001", goalObj, neighbors)
+	if bundle == nil {
+		t.Fatal("expected bundle for criteria generation")
+	}
+	if !needCriteria {
+		t.Fatal("expected needCriteria to be true")
+	}
+
+	// Should NOT mint a new Requirement because REQ-EXISTING-001 was found in neighbors
+	if len(bundle.Objects.Requirements) != 0 {
+		t.Errorf("expected 0 new Requirements (reuse existing), got %d", len(bundle.Objects.Requirements))
+	}
+
+	// Criteria should link to the existing requirement
+	for _, crit := range bundle.Objects.Criteria {
+		if crit.RequirementRef != "REQ-EXISTING-001" {
+			t.Errorf("expected Criteria RequirementRef 'REQ-EXISTING-001', got %q", crit.RequirementRef)
+		}
+	}
+
+	// Should NOT mint duplicate test case or BLI
+	if len(bundle.Objects.TestCases) != 0 {
+		t.Errorf("expected 0 new TestCases (reuse existing), got %d", len(bundle.Objects.TestCases))
+	}
+	if len(bundle.Objects.BacklogItems) != 0 {
+		t.Errorf("expected 0 new BacklogItems (reuse existing), got %d", len(bundle.Objects.BacklogItems))
+	}
+}

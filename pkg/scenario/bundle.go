@@ -140,6 +140,7 @@ type BacklogTemplate struct {
 	CriteriaRefs    []string `yaml:"criteria_refs,omitempty" json:"criteria_refs,omitempty"`
 	TestCaseRefs    []string `yaml:"test_case_refs,omitempty" json:"test_case_refs,omitempty"`
 	MilestoneRefs   []string `yaml:"milestone_refs,omitempty" json:"milestone_refs,omitempty"`
+	GoalRefs        []string `yaml:"goal_refs,omitempty" json:"goal_refs,omitempty"`
 	DocEntryRefs    []string `yaml:"doc_entry_refs,omitempty" json:"doc_entry_refs,omitempty"`
 	KindUnderTest   string   `yaml:"kind_under_test,omitempty" json:"kind_under_test,omitempty"`
 	Priority        string   `yaml:"priority,omitempty" json:"priority,omitempty"`

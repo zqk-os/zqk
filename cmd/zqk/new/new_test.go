@@ -373,15 +373,13 @@ func TestAutoTracePipeline_BLI1789335658105469000_Discipline(t *testing.T) {
 		t.Fatal("object subcommand not found")
 	}
 
-	// 1. Qualifying kinds (requirement, goal, milestone) trigger trace pipeline in non-test mode
-	for _, kind := range []string{objects.KindRequirement, objects.KindGoal, objects.KindMilestone} {
-		if !shouldAutoTracePipelineConfigured(leaf, kind, false, false) {
-			t.Errorf("kind %s should auto-run trace pipeline in standard production mode", kind)
-		}
+	// 1. Qualifying kind (requirement only) triggers trace pipeline in non-test mode (Issue #504)
+	if !shouldAutoTracePipelineConfigured(leaf, objects.KindRequirement, false, false) {
+		t.Errorf("kind requirement should auto-run trace pipeline in standard production mode")
 	}
 
-	// 2. Non-qualifying kinds never trigger trace pipeline
-	for _, kind := range []string{objects.KindBacklogItem, objects.KindCriteria, objects.KindTestCase, objects.KindAgentTask} {
+	// 2. Non-qualifying kinds (including strategic goals, milestones, BLIs, criteria) never trigger trace pipeline
+	for _, kind := range []string{objects.KindGoal, objects.KindMilestone, objects.KindBacklogItem, objects.KindCriteria, objects.KindTestCase, objects.KindAgentTask} {
 		if shouldAutoTracePipelineConfigured(leaf, kind, false, false) {
 			t.Errorf("kind %s must never auto-run trace pipeline", kind)
 		}
@@ -631,5 +629,29 @@ func TestNewEpicConvenienceCmd(t *testing.T) {
 	}
 	if cmd.Name() != "epic" {
 		t.Fatalf("expected command name 'epic', got %s", cmd.Name())
+	}
+}
+
+func TestShouldAutoTracePipeline_Issue504_OnlyRequirements(t *testing.T) {
+	// Requirements trigger auto-trace outside test environments
+	if !shouldAutoTracePipelineConfigured(nil, objects.KindRequirement, false, false) {
+		t.Errorf("expected KindRequirement to trigger auto-trace when not in test")
+	}
+
+	// Goals must NOT trigger auto-trace (Issue #504)
+	if shouldAutoTracePipelineConfigured(nil, objects.KindGoal, false, false) {
+		t.Errorf("expected KindGoal NOT to trigger auto-trace")
+	}
+
+	// Milestones must NOT trigger auto-trace (Issue #504)
+	if shouldAutoTracePipelineConfigured(nil, objects.KindMilestone, false, false) {
+		t.Errorf("expected KindMilestone NOT to trigger auto-trace")
+	}
+
+	// Other kinds must NOT trigger auto-trace
+	for _, kind := range []string{objects.KindBacklogItem, objects.KindTestCase, objects.KindPriorityPlan, objects.KindEpic} {
+		if shouldAutoTracePipelineConfigured(nil, kind, false, false) {
+			t.Errorf("expected %s NOT to trigger auto-trace", kind)
+		}
 	}
 }

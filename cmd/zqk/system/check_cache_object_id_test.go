@@ -737,6 +737,7 @@ func TestObjectIDCache_BuildCache_BuildsReverseReferenceIndex(t *testing.T) {
 			_ = q.Shutdown()
 		}
 		storage.FlushGlobalAuditBufferForProjectRoot(projectRoot)
+		time.Sleep(50 * time.Millisecond)
 	})
 
 	// Create at least one kind dir so object ID cache build has something to scan
