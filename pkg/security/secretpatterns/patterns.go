@@ -31,8 +31,8 @@ var (
 	GitHubOAuthRegex          = regexp.MustCompile(`\bgho_[0-9a-zA-Z]{36}\b`)
 	GitHubFineGrainedPATRegex = regexp.MustCompile(`\bgithub_pat_[a-zA-Z0-9_]{82}\b`)
 	PrivateKeyRegex           = regexp.MustCompile(`-----BEGIN (?:[A-Z0-9_-]+ )*PRIVATE KEY-----`)
-	SlackTokenRegex   = regexp.MustCompile(`\bxox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}\b`)
-	SlackWebhookRegex = regexp.MustCompile(slackWebhookPattern())
+	SlackTokenRegex           = regexp.MustCompile(`\bxox[baprs]-[0-9]{12}-[0-9]{12}-[a-zA-Z0-9]{24}\b`)
+	SlackWebhookRegex         = regexp.MustCompile(slackWebhookPattern())
 )
 
 func slackWebhookPattern() string {
