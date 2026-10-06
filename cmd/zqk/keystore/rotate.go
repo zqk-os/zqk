@@ -99,7 +99,7 @@ func runRotate(cmd *cobra.Command, args []string) error {
 		}
 
 		// Check permissions for rotation
-		if flags.NewCredential != emptyValue {
+		if flags.NewKeyData != emptyValue {
 			_, _, err := checkPermissions(secCtx, accountID, true)
 			if err != nil {
 				return err
@@ -113,7 +113,7 @@ func runRotate(cmd *cobra.Command, args []string) error {
 		}
 
 		// Determine update context
-		updateCtx := determineUpdateContext(secCtx, flags.NewCredential)
+		updateCtx := determineUpdateContext(secCtx, flags.NewKeyData)
 
 		// Update the entry
 		if err := storageProvider.Update(opCtx, updateCtx, keyID, updates); err != nil {

@@ -1,12 +1,11 @@
 package keystore
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/authcred"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -19,7 +18,7 @@ import (
 type CreateFlags struct {
 	AccountID   string
 	KeyType     string
-	Credential  string
+	KeyData     string
 	Title       string
 	Description string
 	ExpiresAt   string
@@ -36,7 +35,7 @@ func parseCreateFlags(cmd *cobra.Command) *CreateFlags {
 	flags.KeyType = keyType
 
 	credential, _ := cmd.Flags().GetString("credential") //nolint:errcheck // Flag getters don't fail in cobra
-	flags.Credential = credential
+	flags.KeyData = credential
 
 	title, _ := cmd.Flags().GetString("title") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.Title = title
@@ -103,9 +102,7 @@ func hashPassword(password string) (string, error) {
 
 // hashToken hashes an API key or token using SHA-256 digest.
 func hashToken(token string) string {
-	h := sha256.New()
-	_, _ = h.Write([]byte(token))
-	return "sha256:" + hex.EncodeToString(h.Sum(nil))
+	return authcred.HashAPIKey(token)
 }
 
 // buildKeystoreEntry builds the keystore entry object

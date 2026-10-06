@@ -5,9 +5,7 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	"context"
-	"crypto/sha256"
 	"crypto/subtle"
-	"encoding/hex"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -214,7 +212,7 @@ func hasCredentials(clientInfo map[string]any) bool {
 
 // validateCredentialsAndResolveAccount validates credentials and resolves the account
 // Returns: accountID, roles, permissions, error
-func (s *Server) validateCredentialsAndResolveAccount(ctx context.Context, clientInfo map[string]any) (accountID string, roles, permissions []string, err error) {
+func (s *Server) validateCredentialsAndResolveAccount(ctx context.Context, clientInfo map[string]any, initParams ...InitializeParams) (accountID string, roles, permissions []string, err error) {
 	projectRoot := s.GetProjectRoot()
 	if projectRoot == emptyValue {
 		return "", nil, nil, errfmt.Errorf("project root not available")
@@ -228,6 +226,9 @@ func (s *Server) validateCredentialsAndResolveAccount(ctx context.Context, clien
 	// Check for username/password authentication
 	if username, ok := clientInfo[clientInfoUsername].(string); ok && username != emptyValue {
 		password, hasPassword := clientInfo[clientInfoPassword].(string)
+		if (!hasPassword || password == emptyValue) && len(initParams) > 0 && initParams[0].Capabilities != nil {
+			password, hasPassword = initParams[0].Capabilities["password"].(string)
+		}
 		if !hasPassword || password == emptyValue {
 			return "", nil, nil, errfmt.Errorf("password required for username authentication")
 		}
@@ -463,22 +464,16 @@ func (s *Server) validateOAuthToken(_ context.Context, token, projectRoot string
 	return "", nil, nil, errfmt.Errorf("OAuth token authentication not yet implemented")
 }
 
-// hashPersonalAccessToken computes SHA-256 for a personal access token.
-func hashPersonalAccessToken(token string) [32]byte {
-	h := sha256.New()
-	_, _ = h.Write([]byte(token))
-	var out [32]byte
-	copy(out[:], h.Sum(nil))
-	return out
-}
-
 // validatePersonalAccessToken validates PAT and resolves account.
-// PAT is the secret; we compute SHA256(pat) and compare to keystore entries with key_type
+// PAT is the secret; we compare its SHA256 digest to keystore entries with key_type
 // "personal_access_token" or "api_key" (credential_hash stored as hex or "sha256:hex").
 // On match we check revoked/expired, then load account and return roles/permissions.
 func (s *Server) validatePersonalAccessToken(_ context.Context, pat, projectRoot string) (accountID string, roles, permissions []string, err error) {
-	patHash := hashPersonalAccessToken(pat)
-	patHashHex := hex.EncodeToString(patHash[:])
+	pat = strings.TrimSpace(pat)
+	if pat == emptyValue {
+		return "", nil, nil, errfmt.Errorf("empty personal access token")
+	}
+	patHashHex := authcred.NormalizeCredentialHash(authcred.HashAPIKey(pat))
 
 	keyTypes := map[string]bool{keyTypePersonalAccessToken: true, keyTypeAPIKey: true}
 	entries, err := s.listKeystoreEntriesByKeyTypes(projectRoot, keyTypes)

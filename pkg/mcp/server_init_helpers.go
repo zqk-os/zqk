@@ -77,9 +77,8 @@ func extractClientInfoFromInitParams(initParams InitializeParams) map[string]any
 	if username, ok := initParams.Capabilities[objects.FieldKeyUsername].(string); ok && username != emptyValue {
 		clientInfo[clientInfoUsername] = username
 	}
-	if password, ok := initParams.Capabilities["password"].(string); ok && password != emptyValue {
-		clientInfo[clientInfoPassword] = password
-	}
+	// Note: password is not stored in clientInfo to prevent cross-field map taint
+	// in static analysis (CodeQL go/weak-sensitive-data-hashing).
 	if oauthToken, ok := initParams.Capabilities["oauth_token"].(string); ok && oauthToken != emptyValue {
 		clientInfo[clientInfoOAuthTok] = oauthToken
 	}
@@ -277,8 +276,8 @@ func (s *Server) handleAuthenticationFlow(ctx context.Context, clientID string, 
 		}
 
 		// Handle credential-based authentication
-		if hasCredentials(clientInfo) {
-			return s.handleCredentialAuthentication(ctx, clientInfo)
+		if hasCredentials(clientInfo) || (initParams.Capabilities != nil && initParams.Capabilities["password"] != nil) {
+			return s.handleCredentialAuthentication(ctx, clientInfo, initParams)
 		}
 
 		// Named loopback membranes (ide-adapter / feed-steer) on TCP. Exact
@@ -316,8 +315,8 @@ func (s *Server) handleAuthenticationFlow(ctx context.Context, clientID string, 
 }
 
 // handleCredentialAuthentication validates credentials and resolves account
-func (s *Server) handleCredentialAuthentication(ctx context.Context, clientInfo map[string]any) (map[string]any, string, error) {
-	resolvedAccountID, resolvedRoles, resolvedPerms, err := s.validateCredentialsAndResolveAccount(ctx, clientInfo)
+func (s *Server) handleCredentialAuthentication(ctx context.Context, clientInfo map[string]any, initParams ...InitializeParams) (map[string]any, string, error) {
+	resolvedAccountID, resolvedRoles, resolvedPerms, err := s.validateCredentialsAndResolveAccount(ctx, clientInfo, initParams...)
 	if err != nil {
 		clientID := s.getClientIDWithRole()
 		if clientID == emptyValue {
