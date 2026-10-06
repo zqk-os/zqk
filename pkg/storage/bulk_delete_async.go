@@ -179,11 +179,27 @@ func (m *BulkDeleteJobManager) ExecuteJob(
 			m.jobsCompletedTotal.Add(1)
 		}).
 		StartSimple(func() {
+			if m.storage == nil {
+				StorageLog(m.logger).Error(LogEventStorageBulkDeleteAsyncJobFailedErr, errfmt.Errorf("storage provider is nil")).
+					JobID(jobID).
+					Log()
+				_ = concurrency.RunInLockWithLogger(
+					&job.mu, locknames.LockNameBulkDeleteJobFailed, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+					func() error {
+						job.Status = bulkDeleteJobStatusFailed
+						return nil
+					},
+				)
+				return
+			}
 
 			// Use optimized bulk delete if available
 			if fileStorage, ok := m.storage.(*FileObjectStorage); ok {
 				result, err := fileStorage.BulkDeleteOptimized(ctx, secCtx, job.ObjectIDs, cascade, maxWorkers)
-				if err != nil {
+				if err != nil || result == nil {
+					if err == nil {
+						err = errfmt.Errorf("bulk delete returned nil result")
+					}
 					lockErr := concurrency.RunInLockWithLogger(
 						&job.mu, locknames.LockNameBulkDeleteJobFailed, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 						func() error {
@@ -220,7 +236,10 @@ func (m *BulkDeleteJobManager) ExecuteJob(
 			} else {
 				// Fallback to standard bulk delete
 				result, err := m.storage.BulkDelete(ctx, secCtx, job.ObjectIDs, cascade)
-				if err != nil {
+				if err != nil || result == nil {
+					if err == nil {
+						err = errfmt.Errorf("bulk delete returned nil result")
+					}
 					lockErr := concurrency.RunInLockWithLogger(
 						&job.mu, locknames.LockNameBulkDeleteJobFailed, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 						func() error {

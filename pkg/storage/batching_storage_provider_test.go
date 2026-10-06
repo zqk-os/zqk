@@ -42,6 +42,12 @@ func (m *mockStorageProvider) BulkCreate(ctx context.Context, secCtx *pkgctx.Sec
 	return &BulkResult{Results: objs, SuccessCount: len(objs), TotalCount: len(objs)}, nil
 }
 
+func (m *mockStorageProvider) BulkDelete(ctx context.Context, secCtx *pkgctx.SecurityContext, ids []string, cascade bool) (*BulkResult, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return &BulkResult{SuccessCount: len(ids), TotalCount: len(ids)}, nil
+}
+
 func TestBatchingStorageProvider_Batching(t *testing.T) {
 	mock := &mockStorageProvider{}
 	batcher := NewBatchingObjectStorage(mock)
