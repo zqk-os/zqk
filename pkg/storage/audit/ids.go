@@ -102,8 +102,7 @@ func ExpandIDRange(prefix, separator, rangeStr string) []string {
 		return []string{rangeStr}
 	}
 
-	count := end - start + 1
-	ids := make([]string, 0, count)
+	ids := make([]string, 0)
 	for i := start; i <= end; i++ {
 		ids = append(ids, fmt.Sprintf("%s%d", prefix, i))
 	}

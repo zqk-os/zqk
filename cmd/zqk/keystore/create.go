@@ -80,9 +80,14 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		}
 
 		// Hash the credential
-		credentialHash, err := hashCredentialForCreate(flags.Credential, flags.KeyType)
-		if err != nil {
-			return err
+		var credentialHash string
+		if flags.KeyType == "password" {
+			credentialHash, err = hashPassword(flags.Credential)
+			if err != nil {
+				return err
+			}
+		} else {
+			credentialHash = hashToken(flags.Credential)
 		}
 
 		// Build keystore entry (salt is always empty for both password and token hashing)

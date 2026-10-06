@@ -103,16 +103,9 @@ func hashPassword(password string) (string, error) {
 
 // hashToken hashes an API key or token using SHA-256 digest.
 func hashToken(token string) string {
-	hashBytes := sha256.Sum256([]byte(token))
-	return "sha256:" + hex.EncodeToString(hashBytes[:])
-}
-
-// hashCredentialForCreate hashes a credential based on key type (for create)
-func hashCredentialForCreate(credential, keyType string) (hash string, err error) {
-	if keyType == "password" {
-		return hashPassword(credential)
-	}
-	return hashToken(credential), nil
+	h := sha256.New()
+	_, _ = h.Write([]byte(token))
+	return "sha256:" + hex.EncodeToString(h.Sum(nil))
 }
 
 // buildKeystoreEntry builds the keystore entry object

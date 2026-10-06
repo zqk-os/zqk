@@ -75,10 +75,7 @@ func runIssue(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		credentialHash, err := hashCredentialForCreate(secret, "api_key")
-		if err != nil {
-			return err
-		}
+		credentialHash := hashToken(secret)
 
 		flags := &CreateFlags{
 			AccountID:   accountID,

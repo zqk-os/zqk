@@ -465,7 +465,11 @@ func (s *Server) validateOAuthToken(_ context.Context, token, projectRoot string
 
 // hashPersonalAccessToken computes SHA-256 for a personal access token.
 func hashPersonalAccessToken(token string) [32]byte {
-	return sha256.Sum256([]byte(token))
+	h := sha256.New()
+	_, _ = h.Write([]byte(token))
+	var out [32]byte
+	copy(out[:], h.Sum(nil))
+	return out
 }
 
 // validatePersonalAccessToken validates PAT and resolves account.
