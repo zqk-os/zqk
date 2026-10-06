@@ -29,9 +29,12 @@ A frequent point of confusion is the dual usage of the word "Pack" in modern age
 | Dimension | Kernel Domain Packs (`packs/<domain>/`) | Swarm Orchestration Packs (`swarm.yaml`) |
 | :--- | :--- | :--- |
 | **Artifact Type** | Go source code, schemas, lifecycles, builders | Declarative YAML configuration |
-| **Lifecycle** | Compile-time static linking into `zqk` | Runtime interpretation by Swarm Engine |
-| **Purpose** | Extends the Knowledge Kernel type system | Choreographs multi-agent teamwork & seats |
-| **Modification** | Requires recompilation (`make`) | Dynamic; author and execute immediately |
+| **Lifecycle** | Compile-time static linking into `zqk` (Go code) / Dynamic schema indexing (spec metadata) | Runtime interpretation by Swarm Engine |
+| **Purpose** | Extends the Knowledge Kernel type system & behavior | Choreographs multi-agent teamwork & seats |
+| **Modification** | Spec metadata: Dynamic loading without rebuild; Go code (builders/handlers): Recompilation required (`make`) | Dynamic; author and execute immediately |
+
+> [!NOTE]
+> **Dynamic Spec Loading vs. Go Binary Recompilation:** When a pack's declarative specification metadata (YAML schemas in `specs/objects/`, lifecycle state machines in `specs/lifecycles/`, and field definitions) is installed or registered (e.g. via `zqk kind-pack`), the Knowledge Kernel dynamically indexes and validates it without rebuilding the binary. However, new compiled Go code—such as custom command handlers, builders (`bldr_cli_cmd_v1`), or native kernel hooks—requires static recompilation (`make build`).
 
 ---
 

@@ -33,22 +33,27 @@ This document establishes the **authoritative ground rules, naming taxonomy, beh
    - **New Drift Permitted:** 0 (enforced by `zqk system validate-command-specs`)
 
 ### Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy
-1. **Domain Hierarchy & Approved Ergonomics Shortcuts:**  
-   Primary root-level commands represent distinct architectural **domains** (`system`, `agent`, `workflow`, `object`, `test`, `job`, `service`, `vendor`). Unqualified verbs are prohibited at the root level unless explicitly designated as approved universal ergonomics shortcuts:
-   - **`zqk do`**: Autonomous CAP loop execution shorthand (`zqk workflow vds do`).
-   - **`zqk inspect`**: Interactive TUI Object Inspector and Policy Studio shortcut (`zqk object inspect`).
-   - **`zqk mutate`**: ZQL declarative mutation engine shortcut (`zqk object mutate`).
-   - **`zqk query`**: ZPARQL graph query language engine shortcut (`zqk graph query`).
-   - **`zqk validate`**: Invariant gate and schema validation shortcut (`zqk system validate`).
-   - **`zqk rollback`**: Transaction rollback journal restoration shortcut (`zqk object rollback`).
-   - **`zqk completion`**: Shell completion script generator (`zqk system completion`).
-   - **`zqk sync`**: Storage CAS and P2P mesh synchronization shortcut (`zqk mesh sync`).
-   - **`zqk pre-commit`**: Local pre-commit release gate and secret scan runner (`zqk system pre-commit`).
-   - **`zqk learn`**: Institutional memory and operational lessons capture shortcut (`zqk agent learn`).
-   - **`zqk new`**: Scaffolding wizard for new packs, adapters, and schemas (`zqk object new`).
-   - **`zqk reports`**: Quality evaluation and engineering velocity reporting tool (`zqk system reports`).
-   - **`zqk tray`**: macOS status bar daemon companion (`zqk service tray`).
-   - **`zqk join`**: Multi-domain relational projection and graph join engine (`zqk graph join`).
+1. **Root Taxonomy Tiers & Approved Ergonomics Shortcuts:**  
+   Every command at the root level must belong to one of five approved taxonomy tiers. Unspecced or unapproved root verbs are prohibited:
+   - **Tier 1: Core Architectural Domains:** Primary subsystems providing full lifecycle management (`system`, `agent`, `workflow`, `object`, `test`, `job`, `service`, `vendor`, `mesh`, `graph`, `state`, `ambient`, `scheduler`, `daemon`, `pack`, `mcp`, `keystore`, `kernel`).
+   - **Tier 2: Day-0 Onboarding & Swarms:** Zero-friction developer entry points (`init`, `quickstart`, `run`).
+   - **Tier 3: Everyday Utilities & Inspection:** High-frequency operational verbs and helpers (`auth`, `explain`, `grep`, `ui`, `version`, `pplan`).
+   - **Tier 4: Approved Ergonomics Shortcuts:** Exactly 14 universal root shortcuts aliased to domain commands:
+     - **`zqk do`**: Autonomous CAP loop execution shorthand (`zqk workflow vds do`).
+     - **`zqk inspect`**: Interactive TUI Object Inspector and Policy Studio shortcut (`zqk object inspect`).
+     - **`zqk mutate`**: ZQL declarative mutation engine shortcut (`zqk object mutate`).
+     - **`zqk query`**: ZPARQL graph query language engine shortcut (`zqk graph query`).
+     - **`zqk validate`**: Invariant gate and schema validation shortcut (`zqk system validate`).
+     - **`zqk rollback`**: Transaction rollback journal restoration shortcut (`zqk object rollback`).
+     - **`zqk completion`**: Shell completion script generator (`zqk system completion`).
+     - **`zqk sync`**: Storage CAS and P2P mesh synchronization shortcut (`zqk mesh sync`).
+     - **`zqk pre-commit`**: Local pre-commit release gate and secret scan runner (`zqk system pre-commit`).
+     - **`zqk learn`**: Institutional memory and operational lessons capture shortcut (`zqk agent learn`).
+     - **`zqk new`**: Scaffolding wizard for new packs, adapters, and schemas (`zqk object new`).
+     - **`zqk reports`**: Quality evaluation and engineering velocity reporting tool (`zqk system reports`).
+     - **`zqk tray`**: macOS status bar daemon companion (`zqk service tray`).
+     - **`zqk join`**: Multi-domain relational projection and graph join engine (`zqk graph join`).
+   - **Tier 5: Specialized & Extension Domains:** Deep operational modules and admin surfaces cataloged under `.zqk/cli/command_spec_coverage_baseline.json` and ratcheted toward 100% spec parity (`matrix`, `kind-pack`, `inbox`, `intake`, `feed`, `ci`, `docman`, `domain`, `ontology`, `ops`, `organizational`, `semantic`, `spec`, `swarm`, `convergence`, `observer`, `automation`, `callback`).
 2. **Hierarchical Naming:**  
    Subcommands must follow either:
    - `<domain> <resource> <verb>` (e.g. `zqk object requirement create`, `zqk job trigger list`)
@@ -94,24 +99,69 @@ All commands must implement the standard **Command DNA**:
 
 ## 3. Canonical Domain Taxonomy Matrix
 
-> **Implementation Note (Current State):** The canonical taxonomy below is an aspirational governance target. The current CLI surface (`cmd/zqk/`) includes additional root commands beyond the approved list. These grandfathered or legacy commands are actively under review for consolidation, retirement, or explicit approval.
+> **Implementation Note (Current State):** The canonical taxonomy below defines the approved classification and responsibilities for all root commands in `cmd/zqk/`. Core domains, Day-0 entry points, and ergonomics shortcuts provide the stable primary user interface, while specialized/extension domains are managed under `.zqk/cli/command_spec_coverage_baseline.json` and ratcheted toward 100% declarative specification parity.
 
-| Domain Namespace | Primary Responsibilities | Example Commands |
-| :--- | :--- | :--- |
-| **`zqk init`** | Zero-friction greenfield project knowledge kernel initialization | `init`, `init my-project` |
-| **`zqk run`** | Portable multi-agent swarm package execution (local or remote Git) | `run swarm.yaml`, `run https://github.com/org/swarm` |
-| **`zqk ui`** | Interactive full-screen terminal mission control console (state, audit, swarm, pm, metrics, scheduler) | `ui`, `ui --tab pm`, `ui --tab metrics` |
-| **`zqk state`** | Knowledge kernel state graph inspection, audit journals, time-series telemetry, and live streaming | `state stream --dashboard`, `state tree`, `state journal`, `state tsdb` |
-| **`zqk grep`** | In-process trigram and AST code search | `grep "Pattern" pkg/`, `grep --ast "func Test*"` |
-| **`zqk system`** | Host environment, kernel health, resource hygiene, spec validation, initialization | `system check`, `system resource-hygiene`, `system init`, `system validate-command-specs` |
-| **`zqk workflow`** | Process flow, next-action discovery, pipeline generation, VDS gating | `workflow whats-next`, `workflow gen-trace-pipeline`, `workflow vds evaluate` |
-| **`zqk object`** | Full CRUD, relationship traversal, draft plane promotion across all kernel objects | `object get <id>`, `object list <kind>`, `object create <kind>`, `object promote <id>` |
-| **`zqk agent`** | Multi-agent swarm orchestration, seating, task claims, execution delegation | `agent claim-work`, `agent orchestrate`, `agent prepare-context` |
-| **`zqk test`** | Test execution, requirement-to-test verification, test suite dashboards | `test run <tst-id>`, `test dashboard`, `test matrix` |
-| **`zqk job`** | Background scheduler job triggers, queues, history, and status | `job list`, `job trigger <id>`, `job status <id>` |
-| **`zqk service`** | Persistent daemon lifecycles, MCP service supervise, socket management | `service start`, `service status`, `service stop` |
-| **`zqk vendor`** | Isolated third-party adapters and IDE integration shims | `vendor cursor paste`, `vendor vscode register` |
-| **`zqk ambient`** | Ambient filesystem monitoring, metric waves, telemetry capture | `ambient wave`, `ambient status` |
+| Command / Domain | Tier | Primary Responsibilities | Example Commands |
+| :--- | :--- | :--- | :--- |
+| **`zqk init`** | Day-0 Onboarding | Greenfield project knowledge kernel initialization | `init`, `init my-project` |
+| **`zqk quickstart`** | Day-0 Onboarding | Interactive zero-friction project onboarding and quickstart guide | `quickstart`, `quickstart --agent` |
+| **`zqk run`** | Day-0 / Swarms | Portable multi-agent swarm package execution (local or remote Git) | `run swarm.yaml`, `run https://github.com/org/swarm` |
+| **`zqk auth`** | Everyday Utility | Interactive session authentication and credential token management | `auth login`, `auth logout`, `auth status` |
+| **`zqk explain`** | Everyday Utility | Progressive disclosure acronym explainer and ontology glossary | `explain VDS`, `explain CAS`, `explain BLI` |
+| **`zqk grep`** | Everyday Utility | In-process trigram and polyglot AST code search engine | `grep "Pattern" pkg/`, `grep --ast "func Test*"` |
+| **`zqk pplan`** | Everyday Utility | Priority plan everyday convenience shortcut | `pplan current`, `pplan next`, `pplan add` |
+| **`zqk ui`** | Everyday Utility | Full-screen terminal mission control console (state, audit, swarm, PM, metrics) | `ui`, `ui -w`, `ui --tab metrics` |
+| **`zqk version`** | Everyday Utility | Output version, commit hash, build timestamp, and license info | `version`, `version --json` |
+| **`zqk system`** | Core Domain | Host environment, kernel health, resource hygiene, spec validation, initialization | `system check`, `system resource-hygiene`, `system validate-command-specs` |
+| **`zqk workflow`** | Core Domain | Process flow, next-action discovery, pipeline generation, VDS gating | `workflow whats-next`, `workflow gen-trace-pipeline`, `workflow vds evaluate` |
+| **`zqk object`** | Core Domain | Full CRUD, relationship traversal, draft plane promotion across all kernel objects | `object get <id>`, `object list <kind>`, `object create <kind>`, `object promote <id>` |
+| **`zqk agent`** | Core Domain | Multi-agent swarm orchestration, seating, task claims, execution delegation | `agent claim-work`, `agent orchestrate`, `agent prepare-context` |
+| **`zqk test`** | Core Domain | Test execution, requirement-to-test verification, test suite dashboards | `test run <tst-id>`, `test dashboard`, `test matrix` |
+| **`zqk job`** | Core Domain | Background scheduler job triggers, queues, history, and status | `job list`, `job trigger <id>`, `job status <id>` |
+| **`zqk service`** | Core Domain | Host OS service supervisor (launchd / systemd), daemon lifecycles | `service start`, `service status`, `service stop` |
+| **`zqk vendor`** | Core Domain | Isolated third-party adapters and IDE integration shims | `vendor cursor paste`, `vendor vscode register` |
+| **`zqk ambient`** | Core Domain | Ambient filesystem monitoring, metric waves, telemetry capture | `ambient wave`, `ambient status` |
+| **`zqk state`** | Core Domain | Knowledge kernel state graph inspection, audit journals, telemetry | `state stream --dashboard`, `state tree`, `state journal` |
+| **`zqk graph`** | Core Domain | Graph database operations, reasoning, and ZPARQL query engine | `graph query`, `graph join`, `graph neighbors` |
+| **`zqk mesh`** | Core Domain | P2P agent mesh networking, sync, routing, and federation | `mesh status`, `mesh sync`, `mesh peer` |
+| **`zqk mcp`** | Core Domain | Model Context Protocol (MCP) server lifecycle and IDE config | `mcp install`, `mcp serve`, `mcp ensure` |
+| **`zqk pack`** | Core Domain | Holonic swarm package management (scaffold, seal, validate) | `pack scaffold`, `pack seal`, `pack validate` |
+| **`zqk scheduler`** | Core Domain | Background scheduler daemon, cron tasks, and maintenance | `scheduler status`, `scheduler run` |
+| **`zqk daemon`** | Core Domain | Background daemon process group supervisor and lease manager | `daemon list`, `daemon status` |
+| **`zqk keystore`** | Core Domain | Cryptographic key management, signing, and token issuance | `keystore list`, `keystore issue`, `keystore rotate` |
+| **`zqk kernel`** | Core Domain | Knowledge Kernel runtime steward, integrity, and governance | `kernel steward`, `kernel check` |
+| **`zqk do`** | Ergonomics Shortcut | Autonomous CAP loop execution shorthand (`zqk workflow vds do`) | `do`, `do BLI-123` |
+| **`zqk inspect`** | Ergonomics Shortcut | Interactive TUI Object Inspector and Policy Studio (`zqk object inspect`) | `inspect <id>` |
+| **`zqk mutate`** | Ergonomics Shortcut | ZQL declarative mutation engine shortcut (`zqk object mutate`) | `mutate <zql-query>` |
+| **`zqk query`** | Ergonomics Shortcut | ZPARQL graph query language engine shortcut (`zqk graph query`) | `query <zparql>` |
+| **`zqk validate`** | Ergonomics Shortcut | Invariant gate and schema validation shortcut (`zqk system validate`) | `validate --all` |
+| **`zqk rollback`** | Ergonomics Shortcut | Transaction rollback journal restoration shortcut (`zqk object rollback`) | `rollback list`, `rollback apply <id>` |
+| **`zqk completion`**| Ergonomics Shortcut | Shell completion script generator (`zqk system completion`) | `completion zsh`, `completion bash` |
+| **`zqk sync`** | Ergonomics Shortcut | Storage CAS and P2P mesh synchronization shortcut (`zqk mesh sync`) | `sync github`, `sync linear` |
+| **`zqk pre-commit`**| Ergonomics Shortcut | Local pre-commit release gate and secret scan runner (`zqk system pre-commit`) | `pre-commit` |
+| **`zqk learn`** | Ergonomics Shortcut | Institutional memory and operational lessons capture (`zqk agent learn`) | `learn` |
+| **`zqk new`** | Ergonomics Shortcut | Scaffolding wizard for new packs, adapters, and schemas (`zqk object new`) | `new goal`, `new plan`, `new req` |
+| **`zqk reports`** | Ergonomics Shortcut | Quality evaluation and engineering velocity reporting (`zqk system reports`) | `reports` |
+| **`zqk tray`** | Ergonomics Shortcut | macOS status bar daemon companion shortcut (`zqk service tray`) | `tray` |
+| **`zqk join`** | Ergonomics Shortcut | Multi-domain relational projection and graph join (`zqk graph join`) | `join` |
+| **`zqk matrix`** | Extension / Admin | Traceability matrices (CSV registries, validation, reports) | `matrix validate`, `matrix list` |
+| **`zqk kind-pack`** | Extension / Admin | Record a verified spec pack as typed object kinds | `kind-pack record` |
+| **`zqk inbox`** | Extension / Admin | Inspect and manage the agent autonomy inbox | `inbox list`, `inbox process` |
+| **`zqk intake`** | Extension / Admin | Semantic ingestion pipeline (Intent Capture) | `intake process` |
+| **`zqk feed`** | Extension / Admin | Agent correspondence feed (steer / emit-status) | `feed steer`, `feed status` |
+| **`zqk ci`** | Extension / Admin | Local CI simulation (commit → checkout elsewhere → test run) | `ci run` |
+| **`zqk docman`** | Extension / Admin | Documentation discovery, frontmatter verification, index management | `docman verify` |
+| **`zqk domain`** | Extension / Admin | Domain ontology discovery and registration | `domain list` |
+| **`zqk ontology`** | Extension / Admin | Ontology import and translation | `ontology import` |
+| **`zqk ops`** | Extension / Admin | Operations and utility commands | `ops compact` |
+| **`zqk organizational`**| Extension / Admin | Organizational structure and change impact analysis | `organizational list` |
+| **`zqk semantic`** | Extension / Admin | Semantic operations and maturity assessment | `semantic eval` |
+| **`zqk spec`** | Extension / Admin | Declarative specification inspection and management | `spec list` |
+| **`zqk swarm`** | Extension / Admin | Multi-agent swarm observability and throughput | `swarm status` |
+| **`zqk convergence`**| Extension / Admin | Convergence measurement & nest management | `convergence status` |
+| **`zqk observer`** | Extension / Admin | Observer agent operations and AST extraction | `observer search` |
+| **`zqk automation`**| Extension / Admin | Automation and integration operations (hooks, CI/CD, scripts) | `automation run` |
+| **`zqk callback`** | Extension / Admin | Handle scheduler job callbacks and notifications | `callback handle` |
 
 ---
 

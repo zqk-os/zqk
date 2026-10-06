@@ -211,6 +211,7 @@ PACKAGE_FALLBACK_DESCRIPTIONS: Dict[str, str] = {
     "tdval": "Test-driven validation engines, acceptance criteria gates, and verification suites.",
     "telemetry": "Anonymous usage telemetry, performance metrics, and opt-in reporting.",
     "terminal": "Terminal output styling, color detection, and interactive prompts.",
+    "testdiscovery": "Automated discovery of unit, integration, and criteria-linked test targets across Go, Python, and TypeScript.",
     "testhelper": "Hermetic unit and integration testing helper utilities.",
     "testrunner": "Automated test runner execution, timeout management, and report generation.",
     "text": "Text processing, wrap algorithms, and diff formatting.",
@@ -290,9 +291,14 @@ def extract_go_doc_comment(pkg_dir: str) -> str:
                 and not l.startswith("Copyright") 
                 and not l.startswith("SPDX")
                 and not l.startswith("Code generated")
+                and not l.startswith("+build")
+                and not l.startswith("//go:build")
+                and not l.startswith("go:build")
+                and not l.startswith("/*go:build")
             )
             if clean:
                 clean = re.sub(r"^[Pp]ackage\s+[a-zA-Z0-9_]+\s+(?:provides\s+|implements\s+|defines\s+|is\s+|contains\s+)?", "", clean)
+                clean = re.sub(r'</?[a-zA-Z0-9]+[^>]*>', '', clean)
                 # Capitalize first letter
                 if clean:
                     clean = clean[0].upper() + clean[1:]
@@ -312,10 +318,13 @@ def extract_readme_description(readme_path: str) -> str:
                     continue
                 if line.startswith("#") or line.startswith("**") or line.startswith("[!") or line.startswith("```") or line.startswith("---") or line.startswith("|") or line.startswith("Status:"):
                     continue
+                # Remove HTML tags <p>, <p align="...">, etc.
+                clean_line = re.sub(r'</?[a-zA-Z0-9]+[^>]*>', '', line)
                 # Remove markdown links [text](url) -> text
-                clean_line = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', line)
+                clean_line = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', clean_line)
                 # Remove code ticks
                 clean_line = clean_line.replace("`", "")
+                clean_line = clean_line.strip()
                 if len(clean_line) > 15:
                     return clean_line
     except Exception:
@@ -359,6 +368,7 @@ def inspect_package(base_dir: str, pkg_name: str, import_prefix: str) -> Dict:
         desc = f"{pkg_name.title()} component and domain abstractions for ZQK Core."
 
     # Clean description for table: single line, no pipes, length bounded
+    desc = re.sub(r'</?[a-zA-Z0-9]+[^>]*>', '', desc)
     desc = desc.replace("|", "/").replace("\n", " ").strip()
     if len(desc) > 130:
         desc = desc[:127].rstrip() + "..."
