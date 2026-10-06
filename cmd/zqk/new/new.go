@@ -79,6 +79,7 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tc"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindBacklogItem, "bli"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindMilestone, "mil"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindTechnicalDebt, "td", "techdebt"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindPolicy))
 	root.AddCommand(newKindConvenienceCmd(objects.KindQuestion, "que"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindDecision, "dec"))
@@ -213,17 +214,21 @@ func emitJITGuidanceTip(cmd *cobra.Command, kind string) {
 	var tip string
 	switch kind {
 	case objects.KindGoal:
-		tip = "💡 Shift-Left Tip: Goals represent strategic compass themes and decompose into 3–5 requirements (requirement_refs). Goals do NOT declare criteria_refs directly."
+		tip = "💡 Shift-Left Tip: Goals represent timeless strategic compass themes (outside of sprint/time boundaries) and decompose into 3–5 requirements (child requirement.goal_refs). Goals do NOT declare criteria_refs directly."
 	case objects.KindRequirement:
-		tip = "💡 Shift-Left Tip: Requirements define feature contracts and require >= 3 criteria (criteria_refs: static invariant, operational proof, negative boundary) and 1 test_case (TST) verifying the criteria bundle."
+		tip = "💡 Shift-Left Tip: Requirements are timeless functional contracts (never bound to time or priority plans). They own criteria_refs (>= 3 satisfying three-fold proof: static invariant, operational proof, negative boundary) verified 1:1 by a test_case."
+	case objects.KindMilestone:
+		tip = "💡 Shift-Left Tip: Milestones introduce chronological and time constraints — acting as time-bounded subgoals across delivered reality that priority plans aim toward."
 	case objects.KindTestCase:
 		tip = "💡 Shift-Left Tip: Test cases verify the criteria bundle for 1 requirement (1:1 feature contract verification)."
 	case objects.KindBacklogItem:
 		tip = "💡 Shift-Left Tip: Backlog items are atomic units of effort satisfying 1–3 criteria. Decompose work across 2–5 BLIs per plan to avoid scope-stacking."
 	case objects.KindPriorityPlan:
-		tip = "💡 Shift-Left Tip: Priority plans bound exactly 1 cycle of work (sprint/kanban batch, 2–5 BLIs). Plans scope-lock upon entering in_progress to prevent drift."
+		tip = "💡 Shift-Left Tip: Priority plans bound exactly 1 cycle of work (sprint/kanban batch, 2–5 BLIs aiming toward a milestone). Plans scope-lock upon entering in_progress to prevent drift."
 	case objects.KindEpic:
 		tip = "💡 Shift-Left Tip: Epics group multiple priority plans under a unifying theme. Permissive by default (plans can be added in progress unless execution_locked=true)."
+	case objects.KindTechnicalDebt:
+		tip = "💡 Shift-Left Tip: Technical debt provides a tactical entry point into the non-functional behavior plane (code smells, test flakes, performance hotpaths, bug rollups). Rollups of tech debt items tell the anti-pattern story to institute lasting architectural and coding best practices."
 	}
 	if tip != "" {
 		fmt.Fprintln(cmd.ErrOrStderr(), color.CyanString(tip))
