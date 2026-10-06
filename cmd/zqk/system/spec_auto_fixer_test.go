@@ -1326,6 +1326,73 @@ func TestExtractLengthConstraint(t *testing.T) {
 	}
 }
 
+func TestExtractStringLengthConstraint(t *testing.T) {
+	fieldMap := map[string]any{
+		"validation": map[string]any{
+			"min_length": 5,
+			"max_length": 20,
+		},
+	}
+
+	// Success case
+	str, length, ok := extractStringLengthConstraint("hello", fieldMap, "min_length")
+	if !ok || str != "hello" || length != 5 {
+		t.Fatalf("expected ('hello', 5, true), got (%q, %d, %v)", str, length, ok)
+	}
+
+	// Non-string value
+	_, _, ok = extractStringLengthConstraint(12345, fieldMap, "min_length")
+	if ok {
+		t.Fatalf("expected ok=false for non-string currentValue")
+	}
+
+	// Missing validation map
+	_, _, ok = extractStringLengthConstraint("hello", map[string]any{}, "min_length")
+	if ok {
+		t.Fatalf("expected ok=false for missing validation map")
+	}
+
+	// Missing constraint
+	_, _, ok = extractStringLengthConstraint("hello", fieldMap, "unknown_constraint")
+	if ok {
+		t.Fatalf("expected ok=false for unknown constraint")
+	}
+}
+
+func TestExtractArrayLengthConstraint(t *testing.T) {
+	fieldMap := map[string]any{
+		"validation": map[string]any{
+			"min_length": 2,
+			"max_length": 10,
+		},
+	}
+
+	// Success case slice
+	arr := []string{"a", "b", "c"}
+	val, length, ok := extractArrayLengthConstraint(arr, fieldMap, "min_length")
+	if !ok || val.Len() != 3 || length != 2 {
+		t.Fatalf("expected (len=3, 2, true), got (len=%d, %d, %v)", val.Len(), length, ok)
+	}
+
+	// Non-slice/non-array value
+	_, _, ok = extractArrayLengthConstraint("not an array", fieldMap, "min_length")
+	if ok {
+		t.Fatalf("expected ok=false for non-slice currentValue")
+	}
+
+	// Missing validation map
+	_, _, ok = extractArrayLengthConstraint(arr, map[string]any{}, "min_length")
+	if ok {
+		t.Fatalf("expected ok=false for missing validation map")
+	}
+
+	// Missing constraint
+	_, _, ok = extractArrayLengthConstraint(arr, fieldMap, "unknown_constraint")
+	if ok {
+		t.Fatalf("expected ok=false for unknown constraint")
+	}
+}
+
 // TestFixInstanceValidationIssueLayer1_Integration tests the full integration
 func TestFixInstanceValidationIssueLayer1_Integration(t *testing.T) {
 	fixer, testRoot := setupSpecAutoFixerTest(t)
