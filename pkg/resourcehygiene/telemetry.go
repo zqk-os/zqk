@@ -78,7 +78,14 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 	tempCutoff := now.Add(-DefaultTempOrphanAge)
 
 	_ = filepath.WalkDir(zqkDir, func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
+		if err != nil {
+			return nil
+		}
+		if d.IsDir() {
+			name := d.Name()
+			if name == "cas" || name == "blobs" || name == "wal" || name == ".git" {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		name := d.Name()

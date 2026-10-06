@@ -927,6 +927,11 @@ func enrichWhatsNextRemedies(cmd *cobra.Command, projectRoot string, out *whatsN
 	if projectRoot == emptyValue || out == nil {
 		return
 	}
+	autoRemedy, _ := cmd.Flags().GetBool("auto-remedy")
+	if out.KernelAmbience != nil && len(out.KernelAmbience.RemedyRecipes) > 0 && !autoRemedy {
+		out.RemedyRecipes = append(out.RemedyRecipes, out.KernelAmbience.RemedyRecipes...)
+		return
+	}
 	engine := pkgsystem.NewDiagnosticsRemedyEngine(projectRoot)
 	plans, err := engine.Diagnose(context.Background(), nil)
 	if err != nil || len(plans) == 0 {
@@ -939,7 +944,7 @@ func enrichWhatsNextRemedies(cmd *cobra.Command, projectRoot string, out *whatsN
 			out.RemedyRecipes = append(out.RemedyRecipes, fmt.Sprintf("%s: %s", p.Title, p.Description))
 		}
 	}
-	if autoRemedy, _ := cmd.Flags().GetBool("auto-remedy"); autoRemedy {
+	if autoRemedy {
 		rep, err := engine.Apply(context.Background(), plans)
 		if err == nil {
 			out.RemedyReport = rep
