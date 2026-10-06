@@ -463,12 +463,17 @@ func (s *Server) validateOAuthToken(_ context.Context, token, projectRoot string
 	return "", nil, nil, errfmt.Errorf("OAuth token authentication not yet implemented")
 }
 
+// hashPersonalAccessToken computes SHA-256 for a personal access token.
+func hashPersonalAccessToken(token string) [32]byte {
+	return sha256.Sum256([]byte(token))
+}
+
 // validatePersonalAccessToken validates PAT and resolves account.
 // PAT is the secret; we compute SHA256(pat) and compare to keystore entries with key_type
 // "personal_access_token" or "api_key" (credential_hash stored as hex or "sha256:hex").
 // On match we check revoked/expired, then load account and return roles/permissions.
 func (s *Server) validatePersonalAccessToken(_ context.Context, pat, projectRoot string) (accountID string, roles, permissions []string, err error) {
-	patHash := sha256.Sum256([]byte(pat))
+	patHash := hashPersonalAccessToken(pat)
 	patHashHex := hex.EncodeToString(patHash[:])
 
 	keyTypes := map[string]bool{keyTypePersonalAccessToken: true, keyTypeAPIKey: true}

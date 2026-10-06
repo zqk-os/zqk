@@ -92,24 +92,27 @@ func determineAccountID(flags *CreateFlags, secCtx *pkgctx.SecurityContext) (str
 	return flags.AccountID, nil
 }
 
+// hashPassword hashes a user password using bcrypt with built-in salt.
+func hashPassword(password string) (string, error) {
+	hashBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", errfmt.Newf("failed to hash password").Wrap(err)
+	}
+	return string(hashBytes), nil
+}
+
+// hashToken hashes an API key or token using SHA-256 digest.
+func hashToken(token string) string {
+	hashBytes := sha256.Sum256([]byte(token))
+	return "sha256:" + hex.EncodeToString(hashBytes[:])
+}
+
 // hashCredentialForCreate hashes a credential based on key type (for create)
 func hashCredentialForCreate(credential, keyType string) (hash string, err error) {
 	if keyType == "password" {
-		// Use bcrypt for passwords (has built-in salt)
-		var hashBytes []byte
-		hashBytes, err = bcrypt.GenerateFromPassword([]byte(credential), bcrypt.DefaultCost)
-		if err != nil {
-			err = errfmt.Newf("failed to hash password").Wrap(err)
-			return
-		}
-		hash = string(hashBytes)
-		return
+		return hashPassword(credential)
 	}
-
-	// Use SHA256 for tokens/API keys
-	hashBytes := sha256.Sum256([]byte(credential))
-	hash = "sha256:" + hex.EncodeToString(hashBytes[:])
-	return
+	return hashToken(credential), nil
 }
 
 // buildKeystoreEntry builds the keystore entry object

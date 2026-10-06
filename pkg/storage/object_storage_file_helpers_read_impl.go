@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"maps"
+	"math"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -273,7 +274,11 @@ func (f *FileObjectStorage) trackPersistenceStep(
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 
 	// Build metadata
-	metadata := make(map[string]any, len(objMetadata)+len(stepMetadata))
+	allocCap := len(objMetadata)
+	if allocCap <= math.MaxInt-len(stepMetadata) {
+		allocCap += len(stepMetadata)
+	}
+	metadata := make(map[string]any, allocCap)
 	maps.Copy(metadata, objMetadata)
 	for k, v := range stepMetadata {
 		metadata[fmt.Sprintf("step_%s", k)] = v

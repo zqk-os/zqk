@@ -1,8 +1,6 @@
 package keystore
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -11,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/zqktime"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // RotateFlags contains parsed rotate command flags
@@ -85,21 +82,9 @@ func buildRevocationUpdates(revoke, revokeOld bool) map[string]any {
 // hashCredential hashes a credential based on key type
 func hashCredential(credential, keyType string) (hash string, err error) {
 	if keyType == "password" {
-		// Use bcrypt for passwords (has built-in salt)
-		var hashBytes []byte
-		hashBytes, err = bcrypt.GenerateFromPassword([]byte(credential), bcrypt.DefaultCost)
-		if err != nil {
-			err = errfmt.Newf("failed to hash password").Wrap(err)
-			return
-		}
-		hash = string(hashBytes)
-		return
+		return hashPassword(credential)
 	}
-
-	// Use SHA256 for tokens/API keys
-	hashBytes := sha256.Sum256([]byte(credential))
-	hash = "sha256:" + hex.EncodeToString(hashBytes[:])
-	return
+	return hashToken(credential), nil
 }
 
 // buildRotationUpdates builds updates for rotation

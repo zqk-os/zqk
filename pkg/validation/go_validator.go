@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -831,7 +832,11 @@ func (gv *GoValidator) appendUnmetLifecyclePostconditions(
 		return errors
 	}
 
-	destObj := make(map[string]any, len(obj)+2)
+	allocCap := len(obj)
+	if allocCap <= math.MaxInt-2 {
+		allocCap += 2
+	}
+	destObj := make(map[string]any, allocCap)
 	for k, v := range obj {
 		destObj[k] = v
 	}

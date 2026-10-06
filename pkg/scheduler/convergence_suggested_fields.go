@@ -3,6 +3,7 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -54,7 +55,11 @@ func mergeCompletionGateObservabilityIntoPhaseRouter(pm map[string]any, sessionT
 	}
 	switch n := raw.(type) {
 	case []any:
-		out := make([]any, 0, len(n)+1)
+		allocCap := len(n)
+		if allocCap < math.MaxInt {
+			allocCap++
+		}
+		out := make([]any, 0, allocCap)
 		out = append(out, note)
 		out = append(out, n...)
 		pm[objects.FieldKeyNotes] = out

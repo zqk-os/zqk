@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -223,7 +224,11 @@ func convergenceSessionUpdatedAt(obj map[string]any) time.Time {
 }
 
 func updatePipelineTickConvergenceSessionID(ctx context.Context, storage storagepkg.ObjectStorageProvider, secCtx *pkgctx.SecurityContext, env map[string]any, newID string) error {
-	newEnv := make(map[string]any, len(env)+1)
+	allocCap := len(env)
+	if allocCap < math.MaxInt {
+		allocCap++
+	}
+	newEnv := make(map[string]any, allocCap)
 	for k, v := range env {
 		newEnv[k] = v
 	}

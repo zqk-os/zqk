@@ -2,6 +2,8 @@ package logging
 
 import (
 	"sync"
+
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Wire keys aligned with pkg/objects FieldKey* for scheduler log fields — kept as literals here to
@@ -1221,7 +1223,33 @@ func (e *fluentEntry) Int(key string, n int) *fluentEntry {
 	return e
 }
 
+func sanitizeField(f Field) Field {
+	if zqkenv.IsSensitiveKey(f.Key) {
+		return Field{Key: f.Key, Value: "******"}
+	}
+	if s, ok := f.Value.(string); ok {
+		return Field{Key: f.Key, Value: zqkenv.MaskSensitiveValue(f.Key, s)}
+	}
+	return f
+}
+
+func sanitizeFields(fields []Field) []Field {
+	if len(fields) == 0 {
+		return fields
+	}
+	sanitized := make([]Field, len(fields))
+	for i, f := range fields {
+		sanitized[i] = sanitizeField(f)
+	}
+	return sanitized
+}
+
 func (e *fluentEntry) String(key, value string) *fluentEntry {
+	if zqkenv.IsSensitiveKey(key) {
+		value = "******"
+	} else {
+		value = zqkenv.MaskSensitiveValue(key, value)
+	}
 	e.fields = append(e.fields, String(key, value))
 	return e
 }
@@ -1251,22 +1279,23 @@ func (e *fluentEntry) Log() {
 		return
 	}
 
-	// CRIT-CEF-FLUENT-LEVEL-REQUIRED-001: Enforce explicit level requirement
+	fields := sanitizeFields(e.fields)
+
 	// CRIT-CEF-FLUENT-LEVEL-REQUIRED-001: Enforce explicit level requirement
 	switch e.level {
 	case "error":
-		e.logger.Error(e.msg, e.err, e.fields...)
+		e.logger.Error(e.msg, e.err, fields...)
 	case "debug", "trace":
-		e.logger.Debug(e.msg, e.fields...)
+		e.logger.Debug(e.msg, fields...)
 	case "warn":
-		e.logger.Warn(e.msg, e.fields...)
+		e.logger.Warn(e.msg, fields...)
 	case "info":
-		e.logger.Info(e.msg, e.fields...)
+		e.logger.Info(e.msg, fields...)
 	default:
 		// TDE-F-CQ-005: Do not crash daemons or processes if explicit log level is omitted.
 		// Fallback gracefully to Info with structured audit field.
-		e.fields = append(e.fields, String("log_warning", "unlevelled_entry_defaulted_to_info"))
-		e.logger.Info(e.msg, e.fields...)
+		fields = append(fields, String("log_warning", "unlevelled_entry_defaulted_to_info"))
+		e.logger.Info(e.msg, fields...)
 	}
 }
 

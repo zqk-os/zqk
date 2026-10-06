@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"math"
 	"strings"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -90,7 +91,11 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 			if len(newEntries) > 0 {
 				var merged []any
 				if el, ok := existing[k].([]any); ok {
-					merged = make([]any, 0, len(el)+len(newEntries))
+					allocCap := len(el)
+					if allocCap <= math.MaxInt-len(newEntries) {
+						allocCap += len(newEntries)
+					}
+					merged = make([]any, 0, allocCap)
 					merged = append(merged, el...)
 					merged = append(merged, newEntries...)
 				} else {
