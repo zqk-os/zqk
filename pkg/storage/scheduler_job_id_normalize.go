@@ -22,25 +22,6 @@ func hasNestedSchedulerJobChurnID(id string) bool {
 	return strings.Contains(id, ConstMiscSchedulerJobSch)
 }
 
-var schedJobLookupTable = func() [256]byte {
-	var tbl [256]byte
-	for i := 0; i < 256; i++ {
-		tbl[i] = byte(i)
-	}
-	return tbl
-}()
-
-func sanitizeSchedKey(s string) []byte {
-	if len(s) == 0 {
-		return nil
-	}
-	clean := make([]byte, len(s))
-	for i := 0; i < len(s); i++ {
-		clean[i] = schedJobLookupTable[s[i]]
-	}
-	return clean
-}
-
 // normalizeSchedulerJobIDIfRecursive replaces recursive / chained churn-style ids with a short
 // SCH-<unix>-h-<12 hex> form derived from a hash of the original id (same kind + id always maps
 // to the same suffix for a given second). Does not mutate when the id is already safe.
@@ -49,8 +30,7 @@ func normalizeSchedulerJobIDIfRecursive(kind, id string) string {
 		return id
 	}
 	ts := time.Now().Unix()
-	clean := sanitizeSchedKey(kind + "\x00" + id)
-	h := sha256.Sum256(clean)
+	h := sha256.Sum256([]byte(kind + "\x00" + id))
 	suf := hex.EncodeToString(h[:6])
 	return fmt.Sprintf("SCH-%d-h-%s", ts, suf)
 }

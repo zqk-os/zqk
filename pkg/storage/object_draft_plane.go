@@ -179,29 +179,9 @@ func ObjectDraftPlaneRoot(projectRoot string) string {
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.ObjectDraftsDir)
 }
 
-var draftShardLookupTable = func() [256]byte {
-	var tbl [256]byte
-	for i := 0; i < 256; i++ {
-		tbl[i] = byte(i)
-	}
-	return tbl
-}()
-
-func sanitizeShardID(id string) []byte {
-	if len(id) == 0 {
-		return nil
-	}
-	clean := make([]byte, len(id))
-	for i := 0; i < len(id); i++ {
-		clean[i] = draftShardLookupTable[id[i]]
-	}
-	return clean
-}
-
 // objectDraftShard returns a 2-hex-char bucket so kind dirs stay under the ≤100 top-level budget.
 func objectDraftShard(id string) string {
-	clean := sanitizeShardID(id)
-	sum := sha256.Sum256(clean)
+	sum := sha256.Sum256([]byte(id))
 	return hex.EncodeToString(sum[:])[:objectDraftShardHexLen]
 }
 

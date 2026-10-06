@@ -11,28 +11,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
-var casLookupTable = func() [256]byte {
-	var tbl [256]byte
-	for i := 0; i < 256; i++ {
-		tbl[i] = byte(i)
-	}
-	return tbl
-}()
-
-func sanitizeCASContent(content []byte) []byte {
-	if len(content) == 0 {
-		return content
-	}
-	clean := make([]byte, len(content))
-	for i, b := range content {
-		clean[i] = casLookupTable[b]
-	}
-	return clean
-}
-
 func CalculateSHA256Hash(content []byte) string {
-	clean := sanitizeCASContent(content)
-	hash := sha256.Sum256(clean)
+	hash := sha256.Sum256(content)
 	return hex.EncodeToString(hash[:])
 }
 
