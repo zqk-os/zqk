@@ -89,9 +89,9 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 			return err
 		}
 		resolvedAccountID = acc
-	} else if authcred.LooksLikeIssuedSecret(authPrincipalCandidate) {
-		// POL-AGENT-API-KEY-001: opaque secrets resolve via keystore fingerprint.
-		match, resolveErr := authcred.ResolveSecret(projectRoot, authPrincipalCandidate)
+	} else if authcred.LooksLikeIssuedAPIKey(authPrincipalCandidate) {
+		// POL-AGENT-API-KEY-001: opaque API keys resolve via keystore fingerprint.
+		match, resolveErr := authcred.ResolveAPIKey(projectRoot, authPrincipalCandidate)
 		if resolveErr != nil {
 			return errfmt.Errorf("unauthorized: invalid API key (not an ACC-* id and no keystore match); see POL-AGENT-API-KEY-001")
 		}

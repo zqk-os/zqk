@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	// SecretPrefix marks generated agent API keys (never an ACC-* id).
-	SecretPrefix = "zqk_ak_"
+	// APIKeyPrefix marks generated agent API keys (never an ACC-* id).
+	APIKeyPrefix = "zqk_ak_"
+	// SecretPrefix is an alias for APIKeyPrefix.
+	SecretPrefix = APIKeyPrefix
 
 	keyTypeAPIKey              = "api_key"
 	keyTypePersonalAccessToken = "personal_access_token"
@@ -44,9 +46,9 @@ type Match struct {
 	KeyID     string
 }
 
-// ResolveSecret looks up an api_key / personal_access_token keystore entry by SHA256(rawKey).
+// ResolveAPIKey looks up an api_key / personal_access_token keystore entry by SHA256(rawKey).
 // Returns ErrNotFound when no active match exists.
-func ResolveSecret(projectRoot, rawKey string) (Match, error) {
+func ResolveAPIKey(projectRoot, rawKey string) (Match, error) {
 	rawKey = strings.TrimSpace(rawKey)
 	if rawKey == "" {
 		return Match{}, errfmt.Errorf("empty credential")
@@ -81,9 +83,14 @@ func ResolveSecret(projectRoot, rawKey string) (Match, error) {
 	return Match{}, errfmt.Errorf("credential not found in keystore")
 }
 
-// LooksLikeIssuedSecret reports whether raw is an opaque issued key
+// ResolveSecret is a backward-compatible alias for ResolveAPIKey.
+func ResolveSecret(projectRoot, rawKey string) (Match, error) {
+	return ResolveAPIKey(projectRoot, rawKey)
+}
+
+// LooksLikeIssuedAPIKey reports whether raw is an opaque issued key
 // (not ACC-*, session ZS-/ZQK-*, or retired account: form).
-func LooksLikeIssuedSecret(raw string) bool {
+func LooksLikeIssuedAPIKey(raw string) bool {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return false
@@ -98,6 +105,11 @@ func LooksLikeIssuedSecret(raw string) bool {
 		return false
 	}
 	return true
+}
+
+// LooksLikeIssuedSecret is an alias for LooksLikeIssuedAPIKey.
+func LooksLikeIssuedSecret(raw string) bool {
+	return LooksLikeIssuedAPIKey(raw)
 }
 
 // LooksLikeSessionToken reports ZS-* (canonical session) or the ZQK-* synonym

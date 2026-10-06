@@ -71,16 +71,16 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		tokenVal, err := generateIssuedAPIKey()
+		apiKeyVal, err := generateIssuedAPIKey()
 		if err != nil {
 			return err
 		}
-		credentialHash := hashToken(tokenVal)
+		credentialHash := hashToken(apiKeyVal)
 
 		flags := &CreateFlags{
 			AccountID:   accountID,
 			KeyType:     "api_key",
-			KeyData:     tokenVal,
+			KeyData:     apiKeyVal,
 			Title:       title,
 			Description: description,
 			ExpiresAt:   expiresAt,
@@ -97,7 +97,7 @@ func runIssue(cmd *cobra.Command, args []string) error {
 
 		seatingPath := ""
 		if !noSeating {
-			if err := authcred.WriteSeatCredential(proc.ProjectRoot(), accountID, tokenVal); err != nil {
+			if err := authcred.WriteSeatCredential(proc.ProjectRoot(), accountID, apiKeyVal); err != nil {
 				return errfmt.Newf("write seating credential").Wrap(err)
 			}
 			seatingPath = authcred.SeatCredentialPath(proc.ProjectRoot(), accountID)
@@ -108,10 +108,10 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			objects.FieldKeyAccountID: accountID,
 			objects.FieldKeyKeyType:   "api_key",
 			objects.FieldKeyTitle:     title,
-			"credential":              tokenVal,
+			"credential":              apiKeyVal,
 			"fingerprint":             credentialHash,
 			"seating_file":            seatingPath,
-			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), tokenVal),
+			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), apiKeyVal),
 		}
 
 		switch cli.GetFormat(cmd) {
@@ -123,12 +123,12 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			fmt.Fprintf(&buf, "Key ID:       %s\n", keyID)
 			fmt.Fprintf(&buf, "Account:      %s\n", accountID)
 			fmt.Fprintf(&buf, "Fingerprint:  %s\n", credentialHash)
-			fmt.Fprintf(&buf, "Credential:   %s\n", tokenVal)
+			fmt.Fprintf(&buf, "Credential:   %s\n", apiKeyVal)
 			if seatingPath != "" {
 				fmt.Fprintf(&buf, "Seating file: %s\n", seatingPath)
 			}
 			buf.WriteString("\nExport for this seat:\n")
-			fmt.Fprintf(&buf, "  export %s=%s\n", zqkenv.APIKey(), tokenVal)
+			fmt.Fprintf(&buf, "  export %s=%s\n", zqkenv.APIKey(), apiKeyVal)
 			return cli.WriteOutput(cmd, []byte(buf.String()))
 		}
 	})(cmd, args)
@@ -154,7 +154,7 @@ func generateIssuedAPIKey() (string, error) {
 	if _, err := rand.Read(b[:]); err != nil {
 		return "", errfmt.Newf("generate api key").Wrap(err)
 	}
-	return authcred.SecretPrefix + hex.EncodeToString(b[:]), nil
+	return authcred.APIKeyPrefix + hex.EncodeToString(b[:]), nil
 }
 
 func appendAccountTokenFingerprint(proc *cli.Processor, accountID, keyID, fingerprint, expiresAt string) error {
