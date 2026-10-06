@@ -75,13 +75,17 @@ func resolveVDSProjectRoot(cmd *cobra.Command) (string, error) {
 	return root, nil
 }
 
-type vdsExecutionContext struct {
-	root  string
-	spine *vds.SpineProfile
-	cust  *vds.Customization
+type vdsContext struct {
+	root   string
+	spine  *vds.SpineProfile
+	cust   *vds.Customization
+	opCtx  context.Context
+	lookup func(context.Context, string) (map[string]any, error)
 }
 
-func resolveVDSExecutionContext(cmd *cobra.Command, flags *clipkg.FlagBag) (*vdsExecutionContext, error) {
+type vdsExecutionContext = vdsContext
+
+func resolveVDSContext(cmd *cobra.Command, proc *cli.Processor, flags *clipkg.FlagBag) (*vdsContext, error) {
 	root, err := resolveVDSProjectRoot(cmd)
 	if err != nil {
 		return nil, err
@@ -95,26 +99,41 @@ func resolveVDSExecutionContext(cmd *cobra.Command, flags *clipkg.FlagBag) (*vds
 	if err != nil {
 		return nil, err
 	}
-	return &vdsExecutionContext{
-		root:  root,
-		spine: spine,
-		cust:  cust,
+	opCtx := context.Background() // Background: request-or-shutdown derived
+	if c := cmd.Context(); c != nil {
+		opCtx = c
+	}
+	var lookup func(context.Context, string) (map[string]any, error)
+	if proc != nil {
+		if sp := proc.Storage(); sp != nil {
+			sec := proc.SecurityContext()
+			lookup = func(ctx context.Context, id string) (map[string]any, error) {
+				return sp.Read(ctx, sec, id)
+			}
+		}
+	}
+	return &vdsContext{
+		root:   root,
+		spine:  spine,
+		cust:   cust,
+		opCtx:  opCtx,
+		lookup: lookup,
 	}, nil
+}
+
+func resolveVDSExecutionContext(cmd *cobra.Command, flags *clipkg.FlagBag) (*vdsExecutionContext, error) {
+	return resolveVDSContext(cmd, nil, flags)
 }
 
 func runVDSChecklist(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
 		var flags clipkg.FlagBag
-		execCtx, err := resolveVDSExecutionContext(cmd, &flags)
+		vdsCtx, err := resolveVDSContext(cmd, proc, &flags)
 		if err != nil {
 			return err
 		}
-		opCtx := context.Background() // Background: request-or-shutdown derived
-		if c := cmd.Context(); c != nil {
-			opCtx = c
-		}
-		gls := vds.ResolveGlossary(opCtx, execCtx.cust, vdsTitleLookup(proc))
-		rep := vds.BuildChecklist(execCtx.spine, execCtx.cust, gls)
+		gls := vds.ResolveGlossary(vdsCtx.opCtx, vdsCtx.cust, vdsTitleLookup(proc))
+		rep := vds.BuildChecklist(vdsCtx.spine, vdsCtx.cust, gls)
 		return emitVDS(cmd, proc, rep, rep.AgentBrief)
 	})(cmd, args)
 }
@@ -126,36 +145,27 @@ func runVDSEvaluate(cmd *cobra.Command, args []string) error {
 		runCmds := flags.Bool(cmd, "run-commands")
 		persist := flags.Bool(cmd, "persist")
 		applyVerify := flags.Bool(cmd, "apply-verify")
-		execCtx, err := resolveVDSExecutionContext(cmd, &flags)
+		vdsCtx, err := resolveVDSContext(cmd, proc, &flags)
 		if err != nil {
 			return err
 		}
-		chunksPath := vds.ResolveChunksPath(execCtx.root, fileFlag)
+		chunksPath := vds.ResolveChunksPath(vdsCtx.root, fileFlag)
 		chunks, err := vds.LoadChunks(chunksPath)
 		if err != nil {
 			return err
 		}
 
 		opt := vds.EvalOptions{
-			ProjectRoot: execCtx.root,
+			ProjectRoot: vdsCtx.root,
 			RunCommands: runCmds,
 			TitleLookup: vdsTitleLookup(proc),
-		}
-		if sp := proc.Storage(); sp != nil {
-			sec := proc.SecurityContext()
-			opt.Lookup = func(ctx context.Context, id string) (map[string]any, error) {
-				return sp.Read(ctx, sec, id)
-			}
+			Lookup:      vdsCtx.lookup,
 		}
 
-		opCtx := context.Background() // Background: request-or-shutdown derived
-		if c := cmd.Context(); c != nil {
-			opCtx = c
-		}
-		rep := vds.Evaluate(opCtx, chunks, execCtx.spine, execCtx.cust, opt)
+		rep := vds.Evaluate(vdsCtx.opCtx, chunks, vdsCtx.spine, vdsCtx.cust, opt)
 
 		if persist {
-			if err := persistVDSReport(execCtx.root, rep); err != nil {
+			if err := persistVDSReport(vdsCtx.root, rep); err != nil {
 				logging.Fluent(logging.GetLoggerFromProfile(proc.Context().Profile)).
 					Warn("vds: persist failed").WithError(err).Log()
 			}
@@ -194,11 +204,11 @@ func runVDSProject(cmd *cobra.Command, args []string) error {
 		write := flags.Bool(cmd, "write")
 		check := flags.Bool(cmd, "check")
 		outRel := flags.String(cmd, "out")
-		execCtx, err := resolveVDSExecutionContext(cmd, &flags)
+		vdsCtx, err := resolveVDSContext(cmd, proc, &flags)
 		if err != nil {
 			return err
 		}
-		cfg := vds.ResolveVendorProviders(execCtx.cust)
+		cfg := vds.ResolveVendorProviders(vdsCtx.cust)
 		if listOnly {
 			payload := map[string]any{
 				"schema":    "zqk_vds_project_list_v1",
@@ -207,27 +217,18 @@ func runVDSProject(cmd *cobra.Command, args []string) error {
 			}
 			return emitVDS(cmd, proc, payload, "")
 		}
-		opCtx := context.Background() // Background: request-or-shutdown derived
-		if c := cmd.Context(); c != nil {
-			opCtx = c
-		}
 		opt := vds.ProjectOptions{
-			ProjectRoot:   execCtx.root,
+			ProjectRoot:   vdsCtx.root,
 			ProviderID:    provider,
 			AllProviders:  all,
 			OutRel:        outRel,
 			TitleLookup:   vdsTitleLookup(proc),
-			Customization: execCtx.cust,
-			Spine:         execCtx.spine,
-		}
-		if sp := proc.Storage(); sp != nil {
-			sec := proc.SecurityContext()
-			opt.Lookup = func(ctx context.Context, id string) (map[string]any, error) {
-				return sp.Read(ctx, sec, id)
-			}
+			Lookup:        vdsCtx.lookup,
+			Customization: vdsCtx.cust,
+			Spine:         vdsCtx.spine,
 		}
 		if all {
-			batch, err := vds.WriteOrCheckAllProviders(opCtx, opt, write, check)
+			batch, err := vds.WriteOrCheckAllProviders(vdsCtx.opCtx, opt, write, check)
 			if batch != nil {
 				if emitErr := emitVDS(cmd, proc, batch, ""); emitErr != nil && err == nil {
 					return emitErr
@@ -235,7 +236,7 @@ func runVDSProject(cmd *cobra.Command, args []string) error {
 			}
 			return err
 		}
-		res, err := vds.WriteOrCheckProvider(opCtx, opt, write, check)
+		res, err := vds.WriteOrCheckProvider(vdsCtx.opCtx, opt, write, check)
 		if res != nil {
 			if emitErr := emitVDS(cmd, proc, res, ""); emitErr != nil && err == nil {
 				return emitErr
