@@ -111,6 +111,18 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			hasBLI = true
 		}
 	}
+	if tcs, ok := obj[objects.FieldKeyTestCaseRefs].([]any); ok && len(tcs) > 0 {
+		hasTestCase = true
+		for _, tc := range tcs {
+			s := strings.TrimSpace(fmt.Sprint(tc))
+			if s != "" && s != "<nil>" {
+				existingTestCases = append(existingTestCases, s)
+			}
+		}
+	}
+	if blis, ok := obj[objects.FieldKeyBacklogItemRefs].([]any); ok && len(blis) > 0 {
+		hasBLI = true
+	}
 
 	needBLI := !hasBLI
 	needTestCase := !hasTestCase
@@ -145,11 +157,20 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 	targetReqID := targetID
 	if strings.HasPrefix(targetID, "GOAL-") {
 		var existingReqs []string
-		if rrefs, ok := obj[objects.FieldKeyRequirementRefs].([]any); ok {
-			for _, r := range rrefs {
-				s := strings.TrimSpace(fmt.Sprint(r))
-				if s != "" && s != "<nil>" {
-					existingReqs = append(existingReqs, s)
+		for _, n := range criteriaNeighbors {
+			if k, _ := n["_kind"].(string); k == objects.KindRequirement {
+				if id, ok := n[objects.FieldKeyID].(string); ok && id != "" {
+					existingReqs = append(existingReqs, id)
+				}
+			}
+		}
+		if len(existingReqs) == 0 {
+			if rrefs, ok := obj[objects.FieldKeyRequirementRefs].([]any); ok {
+				for _, r := range rrefs {
+					s := strings.TrimSpace(fmt.Sprint(r))
+					if s != "" && s != "<nil>" {
+						existingReqs = append(existingReqs, s)
+					}
 				}
 			}
 		}
@@ -229,7 +250,7 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			Status:          pipelineStatus,
 			CriteriaRefs:    allCriteria,
 			RequirementRefs: tcReqRefs,
-			PathOrID:        "pkg/dummy/path_test.go",
+			PathOrID:        "",
 		})
 	}
 
@@ -247,6 +268,17 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 		if strings.HasPrefix(targetID, "MIL-") {
 			bliMilRefs = []string{targetID}
 		}
+		var bliGoalRefs []string
+		if strings.HasPrefix(targetID, "GOAL-") {
+			bliGoalRefs = []string{targetID}
+		} else if grefs, ok := obj[objects.FieldKeyGoalRefs].([]any); ok {
+			for _, g := range grefs {
+				s := strings.TrimSpace(fmt.Sprint(g))
+				if s != "" && s != "<nil>" {
+					bliGoalRefs = append(bliGoalRefs, s)
+				}
+			}
+		}
 
 		bundle.Objects.BacklogItems = append(bundle.Objects.BacklogItems, scenario.BacklogTemplate{
 			ID:              bliHint,
@@ -257,6 +289,7 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			CriteriaRefs:    allCriteria,
 			RequirementRefs: bliReqRefs,
 			MilestoneRefs:   bliMilRefs,
+			GoalRefs:        bliGoalRefs,
 			TestCaseRefs:    allTestCases,
 			DocEntryRefs:    []string{},
 			Priority:        "high",
@@ -311,13 +344,58 @@ func applyGeneratedTracePipelineForID(cmd *cobra.Command, proc *cli.Processor, t
 		return fmt.Errorf("failed to load target object %s: %w", targetID, err)
 	}
 
+	seenIDs := make(map[string]bool)
 	var criteriaNeighbors []map[string]any
+	appendNeighbor := func(n map[string]any) {
+		id, _ := n[objects.FieldKeyID].(string)
+		if id != "" && !seenIDs[id] {
+			seenIDs[id] = true
+			criteriaNeighbors = append(criteriaNeighbors, n)
+		}
+	}
+
+	// 1. Direct incoming neighbors pointing to targetID (e.g. BLIs, TestCases, Requirements)
+	if neighbors, nerr := storageProvider.GetNeighbors(ctx, secCtx, targetID, "incoming"); nerr == nil {
+		for _, n := range neighbors {
+			appendNeighbor(n)
+		}
+	}
+
+	// 2. If target is a Goal, inspect linked requirements and their incoming neighbors
+	if strings.HasPrefix(targetID, "GOAL-") {
+		for _, n := range criteriaNeighbors {
+			if k, _ := n["_kind"].(string); k == objects.KindRequirement {
+				if reqID, ok := n[objects.FieldKeyID].(string); ok && reqID != "" {
+					if reqNeighbors, rerr := storageProvider.GetNeighbors(ctx, secCtx, reqID, "incoming"); rerr == nil {
+						for _, rn := range reqNeighbors {
+							appendNeighbor(rn)
+						}
+					}
+					if reqObj, roErr := storageProvider.Read(ctx, secCtx, reqID); roErr == nil {
+						if crs, ok := reqObj[objects.FieldKeyCriteriaRefs].([]any); ok {
+							for _, cr := range crs {
+								cid := fmt.Sprint(cr)
+								if cNeighbors, cerr := storageProvider.GetNeighbors(ctx, secCtx, cid, "incoming"); cerr == nil {
+									for _, cn := range cNeighbors {
+										appendNeighbor(cn)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 3. For any criteria referenced directly on targetID, get incoming neighbors
 	if refs, ok := obj[objects.FieldKeyCriteriaRefs].([]any); ok && len(refs) > 0 {
 		for _, r := range refs {
 			critID := fmt.Sprint(r)
-			neighbors, nerr := storageProvider.GetNeighbors(ctx, secCtx, critID, "incoming")
-			if nerr == nil {
-				criteriaNeighbors = append(criteriaNeighbors, neighbors...)
+			if neighbors, nerr := storageProvider.GetNeighbors(ctx, secCtx, critID, "incoming"); nerr == nil {
+				for _, n := range neighbors {
+					appendNeighbor(n)
+				}
 			}
 		}
 	}
@@ -430,17 +508,8 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 
 	if strings.HasPrefix(targetID, "GOAL-") {
 		if len(summary.CreatedRequirementIDs) > 0 {
-			reqRefs, _ := obj[objects.FieldKeyRequirementRefs].([]any)
-			for _, rid := range summary.CreatedRequirementIDs {
-				reqRefs = append(reqRefs, rid)
-			}
-			obj[objects.FieldKeyRequirementRefs] = reqRefs
-			if err := storageProvider.Update(ctx, secCtx, targetID, obj); err == nil {
-				fmt.Fprintf(cmd.OutOrStdout(), "Linked %d new requirement(s) to %s: %s\n", len(summary.CreatedRequirementIDs), targetID, strings.Join(summary.CreatedRequirementIDs, ", "))
-				summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Minted requirement (%s) and linked criteria, test cases, and backlog items to it.", targetID, strings.Join(summary.CreatedRequirementIDs, ", "))
-			} else {
-				summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Minted requirement (%s) but failed to update goal requirement_refs: %v", targetID, strings.Join(summary.CreatedRequirementIDs, ", "), err)
-			}
+			fmt.Fprintf(cmd.OutOrStdout(), "Minted requirement(s) referencing %s: %s\n", targetID, strings.Join(summary.CreatedRequirementIDs, ", "))
+			summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Minted requirement (%s) with goal_refs and linked criteria, test cases, and backlog items to it.", targetID, strings.Join(summary.CreatedRequirementIDs, ", "))
 		} else {
 			summary.LinkageNote = fmt.Sprintf("Target goal %s pre-existed in Knowledge Kernel. Pipeline criteria, test cases, and backlog items linked to existing requirement hierarchy.", targetID)
 		}

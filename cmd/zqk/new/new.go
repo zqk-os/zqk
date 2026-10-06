@@ -239,7 +239,7 @@ func shouldAutoTracePipeline(cmd *cobra.Command, kind string) bool {
 
 func shouldAutoTracePipelineConfigured(cmd *cobra.Command, kind string, inTest bool, hasTestRoot bool) bool {
 	switch kind {
-	case objects.KindRequirement, objects.KindGoal, objects.KindMilestone:
+	case objects.KindRequirement:
 	default:
 		return false
 	}
