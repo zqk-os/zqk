@@ -1,6 +1,9 @@
 package storage
 
-import "maps"
+import (
+	"maps"
+	"math"
+)
 
 // asStringKeyedMap returns v as map[string]any when v is a YAML/JSON object shape.
 // yaml.v3 may decode maps as map[string]any or map[any]any depending on nesting.
@@ -64,7 +67,11 @@ func mergeMapPatchIntoExisting(existing map[string]any, field string, patch any)
 		existing[field] = out
 		return true
 	}
-	merged := make(map[string]any, len(baseMap)+len(patchMap))
+	allocCap := len(baseMap)
+	if allocCap <= math.MaxInt-len(patchMap) {
+		allocCap += len(patchMap)
+	}
+	merged := make(map[string]any, allocCap)
 	maps.Copy(merged, baseMap)
 	maps.Copy(merged, patchMap)
 	existing[field] = merged

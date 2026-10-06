@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"math"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
@@ -84,7 +85,11 @@ func (f *FileObjectStorage) collectGraphHops(
 	refFields := yamlParser.ExtractReferenceFields(currentObj)
 
 	seen := make(map[string]struct{})
-	hops := make([]objects.GraphHop, 0, len(refFields)+4)
+	allocCap := len(refFields)
+	if allocCap <= math.MaxInt-4 {
+		allocCap += 4
+	}
+	hops := make([]objects.GraphHop, 0, allocCap)
 
 	add := func(hop objects.GraphHop) {
 		if hop.NeighborID == emptyValue || hop.NeighborID == currentID {

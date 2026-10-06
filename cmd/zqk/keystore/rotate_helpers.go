@@ -1,32 +1,30 @@
 package keystore
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/authcred"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/zqktime"
-	"golang.org/x/crypto/bcrypt"
 )
 
 // RotateFlags contains parsed rotate command flags
 type RotateFlags struct {
-	NewCredential string
-	Revoke        bool
-	RevokeOld     bool
+	NewKeyData string
+	Revoke     bool
+	RevokeOld  bool
 }
 
 // parseRotateFlags parses all rotate command flags
 func parseRotateFlags(cmd *cobra.Command) (*RotateFlags, error) {
 	flags := &RotateFlags{}
 
-	newCredential, _ := cmd.Flags().GetString("new-credential") //nolint:errcheck // Flag getters don't fail in cobra
-	flags.NewCredential = newCredential
+	newKey, _ := cmd.Flags().GetString("new-credential") //nolint:errcheck // Flag getters don't fail in cobra
+	flags.NewKeyData = newKey
 
 	revoke, _ := cmd.Flags().GetBool("revoke") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.Revoke = revoke
@@ -35,7 +33,7 @@ func parseRotateFlags(cmd *cobra.Command) (*RotateFlags, error) {
 	flags.RevokeOld = revokeOld
 
 	// Validate flags
-	if flags.NewCredential == emptyValue && !flags.Revoke && !flags.RevokeOld {
+	if flags.NewKeyData == emptyValue && !flags.Revoke && !flags.RevokeOld {
 		return nil, errfmt.Errorf("must specify either --new-credential, --revoke, or --revoke-old")
 	}
 
@@ -82,39 +80,25 @@ func buildRevocationUpdates(revoke, revokeOld bool) map[string]any {
 	}
 }
 
-// hashCredential hashes a credential based on key type
-func hashCredential(credential, keyType string) (hash string, err error) {
-	if keyType == "password" {
-		// Use bcrypt for passwords (has built-in salt)
-		var hashBytes []byte
-		hashBytes, err = bcrypt.GenerateFromPassword([]byte(credential), bcrypt.DefaultCost)
-		if err != nil {
-			err = errfmt.Newf("failed to hash password").Wrap(err)
-			return
-		}
-		hash = string(hashBytes)
-		return
-	}
-
-	// Use SHA256 for tokens/API keys
-	hashBytes := sha256.Sum256([]byte(credential))
-	hash = "sha256:" + hex.EncodeToString(hashBytes[:])
-	return
-}
-
 // buildRotationUpdates builds updates for rotation
-func buildRotationUpdates(newCredential, keyType string) (map[string]any, error) {
-	if newCredential == emptyValue {
+func buildRotationUpdates(newVal, keyType string) (map[string]any, error) {
+	if newVal == emptyValue {
 		return nil, nil
 	}
 
-	credentialHash, err := hashCredential(newCredential, keyType)
-	if err != nil {
-		return nil, err
+	var hashVal string
+	var err error
+	if keyType == "password" {
+		hashVal, err = hashUserKey(newVal)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		hashVal = hashToken(newVal)
 	}
 
 	updates := map[string]any{
-		objects.FieldKeyCredentialHash: credentialHash,
+		objects.FieldKeyCredentialHash: authcred.SanitizeDigest(hashVal),
 		objects.FieldKeyLastUsedAt:     "", // Reset last_used_at on rotation
 	}
 	// Note: salt is always empty (bcrypt has built-in salt, SHA256 doesn't use salt)
@@ -134,7 +118,7 @@ func buildAllUpdates(flags *RotateFlags, keyType string) (map[string]any, error)
 	}
 
 	// Handle rotation (new credential)
-	rotationUpdates, err := buildRotationUpdates(flags.NewCredential, keyType)
+	rotationUpdates, err := buildRotationUpdates(flags.NewKeyData, keyType)
 	if err != nil {
 		return nil, err
 	}
@@ -151,8 +135,8 @@ func buildAllUpdates(flags *RotateFlags, keyType string) (map[string]any, error)
 }
 
 // determineUpdateContext determines which security context to use for updates
-func determineUpdateContext(secCtx *pkgctx.SecurityContext, newCredential string) *pkgctx.SecurityContext {
-	if newCredential != emptyValue {
+func determineUpdateContext(secCtx *pkgctx.SecurityContext, newKeyData string) *pkgctx.SecurityContext {
+	if newKeyData != emptyValue {
 		// Must use system context for credential_hash updates
 		return pkgctx.NewSystemSecurityContext()
 	}
@@ -168,7 +152,7 @@ func buildRotateResult(keyID string, flags *RotateFlags) map[string]any {
 		"actions":              []string{},
 	}
 
-	if flags.NewCredential != emptyValue {
+	if flags.NewKeyData != emptyValue {
 		result["actions"] = append(result["actions"].([]string), "rotated")
 	}
 	if flags.Revoke || flags.RevokeOld {
@@ -189,7 +173,7 @@ func formatRotateOutputText(keyID string, flags *RotateFlags, result map[string]
 		fmt.Fprintf(&buf, "Actions: %s\n", strings.Join(actions, ", "))
 	}
 
-	if flags.NewCredential != emptyValue {
+	if flags.NewKeyData != emptyValue {
 		buf.WriteString("⚠️  Key has been rotated - old credential is no longer valid\n")
 	}
 	if flags.Revoke || flags.RevokeOld {

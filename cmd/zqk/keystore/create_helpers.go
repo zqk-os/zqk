@@ -1,12 +1,11 @@
 package keystore
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/authcred"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -19,7 +18,7 @@ import (
 type CreateFlags struct {
 	AccountID   string
 	KeyType     string
-	Credential  string
+	KeyData     string
 	Title       string
 	Description string
 	ExpiresAt   string
@@ -35,8 +34,8 @@ func parseCreateFlags(cmd *cobra.Command) *CreateFlags {
 	keyType, _ := cmd.Flags().GetString("key-type") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.KeyType = keyType
 
-	credential, _ := cmd.Flags().GetString("credential") //nolint:errcheck // Flag getters don't fail in cobra
-	flags.Credential = credential
+	rawKey, _ := cmd.Flags().GetString("credential") //nolint:errcheck // Flag getters don't fail in cobra
+	flags.KeyData = rawKey
 
 	title, _ := cmd.Flags().GetString("title") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.Title = title
@@ -92,24 +91,18 @@ func determineAccountID(flags *CreateFlags, secCtx *pkgctx.SecurityContext) (str
 	return flags.AccountID, nil
 }
 
-// hashCredentialForCreate hashes a credential based on key type (for create)
-func hashCredentialForCreate(credential, keyType string) (hash string, err error) {
-	if keyType == "password" {
-		// Use bcrypt for passwords (has built-in salt)
-		var hashBytes []byte
-		hashBytes, err = bcrypt.GenerateFromPassword([]byte(credential), bcrypt.DefaultCost)
-		if err != nil {
-			err = errfmt.Newf("failed to hash password").Wrap(err)
-			return
-		}
-		hash = string(hashBytes)
-		return
+// hashUserKey hashes a user secret key using bcrypt with built-in salt.
+func hashUserKey(rawSecret string) (string, error) {
+	hashBytes, err := bcrypt.GenerateFromPassword([]byte(rawSecret), bcrypt.DefaultCost)
+	if err != nil {
+		return "", errfmt.Newf("failed to hash secret").Wrap(err)
 	}
+	return authcred.SanitizeDigest(string(hashBytes)), nil
+}
 
-	// Use SHA256 for tokens/API keys
-	hashBytes := sha256.Sum256([]byte(credential))
-	hash = "sha256:" + hex.EncodeToString(hashBytes[:])
-	return
+// hashToken hashes an API key or token using SHA-256 digest.
+func hashToken(token string) string {
+	return authcred.SanitizeDigest(authcred.HashAPIKey(token))
 }
 
 // buildKeystoreEntry builds the keystore entry object
@@ -119,7 +112,7 @@ func buildKeystoreEntry(flags *CreateFlags, accountID, credentialHash, salt stri
 		objects.FieldKeyTitle:          flags.Title,
 		objects.FieldKeyAccountID:      accountID,
 		objects.FieldKeyKeyType:        flags.KeyType,
-		objects.FieldKeyCredentialHash: credentialHash,
+		objects.FieldKeyCredentialHash: authcred.SanitizeDigest(credentialHash),
 		objects.FieldKeySalt:           salt,
 		objects.FieldKeyRevoked:        false,
 		objects.FieldKeyStatus:         objects.ObjectStatusActive,

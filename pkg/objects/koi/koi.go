@@ -120,6 +120,40 @@ func getValue(m map[string]any, key string) (any, bool) {
 	return v, true
 }
 
+func getInt(v any) (int, bool) {
+	switch val := v.(type) {
+	case int:
+		return val, true
+	case int32:
+		return int(val), true
+	case int16:
+		return int(val), true
+	case int8:
+		return int(val), true
+	case int64:
+		if val < int64(math.MinInt) || val > int64(math.MaxInt) {
+			return 0, false
+		}
+		return int(val), true
+	case float64:
+		if val < float64(math.MinInt) || val > float64(math.MaxInt) {
+			return 0, false
+		}
+		return int(val), true
+	case float32:
+		return int(val), true
+	case json.Number:
+		if i, err := strconv.Atoi(string(val)); err == nil {
+			return i, true
+		}
+	case string:
+		if i, err := strconv.Atoi(strings.TrimSpace(val)); err == nil {
+			return i, true
+		}
+	}
+	return 0, false
+}
+
 func getInt64(v any) (int64, bool) {
 	switch val := v.(type) {
 	case int64:
@@ -223,11 +257,8 @@ func GetIntOr(m map[string]any, key string, fallback int) int {
 	if !ok {
 		return fallback
 	}
-	if i, ok := getInt64(v); ok {
-		if i < int64(math.MinInt) || i > int64(math.MaxInt) {
-			return fallback
-		}
-		return int(i)
+	if i, ok := getInt(v); ok {
+		return i
 	}
 	return fallback
 }

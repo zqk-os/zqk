@@ -76,3 +76,29 @@ func TestFluentUnlevelledPanics(t *testing.T) {
 		t.Fatalf("expected log output to contain unlevelled warning field, got: %s", out)
 	}
 }
+
+func TestFluentSensitiveFieldSanitization(t *testing.T) {
+	t.Parallel()
+	var buf bytes.Buffer
+	logger := NewLogger(&buf, InfoLevel, NewTextFormatter(pkgctx.NewSystemContext()))
+
+	Fluent(logger).Info("sanitization_test").
+		String("password", "super_secret_pw").
+		String("api_token", "secret_token_123").
+		WithFields(Field{Key: "secret_key", Value: "sensitive_val"}).
+		Log()
+
+	out := buf.String()
+	if strings.Contains(out, "super_secret_pw") {
+		t.Fatalf("clear-text password leaked in logs: %s", out)
+	}
+	if strings.Contains(out, "secret_token_123") {
+		t.Fatalf("clear-text token leaked in logs: %s", out)
+	}
+	if strings.Contains(out, "sensitive_val") {
+		t.Fatalf("clear-text secret leaked in logs: %s", out)
+	}
+	if !strings.Contains(out, "password=******") {
+		t.Fatalf("expected password to be masked with '******', got: %s", out)
+	}
+}

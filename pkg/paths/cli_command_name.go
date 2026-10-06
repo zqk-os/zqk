@@ -1,6 +1,7 @@
 package paths
 
 import (
+	"math"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
@@ -32,7 +33,11 @@ func BrandExecutableName() string {
 
 // CLIUsage joins the live executable name with subcommand tokens.
 func CLIUsage(args ...string) string {
-	parts := make([]string, 0, 1+len(args))
+	allocCap := len(args)
+	if allocCap < math.MaxInt {
+		allocCap++
+	}
+	parts := make([]string, 0, allocCap)
 	parts = append(parts, CLIName())
 	for _, a := range args {
 		a = strings.TrimSpace(a)

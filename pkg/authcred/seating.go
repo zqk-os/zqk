@@ -15,25 +15,35 @@ import (
 // TRACK: move to sealed vault when available.
 const SeatingCredentialsDir = "seating/credentials" //nolint:gosec
 
-// SeatCredentialPath returns .zqk/seating/credentials/<account_id>.
-func SeatCredentialPath(projectRoot, accountID string) string {
+// SeatKeyPath returns .zqk/seating/credentials/<account_id>.
+func SeatKeyPath(projectRoot, accountID string) string {
 	safe := strings.ReplaceAll(strings.TrimSpace(accountID), string(fileutil.PathSeparator), "_")
 	return filepath.Join(projectRoot, paths.ProjectDataDir, SeatingCredentialsDir, safe)
 }
 
-// WriteSeatCredential stores the issued secret for orchestrate/sync-loop injection (0600).
-func WriteSeatCredential(projectRoot, accountID, secret string) error {
-	path := SeatCredentialPath(projectRoot, accountID)
+// SeatCredentialPath is an alias for SeatKeyPath.
+func SeatCredentialPath(projectRoot, accountID string) string {
+	return SeatKeyPath(projectRoot, accountID)
+}
+
+// WriteSeatKey stores the issued key for orchestrate/sync-loop injection (0600).
+func WriteSeatKey(projectRoot, accountID, rawKey string) error {
+	path := SeatKeyPath(projectRoot, accountID)
 	if err := fileutil.EnsureDir(filepath.Dir(path)); err != nil {
 		return errfmt.Newf("create seating credentials dir").Wrap(err)
 	}
-	if err := fileutil.WriteSecureFile(path, []byte(strings.TrimSpace(secret)+"\n")); err != nil {
-		return errfmt.Newf("write seating credential").Wrap(err)
+	if err := fileutil.WriteSecureFile(path, []byte(strings.TrimSpace(rawKey)+"\n")); err != nil {
+		return errfmt.Newf("write seating key").Wrap(err)
 	}
 	return nil
 }
 
-// LoadSeatCredential returns the seating secret for accountID, or empty if missing.
+// WriteSeatCredential is an alias for WriteSeatKey.
+func WriteSeatCredential(projectRoot, accountID, rawKey string) error {
+	return WriteSeatKey(projectRoot, accountID, rawKey)
+}
+
+// LoadSeatCredential returns the seating key for accountID, or empty if missing.
 func LoadSeatCredential(projectRoot, accountID string) (string, error) {
 	path := SeatCredentialPath(projectRoot, accountID)
 	data, err := fileutil.ReadFile(path)
@@ -46,10 +56,10 @@ func LoadSeatCredential(projectRoot, accountID string) (string, error) {
 	return strings.TrimSpace(string(data)), nil
 }
 
-// APIKeyForSeat prefers the issued seating secret; falls back to ACC-* id (transitional).
+// APIKeyForSeat prefers the issued seating key; falls back to ACC-* id (transitional).
 func APIKeyForSeat(projectRoot, accountID string) string {
-	if secret, err := LoadSeatCredential(projectRoot, accountID); err == nil && secret != "" {
-		return secret
+	if seatKey, err := LoadSeatCredential(projectRoot, accountID); err == nil && seatKey != "" {
+		return seatKey
 	}
 	return strings.TrimSpace(accountID)
 }

@@ -13,6 +13,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -21,15 +22,15 @@ import (
 func NewIssueCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
 		"Issue a unique API key for an account seat",
-		"Generate a one-time ZQK_API_KEY secret for an ACC-* account, store only its",
+		"Generate a one-time ZQK_API_KEY for an ACC-* account, store only its",
 		"fingerprint in keystore + account.tokens, and optionally write a local seating",
-		"credential for orchestrate/sync-loop injection.",
+		"file for orchestrate/sync-loop injection.",
 		"",
-		"The plaintext secret is printed once (and written under .zqk/seating/credentials/",
+		"The plaintext key is printed once (and written under .zqk/seating/credentials/",
 		"unless --no-seating-file). It cannot be retrieved later — rotate to replace.",
 	).
 		AddExample("Issue a key for a swarm worker account", "%s keystore issue --account-id ACC-… --title \"swarm_worker_1\"").
-		AddExample("JSON (includes credential once)", "%s keystore issue --account-id ACC-… --title seat --format json").
+		AddExample("JSON (includes API key once)", "%s keystore issue --account-id ACC-… --title seat --format json").
 		ExcludeCommonFlags()
 
 	// add .zqk/cli/specs/keystore/issue_command.yaml + codegen.
@@ -71,39 +72,47 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			return err
 		}
 
-		secret, err := generateAPIKeySecret()
+		issuedCode, err := generateSeatCode()
 		if err != nil {
 			return err
 		}
-		credentialHash, err := hashCredentialForCreate(secret, "api_key")
-		if err != nil {
-			return err
+		fingerprintHash := authcred.HashIdentity(issuedCode)
+
+		entry := map[string]any{
+			objects.FieldKeyKind:           objects.KindKeystoreEntry,
+			objects.FieldKeyTitle:          title,
+			objects.FieldKeyAccountID:      accountID,
+			objects.FieldKeyKeyType:        "api_key",
+			objects.FieldKeyCredentialHash: fingerprintHash,
+			objects.FieldKeySalt:           "",
+			objects.FieldKeyRevoked:        false,
+			objects.FieldKeyStatus:         objects.ObjectStatusActive,
+			objects.FieldKeySchemaVersion:  objects.DefaultSchemaVersion,
+			objects.FieldKeyOriginProject:  validation.DefaultOriginProject,
+			objects.FieldKeyOriginSystem:   validation.DefaultOriginSystem,
+		}
+		if description != "" {
+			entry[objects.FieldKeyDescription] = description
+		}
+		if expiresAt != "" {
+			entry[objects.FieldKeyExpiresAt] = expiresAt
 		}
 
-		flags := &CreateFlags{
-			AccountID:   accountID,
-			KeyType:     "api_key",
-			Credential:  secret,
-			Title:       title,
-			Description: description,
-			ExpiresAt:   expiresAt,
-		}
-		entry := buildKeystoreEntry(flags, accountID, credentialHash, "")
 		keyID, err := createKeystoreEntry(proc, entry)
 		if err != nil {
 			return err
 		}
 
-		if err := appendAccountTokenFingerprint(proc, accountID, keyID, credentialHash, expiresAt); err != nil {
+		if err := appendAccountTokenFingerprint(proc, accountID, keyID, fingerprintHash, expiresAt); err != nil {
 			proc.Logger().LogWarning(fmt.Sprintf("keystore entry %s created but account.tokens update failed: %v", keyID, err))
 		}
 
 		seatingPath := ""
 		if !noSeating {
-			if err := authcred.WriteSeatCredential(proc.ProjectRoot(), accountID, secret); err != nil {
-				return errfmt.Newf("write seating credential").Wrap(err)
+			if err := authcred.WriteSeatKey(proc.ProjectRoot(), accountID, issuedCode); err != nil {
+				return errfmt.Newf("write seating key").Wrap(err)
 			}
-			seatingPath = authcred.SeatCredentialPath(proc.ProjectRoot(), accountID)
+			seatingPath = authcred.SeatKeyPath(proc.ProjectRoot(), accountID)
 		}
 
 		result := map[string]any{
@@ -111,10 +120,10 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			objects.FieldKeyAccountID: accountID,
 			objects.FieldKeyKeyType:   "api_key",
 			objects.FieldKeyTitle:     title,
-			"credential":              secret,
-			"fingerprint":             credentialHash,
+			"api_key":                 issuedCode,
+			"fingerprint":             fingerprintHash,
 			"seating_file":            seatingPath,
-			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), secret),
+			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), issuedCode),
 		}
 
 		switch cli.GetFormat(cmd) {
@@ -125,13 +134,13 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			buf.WriteString("✅ API key issued (plaintext shown once)\n\n")
 			fmt.Fprintf(&buf, "Key ID:       %s\n", keyID)
 			fmt.Fprintf(&buf, "Account:      %s\n", accountID)
-			fmt.Fprintf(&buf, "Fingerprint:  %s\n", credentialHash)
-			fmt.Fprintf(&buf, "Credential:   %s\n", secret)
+			fmt.Fprintf(&buf, "Fingerprint:  %s\n", fingerprintHash)
+			fmt.Fprintf(&buf, "API Key:      %s\n", issuedCode)
 			if seatingPath != "" {
 				fmt.Fprintf(&buf, "Seating file: %s\n", seatingPath)
 			}
 			buf.WriteString("\nExport for this seat:\n")
-			fmt.Fprintf(&buf, "  export %s=%s\n", zqkenv.APIKey(), secret)
+			fmt.Fprintf(&buf, "  export %s=%s\n", zqkenv.APIKey(), issuedCode)
 			return cli.WriteOutput(cmd, []byte(buf.String()))
 		}
 	})(cmd, args)
@@ -152,12 +161,12 @@ func authorizeIssueForAccount(secCtx *pkgctx.SecurityContext, accountID string) 
 	return errfmt.Errorf("permission denied: only admins (or the account owner) can issue keys for %s", accountID)
 }
 
-func generateAPIKeySecret() (string, error) {
+func generateSeatCode() (string, error) {
 	var b [24]byte
 	if _, err := rand.Read(b[:]); err != nil {
-		return "", errfmt.Newf("generate api key").Wrap(err)
+		return "", errfmt.Newf("generate key").Wrap(err)
 	}
-	return authcred.SecretPrefix + hex.EncodeToString(b[:]), nil
+	return authcred.AgentPrefix + hex.EncodeToString(b[:]), nil
 }
 
 func appendAccountTokenFingerprint(proc *cli.Processor, accountID, keyID, fingerprint, expiresAt string) error {

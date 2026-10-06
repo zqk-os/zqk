@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"path/filepath"
 	"slices"
@@ -490,7 +491,11 @@ func applySchedulerJobFixtures(
 		}
 
 		// Copy template so we do not mutate the original map from the bundle.
-		obj := make(map[string]any, len(fx.Template)+2)
+		allocCap := len(fx.Template)
+		if allocCap <= math.MaxInt-2 {
+			allocCap += 2
+		}
+		obj := make(map[string]any, allocCap)
 		for k, v := range fx.Template {
 			obj[k] = v
 		}

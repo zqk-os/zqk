@@ -10,14 +10,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestHashAndResolveSecret(t *testing.T) {
+func TestHashAndResolveAPIKey(t *testing.T) {
 	root := t.TempDir()
 	dir := filepath.Join(root, paths.ProcessKeystoreDir)
 	if err := fileutil.EnsureDir(dir); err != nil {
 		t.Fatal(err)
 	}
-	secret := SecretPrefix + "test-secret-001"
-	hash := HashAPIKey(secret)
+	rawKey := APIKeyPrefix + "test-key-001"
+	hash := HashAPIKey(rawKey)
 	entry := `account_id: ACC-SEAT-001
 credential_hash: ` + hash + `
 id: KEY-TEST-001
@@ -30,19 +30,19 @@ status: active
 		t.Fatal(err)
 	}
 
-	m, err := ResolveSecret(root, secret)
+	m, err := ResolveAPIKey(root, rawKey)
 	if err != nil {
-		t.Fatalf("ResolveSecret: %v", err)
+		t.Fatalf("ResolveAPIKey: %v", err)
 	}
 	if m.AccountID != "ACC-SEAT-001" || m.KeyID != "KEY-TEST-001" {
 		t.Fatalf("match=%+v", m)
 	}
-	again, err := ResolveSecret(root, secret)
+	again, err := ResolveAPIKey(root, rawKey)
 	if err != nil || again.AccountID != "ACC-SEAT-001" {
-		t.Fatalf("cached ResolveSecret=%+v err=%v", again, err)
+		t.Fatalf("cached ResolveAPIKey=%+v err=%v", again, err)
 	}
 
-	if _, err := ResolveSecret(root, "wrong"); err == nil {
+	if _, err := ResolveAPIKey(root, "wrong"); err == nil {
 		t.Fatal("expected miss")
 	}
 }
@@ -50,16 +50,16 @@ status: active
 func TestSeatCredentialRoundTrip(t *testing.T) {
 	root := t.TempDir()
 	const acc = "ACC-SEAT-002"
-	secret := SecretPrefix + "seat"
-	if err := WriteSeatCredential(root, acc, secret); err != nil {
+	keyVal := APIKeyPrefix + "seat"
+	if err := WriteSeatCredential(root, acc, keyVal); err != nil {
 		t.Fatal(err)
 	}
 	got, err := LoadSeatCredential(root, acc)
-	if err != nil || got != secret {
+	if err != nil || got != keyVal {
 		t.Fatalf("got %q err=%v", got, err)
 	}
-	if APIKeyForSeat(root, acc) != secret {
-		t.Fatalf("APIKeyForSeat want secret")
+	if APIKeyForSeat(root, acc) != keyVal {
+		t.Fatalf("APIKeyForSeat want keyVal")
 	}
 	if APIKeyForSeat(root, "ACC-MISSING") != "ACC-MISSING" {
 		t.Fatalf("fallback to ACC id")
@@ -200,8 +200,8 @@ func TestCanonicalAccountID(t *testing.T) {
 
 func TestWithSeatAPIKeyEnv(t *testing.T) {
 	parent := []string{"FOO=1", "ZQK_API_KEY=ACC-PARENT", "ZQK_PROJECT_ROOT=/old"}
-	out := WithSeatAPIKeyEnv(parent, SecretPrefix+"x", "/wt")
-	if !containsEnv(out, "ZQK_API_KEY="+SecretPrefix+"x") {
+	out := WithSeatAPIKeyEnv(parent, APIKeyPrefix+"x", "/wt")
+	if !containsEnv(out, "ZQK_API_KEY="+APIKeyPrefix+"x") {
 		t.Fatalf("missing seat key: %v", out)
 	}
 	if containsEnv(out, "ZQK_API_KEY=ACC-PARENT") {
@@ -225,13 +225,13 @@ func TestLooksLikeSessionToken(t *testing.T) {
 	if !LooksLikeSessionToken("ZS-123") || !LooksLikeSessionToken("ZQK-123") {
 		t.Fatal("canonical and synonym session ids")
 	}
-	if LooksLikeSessionToken("ACC-1") || LooksLikeSessionToken("zqk-secret") {
-		t.Fatal("account and opaque secret are not sessions")
+	if LooksLikeSessionToken("ACC-1") || LooksLikeSessionToken("zqk-token") {
+		t.Fatal("account and opaque token are not sessions")
 	}
-	if LooksLikeIssuedSecret("ZS-123") || LooksLikeIssuedSecret("ZQK-123") || LooksLikeIssuedSecret("ACC-1") {
-		t.Fatal("session and ACC ids are not issued secrets")
+	if LooksLikeIssuedAPIKey("ZS-123") || LooksLikeIssuedAPIKey("ZQK-123") || LooksLikeIssuedAPIKey("ACC-1") {
+		t.Fatal("session and ACC ids are not issued api keys")
 	}
-	if !LooksLikeIssuedSecret(SecretPrefix + "opaque") {
-		t.Fatal("opaque issued secret")
+	if !LooksLikeIssuedAPIKey(APIKeyPrefix + "opaque") {
+		t.Fatal("opaque issued api key")
 	}
 }
