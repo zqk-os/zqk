@@ -13,30 +13,40 @@ func LevenshteinDistance(s1, s2 string) int {
 	if lb == 0 {
 		return la
 	}
-	if la > maxLevenshteinStringLen || lb > maxLevenshteinStringLen || la >= math.MaxInt || lb >= math.MaxInt {
+	if la > maxLevenshteinStringLen || lb > maxLevenshteinStringLen {
 		if la > lb {
 			return la
 		}
 		return lb
 	}
 
-	dp := make([][]int, la+1)
-	for i := range dp {
-		dp[i] = make([]int, lb+1)
-		dp[i][0] = i
+	// Swap so s2 is always the shorter string for O(min(la, lb)) space
+	if la < lb {
+		s1, s2 = s2, s1
+		la, lb = lb, la
 	}
-	for j := 0; j <= lb; j++ {
-		dp[0][j] = j
+
+	cols := lb
+	if cols < math.MaxInt {
+		cols++
+	}
+
+	prev := make([]int, cols)
+	curr := make([]int, cols)
+	for j := 0; j < cols; j++ {
+		prev[j] = j
 	}
 
 	for i := 1; i <= la; i++ {
-		for j := 1; j <= lb; j++ {
+		curr[0] = i
+		for j := 1; j < cols; j++ {
 			cost := 1
 			if s1[i-1] == s2[j-1] {
 				cost = 0
 			}
-			dp[i][j] = min(dp[i-1][j]+1, min(dp[i][j-1]+1, dp[i-1][j-1]+cost))
+			curr[j] = min(prev[j]+1, min(curr[j-1]+1, prev[j-1]+cost))
 		}
+		copy(prev, curr)
 	}
-	return dp[la][lb]
+	return prev[lb]
 }

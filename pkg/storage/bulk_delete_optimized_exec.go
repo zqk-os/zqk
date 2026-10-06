@@ -47,7 +47,9 @@ func (f *FileObjectStorage) BulkDeleteOptimized(
 	}
 
 	// Load ID validator patterns if needed
-	if err := f.idValidator.LoadPatterns(); err != nil {
+	if f.idValidator == nil {
+		allLeafNodes = false
+	} else if err := f.idValidator.LoadPatterns(); err != nil {
 		StorageLog(logger).Warn(LogEventStorageBulkDeleteIDPatternsFailedFullGraphWarn).WithError(err).Log()
 		allLeafNodes = false
 	} else {
@@ -205,8 +207,10 @@ func (f *FileObjectStorage) BulkDeleteOptimized(
 	if allLeafNodes {
 		idToKind := make(map[string]string, len(deletionOrder))
 		for _, id := range deletionOrder {
-			if kind := f.idValidator.InferKindFromID(id); kind != emptyValue {
-				idToKind[id] = kind
+			if f.idValidator != nil {
+				if kind := f.idValidator.InferKindFromID(id); kind != emptyValue {
+					idToKind[id] = kind
+				}
 			}
 		}
 
