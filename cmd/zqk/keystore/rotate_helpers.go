@@ -22,8 +22,8 @@ type RotateFlags struct {
 func parseRotateFlags(cmd *cobra.Command) (*RotateFlags, error) {
 	flags := &RotateFlags{}
 
-	newCredential, _ := cmd.Flags().GetString("new-credential") //nolint:errcheck // Flag getters don't fail in cobra
-	flags.NewKeyData = newCredential
+	newKey, _ := cmd.Flags().GetString("new-credential") //nolint:errcheck // Flag getters don't fail in cobra
+	flags.NewKeyData = newKey
 
 	revoke, _ := cmd.Flags().GetBool("revoke") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.Revoke = revoke

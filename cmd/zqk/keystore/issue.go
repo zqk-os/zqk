@@ -75,23 +75,22 @@ func runIssue(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		credentialHash := hashToken(apiKeyVal)
+		fingerprintHash := authcred.HashAPIKey(apiKeyVal)
 
 		flags := &CreateFlags{
 			AccountID:   accountID,
 			KeyType:     "api_key",
-			KeyData:     apiKeyVal,
 			Title:       title,
 			Description: description,
 			ExpiresAt:   expiresAt,
 		}
-		entry := buildKeystoreEntry(flags, accountID, credentialHash, "")
+		entry := buildKeystoreEntry(flags, accountID, fingerprintHash, "")
 		keyID, err := createKeystoreEntry(proc, entry)
 		if err != nil {
 			return err
 		}
 
-		if err := appendAccountTokenFingerprint(proc, accountID, keyID, credentialHash, expiresAt); err != nil {
+		if err := appendAccountTokenFingerprint(proc, accountID, keyID, fingerprintHash, expiresAt); err != nil {
 			proc.Logger().LogWarning(fmt.Sprintf("keystore entry %s created but account.tokens update failed: %v", keyID, err))
 		}
 
@@ -108,8 +107,8 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			objects.FieldKeyAccountID: accountID,
 			objects.FieldKeyKeyType:   "api_key",
 			objects.FieldKeyTitle:     title,
-			"credential":              apiKeyVal,
-			"fingerprint":             credentialHash,
+			"api_key":                 apiKeyVal,
+			"fingerprint":             fingerprintHash,
 			"seating_file":            seatingPath,
 			"env_hint":                fmt.Sprintf("%s=%s", zqkenv.APIKey(), apiKeyVal),
 		}
@@ -122,8 +121,8 @@ func runIssue(cmd *cobra.Command, args []string) error {
 			buf.WriteString("✅ API key issued (plaintext shown once)\n\n")
 			fmt.Fprintf(&buf, "Key ID:       %s\n", keyID)
 			fmt.Fprintf(&buf, "Account:      %s\n", accountID)
-			fmt.Fprintf(&buf, "Fingerprint:  %s\n", credentialHash)
-			fmt.Fprintf(&buf, "Credential:   %s\n", apiKeyVal)
+			fmt.Fprintf(&buf, "Fingerprint:  %s\n", fingerprintHash)
+			fmt.Fprintf(&buf, "API Key:      %s\n", apiKeyVal)
 			if seatingPath != "" {
 				fmt.Fprintf(&buf, "Seating file: %s\n", seatingPath)
 			}

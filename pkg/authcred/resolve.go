@@ -15,8 +15,6 @@ import (
 const (
 	// APIKeyPrefix marks generated agent API keys (never an ACC-* id).
 	APIKeyPrefix = "zqk_ak_"
-	// SecretPrefix is an alias for APIKeyPrefix.
-	SecretPrefix = APIKeyPrefix
 
 	keyTypeAPIKey              = "api_key"
 	keyTypePersonalAccessToken = "personal_access_token"
@@ -83,11 +81,6 @@ func ResolveAPIKey(projectRoot, rawKey string) (Match, error) {
 	return Match{}, errfmt.Errorf("credential not found in keystore")
 }
 
-// ResolveSecret is a backward-compatible alias for ResolveAPIKey.
-func ResolveSecret(projectRoot, rawKey string) (Match, error) {
-	return ResolveAPIKey(projectRoot, rawKey)
-}
-
 // LooksLikeIssuedAPIKey reports whether raw is an opaque issued key
 // (not ACC-*, session ZS-/ZQK-*, or retired account: form).
 func LooksLikeIssuedAPIKey(raw string) bool {
@@ -105,11 +98,6 @@ func LooksLikeIssuedAPIKey(raw string) bool {
 		return false
 	}
 	return true
-}
-
-// LooksLikeIssuedSecret is an alias for LooksLikeIssuedAPIKey.
-func LooksLikeIssuedSecret(raw string) bool {
-	return LooksLikeIssuedAPIKey(raw)
 }
 
 // LooksLikeSessionToken reports ZS-* (canonical session) or the ZQK-* synonym

@@ -34,8 +34,8 @@ func parseCreateFlags(cmd *cobra.Command) *CreateFlags {
 	keyType, _ := cmd.Flags().GetString("key-type") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.KeyType = keyType
 
-	credential, _ := cmd.Flags().GetString("credential") //nolint:errcheck // Flag getters don't fail in cobra
-	flags.KeyData = credential
+	rawKey, _ := cmd.Flags().GetString("credential") //nolint:errcheck // Flag getters don't fail in cobra
+	flags.KeyData = rawKey
 
 	title, _ := cmd.Flags().GetString("title") //nolint:errcheck // Flag getters don't fail in cobra
 	flags.Title = title
