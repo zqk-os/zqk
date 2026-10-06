@@ -131,3 +131,45 @@ func TestDocsPortal_IntegrationAndConformance(t *testing.T) {
 		t.Errorf("expected build_portal and verify_tarball in generate_docs_portal.py")
 	}
 }
+
+// TestDocsPortal_DeployDryRunAndCoherency verifies that deploy-docs-portal.sh
+// compiles clean HTML pages with CNAME and .nojekyll markers (CRIT-DOC-DEPLOY-001, CRIT-WEB-COHERENCY-001).
+func TestDocsPortal_DeployDryRunAndCoherency(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	deployScript := filepath.Join(root, "scripts", "open-core", "docs-portal", "deploy-docs-portal.sh")
+
+	fi, err := os.Stat(deployScript)
+	if err != nil {
+		t.Fatalf("failed to stat deploy-docs-portal.sh: %v", err)
+	}
+	if fi.Mode()&0111 == 0 {
+		t.Errorf("expected deploy-docs-portal.sh to be executable")
+	}
+
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", deployScript, "--dry-run")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("deploy-docs-portal.sh --dry-run failed: %v, output: %s", err, string(out))
+	}
+	outputStr := string(out)
+	if !strings.Contains(outputStr, "Compiled") || !strings.Contains(outputStr, "HTML documentation pages") {
+		t.Errorf("expected compiled html documentation pages in output, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "Portal verified at /tmp/zqk-docs-build") {
+		t.Errorf("expected portal verification in output, got: %s", outputStr)
+	}
+
+	cnamePath := filepath.Join("/tmp", "zqk-docs-build", "CNAME")
+	cnameBytes, err := os.ReadFile(cnamePath)
+	if err != nil {
+		t.Fatalf("failed to read CNAME marker: %v", err)
+	}
+	if !strings.Contains(string(cnameBytes), "docs.zqk.dev") {
+		t.Errorf("expected docs.zqk.dev in CNAME, got: %s", string(cnameBytes))
+	}
+
+	nojekyllPath := filepath.Join("/tmp", "zqk-docs-build", ".nojekyll")
+	if !fileutil.Exists(nojekyllPath) {
+		t.Errorf("expected .nojekyll marker at %s", nojekyllPath)
+	}
+}
