@@ -29,31 +29,13 @@ Waiting for `git commit` check-valves or `zqk-vet` to catch errors is a late-sta
 
 ## 3. The 5-Layer Relational Cascade
 
-```
-                  ┌───────────────────────────────┐
-                  │          GOAL                 │
-                  │   Strategic End-State         │
-                  └───────────────┬───────────────┘
-                                  │ 1 : 3-5
-                                  ▼
-                  ┌───────────────────────────────┐
-                  │       REQUIREMENT (REQ)       │◄─────────────────────────────┐
-                  │    Whole Feature Contract     │                              │
-                  └───────────────┬───────────────┘                              │
-                                  │ 1 : 3+                                       │
-                                  ▼                                              │ Verifies All Criteria
-                  ┌───────────────────────────────┐                              │ for the Requirement
-                  │        CRITERIA (CRIT)        │                              │ (1 per Requirement)
-                  │  Static · Operational · Neg   │                              │
-                  └───────┬───────────────┬───────┘                              │
-         Satisfies 1-3    │               │                                      │
-         Criteria / Effort│               │ Evaluated by Unified Runner          │
-                          ▼               ▼                                      │
-           ┌──────────────────────┐   ┌──────────────────────────────────────────┴────┐
-           │  BACKLOG_ITEM (BLI)  │   │                TEST_CASE (TST)                │
-           │  Unit(s) of Work     │   │ Unified Test Runner / Logical Verification    │
-           │  (2-5 per Plan)      │   │ Group proving the entire Requirement          │
-           └──────────────────────┘   └───────────────────────────────────────────────┘
+```mermaid
+graph TD
+    GOAL["GOAL<br/>Strategic Compass · Timeless"] -->|1 : 3-5| REQ["REQUIREMENT (REQ)<br/>Whole Feature Contract · Timeless"]
+    REQ -->|1 : 3+| CRIT["CRITERIA (CRIT)<br/>Three-Fold Proof: Static · Dynamic · Negative"]
+    CRIT -->|Satisfies 1-3 Criteria| BLI["BACKLOG_ITEM (BLI)<br/>Atomic Effort Unit (2-5 per Plan)"]
+    CRIT -->|Evaluated By| TST["TEST_CASE (TST)<br/>Unified Test Runner"]
+    TST -.->|Verifies 1:1| REQ
 ```
 
 ### Critical Linkage Rules
@@ -82,22 +64,40 @@ Waiting for `git commit` check-valves or `zqk-vet` to catch errors is a late-sta
 
 In ZQK Studio and execution planning, the graph renders as an audited two-dimensional execution grid:
 
-```
-                            TIME-BOUNDED EXECUTION CYCLES (Priority Plans)
-                         Cycle 1 (Sprint A)        Cycle 2 (Sprint B)       Cycle 3 (Sprint C)
-                        ┌─────────────────────┐   ┌─────────────────────┐   ┌─────────────────────┐
-                        │ PRI-PLAN-001        │   │ PRI-PLAN-002        │   │ PRI-PLAN-003        │
-                        └─────────────────────┘   └─────────────────────┘   └─────────────────────┘
-┌─────────────────────┐ ┌─────────────────────┐
-│ WORKSTREAM 1        │ │ [BLI-001] [BLI-002] │ ──► Milestone 1: Core Engine Alpha ★
-│ (Lanes / Rows)      │ └─────────────────────┘
-├─────────────────────┤                           ┌─────────────────────┐
-│ WORKSTREAM 2        │                           │ [BLI-003] [BLI-004] │
-│ (e.g. Studio UI)    │                           └─────────────────────┘
-├─────────────────────┤                                                     ┌─────────────────────┐
-│ WORKSTREAM 3        │                                                     │ [BLI-005] [BLI-006] │ ──► Milestone 2: Public Preview ★
-│ (e.g. DevRel)       │                                                     └─────────────────────┘
-└─────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Matrix["GANTT MATRIX TOPOLOGY"]
+        direction TB
+        subgraph Col1["Cycle 1 (Sprint A)"]
+            P1["PRI-PLAN-001<br/>(Scope-Locked)"]
+            subgraph WS1["Workstream 1: Core Engine"]
+                B1["BLI-001"]
+                B2["BLI-002"]
+            end
+            P1 --> WS1
+        end
+
+        subgraph Col2["Cycle 2 (Sprint B)"]
+            P2["PRI-PLAN-002<br/>(Scope-Locked)"]
+            subgraph WS2["Workstream 2: Studio UI"]
+                B3["BLI-003"]
+                B4["BLI-004"]
+            end
+            P2 --> WS2
+        end
+
+        subgraph Col3["Cycle 3 (Sprint C)"]
+            P3["PRI-PLAN-003<br/>(Scope-Locked)"]
+            subgraph WS3["Workstream 3: DevRel"]
+                B5["BLI-005"]
+                B6["BLI-006"]
+            end
+            P3 --> WS3
+        end
+    end
+
+    WS1 --> M1(["Milestone 1: Core Engine Alpha"])
+    WS3 --> M2(["Milestone 2: Public Preview"])
 ```
 
 * **Workstreams (Rows / Swimlanes):** Ongoing functional domains (e.g., *Core Engine*, *Studio UI*, *Developer Relations*).
@@ -125,30 +125,45 @@ Consider a real-world physical engineering endeavor: flipping an old home.
 
 Rather than slicing the execution into ambiguous *"Phase 1 through 6"*, work is structured under domain-cohesive **Epics**:
 
-```
-                              ┌───────────────────────────────────────────────┐
-                              │     MISSION: Flip the House on 1st Ave        │
-                              └───────────────────────┬───────────────────────┘
-                                                      │
-                       ┌──────────────────────────────┴──────────────────────────────┐
-                       ▼                                                             ▼
-┌─────────────────────────────────────────────┐               ┌─────────────────────────────────────────────┐
-│       EPIC: Interior Home Remodel           │               │       EPIC: Exterior & Landscaping Remodel  │
-│   (Thematic Umbrella for Living Spaces)     │               │   (Thematic Umbrella for Curb Appeal)       │
-└──────────────────────┬──────────────────────┘               └──────────────────────┬──────────────────────┘
-                       │                                                             │
-         ┌─────────────┼─────────────┐                                 ┌─────────────┼─────────────┐
-         ▼             ▼             ▼                                 ▼             ▼             ▼
-  ┌─────────────┐┌─────────────┐┌─────────────┐                 ┌─────────────┐┌─────────────┐┌─────────────┐
-  │Plan 1: Demo ││Plan 2: Dry- ││Plan 3: Paint│                 │Plan 1: Tree ││Plan 2: Siding││Plan 3: Sod &│
-  │  & Tearout  ││wall & Patch ││ & Fixtures  │                 │  & Grading  ││ & Trim Paint││ Hardscape   │
-  └──────┬──────┘└─────────────┘└─────────────┘                 └─────────────┘└─────────────┘└─────────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
-[BLI-001] [BLI-002]
-Remove    Remove
-Toilets   Cabinets
+```mermaid
+graph TD
+    subgraph Strategic Direction
+        M["<b>MISSION</b><br/>Flip the House on 1st Ave"]
+    end
+
+    subgraph Thematic Epics
+        E1["<b>EPIC 1: Interior Home Remodel</b><br/><i>Thematic Umbrella for Living Spaces</i>"]
+        E2["<b>EPIC 2: Exterior & Landscaping Remodel</b><br/><i>Thematic Umbrella for Curb Appeal</i>"]
+    end
+
+    subgraph Cycle Plans
+        P1["<b>Plan 1: Demolition & Tearout</b><br/>Cycle Batch 1"]
+        P2["<b>Plan 2: Drywall & Patching</b><br/>Cycle Batch 2"]
+        P3["<b>Plan 3: Painting & Fixtures</b><br/>Cycle Batch 3"]
+
+        P4["<b>Plan 1: Tree Trimming & Grading</b><br/>Cycle Batch 1"]
+        P5["<b>Plan 2: Siding & Exterior Paint</b><br/>Cycle Batch 2"]
+        P6["<b>Plan 3: Sod & Hardscaping</b><br/>Cycle Batch 3"]
+    end
+
+    subgraph Atomic Units of Effort
+        B1["<b>BLI-001</b><br/>Remove Toilets"]
+        B2["<b>BLI-002</b><br/>Remove Cabinets"]
+    end
+
+    M --> E1
+    M --> E2
+
+    E1 --> P1
+    E1 --> P2
+    E1 --> P3
+
+    E2 --> P4
+    E2 --> P5
+    E2 --> P6
+
+    P1 --> B1
+    P1 --> B2
 ```
 
 * **Epic 1: "Interior Home Remodel"**
