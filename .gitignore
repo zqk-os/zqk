@@ -36,6 +36,7 @@ go.work
 nexos_*.txt
 tier*.txt
 COMMIT_MSG*
+pr_body*.txt
 
 # zqk
 # Prevent nested .zqk directories from test data pollution (POL-CODE-006).
