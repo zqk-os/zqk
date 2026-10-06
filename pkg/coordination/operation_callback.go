@@ -118,40 +118,84 @@ func (c *CoordinatorOperationCallback) dispatchEvent(spec callbackEmitSpec) {
 	}
 }
 
-// OnStart emits start event via coordinator
-func (c *CoordinatorOperationCallback) OnStart(operationID string, metadata map[string]any) {
+type callbackEventConfig struct {
+	label         string
+	eventType     string
+	action        string
+	severity      string
+	loggingFields []LoggingField
+	auditMetadata map[string]any
+	emitGlobal    bool
+	duration      time.Duration
+	err           error
+}
+
+func (c *CoordinatorOperationCallback) emitCallbackEvent(operationID string, cfg callbackEventConfig) {
+	loggingFields := make([]LoggingField, 0, 1+len(cfg.loggingFields))
+	loggingFields = append(loggingFields, LoggingField{Key: logFieldOperationID, Value: operationID})
+	loggingFields = append(loggingFields, cfg.loggingFields...)
+
+	auditMetadata := map[string]any{
+		objects.FieldKeyEventType:   operationCallbackAuditEventTypeSystemConfigChange,
+		objects.FieldKeyOperation:   fmt.Sprintf("%s %s", c.operationType, cfg.action),
+		objects.FieldKeyOperationID: operationID,
+		objects.FieldKeySeverity:    cfg.severity,
+	}
+	for k, v := range cfg.auditMetadata {
+		auditMetadata[k] = v
+	}
+
 	eventData := &EventData{
-		LoggingFields: []LoggingField{
-			{Key: logFieldOperationID, Value: operationID},
-			{Key: logFieldOperationType, Value: c.operationType},
-			{Key: logFieldStatus, Value: statusStartedValue},
-		},
-		AuditMetadata: map[string]any{
-			objects.FieldKeyEventType:   operationCallbackAuditEventTypeSystemConfigChange,
-			objects.FieldKeyOperation:   fmt.Sprintf("%s started", c.operationType),
-			objects.FieldKeyOperationID: operationID,
-			"operation_type":            c.operationType,
-			objects.FieldKeySeverity:    "low",
-		},
-		MetricsData: nil,
+		LoggingFields: loggingFields,
+		AuditMetadata: auditMetadata,
+		MetricsData:   nil,
 	}
 
-	maps.Copy(eventData.AuditMetadata, metadata)
-	for k, v := range metadata {
-		eventData.LoggingFields = append(eventData.LoggingFields, LoggingField{Key: k, Value: v})
-	}
-
-	eventCtx := NewEventContext(operationID, c.operationType, "start").
+	eventCtx := NewEventContext(operationID, c.operationType, cfg.eventType).
 		WithEventData(eventData).
 		WithContext(c.ctx).
-		WithChannels(true, true, false, true)
+		WithChannels(true, true, false, cfg.emitGlobal)
+
+	if cfg.duration > 0 {
+		eventCtx = eventCtx.WithDuration(cfg.duration)
+	}
+	if cfg.err != nil {
+		eventCtx = eventCtx.WithError(cfg.err)
+	}
 
 	c.dispatchEvent(callbackEmitSpec{
-		label:       "operation_callback_start",
+		label:       fmt.Sprintf("operation_callback_%s", cfg.label),
 		operationID: operationID,
-		eventType:   "start",
+		eventType:   cfg.eventType,
 		eventCtx:    eventCtx,
-		emitGlobal:  true,
+		emitGlobal:  cfg.emitGlobal,
+		duration:    cfg.duration,
+	})
+}
+
+// OnStart emits start event via coordinator
+func (c *CoordinatorOperationCallback) OnStart(operationID string, metadata map[string]any) {
+	loggingFields := []LoggingField{
+		{Key: logFieldOperationType, Value: c.operationType},
+		{Key: logFieldStatus, Value: statusStartedValue},
+	}
+	for k, v := range metadata {
+		loggingFields = append(loggingFields, LoggingField{Key: k, Value: v})
+	}
+
+	auditMeta := map[string]any{
+		"operation_type": c.operationType,
+	}
+	maps.Copy(auditMeta, metadata)
+
+	c.emitCallbackEvent(operationID, callbackEventConfig{
+		label:         "start",
+		eventType:     "start",
+		action:        "started",
+		severity:      "low",
+		loggingFields: loggingFields,
+		auditMetadata: auditMeta,
+		emitGlobal:    true,
 	})
 }
 
@@ -162,135 +206,78 @@ func (c *CoordinatorOperationCallback) OnProgress(operationID string, progress i
 		percent = float64(progress) / float64(total) * 100.0
 	}
 
-	eventData := &EventData{
-		LoggingFields: []LoggingField{
-			{Key: "operation_id", Value: operationID},
+	c.emitCallbackEvent(operationID, callbackEventConfig{
+		label:     "progress",
+		eventType: "progress",
+		action:    "progress",
+		severity:  "low",
+		loggingFields: []LoggingField{
 			{Key: "progress", Value: progress},
 			{Key: "total", Value: total},
 			{Key: "percent", Value: percent},
 			{Key: "message", Value: message},
 		},
-		AuditMetadata: map[string]any{
-			objects.FieldKeyEventType:   "system_config_change",
-			objects.FieldKeyOperation:   fmt.Sprintf("%s progress", c.operationType),
-			objects.FieldKeyOperationID: operationID,
-			"progress":                  progress,
-			"total":                     total,
-			"percent":                   percent,
-			objects.FieldKeySeverity:    "low",
+		auditMetadata: map[string]any{
+			"progress": progress,
+			"total":    total,
+			"percent":  percent,
 		},
-		MetricsData: nil,
-	}
-
-	eventCtx := NewEventContext(operationID, c.operationType, "progress").
-		WithEventData(eventData).
-		WithContext(c.ctx).
-		WithChannels(true, true, false, true)
-
-	c.dispatchEvent(callbackEmitSpec{
-		label:       "operation_callback_progress",
-		operationID: operationID,
-		eventType:   "progress",
-		eventCtx:    eventCtx,
-		emitGlobal:  true,
+		emitGlobal: true,
 	})
 }
 
 // OnComplete emits completion event via coordinator
 func (c *CoordinatorOperationCallback) OnComplete(operationID string, result any, duration time.Duration) {
-	eventData := &EventData{
-		LoggingFields: []LoggingField{
-			{Key: logFieldOperationID, Value: operationID},
+	c.emitCallbackEvent(operationID, callbackEventConfig{
+		label:     "complete",
+		eventType: "complete",
+		action:    "completed",
+		severity:  "low",
+		loggingFields: []LoggingField{
 			{Key: logFieldStatus, Value: statusCompletedValue},
 			{Key: objects.FieldKeyDurationSeconds, Value: duration.Seconds()},
 		},
-		AuditMetadata: map[string]any{
-			objects.FieldKeyEventType:       operationCallbackAuditEventTypeSystemConfigChange,
-			objects.FieldKeyOperation:       fmt.Sprintf("%s completed", c.operationType),
-			objects.FieldKeyOperationID:     operationID,
+		auditMetadata: map[string]any{
 			objects.FieldKeyDurationSeconds: duration.Seconds(),
-			objects.FieldKeySeverity:        "low",
 		},
-		MetricsData: nil,
-	}
-
-	eventCtx := NewEventContext(operationID, c.operationType, "complete").
-		WithEventData(eventData).
-		WithContext(c.ctx).
-		WithDuration(duration).
-		WithChannels(true, true, false, true)
-
-	c.dispatchEvent(callbackEmitSpec{
-		label:       "operation_callback_complete",
-		operationID: operationID,
-		eventType:   "complete",
-		eventCtx:    eventCtx,
-		emitGlobal:  true,
-		duration:    duration,
+		emitGlobal: true,
+		duration:   duration,
 	})
 }
 
 // OnError emits error event via coordinator
 func (c *CoordinatorOperationCallback) OnError(operationID string, err error) {
-	eventData := &EventData{
-		LoggingFields: []LoggingField{
-			{Key: logFieldOperationID, Value: operationID},
+	c.emitCallbackEvent(operationID, callbackEventConfig{
+		label:     "error",
+		eventType: "error",
+		action:    "failed",
+		severity:  "high",
+		loggingFields: []LoggingField{
 			{Key: logFieldStatus, Value: statusErrorValue},
 			{Key: logFieldError, Value: err.Error()},
 		},
-		AuditMetadata: map[string]any{
-			objects.FieldKeyEventType:   operationCallbackAuditEventTypeSystemConfigChange,
-			objects.FieldKeyOperation:   fmt.Sprintf("%s failed", c.operationType),
-			objects.FieldKeyOperationID: operationID,
-			"error":                     err.Error(),
-			objects.FieldKeySeverity:    "high",
+		auditMetadata: map[string]any{
+			"error": err.Error(),
 		},
-		MetricsData: nil,
-	}
-
-	eventCtx := NewEventContext(operationID, c.operationType, "error").
-		WithEventData(eventData).
-		WithContext(c.ctx).
-		WithError(err).
-		WithChannels(true, true, false, false)
-
-	c.dispatchEvent(callbackEmitSpec{
-		label:       "operation_callback_error",
-		operationID: operationID,
-		eventType:   "error",
-		eventCtx:    eventCtx,
-		emitGlobal:  false,
+		emitGlobal: false,
+		err:        err,
 	})
 }
 
 // OnCancel emits cancellation event via coordinator
 func (c *CoordinatorOperationCallback) OnCancel(operationID string, reason string) {
-	eventData := &EventData{
-		LoggingFields: []LoggingField{
-			{Key: logFieldOperationID, Value: operationID},
+	c.emitCallbackEvent(operationID, callbackEventConfig{
+		label:     "cancel",
+		eventType: "cancelled",
+		action:    "cancelled",
+		severity:  "medium",
+		loggingFields: []LoggingField{
 			{Key: logFieldStatus, Value: statusCancelledValue},
 			{Key: "reason", Value: reason},
 		},
-		AuditMetadata: map[string]any{
-			objects.FieldKeyEventType:   operationCallbackAuditEventTypeSystemConfigChange,
-			objects.FieldKeyOperation:   fmt.Sprintf("%s cancelled", c.operationType),
-			objects.FieldKeyOperationID: operationID,
-			objects.FieldKeyReason:      reason,
-			objects.FieldKeySeverity:    "medium",
+		auditMetadata: map[string]any{
+			objects.FieldKeyReason: reason,
 		},
-		MetricsData: nil,
-	}
-
-	eventCtx := NewEventContext(operationID, c.operationType, "cancelled").
-		WithEventData(eventData).
-		WithContext(c.ctx).
-		WithChannels(true, true, false, false)
-
-	c.dispatchEvent(callbackEmitSpec{
-		label:       "operation_callback_cancel",
-		operationID: operationID,
-		eventType:   "cancelled",
-		eventCtx:    eventCtx,
-		emitGlobal:  false,
+		emitGlobal: false,
 	})
 }
