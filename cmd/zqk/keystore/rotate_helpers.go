@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/authcred"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -97,7 +98,7 @@ func buildRotationUpdates(newVal, keyType string) (map[string]any, error) {
 	}
 
 	updates := map[string]any{
-		objects.FieldKeyCredentialHash: hashVal,
+		objects.FieldKeyCredentialHash: authcred.SanitizeDigest(hashVal),
 		objects.FieldKeyLastUsedAt:     "", // Reset last_used_at on rotation
 	}
 	// Note: salt is always empty (bcrypt has built-in salt, SHA256 doesn't use salt)

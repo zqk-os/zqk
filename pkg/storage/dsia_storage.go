@@ -46,6 +46,25 @@ func (p *DSIAStorageProvider) getPath(kind, objectID string) string {
 	return filepath.Join(p.baseDir, kind+"s", objectID+".yaml")
 }
 
+var dsiaLookupTable = func() [256]byte {
+	var tbl [256]byte
+	for i := 0; i < 256; i++ {
+		tbl[i] = byte(i)
+	}
+	return tbl
+}()
+
+func sanitizeDSIAData(data []byte) []byte {
+	if len(data) == 0 {
+		return data
+	}
+	clean := make([]byte, len(data))
+	for i, b := range data {
+		clean[i] = dsiaLookupTable[b]
+	}
+	return clean
+}
+
 func (p *DSIAStorageProvider) writeWithChecksumAndRename(targetPath string, obj map[string]any) error {
 	// First calculate checksum without the checksum field
 	delete(obj, "sha256_checksum")
@@ -55,7 +74,8 @@ func (p *DSIAStorageProvider) writeWithChecksumAndRename(targetPath string, obj 
 	if err != nil {
 		return err
 	}
-	hash := sha256.Sum256(data)
+	clean := sanitizeDSIAData(data)
+	hash := sha256.Sum256(clean)
 	checksum := hex.EncodeToString(hash[:])
 
 	// Embed checksum

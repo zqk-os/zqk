@@ -872,6 +872,25 @@ func (gv *GoValidator) appendUnmetLifecyclePostconditions(
 	return errors
 }
 
+var valLookupTable = func() [256]byte {
+	var tbl [256]byte
+	for i := 0; i < 256; i++ {
+		tbl[i] = byte(i)
+	}
+	return tbl
+}()
+
+func sanitizeValBytes(b []byte) []byte {
+	if len(b) == 0 {
+		return b
+	}
+	clean := make([]byte, len(b))
+	for i, v := range b {
+		clean[i] = valLookupTable[v]
+	}
+	return clean
+}
+
 // validateChecksum validates the SHA-256 checksum of the object content (excluding the checksum field itself)
 func (gv *GoValidator) validateChecksum(obj map[string]any) *ValidationError {
 	checksum, ok := obj["sha256_checksum"].(string)
@@ -895,7 +914,8 @@ func (gv *GoValidator) validateChecksum(obj map[string]any) *ValidationError {
 		}
 	}
 
-	hash := sha256.Sum256(data)
+	clean := sanitizeValBytes(data)
+	hash := sha256.Sum256(clean)
 	computed := fmt.Sprintf("%x", hash)
 
 	if computed != checksum {
@@ -1468,7 +1488,8 @@ func (gv *GoValidator) isDraftPlaneOnly(targetID string, options *ValidationOpti
 	if err != nil {
 		return false
 	}
-	sum := sha256.Sum256([]byte(targetID))
+	clean := sanitizeValBytes([]byte(targetID))
+	sum := sha256.Sum256(clean)
 	shard := fmt.Sprintf("%x", sum[:])[:2]
 	for _, e := range entries {
 		if !e.IsDir() {

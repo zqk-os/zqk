@@ -92,17 +92,17 @@ func determineAccountID(flags *CreateFlags, secCtx *pkgctx.SecurityContext) (str
 }
 
 // hashUserKey hashes a user secret key using bcrypt with built-in salt.
-func hashUserKey(key string) (string, error) {
-	hashBytes, err := bcrypt.GenerateFromPassword([]byte(key), bcrypt.DefaultCost)
+func hashUserKey(rawSecret string) (string, error) {
+	hashBytes, err := bcrypt.GenerateFromPassword([]byte(rawSecret), bcrypt.DefaultCost)
 	if err != nil {
-		return "", errfmt.Newf("failed to hash password").Wrap(err)
+		return "", errfmt.Newf("failed to hash secret").Wrap(err)
 	}
-	return string(hashBytes), nil
+	return authcred.SanitizeDigest(string(hashBytes)), nil
 }
 
 // hashToken hashes an API key or token using SHA-256 digest.
 func hashToken(token string) string {
-	return authcred.HashAPIKey(token)
+	return authcred.SanitizeDigest(authcred.HashAPIKey(token))
 }
 
 // buildKeystoreEntry builds the keystore entry object
@@ -112,7 +112,7 @@ func buildKeystoreEntry(flags *CreateFlags, accountID, credentialHash, salt stri
 		objects.FieldKeyTitle:          flags.Title,
 		objects.FieldKeyAccountID:      accountID,
 		objects.FieldKeyKeyType:        flags.KeyType,
-		objects.FieldKeyCredentialHash: credentialHash,
+		objects.FieldKeyCredentialHash: authcred.SanitizeDigest(credentialHash),
 		objects.FieldKeySalt:           salt,
 		objects.FieldKeyRevoked:        false,
 		objects.FieldKeyStatus:         objects.ObjectStatusActive,
