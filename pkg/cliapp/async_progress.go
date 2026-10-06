@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	pkgcli "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/ux"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/diagnostics"
@@ -164,10 +165,30 @@ func RunWithAsyncProgress(
 	operationID := fmt.Sprintf("%s_%d", operationType, time.Now().UnixNano())
 	helper := coordination.NewCoordinatorProgressHelper(projectRoot, operationID, operationType, profile)
 
+	isConsoleInteractive := ux.IsInteractive() && profile == string(pkgctx.ProfileHuman)
+	if formatVal, err := cmd.Flags().GetString("format"); err == nil && formatVal != "" && formatVal != "table" && formatVal != "text" {
+		isConsoleInteractive = false
+	}
+	if quietVal, err := cmd.Flags().GetBool("quiet"); err == nil && quietVal {
+		isConsoleInteractive = false
+	}
+
+	var tracker *ux.StepTracker
+	if isConsoleInteractive {
+		tracker = ux.NewStepTracker(fmt.Sprintf("Running %s", operationType))
+	}
+
 	// Shared state so heartbeat can report latest stage/message
 	var state progressState
 	progressFn := func(stage, message string) {
 		state.set(stage, message)
+		if tracker != nil {
+			if message != "" {
+				tracker.Update(fmt.Sprintf("%s: %s", stage, message))
+			} else {
+				tracker.Update(stage)
+			}
+		}
 		_ = helper.EmitStatusChange(ctx, progressStatusStarted, stage, message, nil)
 	}
 	cmd.SetContext(pkgctx.WithValidationProgress(ctx, progressFn))
@@ -188,6 +209,9 @@ func RunWithAsyncProgress(
 	heartbeatCancel() // stop heartbeat as soon as runE returns
 
 	if err != nil {
+		if tracker != nil {
+			tracker.Fail(fmt.Sprintf("%s failed", operationType), err)
+		}
 		var exitCoder interface{ ExitCode() int }
 		if errors.As(err, &exitCoder) && exitCoder.ExitCode() == 3 {
 			_ = helper.EmitCompletion(ctx, duration, "Complete with warnings", nil)
@@ -195,6 +219,9 @@ func RunWithAsyncProgress(
 		}
 		_ = helper.EmitError(ctx, err, "Operation failed", nil)
 		return err
+	}
+	if tracker != nil {
+		tracker.Complete(fmt.Sprintf("%s completed", operationType))
 	}
 	_ = helper.EmitCompletion(ctx, duration, "Complete", nil)
 	return nil
