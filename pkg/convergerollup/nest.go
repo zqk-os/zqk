@@ -90,10 +90,7 @@ func AppendRelatedObjectRef(refs []string, id string) []string {
 			return refs
 		}
 	}
-	out := make([]string, len(refs)+1)
-	copy(out, refs)
-	out[len(refs)] = id
-	return out
+	return append(append([]string(nil), refs...), id)
 }
 
 // RelatedObjectRefsFromMap extracts string refs from an object map.

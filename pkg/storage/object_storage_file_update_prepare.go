@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"maps"
@@ -223,8 +224,14 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 				inboxPath := filepath.Join(f.projectRoot, paths.ProjectDataDir, paths.InboxSubdir, "human")
 				_ = fileutil.EnsureDir(inboxPath)
 				tdePath := filepath.Join(inboxPath, "tde_"+id+"_"+time.Now().Format("20060102150405")+".json")
-				tdeData := []byte(`{"id":"` + id + `", "action": "status_override", "requested_status": "` + statusVal + `"}`)
-				_ = fileutil.WriteStandardFile(tdePath, tdeData)
+				tdePayload := map[string]string{
+					"id":               id,
+					"action":           "status_override",
+					"requested_status": statusVal,
+				}
+				if tdeData, err := json.Marshal(tdePayload); err == nil {
+					_ = fileutil.WriteStandardFile(tdePath, tdeData)
+				}
 			}
 		}
 	}

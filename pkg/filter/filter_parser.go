@@ -225,7 +225,7 @@ func ValidateFilterFields(kind string, filters map[string]any) error {
 				}
 				return errfmt.Errorf("unknown filter field %q for kind %q. Did you mean %s?", fieldName, kind, strings.Join(quoted, " or "))
 			}
-			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown filter field %q for kind %q. Check available fields with 'zqk object template %s'", fieldName, kind, kind)))
+			return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("unknown filter field %q for kind %q. Check available fields with %q", fieldName, kind, "zqk object template "+kind)))
 		}
 	}
 	return nil

@@ -1,5 +1,7 @@
 package strutil
 
+const maxLevenshteinStringLen = 4096
+
 // LevenshteinDistance calculates the Levenshtein distance between two strings.
 func LevenshteinDistance(s1, s2 string) int {
 	la, lb := len(s1), len(s2)
@@ -8,6 +10,12 @@ func LevenshteinDistance(s1, s2 string) int {
 	}
 	if lb == 0 {
 		return la
+	}
+	if la > maxLevenshteinStringLen || lb > maxLevenshteinStringLen {
+		if la > lb {
+			return la
+		}
+		return lb
 	}
 
 	dp := make([][]int, la+1)

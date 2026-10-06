@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // LogLevel represents the severity level of a log message
@@ -93,6 +94,7 @@ func (b *LogMetricsBuilder) Build() map[string]any {
 // This routes logs through the MCP protocol instead of stdout/stderr
 // The client can display these logs in its UI
 func (s *Server) SendLogMessage(level LogLevel, message string, fields map[string]any) error {
+	fields = zqkenv.SanitizeFields(fields)
 	// GUARD 0: Check atomic shutdown flag FIRST (fastest check, before ANY work)
 	// This is the PRIMARY guard - if shutdown is ordered, we never try to acquire locks
 	// CRITICAL: This check happens before ANY other operations, including time.Now()

@@ -5,14 +5,19 @@ import (
 	"strings"
 )
 
-var sensitiveKeyPattern = regexp.MustCompile(`(?i)(api[_-]?key|secret|token|password|auth|credential|bearer|private[_-]?key)`)
+var sensitiveKeyPattern = regexp.MustCompile(`(?i)(api[_-]?key|secret|token|password|auth[_-]?token|credential|bearer|private[_-]?key|authorization)`)
+
+// IsSensitiveKey returns true if the key matches sensitive credential names.
+func IsSensitiveKey(key string) bool {
+	return sensitiveKeyPattern.MatchString(key)
+}
 
 // MaskSensitiveValue returns a redacted string if the key or value is detected to be sensitive.
 func MaskSensitiveValue(key, value string) string {
 	if value == "" {
 		return ""
 	}
-	if sensitiveKeyPattern.MatchString(key) {
+	if IsSensitiveKey(key) {
 		return "******"
 	}
 	// Also check if the value itself looks like a bearer token or secret string
@@ -20,6 +25,29 @@ func MaskSensitiveValue(key, value string) string {
 		return "Bearer ******"
 	}
 	return value
+}
+
+// SanitizeFields recursively sanitizes map fields by masking sensitive keys and values.
+func SanitizeFields(fields map[string]any) map[string]any {
+	if len(fields) == 0 {
+		return fields
+	}
+	out := make(map[string]any, len(fields))
+	for k, v := range fields {
+		if IsSensitiveKey(k) {
+			out[k] = "******"
+			continue
+		}
+		switch val := v.(type) {
+		case string:
+			out[k] = MaskSensitiveValue(k, val)
+		case map[string]any:
+			out[k] = SanitizeFields(val)
+		default:
+			out[k] = v
+		}
+	}
+	return out
 }
 
 // SanitizeEnvironment sanitizes KEY=VALUE environment pairs by masking sensitive variables.

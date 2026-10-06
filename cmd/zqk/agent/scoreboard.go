@@ -32,7 +32,7 @@ func runScoreboard(cmd *cobra.Command, args []string) error {
 
 		for key, duration := range records {
 			logging.FluentEvent(proc.Logger()).Info("agent-idle-record").
-				String("key", key).
+				String("record_key", key).
 				String("duration", duration.String()).
 				Log()
 		}

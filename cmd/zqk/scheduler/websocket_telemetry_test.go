@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	testHandshakeKey    = "dGhlIHNhbXBsZSBub25jZQ=="
+	testHandshakeNonce  = "dGhlIHNhbXBsZSBub25jZQ=="
 	testExpectedPayload = `{"health": 99.5, "traffic": 1.5}`
 	testReadTimeout     = 2 * time.Second
 	testMaskBit         = 0x80
@@ -58,7 +58,7 @@ func TestWebSocketTelemetry(t *testing.T) {
 		"Upgrade: websocket\r\n"+
 		"Connection: Upgrade\r\n"+
 		"Sec-WebSocket-Key: %s\r\n"+
-		"Sec-WebSocket-Version: 13\r\n\r\n", host, testHandshakeKey)
+		"Sec-WebSocket-Version: 13\r\n\r\n", host, testHandshakeNonce)
 
 	// Read handshake response
 	reader := bufio.NewReader(conn)
@@ -75,7 +75,7 @@ func TestWebSocketTelemetry(t *testing.T) {
 	// Verify Sec-WebSocket-Accept header
 	expectedAccept := func() string {
 		h := sha1.New() //nolint:gosec
-		h.Write([]byte(testHandshakeKey + rfc6455WebSocketGuid))
+		h.Write([]byte(testHandshakeNonce + rfc6455WebSocketGuid))
 		return base64.StdEncoding.EncodeToString(h.Sum(nil))
 	}()
 

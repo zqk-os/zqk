@@ -83,7 +83,7 @@ func (b *AuditEventBuffer) Flush() error {
 		if flushErr != nil {
 			// Log error but continue with other groups
 			StorageLog(logger).Warn(LogEventStorageAuditBufferFlushGroupFailedWarn).
-				String("key", key).
+				String("group_key", key).
 				WithError(flushErr).
 				Log()
 			// Emit error event

@@ -10,6 +10,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // envelope tick follow-up dispatch (operational envelope tokens → scheduler job_type → TriggerJob).
@@ -343,7 +344,7 @@ func (s *Scheduler) DispatchEnvelopeTickResolvedJobs(ctx context.Context, envelo
 				if _, denied := policy.DenyList[jt]; denied {
 					if s.logger != nil {
 						DataCellEnvelopeTickLog(s.logger).Info("data_cell_envelope_tick_dispatch_skip_denied_override").
-							String("token", token).
+							String("token", zqkenv.MaskSensitiveValue("token", token)).
 							String("job_type", jt).
 							String("backend", "data-cell").
 							Log()

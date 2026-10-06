@@ -25,3 +25,23 @@ func TestSanitizeEnvironment(t *testing.T) {
 	assert.Equal(t, "PUBLIC_VAR=hello", sanitized[1])
 	assert.Equal(t, "AUTH_TOKEN=******", sanitized[2])
 }
+
+func TestSanitizeFields(t *testing.T) {
+	fields := map[string]any{
+		"token":      "sensitive-abc-123",
+		"password":   "super-secret",
+		"account_id": "ACC-12345678",
+		"details": map[string]any{
+			"api_key": "nested-secret",
+			"status":  "ok",
+		},
+	}
+	sanitized := zqkenv.SanitizeFields(fields)
+	assert.Equal(t, "******", sanitized["token"])
+	assert.Equal(t, "******", sanitized["password"])
+	assert.Equal(t, "ACC-12345678", sanitized["account_id"])
+	nested, ok := sanitized["details"].(map[string]any)
+	assert.True(t, ok)
+	assert.Equal(t, "******", nested["api_key"])
+	assert.Equal(t, "ok", nested["status"])
+}

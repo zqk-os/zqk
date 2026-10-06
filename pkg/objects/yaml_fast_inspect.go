@@ -101,9 +101,7 @@ func ExtractPropertiesFromFile(path string, properties ...string) map[string]str
 	if readErr == nil && n == defaultYAMLInspectReadLimit {
 		rest, err := io.ReadAll(f)
 		if err == nil && len(rest) > 0 {
-			fullData = make([]byte, n+len(rest))
-			copy(fullData, limitData)
-			copy(fullData[n:], rest)
+			fullData = append(append([]byte(nil), limitData...), rest...)
 		} else {
 			fullData = limitData
 		}

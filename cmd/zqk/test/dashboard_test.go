@@ -739,6 +739,10 @@ func TestDashboardState_StartBackgroundWALSubscriber(t *testing.T) {
 	case <-time.After(3 * time.Second):
 		t.Fatal("timed out waiting for WAL subscriber to process event")
 	}
+
+	cancel()
+	_ = wal.Close()
+	time.Sleep(50 * time.Millisecond)
 }
 
 func TestDashboardState_HandleReferenceLinkedEvent(t *testing.T) {

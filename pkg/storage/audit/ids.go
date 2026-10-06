@@ -98,7 +98,7 @@ func ExpandIDRange(prefix, separator, rangeStr string) []string {
 		return []string{rangeStr}
 	}
 
-	if start > end {
+	if start > end || (end-start+1) > 50000 {
 		return []string{rangeStr}
 	}
 

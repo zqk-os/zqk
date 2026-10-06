@@ -211,7 +211,7 @@ func expandChangeJournalIDRange(rangeStr string) []string {
 	endStr := strings.TrimPrefix(parts[1], ChangeJournalEntryIDPrefix)
 	start, err1 := strconv.Atoi(startStr)
 	end, err2 := strconv.Atoi(endStr)
-	if err1 != nil || err2 != nil || start > end {
+	if err1 != nil || err2 != nil || start > end || (end-start+1) > 50000 {
 		return []string{rangeStr}
 	}
 	ids := make([]string, 0, end-start+1)

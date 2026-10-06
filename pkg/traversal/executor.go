@@ -190,9 +190,7 @@ func (e *QueryExecutor) matchPathPattern(ctx context.Context, p PathPattern) ([]
 			for _, targetID := range reachable {
 				// Check target node constraints
 				if e.nodeMatches(targetID, targetPattern) {
-					newPath := make([]string, len(path)+1)
-					copy(newPath, path)
-					newPath[len(path)] = targetID
+					newPath := append(append([]string(nil), path...), targetID)
 					nextPaths = append(nextPaths, newPath)
 				}
 			}
