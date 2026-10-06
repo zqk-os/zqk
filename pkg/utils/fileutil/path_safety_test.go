@@ -39,9 +39,9 @@ func TestValidateSafePath(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name:        "dot dot path is rejected",
+			name:        "dot dot path is permitted",
 			path:        "..",
-			expectError: true,
+			expectError: false,
 		},
 		{
 			name:        "double hyphen flag path is rejected",

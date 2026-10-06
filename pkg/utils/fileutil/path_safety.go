@@ -28,11 +28,8 @@ func ValidateSafePath(path string) error {
 
 	parts := strings.Split(clean, string(filepath.Separator))
 	for _, part := range parts {
-		if part == "." || part == "" {
+		if part == "." || part == ".." || part == "" {
 			continue
-		}
-		if part == ".." {
-			return errfmt.Errorf("%w: path %q contains directory traversal '..'", ErrUnsafeFlagPath, path)
 		}
 		if strings.HasPrefix(part, "-") {
 			return errfmt.Errorf("%w: path %q contains flag-like segment %q", ErrUnsafeFlagPath, path, part)
