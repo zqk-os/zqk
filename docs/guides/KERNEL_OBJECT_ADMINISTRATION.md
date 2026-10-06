@@ -108,15 +108,68 @@ In ZQK Studio and execution planning, the graph renders as an audited two-dimens
 
 ---
 
-## 5. Epic Shockwaves & Permissive Scope Invariant
+## 5. Epics: Giving Semantic Shape to Multi-Plan Initiatives
 
+### The "Phases of Work" Cognitive Dilemma
+In large engineering endeavors and strategic roadmaps, initiatives naturally span multiple cycles or phases of work. However, referring to abstract labels like *"Phase 1, Phase 2, Phase 3, Phase 4"* is a notorious source of cognitive confusion:
+* Stakeholders, executives, and agents constantly lose track of when capabilities arrive: *"Was the database migration in Phase 2, or is that upcoming in Phase 4?"*
+* Numerical phase designations strip away domain intent and obscure the overarching milestone being delivered.
+
+**The `epic` exists to give concrete, human-legible semantic shape to the overall thing.** It aggregates multiple 1-cycle `priority_plan` blocks under a recognizable, domain-cohesive umbrella container.
+
+### The Home Remodel Analogy: From Vision to Epics and Plans
+Consider a real-world physical engineering endeavor: flipping an old home.
+* **Vision:** *"Become the most successful, quality-driven real estate developer in the region."* (Timeless inspirational direction).
+* **Mission:** *"Flip the house on 1st Ave and achieve a 25% net return on investment."* (Core initializing intent).
+* **Goals & Requirements:** Code-compliant modern electrical, brand-new plumbing, energy-efficient HVAC, flawless curb appeal (Timeless functional contracts and quality floors).
+
+Rather than slicing the execution into ambiguous *"Phase 1 through 6"*, work is structured under domain-cohesive **Epics**:
+
+```
+                              ┌───────────────────────────────────────────────┐
+                              │     MISSION: Flip the House on 1st Ave        │
+                              └───────────────────────┬───────────────────────┘
+                                                      │
+                       ┌──────────────────────────────┴──────────────────────────────┐
+                       ▼                                                             ▼
+┌─────────────────────────────────────────────┐               ┌─────────────────────────────────────────────┐
+│       EPIC: Interior Home Remodel           │               │       EPIC: Exterior & Landscaping Remodel  │
+│   (Thematic Umbrella for Living Spaces)     │               │   (Thematic Umbrella for Curb Appeal)       │
+└──────────────────────┬──────────────────────┘               └──────────────────────┬──────────────────────┘
+                       │                                                             │
+         ┌─────────────┼─────────────┐                                 ┌─────────────┼─────────────┐
+         ▼             ▼             ▼                                 ▼             ▼             ▼
+  ┌─────────────┐┌─────────────┐┌─────────────┐                 ┌─────────────┐┌─────────────┐┌─────────────┐
+  │Plan 1: Demo ││Plan 2: Dry- ││Plan 3: Paint│                 │Plan 1: Tree ││Plan 2: Siding││Plan 3: Sod &│
+  │  & Tearout  ││wall & Patch ││ & Fixtures  │                 │  & Grading  ││ & Trim Paint││ Hardscape   │
+  └──────┬──────┘└─────────────┘└─────────────┘                 └─────────────┘└─────────────┘└─────────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+[BLI-001] [BLI-002]
+Remove    Remove
+Toilets   Cabinets
+```
+
+* **Epic 1: "Interior Home Remodel"**
+  * `priority_plan` 1: **Demolition & Tearout** (BLIs: remove old toilets, pull out broken cabinetry, rip out carpets).
+  * `priority_plan` 2: **Drywall & Patching** (BLIs: hang sheetrock, tape, mud, smooth sand).
+  * `priority_plan` 3: **Painting & Fixture Installation** (BLIs: prime walls, two coats interior paint, install vanities & light fixtures).
+* **Epic 2: "Exterior & Landscaping Remodel"**
+  * `priority_plan` 1: **Tree Trimming & Site Grading**
+  * `priority_plan` 2: **Siding Repair & Exterior Paint**
+  * `priority_plan` 3: **Sod Installation & Hardscaping**
+
+Everyone—from human executives to autonomous worker agents—immediately grasps where any piece of work belongs without tracking abstract phase numbers.
+
+### Epic Shockwaves & Permissive Scope Invariant
 * **Child ➔ Parent Shockwave Progression:**
   * When the *first* linked `priority_plan` transitions to `in_progress`, the parent `epic` automatically shockwaves from `planned` ➔ `in_progress`.
   * When *all* linked priority plans reach `complete`, the parent `epic` automatically shockwaves ➔ `completed`.
 * **Permissive Scope Invariant:**
-  * **Priority Plans** are strictly **scope-locked** upon entering `in_progress` to guarantee cycle completion.
-  * **Epics** are **permissive by default**. Operators and agents can freely attach new `priority_plan` objects to an in-progress `epic` as the initiative evolves across cycles.
-  * An `epic` can be explicitly locked by setting `execution_locked: true` when no further plans may be added.
+  * **Priority Plans** are strictly **scope-locked** upon entering `in_progress` to guarantee that the current cycle completes without scope creep.
+  * **Epics** are **permissive by default**. As an initiative evolves across cycles and teams discover new work (e.g., discovering dry rot during demolition requiring an additional subfloor repair plan), operators and agents can freely attach new `priority_plan` objects to an in-progress `epic`.
+  * An `epic` can be explicitly sealed by setting `execution_locked: true` when no further plans or phases may be added.
 
 ---
 

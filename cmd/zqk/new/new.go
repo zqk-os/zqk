@@ -226,7 +226,7 @@ func emitJITGuidanceTip(cmd *cobra.Command, kind string) {
 	case objects.KindPriorityPlan:
 		tip = "💡 Shift-Left Tip: Priority plans bound exactly 1 cycle of work (sprint/kanban batch, 2–5 BLIs aiming toward a milestone). Plans scope-lock upon entering in_progress to prevent drift."
 	case objects.KindEpic:
-		tip = "💡 Shift-Left Tip: Epics group multiple priority plans under a unifying theme. Permissive by default (plans can be added in progress unless execution_locked=true)."
+		tip = "💡 Shift-Left Tip: Epics give human-legible semantic shape to the overall initiative (e.g. 'Interior Home Remodel' vs confusing abstract 'Phase 2/4'), grouping 2–5+ priority plans under a recognizable umbrella. Permissive by default (plans can be added in progress unless execution_locked=true)."
 	case objects.KindTechnicalDebt:
 		tip = "💡 Shift-Left Tip: Technical debt provides a tactical entry point into the non-functional behavior plane (code smells, test flakes, performance hotpaths, bug rollups). Rollups of tech debt items tell the anti-pattern story to institute lasting architectural and coding best practices."
 	}

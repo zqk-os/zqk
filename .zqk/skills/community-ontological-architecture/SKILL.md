@@ -43,9 +43,10 @@ Govern the scrupulous breakdown of high-level intents and composite packs into o
   - Must be deterministic, automated, and runnable without manual human inspection.
   - Linked 1:1 with a `requirement` to wrap and verify its criteria bundle.
 
-### 5. Layer 5: Phased Actions & Parallel Breakdown (`milestone`, `priority_plan`, `backlog_item`)
+### 5. Layer 5: Phased Actions & Parallel Breakdown (`milestone`, `epic`, `priority_plan`, `backlog_item`)
 - **Definition**: The sequence of environment-mutating actions that bend reality toward the goals.
 - **Rules**:
+  - **Epics (Semantic Shape & Thematic Containers)**: Give human-legible semantic shape to multi-plan initiatives, eliminating the cognitive trap of confusing "phases of work" (*"Was that plumbing in Phase 2 or Phase 4?"*). An Epic groups multiple 1-cycle Priority Plans under a meaningful domain umbrella (e.g. Epic: *'Interior Home Remodel'* grouping Plans for *Demolition*, *Drywall*, and *Painting*). Permissive by default (plans can be added as new work is discovered, unless explicitly `execution_locked`).
   - **Milestone Chronological Anchors**: `milestone` objects add the time constraint—acting as time-bounded subgoals across delivered reality that Priority Plans aim toward.
   - **Priority Plans (1-Cycle Batches)**: `priority_plan` groups exactly 1 cycle of work (sprint/kanban batch, 2–5 BLIs) and scope-locks upon `in_progress`.
   - **Backlog Items (Atomic Effort Slices)**: Backlog items satisfy 1 to 3 specific criteria. Never build an entire feature contract in a single monolithic BLI.
