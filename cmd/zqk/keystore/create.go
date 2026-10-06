@@ -82,7 +82,7 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		// Hash the credential
 		var credentialHash string
 		if flags.KeyType == "password" {
-			credentialHash, err = hashPassword(flags.KeyData)
+			credentialHash, err = hashUserKey(flags.KeyData)
 			if err != nil {
 				return err
 			}

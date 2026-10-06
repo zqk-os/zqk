@@ -88,7 +88,7 @@ func buildRotationUpdates(newVal, keyType string) (map[string]any, error) {
 	var hashVal string
 	var err error
 	if keyType == "password" {
-		hashVal, err = hashPassword(newVal)
+		hashVal, err = hashUserKey(newVal)
 		if err != nil {
 			return nil, err
 		}

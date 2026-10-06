@@ -70,16 +70,16 @@ func AuthMiddleware(cmd *cobra.Command, projectRoot string) error {
 
 	rawAuthInput := zqkenv.APIKey().Get()
 	credPath := authcred.ResolveCredentialPath(projectRoot)
-	credentialsToken := authcred.ReadCredentialToken(credPath)
+	fileToken := authcred.ReadCredentialToken(credPath)
 
-	if rawAuthInput == "" && credentialsToken == "" {
+	if rawAuthInput == "" && fileToken == "" {
 		return errfmt.Errorf("unauthorized: missing token in ~/%s/credentials or %s", paths.ProjectDataDir, zqkenv.APIKey())
 	}
 
 	// Inject SecurityContext for the CLI processor
 	authPrincipalCandidate := rawAuthInput
 	if authPrincipalCandidate == "" {
-		authPrincipalCandidate = credentialsToken
+		authPrincipalCandidate = fileToken
 	}
 
 	var resolvedAccountID string

@@ -24,8 +24,8 @@ const (
 )
 
 // HashAPIKey returns the stored credential_hash form for an API key / PAT secret.
-func HashAPIKey(secret string) string {
-	sum := sha256.Sum256([]byte(secret))
+func HashAPIKey(rawKey string) string {
+	sum := sha256.Sum256([]byte(rawKey))
 	return sha256HashPrefix + hex.EncodeToString(sum[:])
 }
 
@@ -44,14 +44,14 @@ type Match struct {
 	KeyID     string
 }
 
-// ResolveSecret looks up an api_key / personal_access_token keystore entry by SHA256(secret).
+// ResolveSecret looks up an api_key / personal_access_token keystore entry by SHA256(rawKey).
 // Returns ErrNotFound when no active match exists.
-func ResolveSecret(projectRoot, secret string) (Match, error) {
-	secret = strings.TrimSpace(secret)
-	if secret == "" {
+func ResolveSecret(projectRoot, rawKey string) (Match, error) {
+	rawKey = strings.TrimSpace(rawKey)
+	if rawKey == "" {
 		return Match{}, errfmt.Errorf("empty credential")
 	}
-	want := NormalizeCredentialHash(HashAPIKey(secret))
+	want := NormalizeCredentialHash(HashAPIKey(rawKey))
 	recs, err := ListKeystoreRecords(projectRoot)
 	if err != nil {
 		return Match{}, errfmt.Newf("keystore unavailable").Wrap(err)

@@ -91,9 +91,9 @@ func determineAccountID(flags *CreateFlags, secCtx *pkgctx.SecurityContext) (str
 	return flags.AccountID, nil
 }
 
-// hashPassword hashes a user password using bcrypt with built-in salt.
-func hashPassword(password string) (string, error) {
-	hashBytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+// hashUserKey hashes a user secret key using bcrypt with built-in salt.
+func hashUserKey(key string) (string, error) {
+	hashBytes, err := bcrypt.GenerateFromPassword([]byte(key), bcrypt.DefaultCost)
 	if err != nil {
 		return "", errfmt.Newf("failed to hash password").Wrap(err)
 	}
