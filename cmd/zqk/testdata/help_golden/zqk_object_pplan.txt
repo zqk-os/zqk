@@ -13,6 +13,9 @@ Flags:
 Usage:
   zqk object pplan [command]
 
+Aliases:
+  pplan, plan
+
 Available Commands:
   current     View backlog items for the current priority plan
 

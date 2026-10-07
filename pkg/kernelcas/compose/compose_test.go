@@ -1012,4 +1012,3 @@ func TestValidateObject_TechnicalDebtOverlay(t *testing.T) {
 		t.Fatalf("expected technical_debt to refuse requirement_refs, got %#v", errs)
 	}
 }
-
