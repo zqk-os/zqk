@@ -140,14 +140,14 @@ func seedAgentSupportHierarchy(t *testing.T, provider storage.ObjectStorageProvi
 	}
 
 	bli := map[string]any{
-		objects.FieldKeyID:              "BLI-INPROCESS-ITEM-001",
-		objects.FieldKeyKind:            objects.KindBacklogItem,
-		objects.FieldKeyTitle:           "Elevate Agent Subsystem Coverage",
-		objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
-		objects.FieldKeyPriorityPlanRef: "PRI-INPROCESS-PLAN-001",
-		objects.FieldKeyEstimatedEffort: "2h",
+		objects.FieldKeyID:                 "BLI-INPROCESS-ITEM-001",
+		objects.FieldKeyKind:               objects.KindBacklogItem,
+		objects.FieldKeyTitle:              "Elevate Agent Subsystem Coverage",
+		objects.FieldKeyStatus:             objects.ObjectStatusPlanned,
+		objects.FieldKeyPriorityPlanRef:    "PRI-INPROCESS-PLAN-001",
+		objects.FieldKeyEstimatedEffort:    "2h",
 		objects.FieldKeyAssigneePersonaRef: "PER-INPROCESS-ENGINEER",
-		objects.FieldKeyDescription:     "Backlog item for agent comprehensive test",
+		objects.FieldKeyDescription:        "Backlog item for agent comprehensive test",
 	}
 	if err := provider.Create(ctx, secCtx, bli); err != nil {
 		t.Fatalf("failed to seed bli: %v", err)
@@ -451,10 +451,10 @@ func TestInProcess_Agent_SyncLoop_DirectHelpers(t *testing.T) {
 
 	// stripGraphBloat
 	objWithBloat := map[string]any{
-		"title":                              "Task",
-		"resolved_upstream":                  "foo",
-		objects.FieldKeyStatusHistory:        []any{"a", "b"},
-		objects.FieldKeyChangeLog:            []any{"c"},
+		"title":                                   "Task",
+		"resolved_upstream":                       "foo",
+		objects.FieldKeyStatusHistory:             []any{"a", "b"},
+		objects.FieldKeyChangeLog:                 []any{"c"},
 		objects.FieldKeyResolvedRelatedObjectRefs: []any{"r1"},
 		"nested": map[string]any{
 			"resolved_child": "bar",
@@ -672,6 +672,3 @@ func TestInProcess_Agent_GuidingStep_Execution(t *testing.T) {
 		t.Fatalf("guiding-step with event failed: %v, out: %s", err, outEvent)
 	}
 }
-
-
-

@@ -318,12 +318,12 @@ func TestInProcess_Agent_SeatWorker_HandleNonComms(t *testing.T) {
 	// 4. Steer with exhausted attempts
 	taskID := "ATK-EXHAUST-001"
 	taskObj := map[string]any{
-		objects.FieldKeyID:                  taskID,
-		objects.FieldKeyKind:                objects.KindAgentTask,
-		objects.FieldKeyTitle:               "Exhausted Task",
-		objects.FieldKeyStatus:              objects.ObjectStatusApproved,
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Exhausted Task",
+		objects.FieldKeyStatus:             objects.ObjectStatusApproved,
 		objects.FieldKeyAssigneePersonaRef: "PER-DEFAULT-OPERATOR",
-		objects.FieldKeyDescription:         "Some work",
+		objects.FieldKeyDescription:        "Some work",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create task: %v", err)
@@ -496,5 +496,3 @@ func TestInProcess_Agent_SeatWorker_TriggerPlanOrchestration(t *testing.T) {
 		t.Error("expected error when triggering orchestration on grooming plan")
 	}
 }
-
-

@@ -44,12 +44,12 @@ func TestInProcess_Agent_Orchestrate_Execution(t *testing.T) {
 	// Seed requirement
 	reqID := "REQ-ORCH-EXEC-001"
 	reqObj := map[string]any{
-		objects.FieldKeyID:          reqID,
-		objects.FieldKeyKind:        objects.KindRequirement,
-		objects.FieldKeyTitle:       "Orchestration Requirement",
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyID:           reqID,
+		objects.FieldKeyKind:         objects.KindRequirement,
+		objects.FieldKeyTitle:        "Orchestration Requirement",
+		objects.FieldKeyStatus:       objects.ObjectStatusActive,
 		objects.FieldKeyCriteriaRefs: []string{"CRI-ORCH-EXEC-001"},
-		objects.FieldKeyDescription: "Requirement for orchestrate test",
+		objects.FieldKeyDescription:  "Requirement for orchestrate test",
 	}
 	if err := provider.Create(ctx, secCtx, reqObj); err != nil {
 		t.Fatalf("failed to create requirement: %v", err)
@@ -294,6 +294,31 @@ func TestInProcess_Agent_Claim_ResolveClaimantIdentity(t *testing.T) {
 	if got == "" {
 		t.Error("expected non-empty identity")
 	}
+
+	// 3. Fallback when proc is nil
+	gotHost := resolveClaimantIdentity(nil, nil)
+	if !strings.HasPrefix(gotHost, "host:") && gotHost != "anonymous" {
+		t.Errorf("expected host or anonymous, got: %q", gotHost)
+	}
+
+	// 4. checkinDue for missing task
+	if due := checkinDue(tempDir, "ATK-NONEXISTENT"); due != "" {
+		t.Errorf("expected empty due string, got: %q", due)
+	}
+
+	// 5. procSecurity and procStorageTuple
+	sec := procSecurity(nil)
+	if sec == nil {
+		t.Error("expected non-nil system security context")
+	}
+	ctxStd, secStd, spStd := procStorageTuple(nil)
+	if ctxStd == nil || secStd == nil || spStd != nil {
+		t.Errorf("unexpected procStorageTuple nil results: %v, %v, %v", ctxStd, secStd, spStd)
+	}
+	emptyCmd := &cobra.Command{}
+	if _, err := newAgentProcessor(emptyCmd); err == nil {
+		t.Error("expected error from newAgentProcessor with empty cmd")
+	}
 }
 
 func TestInProcess_Agent_PreparedContext_HasSemanticContext(t *testing.T) {
@@ -457,13 +482,13 @@ func TestInProcess_Agent_SyncLoop_ImplementedExit(t *testing.T) {
 
 	taskID := "ATK-SYNC-IMPL-001"
 	taskObj := map[string]any{
-		objects.FieldKeyID:                  taskID,
-		objects.FieldKeyKind:                objects.KindAgentTask,
-		objects.FieldKeyTitle:               "Implemented Agent Task",
-		objects.FieldKeyStatus:              objects.ObjectStatusImplemented,
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Implemented Agent Task",
+		objects.FieldKeyStatus:             objects.ObjectStatusImplemented,
 		objects.FieldKeyAssigneePersonaRef: "PER-DEFAULT-OPERATOR",
-		objects.FieldKeyCommitHash:          headCommit,
-		objects.FieldKeyDescription:         "Task already in implemented status",
+		objects.FieldKeyCommitHash:         headCommit,
+		objects.FieldKeyDescription:        "Task already in implemented status",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create implemented task: %v", err)
@@ -494,12 +519,12 @@ func TestInProcess_Agent_Execute_TaskAndPromptExecution(t *testing.T) {
 	// 2. ATK with execution prompt
 	taskID := "ATK-EXEC-TEST-001"
 	taskObj := map[string]any{
-		objects.FieldKeyID:                  taskID,
-		objects.FieldKeyKind:                objects.KindAgentTask,
-		objects.FieldKeyTitle:               "Execute Target ATK",
-		objects.FieldKeyStatus:              objects.ObjectStatusApproved,
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Execute Target ATK",
+		objects.FieldKeyStatus:             objects.ObjectStatusApproved,
 		objects.FieldKeyAssigneePersonaRef: "PER-DEFAULT-OPERATOR",
-		objects.FieldKeyDescription:         "Perform repository refactor",
+		objects.FieldKeyDescription:        "Perform repository refactor",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create task: %v", err)
@@ -513,12 +538,12 @@ func TestInProcess_Agent_Execute_TaskAndPromptExecution(t *testing.T) {
 	// 3. Ad-hoc Backlog Item
 	bliID := "BLI-EXEC-TEST-001"
 	bliObj := map[string]any{
-		objects.FieldKeyID:                  bliID,
-		objects.FieldKeyKind:                objects.KindBacklogItem,
-		objects.FieldKeyTitle:               "Execute Target BLI",
-		objects.FieldKeyStatus:              objects.ObjectStatusPlanned,
+		objects.FieldKeyID:                 bliID,
+		objects.FieldKeyKind:               objects.KindBacklogItem,
+		objects.FieldKeyTitle:              "Execute Target BLI",
+		objects.FieldKeyStatus:             objects.ObjectStatusPlanned,
 		objects.FieldKeyAssigneePersonaRef: "PER-DEFAULT-OPERATOR",
-		objects.FieldKeyDescription:         "Perform ad-hoc backlog item task",
+		objects.FieldKeyDescription:        "Perform ad-hoc backlog item task",
 	}
 	if err := provider.Create(ctx, secCtx, bliObj); err != nil {
 		t.Fatalf("failed to create bli: %v", err)
@@ -598,12 +623,12 @@ func TestInProcess_Agent_SyncLoop_ExtendedHelpers(t *testing.T) {
 	// 1. QuerySubgraph with depth <= 0
 	taskID := "ATK-SUBGRAPH-001"
 	taskObj := map[string]any{
-		objects.FieldKeyID:                  taskID,
-		objects.FieldKeyKind:                objects.KindAgentTask,
-		objects.FieldKeyTitle:               "Subgraph Task",
-		objects.FieldKeyStatus:              objects.ObjectStatusInProgress,
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Subgraph Task",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
 		objects.FieldKeyAssigneePersonaRef: "PER-DEFAULT-OPERATOR",
-		objects.FieldKeyDescription:         "Task description",
+		objects.FieldKeyDescription:        "Task description",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create subgraph task: %v", err)
@@ -621,7 +646,7 @@ func TestInProcess_Agent_SyncLoop_ExtendedHelpers(t *testing.T) {
 	validator := mutation.NewValidator(nil)
 	auditStream := audit.NewAuditStream(tempDir)
 	extra := map[string]any{
-		"custom_note": "verified in test",
+		"custom_note":          "verified in test",
 		objects.FieldKeyStatus: "ignored_override",
 	}
 	err = applyStateMutationWithFields(ctx, secCtx, provider, taskID, objects.KindAgentTask, validator, auditStream, objects.ObjectStatusPendingVerification, extra)
@@ -629,5 +654,3 @@ func TestInProcess_Agent_SyncLoop_ExtendedHelpers(t *testing.T) {
 		t.Logf("applyStateMutationWithFields result: %v", err)
 	}
 }
-
-
