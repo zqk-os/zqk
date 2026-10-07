@@ -6,8 +6,14 @@ import (
 )
 
 func TestParentProcessHelpers(t *testing.T) {
-	_ = ParentProcessName(os.Getppid())
-	_ = IsParentZqk()
+	name := ParentProcessName(os.Getppid())
+	if name != "" {
+		t.Logf("parent process name: %s", name)
+	}
+	isZqk := IsParentZqk()
+	if isZqk {
+		t.Log("parent process is zqk")
+	}
 
 	TouchMeaningfulActivity()
 	last := GetLastMeaningfulActivity()

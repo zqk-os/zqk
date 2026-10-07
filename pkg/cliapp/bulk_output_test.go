@@ -12,6 +12,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 )
 
+func newTestCommandWithBuffer() (*cobra.Command, *bytes.Buffer) {
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+	cmd := &cobra.Command{}
+	cmd.SetContext(ctx)
+	return cmd, &buf
+}
+
 func TestOutputBulkResult_NilResult(t *testing.T) {
 	cmd := &cobra.Command{}
 	// Should not panic or error
@@ -19,10 +27,7 @@ func TestOutputBulkResult_NilResult(t *testing.T) {
 }
 
 func TestOutputBulkResult_SuccessAndErrors(t *testing.T) {
-	var buf bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
-	cmd := &cobra.Command{}
-	cmd.SetContext(ctx)
+	cmd, buf := newTestCommandWithBuffer()
 
 	res := &storage.BulkResult{
 		TotalCount:   2,
@@ -42,10 +47,7 @@ func TestOutputBulkResult_SuccessAndErrors(t *testing.T) {
 }
 
 func TestOutputBulkResult_FallbackFormat(t *testing.T) {
-	var buf bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
-	cmd := &cobra.Command{}
-	cmd.SetContext(ctx)
+	cmd, buf := newTestCommandWithBuffer()
 	cmd.Flags().String("format", "unknown_format_xyz", "")
 
 	res := &storage.BulkResult{
@@ -63,10 +65,7 @@ func TestOutputBulkResult_FallbackFormat(t *testing.T) {
 }
 
 func TestOutputBulkResult_LastResortFallback(t *testing.T) {
-	var buf bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
-	cmd := &cobra.Command{}
-	cmd.SetContext(ctx)
+	cmd, buf := newTestCommandWithBuffer()
 	cmd.Flags().String("format", "unknown_format_xyz", "")
 
 	res := &storage.BulkResult{
