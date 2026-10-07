@@ -190,3 +190,23 @@ func TestSuggest_nil(t *testing.T) {
 		t.Errorf("Suggest(nil) should return zero value: %+v", s)
 	}
 }
+
+func TestSuggest_ProjectRootNotFound(t *testing.T) {
+	err := errors.New("project root not found: no .zqk workspace found")
+	opts := Options{Verbose: false, ExperienceLevel: ExperienceStandard}
+	s := Suggest(err, opts)
+	if !strings.Contains(s.Hint, "init") {
+		t.Errorf("expected hint to mention init: %q", s.Hint)
+	}
+}
+
+func TestSetDefault(t *testing.T) {
+	orig := Default()
+	defer SetDefault(orig)
+
+	mock := &defaultService{}
+	SetDefault(mock)
+	if Default() != mock {
+		t.Errorf("expected custom default service")
+	}
+}

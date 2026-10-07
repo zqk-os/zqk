@@ -64,18 +64,25 @@ func TestSchedulerJobLifecycle_NotAggregatedWhenTargetIDSet(t *testing.T) {
 		t.Fatalf("failed to create completed audit event: %v", err)
 	}
 
-	// Flush CAS listing queue if CAS is active
-	queue := caspkg.GetGlobalListingIndexWriteQueue()
-	_ = queue.FlushKind("audit_event", 2*time.Second)
+	// Flush CAS listing queue for project root if CAS is active
+	_ = caspkg.FlushKindListingIndexForProjectRootWithTimeout(testRoot, "audit_event", 5*time.Second)
+	_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("audit_event", 2*time.Second)
 
-	// 3. List by target_id
+	// 3. List by target_id (with convergence poll)
 	storageCtx := pkgctx.NewStorageContext()
-	res, err := storageProvider.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
-		Kind: "audit_event",
-		Filters: map[string]any{
-			"target_id": jobID,
-		},
-	})
+	var res *storagepkg.QueryResult
+	for i := 0; i < 20; i++ {
+		res, err = storageProvider.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+			Kind: "audit_event",
+			Filters: map[string]any{
+				"target_id": jobID,
+			},
+		})
+		if err == nil && res != nil && len(res.Objects) == 2 {
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 	if err != nil {
 		t.Fatalf("failed to list audit events by target_id: %v", err)
 	}
