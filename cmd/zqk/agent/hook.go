@@ -61,7 +61,13 @@ type antigravityHookOutput struct {
 
 func runPreSubagentHook(cmd *cobra.Command, proc *cli.Processor, vendor string) error {
 	sec := procSecurity(proc)
-	return runPreSubagentHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, os.Stdin, os.Stdout)
+	in := io.Reader(os.Stdin)
+	out := io.Writer(os.Stdout)
+	if cmd != nil {
+		in = cmd.InOrStdin()
+		out = cmd.OutOrStdout()
+	}
+	return runPreSubagentHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, in, out)
 }
 
 func runPreSubagentHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, vendor string, in io.Reader, out io.Writer) error {

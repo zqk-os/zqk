@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // Peer-ack await registry: register on steer, fire wake callback on feed ack
@@ -269,8 +270,13 @@ func defaultPeerAckAwaitFire(a PeerAckAwait) error {
 		return nil // unknown actions: recorded only
 	}
 	root := "" // resolve from cwd when firing from CLI
-	if wd, err := fileutil.Getwd(); err == nil {
+	if testRoot := zqkenv.TestRoot().Get(); testRoot != "" {
+		root = testRoot
+	} else if wd, err := fileutil.Getwd(); err == nil {
 		root = wd
+	}
+	if near := paths.FindNearestProjectRoot(root); near != "" {
+		root = near
 	}
 	msg := strings.TrimSpace(a.WakeMessage)
 	if msg == "" {
