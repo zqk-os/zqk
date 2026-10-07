@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 
 	cron "github.com/robfig/cron/v3"
 )
@@ -32,9 +33,7 @@ func TestExtended_JobExecution_RetryAndOutcomes(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
-	defer func() {
-		_ = sp.Shutdown(context.Background())
-	}()
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -143,10 +142,7 @@ func TestExtended_CapOrchestrator_FailureTrackerAndIndex(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
-	defer func() {
-		_ = sp.Shutdown(context.Background())
-		time.Sleep(100 * time.Millisecond)
-	}()
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()

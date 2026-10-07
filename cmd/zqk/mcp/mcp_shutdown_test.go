@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/mcp"
 )
 
@@ -17,10 +18,10 @@ func TestOSSignalTriggersShutdown(t *testing.T) {
 	// Don't use signal.Notify for test, just send to channel directly
 	// signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	go func() {
+	goroutinelabels.StartNamedGoroutine("mcp_test_shutdown_sig", "simulate os signal", func() {
 		sig := <-sigChan
 		server.RequestProcessShutdown("received OS signal: " + sig.String())
-	}()
+	})
 
 	// Send an interrupt signal
 	sigChan <- os.Interrupt
@@ -32,17 +33,11 @@ func TestOSSignalTriggersShutdown(t *testing.T) {
 	ctx := server.GetShutdownContext()
 	assert.NotNil(t, ctx)
 
-	// Check the internal state (we can only observe side effects in public API or if we check GetShutdownContext)
-	// Let's call order shutdown just to check if it returns a cancelled context if requested
-	// Oh wait, RequestShutdown just sets the flag. We need to check if the flag is set.
-	// Since we are outside the mcp package here, we can't read shutdownRequested.
-	// We can try to serve and see if it exits immediately.
-
 	// Another approach:
 	errChan := make(chan error, 1)
-	go func() {
+	goroutinelabels.StartNamedGoroutine("mcp_test_serve", "mcp server run", func() {
 		errChan <- server.Serve()
-	}()
+	})
 
 	// Wait a bit, then check if it stopped
 	// Wait, Serve() blocks on reading from stdin. So it won't stop unless shutdown is ordered or stdin is closed.

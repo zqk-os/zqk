@@ -23,6 +23,7 @@ func TestSchedulerJobLifecycle_NotAggregatedWhenTargetIDSet(t *testing.T) {
 		t.Fatalf("Failed to create storage factory: %v", err)
 	}
 	storageProvider := storageFactory.GetStorage()
+	testkit.RegisterStorageTestCleanup(t, testRoot, storageProvider)
 
 	// Ensure buffer is ENABLED to verify that target_id prevents aggregation even under enabled buffering
 	bufferRegistry := storagepkg.GetGlobalBufferRegistry()
@@ -64,15 +65,14 @@ func TestSchedulerJobLifecycle_NotAggregatedWhenTargetIDSet(t *testing.T) {
 		t.Fatalf("failed to create completed audit event: %v", err)
 	}
 
-	// Flush CAS listing queue for project root if CAS is active
-	_ = caspkg.FlushKindListingIndexForProjectRootWithTimeout(testRoot, "audit_event", 5*time.Second)
-	_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("audit_event", 2*time.Second)
-
-	// 3. List by target_id (with convergence poll)
+	// 3. List by target_id (with convergence poll and continuous CAS write queue flush)
 	storageCtx := pkgctx.NewStorageContext()
+	bypassCtx := pkgctx.WithBypassCache(ctx)
 	var res *storagepkg.QueryResult
-	for i := 0; i < 20; i++ {
-		res, err = storageProvider.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{
+	for i := 0; i < 30; i++ {
+		_ = caspkg.FlushKindListingIndexForProjectRootWithTimeout(testRoot, "audit_event", 1*time.Second)
+		_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("audit_event", 1*time.Second)
+		res, err = storageProvider.List(bypassCtx, secCtx, storageCtx, storagepkg.ListFilter{
 			Kind: "audit_event",
 			Filters: map[string]any{
 				"target_id": jobID,
@@ -81,7 +81,7 @@ func TestSchedulerJobLifecycle_NotAggregatedWhenTargetIDSet(t *testing.T) {
 		if err == nil && res != nil && len(res.Objects) == 2 {
 			break
 		}
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 	if err != nil {
 		t.Fatalf("failed to list audit events by target_id: %v", err)
