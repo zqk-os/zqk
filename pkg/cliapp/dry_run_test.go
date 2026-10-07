@@ -61,14 +61,57 @@ func TestDryRunHandler_CreateAndUpdate(t *testing.T) {
 		t.Errorf("expected output to contain object YAML, got: %s", out)
 	}
 
-	// Update dry run
+	// Update dry run with current and new fields
 	buf.Reset()
-	handled, err = handler.HandleUpdateDryRun(cmd, "GOAL-1", map[string]any{"title": "Old"}, map[string]any{"title": "New"})
+	current := map[string]any{"title": "Old", "tag": "prod"}
+	updates := map[string]any{"title": "New", "owner": "Alice", "expected_updated_at": "ignore"}
+	handled, err = handler.HandleUpdateDryRun(cmd, "GOAL-1", current, updates)
 	if !handled || err != nil {
 		t.Fatalf("expected handled=true, err=nil, got %v, %v", handled, err)
 	}
 	out = buf.String()
-	if !strings.Contains(out, "Would update object GOAL-1:") {
-		t.Errorf("expected update dry-run output, got: %s", out)
+	if !strings.Contains(out, "Would update object GOAL-1:") || !strings.Contains(out, "title: Old -> New") || !strings.Contains(out, "owner: Alice") {
+		t.Errorf("expected update dry-run output with field transitions, got: %s", out)
+	}
+}
+
+func TestDryRunHandler_ResultHelpers(t *testing.T) {
+	logger := logging.GetLogger()
+	handler := NewDryRunHandler(logger)
+
+	cmd := &cobra.Command{Use: "test"}
+	cmd.Flags().Bool("dry-run", false, "")
+
+	// Disabled
+	handled, resCreate, err := handler.HandleCreateDryRunResult(cmd, map[string]any{"id": "1"}, "goal", "goal")
+	if handled || resCreate != nil || err != nil {
+		t.Errorf("expected false, nil, nil when dry-run disabled")
+	}
+	handled, resUpdate, err := handler.HandleUpdateDryRunResult(cmd, "1", map[string]any{}, map[string]any{})
+	if handled || resUpdate != nil || err != nil {
+		t.Errorf("expected false, nil, nil when dry-run disabled")
+	}
+
+	// Enabled
+	cmd.Flags().Set("dry-run", "true")
+	handled, resCreate, err = handler.HandleCreateDryRunResult(cmd, map[string]any{"id": "1"}, "goal", "")
+	if !handled || resCreate == nil || err != nil {
+		t.Fatalf("HandleCreateDryRunResult failed: %v", err)
+	}
+	if resCreate.Message != "Would create object" {
+		t.Errorf("expected 'Would create object', got %q", resCreate.Message)
+	}
+
+	handled, resUpdate, err = handler.HandleUpdateDryRunResult(
+		cmd,
+		"GOAL-1",
+		map[string]any{"title": "Old", "status": "active"},
+		map[string]any{"title": "New", "expected_updated_at": "ignore-me"},
+	)
+	if !handled || resUpdate == nil || err != nil {
+		t.Fatalf("HandleUpdateDryRunResult failed: %v", err)
+	}
+	if len(resUpdate.Changed) != 1 || resUpdate.Changed["title"].New != "New" {
+		t.Errorf("unexpected changes in dry run update: %+v", resUpdate.Changed)
 	}
 }

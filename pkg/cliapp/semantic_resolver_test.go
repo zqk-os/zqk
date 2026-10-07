@@ -44,6 +44,25 @@ func TestProcessor_ResolveSemanticArgument(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected error when semantic title does not match any object")
 	}
+
+	// 4. Exact and substring title resolution
+	sampleGoal := map[string]any{
+		"id":    "GOAL-arch-123",
+		"kind":  "goal",
+		"title": "Build Architecture Layer",
+	}
+	if err := proj.FileStorage.Create(ctx, proc.SecurityContext(), sampleGoal); err == nil {
+		// Exact title match
+		resID, err := proc.ResolveSemanticArgument(ctx, "goal", "Build Architecture Layer")
+		if err == nil && resID != "GOAL-arch-123" {
+			t.Errorf("expected GOAL-arch-123, got: %s", resID)
+		}
+		// Substring title match
+		resSub, err := proc.ResolveSemanticArgument(ctx, "goal", "Architecture Layer")
+		if err == nil && resSub != "GOAL-arch-123" {
+			t.Errorf("expected substring match GOAL-arch-123, got: %s", resSub)
+		}
+	}
 }
 
 type mockStorageForSemanticDecorator struct {
@@ -53,6 +72,14 @@ type mockStorageForSemanticDecorator struct {
 
 func (m *mockStorageForSemanticDecorator) Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 	return m.readObj, nil
+}
+
+func (m *mockStorageForSemanticDecorator) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+	return &storage.QueryResult{Objects: []map[string]any{m.readObj}}, nil
+}
+
+func (m *mockStorageForSemanticDecorator) Query(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, query storage.Query) (*storage.QueryResult, error) {
+	return &storage.QueryResult{Objects: []map[string]any{m.readObj}}, nil
 }
 
 func TestSemanticStorageDecorator(t *testing.T) {
@@ -94,5 +121,36 @@ func TestSemanticStorageDecorator(t *testing.T) {
 	planObj, err := decorator.Read(context.Background(), secCtxFiltered, "PRI-1")
 	if err != nil || planObj == nil {
 		t.Errorf("expected core priority_plan to be allowed even with vocabulary schemes: %v", err)
+	}
+
+	// List with disallowed kind fast-fails to empty
+	listRes, err := decorator.List(context.Background(), secCtxFiltered, nil, storage.ListFilter{Kind: "unallowed_kind"})
+	if err != nil || len(listRes.Objects) != 0 {
+		t.Errorf("expected empty list result for unallowed kind: %+v", listRes)
+	}
+
+	// Query with core object
+	qRes, err := decorator.Query(context.Background(), secCtxFiltered, nil, storage.Query{})
+	if err != nil || len(qRes.Objects) != 1 {
+		t.Errorf("expected 1 object from Query: %+v", qRes)
+	}
+
+	// Vocabulary scheme allowing goal via []any
+	mockStore.readObj = map[string]any{
+		objects.FieldKeyAllowedKinds: []any{"goal"},
+	}
+	if !decorator.isKindAllowed(context.Background(), secCtxFiltered, "goal") {
+		t.Errorf("expected goal to be allowed by vocabulary scheme")
+	}
+	if decorator.isKindAllowed(context.Background(), secCtxFiltered, "risk_blocker") {
+		t.Errorf("expected risk_blocker to be disallowed by vocabulary scheme")
+	}
+
+	// Vocabulary scheme allowing goal via []string
+	mockStore.readObj = map[string]any{
+		objects.FieldKeyAllowedKinds: []string{"goal"},
+	}
+	if !decorator.isKindAllowed(context.Background(), secCtxFiltered, "goal") {
+		t.Errorf("expected goal to be allowed by string list scheme")
 	}
 }

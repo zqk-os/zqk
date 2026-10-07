@@ -1,12 +1,12 @@
 package cli
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/logging"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestDataLoader_LoadFromString(t *testing.T) {
@@ -36,7 +36,7 @@ func TestDataLoader_LoadFromFile(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	validFile := filepath.Join(tmpDir, "valid.yaml")
-	if err := os.WriteFile(validFile, []byte("name: test-scenario\nsteps:\n  - step1\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(validFile, []byte("name: test-scenario\nsteps:\n  - step1\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -59,7 +59,7 @@ func TestDataLoader_LoadFromFile(t *testing.T) {
 
 	// Invalid YAML file
 	invalidFile := filepath.Join(tmpDir, "bad.yaml")
-	if err := os.WriteFile(invalidFile, []byte("{\ninvalid: json: ["), 0644); err != nil {
+	if err := fileutil.WriteFile(invalidFile, []byte("{\ninvalid: json: ["), 0644); err != nil {
 		t.Fatal(err)
 	}
 	_, _, err = dl.LoadFromFile(invalidFile)
@@ -95,5 +95,42 @@ func TestDataLoader_LoadData_CommandFlags(t *testing.T) {
 	}
 	if data["title"] != "New Title" {
 		t.Errorf("expected overridden title 'New Title', got %v", data["title"])
+	}
+}
+
+func TestDataLoader_DraftAndStdin(t *testing.T) {
+	dl := NewDataLoader(logging.GetLogger())
+
+	// Nil / empty hints
+	p, err := dl.tryLastDraft(nil)
+	if err != nil || p != "" {
+		t.Errorf("expected empty path for nil hint")
+	}
+	p, err = dl.tryLastDraft(&LastDraftHint{})
+	if err != nil || p != "" {
+		t.Errorf("expected empty path for empty hint")
+	}
+
+	data, path, err, handled := dl.loadFromDraftIfAvailable(nil)
+	if handled || data != nil || path != "" || err != nil {
+		t.Errorf("expected handled=false for nil hint")
+	}
+
+	// With actual draft file and draft pointer
+	tmpDir := t.TempDir()
+	draftFile := filepath.Join(tmpDir, "draft.yaml")
+	if err := fileutil.WriteFile(draftFile, []byte("title: Draft Object\nstatus: draft\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Write draft pointer in tmpDir
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+	hint := &LastDraftHint{Scope: LastDraftScopeObject, Kind: "goal"}
+	pointerErr := WriteLastDraftPointer(tmpDir, hint.Scope, hint.Kind, draftFile)
+	if pointerErr == nil {
+		data, path, err := dl.loadFromTerminalOrDraft(hint)
+		if err != nil || path != draftFile || data["title"] != "Draft Object" {
+			t.Errorf("expected draft data from loadFromTerminalOrDraft, got: %+v (err=%v)", data, err)
+		}
 	}
 }

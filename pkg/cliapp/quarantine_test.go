@@ -32,4 +32,20 @@ func TestCreateQuarantinedCommand(t *testing.T) {
 
 	root := &cobra.Command{Use: "root"}
 	RegisterQuarantinedCommands(root)
+
+	// Non-empty quarantined commands list
+	orig := QuarantinedCommands
+	defer func() { QuarantinedCommands = orig }()
+	QuarantinedCommands = []QuarantinedCommand{
+		{
+			Name:        "experimental-tool",
+			Description: "Experimental CLI tool",
+			Reason:      "Work in progress",
+			PlannedFor:  "v1.5.0",
+		},
+	}
+	RegisterQuarantinedCommands(root)
+	if cmd, _, err := root.Find([]string{"experimental-tool"}); err != nil || cmd == nil {
+		t.Errorf("expected registered experimental-tool in root")
+	}
 }

@@ -62,3 +62,21 @@ func TestResolveLastDraftFile_wrongKind(t *testing.T) {
 		t.Fatal("expected kind mismatch error")
 	}
 }
+
+func TestLastDraftRerunHint(t *testing.T) {
+	if hint := lastDraftRerunHint(LastDraftScopeObject, "goal"); hint == "" {
+		t.Errorf("expected non-empty hint for object scope")
+	}
+	if hint := lastDraftRerunHint(LastDraftScopeInternal, "task"); hint == "" {
+		t.Errorf("expected non-empty hint for internal scope")
+	}
+	if hint := lastDraftRerunHint(LastDraftScopeBundle, ""); hint == "" {
+		t.Errorf("expected non-empty hint for bundle scope")
+	}
+	if hint := lastDraftRerunHint(LastDraftScopeSwarm, ""); hint == "" {
+		t.Errorf("expected non-empty hint for swarm scope")
+	}
+	if hint := lastDraftRerunHint("custom", ""); hint == "" {
+		t.Errorf("expected non-empty hint for custom scope")
+	}
+}

@@ -95,6 +95,11 @@ func TestContext_DerivationsAndGuards(t *testing.T) {
 }
 
 func TestResolveCommandProjectRoot(t *testing.T) {
+	rootNil, err := ResolveCommandProjectRoot(nil)
+	if err != nil || rootNil == "" {
+		t.Errorf("expected fallback root for nil command, got %s (err: %v)", rootNil, err)
+	}
+
 	cmd := &cobra.Command{Use: "test"}
 	ctx := ContextForProjectRoot("/test/proj/root")
 	SetContext(cmd, ctx)

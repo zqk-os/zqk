@@ -1,13 +1,13 @@
 package cli
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestDataLoader_LoadUpdates(t *testing.T) {
@@ -36,7 +36,7 @@ func TestDataLoader_LoadUpdates(t *testing.T) {
 	// Valid file updates
 	tmpDir := t.TempDir()
 	fpath := filepath.Join(tmpDir, "updates.yaml")
-	if err := os.WriteFile(fpath, []byte("description: From file\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(fpath, []byte("description: From file\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
 	d4, err4 := dl.LoadUpdatesFromFile(fpath)
@@ -71,5 +71,21 @@ func TestApplyAutoStatusFlag(t *testing.T) {
 	err = ApplyAutoStatusFlag(cmd, map[string]any{"kind": "criteria"}, updates)
 	if err == nil {
 		t.Errorf("expected conflict error when updates contains status")
+	}
+
+	// 4. unsupported kind (missing auto_status_transitionable trait)
+	delete(updates, objects.FieldKeyStatus)
+	err = ApplyAutoStatusFlag(cmd, map[string]any{"kind": "criteria"}, updates)
+	if err == nil {
+		t.Errorf("expected error for missing auto_status_transitionable trait")
+	}
+
+	// 5. valid kind (backlog_item with status planned) -> updates to testing
+	err = ApplyAutoStatusFlag(cmd, map[string]any{"kind": "backlog_item", "status": "planned"}, updates)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if updates[objects.FieldKeyStatus] != "testing" {
+		t.Errorf("expected status 'testing', got %v", updates[objects.FieldKeyStatus])
 	}
 }

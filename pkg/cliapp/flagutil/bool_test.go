@@ -21,7 +21,9 @@ func TestIsTrue(t *testing.T) {
 		t.Errorf("expected IsTrue to be false for default false bool")
 	}
 
-	_ = fs.Set("active", "true")
+	if err := fs.Set("active", "true"); err != nil {
+		t.Fatalf("failed to set active flag: %v", err)
+	}
 	if !IsTrue(fBool) {
 		t.Errorf("expected IsTrue to be true after set to true")
 	}

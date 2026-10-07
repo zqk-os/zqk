@@ -98,3 +98,18 @@ func TestEnhanceError_deduplicatesHint(t *testing.T) {
 		t.Errorf("expected suggestion to appear at most once, got %q", err2.Error())
 	}
 }
+
+func TestGuard_Requiref(t *testing.T) {
+	cmd := pkgcli.NewCommandBuilder("x").Build()
+	err := Guard(cmd).Requiref(true, "limit %d", 10).Return()
+	if err != nil {
+		t.Errorf("Requiref(true, ...): got %v", err)
+	}
+	err = Guard(cmd).Requiref(false, "count %d exceeds max %d", 15, 10).Return()
+	if err == nil {
+		t.Fatal("Requiref(false, ...): expected non-nil")
+	}
+	if !strings.Contains(err.Error(), "count 15 exceeds max 10") {
+		t.Errorf("expected formatted string in error: %s", err.Error())
+	}
+}

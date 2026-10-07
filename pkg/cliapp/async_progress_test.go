@@ -2,7 +2,9 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -163,5 +165,61 @@ func TestNewAsyncCommand(t *testing.T) {
 	}
 	if err := cmd.RunE(cmd, nil); err != nil {
 		t.Fatalf("RunE: %v", err)
+	}
+}
+
+func TestProgressState_SetGet(t *testing.T) {
+	state := &progressState{}
+	s, m := state.get()
+	if s != "" || m != "" {
+		t.Errorf("expected empty initial state, got (%q, %q)", s, m)
+	}
+	state.set("stage1", "message1")
+	s, m = state.get()
+	if s != "stage1" || m != "message1" {
+		t.Errorf("expected (stage1, message1), got (%q, %q)", s, m)
+	}
+}
+
+func TestProgressHeartbeatLabel(t *testing.T) {
+	if l := progressHeartbeatLabel("scheduler_start"); l != "Scheduler daemon running" {
+		t.Errorf("unexpected label: %s", l)
+	}
+	if l := progressHeartbeatLabel("mcp_serve"); l != "MCP server running" {
+		t.Errorf("unexpected label: %s", l)
+	}
+	if l := progressHeartbeatLabel("custom_op"); l != "Operation in progress: custom_op" {
+		t.Errorf("unexpected label: %s", l)
+	}
+}
+
+func TestRunProgressHeartbeat_ExitOnContext(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	helper := coordination.NewCoordinatorProgressHelper(t.TempDir(), "op-1", "test_op", "system")
+	state := &progressState{}
+	state.set("stage_a", "running well")
+
+	// Cancel context immediately so heartbeat loop exits cleanly
+	cancel()
+	runProgressHeartbeat(ctx, helper, "test_op", state, 10*time.Millisecond)
+}
+
+func TestRunWithAsyncProgress_ErrorAndNonInteractive(t *testing.T) {
+	coord := coordination.NewCoordinator(coordination.CoordinatorConfig{})
+	old := coordination.GetCoordinator()
+	coordination.SetGlobalCoordinator(coord)
+	defer coordination.SetGlobalCoordinator(old)
+
+	cmd := pkgcli.NewCommandBuilder("async_err_cmd").Build()
+	cmd.Flags().String("format", "json", "")
+	cmd.Flags().Bool("quiet", true, "")
+	cmd.SetContext(context.Background())
+
+	expectedErr := errors.New("underlying failure")
+	err := RunWithAsyncProgress(cmd, nil, "failing_op", func(*cobra.Command, []string) error {
+		return expectedErr
+	})
+	if !errors.Is(err, expectedErr) {
+		t.Errorf("expected %v, got %v", expectedErr, err)
 	}
 }

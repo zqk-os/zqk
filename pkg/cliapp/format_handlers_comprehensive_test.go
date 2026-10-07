@@ -6,6 +6,8 @@ import (
 	"errors"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/quality"
 )
 
 type mockPermissionChecker struct {
@@ -181,4 +183,265 @@ func TestFormatHandlerWithPermissions(t *testing.T) {
 	// SetPermissionChecker
 	newChecker := &mockPermissionChecker{allowFormat: true, allowData: true}
 	wrapper.SetPermissionChecker(newChecker)
+}
+
+type mockTablePrintable struct {
+	content string
+}
+
+func (m *mockTablePrintable) FormatTable() ([]byte, error) {
+	return []byte(m.content), nil
+}
+
+func TestTableFormatHandler_TableFormattingAndFallbacks(t *testing.T) {
+	h := &TableFormatHandler{}
+
+	// TablePrintable interface
+	tp := &mockTablePrintable{content: "custom-table-output"}
+	out, err := h.Format(tp)
+	if err != nil || string(out) != "custom-table-output" {
+		t.Errorf("expected custom-table-output, got: %q", string(out))
+	}
+
+	// Objects map containing []map[string]any with id, title, status, kind
+	objData := map[string]any{
+		"objects": []map[string]any{
+			{"id": "GOAL-1", "title": "First Goal", "status": "active", "kind": "goal"},
+			{"id": "GOAL-2", "title": "Second Goal", "status": "planned", "kind": "goal"},
+		},
+	}
+	out, err = h.Format(objData)
+	if err != nil || !strings.Contains(string(out), "GOAL-1") || !strings.Contains(string(out), "STATUS") {
+		t.Errorf("expected rendered table with headers: %s", string(out))
+	}
+
+	// Slice of maps with non-standard fallback columns (first 3 keys)
+	nonStd := []map[string]any{
+		{"foo": "val1", "bar": "val2", "baz": "val3"},
+	}
+	out, err = h.Format(nonStd)
+	if err != nil || !strings.Contains(string(out), "FOO") {
+		t.Errorf("expected fallback column table: %s", string(out))
+	}
+
+	// Any slice with all maps
+	anySlice := []any{
+		map[string]any{"id": "BLI-1", "name": "Item 1"},
+	}
+	out, err = h.Format(anySlice)
+	if err != nil || !strings.Contains(string(out), "BLI-1") {
+		t.Errorf("expected rendered table from any slice: %s", string(out))
+	}
+
+	// Single map fallback (renders YAML)
+	singleMap := map[string]any{"simple_key": "simple_val"}
+	out, err = h.Format(singleMap)
+	if err != nil || !strings.Contains(string(out), "simple_key: simple_val") {
+		t.Errorf("expected yaml fallback: %s", string(out))
+	}
+}
+
+func TestYAMLFormatHandler_StreamingAndValidation(t *testing.T) {
+	h := &YAMLFormatHandler{}
+	if h.IsStreaming() {
+		t.Errorf("expected IsStreaming=false for YAML")
+	}
+
+	var buf bytes.Buffer
+	data := map[string]any{"greeting": "hello"}
+	if err := h.Stream(context.Background(), data, &buf); err != nil {
+		t.Fatalf("Stream failed: %v", err)
+	}
+	if !strings.Contains(buf.String(), "greeting: hello") {
+		t.Errorf("expected YAML content: %s", buf.String())
+	}
+}
+
+func TestProseAndMarkdownRendering_AllVariants(t *testing.T) {
+	rawHandler := &RawFormatHandler{}
+	mdHandler := &MarkdownFormatHandler{}
+	htmlHandler := &HTMLFormatHandler{}
+
+	if rawHandler.IsStreaming() || mdHandler.IsStreaming() || htmlHandler.IsStreaming() {
+		t.Errorf("expected IsStreaming=false")
+	}
+	if err := rawHandler.Validate(nil); err != nil {
+		t.Errorf("expected Validate=nil")
+	}
+	if err := mdHandler.Validate(nil); err != nil {
+		t.Errorf("expected Validate=nil")
+	}
+	if err := htmlHandler.Validate(nil); err != nil {
+		t.Errorf("expected Validate=nil")
+	}
+
+	// Map with title, subtitle, statement, description, body
+	proseData := map[string]any{
+		"title":       "Important Notice\\nSecond Line",
+		"subtitle":    "Brief subtitle\\tindented",
+		"description": "Here is the \\\"quote\\\" and \\u0041 unicode",
+	}
+
+	rawOut, err := rawHandler.Format(proseData)
+	if err != nil || !strings.Contains(string(rawOut), "Here is the \"quote\" and A unicode") {
+		t.Errorf("unexpected raw output: %s", string(rawOut))
+	}
+
+	mdOut, err := mdHandler.Format(proseData)
+	if err != nil || !strings.Contains(string(mdOut), "Here is the \"quote\" and A unicode") {
+		t.Errorf("unexpected markdown output: %s", string(mdOut))
+	}
+
+	htmlOut, err := htmlHandler.Format(proseData)
+	if err != nil || !strings.Contains(string(htmlOut), "<h1>Important Notice</h1>") {
+		t.Errorf("unexpected html output: %s", string(htmlOut))
+	}
+
+	// Stream methods
+	var b bytes.Buffer
+	if err := rawHandler.Stream(context.Background(), "hello", &b); err != nil || b.String() != "hello" {
+		t.Errorf("unexpected raw stream: %s", b.String())
+	}
+	b.Reset()
+	if err := mdHandler.Stream(context.Background(), "hello", &b); err != nil || b.String() != "hello" {
+		t.Errorf("unexpected md stream: %s", b.String())
+	}
+	b.Reset()
+	if err := htmlHandler.Stream(context.Background(), "# Heading", &b); err != nil || !strings.Contains(b.String(), "<h1>Heading</h1>") {
+		t.Errorf("unexpected html stream: %s", b.String())
+	}
+
+	// Full markdown coverage: headings, code blocks, lists, horizontal rules, quotes, links
+	fullMd := "# H1\n## H2\n### H3\n#### H4\n```\ncode block\n```\n---\n* item 1\n- item 2\n\n> blockquote\n**bold** *italic* `inline` [title](http://example.com)\n"
+	b.Reset()
+	if err := htmlHandler.Stream(context.Background(), fullMd, &b); err != nil {
+		t.Fatalf("unexpected stream error: %v", err)
+	}
+	htmlStr := b.String()
+	if !strings.Contains(htmlStr, "<h2>H2</h2>") || !strings.Contains(htmlStr, "<pre><code>code block</code></pre>") || !strings.Contains(htmlStr, "<li>item 1</li>") {
+		t.Errorf("expected full html render, got: %s", htmlStr)
+	}
+}
+
+func TestJSONLFormatHandler_StreamSliceAndObject(t *testing.T) {
+	h := &JSONLFormatHandler{}
+	if !h.IsStreaming() {
+		t.Errorf("expected JSONLFormatHandler.IsStreaming=true")
+	}
+
+	// Stream slice of maps
+	var buf bytes.Buffer
+	sliceData := []any{
+		map[string]any{"id": "BLI-1", "val": 10},
+		map[string]any{"id": "BLI-2", "val": 20},
+	}
+	if err := h.Stream(context.Background(), sliceData, &buf); err != nil {
+		t.Fatalf("Stream slice failed: %v", err)
+	}
+	if !strings.Contains(buf.String(), "BLI-1") || !strings.Contains(buf.String(), "BLI-2") {
+		t.Errorf("expected stream to contain both objects: %s", buf.String())
+	}
+
+	// Stream single object
+	buf.Reset()
+	singleObj := map[string]any{"id": "GOAL-99", "status": "active"}
+	if err := h.Stream(context.Background(), singleObj, &buf); err != nil {
+		t.Fatalf("Stream single object failed: %v", err)
+	}
+	if !strings.Contains(buf.String(), "GOAL-99") {
+		t.Errorf("expected stream to contain single object: %s", buf.String())
+	}
+}
+
+func TestCSVFormatHandler_Comprehensive(t *testing.T) {
+	h := &CSVFormatHandler{}
+	if h.IsStreaming() {
+		t.Errorf("expected CSVFormatHandler.IsStreaming=false")
+	}
+
+	// Invalid type
+	if err := h.Validate("not a matrix result"); err == nil {
+		t.Errorf("expected Validate error for invalid data type")
+	}
+	if _, err := h.Format("not a matrix result"); err == nil {
+		t.Errorf("expected Format error for invalid data type")
+	}
+
+	// Valid matrix result
+	res := &quality.MatrixGetResult{
+		Header: []string{"id", "status"},
+		Rows: []map[string]string{
+			{"id": "BLI-1", "status": "completed"},
+			{"id": "BLI-2", "status": "planned"},
+		},
+	}
+	if err := h.Validate(res); err != nil {
+		t.Fatalf("unexpected Validate error: %v", err)
+	}
+
+	formatted, err := h.Format(res)
+	if err != nil {
+		t.Fatalf("unexpected Format error: %v", err)
+	}
+	csvStr := string(formatted)
+	if !strings.Contains(csvStr, "id,status") || !strings.Contains(csvStr, "BLI-1,completed") {
+		t.Errorf("unexpected CSV output: %s", csvStr)
+	}
+
+	var buf bytes.Buffer
+	if err := h.Stream(context.Background(), res, &buf); err != nil {
+		t.Fatalf("unexpected Stream error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "BLI-2,planned") {
+		t.Errorf("expected Stream output to contain BLI-2, got: %s", buf.String())
+	}
+}
+
+func TestFormatHandlerWithPermissions_Comprehensive(t *testing.T) {
+	base := &YAMLFormatHandler{}
+	checker := &mockPermissionChecker{allowFormat: true, allowData: true}
+	h := NewFormatHandlerWithPermissions(base, checker)
+
+	if h.IsStreaming() {
+		t.Errorf("expected IsStreaming=false")
+	}
+	if err := h.Validate(map[string]any{"a": "b"}); err != nil {
+		t.Errorf("unexpected Validate error: %v", err)
+	}
+
+	out, err := h.Format(map[string]any{"key": "value"})
+	if err != nil || !strings.Contains(string(out), "key: value") {
+		t.Fatalf("unexpected Format output: %s (err=%v)", string(out), err)
+	}
+
+	// Stream with allowed permissions
+	var buf bytes.Buffer
+	if err := h.Stream(context.Background(), map[string]any{"foo": "bar"}, &buf); err != nil {
+		t.Fatalf("unexpected Stream error: %v", err)
+	}
+	if !strings.Contains(buf.String(), "foo: bar") {
+		t.Errorf("expected Stream output, got: %s", buf.String())
+	}
+
+	// Stream with format not allowed
+	checker.allowFormat = false
+	checker.formatReason = "rpc required"
+	if err := h.Stream(context.Background(), map[string]any{"foo": "bar"}, &buf); err == nil {
+		t.Errorf("expected format not allowed error")
+	}
+
+	// Stream with data access denied
+	checker.allowFormat = true
+	checker.allowData = false
+	checker.dataReason = "confidential"
+	if err := h.Stream(context.Background(), map[string]any{"foo": "bar"}, &buf); err == nil {
+		t.Errorf("expected data access denied error")
+	}
+
+	// SetPermissionChecker
+	h.SetPermissionChecker(nil)
+	buf.Reset()
+	if err := h.Stream(context.Background(), map[string]any{"foo": "baz"}, &buf); err != nil {
+		t.Fatalf("unexpected Stream error after clearing checker: %v", err)
+	}
 }
