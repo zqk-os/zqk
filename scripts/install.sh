@@ -15,12 +15,52 @@
 #   ZQK_INSTALL_METHOD=goinstall ./scripts/install.sh
 set -e
 
-VERSION="${1:-latest}"
 REPO="${ZQK_REPO:-zqk-os/zqk}"
 MODULE="${ZQK_MODULE:-github.com/zqk-os/zqk}"
 INSTALL_DIR="${ZQK_INSTALL_DIR:-/usr/local/bin}"
 # INSTALL_METHOD: auto | binary | goinstall | source
 INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
+MODE="${ZQK_MODE:-}"
+VERSION="latest"
+
+for arg in "$@"; do
+  case "$arg" in
+    --fast|-f)
+      MODE="fast"
+      ;;
+    --walkthrough|-w)
+      MODE="walkthrough"
+      ;;
+    -*)
+      echo "Unknown flag: $arg" >&2
+      exit 1
+      ;;
+    *)
+      if [ "$arg" != "latest" ]; then
+        VERSION="$arg"
+      fi
+      ;;
+  esac
+done
+
+if [ -z "$MODE" ]; then
+  if [ -t 0 ] && [ -t 1 ]; then
+    echo "========================================================================"
+    echo "⚡ Welcome to ZQK (Zen Quantum Kernel) Installer"
+    echo "========================================================================"
+    echo "Choose your path:"
+    echo "  1) Go Fast      — 98.8% agent token savings via zgrep in < 5 seconds"
+    echo "  2) Walk Through — Interactive walkthrough of the Knowledge Kernel"
+    printf "Selection [1/2] (default 1): "
+    read -r CHOICE || CHOICE="1"
+    case "$CHOICE" in
+      2) MODE="walkthrough" ;;
+      *) MODE="fast" ;;
+    esac
+  else
+    MODE="fast"
+  fi
+fi
 
 # Auto-detect GITHUB_TOKEN via gh CLI if not explicitly set
 if [ -z "$GITHUB_TOKEN" ] && command -v gh >/dev/null 2>&1; then
@@ -335,10 +375,12 @@ _place_binary() {
     echo "🔑 Installing to ${INSTALL_DIR} (requires sudo)..."
     sudo install -m 755 "$bin" "${INSTALL_DIR}/zqk"
     [ -f "$mcp_bin" ] && sudo install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
+    sudo ln -sf "${INSTALL_DIR}/zqk" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
   else
     echo "📂 Installing to ${INSTALL_DIR}..."
     install -m 755 "$bin" "${INSTALL_DIR}/zqk"
     [ -f "$mcp_bin" ] && install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
+    ln -sf "${INSTALL_DIR}/zqk" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
   fi
   # Remove macOS quarantine flag
   if [ "$OS" = "darwin" ] && command -v xattr >/dev/null 2>&1; then
@@ -394,15 +436,34 @@ esac
 # ---------------------------------------------------------------------------
 if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
   ZQK_BIN="${INSTALL_DIR}/zqk"
+  if [ ! -x "$ZQK_BIN" ] && command -v zqk >/dev/null 2>&1; then
+    ZQK_BIN="$(command -v zqk)"
+  fi
+  ln -sf "$ZQK_BIN" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
   ZQK_VER="$("$ZQK_BIN" version 2>/dev/null || echo 'installed')"
   echo ""
   echo "✅ ZQK ${ZQK_VER} installed to ${INSTALL_DIR}/zqk"
+  echo "✅ zgrep linked to ${INSTALL_DIR}/zgrep"
   echo ""
-  echo "Quick start (< 2 min):"
-  echo "  mkdir my-project && cd my-project"
-  echo "  zqk system init --project-name my-project"
-  echo "  zqk workflow whats-next          # discover mission + next tasks"
-  echo "  zqk mcp proxy --tcp 127.0.0.1:7777 # expose MCP securely on loopback"
-  echo ""
-  echo "Docs: https://github.com/${REPO}#readme"
+
+  if [ "$MODE" = "fast" ]; then
+    echo "========================================================================"
+    echo "⚡ Go Fast — Drop into your agent rules (.cursorrules, CLAUDE.md, .clinerules):"
+    echo "========================================================================"
+    echo "  • Search:  zgrep \"<query>\" --max-tokens 500 -f json"
+    echo "  • Go AST:  zgrep --ast --kind struct|func \"<name>\""
+    echo "  • Reindex: zgrep --reindex"
+    echo ""
+    echo "Ready to explore the kernel later? Run: zqk system start-here"
+    echo "Docs: https://github.com/${REPO}#readme"
+    echo "========================================================================"
+  else
+    echo "========================================================================"
+    echo "🧭 Walk Through — Launching Knowledge Kernel Walkthrough..."
+    echo "========================================================================"
+    "$ZQK_BIN" system start-here || true
+  fi
+else
+  echo "❌ Installation could not be completed." >&2
+  exit 1
 fi
