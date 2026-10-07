@@ -732,6 +732,8 @@ func (e *Executor) executeDeleteObjectsStep(ctx context.Context, step *Step, ste
 	// Mark context as CLI operation to allow deletions
 	ctx = storage.WithCLIOperation(ctx)
 	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx = pkgctx.WithSecurityContext(ctx, secCtx)
+	ctx = pkgctx.WithAllowCoreObjectDelete(ctx)
 	deleted := 0
 	skipped := 0
 	errors := 0
