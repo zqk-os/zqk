@@ -24,6 +24,8 @@ Add this to `.cursorrules`, `CLAUDE.md`, or `.clinerules`:
 - For Go syntax: `zgrep --ast --kind struct|func <name>`.
 ```
 
+Full agent configuration reference: [Go Fast Agent Code Search Guide](docs/guides/GO_FAST_AGENT_CODE_SEARCH.md).
+
 ---
 
 ### Option 2: Walk Through
