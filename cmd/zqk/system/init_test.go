@@ -205,6 +205,14 @@ func TestInit_Greenfield_NoEnvVars(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
+	t.Cleanup(func() {
+		_ = WaitProjectCacheBackgroundWork(context.Background(), tmpDir)
+		if provider, ok := storage.GetGlobalStorageProviderCache().Get(tmpDir); ok {
+			_ = provider.Shutdown(context.Background())
+			storage.GetGlobalStorageProviderCache().Delete(tmpDir)
+		}
+	})
+
 	// We MUST run app.Execute() or similar to trigger root.go PersistentPreRunE,
 	// because the bug was that root.go created .zqk before init_impl ran.
 	// But root.go is in the app package. We can't import app here easily due to cycle.
@@ -563,6 +571,7 @@ func TestInit_GreenfieldAnchorsToCWD(t *testing.T) {
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("Init in child dir failed: %v", err)
 	}
+	_ = WaitProjectCacheBackgroundWork(context.Background(), childDir)
 	if provider, ok := storage.GetGlobalStorageProviderCache().Get(childDir); ok {
 		if err := provider.Shutdown(context.Background()); err != nil {
 			t.Fatalf("shutdown child storage: %v", err)
