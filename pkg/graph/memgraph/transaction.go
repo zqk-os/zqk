@@ -203,6 +203,9 @@ func (tx *memgraphTransaction) BeginNestedTransaction(ctx context.Context) (prov
 
 // GetParent returns the parent transaction if this is a nested transaction
 func (tx *memgraphTransaction) GetParent() provider.GraphTransaction {
+	if tx.parent == nil {
+		return nil
+	}
 	return tx.parent
 }
 
