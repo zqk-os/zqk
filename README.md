@@ -6,60 +6,66 @@
 
 **The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md).
 
-## Quickstart (5 Minutes)
+## Getting Started
 
-### 1. Install or Build
+### Installation (macOS & Linux)
 
-#### Homebrew (macOS & Linux)
 ```sh
-brew tap zqk-os/tap
-brew install zqk
+# Single-command install (defaults to interactive choice: Go Fast or Walk Through)
+curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
 ```
 
-#### GitHub Release Binaries
-Pre-compiled release archives and OpenVEX attestations are available at [GitHub Releases](https://github.com/zqk-os/zqk/releases/latest).
-
-#### Build From Source
+Or install via Homebrew:
 ```sh
-git clone https://github.com/zqk-os/zqk.git && cd zqk
-make          # → ./bin/zqk
-./bin/zqk --version
+brew tap zqk-os/tap && brew install zqk
 ```
 
-### 2. Seed a Sovereign Cell (Polyglot: Go, Python, TS, Rust)
+---
+
+### Choose Your Path: Go Fast vs. Walk Through
+
+ZQK offers two paths depending on your workflow:
+
+#### Option 1: Go Fast
+*For developers who want immediate token savings with zero learning curve.*
+
+Installs `zqk` and links `zgrep` into your PATH. Drop it directly into Cursor, Claude Code, Cline, or Aider to stop context-window blowouts:
+
 ```sh
-mkdir my-project && cd my-project
-zqk init
-zqk quickstart
+# Token-budgeted search (default 500 tokens, sub-15ms)
+zgrep "HandleRequest" --max-tokens 500 -f json
+
+# Go AST structural search
+zgrep --ast --kind struct MemoryStore
 ```
 
-Do **not** `export ZQK_PROJECT_ROOT` in your shell profile. ZQK discovers the nearest `.zqk/` membrane from the working tree.
+Add this to `.cursorrules`, `CLAUDE.md`, or `.clinerules`:
+```markdown
+- NEVER run raw recursive grep or find.
+- ALWAYS use `zgrep <query> --max-tokens 500 -f json`.
+- For Go syntax: `zgrep --ast --kind struct|func <name>`.
+```
 
-### 3. Seat Your AI Agent (Cursor, Claude Code, Windsurf, Cline)
+#### Option 2: Walk Through
+*For developers who want to understand core principles and see the Knowledge Kernel in action.*
+
+Conducts an interactive walkthrough to capture intent, objectify goals, and experience the 5-layer cascade:
+
 ```sh
-zqk system agent-onboard --format json
+# Launch the interactive walkthrough
 zqk system start-here
 ```
 
-### 4. Connect via Model Context Protocol (MCP)
-```sh
-zqk mcp install
-zqk mcp ensure --tcp 127.0.0.1:8443
-# Cursor stdio: zqk mcp cursor-adapter
-```
-
-### 5. Run Swarms & Live Telemetry
-```sh
-# Run a portable swarm package (local path or remote git URL)
-zqk run ./examples/swarms/code-eval/
-# Or run from remote git: zqk run https://github.com/zqk-os/swarm-starter-kit
-
-# Launch interactive full-screen terminal mission control
-zqk ui
-
-# Stream real-time mutations with the visual ANSI seismograph
-zqk state stream --dashboard
-```
+- **5-Layer Cascade:** Vision ➔ Goals ➔ Priority Plans ➔ Requirements ➔ Backlog Items.
+- **Fail-Closed Done Gates:** Automated AST verification and test execution before state transitions.
+- **Visual Web Studio:** Real-time Gantt timeline and DAG visualization:
+  ```sh
+  zqk ui -w
+  ```
+- **Ambient MCP Server:** Expose local kernel tools to Cursor or Claude:
+  ```sh
+  zqk mcp proxy --tcp 127.0.0.1:7777
+  ```
 
 ---
 
