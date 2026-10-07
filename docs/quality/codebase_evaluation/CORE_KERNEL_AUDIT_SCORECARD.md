@@ -1,9 +1,9 @@
 # Core Knowledge Kernel Comprehensive Hardening & Audit Scorecard
 
-**Milestone:** `MIL-1791318896373750000-288b4731` (Core Kernel Hardening & Comprehensive Audit Constellation)  
-**Priority Plan:** `PRI-1791318593529202000-87cbab28`  
-**Parent Goal:** `GOAL-1791318587690915000-327bf6aa` (Harden Core Kernel Test Coverage, Remove Friction, and Align Open-Core Strategy)  
-**Lead Persona:** `PER-COMMUNITY-DEMO-ROADMAP-ARCHITECT`
+**Subject:** Core Knowledge Kernel Comprehensive Hardening & Audit Scorecard  
+**Scope:** Open-Core Public Candidate Release Verification  
+**Standard:** Zero Leaks, Sub-Second Read Paths, Responsive Feedback  
+**Timestamp:** 2026-10-06  
 
 ---
 
@@ -22,13 +22,13 @@ xychart-beta
 
 ### 1.1 Constellation Audit Matrix
 
-| Vector / BLI | Domain Area | Pre-Audit Finding | Remediation Applied | Final Verdict |
+| Vector | Domain Area | Pre-Audit Finding | Remediation Applied | Final Verdict |
 | :--- | :--- | :--- | :--- | :--- |
-| **BLI 1** (`46d6f5da`) | Open-Core vs Enterprise Slicing | Risk of private package leaks into public distribution candidate | Verified `check-public-release-payload.sh`; 0 forbidden enterprise imports; pure Apache-2.0 isolation | **PASS (Grade A+)** |
-| **BLI 2** (`1fd017e8`) | CLI Taxonomy & Findability | `pplan` abbreviation caused friction; redundant subcommands | Audited all 547 CLI specs with 0 drift; introduced top-level `plan` alias for `pplan` | **PASS (Grade A+)** |
-| **BLI 3** (`11cb8a80`) | Latency & Storage Traversal | `whats-next` took 10.73s due to Darwin `sysctl(KERN_PROC_ALL)` storm & 24,000 CAS blob walks | Implemented 2s TTL ancestry cache, pruned CAS/WAL traversal, deduplicated diagnostics; latency dropped 90% to 1.22s | **PASS (Grade A+)** |
-| **BLI 4** (`deb88239`) | Console UX & Responsive Spinners | Operations >200ms executed silently without user feedback | Implemented `StepTracker` with elapsed timers; wired to `RunWithAsyncProgress` across >50 commands; suppression for CI/JSON | **PASS (Grade A+)** |
-| **BLI 5** (`0c830c33`) | Strategic Roadmap & YouTube Blueprint | Lack of greenfield screen recording walkthrough script | Authored YouTube Demo Blueprint, verified zero-dependency greenfield initialization, codified tech debt rollup | **PASS (Grade A+)** |
+| **Vector 1** | Open-Core vs Enterprise Slicing | Risk of private package leaks into public distribution candidate | Verified `check-public-release-payload.sh`; 0 forbidden enterprise imports; pure Apache-2.0 isolation | **PASS (Grade A+)** |
+| **Vector 2** | CLI Taxonomy & Findability | `pplan` abbreviation caused friction; redundant subcommands | Audited all 547 CLI specs with 0 drift; introduced top-level `plan` alias for `pplan` | **PASS (Grade A+)** |
+| **Vector 3** | Latency & Storage Traversal | `whats-next` took 10.73s due to Darwin `sysctl(KERN_PROC_ALL)` storm & 24,000 CAS blob walks | Implemented 2s TTL ancestry cache, pruned CAS/WAL traversal, deduplicated diagnostics; latency dropped 90% to 1.22s | **PASS (Grade A+)** |
+| **Vector 4** | Console UX & Responsive Spinners | Operations >200ms executed silently without user feedback | Implemented `StepTracker` with elapsed timers; wired to `RunWithAsyncProgress` across >50 commands; suppression for CI/JSON | **PASS (Grade A+)** |
+| **Vector 5** | Strategic Roadmap & YouTube Blueprint | Lack of greenfield screen recording walkthrough script | Authored YouTube Demo Blueprint, verified zero-dependency greenfield initialization, codified tech debt rollup | **PASS (Grade A+)** |
 
 ---
 

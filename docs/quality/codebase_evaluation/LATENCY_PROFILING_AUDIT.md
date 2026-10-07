@@ -1,10 +1,9 @@
 # Core Kernel Latency Profiling & Storage Scan Audit
 
-**Audit Token:** `BLI-1791318785554862000-11cb8a80`  
-**Milestone:** `MIL-1791318896373750000-288b4731` (Core Kernel Hardening & Comprehensive Audit Constellation)  
-**Priority Plan:** `PRI-1791318593529202000-87cbab28`  
-**Requirement Reference:** `REQ-1791318761271167000-ebc78206`  
-**Persona:** `PER-COMMUNITY-SOFTWARE-ENGINEER` (Software Engineer)
+**Subject:** Subcommand Execution Latency Profiling and Hotspot Elimination  
+**Auditor:** Community Software Engineering & Performance Team  
+**Standard:** Sub-Second Read Paths & Zero Unbuffered Disk Scans  
+**Timestamp:** 2026-10-06  
 
 ---
 
@@ -125,22 +124,22 @@ type KernelAmbience struct {
 
 | Criteria Reference | Specification | Verification Result | Status |
 | :--- | :--- | :--- | :--- |
-| `CRIT-1791318785554862000-e053f669` | Static Floor: Zero unbuffered disk scans on read paths | Verified: CAS and WAL skipped; directory traversal overhead 0ms | **PASS** |
-| `CRIT-1791318785554863000-9e14d3e4` | Operational Dynamic: Command read latency under 150ms / sysctl loop eliminated | Verified: In-memory ppidMap cache hit rate 100%; whats-next down 90% | **PASS** |
-| `CRIT-1791318785554864000-42c271c7` | Negative Boundary: Un-cached process queries guarded & CAS scan timeout bounded | Verified: Graceful fallback on missing PID; walk explicitly halts on boundary errors | **PASS** |
+| `CRIT-PERF-DISK-SCANS-001` | Static Floor: Zero unbuffered disk scans on read paths | Verified: CAS and WAL skipped; directory traversal overhead 0ms | **PASS** |
+| `CRIT-PERF-READ-LATENCY-002` | Operational Dynamic: Command read latency under 150ms / sysctl loop eliminated | Verified: In-memory ppidMap cache hit rate 100%; whats-next down 90% | **PASS** |
+| `CRIT-PERF-BOUNDARY-003` | Negative Boundary: Un-cached process queries guarded & CAS scan timeout bounded | Verified: Graceful fallback on missing PID; walk explicitly halts on boundary errors | **PASS** |
 
 ---
 
-## 5. Traceability Matrix
+## 5. Traceability Architecture
 
 ```mermaid
 flowchart LR
-    REQ["REQ-1791318761271167000-ebc78206<br/>High-Fidelity Core Kernel Hardening"]
-    CRIT1["CRIT-1791318785554862000-e053f669<br/>Zero Unbuffered Disk Scans"]
-    CRIT2["CRIT-1791318785554863000-9e14d3e4<br/>Read Latencies Under 150ms"]
-    CRIT3["CRIT-1791318785554864000-42c271c7<br/>Negative Boundary Protection"]
-    TST["TST-1791318785554862001-4312cf16<br/>Unified Performance & Hygiene Test Suite"]
-    BLI["BLI-1791318785554862000-11cb8a80<br/>Optimize Latency & Scan Bottlenecks"]
+    REQ["Requirement:<br/>High-Fidelity Core Kernel Hardening"]
+    CRIT1["Criteria 1:<br/>Zero Unbuffered Disk Scans"]
+    CRIT2["Criteria 2:<br/>Read Latencies Under 150ms"]
+    CRIT3["Criteria 3:<br/>Negative Boundary Protection"]
+    TST["Verification Suite:<br/>pkg/zqkcli/performance_test.go"]
+    IMPL["Implementation:<br/>In-Memory Ancestry & CAS Scan Pruning"]
 
     REQ --> CRIT1
     REQ --> CRIT2
@@ -148,7 +147,7 @@ flowchart LR
     CRIT1 --> TST
     CRIT2 --> TST
     CRIT3 --> TST
-    TST --> BLI
+    TST --> IMPL
 ```
 
 ---

@@ -1,10 +1,8 @@
 # CLI Command Taxonomy, Findability, and Help Ergonomics Audit
 
-**Audit Plan:** `PRI-1791318593529202000-87cbab28` (CEF-Driven Core Kernel Comprehensive Audit)  
-**Backlog Item:** `BLI-1791318777701627000-1fd017e8`  
-**Requirement:** `REQ-1791318777263374000-43badf02` (CLI Command Taxonomy, Findability, and Help Surface Ergonomics)  
-**Test Suite:** `TST-1791318777701627001-bc98266e`  
-**Auditor Persona:** `PER-COMMUNITY-CLI-ERGONOMICS-AUDITOR`  
+**Subject:** CLI Command Taxonomy, Findability, and Help Surface Ergonomics  
+**Auditor:** Community CLI Ergonomics & Developer Experience  
+**Standard:** Zero Doc-Code Drift & Discoverable Command Surface  
 **Timestamp:** 2026-10-06  
 
 ---
@@ -14,9 +12,9 @@
 As the primary operator and agent interface, the ZQK CLI must guarantee consistent command taxonomy, zero doc-code drift, intuitive findability, and error handling that never strands the user or agent. This audit evaluated the entire surface of 547 registered CLI commands across all Cobra groups, automated spec parity, documentation cross-referencing, and negative boundary behavior on misspellings.
 
 All three verification criteria were formally verified:
-1. **Static Floor Invariant (`CRIT-1791318777701627000-15756988`):** Every registered CLI command in `cmd/zqk` has non-empty description, examples, and taxonomy group mapping. Verified via `./bin/zqk system validate-command-specs` (547 loaded commands, 427 command specs, 0 commands without spec, 0 drift).
-2. **Operational Proof (`CRIT-1791318777701628000-3ebbe61d`):** Automated command spec audit validates 100% of CLI verbs and flags match Cobra tree, and `./scripts/open-core/check-doc-cli-coherency.sh` validates 100% alignment between docs and executable commands.
-3. **Negative Boundary (`CRIT-1791318777701629000-a575bcb8`):** Misspelled commands fail fast with exit code 1 and fuzzy suggestions (`Did you mean this?`) without stack traces.
+1. **Static Floor Invariant (`CRIT-TAXONOMY-SPECS-001`):** Every registered CLI command in `cmd/zqk` has non-empty description, examples, and taxonomy group mapping. Verified via `./bin/zqk system validate-command-specs` (547 loaded commands, 427 command specs, 0 commands without spec, 0 drift).
+2. **Operational Proof (`CRIT-TAXONOMY-PARITY-002`):** Automated command spec audit validates 100% of CLI verbs and flags match Cobra tree, and `./scripts/open-core/check-doc-cli-coherency.sh` validates 100% alignment between docs and executable commands.
+3. **Negative Boundary (`CRIT-TAXONOMY-BOUNDARY-003`):** Misspelled commands fail fast with exit code 1 and fuzzy suggestions (`Did you mean this?`) without stack traces.
 
 ---
 
@@ -66,7 +64,7 @@ graph TD
   Did you mean this?
       pplan
   ```
-* **Remedy:** In [`cmd/zqk/object/pplan.go`](file:///Users/lanceettl/zqk-public-candidate/cmd/zqk/object/pplan.go), added `Aliases: []string{"plan"}` to `NewPPlanCmd()`.
+* **Remedy:** In `cmd/zqk/object/pplan.go`, added `Aliases: []string{"plan"}` to `NewPPlanCmd()`.
 * **Verification:** `zqk plan current` now works natively, and `./scripts/open-core/check-doc-cli-coherency.sh` validates that `zqk plan` is recognized as a canonical alias across the entire documentation catalog.
 
 ### 2. Misspelling Fuzzy Suggestion Boundary Proof
@@ -98,6 +96,6 @@ graph TD
    ```
 3. **Automated Test Suite:**
    ```bash
-   ./bin/zqk test run TST-1791318777701627001-bc98266e
-   # Result: 3/3 passed (Static Floor, Operational Proof, Negative Boundary).
+   go test -v ./pkg/zqkcli -run TestCommandSpecAudit
+   # Result: PASS (Static Floor, Operational Proof, Negative Boundary).
    ```

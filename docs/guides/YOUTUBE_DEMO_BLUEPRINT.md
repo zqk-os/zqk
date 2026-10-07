@@ -1,10 +1,6 @@
 # YouTube Project Demo Blueprint: Autonomous Engineering with the ZQK Knowledge Kernel
 
 **Document Reference:** `docs/guides/YOUTUBE_DEMO_BLUEPRINT.md`  
-**Milestone:** `MIL-1791318896373750000-288b4731`  
-**Priority Plan:** `PRI-1791318593529202000-87cbab28`  
-**Requirement Reference:** `REQ-1791318803941132000-953ccb45`  
-**Lead Persona:** `PER-COMMUNITY-DEMO-ROADMAP-ARCHITECT`  
 **Target Video Duration:** 12–15 Minutes  
 **Target Audience:** Autonomous Agent Practitioners, Staff Engineers, Open-Source Devs
 

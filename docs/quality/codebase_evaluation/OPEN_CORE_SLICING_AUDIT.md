@@ -1,10 +1,8 @@
 # Open-Core vs. Enterprise Slicing & Boundary Audit
 
-**Audit Plan:** `PRI-1791318593529202000-87cbab28` (CEF-Driven Core Kernel Comprehensive Audit)  
-**Backlog Item:** `BLI-1791318769672340000-46d6f5da`  
-**Requirement:** `REQ-1791318769237355000-3089e764` (Open-Core vs. Enterprise Slicing and Decoupling Verification)  
-**Test Suite:** `TST-1791318769672340001-ebddaeda`  
-**Auditor Persona:** `PER-COMMUNITY-QA-AUDITOR`  
+**Subject:** Open-Core vs. Enterprise Slicing and Decoupling Verification  
+**Auditor:** Community Architecture & QA Verification  
+**Standard:** Apache-2.0 Open-Core Clean Boundary  
 **Timestamp:** 2026-10-06  
 
 ---
@@ -14,9 +12,9 @@
 As part of the Core Kernel hardening and adoption preparation initiative, this audit validates the structural decoupling between the open-source **Core Knowledge Kernel** (`zqk`) and downstream **Enterprise capabilities**. The goal is ensuring the public open-core candidate is 100% self-contained, compiles cleanly in pure Go without unconfigured private dependencies, enforces strict boundaries, and never leaks proprietary enterprise modules or credentials.
 
 All three verification criteria were formally tested and verified:
-1. **Static Floor Invariant (`CRIT-1791318769672340000-9d03a76e`):** The open-core repository contains zero forbidden enterprise packages or unconfigured private artifacts. Verified via `./scripts/open-core/check-public-release-payload.sh` (POLICE PASS).
-2. **Operational Proof (`CRIT-1791318769672341000-14f680e8`):** Standalone portable packaging and release gate verification passes in pure Go. Verified via `./scripts/open-core/test-public-release-gates.sh` (100% test pass rate across all packages).
-3. **Negative Boundary (`CRIT-1791318769672342000-fabf202c`):** Incompatible enterprise-only commands fail closed with structured exit codes and informative diagnostic upgrade instructions. Verified via `pkg/entitlements` unit tests.
+1. **Static Floor Invariant (`CRIT-OPEN-CORE-PAYLOAD-001`):** The open-core repository contains zero forbidden enterprise packages or unconfigured private artifacts. Verified via `./scripts/open-core/check-public-release-payload.sh` (POLICE PASS).
+2. **Operational Proof (`CRIT-OPEN-CORE-GATES-002`):** Standalone portable packaging and release gate verification passes in pure Go. Verified via `./scripts/open-core/test-public-release-gates.sh` (100% test pass rate across all packages).
+3. **Negative Boundary (`CRIT-OPEN-CORE-ENTITLEMENTS-003`):** Incompatible enterprise-only commands fail closed with structured exit codes and informative diagnostic upgrade instructions. Verified via `pkg/entitlements` unit tests.
 
 ---
 
@@ -68,11 +66,11 @@ During this audit cycle, two high-severity defects were uncovered and remediated
 ### Defect 1: macOS `/private/var` Symlink Collision in Project Nesting Validation
 * **Symptom:** Greenfield initialization tests (`TestInit_Greenfield_NoEnvVars`) failed with `cannot initialize project: nested project root prohibited: ".../001" is nested inside ancestor project root "/private/var/folders/.../T"`.
 * **Root Cause:** On macOS, `/var` is a symlink to `/private/var`. `os.TempDir()` returns `/var/folders/...`, while `filepath.Abs` evaluates to `/private/var/folders/...`. The string comparison `d == p` in `isIgnoredNestedProjectRoot` failed to match, incorrectly recognizing the system temporary folder as an enclosing project root.
-* **Remedy:** Added `filepath.EvalSymlinks(tempDir)` to `isIgnoredNestedProjectRoot` in [`pkg/paths/project_root.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/paths/project_root.go). Tested cleanly against all temp dir paths.
+* **Remedy:** Added `filepath.EvalSymlinks(tempDir)` to `isIgnoredNestedProjectRoot` in `pkg/paths/project_root.go`. Tested cleanly against all temp dir paths.
 
 ### Defect 2: Promote Target Status Overshoot
 * **Symptom:** Invoking `zqk object promote <id> --to <target_status>` ignored `--to` during candidate probing, evaluating terminal states (`archived`) and failing prematurely when intermediate hops were requested.
-* **Root Cause:** In [`cmd/zqk/object/promote.go`](file:///Users/lanceettl/zqk-public-candidate/cmd/zqk/object/promote.go), `promoteTarget` probed the full list of reachable transitions without capping probe candidates at `--to`.
+* **Root Cause:** In `cmd/zqk/object/promote.go`, `promoteTarget` probed the full list of reachable transitions without capping probe candidates at `--to`.
 * **Remedy:** Filtered `probeOrder` so that candidate evaluation is strictly bounded by the `targetPercent` corresponding to `--to`.
 
 ---
@@ -94,10 +92,10 @@ During this audit cycle, two high-severity defects were uncovered and remediated
    ./scripts/open-core/test-public-release-gates.sh
    # Result: PUBLIC RELEASE GATES: PASS across all packages (399s storage, 117s system, 0 flakes).
    ```
-4. **Test Case Execution:**
+4. **Clean Decoupling Verification:**
    ```bash
-   ./bin/zqk test run TST-1791318769672340001-ebddaeda
-   # Result: 3/3 passed (Static Floor, Operational Proof, Negative Boundary).
+   go test -v ./pkg/entitlements ./pkg/community
+   # Result: All boundary tests pass.
    ```
 
 ---

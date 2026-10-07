@@ -1,10 +1,9 @@
 # Core Kernel Console UX & Responsive Feedback Audit
 
-**Audit Token:** `BLI-1791318796173626000-deb88239`  
-**Milestone:** `MIL-1791318896373750000-288b4731` (Core Kernel Hardening & Comprehensive Audit Constellation)  
-**Priority Plan:** `PRI-1791318593529202000-87cbab28`  
-**Requirement Reference:** `REQ-1791318795739874000-3d002973`  
-**Persona:** `PER-COMMUNITY-CLI-ERGONOMICS-AUDITOR` (CLI Ergonomics & Feedback Auditor)
+**Subject:** Console UX, Responsive Progress Feedback, and Zero-Stall User Experience  
+**Auditor:** Community CLI Ergonomics & Developer Experience  
+**Standard:** Responsive Visual Step Tracking with Structured Stream Suppression  
+**Timestamp:** 2026-10-06  
 
 ---
 
@@ -108,22 +107,22 @@ flowchart LR
 
 | Criteria Reference | Specification | Verification Result | Status |
 | :--- | :--- | :--- | :--- |
-| `CRIT-1791318796173626000-10adcce5` | Static Floor: Commands >200ms bind unified console progress emitter | Verified: `RunWithAsyncProgress` wraps >50 CLI commands with `StepTracker` | **PASS** |
-| `CRIT-1791318796173627000-b941739e` | Operational Proof: Interactive sessions display active step name and elapsed timer | Verified: `TestStepTracker_CompleteAndFail` validates elapsed duration and step updates | **PASS** |
-| `CRIT-1791318796173628000-71792b85` | Negative Boundary: Non-interactive/JSON executions suppress ANSI codes | Verified: `TestSuppressionControl` proves zero ANSI codes on JSON, quiet, CI, and agent profiles | **PASS** |
+| `CRIT-UX-PROGRESS-001` | Static Floor: Commands >200ms bind unified console progress emitter | Verified: `RunWithAsyncProgress` wraps >50 CLI commands with `StepTracker` | **PASS** |
+| `CRIT-UX-ELAPSED-002` | Operational Proof: Interactive sessions display active step name and elapsed timer | Verified: `TestStepTracker_CompleteAndFail` validates elapsed duration and step updates | **PASS** |
+| `CRIT-UX-SUPPRESSION-003` | Negative Boundary: Non-interactive/JSON executions suppress ANSI codes | Verified: `TestSuppressionControl` proves zero ANSI codes on JSON, quiet, CI, and agent profiles | **PASS** |
 
 ---
 
-## 5. Traceability Matrix
+## 5. Traceability Architecture
 
 ```mermaid
 flowchart LR
-    REQ["REQ-1791318795739874000-3d002973<br/>Console UX & Zero-Stall User Experience"]
-    CRIT1["CRIT-1791318796173626000-10adcce5<br/>Unified Console Progress Emitter"]
-    CRIT2["CRIT-1791318796173627000-b941739e<br/>Elapsed Timer & Step Display"]
-    CRIT3["CRIT-1791318796173628000-71792b85<br/>Clean Structured Log Suppression"]
-    TST["TST-1791318796173626001-52c13075<br/>Console UX & Progress Test Suite"]
-    BLI["BLI-1791318796173626000-deb88239<br/>Audit Console UX & Unified Spinners"]
+    REQ["Requirement:<br/>Console UX & Zero-Stall User Experience"]
+    CRIT1["Criteria 1:<br/>Unified Console Progress Emitter"]
+    CRIT2["Criteria 2:<br/>Elapsed Timer & Step Display"]
+    CRIT3["Criteria 3:<br/>Clean Structured Log Suppression"]
+    TST["Verification Suite:<br/>pkg/cli/ux/spinner_test.go"]
+    IMPL["Implementation:<br/>StepTracker & cliapp Integration"]
 
     REQ --> CRIT1
     REQ --> CRIT2
@@ -131,5 +130,5 @@ flowchart LR
     CRIT1 --> TST
     CRIT2 --> TST
     CRIT3 --> TST
-    TST --> BLI
+    TST --> IMPL
 ```
