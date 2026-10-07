@@ -936,3 +936,79 @@ func TestValidateObjectIntent_requirementTracePipelineCriteria(t *testing.T) {
 		}
 	}
 }
+
+func TestValidateObject_TimelessGoalAndRequirementRefusePriorityPlan(t *testing.T) {
+	ResetDefaultForTest()
+	if err := WarmDefaultRegistry(""); err != nil {
+		t.Fatal(err)
+	}
+
+	// Goal must refuse priority_plan_ref
+	goalWithPlan := map[string]any{
+		objects.FieldKeyKind:            objects.KindGoal,
+		objects.FieldKeyID:              "GOAL-timeless-001",
+		objects.FieldKeyTitle:           "Timeless Strategic Goal",
+		objects.FieldKeyDescription:     "A high-level strategic compass that is completely timeless and unconstrained.",
+		objects.FieldKeyPriorityPlanRef: "PRI-plan-001",
+	}
+	errs := ValidateObject(t.Context(), Default(), objects.KindGoal, goalWithPlan, nil)
+	foundGoalPlan := false
+	for _, e := range errs {
+		if e.Field == objects.FieldKeyPriorityPlanRef && strings.Contains(e.Message, "timeless strategic compass") {
+			foundGoalPlan = true
+			break
+		}
+	}
+	if !foundGoalPlan {
+		t.Fatalf("expected goal to refuse priority_plan_ref as timeless, got %#v", errs)
+	}
+
+	// Requirement must refuse priority_plan_ref
+	reqWithPlan := map[string]any{
+		objects.FieldKeyKind:            objects.KindRequirement,
+		objects.FieldKeyID:              "REQ-timeless-001",
+		objects.FieldKeyTitle:           "Timeless Feature Contract",
+		objects.FieldKeyDescription:     "A timeless functional contract that must not be bound to time or schedule.",
+		objects.FieldKeyCriteriaRefs:    []any{"CRIT-001"},
+		objects.FieldKeyPriorityPlanRef: "PRI-plan-001",
+	}
+	errs = ValidateObject(t.Context(), Default(), objects.KindRequirement, reqWithPlan, nil)
+	foundReqPlan := false
+	for _, e := range errs {
+		if e.Field == objects.FieldKeyPriorityPlanRef && strings.Contains(e.Message, "timeless contract") {
+			foundReqPlan = true
+			break
+		}
+	}
+	if !foundReqPlan {
+		t.Fatalf("expected requirement to refuse priority_plan_ref as timeless, got %#v", errs)
+	}
+}
+
+func TestValidateObject_TechnicalDebtOverlay(t *testing.T) {
+	ResetDefaultForTest()
+	if err := WarmDefaultRegistry(""); err != nil {
+		t.Fatal(err)
+	}
+
+	// Technical debt must refuse requirement_refs
+	tdeWithReq := map[string]any{
+		objects.FieldKeyKind:            objects.KindTechnicalDebt,
+		objects.FieldKeyID:              "TDE-test-001",
+		objects.FieldKeyTitle:           "Fix flaky storage teardown",
+		objects.FieldKeyStatus:          "identified",
+		objects.FieldKeyDescription:     "Non-functional behavior plane issue: premature defer cancel in tests.",
+		objects.FieldKeyRequirementRefs: []any{"REQ-001"},
+	}
+	errs := ValidateObject(t.Context(), Default(), objects.KindTechnicalDebt, tdeWithReq, nil)
+	foundReqRefuse := false
+	for _, e := range errs {
+		if e.Field == objects.FieldKeyRequirementRefs && strings.Contains(e.Message, "non-functional behavior plane") {
+			foundReqRefuse = true
+			break
+		}
+	}
+	if !foundReqRefuse {
+		t.Fatalf("expected technical_debt to refuse requirement_refs, got %#v", errs)
+	}
+}

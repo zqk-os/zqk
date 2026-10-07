@@ -177,6 +177,35 @@ fields:
     validation:
       max_length: 200
       required: false
+  goal_refs:
+    access:
+      requires:
+        - access:confidential
+    checklist:
+      authority: creator/owner
+      automation_hooks: used for strategic alignment and goal impact analysis
+      cardinality: zero_or_many
+      criticality: association
+      default: []
+      dependencies: goals registry
+      observability: "yes"
+      origin_lifecycle: mutable
+      purpose: Strategic goals supported or protected by remediating this technical debt
+      security: non-sensitive
+      system_usage:
+        - traceability
+        - alignment
+        - reporting
+      validation: IDs exist (GOAL-#### format)
+    field_profile_code: TDE-014
+    permissions: rwx
+    semantic_type: reference
+    traits:
+      - field_mutable_group
+      - field_reference_group
+    type: list
+    validation:
+      required: false
   impact_assessment:
     access:
       requires:

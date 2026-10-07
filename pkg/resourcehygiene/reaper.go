@@ -382,6 +382,22 @@ func ReapOrphanedProcesses(projectRoot string, dryRun bool) (int, []string, erro
 	var count int
 	var reaped []string
 
+	// Build self process ancestor lookup from the process table snapshot
+	ppidMap := make(map[int]int, len(procs))
+	for _, p := range procs {
+		ppidMap[p.pid] = p.ppid
+	}
+	selfAncestors := make(map[int]struct{}, 16)
+	curr := selfPID
+	for curr > 1 {
+		selfAncestors[curr] = struct{}{}
+		parent, ok := ppidMap[curr]
+		if !ok || parent <= 0 || parent == curr {
+			break
+		}
+		curr = parent
+	}
+
 	for _, p := range procs {
 		pid := p.pid
 		if pid <= 1 || pid == selfPID {
@@ -394,6 +410,9 @@ func ReapOrphanedProcesses(projectRoot string, dryRun bool) (int, []string, erro
 		}
 
 		// Never touch current process ancestors
+		if _, isAncestor := selfAncestors[pid]; isAncestor {
+			continue
+		}
 		if process.IsAncestorPID(pid, selfPID) {
 			continue
 		}

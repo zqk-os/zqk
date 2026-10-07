@@ -11,20 +11,23 @@ Govern the scrupulous breakdown of high-level intents and composite packs into o
 ## The Five-Layer Ontological Cascade Rubric
 
 ### 1. Layer 1: Strategic Intent & Goals (`goal`)
-- **Definition**: Declare the ultimate desired end-state condition, not an operational activity.
+- **Definition**: Declare the timeless ultimate desired end-state condition, not an operational or time-scheduled activity.
 - **Constraints**:
   - Must link to governing `mission` and `vision`.
   - Must define explicit boundary conditions (in-scope vs. out-of-scope).
   - Must specify success invariants that outlive individual sprint intervals.
+  - **Timelessness Invariant**: Goals exist outside of any time, sprint, or calendar constraint. Strictly NO `priority_plan_refs` or `criteria_refs` on `goal`.
 
 ### 2. Layer 2: State Transitions & Capabilities (`requirement`)
-- **Definition**: The unique structural contributions or environment state changes required to achieve the goal.
+- **Definition**: The timeless functional contract (`MUST`, `MUST NOT`) defining whole-feature deliverables linked to goals.
 - **Rules & Gates**:
   - **Orthogonality**: Requirements must be non-overlapping and mutually independent where possible.
   - **Normative Precision**: Use RFC-2119 keywords (`MUST`, `MUST NOT`, `REQUIRED`).
   - **Anti-Superficiality Doctrine**:
     - Prohibit vague adjectives (`better`, `cleaner`, `faster`, `improved`, `fixed`, `code changed`, `done`).
     - Every requirement MUST include an explicit `problem_statement` and bounded `operational_scope`.
+  - **Timelessness Invariant**: Requirements exist outside of time and schedules. They MUST NOT declare `priority_plan_ref` or `priority_plan_refs`.
+  - **Traceability Contract**: Requirements own `criteria_refs` (>= 3 satisfying the Three-Fold Proof) and are verified 1:1 by a `test_case`.
 
 ### 3. Layer 3: Verifiable Measurements & Conditions (`criteria`)
 - **Definition**: The exact parameters, conditions, and thresholds required to confirm requirement satisfaction.
@@ -38,13 +41,23 @@ Govern the scrupulous breakdown of high-level intents and composite packs into o
 - **Constraints**:
   - Must declare concrete file targets (`path_or_id`) and test entrypoints.
   - Must be deterministic, automated, and runnable without manual human inspection.
+  - Linked 1:1 with a `requirement` to wrap and verify its criteria bundle.
 
-### 5. Layer 5: Phased Actions & Parallel Breakdown (`milestone`, `priority_plan`, `backlog_item`)
+### 5. Layer 5: Phased Actions & Parallel Breakdown (`milestone`, `epic`, `priority_plan`, `backlog_item`)
 - **Definition**: The sequence of environment-mutating actions that bend reality toward the goals.
 - **Rules**:
+  - **Epics (Semantic Shape & Thematic Containers)**: Give human-legible semantic shape to multi-plan initiatives, eliminating the cognitive trap of confusing "phases of work" (*"Was that plumbing in Phase 2 or Phase 4?"*). An Epic groups multiple 1-cycle Priority Plans under a meaningful domain umbrella (e.g. Epic: *'Interior Home Remodel'* grouping Plans for *Demolition*, *Drywall*, and *Painting*). Permissive by default (plans can be added as new work is discovered, unless explicitly `execution_locked`).
+  - **Milestone Chronological Anchors**: `milestone` objects add the time constraint—acting as time-bounded subgoals across delivered reality that Priority Plans aim toward.
+  - **Priority Plans (1-Cycle Batches)**: `priority_plan` groups exactly 1 cycle of work (sprint/kanban batch, 2–5 BLIs) and scope-locks upon `in_progress`.
+  - **Backlog Items (Atomic Effort Slices)**: Backlog items satisfy 1 to 3 specific criteria. Never build an entire feature contract in a single monolithic BLI.
   - **Maximal Parallelism**: Partition work into decoupled packages to prevent file lock contention and git merge conflicts.
   - **Shovel-Ready Verification**: Backlog items must have problem statements, acceptance considerations, linked milestone, requirements, criteria, and tests before entering `planned` status.
   - **Convergence Binding**: Bind work intervals to `convergence_session` objects for iterative re-measurement.
+
+### 6. The Non-Functional Behavior Plane (`technical_debt`)
+- **Definition**: Tactical entry point into technical work supporting goals without being a feature requirement contract.
+- **Non-Functional Plane Story**: Documents code smells, test flakes, performance bottlenecks, teardown leaks, and negative boundary omissions.
+- **The Rollup & Categorization Principle**: Multiple tech debt items MUST be rolled up to extract systemic anti-pattern stories, directly codifying new architectural best practices and formal kernel `policy` objects.
 
 ### 6. Declarative Traversal & Atomic Mutation Discipline (ZPARQL & ZQL)
 - **Declarative Graph Traversal (`zqk query` / MCP `query_zparql`)**:

@@ -69,7 +69,7 @@ func IsCompositionFieldAllowed(kind, field string, spec *Spec) bool {
 	}
 	if kind == KindTechnicalDebt {
 		switch field {
-		case "impact", "priority", "remediation":
+		case "impact", "priority", "remediation", "goal_refs", "goal_ref", "priority_plan_ref", "milestone_ref":
 			return true
 		}
 	}

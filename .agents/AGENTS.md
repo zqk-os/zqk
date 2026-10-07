@@ -36,12 +36,18 @@
 
 ## Process Administration & Management: Kernel Objects (Shift-Left Directive)
 - **Shift-Left Upfront Discipline:** Do not wait for `zqk-vet` or git commit check-valves to catch bad slicing or scope creep. Agents must follow the canonical relational model out of the gate:
-  - **`goal` (Strategic Compass):** Decomposes into 3–5 `requirement` contracts (`requirement_refs`). **Strictly NO `criteria_refs` on `goal`.**
-  - **`requirement` (Whole Feature Contract):** Owns `criteria_refs`. MUST declare at least 3 criteria satisfying the Three-Fold Proof (Static Floor Invariant, Operational Dynamic Proof, Negative Adversarial Boundary).
-  - **`test_case` (Unified Verification Group):** Linked 1:1 to a `requirement`. Wraps and verifies all criteria for that requirement in a single execution (`zqk test run <tst_id>`).
-  - **`backlog_item` (Atomic Unit of Effort):** Satisfies 1 to 3 specific criteria. Never build an entire feature in one monolithic BLI. Minimum 2–5 BLIs per Priority Plan.
-  - **`priority_plan` (Time-Bounded Execution Cycle):** Groups exactly **1 cycle of work** (sprint/kanban batch). Acts as the stackable column on the Gantt chart. Scope-locked upon entering `in_progress` to guarantee completion.
-  - **`epic` (Thematic Multi-Plan Container):** Groups multiple plans under an overarching theme. Responds to shockwaves (first linked plan `in_progress` flips epic to `in_progress`; all linked plans `complete` flips epic to `completed`). Permissive by default (can add plans while in_progress unless explicitly `execution_locked`).
+  - **Timeless Strategic & Functional Contracts:**
+    - **`goal` (Timeless Strategic Compass):** Anchors high-level intent outside of any sprint, schedule, or calendar constraint. Decomposes into 3–5 `requirement` contracts (child `requirement.goal_refs`). **Strictly NO `criteria_refs` or `priority_plan_refs` on `goal`.**
+    - **`requirement` (Timeless Whole Feature Contract):** Owns `criteria_refs`. MUST declare at least 3 criteria satisfying the Three-Fold Proof (Static Floor Invariant, Operational Dynamic Proof, Negative Adversarial Boundary). **Requirements exist outside of time and MUST NOT declare `priority_plan_ref` or `priority_plan_refs`.**
+    - **`test_case` (Unified Verification Group):** Linked 1:1 to a `requirement`. Wraps and verifies all criteria for that requirement in a single execution (`zqk test run <tst_id>`).
+  - **Chronological Anchors & Time-Bounded Execution:**
+    - **`milestone` (Chronological Boundary Anchor):** Introduces the time constraint across delivered reality. Acts as a time-bounded subgoal or external release event that Priority Plans aim toward.
+    - **`priority_plan` (Time-Bounded Execution Cycle):** Groups exactly **1 cycle of work** (sprint/kanban batch, 2–5 BLIs) aiming toward a `milestone`. Acts as the stackable column on the Gantt chart. Scope-locked upon entering `in_progress` to guarantee completion.
+    - **`backlog_item` (Atomic Unit of Effort):** Satisfies 1 to 3 specific criteria. Never build an entire feature in one monolithic BLI. Minimum 2–5 BLIs per Priority Plan.
+    - **`epic` (Thematic Multi-Plan Container & Semantic Shape):** Gives human-legible semantic shape to the overall initiative (e.g. 'Interior Home Remodel' vs confusing abstract 'Phase 2/4'), grouping multiple 1-cycle Priority Plans under a meaningful domain umbrella. Responds to shockwaves (first linked plan `in_progress` flips epic to `in_progress`; all linked plans `complete` flips epic to `completed`). Permissive by default (can add plans while in_progress as new work/phases are discovered, unless explicitly `execution_locked`).
+  - **The Non-Functional Behavior Plane (`technical_debt`):**
+    - **`technical_debt` (Tactical Entry Point into Non-Functional Reality):** Represents tactical technical work (code smells, test flakes, performance bottlenecks, storage leaks, negative boundary omissions) often supporting one or more goals, but not directly called out as a feature requirement.
+    - **The Rollup & Categorization Principle:** Technical debt tells the story of the non-functional plane. The rollup and clustering of multiple tech debt items MUST be used to extract the underlying anti-pattern story and codify lasting architectural or coding best practices (minted as `policy` objects or verified invariants), preventing recurrence in future initiatives.
 - **Anti-Hijacking Rule (No Scope-Stacking):** If human intent introduces a new UI, macro factor, or capability, NEVER append or mutate an in-flight or completed BLI. Mint a new BLI under the cycle or mint a new Priority Plan under the parent Epic.
 - Reference: `docs/guides/KERNEL_OBJECT_ADMINISTRATION.md`
 

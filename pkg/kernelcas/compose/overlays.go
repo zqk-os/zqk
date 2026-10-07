@@ -21,6 +21,8 @@ func kindOverlayRules(objectKind, intent string) []Rule {
 		rules = milestoneOverlay()
 	case objects.KindTestCase:
 		rules = testCaseOverlay()
+	case objects.KindTechnicalDebt:
+		rules = technicalDebtOverlay()
 	case objects.KindPriorityPlan:
 		rules = priorityPlanOverlay()
 	case objects.KindRequirement:
@@ -292,13 +294,19 @@ func goalOverlay() []Rule {
 			},
 		},
 		{
-			ID: "goal_plan_active_gate",
-			Op: OpRefusePlanStatus,
+			ID: "goal_no_priority_plan_refs",
+			Op: OpRefuseFieldPresent,
 			Config: map[string]any{
-				"plan_field":          objects.FieldKeyPriorityPlanRef,
-				"when_object_status":  []any{objects.ObjectStatusActive},
-				"require_plan_status": []any{objects.ObjectStatusActive, objects.ObjectStatusInProgress},
-				"message_fmt":         "goal status cannot be set to 'active' because the linked priority_plan %s is in '%s' status (must be 'active' or 'in_progress')",
+				objects.FieldKeyField: objects.FieldKeyPriorityPlanRef,
+				"message":             "goal is a timeless strategic compass and must not store priority_plan_ref; priority plans schedule backlog_items or technical_debt, not goals",
+			},
+		},
+		{
+			ID: "goal_no_priority_plan_multi_refs",
+			Op: OpRefuseFieldPresent,
+			Config: map[string]any{
+				objects.FieldKeyField: objects.FieldKeyPriorityPlanRefs,
+				"message":             "goal is a timeless strategic compass and must not store priority_plan_refs; priority plans schedule backlog_items or technical_debt, not goals",
 			},
 		},
 		{
@@ -537,6 +545,22 @@ func requirementOverlay() []Rule {
 			Config: map[string]any{
 				objects.FieldKeyField: objects.FieldKeyTechnicalSpecRefs,
 				"message":             "requirement must not store technical_spec_refs; occupancy is child-owned via technical_spec.requirement_refs",
+			},
+		},
+		{
+			ID: "req_no_priority_plan_refs",
+			Op: OpRefuseFieldPresent,
+			Config: map[string]any{
+				objects.FieldKeyField: objects.FieldKeyPriorityPlanRef,
+				"message":             "requirement is a timeless contract and must not store priority_plan_ref; priority plans schedule backlog_items or technical_debt, not requirements",
+			},
+		},
+		{
+			ID: "req_no_priority_plan_multi_refs",
+			Op: OpRefuseFieldPresent,
+			Config: map[string]any{
+				objects.FieldKeyField: objects.FieldKeyPriorityPlanRefs,
+				"message":             "requirement is a timeless contract and must not store priority_plan_refs; priority plans schedule backlog_items or technical_debt, not requirements",
 			},
 		},
 	}
@@ -831,4 +855,27 @@ func traitOverlayRules(objectKind, intent string) []Rule {
 	}
 
 	return rules
+}
+
+func technicalDebtOverlay() []Rule {
+	return []Rule{
+		{
+			ID: "tde_require_description",
+			Op: OpRequireField,
+			Config: map[string]any{
+				objects.FieldKeyField: "description",
+				"message":             "description must be populated describing the defect, smell, or non-functional issue (CAS completeness barrier)",
+				"skip_preliminary":    true,
+				"skip_terminal":       true,
+			},
+		},
+		{
+			ID: "tde_no_requirement_refs",
+			Op: OpRefuseFieldPresent,
+			Config: map[string]any{
+				objects.FieldKeyField: objects.FieldKeyRequirementRefs,
+				"message":             "technical debt belongs to the non-functional behavior plane and must not store requirement_refs; link to goals or backlog items instead",
+			},
+		},
+	}
 }

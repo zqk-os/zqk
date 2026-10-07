@@ -1,7 +1,6 @@
 package storage_test
 
 import (
-	"context"
 	"path/filepath"
 	"testing"
 
@@ -29,7 +28,6 @@ func setupRuntimeDeltaPipelineTest(t *testing.T) (testRoot string, str storage.O
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	secCtx = pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	str = fos
 	t.Cleanup(func() {

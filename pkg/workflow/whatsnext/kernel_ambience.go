@@ -70,6 +70,7 @@ type KernelAmbience struct {
 	StaleTestCatalyst *StaleTestCatalyst     `json:"stale_test_catalyst,omitempty"`
 	StaleAgentTask    *StaleAgentTask        `json:"stale_agent_task,omitempty"`
 	RemedyHint        string                 `json:"remedy_hint,omitempty"`
+	RemedyRecipes     []string               `json:"remedy_recipes,omitempty"`
 }
 
 // StaleAgentTask holds information and command hints for stalled in-progress agent tasks.
@@ -263,6 +264,11 @@ func EnrichAutoRemedy(amb *KernelAmbience, projectRoot string) {
 		for _, p := range plans {
 			if p.AutoApply {
 				fixableCount++
+			}
+			if p.Command != "" {
+				amb.RemedyRecipes = append(amb.RemedyRecipes, fmt.Sprintf("%s: %s (run: %s)", p.Title, p.Description, p.Command))
+			} else {
+				amb.RemedyRecipes = append(amb.RemedyRecipes, fmt.Sprintf("%s: %s", p.Title, p.Description))
 			}
 		}
 		if fixableCount > 0 {
