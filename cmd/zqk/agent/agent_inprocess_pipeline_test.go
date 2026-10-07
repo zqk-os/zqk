@@ -227,6 +227,12 @@ func TestInProcess_Agent_SeatWorker_Fill_Direct(t *testing.T) {
 		t.Fatalf("expected nil error on recent fill skip, got: %v", err)
 	}
 	t.Logf("submitKernelFill skip msg: %s", s)
+
+	// 5. schedulerCallbackNotify
+	cb := schedulerCallbackNotify("zqk", "/tmp/log.json")
+	if !strings.Contains(cb, "callback notify") {
+		t.Errorf("expected callback notify in output, got: %s", cb)
+	}
 }
 
 func TestInProcess_Agent_LoopGuard_DirectHelpers(t *testing.T) {
@@ -260,6 +266,15 @@ func TestInProcess_Agent_LoopGuard_DirectHelpers(t *testing.T) {
 	}
 
 	// 3. stagnationGuard
+	sgZero := newStagnationGuard(0)
+	if sgZero == nil || sgZero.max <= 0 {
+		t.Errorf("expected default max for zero max, got: %+v", sgZero)
+	}
+	var nilSG *stagnationGuard
+	if nilSG.Observe("fp-1") {
+		t.Error("expected false for nil stagnation guard")
+	}
+
 	sg := newStagnationGuard(2)
 	if sg.Observe("fp-1") {
 		t.Error("expected first observation not to abort")
@@ -316,8 +331,13 @@ func TestInProcess_Agent_Claim_ResolveClaimantIdentity(t *testing.T) {
 		t.Errorf("unexpected procStorageTuple nil results: %v, %v, %v", ctxStd, secStd, spStd)
 	}
 	emptyCmd := &cobra.Command{}
-	if _, err := newAgentProcessor(emptyCmd); err == nil {
-		t.Error("expected error from newAgentProcessor with empty cmd")
+	emptyCmd.SetContext(stdctx.Background())
+	procEmpty, err := newAgentProcessor(emptyCmd)
+	if err != nil {
+		t.Fatalf("failed to create processor: %v", err)
+	}
+	if procEmpty.ProjectRoot() == "" {
+		t.Error("expected non-empty project root")
 	}
 }
 
@@ -652,5 +672,32 @@ func TestInProcess_Agent_SyncLoop_ExtendedHelpers(t *testing.T) {
 	err = applyStateMutationWithFields(ctx, secCtx, provider, taskID, objects.KindAgentTask, validator, auditStream, objects.ObjectStatusPendingVerification, extra)
 	if err != nil {
 		t.Logf("applyStateMutationWithFields result: %v", err)
+	}
+}
+
+func TestInProcess_Agent_SyncLoop_LLMFailurePath(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := stdctx.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	taskID := "ATK-SYNC-LLM-001"
+	taskObj := map[string]any{
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "LLM Sync Task",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyAssigneePersonaRef: "PER-DEFAULT-OPERATOR",
+		objects.FieldKeyDescription:        "Execute sync loop LLM completion step",
+	}
+	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
+		t.Fatalf("failed to create task: %v", err)
+	}
+
+	// sync-loop will run 1 tick (2s), build prompt, attempt LLM completion, handle error, and return
+	_, err := executeAgentCommand(t, tempDir, provider, "sync-loop", taskID)
+	if err == nil {
+		t.Error("expected error from LLM client in unit test environment")
 	}
 }
