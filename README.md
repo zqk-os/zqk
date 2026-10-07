@@ -6,7 +6,7 @@
 
 **The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md).
 
-## Getting Started
+## Quickstart
 
 ### Installation (macOS & Linux)
 
@@ -24,15 +24,15 @@ brew tap zqk-os/tap && brew install zqk
 
 ### Choose Your Path: Go Fast vs. Walk Through
 
-ZQK offers two paths depending on your workflow:
+ZQK offers two paths for Polyglot projects (Go, Python, TypeScript, Rust):
 
 #### Option 1: Go Fast
 *For developers who want immediate token savings with zero learning curve.*
 
-Installs `zqk` and links `zgrep` into your PATH. Drop it directly into Cursor, Claude Code, Cline, or Aider to stop context-window blowouts:
+Installs `zqk` and links `zgrep` (`zqk grep`) into your PATH. Drop it directly into Cursor, Claude Code, Cline, or Aider to stop context-window blowouts:
 
 ```sh
-# Token-budgeted search (default 500 tokens, sub-15ms)
+# Token-budgeted search via zqk grep / zgrep (default 500 tokens, sub-15ms)
 zgrep "HandleRequest" --max-tokens 500 -f json
 
 # Go AST structural search

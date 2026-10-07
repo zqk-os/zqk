@@ -52,4 +52,4 @@ Prompt your paired AI assistant:
 - **Agent Seating & Directives**: Run `./bin/zqk system agent-onboard` to detect and prime editor directives.
 - **Model Context Protocol (MCP)**: Run `./bin/zqk mcp proxy --tcp 127.0.0.1:7777` to expose MCP tools.
 - **Task Discovery**: Run `./bin/zqk workflow whats-next` to inspect shovel-ready items.
-- **Full Guide**: [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN.md).
+- **Full Guide**: [docs/getting-started.md](docs/getting-started.md) & [docs/onboarding/COMMUNITY_FIRST_RUN.md](docs/onboarding/COMMUNITY_FIRST_RUN.md).
