@@ -3,15 +3,15 @@ package memgraph
 import (
 	"context"
 	"encoding/json"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/httpheaders"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/graph/provider"
-	"github.com/zqk-os/zqk/pkg/httpheaders"
 )
 
 func TestQueryHelpers_FormattingAndSanitization(t *testing.T) {
@@ -630,7 +630,9 @@ func (b *batchMockTx) DeleteNode(ctx context.Context, id string, labels []string
 func (b *batchMockTx) UpdateEdge(ctx context.Context, fromID, toID, edgeType string, updates provider.EdgeUpdates) error {
 	return nil
 }
-func (b *batchMockTx) DeleteEdge(ctx context.Context, fromID, toID, edgeType string) error { return nil }
+func (b *batchMockTx) DeleteEdge(ctx context.Context, fromID, toID, edgeType string) error {
+	return nil
+}
 func (b *batchMockTx) ExecuteQuery(ctx context.Context, query provider.Query) (*provider.QueryResult, error) {
 	return &provider.QueryResult{}, nil
 }
@@ -932,7 +934,3 @@ func TestMemgraphConnection_CloseAndRollbackBranches(t *testing.T) {
 		t.Fatalf("Close failed: %v", err)
 	}
 }
-
-
-
-

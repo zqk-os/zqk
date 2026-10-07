@@ -337,7 +337,9 @@ func TestAuditAndObservers(t *testing.T) {
 	var saveFired, buildFired, hitFired, missFired atomic.Bool
 	SetCacheLifecycleObservers(
 		func(projectRoot string, entryCount int, saveDuration time.Duration) { saveFired.Store(true) },
-		func(projectRoot, operation string, entryCount int, forceRebuild bool, buildDuration time.Duration) { buildFired.Store(true) },
+		func(projectRoot, operation string, entryCount int, forceRebuild bool, buildDuration time.Duration) {
+			buildFired.Store(true)
+		},
 		func(id string, logger logging.Logger) { hitFired.Store(true) },
 		func(id string, cacheSize int, logger logging.Logger) { missFired.Store(true) },
 	)
@@ -845,9 +847,3 @@ func TestCountByKind_AndClearInMemoryWithRoot(t *testing.T) {
 		t.Fatal("expected cache to be cleared after ClearInMemoryCache with matching root")
 	}
 }
-
-
-
-
-
-
