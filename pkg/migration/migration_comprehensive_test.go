@@ -3,7 +3,6 @@ package migration
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -570,7 +569,7 @@ func TestSteps_TransformStep_LifecycleAndYAML(t *testing.T) {
 	}
 
 	yamlFile := filepath.Join(tmpDir, "sample.yaml")
-	_ = os.WriteFile(yamlFile, []byte("id: GOAL-SAMPLE-1\nname: Sample Goal\n"), 0644)
+	_ = fileutil.WriteFile(yamlFile, []byte("id: GOAL-SAMPLE-1\nname: Sample Goal\n"), paths.FilePerm644)
 	sYAML := &Step{
 		ID:      "t_yaml",
 		ForEach: "source_files",
@@ -609,8 +608,8 @@ func TestExecutor_Execute_EndToEndAndSnapshots(t *testing.T) {
 	exec.SetSnapshotCreator(snapCreator)
 
 	scanDir := filepath.Join(tmpDir, "scandir")
-	_ = os.MkdirAll(scanDir, 0755)
-	_ = os.WriteFile(filepath.Join(scanDir, "item.yaml"), []byte("kind: backlog_item\nid: BLI-E2E-1\ntitle: Item\n"), 0644)
+	_ = fileutil.MkdirAll(scanDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(scanDir, "item.yaml"), []byte("kind: backlog_item\nid: BLI-E2E-1\ntitle: Item\n"), paths.FilePerm644)
 
 	bTrue := true
 	spec := &Spec{
@@ -737,8 +736,8 @@ func TestExecutor_Execute_FailureAndContinueOnError(t *testing.T) {
 func TestHistory_CorruptedFile(t *testing.T) {
 	tmpDir := t.TempDir()
 	histPath := historyFilePath(tmpDir)
-	_ = os.MkdirAll(filepath.Dir(histPath), 0755)
-	_ = os.WriteFile(histPath, []byte("invalid-json{"), 0644)
+	_ = fileutil.MkdirAll(filepath.Dir(histPath), paths.DirPerm755)
+	_ = fileutil.WriteFile(histPath, []byte("invalid-json{"), paths.FilePerm644)
 
 	if _, err := LoadHistory(tmpDir); err == nil {
 		t.Error("expected error loading corrupted history")
@@ -884,7 +883,7 @@ transitions:
   - from: "draft"
     to: "active"
 `
-	_ = os.WriteFile(lcFile, []byte(lcContent), 0644)
+	_ = fileutil.WriteFile(lcFile, []byte(lcContent), paths.FilePerm644)
 
 	if err := helper.migrateLifecycleFile(ctx, lcFile, "goal", "v1_0_0", false, true); err != nil {
 		t.Fatalf("dry run migrateLifecycleFile failed: %v", err)
@@ -911,7 +910,7 @@ func TestSteps_TransformStep_MoreBuildersAndErrors(t *testing.T) {
 	ctx := context.Background()
 
 	lcPath := filepath.Join(tmpDir, "goal_lifecycle.yaml")
-	_ = os.WriteFile(lcPath, []byte("schema_version: '1.0.0'\nobject_type: goal\nstatuses: [{value: draft, display: Draft}]\n"), 0644)
+	_ = fileutil.WriteFile(lcPath, []byte("schema_version: '1.0.0'\nobject_type: goal\nstatuses: [{value: draft, display: Draft}]\n"), paths.FilePerm644)
 	sLC := &Step{
 		ID:      "t_lcb",
 		ForEach: "src",

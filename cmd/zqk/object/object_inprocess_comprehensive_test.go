@@ -1,9 +1,8 @@
 package object
 
 import (
+	"bytes"
 	stdctx "context"
-	"io"
-	"os"
 	"strings"
 	"testing"
 
@@ -25,33 +24,27 @@ func executeObjectCommand(t *testing.T, projectRoot string, provider storage.Obj
 	fullArgs := append([]string{"object"}, args...)
 	rootCmd.SetArgs(fullArgs)
 
+	var buf bytes.Buffer
 	testCtx := setTestCLIContext(t, rootCmd, projectRoot, provider)
+	testCtx = pkgctx.WithCommandOutputWriter(testCtx, &buf)
+
+	rootCmd.SetOut(&buf)
+	rootCmd.SetErr(&buf)
+	rootCmd.SetContext(testCtx)
+
 	var propagate func(c *cobra.Command)
 	propagate = func(c *cobra.Command) {
-		c.SetContext(rootCmd.Context())
+		c.SetContext(testCtx)
+		c.SetOut(&buf)
+		c.SetErr(&buf)
 		for _, child := range c.Commands() {
 			propagate(child)
 		}
 	}
 	propagate(rootCmd)
 
-	oldStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
-
-	outCh := make(chan string)
-	go func() {
-		out, _ := io.ReadAll(r)
-		outCh <- string(out)
-	}()
-
 	err := rootCmd.ExecuteContext(testCtx)
-
-	_ = w.Close()
-	os.Stdout = oldStdout
-	output := <-outCh
-
-	return output, err
+	return buf.String(), err
 }
 
 func TestInProcess_ObjectGet_Matrix(t *testing.T) {

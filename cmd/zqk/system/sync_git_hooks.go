@@ -464,6 +464,47 @@ if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
 	echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing." >&2
 	exit 1
 fi
+
+# 6. Staged Go Source Hygiene Ratchet Gate
+# Enforces that all newly added or modified Go files strictly use:
+# - goroutinelabels instead of raw 'go func('
+# - pkg/utils/fileutil instead of raw os.WriteFile/ReadFile/MkdirAll
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$' || true)
+if [ -n "$STAGED_GO_FILES" ]; then
+	RAW_GOROUTINE_VIOLATIONS=0
+	FILEUTIL_VIOLATIONS=0
+	for gf in $STAGED_GO_FILES; do
+		# Skip exemptions (vendor, testdata, goroutinelabels itself, fileutil itself)
+		case "$gf" in
+			vendor/*|*/testdata/*|testdata/*|pkg/goroutinelabels/*|pkg/utils/fileutil/*)
+				continue
+				;;
+		esac
+
+		# Check for raw goroutines
+		if git show ":$gf" 2>/dev/null | grep -E '^[[:space:]]*go[[:space:]]+func\(' >/dev/null 2>&1; then
+			echo "❌ [ZQK PRE-COMMIT] Raw goroutine violation in staged file: $gf" >&2
+			echo "   Naked 'go func()' is strictly prohibited (POL-CONCURRENCY)." >&2
+			echo "   Use goroutinelabels.NewGoroutine(\"<name>\", \"<purpose>\").StartSimple(...) instead." >&2
+			RAW_GOROUTINE_VIOLATIONS=$((RAW_GOROUTINE_VIOLATIONS + 1))
+		fi
+
+		# Check for direct os filesystem calls instead of fileutil
+		if git show ":$gf" 2>/dev/null | grep -E '\bos\.(WriteFile|ReadFile|Mkdir|MkdirAll|RemoveAll)\(' >/dev/null 2>&1; then
+			echo "❌ [ZQK PRE-COMMIT] Filesystem abstraction violation in staged file: $gf" >&2
+			echo "   Direct standard library 'os.*' filesystem operations prohibited." >&2
+			echo "   Use 'github.com/zqk-os/zqk/pkg/utils/fileutil' (e.g. fileutil.WriteFile, fileutil.ReadFile, fileutil.MkdirAll)." >&2
+			FILEUTIL_VIOLATIONS=$((FILEUTIL_VIOLATIONS + 1))
+		fi
+	done
+
+	if [ "$RAW_GOROUTINE_VIOLATIONS" -gt 0 ] || [ "$FILEUTIL_VIOLATIONS" -gt 0 ]; then
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "❌ [ZQK PRE-COMMIT] Staged Go source hygiene gate failed ($RAW_GOROUTINE_VIOLATIONS goroutine, $FILEUTIL_VIOLATIONS filesystem violations)." >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		exit 1
+	fi
+fi
 `
 
 const defaultPrePushHookScript = `#!/bin/sh

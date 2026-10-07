@@ -126,10 +126,21 @@ func requireFieldRegistryReloaded(t *testing.T) {
 	}
 }
 
+func registerInitTestCleanup(t *testing.T, dir string) {
+	t.Cleanup(func() {
+		_ = WaitProjectCacheBackgroundWork(context.Background(), dir)
+		if provider, ok := storage.GetGlobalStorageProviderCache().Get(dir); ok {
+			_ = provider.Shutdown(context.Background())
+			storage.GetGlobalStorageProviderCache().Delete(dir)
+		}
+	})
+}
+
 func TestInit_Greenfield(t *testing.T) {
 	// Do not use t.Parallel(): same *testing.T uses t.Setenv(ZQK_TEST_ROOT); parallel subtests could overwrite process env.
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	// Change to temp directory
 	originalDir, err := fileutil.Getwd()
@@ -205,13 +216,7 @@ func TestInit_Greenfield_NoEnvVars(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
-	t.Cleanup(func() {
-		_ = WaitProjectCacheBackgroundWork(context.Background(), tmpDir)
-		if provider, ok := storage.GetGlobalStorageProviderCache().Get(tmpDir); ok {
-			_ = provider.Shutdown(context.Background())
-			storage.GetGlobalStorageProviderCache().Delete(tmpDir)
-		}
-	})
+	registerInitTestCleanup(t, tmpDir)
 
 	// We MUST run app.Execute() or similar to trigger root.go PersistentPreRunE,
 	// because the bug was that root.go created .zqk before init_impl ran.
@@ -235,6 +240,7 @@ func TestInit_Legacy(t *testing.T) {
 	// Do not run in parallel: same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	// Create some existing files/directories to simulate legacy project
 	existingFile := filepath.Join(tmpDir, "existing-file.txt")
@@ -348,6 +354,7 @@ func TestInit_Snapshot_Wipe(t *testing.T) {
 func TestInit_RespectsZQK_TEST_ROOT(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	// Change to a different directory (not the test root)
 	originalDir, err := fileutil.Getwd()
@@ -383,6 +390,7 @@ func TestInit_ForceOverwrite(t *testing.T) {
 	// Do not run in parallel: same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	// Change to temp directory
 	originalDir, err := fileutil.Getwd()
@@ -420,6 +428,7 @@ func TestInit_SecondRunActionableGuidance(t *testing.T) {
 	// Do not run in parallel: same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	originalDir, err := fileutil.Getwd()
 	if err != nil {
@@ -456,6 +465,7 @@ func TestInit_SecondRunActionableGuidance(t *testing.T) {
 func TestInit_SimpleMode(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	originalDir, err := fileutil.Getwd()
 	if err != nil {
@@ -494,6 +504,7 @@ func TestInit_SimpleMode(t *testing.T) {
 func TestInit_AdvancedMode(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
+	registerInitTestCleanup(t, tmpDir)
 
 	originalDir, err := fileutil.Getwd()
 	if err != nil {
