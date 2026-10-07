@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -204,6 +205,7 @@ func TestProcessor_CacheInvalidation(t *testing.T) {
 	cmd := &cobra.Command{Use: "test-cache"}
 	cmd.SetContext(pkgctx.NewSystemContext())
 	cliCtx := ContextForProjectRoot(tempRoot)
+	cliCtx.CacheFreshnessEnabled = true
 	SetContext(cmd, cliCtx)
 
 	proc, err := NewProcessor(cmd)
@@ -231,4 +233,202 @@ func TestProcessor_CacheInvalidation(t *testing.T) {
 	RegisterCacheFreshnessHandler(func(projectRoot, reason, triggerOperation string, affectedKinds []string) int {
 		return 1
 	})
+
+	// InvalidateCacheAsync with nil
+	resCh := proc.InvalidateCacheAsync(nil)
+	res := <-resCh
+	if res.State != pkgctx.StateFailed {
+		t.Errorf("expected StateFailed for nil InvalidateCacheAsync")
+	}
+
+	// InvalidateCache with IDs
+	cacheCtxValid := pkgctx.NewCacheInvalidationContext([]string{"GOAL-1", "GOAL-2"}, tempRoot, "test-update")
+	cnt, err := proc.InvalidateCache(cacheCtxValid)
+	if err != nil {
+		t.Errorf("unexpected error on InvalidateCache: %v", err)
+	}
+	_ = cnt
+
+	// CheckCacheFreshness
+	if _, err := proc.CheckCacheFreshness(nil); err == nil {
+		t.Errorf("expected error for nil cache freshness context")
+	}
+	freshCtx := pkgctx.NewCacheFreshnessContext(tempRoot, "test-freshness", "test-op")
+	_, err = proc.CheckCacheFreshness(freshCtx)
+	if err != nil {
+		t.Errorf("CheckCacheFreshness unexpected error: %v", err)
+	}
+
+	// CheckCacheFreshnessAsync
+	asyncCh := proc.CheckCacheFreshnessAsync(freshCtx)
+	if asyncCh == nil {
+		t.Errorf("expected non-nil channel from CheckCacheFreshnessAsync")
+	}
+	_ = <-asyncCh
+
+	// TriggerCacheFreshnessCheck with configured triggers
+	proc.cliCtx.CacheFreshnessTriggers = []string{"create", "update"}
+	proc.TriggerCacheFreshnessCheck("delete", []string{"goal"}) // not in trigger list
+	proc.TriggerCacheFreshnessCheck("create", []string{"goal"}) // in trigger list
+	proc.cliCtx.CacheFreshnessTriggers = []string{"*"}
+	proc.TriggerCacheFreshnessCheck("custom-op", []string{"goal"}) // wildcard match
+
+	// Disabled cache freshness
+	proc.cliCtx.CacheFreshnessEnabled = false
+	c, _ := proc.CheckCacheFreshness(freshCtx)
+	if c != 0 {
+		t.Errorf("expected 0 from disabled CheckCacheFreshness")
+	}
+	disabledCh := proc.CheckCacheFreshnessAsync(freshCtx)
+	_ = <-disabledCh
+	proc.TriggerCacheFreshnessCheck("any", nil)
+}
+
+func TestProcessor_GovernorAndContextAccessors(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind: "cliapp.processor.accessors",
+	})
+	tempRoot := proj.Root
+	cmd := &cobra.Command{Use: "status"}
+	cmd.SetContext(pkgctx.NewSystemContext())
+	cliCtx := ContextForProjectRoot(tempRoot)
+	cliCtx.Profile = "human"
+	cliCtx.PriorityPlan = "PRI-1"
+	cliCtx.Workstream = "WS-1"
+	SetContext(cmd, cliCtx)
+
+	proc, err := NewProcessor(cmd)
+	if err != nil {
+		t.Fatalf("failed to create processor: %v", err)
+	}
+	defer proc.Close()
+
+	// CheckGovernorApproval on normal command -> nil
+	if err := proc.CheckGovernorApproval(cmd); err != nil {
+		t.Errorf("expected nil for CheckGovernorApproval on non-governor command: %v", err)
+	}
+
+	// Logger, StorageFactory, OperationContext
+	if proc.Logger() == nil {
+		t.Errorf("expected non-nil Logger")
+	}
+	if proc.StorageFactory() == nil {
+		t.Errorf("expected non-nil StorageFactory")
+	}
+	if proc.OperationContext() == nil {
+		t.Errorf("expected non-nil OperationContext")
+	}
+
+	// GetContextLayers and GetEffectiveValue
+	layers := proc.GetContextLayers()
+	if layers == nil {
+		t.Errorf("expected non-nil ContextLayers")
+	}
+
+	for _, key := range []string{
+		"format", "verbose", "quiet", "profile", "project_root", "priority_plan", "workstream",
+		"milestone", "storage.max_page_size", "storage.default_page_size", "storage.enable_grouping", "storage.max_group_size",
+	} {
+		val, ok := proc.GetEffectiveValue(key)
+		if !ok || val == nil {
+			t.Errorf("expected ok=true for key %s", key)
+		}
+	}
+	if _, ok := proc.GetEffectiveValue("non_existent_key"); ok {
+		t.Errorf("expected ok=false for non_existent_key")
+	}
+
+	// System object check and modification
+	nonSys := map[string]any{"id": "GOAL-1", "kind": "goal"}
+	if proc.IsSystemObject(nonSys) {
+		t.Errorf("expected false for IsSystemObject on nonSys")
+	}
+	if !proc.CanModifySystemObject(nonSys) {
+		t.Errorf("expected true for CanModifySystemObject on nonSys")
+	}
+
+	// ValidateObject
+	if err := proc.ValidateObject(nil, "goal", ""); err == nil {
+		t.Errorf("expected error for nil object")
+	}
+	if err := proc.ValidateObject(nonSys, "", ""); err == nil {
+		t.Errorf("expected error for empty kind")
+	}
+	if err := proc.ValidateObject(nonSys, "goal", ""); err != nil {
+		t.Errorf("unexpected error for valid object: %v", err)
+	}
+
+	// CheckPermission
+	if err := proc.CheckPermission("read", "goal"); err != nil {
+		t.Errorf("expected nil from CheckPermission: %v", err)
+	}
+
+	// StorageTuple and WithProcessor
+	opCtx, sCtx, sp := proc.StorageTuple()
+	if opCtx == nil || sCtx == nil || sp == nil {
+		t.Errorf("expected non-nil StorageTuple elements")
+	}
+	wrappedHandler := WithProcessor(func(c *cobra.Command, a []string, p *Processor) error {
+		return nil
+	})
+	if wrappedHandler == nil {
+		t.Errorf("expected non-nil wrapped handler")
+	}
+}
+
+func TestProcessor_CheckGovernorApproval_WithRequirements(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind: "cliapp.processor.governor",
+	})
+	cmd := &cobra.Command{Use: "test-governor"}
+	cmd.SetContext(pkgctx.NewSystemContext())
+	RequireGovernorApproval(cmd, true)
+	cmd.Flags().String("event-id", "", "")
+
+	cliCtx := ContextForProjectRoot(proj.Root)
+	SetContext(cmd, cliCtx)
+
+	proc, err := NewProcessor(cmd)
+	if err != nil {
+		t.Fatalf("NewProcessor failed: %v", err)
+	}
+
+	// 1. Without event-id -> creates proposed event (or fails validation) and returns error
+	err = proc.CheckGovernorApproval(cmd)
+	if err == nil {
+		t.Fatalf("expected error from CheckGovernorApproval without event-id")
+	}
+
+	// 2. With event-id on file storage (non-graph) -> returns graph backend required error
+	_ = cmd.Flags().Set("event-id", "EVT-123")
+	err = proc.CheckGovernorApproval(cmd)
+	if err == nil || !strings.Contains(err.Error(), "graph backend required") {
+		t.Fatalf("expected graph backend required error, got: %v", err)
+	}
+}
+
+func TestWithProcessor_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind: "cliapp.processor.withproc",
+	})
+	cmd := &cobra.Command{Use: "run-with-proc"}
+	cmd.SetContext(pkgctx.NewSystemContext())
+	cliCtx := ContextForProjectRoot(proj.Root)
+	SetContext(cmd, cliCtx)
+
+	invoked := false
+	wrapped := WithProcessor(func(c *cobra.Command, args []string, p *Processor) error {
+		invoked = true
+		if p == nil {
+			t.Errorf("expected non-nil Processor")
+		}
+		return nil
+	})
+
+	if err := wrapped(cmd, nil); err != nil {
+		t.Fatalf("wrapped run failed: %v", err)
+	}
+	if !invoked {
+		t.Errorf("expected wrapped function to be invoked")
+	}
 }

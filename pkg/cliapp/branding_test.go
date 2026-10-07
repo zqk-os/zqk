@@ -37,3 +37,16 @@ func TestApplyBrandingToCommandTree(t *testing.T) {
 	// Nil command should not panic
 	ApplyBrandingToCommandTree(nil, "mytool", "MyBrand")
 }
+
+func TestApplyBranding_DefaultsAndEmpty(t *testing.T) {
+	cmd := &cobra.Command{
+		Short: "",
+		Long:  "zqk NEXOS",
+	}
+	ApplyBrandingToCommandTree(cmd, "", "")
+	if !strings.Contains(cmd.Long, "zqk") || !strings.Contains(cmd.Long, "ZQK") {
+		t.Errorf("expected default branding, got: %s", cmd.Long)
+	}
+
+	applyBrandingRecursive(nil, "exe", "prod")
+}

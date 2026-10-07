@@ -2,6 +2,8 @@ package cli
 
 import (
 	"bytes"
+	"context"
+	"strings"
 	"testing"
 )
 
@@ -38,5 +40,35 @@ func TestScanForObjectIDs(t *testing.T) {
 	ids := ScanForObjectIDs(data)
 	if len(ids) != 2 {
 		t.Fatalf("expected 2 ids, got %v", ids)
+	}
+}
+
+func TestSemanticLinkFormatHandler_Methods(t *testing.T) {
+	h := &SemanticLinkFormatHandler{}
+	if h.IsStreaming() {
+		t.Errorf("expected IsStreaming=false")
+	}
+	if err := h.Validate(nil); err != nil {
+		t.Errorf("expected Validate=nil")
+	}
+
+	payload := map[string]any{
+		"target": "GOAL-1782226824226137000-7d41c8a7",
+	}
+
+	out, err := h.Format(payload)
+	if err != nil {
+		t.Fatalf("Format failed: %v", err)
+	}
+	if !strings.Contains(string(out), "zqk object get") {
+		t.Errorf("expected output to contain 'zqk object get', got: %s", string(out))
+	}
+
+	var buf bytes.Buffer
+	if err := h.Stream(context.Background(), payload, &buf); err != nil {
+		t.Fatalf("Stream failed: %v", err)
+	}
+	if !strings.Contains(buf.String(), "zqk object get") {
+		t.Errorf("expected stream to contain 'zqk object get', got: %s", buf.String())
 	}
 }

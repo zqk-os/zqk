@@ -105,6 +105,48 @@ func TestParseFieldFlagsWithAppend_goalRefsAppendsList(t *testing.T) {
 	}
 }
 
+func TestParseFieldFlagsWithAppend_StringAndNonString(t *testing.T) {
+	t.Parallel()
+	logger := logging.NewEventLogger(pkgctx.NewSystemContext())
+	fp := NewFieldParser(logger)
+
+	// Append to existing string
+	got, err := fp.ParseFieldFlagsWithAppend(
+		[]string{"description+=Line two"},
+		map[string]any{"description": "Line one"},
+	)
+	if err != nil {
+		t.Fatalf("ParseFieldFlagsWithAppend failed: %v", err)
+	}
+	if got["description"] != "Line one\n\nLine two" {
+		t.Errorf("expected multiline description, got: %q", got["description"])
+	}
+
+	// Append to empty/nil currentObj
+	got, err = fp.ParseFieldFlagsWithAppend(
+		[]string{"description+=Solo line"},
+		nil,
+	)
+	if err != nil {
+		t.Fatalf("ParseFieldFlagsWithAppend nil failed: %v", err)
+	}
+	if got["description"] != "Solo line" {
+		t.Errorf("expected 'Solo line', got: %q", got["description"])
+	}
+
+	// Append to non-string existing value
+	got, err = fp.ParseFieldFlagsWithAppend(
+		[]string{"notes+=Additional"},
+		map[string]any{"notes": 12345},
+	)
+	if err != nil {
+		t.Fatalf("ParseFieldFlagsWithAppend non-string failed: %v", err)
+	}
+	if got["notes"] != "12345\n\nAdditional" {
+		t.Errorf("expected converted multiline string, got: %q", got["notes"])
+	}
+}
+
 // TestDataLoader_FieldFlags_ConsistentWithUpdate verifies BLI-TDE-VALIDATION-CREATE-FIELDS-001
 // and TDE-1787604878092294000-debe585a: DataLoader must parse array/json fields via FieldParser
 // so create and update handle types identically without storing unrepairable stringified literals.
@@ -128,5 +170,35 @@ func TestDataLoader_FieldFlags_ConsistentWithUpdate(t *testing.T) {
 	tags, ok := data["tags"].([]any)
 	if !ok || len(tags) != 2 {
 		t.Fatalf("expected tags to be []any of len 2, got %T: %v", data["tags"], data["tags"])
+	}
+}
+
+func TestParseFieldFlag_AllSeparatorsAndErrors(t *testing.T) {
+	t.Parallel()
+	logger := logging.NewEventLogger(pkgctx.NewSystemContext())
+	fp := NewFieldParser(logger)
+
+	// Equal
+	k, v, isApp, err := fp.ParseFieldFlag("title=Hello")
+	if err != nil || k != "title" || v != "Hello" || isApp {
+		t.Errorf("expected title=Hello, got %s=%s, isApp=%v, err=%v", k, v, isApp, err)
+	}
+
+	// Colon
+	k, v, isApp, err = fp.ParseFieldFlag("kind:goal")
+	if err != nil || k != "kind" || v != "goal" || isApp {
+		t.Errorf("expected kind:goal, got %s=%s, isApp=%v, err=%v", k, v, isApp, err)
+	}
+
+	// Append
+	k, v, isApp, err = fp.ParseFieldFlag("desc+=extra line")
+	if err != nil || k != "desc" || v != "extra line" || !isApp {
+		t.Errorf("expected desc+=extra line, got %s=%s, isApp=%v, err=%v", k, v, isApp, err)
+	}
+
+	// Invalid format (no separator)
+	_, _, _, err = fp.ParseFieldFlag("invalid_string_no_separator")
+	if err == nil {
+		t.Errorf("expected error for invalid field format")
 	}
 }

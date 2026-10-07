@@ -209,4 +209,61 @@ func TestSetDefault(t *testing.T) {
 	if Default() != mock {
 		t.Errorf("expected custom default service")
 	}
+
+	SetDefault(nil)
+	if Default() == nil {
+		t.Errorf("expected non-nil default service after reset")
+	}
+}
+
+func TestFormat_NilAndHints(t *testing.T) {
+	if Format(nil, Options{}) != "" {
+		t.Errorf("expected empty string for nil error")
+	}
+
+	errWithHint := errors.New("object BLI-999 not found")
+	formatted := Format(errWithHint, Options{ExperienceLevel: ExperienceStandard})
+	if !strings.Contains(formatted, "not found") || !strings.Contains(formatted, "list") {
+		t.Errorf("unexpected formatted output: %s", formatted)
+	}
+
+	errNoHint := errors.New("some completely unknown random failure")
+	formattedNoHint := Format(errNoHint, Options{ExperienceLevel: ExperienceExpert})
+	if formattedNoHint != errNoHint.Error() {
+		t.Errorf("expected exact error message when no hint: %q", formattedNoHint)
+	}
+}
+
+func TestExperienceFromProfile_EdgeCases(t *testing.T) {
+	if lvl := ExperienceFromProfile("quiet"); lvl != ExperienceExpert {
+		t.Errorf("expected ExperienceExpert for quiet, got %v", lvl)
+	}
+	if lvl := ExperienceFromProfile("debug"); lvl != ExperienceExpert {
+		t.Errorf("expected ExperienceExpert for debug, got %v", lvl)
+	}
+	if lvl := ExperienceFromProfile("some-random-profile"); lvl != ExperienceStandard {
+		t.Errorf("expected ExperienceStandard for unknown, got %v", lvl)
+	}
+}
+
+func TestSuggest_ExpertModeHints(t *testing.T) {
+	opts := Options{ExperienceLevel: ExperienceExpert}
+
+	// project root not found in expert mode
+	sRoot := Suggest(errors.New("project root not found"), opts)
+	if sRoot.Hint == "" {
+		t.Errorf("expected concise hint for project root in expert mode")
+	}
+
+	// permission denied in expert mode
+	sPerm := Suggest(errors.New("permission denied for resource"), opts)
+	if sPerm.Hint == "" {
+		t.Errorf("expected concise hint for permission in expert mode")
+	}
+
+	// required field in expert mode
+	sReq := Suggest(errors.New("field 'title' is required"), opts)
+	if sReq.Hint == "" {
+		t.Errorf("expected concise hint for required field in expert mode")
+	}
 }
