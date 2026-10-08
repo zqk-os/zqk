@@ -473,6 +473,8 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 				if personaID == "" {
 					if assignee := kItem.GetString(objects.FieldKeyAssigneePersonaRef); assignee != "" {
 						personaID = assignee
+					} else if pRef := kItem.GetString(objects.FieldKeyPersonaRef); pRef != "" {
+						personaID = pRef
 					} else {
 						refs := kItem.GetStringSlice(objects.FieldKeyPersonaRefs)
 						if len(refs) > 0 {
@@ -690,7 +692,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 							if !nativeSwarmEligible(modelTier) {
 								_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Queued %q for primary claim (skipped native swarm for %s)\n", taskID, modelTier)))
 								// Wake host/project primary orchestrator so work is not stranded.
-								msg := fmt.Sprintf("Orchestrate queued ATK %s (%s) — consider agent execute or claim. title=%s", taskID, modelTier, titleStr)
+								msg := fmt.Sprintf("Orchestrate queued ATK %s (%s): consider agent execute or claim. title=%s", taskID, modelTier, titleStr)
 								if _, werr := primaryorch.WakePrimary(workerCtx, state.proc.ProjectRoot(), primaryorch.WakeRequest{
 									TaskID:  taskID,
 									Persona: personaID,
@@ -733,7 +735,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 										}
 									} else {
 										// Isolated git worktree for the subagent. Reuse a leftover
-										// checkout/branch from a prior error cycle — do not remint.
+										// checkout/branch from a prior error cycle; do not remint.
 										var wtErr error
 										worktreePath, wtErr = ensureOrchestrationWorktree(workerCtx, state.proc.ProjectRoot(), taskID)
 										if wtErr != nil {

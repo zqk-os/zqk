@@ -66,6 +66,7 @@ func TestInProcess_Agent_ClaimTaskForExecute_Direct(t *testing.T) {
 		objects.FieldKeyBacklogItemRef:     bliID,
 		objects.FieldKeyPriorityPlanRef:    planID,
 		objects.FieldKeyAssigneePersonaRef: "PER-INPROCESS-ENGINEER",
+		objects.FieldKeyEstimatedEffort:    "1h",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create task: %v", err)

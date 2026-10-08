@@ -7,6 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/testkit"
@@ -29,7 +32,7 @@ func TestPreSubagentHook_EnrichesSubagentPrompt(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
 		objects.FieldKeySchemaVersion: "2.0.0",
 	}
-	_ = fs.Create(context.Background(), secCtx, bli)
+	require.NoError(t, fs.Create(context.Background(), secCtx, bli))
 
 	// Build mock Antigravity hook input
 	hookInput := antigravityHookInput{
@@ -91,4 +94,34 @@ func TestPreSubagentHook_EnrichesSubagentPrompt(t *testing.T) {
 	if !strings.Contains(enrichedPrompt, "Standing mandates") && !strings.Contains(enrichedPrompt, "Orchestration Context") {
 		t.Fatalf("expected enriched prompt to contain standing mandates, got: %s", enrichedPrompt)
 	}
+}
+
+func TestPreSubagentHook_EdgeCases(t *testing.T) {
+	var out bytes.Buffer
+
+	// 1. Nil storage
+	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, nil, "/tmp", "antigravity", bytes.NewReader(nil), &out))
+	assert.Contains(t, out.String(), `"decision": "allow"`)
+
+	// 2. Empty input
+	out.Reset()
+	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", bytes.NewReader([]byte("")), &out))
+	assert.Contains(t, out.String(), `"decision": "allow"`)
+
+	// 3. Corrupt JSON
+	out.Reset()
+	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", bytes.NewReader([]byte("{corrupt")), &out))
+	assert.Contains(t, out.String(), `"decision": "allow"`)
+
+	// 4. Non-matching tool call name
+	out.Reset()
+	inputOtherTool := []byte(`{"tool_call":{"name":"read_file"}}`)
+	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", bytes.NewReader(inputOtherTool), &out))
+	assert.Contains(t, out.String(), `"decision": "allow"`)
+
+	// 5. Missing Subagents arg
+	out.Reset()
+	inputNoSubagents := []byte(`{"tool_call":{"name":"invoke_subagent","args":{}}}`)
+	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", bytes.NewReader(inputNoSubagents), &out))
+	assert.Contains(t, out.String(), `"decision": "allow"`)
 }

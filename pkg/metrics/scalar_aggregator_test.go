@@ -34,12 +34,16 @@ func TestScalarMetricAggregator_Aggregate(t *testing.T) {
 	}
 
 	aggregator := NewScalarMetricAggregator(mockStorage)
+	if aggregator.GetMetricType() != MetricTypeScalar {
+		t.Errorf("Expected metric type %s, got %s", MetricTypeScalar, aggregator.GetMetricType())
+	}
+
 	config := &AggregationConfig{
 		ObjectKind:   "test_kind",
 		FieldName:    "value",
 		WindowStart:  time.Now().Add(-2 * time.Hour),
 		WindowEnd:    time.Now(),
-		Aggregations: []string{"sum", "avg", "count"},
+		Aggregations: []string{"sum", "avg", "count", "min", "max"},
 	}
 
 	result, err := aggregator.Aggregate(context.Background(), config)
@@ -55,5 +59,22 @@ func TestScalarMetricAggregator_Aggregate(t *testing.T) {
 	}
 	if result.Aggregations["count"] != 2 {
 		t.Errorf("Expected count 2, got %v", result.Aggregations["count"])
+	}
+	if result.Aggregations["min"] != 10.0 {
+		t.Errorf("Expected min 10.0, got %v", result.Aggregations["min"])
+	}
+	if result.Aggregations["max"] != 20.0 {
+		t.Errorf("Expected max 20.0, got %v", result.Aggregations["max"])
+	}
+
+	// Test empty slice helper functions
+	if minFloatSlice(nil) != 0 {
+		t.Errorf("Expected minFloatSlice(nil) == 0, got %v", minFloatSlice(nil))
+	}
+	if maxFloatSlice(nil) != 0 {
+		t.Errorf("Expected maxFloatSlice(nil) == 0, got %v", maxFloatSlice(nil))
+	}
+	if average(nil) != 0 {
+		t.Errorf("Expected average(nil) == 0, got %v", average(nil))
 	}
 }

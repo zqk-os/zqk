@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -435,5 +436,120 @@ func TestOrchestrationExecutor_ParentZqkEnvShielding(t *testing.T) {
 	}
 	if !foundBin {
 		t.Fatalf("expected %s to be injected into child execution env", zqkenv.Bin().Name())
+	}
+}
+
+func TestOrchLivePickRank_AllBranches(t *testing.T) {
+	t.Parallel()
+
+	// 1. nil obj
+	if got := orchLivePickRank(nil); got != 0 {
+		t.Fatalf("expected 0 for nil, got %d", got)
+	}
+
+	// 2. approved status -> 3
+	if got := orchLivePickRank(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusApproved}); got != 3 {
+		t.Fatalf("expected 3 for approved, got %d", got)
+	}
+
+	// 3. in_progress status with claimed_by -> 3
+	if got := orchLivePickRank(map[string]any{
+		objects.FieldKeyStatus:    objects.ObjectStatusInProgress,
+		objects.FieldKeyClaimedBy: "agent-1",
+	}); got != 3 {
+		t.Fatalf("expected 3 for claimed in_progress, got %d", got)
+	}
+
+	// 4. in_progress status without claimed_by -> 2
+	if got := orchLivePickRank(map[string]any{
+		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
+	}); got != 2 {
+		t.Fatalf("expected 2 for unclaimed in_progress, got %d", got)
+	}
+
+	// 5. error or failed status -> 1
+	if got := orchLivePickRank(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusError}); got != 1 {
+		t.Fatalf("expected 1 for error, got %d", got)
+	}
+	if got := orchLivePickRank(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusFailed}); got != 1 {
+		t.Fatalf("expected 1 for failed, got %d", got)
+	}
+
+	// 6. default status -> 2
+	if got := orchLivePickRank(map[string]any{objects.FieldKeyStatus: "custom_status"}); got != 2 {
+		t.Fatalf("expected 2 for custom, got %d", got)
+	}
+}
+
+func TestEnsureOrchestrationWorktree_EmptyTaskID(t *testing.T) {
+	t.Parallel()
+	_, err := ensureOrchestrationWorktree(context.Background(), "/tmp/test", "")
+	if err == nil {
+		t.Fatal("expected error for empty task ID")
+	}
+}
+
+func TestOrchestrationWorktreeBaseRef(t *testing.T) {
+	t.Parallel()
+	ref := orchestrationWorktreeBaseRef(context.Background(), t.TempDir())
+	if ref == "" {
+		t.Fatal("expected non-empty base ref")
+	}
+}
+
+func TestGitWorktreeAndResetHelpers(t *testing.T) {
+	root := t.TempDir()
+	initGitRepoInDir(t, root)
+	ctx := context.Background()
+
+	// isGitWorktreeCheckout
+	if !isGitWorktreeCheckout(root) {
+		t.Fatalf("expected true for git repo root, got false")
+	}
+	if isGitWorktreeCheckout(t.TempDir()) {
+		t.Fatalf("expected false for empty non-git dir, got true")
+	}
+
+	// gitRevExists
+	if !gitRevExists(ctx, root, "HEAD") {
+		t.Fatalf("expected HEAD to exist")
+	}
+	if gitRevExists(ctx, root, "nonexistent-rev-12345") {
+		t.Fatalf("expected nonexistent rev to not exist")
+	}
+
+	// gitRefExists
+	if gitRefExists(ctx, root, "refs/heads/nonexistent-branch-999") {
+		t.Fatalf("expected nonexistent branch ref to not exist")
+	}
+
+	// resetOrchestrationWorktree
+	if err := resetOrchestrationWorktree(ctx, root, "HEAD"); err != nil {
+		t.Fatalf("resetOrchestrationWorktree failed: %v", err)
+	}
+	if err := resetOrchestrationWorktree(ctx, root, ""); err != nil {
+		t.Fatalf("resetOrchestrationWorktree with empty baseRef failed: %v", err)
+	}
+}
+
+func TestOrchestrationTaskAndWorktree_EdgeCases(t *testing.T) {
+	ctx := context.Background()
+
+	// findExistingOrchestrationTask with nil state or nil sp
+	_, _, _, err := findExistingOrchestrationTask(ctx, nil, "title", "BLI-1")
+	if err == nil || !strings.Contains(err.Error(), "orchestrator storage is not available") {
+		t.Fatalf("expected storage error for nil state, got: %v", err)
+	}
+
+	state := &orchestratorState{}
+	_, _, _, err = findExistingOrchestrationTask(ctx, state, "title", "BLI-1")
+	if err == nil || !strings.Contains(err.Error(), "orchestrator storage is not available") {
+		t.Fatalf("expected storage error for nil sp, got: %v", err)
+	}
+
+	// ensureOrchestrationWorktree with empty task ID
+	_, err = ensureOrchestrationWorktree(ctx, "/some/path", "")
+	if err == nil || !strings.Contains(err.Error(), "empty task id") {
+		t.Fatalf("expected empty task id error, got: %v", err)
 	}
 }

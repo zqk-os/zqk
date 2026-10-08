@@ -1,0 +1,61 @@
+$schema: https://zqk.dev/schemas/swarm_package_spec.schema.json
+name: legacy-refactor
+version: 1.0.0
+description: 'Legacy Monolith Refactor: Gin Context Engine Zero-Allocation Refactor with Frozen Baseline Invariants'
+author: zqk-community
+license: Apache-2.0
+entrypoint: task-1-clone-and-freeze
+parameters:
+    target_repo:
+        type: string
+        default: https://github.com/gin-gonic/gin
+        description: Public repository URL to clone and refactor
+    workspace_dir:
+        type: string
+        default: /tmp/zqk-pack-legacy-gin
+        description: Target isolated workspace directory
+integrity:
+    algorithm: ed25519
+    signer_id: support@zqkos.com
+    content_digest: sha256:d7793f97d2b00e5b72aba3bf99cdb9f3cbb1e517cae4ee5187447cbfea2ee103
+    signature: 1bbfe080bf00c4bbd30eb65d1d722c39d1a29237f3922819a88176e496f1f195f3a8210a17af3c4da15460856142a8a77b75cfeed0739426440765d608882500
+membranes:
+    - path: .zqk/process/
+      mode: read_only
+    - path: .zqk/audit/
+      mode: audit_log
+agents:
+    - name: Architect
+      role: system_architect
+      skills:
+        - ASK-COMMUNITY-ARCH-DESIGN
+      system_prompt: Inspect public repository, map AST call graphs, and freeze baseline invariants.
+    - name: Optimization Engineer
+      role: optimization_engineer
+      skills:
+        - ASK-COMMUNITY-CODE-CRAFTSMAN
+      system_prompt: Refactor Context struct and request engine to reduce heap allocations while preserving signatures.
+    - name: Verification Auditor
+      role: verification_auditor
+      skills:
+        - ASK-COMMUNITY-QA-VERIFICATION
+      system_prompt: Execute frozen baseline test bundle and verify zero API regressions.
+tasks:
+    - id: task-1-clone-and-freeze
+      title: Clone target repository and freeze baseline test invariants
+      role: system_architect
+    - id: task-2-ast-caller-mapping
+      title: Map all transitive callers of gin.Context methods using zqk grep AST
+      role: system_architect
+      depends_on:
+        - task-1-clone-and-freeze
+    - id: task-3-optimize-engine
+      title: Apply zero-allocation refactoring to Context payload buffer
+      role: optimization_engineer
+      depends_on:
+        - task-2-ast-caller-mapping
+    - id: task-4-verify-zero-regressions
+      title: Run baseline test suite and assert 100% backward API compatibility
+      role: verification_auditor
+      depends_on:
+        - task-3-optimize-engine

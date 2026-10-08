@@ -75,3 +75,23 @@ func TestValidationTriggerBatch_NoTriggerWhenEmptyProjectRoot(t *testing.T) {
 		t.Errorf("expected no trigger call for empty project root, got %d", calls)
 	}
 }
+
+func TestValidationTriggerBatch_SkipKindsAndNoScheduler(t *testing.T) {
+	// 1. ShouldSkipBackgroundValidationBatchForKind
+	var calls int
+	restore := SetValidationTriggerFuncForTest(func(context.Context, string, string, map[string]any) error {
+		calls++
+		return nil
+	})
+	AddValidationTrigger("root", objects.KindAuditEvent, "AUD-1", "create")
+	if calls != 0 {
+		t.Errorf("expected audit_event to be skipped, got call")
+	}
+	restore()
+
+	// 2. No scheduler and no validationTriggerFunc
+	AddValidationTrigger("root", objects.KindBacklogItem, "BLI-1", "create")
+
+	// 3. flushValidationBatch on unknown root
+	flushValidationBatch("unknown-root")
+}

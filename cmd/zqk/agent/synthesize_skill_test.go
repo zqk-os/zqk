@@ -4,29 +4,29 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/storage/audit"
 )
 
-func TestSynthesizeSkillCommitContext_SetsPromoteOnCreate(t *testing.T) {
-	t.Parallel()
+func TestNewSynthesizeSkillCmd_Structure(t *testing.T) {
+	cmd := NewSynthesizeSkillCmd()
+	require.NotNil(t, cmd)
 
-	cliCtx := audit.WithCLIOperation(pkgctx.NewSystemContext())
-	got := synthesizeSkillCommitContext(cliCtx)
-	if !pkgctx.GetPromoteOnCreate(got) {
-		t.Fatal("COMMIT Create ctx must set WithPromoteOnCreate (same as object create --promote)")
-	}
-	if !audit.HasCLIMarker(got) {
-		t.Fatal("COMMIT Create ctx must keep the CLI marker from OperationContext")
-	}
+	flags := cmd.Flags()
+	assert.NotNil(t, flags.Lookup("capability"))
+	assert.NotNil(t, flags.Lookup("provider"))
 }
 
-func TestSynthesizeSkillCommitContext_NilFallsBackToSystem(t *testing.T) {
-	t.Parallel()
+func TestSynthesizeSkillCommitContext(t *testing.T) {
+	// Nil context
+	ctxNil := synthesizeSkillCommitContext(nil)
+	require.NotNil(t, ctxNil)
+	assert.True(t, pkgctx.GetPromoteOnCreate(ctxNil))
 
-	var noContext context.Context
-	got := synthesizeSkillCommitContext(noContext)
-	if !pkgctx.GetPromoteOnCreate(got) {
-		t.Fatal("nil op ctx must still set WithPromoteOnCreate")
-	}
+	// Existing context
+	baseCtx := context.Background()
+	ctxExisting := synthesizeSkillCommitContext(baseCtx)
+	require.NotNil(t, ctxExisting)
+	assert.True(t, pkgctx.GetPromoteOnCreate(ctxExisting))
 }

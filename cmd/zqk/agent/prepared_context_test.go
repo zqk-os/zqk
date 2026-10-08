@@ -2,12 +2,14 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/agentprompt"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -78,6 +80,15 @@ func TestIsPreparedContextRefusal(t *testing.T) {
 	}
 	if !isPreparedContextRefusal(errPreparedContextStorage) {
 		t.Fatal("nil storage must refuse")
+	}
+	if !isPreparedContextRefusal(storage.ErrObjectNotFound) {
+		t.Fatal("ErrObjectNotFound must refuse")
+	}
+	if !isPreparedContextRefusal(errors.New("custom: object not found in table")) {
+		t.Fatal("string containing object not found must refuse")
+	}
+	if isPreparedContextRefusal(errors.New("other error")) {
+		t.Fatal("other error is not a refusal")
 	}
 	if isPreparedContextRefusal(nil) {
 		t.Fatal("nil is not a refusal")

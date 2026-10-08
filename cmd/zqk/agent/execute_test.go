@@ -3,6 +3,12 @@ package agent
 import (
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 func TestResolveExecuteSystemPrompt(t *testing.T) {
@@ -80,15 +86,15 @@ func TestFormatTaskStepsSection(t *testing.T) {
 		t.Parallel()
 		steps := []any{
 			map[string]any{
-				"title":       "Implementation Phase",
-				"status":      "pending_implementation",
-				"description": "Write code changes.",
+				"title":                "Implementation Phase",
+				objects.FieldKeyStatus: objects.ObjectStatusPendingImplementation,
+				"description":          "Write code changes.",
 			},
 			map[string]any{
-				"title":       "Validation Phase",
-				"status":      "pending",
-				"description": "Run test suite.",
-				"command":     "./bin/zqk agent validate",
+				"title":                "Validation Phase",
+				objects.FieldKeyStatus: objects.ObjectStatusPending,
+				"description":          "Run test suite.",
+				"command":              "./bin/zqk agent validate",
 			},
 		}
 		got := formatTaskStepsSection(steps)
@@ -102,4 +108,82 @@ func TestFormatTaskStepsSection(t *testing.T) {
 			t.Fatalf("expected verification command, got: %s", got)
 		}
 	})
+}
+
+func TestExecuteCmd_ExecutionInputValidation(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	// 1. Missing both prompt and task ID
+	_, err := executeAgentCommand(t, tempDir, provider, "execute")
+	assert.ErrorContains(t, err, "requires --prompt, --task-id, or a task ID argument")
+
+	// 2. Non-existent task ID
+	_, err = executeAgentCommand(t, tempDir, provider, "execute", "ATK-NONEXISTENT")
+	assert.ErrorContains(t, err, "failed to read task")
+}
+
+func TestExecuteCmd_Branches(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := pkgctx.NewSystemContext()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	// 1. Non-agent-task kind (e.g. backlog_item) builds prompt via BuildTaskPrompt
+	bliID := "BLI-EXEC-BRANCH-001"
+	bli := map[string]any{
+		objects.FieldKeyID:              bliID,
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyTitle:           "Backlog Item for Execution",
+		objects.FieldKeyDescription:     "Build a new feature in Go.",
+		objects.FieldKeyStatus:          objects.ObjectStatusOriginated,
+		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+		objects.FieldKeyPriorityPlanRef: "PRI-TEST-PLAN",
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, bli))
+	_, err := executeAgentCommand(t, tempDir, provider, "execute", bliID, "--mcp-path", "/nonexistent/mcp")
+	assert.ErrorContains(t, err, "failed to initialize MCP executor")
+
+	// 2. Task with execution prompt and MCP failure
+	taskWithPromptID := "ATK-WITH-PROMPT"
+	taskWithPrompt := map[string]any{
+		objects.FieldKeyID:                 taskWithPromptID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "With Prompt Task",
+		objects.FieldKeyDescription:        "Execution instructions for agent worker.",
+		objects.FieldKeyStatus:             objects.ObjectStatusApproved,
+		objects.FieldKeyEstimatedEffort:    "1h",
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeyTaskSteps: []any{
+			map[string]any{
+				objects.FieldKeyTitle:  "Step 1",
+				objects.FieldKeyStatus: objects.ObjectStatusApproved,
+			},
+		},
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, taskWithPrompt))
+	_, err = executeAgentCommand(t, tempDir, provider, "execute", taskWithPromptID, "--mcp-path", "/nonexistent/mcp")
+	assert.ErrorContains(t, err, "failed to initialize MCP executor")
+
+	// 3. Task with Task Envelope
+	taskEnvID := "ATK-WITH-ENVELOPE"
+	taskEnv := map[string]any{
+		objects.FieldKeyID:                 taskEnvID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Envelope Task",
+		objects.FieldKeyDescription:        "zqk_task_envelope_v1\nContext: test",
+		objects.FieldKeyStatus:             objects.ObjectStatusApproved,
+		objects.FieldKeyEstimatedEffort:    "1h",
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, taskEnv))
+	_, err = executeAgentCommand(t, tempDir, provider, "execute", taskEnvID, "--mcp-path", "/nonexistent/mcp")
+	assert.ErrorContains(t, err, "failed to initialize MCP executor")
+
+	// 4. Prompt only with MCP failure
+	_, err = executeAgentCommand(t, tempDir, provider, "execute", "--prompt", "do work", "--mcp-path", "/nonexistent/mcp")
+	assert.ErrorContains(t, err, "failed to initialize MCP executor")
 }

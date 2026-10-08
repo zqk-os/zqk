@@ -43,3 +43,7 @@ func TestApplyDefaultCLIGoroutineBudget_InstallsWhenMissing(t *testing.T) {
 		t.Fatal("second apply must not replace an existing budget")
 	}
 }
+
+func TestApplyMaxOSThreads(t *testing.T) {
+	applyMaxOSThreads()
+}

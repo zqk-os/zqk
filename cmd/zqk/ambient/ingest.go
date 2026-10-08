@@ -1,6 +1,7 @@
 package ambient
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -40,7 +41,17 @@ func runAmbientIngest(cmd *cobra.Command, _ []string) error {
 
 	eventLogger := logging.GetLoggerFromContext(cmd.Context())
 	hub := ambient.NewEventHub()
+	mux := newAmbientIngestHandler(cmd.Context(), hub, eventLogger)
 
+	// Loopback-only by default.
+	// Set timeouts to prevent unbounded resource consumption.
+	addr := fmt.Sprintf("127.0.0.1:%d", port)
+	eventLogger.Logger().Info("Starting ambient event ingest API", logging.String("addr", addr))
+	srv := newAmbientIngestServer(addr, mux)
+	return srv.ListenAndServe()
+}
+
+func newAmbientIngestHandler(ctx context.Context, hub ambient.EventHub, eventLogger *logging.EventLogger) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ingest", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -84,7 +95,7 @@ func runAmbientIngest(cmd *cobra.Command, _ []string) error {
 			Timestamp: ts,
 		}
 
-		if err := hub.Publish(cmd.Context(), event); err != nil {
+		if err := hub.Publish(ctx, event); err != nil {
 			eventLogger.Logger().Error("Failed to publish ambient event", err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
 			return
@@ -93,11 +104,5 @@ func runAmbientIngest(cmd *cobra.Command, _ []string) error {
 		w.WriteHeader(http.StatusAccepted)
 		fmt.Fprintln(w, `{"status":"accepted"}`)
 	})
-
-	// Loopback-only by default.
-	// Set timeouts to prevent unbounded resource consumption.
-	addr := fmt.Sprintf("127.0.0.1:%d", port)
-	eventLogger.Logger().Info("Starting ambient event ingest API", logging.String("addr", addr))
-	srv := newAmbientIngestServer(addr, mux)
-	return srv.ListenAndServe()
+	return mux
 }
