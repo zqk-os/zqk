@@ -45,55 +45,55 @@ func TestSubscriberStreaming_LoopHandshakeAndEvents(t *testing.T) {
 	serverDone := make(chan struct{})
 	goroutinelabels.NewGoroutine("mock_mcp_test_server", "mock MCP tcp listener for subscriber test").
 		StartSimple(func() {
-		defer close(serverDone)
-		conn, err := ln.Accept()
-		if err != nil {
-			return
-		}
-		defer conn.Close()
+			defer close(serverDone)
+			conn, err := ln.Accept()
+			if err != nil {
+				return
+			}
+			defer conn.Close()
 
-		reader := bufio.NewReader(conn)
+			reader := bufio.NewReader(conn)
 
-		// 1. Expect initialize request
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			return
-		}
-		var initReq map[string]any
-		_ = json.Unmarshal([]byte(line), &initReq)
+			// 1. Expect initialize request
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				return
+			}
+			var initReq map[string]any
+			_ = json.Unmarshal([]byte(line), &initReq)
 
-		// Respond to initialize with id=1
-		_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","id":1,"result":{"capabilities":{}}}` + "\n"))
+			// Respond to initialize with id=1
+			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","id":1,"result":{"capabilities":{}}}` + "\n"))
 
-		// 2. Expect notifications/initialized
-		_, err = reader.ReadString('\n')
-		if err != nil {
-			return
-		}
+			// 2. Expect notifications/initialized
+			_, err = reader.ReadString('\n')
+			if err != nil {
+				return
+			}
 
-		// 3. Expect events/subscribe request
-		_, err = reader.ReadString('\n')
-		if err != nil {
-			return
-		}
-		// Respond to subscribe with id=2
-		_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","id":2,"result":{"subscribed":true}}` + "\n"))
+			// 3. Expect events/subscribe request
+			_, err = reader.ReadString('\n')
+			if err != nil {
+				return
+			}
+			// Respond to subscribe with id=2
+			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","id":2,"result":{"subscribed":true}}` + "\n"))
 
-		// 4. Send malformed json line to test unmarshal error recovery
-		_, _ = conn.Write([]byte(`{not valid json}` + "\n"))
+			// 4. Send malformed json line to test unmarshal error recovery
+			_, _ = conn.Write([]byte(`{not valid json}` + "\n"))
 
-		// 5. Send unrelated event notification (ignored by subscriber)
-		_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"peer.heartbeat"}}}` + "\n"))
+			// 5. Send unrelated event notification (ignored by subscriber)
+			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"peer.heartbeat"}}}` + "\n"))
 
-		// 6. Send action.required notification
-		_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action.required"}}}` + "\n"))
+			// 6. Send action.required notification
+			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action.required"}}}` + "\n"))
 
-		// 7. Send action_required notification
-		_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action_required"}}}` + "\n"))
+			// 7. Send action_required notification
+			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action_required"}}}` + "\n"))
 
-		// Allow client to process events
-		time.Sleep(50 * time.Millisecond)
-	})
+			// Allow client to process events
+			time.Sleep(50 * time.Millisecond)
+		})
 
 	logger := logging.GetLoggerFromProfile("test")
 	ctx, cancel := stdctx.WithTimeout(stdctx.Background(), 2*time.Second)
