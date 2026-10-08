@@ -98,3 +98,34 @@ func TestPackCLI_Manifest(t *testing.T) {
 		}
 	}
 }
+
+func TestPackCLI_BuiltinSwarmPacks(t *testing.T) {
+	packs := []string{
+		"code-eval",
+		"greenfield-genesis",
+		"legacy-refactor",
+		"swarm-hitl",
+		"rbac-recovery",
+	}
+
+	repoRoot, err := filepath.Abs("../../..")
+	if err != nil {
+		t.Fatalf("failed to get repo root: %v", err)
+	}
+
+	for _, packName := range packs {
+		packDir := filepath.Join(repoRoot, "packs", packName)
+		validateCmd := newValidateCmd()
+		buf := new(bytes.Buffer)
+		validateCmd.SetOut(buf)
+		validateCmd.SetArgs([]string{packDir})
+
+		if err := validateCmd.Execute(); err != nil {
+			t.Errorf("builtin pack %s validation failed: %v", packName, err)
+		}
+
+		if !strings.Contains(buf.String(), "is valid and SEALED") {
+			t.Errorf("builtin pack %s output unexpected: %s", packName, buf.String())
+		}
+	}
+}

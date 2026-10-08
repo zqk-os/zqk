@@ -1,0 +1,72 @@
+$schema: https://zqk.dev/schemas/swarm_package_spec.schema.json
+name: swarm-hitl
+version: 1.0.0
+description: 'Multi-Agent Swarm with Real-Time HITL Authorization: Parallel Worktrees, AST Symbol Locks, and Zero Merge Conflicts'
+author: zqk-community
+license: Apache-2.0
+entrypoint: task-1-clone-and-topology
+parameters:
+    target_repo:
+        type: string
+        default: https://github.com/charmbracelet/bubbletea
+        description: Public repository URL to clone and enhance
+    workspace_dir:
+        type: string
+        default: /tmp/zqk-pack-swarm-bubbletea
+        description: Target isolated workspace directory
+integrity:
+    algorithm: ed25519
+    signer_id: support@zqkos.com
+    content_digest: sha256:54e5e2e890d4a1769189be8caa88244eda7eedbbb70d995e73d81e7d81f3d850
+    signature: a3b6e51534b9c94b24d2e7f5cc963c7c6f345f9c5f4ea0732fbd9a1c625ac39164e8f0dce83b0e6c485f6ae8766f29aaf2c19a52bf22f709437bacd17aad720f
+membranes:
+    - path: .zqk/process/
+      mode: read_only
+    - path: .zqk/audit/
+      mode: audit_log
+agents:
+    - name: Concurrency Architect
+      role: concurrency_architect
+      skills:
+        - ASK-COMMUNITY-TPM-ORCHESTRATION
+      system_prompt: Plan-scoped branch topology orchestration and worktree sandboxing.
+    - name: Renderer Specialist
+      role: renderer_specialist
+      skills:
+        - ASK-COMMUNITY-CODE-CRAFTSMAN
+      system_prompt: Parallel ANSI renderer optimization in isolated worktree.
+    - name: Runtime Specialist
+      role: runtime_specialist
+      skills:
+        - ASK-COMMUNITY-ARCH-DESIGN
+      system_prompt: High-throughput batch event queue implementation in isolated worktree.
+    - name: Human Operator Gatekeeper
+      role: human_operator
+      skills:
+        - ASK-COMMUNITY-QA-VERIFICATION
+      system_prompt: Real-time human-in-the-loop authorization gate for core dispatch modifications.
+tasks:
+    - id: task-1-clone-and-topology
+      title: Clone target repo and initialize 3-seat plan-scoped worktree topology
+      role: concurrency_architect
+    - id: task-2-concurrent-renderer
+      title: Seat 1 executes renderer optimization in parallel worktree
+      role: renderer_specialist
+      depends_on:
+        - task-1-clone-and-topology
+    - id: task-3-concurrent-runtime
+      title: Seat 2 executes event queue enhancement in parallel worktree
+      role: runtime_specialist
+      depends_on:
+        - task-1-clone-and-topology
+    - id: task-4-hitl-gate-approval
+      title: Seat 3 proposes core event loop modification and requests operator authorization
+      role: human_operator
+      depends_on:
+        - task-2-concurrent-renderer
+        - task-3-concurrent-runtime
+    - id: task-5-cas-sequential-merge
+      title: Merge approved branches into main with zero conflicts via CAS symbol locks
+      role: concurrency_architect
+      depends_on:
+        - task-4-hitl-gate-approval

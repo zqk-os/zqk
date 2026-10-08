@@ -1,0 +1,63 @@
+$schema: https://zqk.dev/schemas/swarm_package_spec.schema.json
+name: greenfield-genesis
+version: 1.0.0
+description: 'Greenfield Service Genesis: Distributed Token Bucket Rate Limiter Service with thread-safe Mutex AST invariants and fail-closed done-gates'
+author: zqk-community
+license: Apache-2.0
+entrypoint: task-1-bootstrap
+parameters:
+    workspace_dir:
+        type: string
+        default: /tmp/zqk-pack-greenfield-genesis
+        description: Target workspace directory for service bootstrap
+integrity:
+    algorithm: ed25519
+    signer_id: support@zqkos.com
+    content_digest: sha256:2936bc0e98a50d413fb9f0364c63a2bcc5c764c98dd00725156ea39ce8df3d09
+    signature: 109bb937ac1e58d7745c4ee18a17960e36072606b2a3d214b713797baa53ec022e536283d40b3bad1d4501956b863cd243776b1d8dc888f2daad5112b371080c
+membranes:
+    - path: .zqk/process/
+      mode: read_only
+    - path: .zqk/audit/
+      mode: audit_log
+agents:
+    - name: Core Engineer
+      role: core_engineer
+      skills:
+        - ASK-COMMUNITY-CODE-CRAFTSMAN
+      system_prompt: Implement thread-safe token bucket rate limiter struct and mutex receiver methods.
+    - name: API Engineer
+      role: api_engineer
+      skills:
+        - ASK-COMMUNITY-ARCH-DESIGN
+      system_prompt: Implement HTTP middleware, Retry-After header, and liveness/readiness probes.
+    - name: QA Engineer
+      role: qa_engineer
+      skills:
+        - ASK-COMMUNITY-QA-VERIFICATION
+      system_prompt: Add high-concurrency race stress harness and verify zero data races under -race.
+tasks:
+    - id: task-1-bootstrap
+      title: Initialize clean repo, module, and kernel graph hierarchy
+      role: core_engineer
+    - id: task-2-core-engine
+      title: Implement Core Token Bucket Struct and Mutex Receiver
+      role: core_engineer
+      depends_on:
+        - task-1-bootstrap
+    - id: task-3-api-middleware
+      title: Implement HTTP Middleware and Status Code Handler
+      role: api_engineer
+      depends_on:
+        - task-2-core-engine
+    - id: task-4-concurrency-stress
+      title: High-Concurrency Race Stress Harness
+      role: qa_engineer
+      depends_on:
+        - task-2-core-engine
+    - id: task-5-verify-done-gate
+      title: Intercept and verify AST concurrency invariants and test bundle under -race
+      role: qa_engineer
+      depends_on:
+        - task-3-api-middleware
+        - task-4-concurrency-stress

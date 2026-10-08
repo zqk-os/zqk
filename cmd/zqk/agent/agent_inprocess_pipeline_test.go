@@ -55,14 +55,16 @@ func TestInProcess_Agent_Orchestrate_Execution(t *testing.T) {
 		t.Fatalf("failed to create requirement: %v", err)
 	}
 
-	// Seed active plan
+	// Seed grooming plan
 	planID := "PRI-ORCH-EXEC-001"
 	planObj := map[string]any{
-		objects.FieldKeyID:          planID,
-		objects.FieldKeyKind:        objects.KindPriorityPlan,
-		objects.FieldKeyTitle:       "Orchestration Execution Plan",
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
-		objects.FieldKeyDescription: "Plan for testing orchestrate pipeline",
+		objects.FieldKeyID:             planID,
+		objects.FieldKeyKind:           objects.KindPriorityPlan,
+		objects.FieldKeyTitle:          "Orchestration Execution Plan",
+		objects.FieldKeyStatus:         objects.ObjectStatusGrooming,
+		objects.FieldKeyDescription:    "Plan for testing orchestrate pipeline",
+		objects.FieldKeyPersonaRefs:    []any{"PER-DEFAULT-OPERATOR"},
+		objects.FieldKeyWorkstreamRefs: []any{"WS-ORCH-001"},
 	}
 	if err := provider.Create(ctx, secCtx, planObj); err != nil {
 		t.Fatalf("failed to create plan: %v", err)
@@ -86,6 +88,12 @@ func TestInProcess_Agent_Orchestrate_Execution(t *testing.T) {
 	}
 	if err := provider.Create(ctx, secCtx, bliObj); err != nil {
 		t.Fatalf("failed to create bli: %v", err)
+	}
+
+	planObj[objects.FieldKeyStatus] = objects.ObjectStatusActive
+	planObj[objects.FieldKeyActiveOrder] = 1
+	if err := provider.Update(ctx, secCtx, planID, planObj); err != nil {
+		t.Fatalf("failed to activate plan: %v", err)
 	}
 
 	out, err := executeAgentCommand(t, tempDir, provider, "orchestrate", planID)
@@ -331,7 +339,7 @@ func TestInProcess_Agent_Claim_ResolveClaimantIdentity(t *testing.T) {
 		t.Errorf("unexpected procStorageTuple nil results: %v, %v, %v", ctxStd, secStd, spStd)
 	}
 	emptyCmd := &cobra.Command{}
-	emptyCmd.SetContext(stdctx.Background())
+	setAgentCLIContext(t, emptyCmd, tempDir, provider)
 	procEmpty, err := newAgentProcessor(emptyCmd)
 	if err != nil {
 		t.Fatalf("failed to create processor: %v", err)

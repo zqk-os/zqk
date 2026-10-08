@@ -137,6 +137,7 @@ func TestAgentStatusCmd(t *testing.T) {
 		cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
 		cmd.SetOut(&buf)
 		cmd.SetErr(&buf)
+		cmd.SetArgs([]string{})
 
 		err = cmd.Execute()
 		assert.NoError(t, err)
@@ -188,6 +189,7 @@ func TestAgentStatusCmd(t *testing.T) {
 		cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
 		cmd.SetOut(&buf)
 		cmd.SetErr(&buf)
+		cmd.SetArgs([]string{})
 
 		err = cmd.Execute()
 		assert.NoError(t, err)
@@ -234,6 +236,7 @@ func TestAgentStatusCmd_StalledPlanAlert(t *testing.T) {
 	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{})
 
 	err = cmd.Execute()
 	assert.NoError(t, err)

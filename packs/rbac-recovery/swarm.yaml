@@ -1,0 +1,57 @@
+$schema: https://zqk.dev/schemas/swarm_package_spec.schema.json
+name: rbac-recovery
+version: 1.0.0
+description: 'Cryptographic RBAC Separation of Concerns & CAP Loop Anti-Hallucination: Fail-Closed Privilege Defense and Sub-50ms CAS Rewind'
+author: zqk-community
+license: Apache-2.0
+entrypoint: task-1-rbac-init
+parameters:
+    workspace_dir:
+        type: string
+        default: /tmp/zqk-pack-rbac-recovery
+        description: Target isolated workspace directory
+integrity:
+    algorithm: ed25519
+    signer_id: support@zqkos.com
+    content_digest: sha256:3b3086e43a47e8b981cd86639f905ef05c4bb2f47cdeeb4b2088a10997b0bec0
+    signature: ad06bdceb7d48c0bbb01283db8896b5c7faaf25a20dd0d7f79465e053d60ce92c45fd278dc4a7a09676cf489e2ca0a9c23b7761e11de06b88e41a53d6232800f
+membranes:
+    - path: .zqk/process/
+      mode: read_only
+    - path: .zqk/audit/
+      mode: audit_log
+agents:
+    - name: Security Auditor
+      role: security_auditor
+      skills:
+        - ASK-COMMUNITY-QA-VERIFICATION
+      system_prompt: RBAC membrane enforcement and privilege boundaries.
+    - name: Worker Seat
+      role: worker_seat
+      skills:
+        - ASK-COMMUNITY-CODE-CRAFTSMAN
+      system_prompt: Junior development role restricted from modifying kernel process tree.
+    - name: Convergence Monitor
+      role: convergence_monitor
+      skills:
+        - ASK-COMMUNITY-TPM-ORCHESTRATION
+      system_prompt: Circular loop detection, circuit breaker tripping, and CAS rewind.
+tasks:
+    - id: task-1-rbac-init
+      title: Initialize RBAC permissions membrane and record pristine CAS tree hash
+      role: security_auditor
+    - id: task-2-privilege-escalation-guard
+      title: Worker attempts unauthorized process tree mutation and verifies fail-closed block
+      role: worker_seat
+      depends_on:
+        - task-1-rbac-init
+    - id: task-3-detect-loop-circuit-breaker
+      title: Simulate ungrounded hallucination churn and trip convergence circuit breaker at cycle 3
+      role: convergence_monitor
+      depends_on:
+        - task-2-privilege-escalation-guard
+    - id: task-4-cas-rewind
+      title: Execute deterministic CAS state rewind restoring pristine codebase
+      role: convergence_monitor
+      depends_on:
+        - task-3-detect-loop-circuit-breaker

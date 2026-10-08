@@ -77,3 +77,60 @@ func TestSessionTouch_TryReuseSessionDoesNotTouch(t *testing.T) {
 			countAfter-countBefore)
 	}
 }
+
+func TestSessionLifecycle_Wrappers(t *testing.T) {
+	testRoot, _ := setupIntegrationTestWithSpecsApp(t, "session-wrappers")
+	sp, err := storage.NewFileObjectStorageForTest(testRoot)
+	if err != nil {
+		t.Fatalf("NewFileObjectStorageForTest: %v", err)
+	}
+	testkit.RegisterStorageTestCleanup(t, testRoot, sp)
+	t.Cleanup(func() {
+		if err := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, sp)); err != nil {
+			t.Logf("project test teardown: %v", err)
+		}
+	})
+
+	ctx := pkgctx.NewSystemContext()
+	sessID := "SESS-WRAPPER-001"
+
+	// WithZqkSessionID and GetZqkSessionIDFromContext
+	ctxWithSess := app.WithZqkSessionID(ctx, sessID)
+	if got := app.GetZqkSessionIDFromContext(ctxWithSess); got != sessID {
+		t.Errorf("expected session %s, got %s", sessID, got)
+	}
+
+	// GetSessionIdleTimeout
+	timeout := app.GetSessionIdleTimeout(testRoot)
+	if timeout <= 0 {
+		t.Errorf("expected positive idle timeout, got %v", timeout)
+	}
+
+	// Start real session
+	createdID := app.StartZqkSession(ctx, testRoot, "wrapper-test", pkgctx.SystemAccountID, sp)
+	if createdID == "" {
+		t.Fatal("expected non-empty createdID")
+	}
+
+	// WritePersistedSessionID, ReadPersistedSessionID, GetCurrentSessionID
+	app.WritePersistedSessionID(ctx, testRoot, createdID, pkgctx.SystemAccountID, sp)
+	if readID := app.ReadPersistedSessionID(testRoot); readID != createdID {
+		t.Errorf("expected persisted ID %s, got %s", createdID, readID)
+	}
+	if currentID := app.GetCurrentSessionID(testRoot); currentID != createdID {
+		t.Errorf("expected current ID %s, got %s", createdID, currentID)
+	}
+
+	// TouchSession and TouchSessionIfNotThrottled
+	app.TouchSession(ctx, testRoot, createdID, "updated-title", pkgctx.SystemAccountID, sp)
+	app.TouchSessionIfNotThrottled(ctx, testRoot, createdID, "throttled-title", pkgctx.SystemAccountID, sp)
+
+	// EndZqkSession
+	app.EndZqkSession(ctx, testRoot, createdID, "completed", pkgctx.SystemAccountID, sp)
+
+	// ClearPersistedSession
+	app.ClearPersistedSession(testRoot)
+	if readAfterClear := app.ReadPersistedSessionID(testRoot); readAfterClear != "" {
+		t.Errorf("expected empty after clear, got %s", readAfterClear)
+	}
+}

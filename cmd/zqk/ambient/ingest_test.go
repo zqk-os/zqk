@@ -6,58 +6,43 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/zqk-os/zqk/pkg/ambient"
+	"github.com/zqk-os/zqk/pkg/logging"
 )
 
 func TestIngestEndpoint(t *testing.T) {
-	// Setup the test logger and hub
 	ctx := context.Background()
 	hub := ambient.NewEventHub()
+	logger := logging.GetLoggerFromContext(ctx)
+	handler := newAmbientIngestHandler(ctx, hub, logger)
 
-	// Handler function from ingest.go extracted for testing
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
-
-		body := new(bytes.Buffer)
-		_, err := body.ReadFrom(r.Body)
-		if err != nil {
-			http.Error(w, "Failed to read request body", http.StatusBadRequest)
-			return
-		}
-		defer r.Body.Close()
-
-		// Simplified test logic for JSON parsing
-		// (normally we'd reuse the exact handler)
-		// For now we just check if it receives a valid POST and publishes.
-		event := ambient.Event{
-			Type:      ambient.EventTypeSession,
-			Payload:   "test payload",
-			Timestamp: time.Now(),
-		}
-
-		if err := hub.Publish(ctx, event); err != nil {
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusAccepted)
-		_, _ = w.Write([]byte(`{"status":"accepted"}`))
-	}
-
-	req := httptest.NewRequest(http.MethodPost, "/ingest", bytes.NewBuffer([]byte(`{"type":"session","payload":"test"}`)))
+	// 1. Method Not Allowed
+	req := httptest.NewRequest(http.MethodGet, "/ingest", nil)
 	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusMethodNotAllowed, w.Result().StatusCode)
 
-	handler(w, req)
+	// 2. Bad JSON
+	req = httptest.NewRequest(http.MethodPost, "/ingest", bytes.NewBuffer([]byte(`{invalid-json`)))
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
 
-	res := w.Result()
-	if res.StatusCode != http.StatusAccepted {
-		t.Errorf("expected status %d, got %d", http.StatusAccepted, res.StatusCode)
-	}
+	// 3. Valid JSON with type and timestamp
+	payloadWithTS := `{"type":"session","payload":"test-data","timestamp":"2026-10-07T20:00:00Z"}`
+	req = httptest.NewRequest(http.MethodPost, "/ingest", bytes.NewBuffer([]byte(payloadWithTS)))
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusAccepted, w.Result().StatusCode)
+
+	// 4. Valid JSON with empty type and without timestamp
+	payloadEmptyType := `{"payload":"fallback-data"}`
+	req = httptest.NewRequest(http.MethodPost, "/ingest", bytes.NewBuffer([]byte(payloadEmptyType)))
+	w = httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusAccepted, w.Result().StatusCode)
 }
 
 func TestAmbientIngestServer_Timeouts(t *testing.T) {

@@ -59,3 +59,89 @@ func TestRecentFillSubmit_cooldown(t *testing.T) {
 		t.Fatalf("mark name %s", path)
 	}
 }
+
+func TestSubmitKernelFill_EarlyReturns(t *testing.T) {
+	t.Parallel()
+	ctx := t.Context()
+	root := t.TempDir()
+
+	// 1. Nil fill item
+	res, err := submitKernelFill(ctx, root, nil)
+	if err != nil || res != "" {
+		t.Fatalf("expected empty nil, got %q, %v", res, err)
+	}
+
+	// 2. AutoSubmit false
+	res, err = submitKernelFill(ctx, root, &whatsnext.FillItem{AutoSubmit: false})
+	if err != nil || res != "" {
+		t.Fatalf("expected empty nil, got %q, %v", res, err)
+	}
+
+	// 3. Empty SubmitArgs
+	res, err = submitKernelFill(ctx, root, &whatsnext.FillItem{AutoSubmit: true, SubmitArgs: "   "})
+	if err != nil || res != "" {
+		t.Fatalf("expected empty nil, got %q, %v", res, err)
+	}
+
+	// 4. Recent submit cooldown
+	if err := writeFillSubmitMark(root, "ghost_ref", "SCH-123"); err != nil {
+		t.Fatal(err)
+	}
+	res, err = submitKernelFill(ctx, root, &whatsnext.FillItem{
+		Kind:       "ghost_ref",
+		AutoSubmit: true,
+		SubmitArgs: "some command",
+	})
+	if err != nil || !strings.HasPrefix(res, "already_submitted") {
+		t.Fatalf("expected already_submitted, got %q, %v", res, err)
+	}
+}
+
+func TestSchedulerCallbackNotify(t *testing.T) {
+	t.Parallel()
+	got := schedulerCallbackNotify("zqk", "/tmp/log.json")
+	want := "zqk callback notify --log-file /tmp/log.json"
+	if got != want {
+		t.Fatalf("got %q want %q", got, want)
+	}
+}
+
+func TestSubmitKernelFill_Execution(t *testing.T) {
+	ctx := t.Context()
+	root := t.TempDir()
+
+	binDir := filepath.Join(root, "bin")
+	_ = fileutil.MkdirAll(binDir, 0755)
+	mockBin := filepath.Join(binDir, "mock_zqk.sh")
+	script := "#!/bin/sh\ncase \"$*\" in *TRIGGER_MOCK_FAILURE*) echo \"mock failure\" >&2; exit 1;; esac\necho \"SCH-SUBMITTED-999\"\n"
+	if err := fileutil.WriteFile(mockBin, []byte(script), 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("ZQK_BIN", mockBin)
+
+	// 1. Success execution
+	fillSuccess := &whatsnext.FillItem{
+		Kind:       "test_fill",
+		AutoSubmit: true,
+		SubmitArgs: "object draft sweep",
+	}
+	res, err := submitKernelFill(ctx, root, fillSuccess)
+	if err != nil {
+		t.Fatalf("submitKernelFill failed: %v", err)
+	}
+	if !strings.Contains(res, "SCH-SUBMITTED-999") {
+		t.Fatalf("expected SCH-SUBMITTED-999, got %q", res)
+	}
+
+	// 2. Failure execution
+	fillFail := &whatsnext.FillItem{
+		Kind:       "test_fail_fill",
+		AutoSubmit: true,
+		SubmitArgs: "TRIGGER_MOCK_FAILURE",
+	}
+	_, err = submitKernelFill(ctx, root, fillFail)
+	if err == nil {
+		t.Fatal("expected error from failed submitKernelFill, got nil")
+	}
+}

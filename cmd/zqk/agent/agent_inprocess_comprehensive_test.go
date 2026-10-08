@@ -48,6 +48,10 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 	_ = fileutil.EnsureDir(hooksDir)
 	_ = fileutil.WriteStandardFile(filepath.Join(hooksDir, "agent_chat_channel.jsonl"), []byte(""))
 
+	binDir := filepath.Join(p.Root, "bin")
+	_ = fileutil.MkdirAll(binDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(binDir, "zqk"), []byte("#!/bin/sh\nexit 0\n"), 0755)
+
 	defaultOp := map[string]any{
 		objects.FieldKeyID:          objects.ConstPersonaDefaultOperator,
 		objects.FieldKeyKind:        objects.KindPersona,
@@ -91,6 +95,7 @@ func executeAgentCommand(t *testing.T, projectRoot string, provider storage.Obje
 	testCtx := setAgentCLIContext(t, rootCmd, projectRoot, provider)
 	testCtx = pkgctx.WithCommandOutputWriter(testCtx, &buf)
 
+	rootCmd.SetIn(bytes.NewReader(nil))
 	rootCmd.SetOut(&buf)
 	rootCmd.SetErr(&buf)
 	rootCmd.SetContext(testCtx)
@@ -98,6 +103,7 @@ func executeAgentCommand(t *testing.T, projectRoot string, provider storage.Obje
 	var propagate func(c *cobra.Command)
 	propagate = func(c *cobra.Command) {
 		c.SetContext(testCtx)
+		c.SetIn(bytes.NewReader(nil))
 		c.SetOut(&buf)
 		c.SetErr(&buf)
 		for _, child := range c.Commands() {
@@ -129,11 +135,13 @@ func seedAgentSupportHierarchy(t *testing.T, provider storage.ObjectStorageProvi
 	}
 
 	plan := map[string]any{
-		objects.FieldKeyID:          "PRI-INPROCESS-PLAN-001",
-		objects.FieldKeyKind:        objects.KindPriorityPlan,
-		objects.FieldKeyTitle:       "InProcess Comprehensive Test Plan",
-		objects.FieldKeyStatus:      objects.ObjectStatusActive,
-		objects.FieldKeyDescription: "Priority plan for testing agent subsystems",
+		objects.FieldKeyID:             "PRI-INPROCESS-PLAN-001",
+		objects.FieldKeyKind:           objects.KindPriorityPlan,
+		objects.FieldKeyTitle:          "InProcess Comprehensive Test Plan",
+		objects.FieldKeyStatus:         objects.ObjectStatusGrooming,
+		objects.FieldKeyDescription:    "Priority plan for testing agent subsystems",
+		objects.FieldKeyPersonaRefs:    []any{"PER-INPROCESS-ENGINEER"},
+		objects.FieldKeyWorkstreamRefs: []any{"WS-INPROCESS-001"},
 	}
 	if err := provider.Create(ctx, secCtx, plan); err != nil {
 		t.Fatalf("failed to seed plan: %v", err)
@@ -151,6 +159,12 @@ func seedAgentSupportHierarchy(t *testing.T, provider storage.ObjectStorageProvi
 	}
 	if err := provider.Create(ctx, secCtx, bli); err != nil {
 		t.Fatalf("failed to seed bli: %v", err)
+	}
+
+	plan[objects.FieldKeyStatus] = objects.ObjectStatusActive
+	plan[objects.FieldKeyActiveOrder] = 1
+	if err := provider.Update(ctx, secCtx, "PRI-INPROCESS-PLAN-001", plan); err != nil {
+		t.Fatalf("failed to activate plan: %v", err)
 	}
 
 	return "PRI-INPROCESS-PLAN-001", "BLI-INPROCESS-ITEM-001"
@@ -294,7 +308,7 @@ func TestInProcess_Agent_Orchestrate_DirectHelpers(t *testing.T) {
 	}
 
 	// isTestCaseReadyStatus
-	if !isTestCaseReadyStatus("active") || !isTestCaseReadyStatus("complete") || !isTestCaseReadyStatus("draft") || isTestCaseReadyStatus("archived") {
+	if !isTestCaseReadyStatus(objects.ObjectStatusActive) || !isTestCaseReadyStatus(objects.ObjectStatusComplete) || !isTestCaseReadyStatus(objects.ObjectStatusDraft) || isTestCaseReadyStatus(objects.ObjectStatusArchived) {
 		t.Error("unexpected isTestCaseReadyStatus results")
 	}
 
@@ -366,6 +380,7 @@ func TestInProcess_Agent_TaskOutcome_And_Envelope(t *testing.T) {
 		objects.FieldKeyBacklogItemRef:     bliID,
 		objects.FieldKeyPriorityPlanRef:    planID,
 		objects.FieldKeyAssigneePersonaRef: "PER-INPROCESS-ENGINEER",
+		objects.FieldKeyEstimatedEffort:    "1h",
 		objects.FieldKeyDescription:        "Comprehensive test agent task description",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
@@ -406,8 +421,8 @@ func TestInProcess_Agent_TaskOutcome_And_Envelope(t *testing.T) {
 	_ = disp
 
 	outPayload := map[string]any{
-		"commit_sha": "abc1234",
-		"status":     "passed",
+		"commit_sha":           "abc1234",
+		objects.FieldKeyStatus: objects.ObjectStatusComplete,
 	}
 	if err := persistOrchestratedTaskOutcome(ctx, state, taskID, objects.ObjectStatusInProgress, outPayload); err != nil {
 		t.Fatalf("persistOrchestratedTaskOutcome failed: %v", err)
@@ -424,20 +439,22 @@ func TestInProcess_Agent_RunOrchestrate_Validation(t *testing.T) {
 		t.Error("expected error orchestrating nonexistent plan")
 	}
 
-	// Plan status error: plan in planned status
+	// Plan status error: plan in grooming status
 	ctx := stdctx.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
-	plannedPlan := map[string]any{
-		objects.FieldKeyID:     "PRI-PLANNED-ONLY",
+	groomingPlan := map[string]any{
+		objects.FieldKeyID:     "PRI-GROOMING-ONLY",
 		objects.FieldKeyKind:   objects.KindPriorityPlan,
-		objects.FieldKeyTitle:  "Planned Only Plan",
-		objects.FieldKeyStatus: objects.ObjectStatusPlanned,
+		objects.FieldKeyTitle:  "Grooming Only Plan",
+		objects.FieldKeyStatus: objects.ObjectStatusGrooming,
 	}
-	_ = provider.Create(ctx, secCtx, plannedPlan)
+	if err := provider.Create(ctx, secCtx, groomingPlan); err != nil {
+		t.Fatalf("failed to create grooming plan: %v", err)
+	}
 
-	_, err = executeAgentCommand(t, tempDir, provider, "orchestrate", "PRI-PLANNED-ONLY")
+	_, err = executeAgentCommand(t, tempDir, provider, "orchestrate", "PRI-GROOMING-ONLY")
 	if err == nil {
-		t.Error("expected error orchestrating planned-only plan")
+		t.Error("expected error orchestrating grooming-only plan")
 	}
 }
 
@@ -610,6 +627,7 @@ func TestInProcess_Agent_ClaimAndRelease_Execution(t *testing.T) {
 		objects.FieldKeyBacklogItemRef:     bliID,
 		objects.FieldKeyPriorityPlanRef:    planID,
 		objects.FieldKeyAssigneePersonaRef: "PER-INPROCESS-ENGINEER",
+		objects.FieldKeyEstimatedEffort:    "1h",
 	}
 	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create task: %v", err)
@@ -670,5 +688,18 @@ func TestInProcess_Agent_GuidingStep_Execution(t *testing.T) {
 	outEvent, err := executeAgentCommand(t, tempDir, provider, "guiding-step", "--event", "session_start")
 	if err != nil {
 		t.Fatalf("guiding-step with event failed: %v, out: %s", err, outEvent)
+	}
+}
+
+func TestProcSecurityAndTuple(t *testing.T) {
+	// nil processor
+	sec := procSecurity(nil)
+	if sec == nil || sec.AccountID != pkgctx.SystemAccountID {
+		t.Fatalf("expected system secCtx for nil proc, got %v", sec)
+	}
+
+	c, s, p := procStorageTuple(nil)
+	if c == nil || s == nil || p != nil {
+		t.Fatalf("unexpected tuple for nil proc: c=%v, s=%v, p=%v", c, s, p)
 	}
 }

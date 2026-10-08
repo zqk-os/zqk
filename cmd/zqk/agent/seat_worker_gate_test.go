@@ -34,7 +34,6 @@ func mustJSON(v any) string {
 }
 
 func TestVerifyWorkAsCompletion_rejectsNoMutationWrites(t *testing.T) {
-	t.Parallel()
 	feedback, err := verifyWorkAsCompletion(context.Background(), t.TempDir(), []swarm.ToolCallRecord{
 		{Name: "zqk_object_get", Arguments: objectGetArgs("ATK-1")},
 	})
@@ -47,7 +46,6 @@ func TestVerifyWorkAsCompletion_rejectsNoMutationWrites(t *testing.T) {
 }
 
 func TestVerifyWorkAsCompletion_acceptsNonGoMutationWrite(t *testing.T) {
-	t.Parallel()
 	feedback, err := verifyWorkAsCompletion(context.Background(), t.TempDir(), []swarm.ToolCallRecord{
 		writeRecord("scripts/forbid-git-clean-process.sh"),
 	})

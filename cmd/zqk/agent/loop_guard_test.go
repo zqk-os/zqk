@@ -33,6 +33,29 @@ func TestLoadLoopGuardConfig_EnvOverride(t *testing.T) {
 	}
 }
 
+func TestLoadLoopGuardConfig_NegativeOverrides(t *testing.T) {
+	t.Setenv(zqkenv.AgentSyncMaxLoops().Name(), "-5")
+	t.Setenv(zqkenv.AgentMaxVerificationAttempts().Name(), "0")
+	t.Setenv(zqkenv.AgentSyncMaxStagnantTicks().Name(), "-1")
+	cfg := LoadLoopGuardConfig()
+	if cfg.MaxSyncLoops != defaultMaxSyncLoops {
+		t.Fatalf("MaxSyncLoops=%d want %d", cfg.MaxSyncLoops, defaultMaxSyncLoops)
+	}
+	if cfg.MaxVerificationAttempts != defaultMaxVerificationAttempts {
+		t.Fatalf("MaxVerificationAttempts=%d want %d", cfg.MaxVerificationAttempts, defaultMaxVerificationAttempts)
+	}
+	if cfg.MaxStagnantProgressTicks != defaultMaxStagnantProgressTicks {
+		t.Fatalf("MaxStagnantProgressTicks=%d want %d", cfg.MaxStagnantProgressTicks, defaultMaxStagnantProgressTicks)
+	}
+}
+
+func TestNewStagnationGuard_DefaultMax(t *testing.T) {
+	g := newStagnationGuard(0)
+	if g.max != defaultMaxStagnantProgressTicks {
+		t.Fatalf("g.max=%d want %d", g.max, defaultMaxStagnantProgressTicks)
+	}
+}
+
 func TestStagnationGuard_TripsOnUnchangedFingerprint(t *testing.T) {
 	g := newStagnationGuard(3)
 	if g.Observe("a") {
@@ -68,5 +91,71 @@ func TestTaskProgressFingerprint_IncludesAttempts(t *testing.T) {
 	fp2 := taskProgressFingerprint(task)
 	if fp1 == fp2 {
 		t.Fatalf("expected attempt change to alter fingerprint: %q", fp1)
+	}
+}
+
+func TestTaskProgressFingerprint_EdgeCases(t *testing.T) {
+	// 1. Nil task
+	if got := taskProgressFingerprint(nil); got != "" {
+		t.Fatalf("expected empty for nil task, got %q", got)
+	}
+
+	// 2. Nil stagnation guard
+	var g *stagnationGuard
+	if g.Observe("test") {
+		t.Fatalf("expected false for nil stagnation guard")
+	}
+
+	// 3. Completeness validation steps
+	taskWithCV := map[string]any{
+		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
+		objects.FieldKeyCompletenessValidation: []any{
+			map[string]any{
+				objects.FieldKeyName:                 "Check 1",
+				objects.FieldKeyStatus:               objects.ObjectStatusApproved,
+				objects.FieldKeyVerificationAttempts: "2",
+			},
+		},
+	}
+	fp := taskProgressFingerprint(taskWithCV)
+	if fp == "" {
+		t.Fatalf("expected non-empty fingerprint for task with completeness_validation")
+	}
+}
+
+func TestVerificationAttemptsOf_Types(t *testing.T) {
+	// Nil step
+	if verificationAttemptsOf(nil) != 0 {
+		t.Fatalf("expected 0 for nil step")
+	}
+
+	// Missing attempts key
+	if verificationAttemptsOf(map[string]any{}) != 0 {
+		t.Fatalf("expected 0 for missing key")
+	}
+
+	// int
+	if verificationAttemptsOf(map[string]any{objects.FieldKeyVerificationAttempts: 5}) != 5 {
+		t.Fatalf("expected 5 for int")
+	}
+
+	// int64
+	if verificationAttemptsOf(map[string]any{objects.FieldKeyVerificationAttempts: int64(6)}) != 6 {
+		t.Fatalf("expected 6 for int64")
+	}
+
+	// float64
+	if verificationAttemptsOf(map[string]any{objects.FieldKeyVerificationAttempts: float64(7)}) != 7 {
+		t.Fatalf("expected 7 for float64")
+	}
+
+	// string
+	if verificationAttemptsOf(map[string]any{objects.FieldKeyVerificationAttempts: "8"}) != 8 {
+		t.Fatalf("expected 8 for string")
+	}
+
+	// invalid type
+	if verificationAttemptsOf(map[string]any{objects.FieldKeyVerificationAttempts: []string{"a"}}) != 0 {
+		t.Fatalf("expected 0 for invalid type")
 	}
 }
