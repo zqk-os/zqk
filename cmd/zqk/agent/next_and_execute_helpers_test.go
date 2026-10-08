@@ -145,3 +145,64 @@ func TestExecute_WithPromptFlag(t *testing.T) {
 	_, err := executeAgentCommand(t, tempDir, provider, "execute", "--prompt", "Direct Prompt Test")
 	assert.Error(t, err)
 }
+
+func TestExecute_TargetingBacklogItemDirectly(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	bli := map[string]any{
+		objects.FieldKeyID:            "BLI-EXEC-DIRECT-001",
+		objects.FieldKeyKind:          objects.KindBacklogItem,
+		objects.FieldKeyTitle:         "Direct BLI Execution",
+		objects.FieldKeyDescription:   "Description for direct execution test",
+		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, bli))
+
+	_, err := executeAgentCommand(t, tempDir, provider, "execute", "BLI-EXEC-DIRECT-001")
+	assert.Error(t, err)
+}
+
+func TestExecute_TargetingAgentTaskWithEnvelopeAndSteps(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	bli := map[string]any{
+		objects.FieldKeyID:            "BLI-LINKED-001",
+		objects.FieldKeyKind:          objects.KindBacklogItem,
+		objects.FieldKeyTitle:         "Linked BLI",
+		objects.FieldKeyDescription:   "Deliverables for linked BLI item",
+		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, bli))
+
+	task := map[string]any{
+		objects.FieldKeyID:                 "ATK-EXEC-ENVELOPE-001",
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Task with Envelope and Steps",
+		objects.FieldKeyDescription:        "TASK_ENVELOPE\nDescription: Execute task",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyBacklogItemRef:     "BLI-LINKED-001",
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeyTaskSteps: []any{
+			map[string]any{
+				objects.FieldKeyTitle:       "Step 1",
+				objects.FieldKeyDescription: "Do step 1",
+				objects.FieldKeyStatus:      objects.ObjectStatusPending,
+			},
+		},
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, task))
+
+	_, err := executeAgentCommand(t, tempDir, provider, "execute", "ATK-EXEC-ENVELOPE-001")
+	assert.Error(t, err)
+}

@@ -154,3 +154,50 @@ func TestChatResponder_WithExistingSessionState(t *testing.T) {
 		t.Errorf("expected 'No new messages found', got: %s", out)
 	}
 }
+
+func TestChatResponder_IdleDetection(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	transcriptDir := filepath.Join(tempDir, ".system_generated", "logs")
+	_ = fileutil.EnsureDir(transcriptDir)
+	logPath := filepath.Join(transcriptDir, "transcript.jsonl")
+
+	oldTime := time.Now().Add(-20 * time.Minute)
+	entry := fmt.Sprintf(`{"step_index": 1, "type": "USER_INPUT", "content": "hello", "timestamp": %q}`+"\n", oldTime.Format(time.RFC3339))
+	_ = fileutil.WriteStandardFile(logPath, []byte(entry))
+
+	t.Setenv(zqkenv.AGTranscriptPath().Name(), logPath)
+
+	convID := "DEFAULT"
+	if root, err := antigravity.ConversationRootFromTranscript(logPath); err == nil {
+		if id := antigravity.ConversationID(root); id != "" {
+			convID = id
+		}
+	}
+	hash := fnv.New32a()
+	_, _ = hash.Write([]byte(convID))
+	sessionID := fmt.Sprintf("ZQK-%d", hash.Sum32())
+
+	// When last_nudge_time is after oldTime -> "already nudged"
+	statePayload, _ := json.Marshal(map[string]any{
+		"last_step":       float64(1),
+		"last_nudge_time": time.Now().Format(time.RFC3339),
+	})
+	sessionObj := map[string]any{
+		objects.FieldKeyID:            sessionID,
+		objects.FieldKeyKind:          objects.KindZqkSession,
+		objects.FieldKeyTitle:         string(statePayload),
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	require.NoError(t, provider.Create(ctx, secCtx, sessionObj))
+
+	out, err := executeAgentCommand(t, tempDir, provider, "chat-responder")
+	require.NoError(t, err)
+	if !strings.Contains(out, "already nudged") {
+		t.Errorf("expected 'already nudged' in output, got: %s", out)
+	}
+}

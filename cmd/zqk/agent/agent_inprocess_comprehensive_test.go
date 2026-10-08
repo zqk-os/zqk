@@ -48,6 +48,10 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 	_ = fileutil.EnsureDir(hooksDir)
 	_ = fileutil.WriteStandardFile(filepath.Join(hooksDir, "agent_chat_channel.jsonl"), []byte(""))
 
+	binDir := filepath.Join(p.Root, "bin")
+	_ = fileutil.MkdirAll(binDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(binDir, "zqk"), []byte("#!/bin/sh\nexit 0\n"), 0755)
+
 	defaultOp := map[string]any{
 		objects.FieldKeyID:          objects.ConstPersonaDefaultOperator,
 		objects.FieldKeyKind:        objects.KindPersona,

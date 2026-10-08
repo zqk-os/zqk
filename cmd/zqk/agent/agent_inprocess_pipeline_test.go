@@ -339,7 +339,7 @@ func TestInProcess_Agent_Claim_ResolveClaimantIdentity(t *testing.T) {
 		t.Errorf("unexpected procStorageTuple nil results: %v, %v, %v", ctxStd, secStd, spStd)
 	}
 	emptyCmd := &cobra.Command{}
-	emptyCmd.SetContext(stdctx.Background())
+	setAgentCLIContext(t, emptyCmd, tempDir, provider)
 	procEmpty, err := newAgentProcessor(emptyCmd)
 	if err != nil {
 		t.Fatalf("failed to create processor: %v", err)

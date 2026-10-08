@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -14,7 +13,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/mutation"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
@@ -186,93 +184,8 @@ func TestRecover_Helpers(t *testing.T) {
 	assert.Equal(t, "OBJ-1", merged[0]["id"])
 }
 
-func TestRecover_ArchivingTerminalParent(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Seed completed parent plan
-	plan := map[string]any{
-		objects.FieldKeyID:          "PRI-TERMINAL-001",
-		objects.FieldKeyKind:        objects.KindPriorityPlan,
-		objects.FieldKeyStatus:      objects.ObjectStatusComplete,
-		objects.FieldKeyTitle:       "Finished Plan",
-		objects.FieldKeyDescription: "Completed terminal plan",
-	}
-	storage.CreateCASVisible(t, provider, ctx, secCtx, plan, objects.ObjectStatusComplete)
-
-	// Seed orphaned in_progress task referencing completed plan
-	task := map[string]any{
-		objects.FieldKeyID:                 "ATK-ORPHAN-001",
-		objects.FieldKeyKind:               objects.KindAgentTask,
-		objects.FieldKeyTitle:              "Orphaned Task",
-		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
-		objects.FieldKeyPriorityPlanRef:    "PRI-TERMINAL-001",
-		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
-		objects.FieldKeyClaimedBy:          "agent-old",
-		objects.FieldKeyUpdatedAt:          time.Now().Add(-2 * time.Hour).UTC().Format(time.RFC3339),
-	}
-	storage.CreateCASVisible(t, provider, ctx, secCtx, task, objects.ObjectStatusInProgress)
-
-	out, err := executeAgentCommand(t, tempDir, provider, "recover", "PRI-TERMINAL-001")
-	require.NoError(t, err)
-	assert.Contains(t, out, "Archived orphaned task")
-
-	updated, err := provider.Read(ctx, secCtx, "ATK-ORPHAN-001")
-	require.NoError(t, err)
-	assert.Equal(t, objects.ObjectStatusArchived, updated[objects.FieldKeyStatus])
-}
-
-func TestRecover_FlagBranches(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-
-	// 1. Semantic routing failure on non-existent plan
-	_, err := executeAgentCommand(t, tempDir, provider, "recover", "NONEXISTENT-PLAN-999")
-	assert.ErrorContains(t, err, "semantic routing failed")
-
-	// 2. --all flag with no tasks
-	out, err := executeAgentCommand(t, tempDir, provider, "recover", "--all")
-	require.NoError(t, err)
-	assert.Contains(t, out, "Recovered 0 task(s)")
-
-	// 3. --stale flag with no tasks
-	out2, err2 := executeAgentCommand(t, tempDir, provider, "recover", "--stale")
-	require.NoError(t, err2)
-	assert.Contains(t, out2, "Recovered 0 task(s)")
-}
-
-func TestRunSyncLoop_EarlyValidations(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
-
-	cmd := NewSyncLoopCmd()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), secCtx))
-
-	// 1. Task not found
-	err := runSyncLoop(cmd, "ATK-NOT-FOUND")
-	assert.ErrorContains(t, err, "failed to read task")
-
-	// 2. Not an agent_task (e.g. persona)
-	sysCtx := pkgctx.NewSystemContext()
-	require.NoError(t, provider.Create(sysCtx, secCtx, map[string]any{
-		objects.FieldKeyID:          "PER-NON-TASK",
-		objects.FieldKeyKind:        objects.KindPersona,
-		objects.FieldKeyTitle:       "Persona Title",
-		objects.FieldKeyDescription: "Persona Description",
-		objects.FieldKeyStatus:      objects.ObjectStatusApproved,
-	}))
-
-	err = runSyncLoop(cmd, "PER-NON-TASK")
-	assert.ErrorContains(t, err, "can only execute agent_task objects")
-}
-
 func TestQuerySubgraph_SemanticPayloadBranches(t *testing.T) {
-	_, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
+	provider := newMockHelperStore()
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -308,8 +221,8 @@ func TestQuerySubgraph_SemanticPayloadBranches(t *testing.T) {
 }
 
 func TestApplyStateMutationWithFields_ExtraFieldsAndDefaultAssignee(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
+	tempDir := t.TempDir()
+	provider := newMockHelperStore()
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()

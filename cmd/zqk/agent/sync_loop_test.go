@@ -149,6 +149,7 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 		},
 	})
 	root := project.Root
+	t.Setenv("ZQK_PROJECT_ROOT", root)
 	testProcessDir := filepath.Join(root, paths.ProcessDir)
 	testSpecsDir := filepath.Join(root, paths.ProcessInternalObjectSpecsDir)
 	origMapper.SetDirectories(testProcessDir, testSpecsDir)
@@ -160,6 +161,11 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 		t.Fatalf("GetOrCreate storage: %v", err)
 	}
 	testkit.RegisterStorageTestCleanup(t, root, store)
+	t.Cleanup(func() {
+		if fos, ok := store.(*storage.FileObjectStorage); ok {
+			_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, fos))
+		}
+	})
 
 	// Create an agent_skill to satisfy CRIT-PERSONA-SKILL-BOUND
 	skillCtx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentSkill)

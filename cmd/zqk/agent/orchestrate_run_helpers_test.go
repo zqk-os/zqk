@@ -2,15 +2,24 @@ package agent
 
 import (
 	"context"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/daemon/singleton"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockHelperStore struct {
@@ -50,6 +59,41 @@ func (m *mockHelperStore) List(ctx context.Context, secCtx *pkgctx.SecurityConte
 	}
 	return &storage.QueryResult{Objects: res}, nil
 }
+
+func (m *mockHelperStore) BeginTransaction(ctx context.Context) (storage.ObjectTransaction, error) {
+	return &mockHelperTx{m: m}, nil
+}
+
+type mockHelperTx struct {
+	m *mockHelperStore
+}
+
+func (tx *mockHelperTx) Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error {
+	return tx.m.Create(ctx, secCtx, obj)
+}
+
+func (tx *mockHelperTx) Read(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
+	return tx.m.Read(ctx, secCtx, id)
+}
+
+func (tx *mockHelperTx) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
+	existing, err := tx.m.Read(ctx, secCtx, id)
+	if err != nil {
+		existing = make(map[string]any)
+	}
+	for k, v := range updates {
+		existing[k] = v
+	}
+	return tx.m.Update(ctx, secCtx, id, existing)
+}
+
+func (tx *mockHelperTx) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
+	delete(tx.m.objs, id)
+	return nil
+}
+
+func (tx *mockHelperTx) Commit(ctx context.Context) error   { return nil }
+func (tx *mockHelperTx) Rollback(ctx context.Context) error { return nil }
 
 func TestIsTestCaseReadyStatus(t *testing.T) {
 	cases := []struct {
@@ -254,4 +298,329 @@ func TestRunOrchestrate_ValidationBranches(t *testing.T) {
 	cmdEmpty.SetContext(adminCtx)
 	err = runOrchestrate(cmdEmpty, "", OrchestrateOptions{})
 	assert.ErrorContains(t, err, "no active priority plan")
+}
+
+func TestRunOrchestrate_GuardAlreadyAcquired(t *testing.T) {
+	tempDir, _, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+
+	planID := "PRI-LOCKED-001"
+	guardName := "orchestrator-" + strings.ToLower(planID)
+	release, err := singleton.Guard(tempDir, guardName)
+	require.NoError(t, err)
+	defer release()
+
+	adminCtx := pkgctx.WithSecurityContext(context.Background(), pkgctx.NewSystemSecurityContext())
+	cmdAdmin := NewOrchestrateCmd()
+	cmdAdmin.SetContext(adminCtx)
+
+	err = runOrchestrate(cmdAdmin, planID, OrchestrateOptions{})
+	assert.NoError(t, err)
+}
+
+func TestRunOrchestrate_PlanKindsAndFailures(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	adminCtx := pkgctx.WithSecurityContext(ctx, secCtx)
+
+	// 1. Missing plan in storage after guard acquired
+	cmd1 := NewOrchestrateCmd()
+	cmd1.SetContext(adminCtx)
+	err := runOrchestrate(cmd1, "PRI-NONEXISTENT-AFTER-GUARD", OrchestrateOptions{})
+	assert.ErrorContains(t, err, "failed to load plan")
+
+	// 2. Priority plan with inactive/unsupported status (e.g. proposed)
+	planInactive := map[string]any{
+		objects.FieldKeyID:            "PRI-INACTIVE-STATUS-001",
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeyTitle:         "Proposed Priority Plan",
+		objects.FieldKeyDescription:   "Proposed plan description for unit test",
+		objects.FieldKeyStatus:        objects.ObjectStatusProposed,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, planInactive))
+
+	cmd2 := NewOrchestrateCmd()
+	cmd2.SetContext(adminCtx)
+	err = runOrchestrate(cmd2, "PRI-INACTIVE-STATUS-001", OrchestrateOptions{})
+	assert.ErrorContains(t, err, "orchestrator can only operate on active or in_progress")
+
+	// 3. Pipeline plan kind loads tasks
+	pipePlan := map[string]any{
+		objects.FieldKeyID:            "PIP-TEST-PIPELINE-001",
+		objects.FieldKeyKind:          objects.KindPipeline,
+		objects.FieldKeyTitle:         "Test Pipeline",
+		objects.FieldKeyDescription:   "Test pipeline description",
+		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyAgentTaskRefs: []any{"ATK-1"},
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, pipePlan))
+
+	cmd3 := NewOrchestrateCmd()
+	cmd3.SetContext(adminCtx)
+	_ = runOrchestrate(cmd3, "PIP-TEST-PIPELINE-001", OrchestrateOptions{})
+}
+
+func TestRunOrchestrate_StrategicPlanRouting(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	adminCtx := pkgctx.WithSecurityContext(ctx, secCtx)
+
+	defaultAgent := map[string]any{
+		objects.FieldKeyID:          objects.ConstPersonaDefaultAgent,
+		objects.FieldKeyKind:        objects.KindPersona,
+		objects.FieldKeyTitle:       "Default Agent",
+		objects.FieldKeyName:        "Default Agent",
+		objects.FieldKeyRole:        "agent",
+		objects.FieldKeyStatus:      objects.ObjectStatusApproved,
+		objects.FieldKeyDescription: "Default agent persona for tests",
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, defaultAgent))
+
+	stratPlan := map[string]any{
+		objects.FieldKeyID:            "STRAT-PLAN-TEST-001",
+		objects.FieldKeyKind:          objects.KindStrategicPlan,
+		objects.FieldKeyTitle:         "Test Strategic Plan",
+		objects.FieldKeyDescription:   "Strategic plan description for testing review items",
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyPersonaRefs:   []any{objects.ConstPersonaDefaultAgent},
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, stratPlan))
+
+	cmd := NewOrchestrateCmd()
+	cmd.SetContext(adminCtx)
+	err := runOrchestrate(cmd, "STRAT-PLAN-TEST-001", OrchestrateOptions{})
+	assert.NoError(t, err)
+}
+
+func TestRunOrchestrate_DenyDoer(t *testing.T) {
+	tempDir, _, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+
+	cmd := NewOrchestrateCmd()
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), pkgctx.NewSecurityContext("doer-agent-1", []string{"developer"}, []string{"read:*", "write:code"})))
+	err := runOrchestrate(cmd, "PRI-ANY-001", OrchestrateOptions{})
+	assert.ErrorContains(t, err, "doer seats cannot orchestrate peers")
+}
+
+func TestRunOrchestrate_EmptyPlanArg_NoActivePlan(t *testing.T) {
+	tempDir, _, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+
+	cmd := NewOrchestrateCmd()
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), pkgctx.NewSystemSecurityContext()))
+	err := runOrchestrate(cmd, "", OrchestrateOptions{})
+	assert.ErrorContains(t, err, "no active priority plan or strategic plan found to orchestrate")
+}
+
+func TestRunOrchestrate_EmptyPlanArg_ActivePlan(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	adminCtx := pkgctx.WithSecurityContext(ctx, secCtx)
+
+	plan := map[string]any{
+		objects.FieldKeyID:            "PRI-AUTODISCOVER-001",
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeyTitle:         "Autodiscovered Active Plan",
+		objects.FieldKeyDescription:   "Active plan for empty planArg test",
+		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, plan))
+
+	cmd := NewOrchestrateCmd()
+	cmd.SetContext(adminCtx)
+	err := runOrchestrate(cmd, "", OrchestrateOptions{})
+	assert.NoError(t, err)
+}
+
+func TestRunOrchestrate_SkipDoneAndReplaceDispositions(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+	t.Setenv("ZQK_PROJECT_ROOT", tempDir)
+	t.Setenv("ZQK_TEST_BYPASS_GITEVIDENCE", "1")
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	adminCtx := pkgctx.WithSecurityContext(ctx, secCtx)
+
+	_ = execwrap.CommandContext(ctx, "git", "init", tempDir).Run()
+	_ = execwrap.CommandContext(ctx, "git", "-C", tempDir, "config", "user.email", "test@test.com").Run()
+	_ = execwrap.CommandContext(ctx, "git", "-C", tempDir, "config", "user.name", "Test").Run()
+	_ = execwrap.CommandContext(ctx, "git", "-C", tempDir, "commit", "--allow-empty", "-m", "init").Run()
+	revOut, err := execwrap.CommandContext(ctx, "git", "-C", tempDir, "rev-parse", "HEAD").Output()
+	require.NoError(t, err)
+	commitHash := strings.TrimSpace(string(revOut))
+
+	reqObj := map[string]any{
+		objects.FieldKeyID:            "REQ-TEST-001",
+		objects.FieldKeyKind:          objects.KindRequirement,
+		objects.FieldKeyTitle:         "Test Requirement",
+		objects.FieldKeyDescription:   "Requirement for test validation",
+		objects.FieldKeyStatus:        "active",
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, reqObj))
+
+	critObj := map[string]any{
+		objects.FieldKeyID:            "CRIT-TEST-001",
+		objects.FieldKeyKind:          objects.KindCriteria,
+		objects.FieldKeyTitle:         "Test Criteria",
+		objects.FieldKeyDescription:   "Criteria for test validation",
+		"category":                    "acceptance",
+		objects.FieldKeyStatus:        "awaiting_verification",
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, critObj))
+
+	planID := "PRI-DISP-TEST-001"
+	plan := map[string]any{
+		objects.FieldKeyID:            planID,
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeyTitle:         "Disposition Plan",
+		objects.FieldKeyDescription:   "Active plan for testing disposition branches",
+		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, plan))
+
+	bliDone := map[string]any{
+		objects.FieldKeyID:              "BLI-SKIP-DONE-001",
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyTitle:           "Task Already Done",
+		objects.FieldKeyDescription:     "Done item description for unit test validation",
+		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyRequirementRefs: []any{"REQ-TEST-001"},
+		objects.FieldKeyCriteriaRefs:    []any{"CRIT-TEST-001"},
+		objects.FieldKeyEstimatedEffort: "1h",
+		objects.FieldKeyPersonaRefs:     []any{objects.ConstPersonaDefaultOperator},
+		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, bliDone))
+
+	bliReplace := map[string]any{
+		objects.FieldKeyID:              "BLI-REPLACE-001",
+		objects.FieldKeyKind:            objects.KindBacklogItem,
+		objects.FieldKeyTitle:           "Task To Replace",
+		objects.FieldKeyDescription:     "Failed item to replace",
+		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
+		objects.FieldKeyPriorityPlanRef: planID,
+		objects.FieldKeyRequirementRefs: []any{"REQ-TEST-001"},
+		objects.FieldKeyCriteriaRefs:    []any{"CRIT-TEST-001"},
+		objects.FieldKeyEstimatedEffort: "1h",
+		objects.FieldKeyPersonaRefs:     []any{objects.ConstPersonaDefaultOperator},
+		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, bliReplace))
+
+	atkDone := map[string]any{
+		objects.FieldKeyID:                 "ATK-DONE-001",
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Execute Task: Task Already Done",
+		objects.FieldKeyDescription:        "Agent task description for testing execution",
+		objects.FieldKeyStatus:             objects.ObjectStatusImplemented,
+		objects.FieldKeyPriorityPlanRef:    planID,
+		objects.FieldKeyBacklogItemRef:     "BLI-SKIP-DONE-001",
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeyCommitHash:         commitHash,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, atkDone))
+
+	atkFailed := map[string]any{
+		objects.FieldKeyID:                 "ATK-FAIL-001",
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Execute Task: Task To Replace",
+		objects.FieldKeyDescription:        "Agent task description for testing execution",
+		objects.FieldKeyStatus:             objects.ObjectStatusError,
+		objects.FieldKeyPriorityPlanRef:    planID,
+		objects.FieldKeyBacklogItemRef:     "BLI-REPLACE-001",
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, atkFailed))
+
+	cmd := NewOrchestrateCmd()
+	cmd.SetContext(adminCtx)
+	err = runOrchestrate(cmd, planID, OrchestrateOptions{})
+	assert.NoError(t, err)
+}
+
+func TestOrchestrate_HelperFunctions(t *testing.T) {
+	// nativeSwarmEligible
+	assert.True(t, nativeSwarmEligible("tier_1_routine"))
+	assert.True(t, nativeSwarmEligible("TIER_2_SIMPLE"))
+	assert.True(t, nativeSwarmEligible("tier_3_light"))
+	assert.True(t, nativeSwarmEligible("tier_3_simple"))
+	assert.False(t, nativeSwarmEligible("tier_1_complex"))
+	assert.False(t, nativeSwarmEligible("unknown"))
+
+	// appendStringReference
+	refs := appendStringReference(nil, "ref-1")
+	assert.Equal(t, []any{"ref-1"}, refs)
+	refs = appendStringReference([]string{"ref-1"}, "ref-2")
+	assert.Equal(t, []any{"ref-1", "ref-2"}, refs)
+	refs = appendStringReference([]any{"ref-1", "ref-2"}, "ref-1") // already present
+	assert.Equal(t, []any{"ref-1", "ref-2"}, refs)
+
+	// buildOrchestrationExecutorArgs
+	argsNoTimeout := buildOrchestrationExecutorArgs("ATK-1", "prompt content", 0)
+	assert.Equal(t, []string{"agent", "execute", "--task-id", "ATK-1", "--prompt", "prompt content"}, argsNoTimeout)
+	argsTimeout := buildOrchestrationExecutorArgs("ATK-1", "prompt content", 30*time.Second)
+	assert.Contains(t, argsTimeout, "--timeout")
+
+	// orchestrationExecutorChildEnv
+	childEnv := orchestrationExecutorChildEnv([]string{"PATH=/bin"}, "/tmp/seated", "KEY-123", "/bin/zqk")
+	assert.NotEmpty(t, childEnv)
+
+	// configureOrchestrationExecutorProcess
+	cmd := exec.Command("true")
+	configureOrchestrationExecutorProcess(cmd)
+	assert.NotNil(t, cmd.SysProcAttr)
+	assert.NotNil(t, cmd.Cancel)
+	// Cancel when Process == nil returns os.ErrProcessDone
+	assert.ErrorIs(t, cmd.Cancel(), os.ErrProcessDone)
+}
+
+func TestSeedAgentWorktreeRuntime_WithIndexAndDraft(t *testing.T) {
+	mainRoot := t.TempDir()
+	worktreeRoot := t.TempDir()
+
+	// Create main process directory with .index and .index.json files
+	procDir := filepath.Join(mainRoot, paths.ProcessDir, "backlog_items")
+	require.NoError(t, fileutil.EnsureDir(procDir))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(procDir, ".index"), []byte("index-data"), paths.FilePerm600))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(procDir, ".index.json"), []byte("{}"), paths.FilePerm600))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(procDir, "ignored.txt"), []byte("ignore"), paths.FilePerm600))
+
+	// Pre-create worktree draft directory to trigger cleanup/replacement
+	draftDir := storage.ObjectDraftPlaneRoot(worktreeRoot)
+	require.NoError(t, fileutil.EnsureDir(draftDir))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(draftDir, "draft.yaml"), []byte("draft"), paths.FilePerm600))
+
+	err := seedAgentWorktreeRuntime(mainRoot, worktreeRoot)
+	require.NoError(t, err)
+
+	// Verify copied index files
+	assert.True(t, fileutil.Exists(filepath.Join(worktreeRoot, paths.ProcessDir, "backlog_items", ".index")))
+	assert.True(t, fileutil.Exists(filepath.Join(worktreeRoot, paths.ProcessDir, "backlog_items", ".index.json")))
+	assert.False(t, fileutil.Exists(filepath.Join(worktreeRoot, paths.ProcessDir, "backlog_items", "ignored.txt")))
 }

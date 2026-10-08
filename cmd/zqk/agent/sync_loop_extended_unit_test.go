@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -290,6 +291,12 @@ func TestSyncLoop_StepVerification_FailedAndMaxAttempts(t *testing.T) {
 	updated, err := store.Read(bypassCtx, secCtx, taskID)
 	require.NoError(t, err)
 	assert.Equal(t, objects.ObjectStatusFailed, updated[objects.FieldKeyStatus])
+
+	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
+	if writeQueue != nil {
+		_ = writeQueue.FlushAll(1 * time.Second)
+	}
+	time.Sleep(50 * time.Millisecond)
 }
 
 func TestSyncLoop_MaxLoopLimit(t *testing.T) {

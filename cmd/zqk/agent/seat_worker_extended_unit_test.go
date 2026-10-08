@@ -70,6 +70,18 @@ func TestHandleNonCommsWithAgentX_MaxAttemptsExceeded(t *testing.T) {
 	eventID := "EVT-MAX-ATTEMPTS"
 	taskID := "ATK-ATTEMPT-TEST"
 
+	task := map[string]any{
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Attempt test task",
+		objects.FieldKeyDescription:        "Attempt test description",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeyClaimedBy:          "agent-1",
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, task))
+
 	attemptKey := agentfeed.SeatAttemptKey(eventID, taskID)
 	agentfeed.RecordSeatEventAttempt(tempDir, "agent-1", attemptKey)
 	agentfeed.RecordSeatEventAttempt(tempDir, "agent-1", attemptKey)
@@ -159,7 +171,7 @@ func TestHandleNonCommsWithAgentX_DocsEval_Flow(t *testing.T) {
 		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
 		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
 	}
-	storage.CreateCASVisible(t, provider, ctx, secCtx, task, objects.ObjectStatusInProgress)
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, task))
 
 	item := agentfeed.CorrespondenceItem{
 		EventID: "EVT-DOCS-EVAL-001",
@@ -239,10 +251,11 @@ func TestHandleNonCommsWithAgentX_OrchestrateDirective_Flow(t *testing.T) {
 		objects.FieldKeyID:            "PRI-INACTIVE-001",
 		objects.FieldKeyKind:          objects.KindPriorityPlan,
 		objects.FieldKeyTitle:         "Inactive Plan",
+		objects.FieldKeyDescription:   "Inactive plan description",
 		objects.FieldKeyStatus:        objects.ObjectStatusComplete,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
-	storage.CreateCASVisible(t, provider, ctx, secCtx, planPlanned, objects.ObjectStatusComplete)
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, planPlanned))
 
 	err = handleNonCommsWithAgentX(ctx, nil, provider, secCtx, tempDir, "agent-1", "operator", "session-1", agentfeed.CorrespondenceItem{EventID: "EVT-2"}, "ORCHESTRATE_PLAN PRI-INACTIVE-001")
 	require.NoError(t, err)
@@ -252,13 +265,15 @@ func TestHandleNonCommsWithAgentX_OrchestrateDirective_Flow(t *testing.T) {
 		objects.FieldKeyID:            "PRI-ORCH-ACTIVE-001",
 		objects.FieldKeyKind:          objects.KindPriorityPlan,
 		objects.FieldKeyTitle:         "Active Plan",
+		objects.FieldKeyDescription:   "Active plan description",
 		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
 		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
 	}
-	storage.CreateCASVisible(t, provider, ctx, secCtx, planActive, objects.ObjectStatusInProgress)
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, planActive))
 
 	err = handleNonCommsWithAgentX(ctx, nil, provider, secCtx, tempDir, "agent-1", "operator", "session-1", agentfeed.CorrespondenceItem{EventID: "EVT-3"}, "ORCHESTRATE_PLAN PRI-ORCH-ACTIVE-001")
 	require.NoError(t, err)
+
 }
 
 func TestHandleNonCommsWithAgentX_ErrorAndAttemptGates(t *testing.T) {
@@ -398,4 +413,64 @@ func TestRecentPlanOrchSubmitAndAckSkip(t *testing.T) {
 
 	err := ackSeatWorkerSkip(tempDir, "agent-1", "operator", "session-1", "EVT-1", "no work")
 	assert.NoError(t, err)
+}
+
+func TestHandleNonCommsWithAgentX_OrchestrateDirective_SkippedMark(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	planID := "PRI-TEST-ORCH-SKIP-001"
+
+	plan := map[string]any{
+		objects.FieldKeyID:            planID,
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeyTitle:         "Active Plan for Orch Skip",
+		objects.FieldKeyDescription:   "Active plan description",
+		objects.FieldKeyStatus:        objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, plan))
+
+	require.NoError(t, writePlanOrchSubmitMark(tempDir, planID, "already dispatched"))
+
+	item := agentfeed.CorrespondenceItem{EventID: "EVT-SKIP-001"}
+	body := "ORCHESTRATE_PLAN " + planID
+	err := handleNonCommsWithAgentX(ctx, nil, provider, secCtx, tempDir, "agent-1", "operator", "session-1", item, body)
+	require.NoError(t, err)
+}
+
+func TestHandleNonCommsWithAgentX_CodingFlowWithWorktree(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	taskID := "ATK-CODE-TASK-001"
+
+	task := map[string]any{
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Code implementation task",
+		objects.FieldKeyDescription:        "implement feature in go",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeyClaimedBy:          "agent-1",
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, task))
+
+	item := agentfeed.CorrespondenceItem{EventID: "EVT-CODE-001"}
+	body := "ATTN agent-1 implement " + taskID
+
+	err := handleNonCommsWithAgentX(ctx, nil, provider, secCtx, tempDir, "agent-1", "operator", "session-1", item, body)
+	assert.NoError(t, err)
+}
+
+func TestRunAgentSeatWorker_WorktreeRootRefusal(t *testing.T) {
+	t.Setenv("ZQK_PROJECT_ROOT", "/tmp/zqk-worktrees/test-repo/ATK-123")
+	cmd := NewSeatWorkerCmd()
+	err := cmd.Execute()
+	assert.ErrorContains(t, err, "seat-worker cannot run with ZQK_PROJECT_ROOT set to agent worktree")
 }
