@@ -62,7 +62,9 @@ func outputListStructured(cmd *cobra.Command, result *storage.QueryResult) error
 
 //nolint:gocyclo // Function orchestrates table output; complexity reduced via helper functions
 func outputListTable(cmd *cobra.Command, result *storage.QueryResult, kind, groupBy string, tableFieldOrder []string) error {
+	cli.ClearSpinner()
 	out := cmd.OutOrStdout()
+	fmt.Fprint(out, "\r\033[K")
 
 	// Load spec for this kind to get display_length defaults
 	spec := loadSpecForKind(kind)
@@ -149,7 +151,7 @@ func getMaxTableRows() int {
 //
 //nolint:gocritic // preferFprint
 func outputUngroupedTable(out io.Writer, cmd *cobra.Command, result *storage.QueryResult, kind string, spec *objects.Spec, tableFieldOrder []string) {
-	fmt.Fprint(out, color.New(color.FgCyan, color.Bold).Sprintf("Objects of kind %s:\n", kind))
+	fmt.Fprint(out, "\r\033[K"+color.New(color.FgCyan, color.Bold).Sprintf("Objects of kind %s:\n", kind))
 	if scope, ok := namespaceScopeFromMeta(result.Meta); ok {
 		fmt.Fprint(out, color.New(color.FgHiBlack).Sprintf("%s\n", formatNamespaceScopeTableLine(scope)))
 	}

@@ -201,10 +201,10 @@ func CanonicalSeedTerms() []Acronym {
 		},
 		{
 			Code:        "VDS",
-			FullName:    "Verification Definition of Done",
+			FullName:    "Verifiable Decomposition Spine",
 			SchemeRef:   KernelAcronymsSchemeID,
 			Category:    "verification",
-			Definition:  "Automated gate proving that all criteria and test lineages are green before pull requests merge.",
+			Definition:  "The 5-layer unbroken verification lineage connecting Vision, Goals, Plans, Requirements/Criteria, and Backlog Items to ensure fail-closed execution.",
 			Context:     "operational",
 			RelatedRefs: []string{"CRIT", "REQ", "BLI"},
 		},

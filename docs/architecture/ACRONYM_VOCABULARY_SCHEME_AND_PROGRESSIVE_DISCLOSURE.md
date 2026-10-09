@@ -18,7 +18,7 @@ The vocabulary scheme provides:
 | **PRI** | Priority Plan | work | A time-bounded execution plan defining prioritized work packages and delivery horizons. Corresponds to integration branches. |
 | **REQ** | Requirement | specification | A formal system invariant, capability, or architectural specification. Proven by at least three orthogonal criteria. |
 | **CRIT** | Criterion | verification | An objective, verifiable acceptance condition proving a requirement (Static Floor, Operational Proof, Negative Boundary). |
-| **VDS** | Verification Definition of Done | verification | Automated gate proving that all criteria and test lineages are green before pull requests merge. |
+| **VDS** | Verifiable Decomposition Spine | verification | The 5-layer unbroken verification lineage connecting Vision, Goals, Plans, Requirements/Criteria, and Backlog Items to ensure fail-closed execution. |
 | **TCFG** | Team Configuration | organization | Approved team composition, agent roster, and operational permissions. |
 | **CVS** | Convergence Session | coordination | A structured cybernetic feedback session that closes deltas between projected and actual system state. |
 | **ATK** | Agent Task | execution | A granular, autonomous unit of work assigned to and executed by an agent persona. |

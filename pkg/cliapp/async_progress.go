@@ -45,6 +45,11 @@ func OperationTypeFromCommand(cmd *cobra.Command) string {
 	return strings.Join(parts[1:], "_")
 }
 
+// ClearSpinner stops the active terminal spinner immediately and clears the line.
+func ClearSpinner() {
+	ux.ClearSpinner()
+}
+
 // BindAsyncProgress sets cmd.RunE to run runE wrapped with RunWithAsyncProgress.
 // Operation type is derived at runtime from cmd.CommandPath() so it stays correct
 // for subcommands (e.g. "zqk spec list" → "spec_list"). Use for consistent async retrofit.
