@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func findRepoRootForSDK(t *testing.T) string {
@@ -63,7 +64,7 @@ func TestOpenAPIClientSDK_FunctionalAcceptance(t *testing.T) {
 		}
 	}
 
-	tsBytes, err := os.ReadFile(tsIndex)
+	tsBytes, err := fileutil.ReadFile(tsIndex)
 	if err != nil {
 		t.Fatalf("failed reading ts index: %v", err)
 	}
@@ -84,7 +85,7 @@ func TestOpenAPIClientSDK_FunctionalAcceptance(t *testing.T) {
 		}
 	}
 
-	pyBytes, err := os.ReadFile(pyClient)
+	pyBytes, err := fileutil.ReadFile(pyClient)
 	if err != nil {
 		t.Fatalf("failed reading py client: %v", err)
 	}
@@ -104,7 +105,7 @@ func TestOpenAPIClientSDK_FunctionalAcceptance(t *testing.T) {
 		}
 	}
 
-	goBytes, err := os.ReadFile(goClient)
+	goBytes, err := fileutil.ReadFile(goClient)
 	if err != nil {
 		t.Fatalf("failed reading go client: %v", err)
 	}
@@ -138,7 +139,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	// Sub-test 2: Malformed / non-dictionary YAML
 	t.Run("MalformedSpecYAML", func(t *testing.T) {
 		badYaml := filepath.Join(tmpDir, "bad.yaml")
-		if err := os.WriteFile(badYaml, []byte("just a string, not a valid openapi dict\n"), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(badYaml, []byte("just a string, not a valid openapi dict\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write bad.yaml: %v", err)
 		}
 		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", badYaml, "--out-dir", filepath.Join(tmpDir, "out2"))
@@ -152,7 +153,7 @@ func TestOpenAPIClientSDK_BoundaryAndErrorHandling(t *testing.T) {
 	t.Run("SpecMissingPaths", func(t *testing.T) {
 		noPathsYaml := filepath.Join(tmpDir, "nopaths.yaml")
 		content := "openapi: 3.0.0\ninfo:\n  title: Empty\n  version: 1.0.0\npaths: {}\n"
-		if err := os.WriteFile(noPathsYaml, []byte(content), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(noPathsYaml, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write nopaths.yaml: %v", err)
 		}
 		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", noPathsYaml, "--out-dir", filepath.Join(tmpDir, "out3"))
@@ -177,7 +178,7 @@ paths:
         '200':
           description: ok
 `
-		if err := os.WriteFile(noOpIdYaml, []byte(content), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(noOpIdYaml, []byte(content), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write noopid.yaml: %v", err)
 		}
 		cmd := testkit.ManagedCommand(t, t.Context(), "python3", genScript, "--spec", noOpIdYaml, "--out-dir", filepath.Join(tmpDir, "out4"))
@@ -228,7 +229,7 @@ func TestOpenAPIClientSDK_IntegrationAndConformance(t *testing.T) {
 
 	// Verify mode on corrupted/missing output fails cleanly
 	corruptedDir := filepath.Join(tmpDir, "corrupted")
-	if err := os.MkdirAll(corruptedDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(corruptedDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create corrupted dir: %v", err)
 	}
 	vFailCmd := testkit.ManagedCommand(t, t.Context(), "bash", filepath.Join(repoRoot, "scripts", "generate-openapi-clients.sh"), "--verify", corruptedDir)

@@ -2,12 +2,13 @@ package validation
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestAsyncValidator_HelpersExtended(t *testing.T) {
@@ -27,11 +28,11 @@ func TestAsyncValidator_HelpersExtended(t *testing.T) {
 
 	// checkHashRegistryUpdated
 	objDir := filepath.Join(tmpDir, "objects")
-	if err := os.MkdirAll(objDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(objDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create objDir: %v", err)
 	}
 	objFile := filepath.Join(objDir, "obj1.yaml")
-	if err := os.WriteFile(objFile, []byte("id: obj1"), 0644); err != nil {
+	if err := fileutil.WriteFile(objFile, []byte("id: obj1"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write objFile: %v", err)
 	}
 
@@ -43,7 +44,7 @@ func TestAsyncValidator_HelpersExtended(t *testing.T) {
 
 	// Create hash registry file
 	hashFile := filepath.Join(objDir, "."+objects.KindBacklogItem+".hashes")
-	if err := os.WriteFile(hashFile, []byte("hash1"), 0644); err != nil {
+	if err := fileutil.WriteFile(hashFile, []byte("hash1"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write hashFile: %v", err)
 	}
 

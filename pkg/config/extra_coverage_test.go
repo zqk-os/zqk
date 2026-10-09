@@ -2,10 +2,11 @@
 package config
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestExtraAccessorsAndLoaders(t *testing.T) {
@@ -127,13 +128,13 @@ func TestExtraProfilesLogsAndProject(t *testing.T) {
 	parent := []byte("schema_version: \"1\"\nkind: profile\ntype: cli_context\nmetadata:\n  name: parent\nspec:\n  a: 1\n  nested:\n    x: 1\n")
 	child := []byte("schema_version: \"1\"\nkind: profile\ntype: cli_context\nmetadata:\n  name: child\n  extends: parent\nspec:\n  b: 2\n  nested:\n    y: 2\n")
 	bad := []byte("kind: not-profile\n")
-	if err := os.WriteFile(filepath.Join(dir, "parent.yaml"), parent, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "parent.yaml"), parent, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "child.yaml"), child, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "child.yaml"), child, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "bad.yaml"), bad, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, "bad.yaml"), bad, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	pl := NewProfileLoader(dir)

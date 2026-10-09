@@ -26,7 +26,7 @@ func TestContainerDistribution_FunctionalAcceptance(t *testing.T) {
 		t.Skipf("Dockerfile.community not found at %s (studio-only artifact)", dockerfilePath)
 	}
 
-	dockerfileBytes, err := os.ReadFile(dockerfilePath)
+	dockerfileBytes, err := fileutil.ReadFile(dockerfilePath)
 	if err != nil {
 		t.Fatalf("failed to read Dockerfile.community: %v", err)
 	}
@@ -58,7 +58,7 @@ func TestContainerDistribution_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("expected templates directory at %s", templatesDir)
 	}
 
-	chartBytes, err := os.ReadFile(chartYamlPath)
+	chartBytes, err := fileutil.ReadFile(chartYamlPath)
 	if err != nil {
 		t.Fatalf("failed to read Chart.yaml: %v", err)
 	}
@@ -114,7 +114,7 @@ func TestContainerDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Corrupt archive
 	tmpDir := t.TempDir()
 	corruptTgz := filepath.Join(tmpDir, "corrupt.tgz")
-	if err := os.WriteFile(corruptTgz, []byte("invalid gzip stream content"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(corruptTgz, []byte("invalid gzip stream content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write corrupt archive: %v", err)
 	}
 	cmdCorrupt := testkit.ManagedCommand(t, t.Context(), "bash", packageScript, "--verify", corruptTgz)
@@ -151,7 +151,7 @@ func TestContainerDistribution_IntegrationAndConformance(t *testing.T) {
 	if !fileutil.Exists(packageScript) {
 		t.Skipf("package-community.sh not found at %s (studio-only artifact)", packageScript)
 	}
-	packageBytes, err := os.ReadFile(packageScript)
+	packageBytes, err := fileutil.ReadFile(packageScript)
 	if err != nil {
 		t.Fatalf("failed to read package-community.sh: %v", err)
 	}
@@ -172,7 +172,7 @@ func TestContainerDistribution_IntegrationAndConformance(t *testing.T) {
 	if !fileutil.Exists(workflowPath) {
 		t.Skipf("release-community.yml not found at %s (studio-only artifact)", workflowPath)
 	}
-	workflowBytes, err := os.ReadFile(workflowPath)
+	workflowBytes, err := fileutil.ReadFile(workflowPath)
 	if err != nil {
 		t.Fatalf("failed to read release-community.yml: %v", err)
 	}

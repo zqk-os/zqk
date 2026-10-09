@@ -11,8 +11,10 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type dummyCleanupObj struct {
@@ -50,7 +52,7 @@ func TestCLISubprocess_Wire(t *testing.T) {
 func TestGitEvidence_ProductCommitMentioningBacklog(t *testing.T) {
 	tmp := t.TempDir()
 	relPath := "test_file.txt"
-	if err := os.WriteFile(filepath.Join(tmp, relPath), []byte("hello backlog"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmp, relPath), []byte("hello backlog"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write file: %v", err)
 	}
 

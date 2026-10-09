@@ -1,7 +1,6 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -33,7 +32,7 @@ func TestPackCompositionDocs(t *testing.T) {
 		t.Fatalf("expected pack composition doc at %s", docPath)
 	}
 
-	contentBytes, err := os.ReadFile(docPath)
+	contentBytes, err := fileutil.ReadFile(docPath)
 	if err != nil {
 		t.Fatalf("failed to read pack composition doc: %v", err)
 	}
@@ -51,7 +50,7 @@ func TestPackCompositionDocs(t *testing.T) {
 	// Verify linkage in PACK-COMPOSITION.md
 	stubPath := filepath.Join(root, packCompStubRelPath)
 	if fileutil.Exists(stubPath) {
-		stubBytes, readErr := os.ReadFile(stubPath)
+		stubBytes, readErr := fileutil.ReadFile(stubPath)
 		if readErr == nil && !strings.Contains(string(stubBytes), "PACK_COMPOSITION_AND_EXTENSIBILITY.md") {
 			t.Errorf("expected link to PACK_COMPOSITION_AND_EXTENSIBILITY.md in %s", packCompStubRelPath)
 		}
@@ -65,7 +64,7 @@ func TestLanguageDocs(t *testing.T) {
 	if !fileutil.Exists(zparqlPath) {
 		t.Fatalf("expected ZPARQL manual at %s", zparqlPath)
 	}
-	zparqlBytes, err := os.ReadFile(zparqlPath)
+	zparqlBytes, err := fileutil.ReadFile(zparqlPath)
 	if err != nil {
 		t.Fatalf("failed to read ZPARQL manual: %v", err)
 	}
@@ -78,7 +77,7 @@ func TestLanguageDocs(t *testing.T) {
 	if !fileutil.Exists(zqlPath) {
 		t.Fatalf("expected ZQL manual at %s", zqlPath)
 	}
-	zqlBytes, zqlErr := os.ReadFile(zqlPath)
+	zqlBytes, zqlErr := fileutil.ReadFile(zqlPath)
 	if zqlErr != nil {
 		t.Fatalf("failed to read ZQL manual: %v", zqlErr)
 	}
@@ -96,7 +95,7 @@ func TestLifecycleDocs(t *testing.T) {
 		t.Fatalf("expected lifecycle state machine doc at %s", docPath)
 	}
 
-	contentBytes, err := os.ReadFile(docPath)
+	contentBytes, err := fileutil.ReadFile(docPath)
 	if err != nil {
 		t.Fatalf("failed to read lifecycle state machine doc: %v", err)
 	}
@@ -117,7 +116,7 @@ func TestAmbientSignalRubricDoc(t *testing.T) {
 		t.Fatalf("expected ambient signal rubric at %s", docPath)
 	}
 
-	contentBytes, err := os.ReadFile(docPath)
+	contentBytes, err := fileutil.ReadFile(docPath)
 	if err != nil {
 		t.Fatalf("failed to read ambient signal rubric: %v", err)
 	}
@@ -142,7 +141,7 @@ func TestDocsIndexCompleteness(t *testing.T) {
 		t.Fatalf("expected docs index at %s", indexPath)
 	}
 
-	indexBytes, err := os.ReadFile(indexPath)
+	indexBytes, err := fileutil.ReadFile(indexPath)
 	if err != nil {
 		t.Fatalf("failed to read docs index: %v", err)
 	}

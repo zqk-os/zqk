@@ -2,10 +2,11 @@
 package integrity
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestValidateTDE_NilAndDefaults(t *testing.T) {
@@ -87,10 +88,10 @@ func TestVerifySkillHash_UnknownID(t *testing.T) {
 func TestCollectWorkspaceEvidence_Hints(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	if err := os.Mkdir(filepath.Join(root, "subdir"), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(root, "subdir"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "file.txt"), []byte("ok"), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(root, "file.txt"), []byte("ok"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	got, err := CollectWorkspaceEvidence(root, []EvidenceHint{

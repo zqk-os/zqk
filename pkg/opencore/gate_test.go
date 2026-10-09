@@ -1,10 +1,11 @@
 package opencore
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 const (
@@ -14,7 +15,7 @@ const (
 
 func writeGateFile(t *testing.T, dir, name, content string) {
 	t.Helper()
-	if err := os.WriteFile(filepath.Join(dir, name), []byte(content), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, name), []byte(content), paths.FilePerm600); err != nil {
 		t.Fatalf("writeGateFile: %v", err)
 	}
 }
@@ -148,7 +149,7 @@ func TestGateReport_EmptyDirPasses(t *testing.T) {
 
 func writeGateBytes(t *testing.T, dir, name string, content []byte) {
 	t.Helper()
-	if err := os.WriteFile(filepath.Join(dir, name), content, paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, name), content, paths.FilePerm600); err != nil {
 		t.Fatalf("writeGateBytes: %v", err)
 	}
 }

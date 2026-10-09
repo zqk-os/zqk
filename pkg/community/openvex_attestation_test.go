@@ -64,7 +64,7 @@ func TestOpenVEX_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("expected output file at %s", outVex)
 	}
 
-	vexBytes, err := os.ReadFile(outVex)
+	vexBytes, err := fileutil.ReadFile(outVex)
 	if err != nil {
 		t.Fatalf("failed to read generated OpenVEX file: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	// 3. Corrupt JSON
 	tmpDir := t.TempDir()
 	badJSON := filepath.Join(tmpDir, "bad.json")
-	if err := os.WriteFile(badJSON, []byte("{invalid json content"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(badJSON, []byte("{invalid json content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write bad json: %v", err)
 	}
 	cmdBad := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", badJSON)
@@ -136,7 +136,7 @@ func TestOpenVEX_BoundaryAndErrorHandling(t *testing.T) {
 	// 4. Invalid OpenVEX schema (missing statements)
 	invalidVex := filepath.Join(tmpDir, "invalid-vex.json")
 	invalidContent := `{"@context":"https://openvex.dev/ns/v0.2.0","@id":"test","author":"test","statements":[]}`
-	if err := os.WriteFile(invalidVex, []byte(invalidContent), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(invalidVex, []byte(invalidContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write invalid vex: %v", err)
 	}
 	cmdInvalid := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--verify", invalidVex)
@@ -155,7 +155,7 @@ func TestOpenVEX_IntegrationAndConformance(t *testing.T) {
 		t.Fatalf("expected package-community.sh at %s", packageScript)
 	}
 
-	packageBytes, err := os.ReadFile(packageScript)
+	packageBytes, err := fileutil.ReadFile(packageScript)
 	if err != nil {
 		t.Fatalf("failed to read package-community.sh: %v", err)
 	}

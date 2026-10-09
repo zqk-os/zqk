@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -76,7 +77,7 @@ func TestAgentWorktreeMainRepo_seatedKernelNotParentHops(t *testing.T) {
 func TestAgentWorktreeMainRepo_refusesUnbondedIsolatedTree(t *testing.T) {
 	t.Parallel()
 	wt := filepath.Join(t.TempDir(), agentWorktreeTempBucket, "repo-key", "ATK-unbonded")
-	if err := os.MkdirAll(wt, 0o755); err != nil {
+	if err := fileutil.MkdirAll(wt, DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	got, err := AgentWorktreeMainRepo(wt)
@@ -151,11 +152,11 @@ func TestBootstrapWorktreeConfig_AssumeUnchanged(t *testing.T) {
 	_ = cmd.Run()
 
 	cfgDir := filepath.Join(repoDir, ConfigDir)
-	if err := os.MkdirAll(cfgDir, 0o755); err != nil {
+	if err := fileutil.MkdirAll(cfgDir, DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	cfgFile := filepath.Join(cfgDir, ZqkLocalConfigFileName)
-	if err := os.WriteFile(cfgFile, []byte("initial: true\n"), 0o600); err != nil {
+	if err := fileutil.WriteFile(cfgFile, []byte("initial: true\n"), FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -175,7 +176,7 @@ func TestBootstrapWorktreeConfig_AssumeUnchanged(t *testing.T) {
 		t.Fatalf("BootstrapWorktreeConfig failed: %v", err)
 	}
 
-	data, err := os.ReadFile(cfgFile)
+	data, err := fileutil.ReadFile(cfgFile)
 	if err != nil {
 		t.Fatal(err)
 	}

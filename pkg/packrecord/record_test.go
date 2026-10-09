@@ -1,12 +1,13 @@
 package packrecord
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestInstallRecordsFormalSpec(t *testing.T) {
@@ -21,7 +22,7 @@ func TestInstallRecordsFormalSpec(t *testing.T) {
 		t.Fatalf("manifest = %+v", got)
 	}
 	recorded := filepath.Join(recordDir(root, "widget-pack"), specSubdir, "widget.yaml")
-	data, err := os.ReadFile(recorded)
+	data, err := fileutil.ReadFile(recorded)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +36,7 @@ func TestInstallRecordsFormalSpec(t *testing.T) {
 
 func TestInstallRejectsMismatchedOntology(t *testing.T) {
 	src := writePack(t, "widget-pack", "widget")
-	if err := os.WriteFile(filepath.Join(src, specSubdir, "widget.yaml"), []byte("ontology: other\n"), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(src, specSubdir, "widget.yaml"), []byte("ontology: other\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := Install(src, t.TempDir()); err == nil {
@@ -62,22 +63,22 @@ func TestLoadRegistersRecordedPack(t *testing.T) {
 func writePack(t *testing.T, name, kind string) string {
 	t.Helper()
 	dir := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(dir, specSubdir), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(dir, specSubdir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(dir, lifecycleSubdir), 0o755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(dir, lifecycleSubdir), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	manifest := "name: " + name + "\nkinds:\n  - " + kind + "\n"
-	if err := os.WriteFile(filepath.Join(dir, manifestName), []byte(manifest), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, manifestName), []byte(manifest), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	spec := "ontology: " + kind + "\ndescription: uploaded kind\n"
-	if err := os.WriteFile(filepath.Join(dir, specSubdir, kind+".yaml"), []byte(spec), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, specSubdir, kind+".yaml"), []byte(spec), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	life := "name: " + kind + "\nstatuses:\n  - name: originated\n"
-	if err := os.WriteFile(filepath.Join(dir, lifecycleSubdir, kind+"_lifecycle.yaml"), []byte(life), 0o644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir, lifecycleSubdir, kind+"_lifecycle.yaml"), []byte(life), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	return dir

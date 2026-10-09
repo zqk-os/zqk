@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"go/ast"
 	"go/parser"
 	"go/printer"
@@ -33,7 +34,7 @@ func inverted() {
 	mu2.Unlock()
 }
 `
-	err := os.WriteFile(filepath.Join(tmpDir, "bad.go"), []byte(badCode), paths.FilePerm644) //nolint:gosec
+	err := fileutil.WriteFile(filepath.Join(tmpDir, "bad.go"), []byte(badCode), paths.FilePerm644) //nolint:gosec
 	if err != nil {
 		t.Fatal(err)
 	}

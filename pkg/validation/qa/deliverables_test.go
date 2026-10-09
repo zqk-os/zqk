@@ -1,12 +1,13 @@
 package qa
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestExtractArtifactList(t *testing.T) {
@@ -63,7 +64,7 @@ func TestIsDeliverableBearingKind(t *testing.T) {
 func TestValidateArtifactFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 	validFile := filepath.Join(tmpDir, "valid.go")
-	require.NoError(t, os.WriteFile(validFile, []byte("package test\n"), 0644))
+	require.NoError(t, fileutil.WriteFile(validFile, []byte("package test\n"), paths.FilePerm644))
 
 	// Valid file
 	require.NoError(t, ValidateArtifactFiles([]string{validFile}, ""))
@@ -80,7 +81,7 @@ func TestValidateArtifactFiles(t *testing.T) {
 
 	// Directory instead of regular file
 	subDir := filepath.Join(tmpDir, "subdir")
-	require.NoError(t, os.Mkdir(subDir, 0755))
+	require.NoError(t, fileutil.MkdirAll(subDir, paths.DirPerm755))
 	err = ValidateArtifactFiles([]string{subDir}, "")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "does not exist or cannot be read")
@@ -89,7 +90,7 @@ func TestValidateArtifactFiles(t *testing.T) {
 func TestValidateDeliverableArtifacts(t *testing.T) {
 	tmpDir := t.TempDir()
 	validFile := filepath.Join(tmpDir, "valid.go")
-	require.NoError(t, os.WriteFile(validFile, []byte("package test\n"), 0644))
+	require.NoError(t, fileutil.WriteFile(validFile, []byte("package test\n"), paths.FilePerm644))
 
 	// Nil object
 	paths, err := ValidateDeliverableArtifacts(nil, "")

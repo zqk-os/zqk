@@ -13,6 +13,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/community"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CRIT-1789715923297491000-72ded0bd: Functional Acceptance
@@ -20,7 +21,7 @@ import (
 func TestDoctor_FunctionalAcceptance(t *testing.T) {
 	tempDir := t.TempDir()
 	// Create mock .zqk directory
-	err := os.Mkdir(filepath.Join(tempDir, paths.ProjectDataDir), paths.DirPerm755)
+	err := fileutil.MkdirAll(filepath.Join(tempDir, paths.ProjectDataDir), paths.DirPerm755)
 	require.NoError(t, err)
 
 	doctor := community.NewSystemDoctor(tempDir)
@@ -54,7 +55,7 @@ func TestDoctor_BoundaryAndErrorHandling(t *testing.T) {
 
 	t.Run("file_as_workspace_root", func(t *testing.T) {
 		tempFile := filepath.Join(t.TempDir(), "dummy.txt")
-		err := os.WriteFile(tempFile, []byte("probe"), paths.FilePerm644)
+		err := fileutil.WriteFile(tempFile, []byte("probe"), paths.FilePerm644)
 		require.NoError(t, err)
 
 		checker := &community.FilesystemPermissionsChecker{}

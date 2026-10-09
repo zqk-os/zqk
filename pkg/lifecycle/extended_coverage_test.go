@@ -3,7 +3,6 @@ package lifecycle
 import (
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -14,8 +13,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/rollback"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
 )
 
@@ -228,11 +229,11 @@ func TestLifecycleEventWAL_Full(t *testing.T) {
 	// Legacy migration test
 	legacyDir := t.TempDir()
 	walDir := filepath.Join(legacyDir, ".zqk", "wal")
-	_ = os.MkdirAll(walDir, 0755)
+	_ = fileutil.MkdirAll(walDir, paths.DirPerm755)
 	legacyWAL := filepath.Join(walDir, "lifecycle_events")
-	_ = os.WriteFile(legacyWAL, []byte("{}\n"), 0644)
+	_ = fileutil.WriteFile(legacyWAL, []byte("{}\n"), paths.FilePerm644)
 	legacyCk := filepath.Join(walDir, "lifecycle_events.checkpoint")
-	_ = os.WriteFile(legacyCk, []byte("0"), 0644)
+	_ = fileutil.WriteFile(legacyCk, []byte("0"), paths.FilePerm644)
 
 	if err := migrateLifecycleWALToCanonicalNames(""); err != nil {
 		t.Errorf("expected nil for empty projectRoot")
@@ -241,7 +242,7 @@ func TestLifecycleEventWAL_Full(t *testing.T) {
 		t.Fatalf("migrateLifecycleWALToCanonicalNames failed: %v", err)
 	}
 	canonicalWAL := filepath.Join(walDir, "lifecycle_events.wal")
-	if _, err := os.Stat(canonicalWAL); err != nil {
+	if _, err := fileutil.Stat(canonicalWAL); err != nil {
 		t.Errorf("expected canonical WAL file to exist after migration")
 	}
 }
