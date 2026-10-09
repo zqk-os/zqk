@@ -1,8 +1,6 @@
 module github.com/zqk-os/zqk
 
-go 1.26.0
-
-toolchain go1.26.6
+go 1.26.9
 
 require (
 	github.com/briandowns/spinner v1.23.2
