@@ -3,7 +3,6 @@ package newcmd
 import (
 	"bytes"
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -433,7 +432,7 @@ func TestRunNewCommandSpec_RichScaffold(t *testing.T) {
 	}
 
 	specPath := filepath.Join(tmpDir, ".zqk/cli/specs/testpkg/my_action_command.yaml")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	if err != nil {
 		t.Fatalf("failed to read generated spec: %v", err)
 	}
@@ -503,7 +502,7 @@ func TestRunNewCommandSpec_FromCmdIntrospection(t *testing.T) {
 	}
 
 	specPath := filepath.Join(tmpDir, ".zqk/cli/specs/sample_worker_command.yaml")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	if err != nil {
 		t.Fatalf("failed to read generated spec: %v", err)
 	}
@@ -576,7 +575,7 @@ func TestRunNewCommandSpec_CustomFlagsAndExamples(t *testing.T) {
 	}
 
 	specPath := filepath.Join(tmpDir, ".zqk/cli/specs/compute/hash_command.yaml")
-	data, err := os.ReadFile(specPath)
+	data, err := fileutil.ReadFile(specPath)
 	if err != nil {
 		t.Fatalf("failed to read generated spec: %v", err)
 	}

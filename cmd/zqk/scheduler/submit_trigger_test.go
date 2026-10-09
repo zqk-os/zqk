@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -206,10 +207,10 @@ func TestEnqueueJobTriggerRequest_SetsCLISubmitOrigin(t *testing.T) {
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
 	// Write PID file for running scheduler daemon
 	pidFile := paths.SchedulerPIDFilePath(testRoot)
-	if err := os.MkdirAll(filepath.Dir(pidFile), paths.DirPerm750); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(pidFile), paths.DirPerm750); err != nil {
 		t.Fatalf("mkdir scheduler dir: %v", err)
 	}
-	if err := os.WriteFile(pidFile, []byte(fmt.Sprintf("%d", os.Getpid())), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(pidFile, []byte(fmt.Sprintf("%d", os.Getpid())), paths.FilePerm600); err != nil {
 		t.Fatalf("write pid file: %v", err)
 	}
 

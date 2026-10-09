@@ -2,18 +2,18 @@ package system
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestGetSystemHealthDataMCPFast_WithCachedSummary(t *testing.T) {
 	tmpDir := t.TempDir()
 	healthDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.SystemHealthDir)
-	if err := os.MkdirAll(healthDir, paths.FilePerm755); err != nil {
+	if err := fileutil.MkdirAll(healthDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create temp health dir: %v", err)
 	}
 
@@ -31,7 +31,7 @@ func TestGetSystemHealthDataMCPFast_WithCachedSummary(t *testing.T) {
 		t.Fatalf("failed to marshal summary: %v", err)
 	}
 	cacheFile := filepath.Join(healthDir, systemHealthLatestFile)
-	if err := os.WriteFile(cacheFile, data, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(cacheFile, data, paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write summary file: %v", err)
 	}
 
@@ -52,7 +52,7 @@ func TestGetSystemHealthDataMCPFast_WithCachedSummary(t *testing.T) {
 	// Now test degraded status when blocking issues > 0
 	payload["summary"].(map[string]any)["blocking_issues"] = 3
 	data, _ = json.Marshal(payload)
-	_ = os.WriteFile(cacheFile, data, paths.FilePerm644)
+	_ = fileutil.WriteFile(cacheFile, data, paths.FilePerm644)
 
 	healthDegraded := getSystemHealthDataMCPFast(tmpDir)
 	if healthDegraded[objects.FieldKeyStatus] != "degraded" {
@@ -66,7 +66,7 @@ func TestGetSystemHealthDataMCPFast_WithCachedSummary(t *testing.T) {
 	payload["summary"].(map[string]any)["blocking_issues"] = 0
 	payload["summary"].(map[string]any)["warnings"] = 0
 	data, _ = json.Marshal(payload)
-	_ = os.WriteFile(cacheFile, data, paths.FilePerm644)
+	_ = fileutil.WriteFile(cacheFile, data, paths.FilePerm644)
 
 	healthHealthy := getSystemHealthDataMCPFast(tmpDir)
 	if healthHealthy[objects.FieldKeyStatus] != "healthy" {

@@ -732,6 +732,45 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 	}
 	v.mu.Lock()
 	v.lastUpdated = env.MaterializedAt
+	if env.Payload.LeadPlan != nil && env.Payload.LeadPlan.ID != "" {
+		v.plans[env.Payload.LeadPlan.ID] = &PlanNode{
+			ID:     env.Payload.LeadPlan.ID,
+			Title:  env.Payload.LeadPlan.Title,
+			Status: env.Payload.LeadPlan.Status,
+		}
+	}
+	for _, p := range env.Payload.ActivePlans {
+		if p.ID != "" {
+			v.plans[p.ID] = &PlanNode{
+				ID:     p.ID,
+				Title:  p.Title,
+				Status: p.Status,
+			}
+		}
+	}
+	for _, c := range env.Payload.ConvergenceSessions {
+		if c.ID != "" {
+			v.cvsSessions[c.ID] = &CVSNode{
+				ID:           c.ID,
+				Title:        c.Title,
+				CurrentPhase: c.CurrentPhase,
+				Status:       c.Status,
+			}
+		}
+	}
+	for assignee, t := range env.Payload.ActiveTasksByAssignee {
+		if t != nil && t.ID != "" {
+			v.tasks[t.ID] = &TaskNode{
+				ID:                 t.ID,
+				Title:              t.Title,
+				Status:             t.Status,
+				AssigneePersonaRef: assignee,
+			}
+		}
+	}
+	if len(env.Payload.RecentEvents) > 0 {
+		v.recentEvents = append([]WhatsNextEventSummary(nil), env.Payload.RecentEvents...)
+	}
 	v.mu.Unlock()
 	return env.Payload, nil
 }
@@ -778,8 +817,10 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 			payload.Stale = false
 			payload.Recovering = false
 			payload.DegradedReason = ""
-			view.lastUpdated = payload.MaterializedAt
-			_ = view.SaveToLiteFile()
+			targetPath := WhatsNextLiteFilePath(projectRoot)
+			if data, errM := json.MarshalIndent(payload, "", "  "); errM == nil {
+				_ = fileutil.WriteFile(targetPath, data, paths.FilePerm644)
+			}
 			return payload, nil
 		}
 

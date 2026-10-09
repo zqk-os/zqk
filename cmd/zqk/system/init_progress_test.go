@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestInitProgress_Interactive(t *testing.T) {
@@ -95,10 +96,10 @@ func TestDetectLegacyCodebase(t *testing.T) {
 
 	// 2. Dir with only bin/zqk
 	dir2 := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(dir2, "bin"), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(dir2, "bin"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir2, "bin", "zqk"), []byte("#!/bin/sh\n"), 0755); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir2, "bin", "zqk"), []byte("#!/bin/sh\n"), paths.FilePerm755); err != nil {
 		t.Fatal(err)
 	}
 	if detectLegacyCodebase(dir2) {
@@ -106,10 +107,10 @@ func TestDetectLegacyCodebase(t *testing.T) {
 	}
 
 	// 3. Dir with bin/zqk, .gitignore, and ANTIGRAVITY.md
-	if err := os.WriteFile(filepath.Join(dir2, ".gitignore"), []byte(".zqk/\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir2, ".gitignore"), []byte(".zqk/\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir2, "ANTIGRAVITY.md"), []byte("# Rules\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir2, "ANTIGRAVITY.md"), []byte("# Rules\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if detectLegacyCodebase(dir2) {
@@ -118,7 +119,7 @@ func TestDetectLegacyCodebase(t *testing.T) {
 
 	// 4. Dir with actual source code (e.g. main.go)
 	dir3 := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir3, "main.go"), []byte("package main\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir3, "main.go"), []byte("package main\n"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	if !detectLegacyCodebase(dir3) {
@@ -127,10 +128,10 @@ func TestDetectLegacyCodebase(t *testing.T) {
 
 	// 5. Dir with bin/ containing non-zqk binary/script
 	dir4 := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(dir4, "bin"), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(dir4, "bin"), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir4, "bin", "custom.sh"), []byte("#!/bin/sh\n"), 0755); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(dir4, "bin", "custom.sh"), []byte("#!/bin/sh\n"), paths.FilePerm755); err != nil {
 		t.Fatal(err)
 	}
 	if !detectLegacyCodebase(dir4) {

@@ -3,7 +3,6 @@ package tray
 import (
 	"bytes"
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -22,7 +21,7 @@ func setupTestProjectWithTrayYAML(t *testing.T, entries []traypkg.Entry) string 
 	t.Helper()
 	tmpDir := t.TempDir()
 	zqkDir := filepath.Join(tmpDir, paths.ProjectDataDir)
-	if err := os.MkdirAll(zqkDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(zqkDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create .zqk dir: %v", err)
 	}
 

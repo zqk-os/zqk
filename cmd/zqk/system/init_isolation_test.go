@@ -1,7 +1,6 @@
 package system
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -40,7 +39,7 @@ func TestWriteRootIsolationFiles(t *testing.T) {
 	}
 
 	// Verify content of config/zqk.yaml
-	cfgContent, err := os.ReadFile(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName))
+	cfgContent, err := fileutil.ReadFile(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName))
 	if err != nil {
 		t.Fatalf("failed to read zqk.yaml: %v", err)
 	}
@@ -49,7 +48,7 @@ func TestWriteRootIsolationFiles(t *testing.T) {
 	}
 
 	// Verify content of config/zqk-local.yaml
-	localContent, err := os.ReadFile(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkLocalConfigFileName))
+	localContent, err := fileutil.ReadFile(filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkLocalConfigFileName))
 	if err != nil {
 		t.Fatalf("failed to read zqk-local.yaml: %v", err)
 	}
@@ -59,7 +58,7 @@ func TestWriteRootIsolationFiles(t *testing.T) {
 	}
 
 	// Verify remote_hold.json has hold=true
-	holdContent, err := os.ReadFile(filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "remote_hold.json"))
+	holdContent, err := fileutil.ReadFile(filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir, "remote_hold.json"))
 	if err != nil {
 		t.Fatalf("failed to read remote_hold.json: %v", err)
 	}
@@ -78,7 +77,7 @@ func TestWriteProjectConfigFiles_SSOT(t *testing.T) {
 	}
 
 	configFile := filepath.Join(tmpDir, paths.ConfigDir, paths.ZqkConfigFileName)
-	data, err := os.ReadFile(configFile)
+	data, err := fileutil.ReadFile(configFile)
 	if err != nil {
 		t.Fatalf("failed to read %s: %v", configFile, err)
 	}
@@ -97,7 +96,7 @@ func TestConfigRootFallback(t *testing.T) {
 	zqkContent := `system:
   storage_mode: "file"
 `
-	if err := os.WriteFile(filepath.Join(tmpDir, paths.ZqkConfigFileName), []byte(zqkContent), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, paths.ZqkConfigFileName), []byte(zqkContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write root zqk.yaml: %v", err)
 	}
 
@@ -183,7 +182,7 @@ func TestFirstRun_BoundaryAndErrorHandling(t *testing.T) {
 	// Verify boundary condition where projectRoot is an existing regular file rather than a directory
 	tmpDir := t.TempDir()
 	filePath := filepath.Join(tmpDir, "blocked_by_file")
-	if err := os.WriteFile(filePath, []byte("plain file"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(filePath, []byte("plain file"), paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -211,7 +210,7 @@ func TestPublicRelease_PackagingIntegrityAndGates(t *testing.T) {
 	}
 
 	for _, s := range requiredScripts {
-		st, err := os.Stat(s)
+		st, err := fileutil.Stat(s)
 		if err != nil {
 			t.Errorf("expected release script to exist: %s (%v)", s, err)
 			continue
@@ -232,7 +231,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	}
 
 	overlayScript := filepath.Join(root, "scripts", "open-core", "apply-community-source.sh")
-	st, err := os.Stat(overlayScript)
+	st, err := fileutil.Stat(overlayScript)
 	if err != nil {
 		t.Fatalf("expected apply-community-source.sh to exist: %v", err)
 	}
@@ -242,7 +241,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 
 	// Verify Makefile contains zcom target
 	makefilePath := filepath.Join(root, "Makefile")
-	mfData, err := os.ReadFile(makefilePath)
+	mfData, err := fileutil.ReadFile(makefilePath)
 	if err != nil {
 		t.Fatalf("failed to read Makefile: %v", err)
 	}
@@ -253,12 +252,12 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	// Test non-destructive overlay into temp directory with existing process object
 	tmpDest := t.TempDir()
 	procDir := filepath.Join(tmpDest, paths.ProjectDataDir, paths.ProcessSubdir)
-	if err := os.MkdirAll(procDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(procDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	sentinelPath := filepath.Join(procDir, "sentinel.yaml")
 	sentinelContent := []byte("sentinel: preserved\n")
-	if err := os.WriteFile(sentinelPath, sentinelContent, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(sentinelPath, sentinelContent, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -269,7 +268,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	}
 
 	// Verify sentinel was preserved untouched
-	saved, err := os.ReadFile(sentinelPath)
+	saved, err := fileutil.ReadFile(sentinelPath)
 	if err != nil || string(saved) != string(sentinelContent) {
 		t.Errorf("%s was corrupted or deleted by overlay! err=%v, content=%s", paths.ProcessDir, err, string(saved))
 	}
@@ -288,7 +287,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	}
 
 	// Verify the installed Makefile is the slim community version
-	installedMf, err := os.ReadFile(filepath.Join(tmpDest, "Makefile"))
+	installedMf, err := fileutil.ReadFile(filepath.Join(tmpDest, "Makefile"))
 	if err != nil {
 		t.Fatalf("failed to read installed Makefile: %v", err)
 	}
@@ -303,20 +302,20 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	// Verify apply-community-source.sh preserves destination-owned README.md
 	destReadmePath := filepath.Join(tmpDest, "README.md")
 	customReadme := []byte("# Custom Dest Community README\n")
-	if err := os.WriteFile(destReadmePath, customReadme, paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(destReadmePath, customReadme, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}
 	cmd2 := testkit.ManagedCommand(t, t.Context(), overlayScript, tmpDest)
 	if out2, err := cmd2.CombinedOutput(); err != nil {
 		t.Fatalf("second apply-community-source.sh run failed: %v, output: %s", err, string(out2))
 	}
-	preservedReadme, err := os.ReadFile(destReadmePath)
+	preservedReadme, err := fileutil.ReadFile(destReadmePath)
 	if err != nil || string(preservedReadme) != string(customReadme) {
 		t.Errorf("apply-community-source.sh clobbered destination README.md: got %s", string(preservedReadme))
 	}
 
 	// Verify apply-community-source.sh includes build-bootstrap-archive.sh and sync-public-candidate.sh includes specs
-	overlayData, err := os.ReadFile(overlayScript)
+	overlayData, err := fileutil.ReadFile(overlayScript)
 	if err != nil {
 		t.Fatalf("failed to read apply-community-source.sh: %v", err)
 	}
@@ -332,7 +331,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	}
 
 	syncScript := filepath.Join(root, "scripts", "open-core", "sync-public-candidate.sh")
-	syncData, err := os.ReadFile(syncScript)
+	syncData, err := fileutil.ReadFile(syncScript)
 	if err != nil {
 		t.Fatalf("failed to read sync-public-candidate.sh: %v", err)
 	}
@@ -363,7 +362,7 @@ func TestCommunitySourceOverlay_IntegrityAndProcessPreservation(t *testing.T) {
 	if !fileutil.Exists(stubPath) {
 		t.Errorf("expected register_studio_scheduler_commands.go stub to exist in destination")
 	} else {
-		stubData, _ := os.ReadFile(stubPath)
+		stubData, _ := fileutil.ReadFile(stubPath)
 		if !strings.Contains(string(stubData), "func registerStudioSchedulerCommands(_ *cobra.Command) {}") {
 			t.Errorf("expected no-op stub for registerStudioSchedulerCommands, got: %s", string(stubData))
 		}
