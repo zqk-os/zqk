@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -14,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/audit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestStorageExtended_AuditEventContext(t *testing.T) {
@@ -226,7 +226,7 @@ func TestStorageExtended_AuditIDGenerator(t *testing.T) {
 	ctx := context.Background()
 	testRoot, fos, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
 	auditDir := filepath.Join(testRoot, paths.ProjectDataDir, "audit")
-	require.NoError(t, os.MkdirAll(auditDir, 0755))
+	require.NoError(t, fileutil.MkdirAll(auditDir, paths.DirPerm755))
 	gen := GetAuditIDGenerator(ctx, auditDir, fos)
 	require.NotNil(t, gen)
 
@@ -261,19 +261,17 @@ func TestStorageExtended_BucketingHelpers(t *testing.T) {
 	})
 
 	t.Run("countFilesInDirectory", func(t *testing.T) {
-		tempDir, err := os.MkdirTemp("", "count_files_test_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 
 		// Non-existent directory
-		_, err = countFilesInDirectory(filepath.Join(tempDir, "missing"))
+		_, err := countFilesInDirectory(filepath.Join(tempDir, "missing"))
 		require.Error(t, err)
 
 		// Create YAML, YML, TXT files and a subdirectory
-		require.NoError(t, os.WriteFile(filepath.Join(tempDir, "a.yaml"), []byte("a: 1"), 0644))
-		require.NoError(t, os.WriteFile(filepath.Join(tempDir, "b.yml"), []byte("b: 2"), 0644))
-		require.NoError(t, os.WriteFile(filepath.Join(tempDir, "c.txt"), []byte("txt"), 0644))
-		require.NoError(t, os.Mkdir(filepath.Join(tempDir, "subdir"), 0755))
+		require.NoError(t, fileutil.WriteFile(filepath.Join(tempDir, "a.yaml"), []byte("a: 1"), paths.FilePerm644))
+		require.NoError(t, fileutil.WriteFile(filepath.Join(tempDir, "b.yml"), []byte("b: 2"), paths.FilePerm644))
+		require.NoError(t, fileutil.WriteFile(filepath.Join(tempDir, "c.txt"), []byte("txt"), paths.FilePerm644))
+		require.NoError(t, fileutil.MkdirAll(filepath.Join(tempDir, "subdir"), paths.DirPerm755))
 
 		count, err := countFilesInDirectory(tempDir)
 		require.NoError(t, err)
@@ -283,18 +281,16 @@ func TestStorageExtended_BucketingHelpers(t *testing.T) {
 
 func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 	t.Run("copyFile", func(t *testing.T) {
-		tempDir, err := os.MkdirTemp("", "copy_file_test_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 
 		src := filepath.Join(tempDir, "src.txt")
 		dst := filepath.Join(tempDir, "dst.txt")
-		require.NoError(t, os.WriteFile(src, []byte("hello stream"), 0644))
+		require.NoError(t, fileutil.WriteFile(src, []byte("hello stream"), paths.FilePerm644))
 
-		err = copyFile(src, dst)
+		err := copyFile(src, dst)
 		require.NoError(t, err)
 
-		content, err := os.ReadFile(dst)
+		content, err := fileutil.ReadFile(dst)
 		require.NoError(t, err)
 		assert.Equal(t, "hello stream", string(content))
 
@@ -304,9 +300,7 @@ func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 	})
 
 	t.Run("rewriteStreamRegistryPaths", func(t *testing.T) {
-		tempDir, err := os.MkdirTemp("", "rewrite_registry_test_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 
 		// Non-existent registry file -> returns false, nil
 		changed, err := rewriteStreamRegistryPaths(filepath.Join(tempDir, "missing.reg"), map[string]string{})
@@ -319,7 +313,7 @@ func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 {"id":"E2","loc":"/old/path/2.json::10"}
 {"id":"E3","loc":"/keep/path/3.json::20"}
 `
-		require.NoError(t, os.WriteFile(regPath, []byte(lines), 0644))
+		require.NoError(t, fileutil.WriteFile(regPath, []byte(lines), paths.FilePerm644))
 
 		pathMap := map[string]string{
 			"/old/path/1.json": "/new/path/1.json",
@@ -331,7 +325,7 @@ func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 		assert.True(t, changed)
 
 		// Read back
-		newContent, err := os.ReadFile(regPath)
+		newContent, err := fileutil.ReadFile(regPath)
 		require.NoError(t, err)
 		assert.Contains(t, string(newContent), "/new/path/1.json::0")
 		assert.Contains(t, string(newContent), "/new/path/2.json::10")
@@ -346,9 +340,7 @@ func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 		assert.Equal(t, 0, moved)
 		assert.False(t, updated)
 
-		tempDir, err := os.MkdirTemp("", "audit_stream_migrate_test_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 
 		// Non-existent legacy directory
 		moved, updated, err = MigrateAuditStreamToCanonicalLocation(tempDir)
@@ -358,15 +350,15 @@ func TestStorageExtended_AuditStreamMigrate(t *testing.T) {
 
 		// Set up legacy directory with files
 		legacyDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.AuditStreamsDir)
-		require.NoError(t, os.MkdirAll(legacyDir, 0755))
+		require.NoError(t, fileutil.MkdirAll(legacyDir, paths.DirPerm755))
 
 		// Add matching legacy file: audit_stream_2026-03-03.jsonl
 		legFile1 := filepath.Join(legacyDir, "audit_stream_2026-03-03.jsonl")
-		require.NoError(t, os.WriteFile(legFile1, []byte(`{"id":"E1"}`), 0644))
+		require.NoError(t, fileutil.WriteFile(legFile1, []byte(`{"id":"E1"}`), paths.FilePerm644))
 
 		// Add non-matching file (subdir and wrong prefix)
-		require.NoError(t, os.Mkdir(filepath.Join(legacyDir, "some_dir"), 0755))
-		require.NoError(t, os.WriteFile(filepath.Join(legacyDir, "other.txt"), []byte("skip"), 0644))
+		require.NoError(t, fileutil.Mkdir(filepath.Join(legacyDir, "some_dir"), paths.DirPerm755))
+		require.NoError(t, fileutil.WriteFile(filepath.Join(legacyDir, "other.txt"), []byte("skip"), paths.FilePerm644))
 
 		// Run migration
 		moved, updated, err = MigrateAuditStreamToCanonicalLocation(tempDir)

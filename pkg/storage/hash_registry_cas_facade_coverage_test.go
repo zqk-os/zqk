@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"maps"
-	"os"
 	"sync"
 	"testing"
 
@@ -340,9 +339,7 @@ func TestStorageExtended_CASFacadeExports(t *testing.T) {
 		auditCreator := caspkg.GetAuditCreator()
 		require.NotNil(t, auditCreator)
 
-		tempDir, err := os.MkdirTemp("", "cas_audit_test_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 
 		fileStorage, err := NewFileObjectStorage(tempDir)
 		require.NoError(t, err)

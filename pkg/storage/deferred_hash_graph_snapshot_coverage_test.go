@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -14,6 +13,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestStorageExtended_DeferredHashManager(t *testing.T) {
@@ -29,7 +30,7 @@ func TestStorageExtended_DeferredHashManager(t *testing.T) {
 
 	// Create a real file on disk for hash calculations
 	testFilePath := filepath.Join(testRoot, "test_deferred_obj.json")
-	require.NoError(t, os.WriteFile(testFilePath, []byte(`{"id":"BLI-DEF-1","kind":"backlog_item","title":"Deferred Test"}`), 0600))
+	require.NoError(t, fileutil.WriteFile(testFilePath, []byte(`{"id":"BLI-DEF-1","kind":"backlog_item","title":"Deferred Test"}`), paths.FilePerm600))
 
 	// 1. RegisterOperation
 	dhm.RegisterOperation("BLI-DEF-1", "backlog_item", testFilePath, "op-1")

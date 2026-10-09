@@ -9,8 +9,10 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -100,10 +102,10 @@ func (m *mockStorageFacade) GetObjectFilePath(id, kind string) (string, error) {
 func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
 	processDir := filepath.Join(tmpDir, ".zqk", "process")
-	_ = os.MkdirAll(processDir, 0755)
+	_ = fileutil.MkdirAll(processDir, paths.DirPerm755)
 
 	kindDir := filepath.Join(processDir, "backlog_items")
-	_ = os.MkdirAll(kindDir, 0755)
+	_ = fileutil.MkdirAll(kindDir, paths.DirPerm755)
 
 	cas := filecas.NewContentAddressableStorage(kindDir, "backlog_item")
 
@@ -134,7 +136,7 @@ func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 
 	// Write old ID-based file
 	oldFile := filepath.Join(kindDir, "BLI-001.yaml")
-	_ = os.WriteFile(oldFile, []byte("id: BLI-001\nkind: backlog_item\n"), 0644)
+	_ = fileutil.WriteFile(oldFile, []byte("id: BLI-001\nkind: backlog_item\n"), paths.FilePerm644)
 
 	// 1. Kind does not use CAS
 	facade.usesCAS["backlog_item"] = false
@@ -192,7 +194,7 @@ func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 	// 9. MigrateObjectToCAS with relative oldFilePath
 	relFile := filepath.Join(".zqk", "process", "backlog_items", "BLI-REL.yaml")
 	absRelFile := filepath.Join(tmpDir, relFile)
-	_ = os.WriteFile(absRelFile, []byte("id: BLI-REL\nkind: backlog_item\n"), 0644)
+	_ = fileutil.WriteFile(absRelFile, []byte("id: BLI-REL\nkind: backlog_item\n"), paths.FilePerm644)
 	facade.objects["BLI-REL"] = map[string]any{
 		objects.FieldKeyID:   "BLI-REL",
 		objects.FieldKeyKind: "backlog_item",
@@ -202,7 +204,7 @@ func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 
 	// 10. MigrateObjectToCAS with no oldFilePath provided (fallback to GetObjectFilePath)
 	fallbackFile := filepath.Join(kindDir, "BLI-FALLBACK.yaml")
-	_ = os.WriteFile(fallbackFile, []byte("id: BLI-FALLBACK\nkind: backlog_item\n"), 0644)
+	_ = fileutil.WriteFile(fallbackFile, []byte("id: BLI-FALLBACK\nkind: backlog_item\n"), paths.FilePerm644)
 	facade.objects["BLI-FALLBACK"] = map[string]any{
 		objects.FieldKeyID:   "BLI-FALLBACK",
 		objects.FieldKeyKind: "backlog_item",
@@ -257,15 +259,15 @@ func TestCASMigrationUtility_Comprehensive(t *testing.T) {
 func TestDSIAMigrationUtility_Comprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
 	processDir := filepath.Join(tmpDir, ".zqk", "process")
-	_ = os.MkdirAll(processDir, 0755)
+	_ = fileutil.MkdirAll(processDir, paths.DirPerm755)
 
 	backlogDir := filepath.Join(processDir, "backlog_items")
-	_ = os.MkdirAll(backlogDir, 0755)
+	_ = fileutil.MkdirAll(backlogDir, paths.DirPerm755)
 
 	// Write dummy 64-hex yaml hash file
 	hex64 := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	hashFilePath := filepath.Join(backlogDir, hex64+".yaml")
-	_ = os.WriteFile(hashFilePath, []byte("id: BLI-002\nkind: backlog_item\n"), 0644)
+	_ = fileutil.WriteFile(hashFilePath, []byte("id: BLI-002\nkind: backlog_item\n"), paths.FilePerm644)
 
 	facade := &mockStorageFacade{
 		projectRoot: tmpDir,
@@ -284,7 +286,7 @@ func TestDSIAMigrationUtility_Comprehensive(t *testing.T) {
 
 	// 2. MigrateObjectToDSIA invalid YAML
 	badYaml := filepath.Join(backlogDir, "bad.yaml")
-	_ = os.WriteFile(badYaml, []byte(":\n  invalid"), 0644)
+	_ = fileutil.WriteFile(badYaml, []byte(":\n  invalid"), paths.FilePerm644)
 	if err := util.MigrateObjectToDSIA(ctx, secCtx, "backlog_item", "bad", badYaml, false); err == nil {
 		t.Errorf("expected error for invalid YAML")
 	}
@@ -304,27 +306,27 @@ func TestDSIAMigrationUtility_Comprehensive(t *testing.T) {
 	// 4b. MigrateKindToDSIA with a malformed hash file to trigger errs append
 	badHashHex := "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
 	badHashFile := filepath.Join(backlogDir, badHashHex+".yaml")
-	_ = os.WriteFile(badHashFile, []byte(":\n  invalid"), 0644)
+	_ = fileutil.WriteFile(badHashFile, []byte(":\n  invalid"), paths.FilePerm644)
 	migrated, errs = util.MigrateKindToDSIA(ctx, secCtx, "backlog_item", false)
 	if len(errs) == 0 {
 		t.Errorf("expected error from malformed hash file in MigrateKindToDSIA")
 	}
-	_ = os.Remove(badHashFile)
+	_ = fileutil.Remove(badHashFile)
 
 	// 5. MigrateAllToDSIA
 	// Write another hash file so MigrateAllToDSIA has something to migrate
 	hex64_2 := "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
 	hashFilePath2 := filepath.Join(backlogDir, hex64_2+".yaml")
-	_ = os.WriteFile(hashFilePath2, []byte("id: BLI-003\nkind: backlog_item\n"), 0644)
+	_ = fileutil.WriteFile(hashFilePath2, []byte("id: BLI-003\nkind: backlog_item\n"), paths.FilePerm644)
 	// Add bad file to trigger errs in MigrateAllToDSIA
 	badHex := "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
 	badFile := filepath.Join(backlogDir, badHex+".yaml")
-	_ = os.WriteFile(badFile, []byte(":\n  invalid"), 0644)
+	_ = fileutil.WriteFile(badFile, []byte(":\n  invalid"), paths.FilePerm644)
 	mMap, eMap := util.MigrateAllToDSIA(ctx, secCtx, false)
 	if mMap["backlog_item"] != 1 || len(eMap["backlog_item"]) == 0 {
 		t.Errorf("expected 1 migrated and errors in MigrateAllToDSIA, got %v (errs=%v)", mMap, eMap)
 	}
-	_ = os.Remove(badFile)
+	_ = fileutil.Remove(badFile)
 
 	// 6. MigrateObjectToDSIA again with same object ID to trigger Update fallback
 	_ = util.MigrateObjectToDSIA(ctx, secCtx, "backlog_item", hex64_2, hashFilePath2, false)
@@ -332,7 +334,7 @@ func TestDSIAMigrationUtility_Comprehensive(t *testing.T) {
 	// 7. MigrateObjectToDSIA with object having no ID
 	noIDHex := "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
 	noIDFile := filepath.Join(backlogDir, noIDHex+".yaml")
-	_ = os.WriteFile(noIDFile, []byte("kind: backlog_item\ntitle: No ID\n"), 0644)
+	_ = fileutil.WriteFile(noIDFile, []byte("kind: backlog_item\ntitle: No ID\n"), paths.FilePerm644)
 	_ = util.MigrateObjectToDSIA(ctx, secCtx, "backlog_item", noIDHex, noIDFile, true)
 }
 
@@ -340,7 +342,7 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 	tmpDir := t.TempDir()
 	f := filepath.Join(tmpDir, "sample.txt")
 	content := []byte("hello hash verification")
-	_ = os.WriteFile(f, content, 0644)
+	_ = fileutil.WriteFile(f, content, paths.FilePerm644)
 
 	expected := storage.CalculateSHA256Hash(content)
 	ok, err := VerifyHash(f, expected)
@@ -488,29 +490,29 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 	// Test HashMigration with verbose, conflicts, and empty hash
 	hmDir := t.TempDir()
 	hmBacklog := filepath.Join(hmDir, "backlog_items")
-	_ = os.MkdirAll(hmBacklog, 0755)
+	_ = fileutil.MkdirAll(hmBacklog, paths.DirPerm755)
 
 	// 1. File with empty hash
 	emptyHashFile := filepath.Join(hmBacklog, "BLI-EMPTY.yaml.hash")
-	_ = os.WriteFile(emptyHashFile, []byte("   \n"), 0644)
+	_ = fileutil.WriteFile(emptyHashFile, []byte("   \n"), paths.FilePerm644)
 
 	// 2. File with conflict (existing hash != file hash)
 	conflictObjFile := filepath.Join(hmBacklog, "BLI-CONF.yaml")
-	_ = os.WriteFile(conflictObjFile, []byte("id: BLI-CONF\nkind: backlog_item\n"), 0644)
+	_ = fileutil.WriteFile(conflictObjFile, []byte("id: BLI-CONF\nkind: backlog_item\n"), paths.FilePerm644)
 	conflictHashFile := filepath.Join(hmBacklog, "BLI-CONF.yaml.hash")
-	_ = os.WriteFile(conflictHashFile, []byte("hash-in-file"), 0644)
+	_ = fileutil.WriteFile(conflictHashFile, []byte("hash-in-file"), paths.FilePerm644)
 	reg := storage.NewHashRegistry(pkgctx.NewSystemContext(), "backlog_item", hmBacklog)
 	reg.SetHash("BLI-CONF.yaml", "hash-in-index-different")
 	_ = reg.Save()
 
 	// 3. Valid file to migrate with verbose
 	validHashFile := filepath.Join(hmBacklog, "BLI-OK.yaml.hash")
-	_ = os.WriteFile(validHashFile, []byte("hash-ok-123"), 0644)
+	_ = fileutil.WriteFile(validHashFile, []byte("hash-ok-123"), paths.FilePerm644)
 
 	// 4. Hash file in unknown directory
 	unknownDir := filepath.Join(hmDir, "unknown_dir_123")
-	_ = os.MkdirAll(unknownDir, 0755)
-	_ = os.WriteFile(filepath.Join(unknownDir, "file.yaml.hash"), []byte("hash"), 0644)
+	_ = fileutil.MkdirAll(unknownDir, paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(unknownDir, "file.yaml.hash"), []byte("hash"), paths.FilePerm644)
 
 	hmTest := NewHashMigration(hmDir)
 	hmTest.SetVerbose(true)
@@ -530,7 +532,7 @@ func TestVerifyHashAndPromoteObjectSpec(t *testing.T) {
 	hmDry.SetVerbose(true)
 	// Create another dummy hash file
 	dryHashFile := filepath.Join(hmBacklog, "dry.yaml.hash")
-	_ = os.WriteFile(dryHashFile, []byte("xyz"), 0644)
+	_ = fileutil.WriteFile(dryHashFile, []byte("xyz"), paths.FilePerm644)
 	resDry, errDry := hmDry.Migrate(true)
 	if errDry != nil {
 		t.Fatalf("dry run failed: %v", errDry)

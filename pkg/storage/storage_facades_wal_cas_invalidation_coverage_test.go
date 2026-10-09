@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -230,9 +230,7 @@ func TestStorageExtended_Invalidation(t *testing.T) {
 }
 
 func TestStorageExtended_ObjectDraftPlane(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "draft_plane_test_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	storage, err := NewFileObjectStorage(tmpDir)
 	require.NoError(t, err)
@@ -267,9 +265,7 @@ func TestStorageExtended_ObjectDraftPlane(t *testing.T) {
 }
 
 func TestStorageExtended_Cleanup(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "cleanup_test_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	// isEmptyBucketDir on empty dir
 	assert.True(t, isEmptyBucketDir(tmpDir))
@@ -279,19 +275,17 @@ func TestStorageExtended_Cleanup(t *testing.T) {
 
 	// Dir with non-yaml file (dotfile)
 	dotFile := filepath.Join(tmpDir, ".hashes")
-	require.NoError(t, fileutil.WriteFile(dotFile, []byte("hash"), 0644))
+	require.NoError(t, fileutil.WriteFile(dotFile, []byte("hash"), paths.FilePerm644))
 	assert.True(t, isEmptyBucketDir(tmpDir))
 
 	// Dir with yaml file
 	yamlFile := filepath.Join(tmpDir, "object.yaml")
-	require.NoError(t, fileutil.WriteFile(yamlFile, []byte("k: v"), 0644))
+	require.NoError(t, fileutil.WriteFile(yamlFile, []byte("k: v"), paths.FilePerm644))
 	assert.False(t, isEmptyBucketDir(tmpDir))
 }
 
 func TestStorageExtended_BucketingStrategyStorage_Lifecycle(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "bucket_strat_test_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	fileStorage := NewFileBucketStrategyStorage(tmpDir)
 	require.NotNil(t, fileStorage)
@@ -300,7 +294,7 @@ func TestStorageExtended_BucketingStrategyStorage_Lifecycle(t *testing.T) {
 	ctx := context.Background()
 
 	// Load non-existent strategy
-	_, err = fileStorage.LoadStrategy(ctx, "NON-EXISTENT")
+	_, err := fileStorage.LoadStrategy(ctx, "NON-EXISTENT")
 	assert.Error(t, err)
 
 	// SaveStrategy without ID
@@ -403,13 +397,11 @@ func TestStorageExtended_ValidationStrategy(t *testing.T) {
 	assert.NoError(t, syncStrat.Start(""))
 	assert.NoError(t, syncStrat.Stop())
 
-	tmpDir, err := os.MkdirTemp("", "val_strat_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	// Create a dummy hash file
 	hashFile := filepath.Join(tmpDir, "hash123.yaml")
-	require.NoError(t, fileutil.WriteFile(hashFile, []byte("data"), 0644))
+	require.NoError(t, fileutil.WriteFile(hashFile, []byte("data"), paths.FilePerm644))
 
 	mappings := map[string]string{
 		"OBJ-1": "hash123",
@@ -501,9 +493,7 @@ func TestStorageExtended_WorkflowConstraintValidator_Advanced(t *testing.T) {
 }
 
 func TestStorageExtended_WALFacade_Operations(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "wal_facade_test_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	// NewObjectWAL and GetWALPath
 	walObj, err := NewObjectWAL(tmpDir)
@@ -559,9 +549,7 @@ func TestStorageExtended_WALFacade_Operations(t *testing.T) {
 }
 
 func TestStorageExtended_FileCASImpl(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "file_cas_impl_test_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tmpDir)
+	tmpDir := t.TempDir()
 
 	storage, err := NewFileObjectStorage(tmpDir)
 	require.NoError(t, err)

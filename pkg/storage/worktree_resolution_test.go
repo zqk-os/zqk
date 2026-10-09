@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestWorktreeKernelResolution_Integration(t *testing.T) {
@@ -26,7 +27,7 @@ func TestWorktreeKernelResolution_Integration(t *testing.T) {
 
 	// 1. Initialize main git repo
 	mainRepo := filepath.Join(tempDir, "main-repo")
-	if err := os.MkdirAll(mainRepo, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(mainRepo, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create main repo dir: %v", err)
 	}
 
@@ -49,12 +50,12 @@ func TestWorktreeKernelResolution_Integration(t *testing.T) {
 
 	// Write .gitignore ignoring .zqk so worktrees don't inherit a local .zqk
 	gitignorePath := filepath.Join(mainRepo, ".gitignore")
-	if err := os.WriteFile(gitignorePath, []byte(".zqk\n"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(gitignorePath, []byte(".zqk\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write .gitignore: %v", err)
 	}
 
 	readmePath := filepath.Join(mainRepo, "README.md")
-	if err := os.WriteFile(readmePath, []byte("# Main Repo\n"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(readmePath, []byte("# Main Repo\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write README: %v", err)
 	}
 
@@ -85,7 +86,7 @@ func TestWorktreeKernelResolution_Integration(t *testing.T) {
 	storage.MustEnsureProcessSpecsLayoutForTest(t, mainRepo)
 	zqkDir := filepath.Join(mainRepo, paths.ProjectDataDir)
 	goalsDir := filepath.Join(zqkDir, "process", "goals")
-	if err := os.MkdirAll(goalsDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(goalsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create goals dir: %v", err)
 	}
 
@@ -98,13 +99,13 @@ created_by: ACC-TEST
 namespace_id: zqk:kernel
 schema_version: 2.0.0
 `
-	if err := os.WriteFile(sampleGoal, []byte(sampleGoalContent), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(sampleGoal, []byte(sampleGoalContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write sample goal: %v", err)
 	}
 
 	// 4. Test path resolution from the secondary worktree root and deep subdirectory
 	deepSubDir := filepath.Join(worktreePath, "src", "deep", "nested")
-	if err := os.MkdirAll(deepSubDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(deepSubDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create deep sub dir: %v", err)
 	}
 

@@ -1,7 +1,6 @@
 package filecas
 
 import (
-	"os"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -10,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -749,7 +749,7 @@ func TestExtended_IndexSetMappingsAndScanForObjectID(t *testing.T) {
 	hexHash := "3333333333333333333333333333333333333333333333333333333333333333"
 	yamlContent := "id: " + scanID + "\nkind: task\nname: scan-test\n"
 	hashFile := filepath.Join(dir, hexHash+".yaml")
-	if err := os.WriteFile(hashFile, []byte(yamlContent), 0644); err != nil {
+	if err := fileutil.WriteFile(hashFile, []byte(yamlContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write dummy hash file: %v", err)
 	}
 
@@ -828,7 +828,7 @@ func TestExtended_IndexSetMappingsAndScanForObjectID(t *testing.T) {
 
 	// LoadLocked error branches
 	corruptIndexFile := filepath.Join(dir, "corrupt-index.json")
-	if err := os.WriteFile(corruptIndexFile, []byte("{invalid-json"), 0644); err != nil {
+	if err := fileutil.WriteFile(corruptIndexFile, []byte("{invalid-json"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write corrupt file: %v", err)
 	}
 	corruptIdx := &IDIndex{FilePath: corruptIndexFile}
@@ -894,7 +894,7 @@ func TestExtended_IndexSetMappingsAndScanForObjectID(t *testing.T) {
 	missHex := "5555555555555555555555555555555555555555555555555555555555555555"
 	missYaml := "id: " + missObjID + "\nkind: task\n"
 	missPath := filepath.Join(dir, missHex+".yaml")
-	if err := os.WriteFile(missPath, []byte(missYaml), 0644); err != nil {
+	if err := fileutil.WriteFile(missPath, []byte(missYaml), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write miss YAML: %v", err)
 	}
 	// Calling BatchDelete with an ID that is on disk but not in index
