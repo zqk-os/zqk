@@ -114,7 +114,13 @@ func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out, err := triggerPlanOrchestration(context.Background(), nil, nil, root, "PRI-123")
+	store := newMockHelperStore()
+	store.objs["PRI-123"] = map[string]any{
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyStatus: objects.ObjectStatusActive,
+	}
+
+	out, err := triggerPlanOrchestration(context.Background(), store, nil, root, "PRI-123")
 	if err != nil {
 		t.Fatalf("trigger plan orchestration: %v", err)
 	}
@@ -136,7 +142,7 @@ func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
 	} else if !strings.Contains(msg, "PRI-123") {
 		t.Fatalf("cooldown msg = %q", msg)
 	}
-	if _, err := triggerPlanOrchestration(context.Background(), nil, nil, root, "PRI-123"); err != nil {
+	if _, err := triggerPlanOrchestration(context.Background(), store, nil, root, "PRI-123"); err != nil {
 		t.Fatalf("second trigger: %v", err)
 	}
 }
