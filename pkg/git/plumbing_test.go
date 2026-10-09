@@ -2,7 +2,6 @@ package git_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -10,6 +9,8 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/git"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func initTestGitRepo(t *testing.T, dir string) {
@@ -21,7 +22,7 @@ func initTestGitRepo(t *testing.T, dir string) {
 
 	// Commit initial dummy file on main branch
 	dummy := filepath.Join(dir, "README.md")
-	if err := os.WriteFile(dummy, []byte("# Test Repo\n"), 0644); err != nil {
+	if err := fileutil.WriteFile(dummy, []byte("# Test Repo\n"), paths.FilePerm644); err != nil {
 		t.Fatalf("write dummy: %v", err)
 	}
 	runCmd(t, dir, "git", "add", "README.md")
@@ -45,12 +46,12 @@ func TestPlumbingEngine_SnapshotAndRestore(t *testing.T) {
 
 	// Create fake .zqk directory
 	zqkDir := filepath.Join(repoDir, ".zqk")
-	if err := os.MkdirAll(filepath.Join(zqkDir, "objects"), 0755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Join(zqkDir, "objects"), paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir .zqk/objects: %v", err)
 	}
 	sampleObj := filepath.Join(zqkDir, "objects", "sample.yaml")
 	sampleContent := "id: BLI-TEST-001\nkind: backlog_item\ntitle: Sample Test\n"
-	if err := os.WriteFile(sampleObj, []byte(sampleContent), 0644); err != nil {
+	if err := fileutil.WriteFile(sampleObj, []byte(sampleContent), paths.FilePerm644); err != nil {
 		t.Fatalf("write sample: %v", err)
 	}
 
@@ -101,7 +102,7 @@ func TestPlumbingEngine_SnapshotAndRestore(t *testing.T) {
 	}
 
 	restoredFile := filepath.Join(restoreDir, "objects", "sample.yaml")
-	restoredBytes, err := os.ReadFile(restoredFile)
+	restoredBytes, err := fileutil.ReadFile(restoredFile)
 	if err != nil {
 		t.Fatalf("read restored file: %v", err)
 	}
@@ -122,12 +123,12 @@ func TestPlumbingEngine_PushAndFetchDistributed(t *testing.T) {
 
 	// Create state on Node 1
 	zqkDir1 := filepath.Join(node1, ".zqk")
-	if err := os.MkdirAll(zqkDir1, 0755); err != nil {
+	if err := fileutil.MkdirAll(zqkDir1, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir zqkDir1: %v", err)
 	}
 	node1Obj := filepath.Join(zqkDir1, "node1_state.yaml")
 	content := "state: distributed_ok\n"
-	if err := os.WriteFile(node1Obj, []byte(content), 0644); err != nil {
+	if err := fileutil.WriteFile(node1Obj, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("write node1Obj: %v", err)
 	}
 
@@ -189,7 +190,7 @@ func TestPlumbingEngine_PushAndFetchDistributed(t *testing.T) {
 	}
 
 	restoredFile2 := filepath.Join(zqkDir2, "node1_state.yaml")
-	b, err := os.ReadFile(restoredFile2)
+	b, err := fileutil.ReadFile(restoredFile2)
 	if err != nil {
 		t.Fatalf("read restoredFile2: %v", err)
 	}

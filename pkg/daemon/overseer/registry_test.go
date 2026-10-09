@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/daemon/overseer"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CRIT-OVERSEER-REGISTRY-SPEC: Static Floor: Manifest schema validates desired state,
@@ -219,7 +221,7 @@ func TestRegistryAddDelete(t *testing.T) {
 func TestRegistryPeerSeatsAutoSeeding(t *testing.T) {
 	rootDir := t.TempDir()
 	meshDir := filepath.Join(rootDir, ".zqk", "state", "mesh")
-	require.NoError(t, os.MkdirAll(meshDir, 0755))
+	require.NoError(t, fileutil.MkdirAll(meshDir, paths.DirPerm755))
 
 	peerSeatsContent := []byte(`{
   "schema_version": "1",
@@ -232,7 +234,7 @@ func TestRegistryPeerSeatsAutoSeeding(t *testing.T) {
     }
   }
 }`)
-	require.NoError(t, os.WriteFile(filepath.Join(meshDir, "peer_seats.json"), peerSeatsContent, 0644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(meshDir, "peer_seats.json"), peerSeatsContent, paths.FilePerm644))
 
 	regPath := overseer.DefaultRegistryPath(rootDir)
 	reg := overseer.NewRegistry(regPath)

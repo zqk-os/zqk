@@ -2,7 +2,6 @@ package testdiscovery_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -11,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testdiscovery"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // CRIT-TEST-DISC-FUNC-POLYGLOT-001 & CRIT-TEST-DISCOVERY-ENGINE-001:
@@ -36,7 +36,7 @@ func BenchmarkSampleAdd(b *testing.B) {
 	}
 }
 `
-	if err := os.WriteFile(filepath.Join(tempDir, "sample_test.go"), []byte(goTest), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tempDir, "sample_test.go"), []byte(goTest), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write go test: %v", err)
 	}
 
@@ -52,7 +52,7 @@ class TestCalculator(unittest.TestCase):
     def test_multiply(self):
         self.assertEqual(2 * 3, 6)
 `
-	if err := os.WriteFile(filepath.Join(tempDir, "test_calculator.py"), []byte(pyTest), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tempDir, "test_calculator.py"), []byte(pyTest), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write py test: %v", err)
 	}
 
@@ -69,7 +69,7 @@ describe('AuthService', () => {
     });
 });
 `
-	if err := os.WriteFile(filepath.Join(tempDir, "auth.test.ts"), []byte(tsTest), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tempDir, "auth.test.ts"), []byte(tsTest), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write ts test: %v", err)
 	}
 
@@ -122,7 +122,7 @@ func TestLoginIntegration(t *testing.T) {
 	// test logic
 }
 `
-	if err := os.WriteFile(filepath.Join(tempDir, "login_test.go"), []byte(goTest), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tempDir, "login_test.go"), []byte(goTest), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write go test: %v", err)
 	}
 
@@ -171,13 +171,13 @@ import (
 
 func init() {
 	// If this code is executed during discovery, it will create this file
-	_ = os.WriteFile("exploit_executed.marker", []byte("bad"), 0600)
+	_ = fileutil.WriteFile("exploit_executed.marker", []byte("bad"), 0600)
 }
 
 func TestNormal(t *testing.T) {}
 `
 	markerPath := filepath.Join(tempDir, "exploit_executed.marker")
-	if err := os.WriteFile(filepath.Join(tempDir, "exploit_test.go"), []byte(dangerousFile), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tempDir, "exploit_test.go"), []byte(dangerousFile), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
@@ -187,7 +187,7 @@ func TestNormal(t *testing.T) {}
 		t.Fatalf("unexpected discovery error: %v", err)
 	}
 
-	if _, err := os.Stat(markerPath); err == nil {
+	if _, err := fileutil.Stat(markerPath); err == nil {
 		t.Fatalf("SECURITY VIOLATION: Test code was executed during static discovery! Marker file exists.")
 	}
 }
@@ -203,13 +203,13 @@ func TestDiscover_SecurityDirectoryTraversal(t *testing.T) {
 import "testing"
 func TestOutside(t *testing.T) {}
 `
-	if err := os.WriteFile(filepath.Join(outsideDir, "outside_test.go"), []byte(outsideTest), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(outsideDir, "outside_test.go"), []byte(outsideTest), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write outside test: %v", err)
 	}
 
 	// Create symlink inside tempDir pointing to outsideDir
 	symlinkPath := filepath.Join(tempDir, "escape_link")
-	_ = os.Symlink(outsideDir, symlinkPath)
+	_ = fileutil.Symlink(outsideDir, symlinkPath)
 
 	engine := testdiscovery.NewEngine()
 	targets, err := engine.Discover(context.Background(), testdiscovery.DiscoveryOptions{ProjectRoot: tempDir})
@@ -234,7 +234,7 @@ import "testing"
 // Criteria: CRIT-TEST-SVC-001
 func TestServiceOperation(t *testing.T) {}
 `
-	if err := os.WriteFile(filepath.Join(tempDir, "service_test.go"), []byte(goTest), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(tempDir, "service_test.go"), []byte(goTest), paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test: %v", err)
 	}
 
@@ -279,8 +279,8 @@ import "testing"
 func TestItem(t *testing.T) {}
 `
 		fileName := filepath.Join(tempDir, filepath.Join(string(rune('a'+i)), "item_test.go"))
-		_ = os.MkdirAll(filepath.Dir(fileName), paths.DirPerm750)
-		_ = os.WriteFile(fileName, []byte(goTest), paths.FilePerm600)
+		_ = fileutil.MkdirAll(filepath.Dir(fileName), paths.DirPerm750)
+		_ = fileutil.WriteFile(fileName, []byte(goTest), paths.FilePerm600)
 	}
 
 	engine := testdiscovery.NewEngine()
@@ -336,10 +336,10 @@ mod tests {
 }
 `
 	srcDir := filepath.Join(tempDir, "src")
-	if err := os.MkdirAll(srcDir, paths.DirPerm750); err != nil {
+	if err := fileutil.MkdirAll(srcDir, paths.DirPerm750); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(srcDir, "lib.rs"), []byte(rustCode), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(srcDir, "lib.rs"), []byte(rustCode), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 

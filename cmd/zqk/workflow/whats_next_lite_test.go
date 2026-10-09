@@ -3,7 +3,6 @@ package workflow
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -29,7 +28,7 @@ func TestWhatsNextCommand_SyncSweepFlagRegistered(t *testing.T) {
 func TestRunWhatsNextLite_ZeroCostHotPathLatency(t *testing.T) {
 	tmpDir := t.TempDir()
 	stateDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.StateDir)
-	if err := os.MkdirAll(stateDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 

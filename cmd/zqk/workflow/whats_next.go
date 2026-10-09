@@ -181,6 +181,13 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 			}
 			if matched != nil {
 				out.PriorityPlan = matched
+			} else if sp != nil {
+				_, summ, _ := resolvePriorityPlanForWhatsNext(ctx, sp, explicit, nil)
+				if summ != nil {
+					out.PriorityPlan = summ
+				} else {
+					out.PriorityPlan = &whatsNextPriorityPlan{ID: explicit}
+				}
 			} else {
 				out.PriorityPlan = &whatsNextPriorityPlan{ID: explicit}
 			}
@@ -197,11 +204,21 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 				Title:  p.Title,
 				Status: p.Status,
 			}
+		} else if sp != nil {
+			personaIDs := resolveWhatsNextPersonaIDs(ctx, sp, projectRoot, personaFlag, agentIDFlag)
+			columnIDs := planPersonaFilter(ctx, sp, projectRoot, agentIDFlag, personaIDs)
+			_, summ, act := resolvePriorityPlanForWhatsNext(ctx, sp, explicit, columnIDs)
+			if summ != nil {
+				out.PriorityPlan = summ
+				out.ActivePlans = act
+			}
 		}
 
 		if out.PriorityPlan != nil {
-			if counts, ok := lite.BacklogCountsByPlan[out.PriorityPlan.ID]; ok {
+			if counts, ok := lite.BacklogCountsByPlan[out.PriorityPlan.ID]; ok && len(counts) > 0 {
 				out.BacklogCountsByStatus = counts
+			} else if sp != nil {
+				out.BacklogCountsByStatus = countBacklogByStatus(ctx, sp, out.PriorityPlan.ID, nil)
 			}
 		}
 		if len(out.BacklogCountsByStatus) == 0 && len(lite.TotalBacklogCounts) > 0 && out.PriorityPlan == nil {

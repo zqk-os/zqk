@@ -1,12 +1,12 @@
 package testrunner_test
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testrunner"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestScanParallelSafety(t *testing.T) {
@@ -37,7 +37,7 @@ func TestNeedsReview(t *testing.T) {
 }
 `
 	file := filepath.Join(tempDir, "sample_test.go")
-	if err := os.WriteFile(file, []byte(testCode), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(file, []byte(testCode), paths.FilePerm644); err != nil {
 		t.Fatalf("write test file: %v", err)
 	}
 

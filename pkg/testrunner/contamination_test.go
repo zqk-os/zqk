@@ -2,23 +2,23 @@ package testrunner_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testrunner"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestContaminationSnapshotAndDiff(t *testing.T) {
 	tempDir := t.TempDir()
 	planeDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SpecsSubdir)
-	if err := os.MkdirAll(planeDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(planeDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create plane dir: %v", err)
 	}
 
 	f1 := filepath.Join(planeDir, "spec1.yaml")
-	if err := os.WriteFile(f1, []byte("content: 1"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(f1, []byte("content: 1"), paths.FilePerm644); err != nil {
 		t.Fatalf("write f1: %v", err)
 	}
 
@@ -37,12 +37,12 @@ func TestContaminationSnapshotAndDiff(t *testing.T) {
 	}
 
 	// 2. Mutate file
-	if err := os.WriteFile(f1, []byte("content: 2"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(f1, []byte("content: 2"), paths.FilePerm644); err != nil {
 		t.Fatalf("mutate f1: %v", err)
 	}
 	// Add file
 	f2 := filepath.Join(planeDir, "spec2.yaml")
-	if err := os.WriteFile(f2, []byte("content: added"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(f2, []byte("content: added"), paths.FilePerm644); err != nil {
 		t.Fatalf("write f2: %v", err)
 	}
 
@@ -66,11 +66,11 @@ func TestContaminationSnapshotAndDiff(t *testing.T) {
 func TestRunWithContaminationCheck(t *testing.T) {
 	tempDir := t.TempDir()
 	planeDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.SpecsSubdir)
-	if err := os.MkdirAll(planeDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(planeDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	f1 := filepath.Join(planeDir, "spec1.yaml")
-	if err := os.WriteFile(f1, []byte("name: initial"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(f1, []byte("name: initial"), paths.FilePerm644); err != nil {
 		t.Fatalf("write f1: %v", err)
 	}
 
