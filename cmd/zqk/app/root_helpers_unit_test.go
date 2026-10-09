@@ -3,15 +3,22 @@ package app
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	clitool "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/policyinterrupt"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestFormatReminderDuration(t *testing.T) {
@@ -161,4 +168,223 @@ func TestEmitReferenceShockwaves_AllKinds(t *testing.T) {
 
 	// 4. Other kind (no-op)
 	emitReferenceShockwaves(root, "goal", "GOL-1", nil)
+}
+
+func TestCheckCLIReminderInRoot_WithFile(t *testing.T) {
+	root := t.TempDir()
+	flagDir := filepath.Join(root, paths.ProjectDataDir)
+	require.NoError(t, fileutil.EnsureDir(flagDir))
+	flagFile := filepath.Join(flagDir, "cli_reminder.flag")
+	require.NoError(t, fileutil.WriteStandardFile(flagFile, []byte("Important Reminder Message")))
+
+	// Calling checkCLIReminderInRoot should read the file and log
+	checkCLIReminderInRoot(root)
+}
+
+func TestCheckPolicyInterruptGateInRoot_ActorBranches(t *testing.T) {
+	root := t.TempDir()
+
+	// 1. System account is bypassed
+	t.Setenv("ZQK_ACCOUNT_ID", pkgctx.SystemAccountID)
+	assert.NoError(t, checkPolicyInterruptGateInRoot(root))
+
+	// 2. Non-system actor with no pending interrupts
+	t.Setenv("ZQK_ACCOUNT_ID", "acc-user-999")
+	assert.NoError(t, checkPolicyInterruptGateInRoot(root))
+}
+
+func TestIsMutatingCommand(t *testing.T) {
+	assert.True(t, isMutatingCommand(&cobra.Command{Use: "create"}))
+	assert.True(t, isMutatingCommand(&cobra.Command{Use: "update"}))
+	assert.True(t, isMutatingCommand(&cobra.Command{Use: "delete"}))
+	assert.True(t, isMutatingCommand(&cobra.Command{Use: "workflow"}))
+	assert.True(t, isMutatingCommand(&cobra.Command{Use: "system"}))
+
+	parent := &cobra.Command{Use: "workflow"}
+	child := &cobra.Command{Use: "next"}
+	parent.AddCommand(child)
+	assert.True(t, isMutatingCommand(child))
+
+	readCmd := &cobra.Command{Use: "get"}
+	assert.False(t, isMutatingCommand(readCmd))
+	assert.False(t, isMutatingCommand(nil))
+}
+
+func TestIsInformationalCommandError_ExtraBranches(t *testing.T) {
+	assert.False(t, isInformationalCommandError(nil))
+	assert.True(t, isInformationalCommandError(errors.New("semantic routing failed for plan")))
+	assert.True(t, isInformationalCommandError(errors.New("could not semantically resolve target")))
+	assert.True(t, isInformationalCommandError(errors.New("unknown command 'foo'")))
+	assert.True(t, isInformationalCommandError(errors.New("unknown flag: --bar")))
+	assert.True(t, isInformationalCommandError(errors.New("flag provided but not defined: -x")))
+	assert.False(t, isInformationalCommandError(errors.New("internal server crash")))
+}
+
+func TestCheckSchedulerDaemonStatus_WithAdminAndMutating(t *testing.T) {
+	root := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", "") // allow check to proceed
+
+	cmd := &cobra.Command{Use: "create"}
+	adminSec := &pkgctx.SecurityContext{
+		AccountID: "acc-admin",
+		Roles:     []string{"admin"},
+	}
+	ctx := pkgctx.WithSecurityContext(context.Background(), adminSec)
+	cmd.SetContext(ctx)
+
+	err := checkSchedulerDaemonStatus(root, cmd, nil)
+	assert.NoError(t, err)
+}
+
+func TestRoot_StartParentDeathWatcherIfSet(t *testing.T) {
+	// Empty PID
+	t.Setenv("ZQK_PARENT_PID", "")
+	startParentDeathWatcherIfSet()
+
+	// Invalid PID
+	t.Setenv("ZQK_PARENT_PID", "invalid-pid")
+	startParentDeathWatcherIfSet()
+
+	// Negative PID
+	t.Setenv("ZQK_PARENT_PID", "-1")
+	startParentDeathWatcherIfSet()
+}
+
+func TestRoot_MCPInitTrace(t *testing.T) {
+	// Without MCP account ID
+	t.Setenv("ZQK_MCP_ACCOUNT_ID", "")
+	mcpInitTrace(time.Now(), "test-label")
+
+	// With MCP account ID
+	t.Setenv("ZQK_MCP_ACCOUNT_ID", "acc-test-trace")
+	mcpInitTrace(time.Now().Add(-100*time.Millisecond), "test-label")
+}
+
+func TestRoot_PreRunInitFileLogging(t *testing.T) {
+	// Empty project root
+	rootPreRunInitFileLogging(nil, "", false)
+
+	// Is help command
+	rootPreRunInitFileLogging(nil, "/some/root", true)
+
+	// Valid root, non-help command with context flag
+	cmd := &cobra.Command{Use: "test"}
+	cmd.Flags().String("context", "human", "")
+	rootPreRunInitFileLogging(cmd, t.TempDir(), false)
+}
+
+func TestRootPersistentPostRunE_Branches(t *testing.T) {
+	// 1. Help/version command
+	helpCmd := &cobra.Command{Use: "help"}
+	assert.NoError(t, rootPersistentPostRunE(helpCmd, nil))
+
+	versionCmd := &cobra.Command{Use: "version"}
+	assert.NoError(t, rootPersistentPostRunE(versionCmd, nil))
+
+	// 2. Nil context
+	regularCmd := &cobra.Command{Use: "status"}
+	assert.NoError(t, rootPersistentPostRunE(regularCmd, nil))
+
+	// 3. With tracker in context
+	ctx := context.Background()
+	tracker := clitool.NewCommandExecutionTracker()
+	ctx = clitool.WithTracker(ctx, tracker)
+	regularCmd.SetContext(ctx)
+	assert.NoError(t, rootPersistentPostRunE(regularCmd, nil))
+
+	// 4. With cpuProfileFile mock cleanup
+	tmpFile, err := os.CreateTemp("", "cpu-prof-*.pprof")
+	require.NoError(t, err)
+	defer os.Remove(tmpFile.Name())
+	cpuProfileFile = tmpFile
+	assert.NoError(t, rootPersistentPostRunE(helpCmd, nil))
+	assert.Nil(t, cpuProfileFile)
+
+	// 5. With goroutineProfilePath
+	goroutineProfilePath = filepath.Join(t.TempDir(), "goroutine.pprof")
+	assert.NoError(t, rootPersistentPostRunE(helpCmd, nil))
+	assert.Empty(t, goroutineProfilePath)
+}
+
+func TestCheckPolicyInterruptGateInRoot_WithUnacked(t *testing.T) {
+	root := t.TempDir()
+	t.Setenv("ZQK_ACCOUNT_ID", "acc-developer-99")
+	t.Setenv("ZQK_MCP_ACCOUNT_ID", "")
+
+	err := policyinterrupt.AppendInterrupt(root, policyinterrupt.InterruptRecord{
+		DedupeKey:   "PI-CRIT-001",
+		PolicyID:    "POL-BREAKING-CHANGE-001",
+		Severity:    policyinterrupt.SeverityCritical,
+		AckRequired: true,
+		Message:     "Breaking migration in progress",
+	})
+	require.NoError(t, err)
+
+	err = checkPolicyInterruptGateInRoot(root)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "requires acknowledgement")
+}
+
+func TestCheckCLIReminderInRoot_WithRecentFlagFile(t *testing.T) {
+	root := t.TempDir()
+	flagDir := filepath.Join(root, paths.ProjectDataDir)
+	require.NoError(t, fileutil.MkdirAll(flagDir, 0755))
+	flagFile := filepath.Join(flagDir, "cli_reminder.flag")
+	require.NoError(t, fileutil.WriteFile(flagFile, []byte("REMINDER CONTENT"), 0644))
+
+	checkCLIReminderInRoot(root)
+}
+
+func TestCheckSchedulerDaemonStatus_RoleAndPermVariations(t *testing.T) {
+	root := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", "")
+
+	// 1. With manage:scheduler perm
+	cmd := &cobra.Command{Use: "create"}
+	cmd.Flags().Bool("allow-degraded", false, "")
+	sec := &pkgctx.SecurityContext{
+		Permissions: []string{"manage:scheduler"},
+	}
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), sec))
+	assert.NoError(t, checkSchedulerDaemonStatus(root, cmd, nil))
+
+	// 2. With read:* perm and allow-degraded=true
+	cmd2 := &cobra.Command{Use: "create"}
+	cmd2.Flags().Bool("allow-degraded", true, "")
+	_ = cmd2.Flags().Set("allow-degraded", "true")
+	sec2 := &pkgctx.SecurityContext{
+		Permissions: []string{"read:*"},
+	}
+	cmd2.SetContext(pkgctx.WithSecurityContext(context.Background(), sec2))
+	assert.NoError(t, checkSchedulerDaemonStatus(root, cmd2, nil))
+
+	// 3. Without permissions
+	cmd3 := &cobra.Command{Use: "create"}
+	sec3 := &pkgctx.SecurityContext{
+		Roles: []string{"guest"},
+	}
+	cmd3.SetContext(pkgctx.WithSecurityContext(context.Background(), sec3))
+	assert.NoError(t, checkSchedulerDaemonStatus(root, cmd3, nil))
+}
+
+func TestRootPersistentPostRunE_WithStorageAndSession(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	defer func() {
+		if proj.FileStorage != nil {
+			_ = proj.FileStorage.Shutdown(context.Background())
+		}
+	}()
+
+	cmd := &cobra.Command{Use: "create"}
+	cmd.Flags().String("project-root", proj.Root, "")
+	_ = cmd.Flags().Set("project-root", proj.Root)
+
+	ctx := context.Background()
+	ctx = WithZqkSessionID(ctx, "ZS-TEST-001")
+	ctx = clitool.WithTracker(ctx, clitool.NewCommandExecutionTracker())
+	ctx = cli.WithStorageProvider(ctx, proj.FileStorage)
+	cmd.SetContext(ctx)
+
+	t.Setenv("ZQK_PROJECT_ROOT", proj.Root)
+	assert.NoError(t, rootPersistentPostRunE(cmd, nil))
 }
