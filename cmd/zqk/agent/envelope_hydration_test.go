@@ -13,8 +13,9 @@ import (
 // builds a comprehensive task envelope with standing mandates and context.
 func TestEnvelopeHydration_FunctionalAcceptance(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
-		Kind:            "agent_prepared_ctx",
-		SeedSchemaPlane: true,
+		Kind:                     "agent_prepared_ctx",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
 	})
 	root, fs := proj.Root, proj.FileStorage
 	ctx := context.Background()
@@ -94,8 +95,9 @@ func TestEnvelopeHydration_BoundaryAndErrorHandling(t *testing.T) {
 // assemble into an actionable prompt without cold-start failures.
 func TestEnvelopeHydration_IntegrationAndConformance(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
-		Kind:            "agent_prepared_ctx",
-		SeedSchemaPlane: true,
+		Kind:                     "agent_prepared_ctx",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
 	})
 	root, fs := proj.Root, proj.FileStorage
 	ctx := context.Background()
