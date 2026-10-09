@@ -2,7 +2,6 @@ package storage_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -12,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -171,11 +171,11 @@ func TestStorageExtended_DarwinCASVisibilityWait(t *testing.T) {
 	kind := objects.KindPriorityPlan
 	dirName := objects.GetDirectoryFromKind(kind)
 	kindDir := datacell.CellCASPrimaryDir(tmpDir, dirName)
-	_ = os.MkdirAll(kindDir, 0755)
+	_ = fileutil.MkdirAll(kindDir, paths.DirPerm755)
 
 	// Create empty index
 	indexPath := filepath.Join(kindDir, "."+kind+".index")
-	_ = fileutil.WriteFile(indexPath, []byte(`{"mappings":{}}`), 0644)
+	_ = fileutil.WriteFile(indexPath, []byte(`{"mappings":{}}`), paths.FilePerm644)
 
 	// Visibility wait with immediate deadline
 	deadline := time.Now().Add(100 * time.Millisecond)

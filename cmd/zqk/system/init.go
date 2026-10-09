@@ -71,7 +71,7 @@ func NewInitCmd() *cobra.Command {
 	cli.RequireStorage(initCmd, false)
 	cli.RequireSchedulerCheck(initCmd, false)
 
-	cli.BindAsyncProgress(initCmd, func(cmd *cobra.Command, args []string) error {
+	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
 		projectName, _ = cmd.Flags().GetString("project-name")
 		template, _ = cmd.Flags().GetString("template")
 		force, _ = cmd.Flags().GetBool("force")
@@ -87,7 +87,7 @@ func NewInitCmd() *cobra.Command {
 		advanced, _ = cmd.Flags().GetBool("advanced")
 		importOntology, _ = cmd.Flags().GetString("import-ontology")
 		return runInit(cmd, projectName, template, force, snapshotPath, answerFilePath, legacy, merge, wipe, discover, withMaintenanceJobs, withOnboardingRoadmap, simple, advanced, importOntology)
-	})
+	}
 
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(initCmd)

@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"sync/atomic"
 	"testing"
@@ -14,6 +13,8 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // mockQueueHandler implements QueueShutdownHandler for testing QueueShutdownCoordinator
@@ -175,21 +176,21 @@ func TestStorageExtended_FileListCollection(t *testing.T) {
 	month1 := filepath.Join(kindDir, "2026-08")
 	month2 := filepath.Join(kindDir, "2026-09")
 	month3 := filepath.Join(kindDir, "2026-10")
-	require.NoError(t, os.MkdirAll(month1, 0755))
-	require.NoError(t, os.MkdirAll(month2, 0755))
-	require.NoError(t, os.MkdirAll(month3, 0755))
+	require.NoError(t, fileutil.MkdirAll(month1, paths.DirPerm755))
+	require.NoError(t, fileutil.MkdirAll(month2, paths.DirPerm755))
+	require.NoError(t, fileutil.MkdirAll(month3, paths.DirPerm755))
 
 	f1 := filepath.Join(month1, "item1.yaml")
 	f2 := filepath.Join(month2, "item2.yml")
 	f3 := filepath.Join(month3, "item3.yaml")
-	require.NoError(t, os.WriteFile(f1, []byte("title: 1"), 0600))
-	require.NoError(t, os.WriteFile(f2, []byte("title: 2"), 0600))
-	require.NoError(t, os.WriteFile(f3, []byte("title: 3"), 0600))
+	require.NoError(t, fileutil.WriteFile(f1, []byte("title: 1"), paths.FilePerm600))
+	require.NoError(t, fileutil.WriteFile(f2, []byte("title: 2"), paths.FilePerm600))
+	require.NoError(t, fileutil.WriteFile(f3, []byte("title: 3"), paths.FilePerm600))
 
 	assert.True(t, fos.hasDateSubdirectories(kindDir))
 
 	nonDateDir := filepath.Join(testRoot, "nondate_test_kind")
-	require.NoError(t, os.MkdirAll(filepath.Join(nonDateDir, "other_sub"), 0755))
+	require.NoError(t, fileutil.MkdirAll(filepath.Join(nonDateDir, "other_sub"), paths.DirPerm755))
 	assert.False(t, fos.hasDateSubdirectories(nonDateDir))
 
 	// Walk bucketed storage within August to September (should find f1 and f2, not f3)

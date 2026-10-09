@@ -8,6 +8,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -23,28 +24,28 @@ func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 	unallowedDir := filepath.Join(tmpDir, "random_folder")
 
 	for _, d := range []string{docsDir, pkgDir, nodeModulesDir, unallowedDir} {
-		if err := os.MkdirAll(d, 0755); err != nil {
+		if err := fileutil.MkdirAll(d, paths.DirPerm755); err != nil {
 			t.Fatalf("MkdirAll failed: %v", err)
 		}
 	}
 
 	// 1. Allowed doc in docs/
-	_ = fileutil.WriteFile(filepath.Join(docsDir, "guide.md"), []byte("# Guide\nSome doc content"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(docsDir, "guide.md"), []byte("# Guide\nSome doc content"), paths.FilePerm644)
 
 	// 2. Excluded file in node_modules
-	_ = fileutil.WriteFile(filepath.Join(nodeModulesDir, "ignore.md"), []byte("# Ignore"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(nodeModulesDir, "ignore.md"), []byte("# Ignore"), paths.FilePerm644)
 
 	// 3. Unallowed doc not in docs/ and not in code dir
-	_ = fileutil.WriteFile(filepath.Join(unallowedDir, "stray.md"), []byte("# Stray"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(unallowedDir, "stray.md"), []byte("# Stray"), paths.FilePerm644)
 
 	// 4. Non-markdown file in pkg
-	_ = fileutil.WriteFile(filepath.Join(pkgDir, "code.go"), []byte("package sample"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(pkgDir, "code.go"), []byte("package sample"), paths.FilePerm644)
 
 	// 5. Unallowed markdown in code dir (not README.md)
-	_ = fileutil.WriteFile(filepath.Join(pkgDir, "architecture.md"), []byte("# Arch"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(pkgDir, "architecture.md"), []byte("# Arch"), paths.FilePerm644)
 
 	// 6. README in code dir that is brief (<=200 lines, no detailed indicators)
-	_ = fileutil.WriteFile(filepath.Join(pkgDir, "README.md"), []byte("# Package Sample\nIndex summary"), 0644)
+	_ = fileutil.WriteFile(filepath.Join(pkgDir, "README.md"), []byte("# Package Sample\nIndex summary"), paths.FilePerm644)
 
 	// 7. ValidateDocumentationPolicy on projectRoot
 	violations, err := storagepkg.ValidateDocumentationPolicy(tmpDir)
@@ -57,9 +58,9 @@ func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 
 	// 8. Test checkReadmeIsIndexOnly with detailed content but NO doc links
 	pkgDir2 := filepath.Join(tmpDir, "pkg", "detailed")
-	_ = os.MkdirAll(pkgDir2, 0755)
+	_ = fileutil.MkdirAll(pkgDir2, paths.DirPerm755)
 	detailedReadmePath := filepath.Join(pkgDir2, "README.md")
-	_ = fileutil.WriteFile(detailedReadmePath, []byte("# Detailed\n## Architecture\nSome detailed arch"), 0644)
+	_ = fileutil.WriteFile(detailedReadmePath, []byte("# Detailed\n## Architecture\nSome detailed arch"), paths.FilePerm644)
 
 	viols2, _ := storagepkg.ValidateDocumentationPolicyForFile(tmpDir, detailedReadmePath)
 	if len(viols2) == 0 {
@@ -68,7 +69,7 @@ func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 
 	// 9. Test checkReadmeIsIndexOnly with detailed content AND doc links
 	detailedWithLinkPath := filepath.Join(pkgDir2, "readme.md")
-	_ = fileutil.WriteFile(detailedWithLinkPath, []byte("# Detailed\n## Architecture\nSee docs/architecture/arch.md and docs/onboarding/guide.md"), 0644)
+	_ = fileutil.WriteFile(detailedWithLinkPath, []byte("# Detailed\n## Architecture\nSee docs/architecture/arch.md and docs/onboarding/guide.md"), paths.FilePerm644)
 	viols3, _ := storagepkg.ValidateDocumentationPolicyForFile(tmpDir, detailedWithLinkPath)
 	if len(viols3) != 0 {
 		t.Errorf("Expected no violation when doc link is present, got %v", viols3)
@@ -80,7 +81,7 @@ func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 		longContent += "line\n"
 	}
 	longReadmePath := filepath.Join(pkgDir2, "README.md")
-	_ = fileutil.WriteFile(longReadmePath, []byte(longContent), 0644)
+	_ = fileutil.WriteFile(longReadmePath, []byte(longContent), paths.FilePerm644)
 	viols4, _ := storagepkg.ValidateDocumentationPolicyForFile(tmpDir, longReadmePath)
 	if len(viols4) == 0 {
 		t.Errorf("Expected violation for README with > 200 lines")
@@ -94,9 +95,9 @@ func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 	}
 	// Excluded path (e.g. vendor/testdata)
 	vendorDir := filepath.Join(tmpDir, "vendor")
-	_ = os.MkdirAll(vendorDir, 0755)
+	_ = fileutil.MkdirAll(vendorDir, paths.DirPerm755)
 	vendorFile := filepath.Join(vendorDir, "readme.md")
-	_ = fileutil.WriteFile(vendorFile, []byte("vendor"), 0644)
+	_ = fileutil.WriteFile(vendorFile, []byte("vendor"), paths.FilePerm644)
 	viols6, _ := storagepkg.ValidateDocumentationPolicyForFile(tmpDir, vendorFile)
 	if len(viols6) != 0 {
 		t.Errorf("Expected 0 violations for excluded vendor dir")
@@ -109,11 +110,11 @@ func TestStorageExtended_DocumentationPolicy(t *testing.T) {
 
 	// 12. FindUnregisteredDocumentation
 	archDir := filepath.Join(tmpDir, "docs", "architecture")
-	_ = os.MkdirAll(archDir, 0755)
+	_ = fileutil.MkdirAll(archDir, paths.DirPerm755)
 	registeredDoc := filepath.Join(archDir, "registered.md")
 	unregisteredDoc := filepath.Join(archDir, "unregistered.md")
-	_ = fileutil.WriteFile(registeredDoc, []byte("# Reg"), 0644)
-	_ = fileutil.WriteFile(unregisteredDoc, []byte("# Unreg"), 0644)
+	_ = fileutil.WriteFile(registeredDoc, []byte("# Reg"), paths.FilePerm644)
+	_ = fileutil.WriteFile(unregisteredDoc, []byte("# Unreg"), paths.FilePerm644)
 
 	relReg, _ := filepath.Rel(tmpDir, registeredDoc)
 	existingMap := map[string]bool{

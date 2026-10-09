@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -217,7 +216,7 @@ func TestPureGoIndexer_IndexProjectDir(t *testing.T) {
 	require.NoError(t, err)
 
 	filePath := filepath.Join(dataDir, "BLI-TEST-001.yaml")
-	require.NoError(t, os.WriteFile(filePath, rawYAML, paths.FilePerm644))
+	require.NoError(t, fileutil.WriteFile(filePath, rawYAML, paths.FilePerm644))
 
 	indexer := storage.NewPureGoIndexer()
 	count, err := indexer.IndexProjectDir(context.Background(), tmpDir)
@@ -246,7 +245,7 @@ func TestPureGoIndexer_IndexProjectDir_ProcessSubdirectory(t *testing.T) {
 	require.NoError(t, err)
 
 	filePath := filepath.Join(processDir, "GOAL-TEST-001.yaml")
-	require.NoError(t, os.WriteFile(filePath, rawYAML, paths.FilePerm644))
+	require.NoError(t, fileutil.WriteFile(filePath, rawYAML, paths.FilePerm644))
 
 	indexer := storage.NewPureGoIndexer()
 	count, err := indexer.IndexProjectDir(context.Background(), tmpDir)
@@ -353,7 +352,7 @@ func BenchmarkPureGoIndex_vs_YAMLScan(b *testing.B) {
 			"title":      node.Title,
 			"parent_ref": parentID,
 		})
-		_ = os.WriteFile(filepath.Join(dataDir, id+".yaml"), raw, paths.FilePerm644)
+		_ = fileutil.WriteFile(filepath.Join(dataDir, id+".yaml"), raw, paths.FilePerm644)
 	}
 
 	b.Run("PureGoIndex_MultiHopLookup", func(b *testing.B) {
@@ -375,9 +374,9 @@ func BenchmarkPureGoIndex_vs_YAMLScan(b *testing.B) {
 			targetID := fmt.Sprintf("OBJ-%03d", i%objectCount)
 			// Emulate sequential search by reading files
 			var found bool
-			entries, _ := os.ReadDir(dataDir)
+			entries, _ := fileutil.ReadDir(dataDir)
 			for _, e := range entries {
-				content, _ := os.ReadFile(filepath.Join(dataDir, e.Name()))
+				content, _ := fileutil.ReadFile(filepath.Join(dataDir, e.Name()))
 				var m map[string]any
 				_ = yaml.Unmarshal(content, &m)
 				if m["id"] == targetID {

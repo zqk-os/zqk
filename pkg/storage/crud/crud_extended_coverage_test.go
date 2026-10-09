@@ -9,7 +9,9 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/crud"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
@@ -333,12 +335,12 @@ func TestCRUD_LoadStreamDeletedSetFast(t *testing.T) {
 
 	// Create state directory and file
 	stateDir := filepath.Join(tmpDir, ".zqk", "state")
-	if err := os.MkdirAll(stateDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 	delFile := filepath.Join(stateDir, "stream_deleted_task.jsonl")
 	content := "TASK-001\n\nTASK-002  \n  TASK-003\n"
-	if err := os.WriteFile(delFile, []byte(content), 0644); err != nil {
+	if err := fileutil.WriteFile(delFile, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("write file failed: %v", err)
 	}
 

@@ -2,11 +2,12 @@ package storage
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -28,7 +29,7 @@ func TestReadObjectFile_FullStreamRead(t *testing.T) {
 	}
 
 	testFilePath := filepath.Join(tmpDir, "test_large.yaml")
-	if err := os.WriteFile(testFilePath, data, 0644); err != nil {
+	if err := fileutil.WriteFile(testFilePath, data, paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 

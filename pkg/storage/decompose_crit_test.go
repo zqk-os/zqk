@@ -7,6 +7,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func storageDecomposeRepoRoot(t *testing.T) string {
@@ -19,7 +21,7 @@ func storageDecomposeRepoRoot(t *testing.T) string {
 }
 
 func countFileLines(path string) (int, error) {
-	f, err := os.Open(path) //nolint:gosec
+	f, err := fileutil.Open(path)
 	if err != nil {
 		return 0, err
 	}
@@ -98,7 +100,7 @@ func TestCRITOrchestrateOver800HasTRACK(t *testing.T) {
 		if n <= 800 {
 			continue
 		}
-		body, err := os.ReadFile(p) //nolint:gosec
+		body, err := fileutil.ReadFile(p)
 		if err != nil {
 			t.Fatal(err)
 		}

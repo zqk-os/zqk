@@ -29,7 +29,7 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 			specPath = filepath.Join("..", "..", paths.ProcessInternalObjectSpecsDir, "pm", "doc_entry.yaml")
 		}
 		//nolint:gosec
-		data, err := os.ReadFile(specPath)
+		data, err := fileutil.ReadFile(specPath)
 		if err != nil {
 			t.Fatalf("Failed to read doc_entry spec at %s: %v", specPath, err)
 		}
@@ -74,7 +74,7 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 			lifecyclePath = filepath.Join("..", "..", paths.ProcessInternalLifecyclesDir, "pm", "doc_entry_lifecycle.yaml")
 		}
 		//nolint:gosec
-		data, err := os.ReadFile(lifecyclePath)
+		data, err := fileutil.ReadFile(lifecyclePath)
 		if err != nil {
 			t.Fatalf("Failed to read doc_entry lifecycle at %s: %v", lifecyclePath, err)
 		}
@@ -142,7 +142,7 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 		tmpDir := t.TempDir()
 		relDoc := "docs/architecture/sample.md"
 		fullDocPath := filepath.Join(tmpDir, relDoc)
-		if err := os.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
 
@@ -239,7 +239,7 @@ func TestDocEntryIntegrity_Suite(t *testing.T) {
 		tmpDir := t.TempDir()
 		relDoc := "docs/architecture/seal_test.md"
 		fullDocPath := filepath.Join(tmpDir, relDoc)
-		if err := os.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
+		if err := fileutil.MkdirAll(filepath.Dir(fullDocPath), paths.DirPerm750); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
 		content := "# Seal Test Doc\nTesting automated SHA-256 sealing."

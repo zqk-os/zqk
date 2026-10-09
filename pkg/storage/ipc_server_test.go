@@ -88,7 +88,7 @@ func TestStartIPCServer_SocketPermissionsAndLifecycle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	t.Cleanup(func() { os.RemoveAll(tmpDir) })
+	t.Cleanup(func() { fileutil.RemoveAll(tmpDir) })
 
 	socketDir := filepath.Join(tmpDir, "sock")
 	socketPath := filepath.Join(socketDir, "pw.sock")

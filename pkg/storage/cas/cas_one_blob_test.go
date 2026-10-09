@@ -1,8 +1,6 @@
 package cas_test
 
 import (
-	"os"
-
 	"github.com/zqk-os/zqk/pkg/storage"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 
@@ -94,7 +92,7 @@ func TestCAS_UpdateSweepsPlantedPredecessorWithoutQueueWait(t *testing.T) {
 	t.Parallel()
 	testRoot := t.TempDir()
 	kindDir := filepath.Join(datacell.ProcessPrimaryDir(testRoot), objects.GetDirectoryFromKind(objects.KindBacklogItem))
-	if err := os.MkdirAll(kindDir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(kindDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	casQueue := caspkg.NewListingIndexWriteQueueForTest()

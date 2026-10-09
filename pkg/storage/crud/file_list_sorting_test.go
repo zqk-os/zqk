@@ -2,12 +2,13 @@ package crud
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type dummyReadFacade struct {
@@ -337,7 +338,7 @@ func TestInternal_DiscoveryAndContextOptions(t *testing.T) {
 	hexHash := "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	hashFile := filepath.Join(tmpDir, hexHash+".yaml")
 	fileContent := "id: TASK-CAS-1\nkind: task\n"
-	if err := os.WriteFile(hashFile, []byte(fileContent), 0644); err != nil {
+	if err := fileutil.WriteFile(hashFile, []byte(fileContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
@@ -376,11 +377,11 @@ func TestInternal_FileCASWrappers(t *testing.T) {
 	tmpDir := t.TempDir()
 	RemoveOrphanCASFilesForObjectID("ID-1", tmpDir)
 	subDir := filepath.Join(tmpDir, "sub")
-	_ = os.MkdirAll(subDir, 0755)
+	_ = fileutil.MkdirAll(subDir, paths.DirPerm755)
 
 	// Create a CAS hash file
 	hexHash := "1111111111111111111111111111111111111111111111111111111111111111"
 	fPath := filepath.Join(subDir, hexHash+".yaml")
-	_ = os.WriteFile(fPath, []byte("id: ID-ORPHAN\n"), 0644)
+	_ = fileutil.WriteFile(fPath, []byte("id: ID-ORPHAN\n"), paths.FilePerm644)
 	RemoveOrphanCASFilesForObjectID("ID-ORPHAN", tmpDir)
 }

@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"sort"
 	"testing"
@@ -107,9 +106,7 @@ func TestStorageExtended_CriteriaHelpers_and_FileLock(t *testing.T) {
 	})
 
 	t.Run("NewFileLockWithConfig", func(t *testing.T) {
-		tempDir, err := os.MkdirTemp("", "filelock_config_test_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(tempDir)
+		tempDir := t.TempDir()
 
 		lockFile := filepath.Join(tempDir, "test.lock")
 		cfg := FileLockConfig{

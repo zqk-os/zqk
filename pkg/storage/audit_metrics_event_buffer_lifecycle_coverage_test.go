@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"os"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -117,9 +116,7 @@ func TestStorageExtended_AuditMetrics(t *testing.T) {
 
 func TestStorageExtended_AuditEventBufferLifecycle(t *testing.T) {
 	ctx := context.Background()
-	tempDir, err := os.MkdirTemp("", "audit_buffer_test_*")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	buf := NewAuditEventBuffer(tempDir, secCtx, nil)
@@ -158,12 +155,10 @@ func TestStorageExtended_AuditEventBufferLifecycle(t *testing.T) {
 
 	t.Run("TearDownGlobalAuditBufferForTestProjectRoot", func(t *testing.T) {
 		secCtx := pkgctx.NewSystemSecurityContext()
-		resetDir, err := os.MkdirTemp("", "audit_buffer_reset_*")
-		require.NoError(t, err)
-		defer os.RemoveAll(resetDir)
+		resetDir := t.TempDir()
 
 		// No-op when global buffer root doesn't match
-		err = TearDownGlobalAuditBufferForTestProjectRoot("/nonexistent/matching/path", resetDir, secCtx)
+		err := TearDownGlobalAuditBufferForTestProjectRoot("/nonexistent/matching/path", resetDir, secCtx)
 		assert.NoError(t, err)
 
 		// Set global buffer to match

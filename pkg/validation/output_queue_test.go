@@ -660,10 +660,9 @@ func TestOutputWriter_QueueFullBackpressure(t *testing.T) {
 		}
 	} else if err != nil {
 		t.Errorf("Unexpected error: %v (queue size: %d)", err, queueSize)
-	} else if queueSize >= 100 {
-		// Enqueue succeeded - writer drained faster than we filled
-		// This is acceptable, just verify queue is not full
-		t.Errorf("Enqueue succeeded but queue is full (size: %d)", queueSize)
+	} else if queueSize > 100 {
+		// Enqueue succeeded - verify queue never exceeds max capacity
+		t.Errorf("Enqueue succeeded but queue exceeds max capacity (size: %d)", queueSize)
 	}
 
 	// Wait for writer to process some packets
