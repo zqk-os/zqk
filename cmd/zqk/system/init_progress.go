@@ -6,13 +6,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // initProgress provides in-process interactive stage updates and periodic heartbeats
@@ -20,31 +18,23 @@ import (
 // It integrates directly with pkgctx.GetValidationProgress to report into the existing
 // async progress coordinator without spawning any external processes.
 type initProgress struct {
-	ctx             context.Context
-	out             io.Writer
-	interactive     bool
-	currentStage    string
-	stageStart      time.Time
-	mu              sync.Mutex
-	stopHeartbeat   chan struct{}
-	stopped         bool
-	heartbeatActive bool
+	ctx          context.Context
+	out          io.Writer
+	interactive  bool
+	currentStage string
+	stageStart   time.Time
+	mu           sync.Mutex
 }
 
 func newInitProgress(ctx context.Context, out io.Writer, interactive bool) *initProgress {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	p := &initProgress{
-		ctx:           ctx,
-		out:           out,
-		interactive:   interactive,
-		stopHeartbeat: make(chan struct{}),
+	return &initProgress{
+		ctx:         ctx,
+		out:         out,
+		interactive: interactive,
 	}
-	if interactive {
-		goroutinelabels.NewGoroutine("init_progress_heartbeat", "emit stage heartbeat during project initialization").StartSimple(p.runHeartbeat)
-	}
-	return p
 }
 
 func (p *initProgress) withInteractiveLock(fn func()) {
@@ -77,10 +67,6 @@ func (p *initProgress) Header(projectName string, mode InitMode) {
 func (p *initProgress) Step(step, total int, stageName string) {
 	p.reportValidationProgress(stageName, fmt.Sprintf("[%d/%d] %s", step, total, stageName))
 	p.withInteractiveLock(func() {
-		if p.heartbeatActive {
-			fmt.Fprint(p.out, "\r\033[K")
-			p.heartbeatActive = false
-		}
 		p.currentStage = stageName
 		p.stageStart = time.Now()
 		fmt.Fprintf(p.out, "  [%d/%d] %s\n", step, total, stageName)
@@ -96,49 +82,11 @@ func (p *initProgress) SubStep(message string) {
 	p.printInteractive("      ↳ %s\n", message)
 }
 
-func (p *initProgress) runHeartbeat() {
-	ticker := time.NewTicker(3 * time.Second)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-p.ctx.Done():
-			return
-		case <-p.stopHeartbeat:
-			return
-		case <-ticker.C:
-			p.mu.Lock()
-			if p.currentStage != "" && time.Since(p.stageStart) >= 3*time.Second {
-				elapsed := int(time.Since(p.stageStart).Seconds())
-				fmt.Fprintf(p.out, "\r\033[K      ⏳ Working on %s (%ds elapsed)...", strings.ToLower(p.currentStage), elapsed)
-				p.heartbeatActive = true
-			}
-			p.mu.Unlock()
-		}
-	}
-}
-
 func (p *initProgress) Done() {
-	if p == nil {
-		return
-	}
-	p.mu.Lock()
-	if !p.stopped {
-		p.stopped = true
-		close(p.stopHeartbeat)
-	}
-	if p.heartbeatActive {
-		fmt.Fprint(p.out, "\r\033[K")
-		p.heartbeatActive = false
-	}
-	p.mu.Unlock()
 }
 
 func (p *initProgress) Summary(projectRoot string) {
 	p.withInteractiveLock(func() {
-		if p.heartbeatActive {
-			fmt.Fprint(p.out, "\r\033[K")
-			p.heartbeatActive = false
-		}
 		fmt.Fprintf(p.out, "\n✅ %s Knowledge Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
 		fmt.Fprintln(p.out, "────────────────────────────────────────────────────────────────────────────────")
 		fmt.Fprintln(p.out, "Kernel State & Lineage Evidence:")
