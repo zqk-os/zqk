@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
@@ -35,7 +37,7 @@ func TestConstMagicEradication_StaticFloor(t *testing.T) {
 			return nil
 		}
 
-		content, readErr := os.ReadFile(path)
+		content, readErr := fileutil.ReadFile(path)
 		if readErr != nil {
 			return readErr
 		}
@@ -105,7 +107,7 @@ func TestConstMagicEradication_NegativeBoundary(t *testing.T) {
 const ConstMagic9999ffff = "synthetic constant"
 func dummy() {}
 `
-	if err := os.WriteFile(badConstFile, []byte(badConstContent), 0644); err != nil {
+	if err := fileutil.WriteFile(badConstFile, []byte(badConstContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write temp file: %v", err)
 	}
 

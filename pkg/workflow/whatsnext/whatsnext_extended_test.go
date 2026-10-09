@@ -3,7 +3,6 @@ package whatsnext
 import (
 	"context"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -11,7 +10,9 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type extendedMockStorage struct {
@@ -409,7 +410,7 @@ func TestWhatsNextExtended_EnrichStrategicAlignmentAndMetrics(t *testing.T) {
 
 	// 2. Create valid files
 	alignDir := filepath.Join(tmp, ".zqk", "state", "ambient")
-	if err := os.MkdirAll(alignDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(alignDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
@@ -422,13 +423,13 @@ func TestWhatsNextExtended_EnrichStrategicAlignmentAndMetrics(t *testing.T) {
 		},
 	}
 	b, _ := json.Marshal(alignData)
-	_ = os.WriteFile(filepath.Join(alignDir, "align-latest.json"), b, 0644)
+	_ = fileutil.WriteFile(filepath.Join(alignDir, "align-latest.json"), b, paths.FilePerm644)
 
 	rollupData := map[string]any{
 		"total_runs": 100,
 	}
 	b2, _ := json.Marshal(rollupData)
-	_ = os.WriteFile(filepath.Join(alignDir, "metrics-rollup.json"), b2, 0644)
+	_ = fileutil.WriteFile(filepath.Join(alignDir, "metrics-rollup.json"), b2, paths.FilePerm644)
 
 	amb2 := &KernelAmbience{}
 	EnrichStrategicAlignment(amb2, tmp)
@@ -748,7 +749,7 @@ func TestWhatsNextExtended_SeatLookup(t *testing.T) {
 func TestWhatsNextExtended_LoadKernelAmbienceWithCheckSummary(t *testing.T) {
 	tmp := t.TempDir()
 	logsDir := filepath.Join(tmp, ".zqk", "logs")
-	if err := os.MkdirAll(logsDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(logsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("mkdir failed: %v", err)
 	}
 
@@ -769,7 +770,7 @@ func TestWhatsNextExtended_LoadKernelAmbienceWithCheckSummary(t *testing.T) {
     ]
   }
 }`
-	_ = os.WriteFile(filepath.Join(logsDir, "system-check.json"), []byte(content), 0644)
+	_ = fileutil.WriteFile(filepath.Join(logsDir, "system-check.json"), []byte(content), paths.FilePerm644)
 
 	amb := LoadKernelAmbience(tmp)
 	if !amb.Available {

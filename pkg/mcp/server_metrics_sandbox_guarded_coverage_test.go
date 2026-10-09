@@ -14,8 +14,10 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // 1. Server getters/setters and format permission tests
@@ -220,28 +222,28 @@ func TestDeep5_ResourceMIMEAdapters_Comprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	jsonPath1 := filepath.Join(tmpDir, "test1.json")
-	_ = os.WriteFile(jsonPath1, []byte(`{"title": "Test JSON", "description": "JSON Desc", "version": "1.0"}`), paths.FilePerm644)
+	_ = fileutil.WriteFile(jsonPath1, []byte(`{"title": "Test JSON", "description": "JSON Desc", "version": "1.0"}`), paths.FilePerm644)
 
 	jsonPath2 := filepath.Join(tmpDir, "test2.json")
-	_ = os.WriteFile(jsonPath2, []byte(`{"Title": "Alt Title", "Description": "Alt Desc", "Name": "alt_name"}`), paths.FilePerm644)
+	_ = fileutil.WriteFile(jsonPath2, []byte(`{"Title": "Alt Title", "Description": "Alt Desc", "Name": "alt_name"}`), paths.FilePerm644)
 
 	jsonPath3 := filepath.Join(tmpDir, "test3.json")
-	_ = os.WriteFile(jsonPath3, []byte(`{"name": "json_name"}`), paths.FilePerm644)
+	_ = fileutil.WriteFile(jsonPath3, []byte(`{"name": "json_name"}`), paths.FilePerm644)
 
 	jsonInvalid := filepath.Join(tmpDir, "invalid.json")
-	_ = os.WriteFile(jsonInvalid, []byte(`{not json`), paths.FilePerm644)
+	_ = fileutil.WriteFile(jsonInvalid, []byte(`{not json`), paths.FilePerm644)
 
 	yamlPath1 := filepath.Join(tmpDir, "test1.yaml")
-	_ = os.WriteFile(yamlPath1, []byte("title: Test YAML\ndescription: YAML Desc\nauthor: alice\n"), paths.FilePerm644)
+	_ = fileutil.WriteFile(yamlPath1, []byte("title: Test YAML\ndescription: YAML Desc\nauthor: alice\n"), paths.FilePerm644)
 
 	yamlPath2 := filepath.Join(tmpDir, "test2.yaml")
-	_ = os.WriteFile(yamlPath2, []byte("Title: YAML Alt Title\nDescription: YAML Alt Desc\nName: yaml_alt\n"), paths.FilePerm644)
+	_ = fileutil.WriteFile(yamlPath2, []byte("Title: YAML Alt Title\nDescription: YAML Alt Desc\nName: yaml_alt\n"), paths.FilePerm644)
 
 	yamlPath3 := filepath.Join(tmpDir, "test3.yaml")
-	_ = os.WriteFile(yamlPath3, []byte("name: yaml_name\n"), paths.FilePerm644)
+	_ = fileutil.WriteFile(yamlPath3, []byte("name: yaml_name\n"), paths.FilePerm644)
 
 	yamlInvalid := filepath.Join(tmpDir, "invalid.yaml")
-	_ = os.WriteFile(yamlInvalid, []byte("[\ninvalid: yaml"), paths.FilePerm644)
+	_ = fileutil.WriteFile(yamlInvalid, []byte("[\ninvalid: yaml"), paths.FilePerm644)
 
 	// JSONAdapter
 	ja := &JSONAdapter{}
@@ -454,15 +456,16 @@ func TestDeep5_ProxyDaemon_Queries(t *testing.T) {
 	pd := NewProxyDaemon(ln.Addr().String(), nil)
 
 	// Server goroutine answering requests
-	go func() {
+	goroutinelabels.NewGoroutine("mock_proxy_server", "mock mcp proxy server loop").StartSimple(func() {
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
 				return
 			}
-			go func(c net.Conn) {
-				defer c.Close()
-				br := bufio.NewReader(c)
+			cConn := conn
+			goroutinelabels.NewGoroutine("mock_proxy_conn", "mock mcp proxy conn handler").StartSimple(func() {
+				defer cConn.Close()
+				br := bufio.NewReader(cConn)
 				for {
 					line, err := br.ReadBytes('\n')
 					if err != nil {
@@ -482,18 +485,18 @@ func TestDeep5_ProxyDaemon_Queries(t *testing.T) {
 					switch method {
 					case "initialize":
 						resp := fmt.Sprintf(`{"jsonrpc":"2.0","id":%v,"result":{"protocolVersion":"2024-11-05"}}`+"\n", id)
-						_, _ = c.Write([]byte(resp))
+						_, _ = cConn.Write([]byte(resp))
 					case "events/list":
 						resp := fmt.Sprintf(`{"jsonrpc":"2.0","id":%v,"result":{"subscriberCount":4}}`+"\n", id)
-						_, _ = c.Write([]byte(resp))
+						_, _ = cConn.Write([]byte(resp))
 					case "system/diagnostics":
 						resp := fmt.Sprintf(`{"jsonrpc":"2.0","id":%v,"result":{"status":"healthy","uptime":42}}`+"\n", id)
-						_, _ = c.Write([]byte(resp))
+						_, _ = cConn.Write([]byte(resp))
 					}
 				}
-			}(conn)
+			})
 		}
-	}()
+	})
 
 	// Test subscriber count
 	count, err := pd.QueryEventsSubscriberCount(ctx)

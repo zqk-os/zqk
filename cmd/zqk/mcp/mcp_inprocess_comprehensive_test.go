@@ -32,6 +32,11 @@ import (
 var mcpTestMu sync.Mutex
 
 func setupMCPTestProject(t *testing.T) (string, func()) {
+	root, _, cleanup := setupMCPTestProjectWithStorage(t)
+	return root, cleanup
+}
+
+func setupMCPTestProjectWithStorage(t *testing.T) (string, storage.ObjectStorageProvider, func()) {
 	mcpTestMu.Lock()
 	t.Cleanup(func() { mcpTestMu.Unlock() })
 
@@ -39,7 +44,7 @@ func setupMCPTestProject(t *testing.T) (string, func()) {
 		Kind:            "cmd.mcp.comprehensive",
 		SeedSchemaPlane: true,
 	})
-	return p.Root, func() {}
+	return p.Root, p.FileStorage, func() {}
 }
 
 func executeMCPCommand(t *testing.T, projectRoot string, provider storage.ObjectStorageProvider, args ...string) (string, error) {

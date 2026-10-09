@@ -1,11 +1,12 @@
 package community
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestShellEnv_FunctionalAcceptance(t *testing.T) {
@@ -58,7 +59,7 @@ func TestShellEnv_FunctionalAcceptance(t *testing.T) {
 
 			// Pre-populate config file with user settings
 			initialContent := "# User configuration\nalias ll='ls -la'\n"
-			if err := os.WriteFile(tc.configFile, []byte(initialContent), paths.FilePerm644); err != nil {
+			if err := fileutil.WriteFile(tc.configFile, []byte(initialContent), paths.FilePerm644); err != nil {
 				t.Fatalf("failed creating test config: %v", err)
 			}
 
@@ -75,7 +76,7 @@ func TestShellEnv_FunctionalAcceptance(t *testing.T) {
 			}
 
 			// 2. Verify content
-			data, err := os.ReadFile(tc.configFile)
+			data, err := fileutil.ReadFile(tc.configFile)
 			if err != nil {
 				t.Fatalf("failed reading modified config: %v", err)
 			}
@@ -105,7 +106,7 @@ func TestShellEnv_FunctionalAcceptance(t *testing.T) {
 				t.Errorf("expected remRes.Modified to be true")
 			}
 
-			dataAfter, err := os.ReadFile(tc.configFile)
+			dataAfter, err := fileutil.ReadFile(tc.configFile)
 			if err != nil {
 				t.Fatalf("failed reading config after removal: %v", err)
 			}
@@ -165,7 +166,7 @@ func TestShellEnv_BoundaryAndErrorHandling(t *testing.T) {
 		}
 
 		// Count occurrences of marker
-		data, _ := os.ReadFile(cfgPath)
+		data, _ := fileutil.ReadFile(cfgPath)
 		count := strings.Count(string(data), markerStart)
 		if count != 1 {
 			t.Errorf("expected exactly 1 marker block, found %d", count)
@@ -197,7 +198,7 @@ func TestShellEnv_BoundaryAndErrorHandling(t *testing.T) {
 			t.Errorf("expected update to modify file")
 		}
 
-		data, _ := os.ReadFile(cfgPath)
+		data, _ := fileutil.ReadFile(cfgPath)
 		content := string(data)
 		if strings.Contains(content, "/old/path/bin") {
 			t.Errorf("old path should have been replaced")
@@ -235,7 +236,7 @@ func TestShellEnv_BoundaryAndErrorHandling(t *testing.T) {
 		if !res.Modified {
 			t.Errorf("expected file to be created and modified")
 		}
-		if _, err := os.Stat(nestedPath); err != nil {
+		if _, err := fileutil.Stat(nestedPath); err != nil {
 			t.Errorf("nested config file was not created: %v", err)
 		}
 	})

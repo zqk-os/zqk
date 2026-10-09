@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -21,7 +22,7 @@ func TestCaptureDiagnostics_Success(t *testing.T) {
 		t.Fatalf("CaptureDiagnostics failed: %v", err)
 	}
 
-	files, err := os.ReadDir(dir)
+	files, err := fileutil.ReadDir(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +40,7 @@ func TestCaptureDiagnostics_Success(t *testing.T) {
 
 	// Capture with an invalid directory path (e.g. using a file as dir)
 	filePathAsDir := filepath.Join(dir, "file_blocking_dir")
-	_ = os.WriteFile(filePathAsDir, []byte("blocker"), paths.FilePerm644)
+	_ = fileutil.WriteFile(filePathAsDir, []byte("blocker"), paths.FilePerm644)
 	if err := CaptureDiagnostics(filePathAsDir, "test_prefix"); err == nil {
 		t.Fatal("expected error when outputDir is a file")
 	}
@@ -191,7 +192,7 @@ func TestStartCPUProfileOnSIGUSR2(t *testing.T) {
 	// Test error paths in runCPUProfileDump
 	// 1. mkdir failure (dir is an existing file)
 	blockerFile := filepath.Join(dir, "mkdir_blocker")
-	_ = os.WriteFile(blockerFile, []byte("x"), paths.FilePerm644)
+	_ = fileutil.WriteFile(blockerFile, []byte("x"), paths.FilePerm644)
 	cpuProfileDirMu.Lock()
 	cpuProfileDir = filepath.Join(blockerFile, "sub")
 	cpuProfileDirMu.Unlock()
@@ -199,7 +200,7 @@ func TestStartCPUProfileOnSIGUSR2(t *testing.T) {
 
 	// 2. create failure (directory is not writable or is a file)
 	blockerFile2 := filepath.Join(dir, "create_blocker")
-	_ = os.WriteFile(blockerFile2, []byte("x"), paths.FilePerm644)
+	_ = fileutil.WriteFile(blockerFile2, []byte("x"), paths.FilePerm644)
 	cpuProfileDirMu.Lock()
 	cpuProfileDir = blockerFile2
 	cpuProfileDirMu.Unlock()
@@ -227,7 +228,7 @@ func TestSetupSignalHandler(t *testing.T) {
 	// Wait up to 3 seconds for the capture goroutine to write files
 	targetDir := filepath.Join(dir, paths.ProjectDataDir, diagnosticsSubdir, "test_prefix")
 	for i := 0; i < 30; i++ {
-		if entries, err := os.ReadDir(targetDir); err == nil && len(entries) >= 4 {
+		if entries, err := fileutil.ReadDir(targetDir); err == nil && len(entries) >= 4 {
 			break
 		}
 		time.Sleep(100 * time.Millisecond)
@@ -245,11 +246,11 @@ func TestPruneDiagnosticsCaptures_Edges(t *testing.T) {
 	for i := 1; i <= 15; i++ {
 		ts := fmt.Sprintf("20260901-1200%02d", i)
 		name := fmt.Sprintf("%s_%s_goroutines.txt", prefix, ts)
-		_ = os.WriteFile(filepath.Join(dir, name), []byte("test"), paths.FilePerm644)
+		_ = fileutil.WriteFile(filepath.Join(dir, name), []byte("test"), paths.FilePerm644)
 	}
 
 	pruneDiagnosticsCaptures(dir, prefix)
-	remaining, _ := os.ReadDir(dir)
+	remaining, _ := fileutil.ReadDir(dir)
 	if len(remaining) > diagnosticsRetentionMaxCaptureSets {
 		t.Fatalf("expected at most %d sets, got %d", diagnosticsRetentionMaxCaptureSets, len(remaining))
 	}

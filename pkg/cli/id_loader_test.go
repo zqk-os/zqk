@@ -1,12 +1,13 @@
 package cli
 
 import (
-	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestExpandCommaSeparatedIDs(t *testing.T) {
@@ -72,7 +73,7 @@ func TestLoadIDsFromFlags(t *testing.T) {
 	t.Run("from_file_flag", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		filePath := filepath.Join(tmpDir, "ids.yaml")
-		if err := os.WriteFile(filePath, []byte("- ID-A\n- ID-B\n"), 0644); err != nil {
+		if err := fileutil.WriteFile(filePath, []byte("- ID-A\n- ID-B\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write temp file: %v", err)
 		}
 

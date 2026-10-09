@@ -2,7 +2,6 @@ package community
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -80,7 +79,7 @@ func TestTelemetryCollector_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("exported diagnostic snapshot file does not exist at %s", exportPath)
 	}
 
-	content, err := os.ReadFile(exportPath)
+	content, err := fileutil.ReadFile(exportPath)
 	if err != nil {
 		t.Fatalf("failed to read exported file: %v", err)
 	}

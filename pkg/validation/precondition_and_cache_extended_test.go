@@ -1,12 +1,13 @@
 package validation
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestValidationStateCache_ExtendedInvalidation(t *testing.T) {
@@ -70,7 +71,7 @@ func TestOverlayDSL_Extended(t *testing.T) {
 	}
 
 	tmpFile := filepath.Join(options.ProjectRoot, "doc.md")
-	_ = os.WriteFile(tmpFile, []byte("content"), 0644)
+	_ = fileutil.WriteFile(tmpFile, []byte("content"), paths.FilePerm644)
 	objWithPath := map[string]any{objects.FieldKeyPath: tmpFile}
 	handled, met = evalOverlayDSLStage(gv, "target file reachable and readable", objWithPath, options)
 	if !handled || !met {

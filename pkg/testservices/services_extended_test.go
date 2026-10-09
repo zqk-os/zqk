@@ -5,12 +5,14 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
-	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -196,20 +198,32 @@ func TestTestServices_CleanupWithErrors(t *testing.T) {
 }
 
 func TestSetupTestServices_GraphEnabledWithExistingMemgraph(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping docker service test in short mode")
+	}
+	sm := NewServiceManager()
+	if !sm.isDockerAvailable() {
+		t.Skip("Docker not available in this test environment")
+	}
+
 	// Create a temp project root with config/zqk.yaml setting storage.graph_enabled: true
 	tmpDir := t.TempDir()
 
-	configDir := tmpDir + "/config"
-	require.NoError(t, os.MkdirAll(configDir, 0755))
+	configDir := filepath.Join(tmpDir, "config")
+	require.NoError(t, fileutil.MkdirAll(configDir, paths.DirPerm755))
 	configContent := "storage:\n  graph_enabled: true\n"
-	require.NoError(t, fileutil.WriteFile(configDir+"/zqk.yaml", []byte(configContent), 0644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(configDir, "zqk.yaml"), []byte(configContent), paths.FilePerm644))
 
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
 
-	// SetupTestServices with graph enabled will call StartService for MemGraph,
-	// which detects zqk-memgraph already running on host ports and succeeds immediately!
+	// SetupTestServices with graph enabled will call StartService for MemGraph
 	ts, err := SetupTestServices(context.Background())
-	require.NoError(t, err)
+	if err != nil {
+		if strings.Contains(err.Error(), "toomanyrequests") || strings.Contains(err.Error(), "pull rate limit") || strings.Contains(err.Error(), "Cannot connect to the Docker daemon") {
+			t.Skipf("skipping test due to docker environment/pull rate limit: %v", err)
+		}
+		t.Fatalf("unexpected error starting test services: %v", err)
+	}
 	require.NotNil(t, ts)
 	assert.Equal(t, "zqk-test-memgraph", ts.memgraphContainer)
 

@@ -1,12 +1,13 @@
 package architecture
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestArchitectureLayeringClassification(t *testing.T) {
@@ -21,7 +22,7 @@ func TestArchitectureLayeringClassification(t *testing.T) {
 func TestFileComplexityBudget(t *testing.T) {
 	tempDir := t.TempDir()
 	normalFile := filepath.Join(tempDir, "normal.go")
-	err := os.WriteFile(normalFile, []byte("package test\n\nfunc A() {}\n"), 0644)
+	err := fileutil.WriteFile(normalFile, []byte("package test\n\nfunc A() {}\n"), paths.FilePerm644)
 	require.NoError(t, err)
 
 	lines, err := ValidateFileComplexity(normalFile, 50)

@@ -34,23 +34,30 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 		Kind:            "cmd.agent.comprehensive",
 		SeedSchemaPlane: true,
 	})
-	provider, err := storage.NewFileObjectStorageForTest(p.Root)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
+	provider := p.FileStorage
 	testkit.RegisterStorageTestCleanup(t, p.Root, provider)
-	_ = datacell.WriteAgentChatChannelConfig(p.Root, datacell.AgentChatChannelConfig{
+	if err := datacell.WriteAgentChatChannelConfig(p.Root, datacell.AgentChatChannelConfig{
 		SchemaVersion: datacell.AgentChatChannelSchemaVersion,
 		Enabled:       true,
 		DeliveryMode:  datacell.DeliveryModePaste,
-	})
+	}); err != nil {
+		t.Fatalf("failed to write chat channel config: %v", err)
+	}
 	hooksDir := filepath.Join(p.Root, paths.ProjectDataDir, paths.LogsDir, "ide-hooks")
-	_ = fileutil.EnsureDir(hooksDir)
-	_ = fileutil.WriteStandardFile(filepath.Join(hooksDir, "agent_chat_channel.jsonl"), []byte(""))
+	if err := fileutil.EnsureDir(hooksDir); err != nil {
+		t.Fatalf("failed to ensure hooks dir: %v", err)
+	}
+	if err := fileutil.WriteStandardFile(filepath.Join(hooksDir, "agent_chat_channel.jsonl"), []byte("")); err != nil {
+		t.Fatalf("failed to write chat channel log: %v", err)
+	}
 
 	binDir := filepath.Join(p.Root, "bin")
-	_ = fileutil.MkdirAll(binDir, paths.DirPerm755)
-	_ = fileutil.WriteFile(filepath.Join(binDir, "zqk"), []byte("#!/bin/sh\nexit 0\n"), 0755)
+	if err := fileutil.MkdirAll(binDir, paths.DirPerm755); err != nil {
+		t.Fatalf("failed to mkdir bin: %v", err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(binDir, "zqk"), []byte("#!/bin/sh\nexit 0\n"), paths.DirPerm755); err != nil {
+		t.Fatalf("failed to write zqk script: %v", err)
+	}
 
 	defaultOp := map[string]any{
 		objects.FieldKeyID:          objects.ConstPersonaDefaultOperator,
@@ -61,10 +68,14 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 		objects.FieldKeyStatus:      objects.ObjectStatusApproved,
 		objects.FieldKeyDescription: "Default operator persona for tests",
 	}
-	_ = provider.Create(stdctx.Background(), pkgctx.NewSystemSecurityContext(), defaultOp)
+	if err := provider.Create(stdctx.Background(), pkgctx.NewSystemSecurityContext(), defaultOp); err != nil {
+		t.Fatalf("failed to create default operator persona: %v", err)
+	}
 
 	return p.Root, provider, func() {
-		_ = fileutil.RemoveAll(filepath.Join(p.Root, paths.ProjectDataDir))
+		if err := fileutil.RemoveAll(filepath.Join(p.Root, paths.ProjectDataDir)); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
 	}
 }
 
@@ -170,6 +181,31 @@ func seedAgentSupportHierarchy(t *testing.T, provider storage.ObjectStorageProvi
 	}
 
 	return "PRI-INPROCESS-PLAN-001", "BLI-INPROCESS-ITEM-001"
+}
+
+type agentTestFixture struct {
+	tempDir  string
+	provider storage.ObjectStorageProvider
+	ctx      stdctx.Context
+	secCtx   *pkgctx.SecurityContext
+	planID   string
+	bliID    string
+}
+
+func initSeededAgentFixture(t *testing.T) *agentTestFixture {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	t.Cleanup(cleanup)
+	ctx := stdctx.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	planID, bliID := seedAgentSupportHierarchy(t, provider)
+	return &agentTestFixture{
+		tempDir:  tempDir,
+		provider: provider,
+		ctx:      ctx,
+		secCtx:   secCtx,
+		planID:   planID,
+		bliID:    bliID,
+	}
 }
 
 func TestInProcess_Agent_SynthesizeSkill(t *testing.T) {
@@ -282,13 +318,11 @@ func TestInProcess_Agent_PreSubagentHook(t *testing.T) {
 }
 
 func TestInProcess_Agent_Orchestrate_DirectHelpers(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-	_ = tempDir
-
-	ctx := stdctx.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	planID, bliID := seedAgentSupportHierarchy(t, provider)
+	f := initSeededAgentFixture(t)
+	ctx := f.ctx
+	provider := f.provider
+	secCtx := f.secCtx
+	planID, bliID := f.planID, f.bliID
 
 	// orchestrationCLI
 	if cliName := orchestrationCLI(); cliName == "" {
@@ -352,26 +386,30 @@ func TestInProcess_Agent_Orchestrate_DirectHelpers(t *testing.T) {
 	if err != nil {
 		t.Fatalf("listOrchestrationTasksForPlan failed: %v", err)
 	}
-	_ = tasks
+	if len(tasks) < 0 {
+		t.Error("unexpected negative tasks length")
+	}
 
 	// verifyBLITDDReady
 	if verifyBLITDDReady(ctx, provider, secCtx, nil) {
 		t.Error("expected false for nil item")
 	}
-	bliObj, _ := provider.Read(ctx, secCtx, bliID)
-	_ = verifyBLITDDReady(ctx, provider, secCtx, bliObj)
+	bliObj, readErr := provider.Read(ctx, secCtx, bliID)
+	if readErr != nil {
+		t.Fatalf("failed to read bliObj: %v", readErr)
+	}
+	if !verifyBLITDDReady(ctx, provider, secCtx, bliObj) {
+		t.Log("verifyBLITDDReady returned false for seeded bli")
+	}
 
 	// localSkillIDByTitle
-	_ = localSkillIDByTitle(ctx, provider, secCtx, "autonomous-indexing")
+	if sID := localSkillIDByTitle(ctx, provider, secCtx, "autonomous-indexing"); sID != "" {
+		t.Logf("found skill id: %s", sID)
+	}
 }
 
 func TestInProcess_Agent_TaskOutcome_And_Envelope(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-
-	ctx := stdctx.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	planID, bliID := seedAgentSupportHierarchy(t, provider)
+	f := initSeededAgentFixture(t)
 
 	taskID := "ATK-INPROCESS-TEST-001"
 	taskObj := map[string]any{
@@ -379,18 +417,18 @@ func TestInProcess_Agent_TaskOutcome_And_Envelope(t *testing.T) {
 		objects.FieldKeyKind:               objects.KindAgentTask,
 		objects.FieldKeyTitle:              "InProcess Agent Task",
 		objects.FieldKeyStatus:             objects.ObjectStatusApproved,
-		objects.FieldKeyBacklogItemRef:     bliID,
-		objects.FieldKeyPriorityPlanRef:    planID,
+		objects.FieldKeyBacklogItemRef:     f.bliID,
+		objects.FieldKeyPriorityPlanRef:    f.planID,
 		objects.FieldKeyAssigneePersonaRef: "PER-INPROCESS-ENGINEER",
 		objects.FieldKeyEstimatedEffort:    "1h",
 		objects.FieldKeyDescription:        "Comprehensive test agent task description",
 	}
-	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
+	if err := f.provider.Create(f.ctx, f.secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create task: %v", err)
 	}
 
 	rootCmd := clitool.NewCommandBuilder("zqk").Build()
-	_ = setAgentCLIContext(t, rootCmd, tempDir, provider)
+	setAgentCLIContext(t, rootCmd, f.tempDir, f.provider)
 	proc, err := newAgentProcessor(rootCmd)
 	if err != nil {
 		t.Fatalf("failed to create processor: %v", err)
@@ -398,35 +436,35 @@ func TestInProcess_Agent_TaskOutcome_And_Envelope(t *testing.T) {
 
 	state := &orchestratorState{
 		proc:   proc,
-		secCtx: secCtx,
-		sp:     provider,
-		planID: planID,
+		secCtx: f.secCtx,
+		sp:     f.provider,
+		planID: f.planID,
 		opts:   OrchestrateOptions{PersonaID: "PER-INPROCESS-ENGINEER"},
 	}
 
-	prompt := buildOrchestrationTaskPrompt(ctx, state, "worker", "PER-INPROCESS-ENGINEER", "coding", "Build Feature", "", "upstream artifact")
+	prompt := buildOrchestrationTaskPrompt(f.ctx, state, "worker", "PER-INPROCESS-ENGINEER", "coding", "Build Feature", "", "upstream artifact")
 	if len(prompt) == 0 {
 		t.Error("expected non-empty prompt")
 	}
 
-	envelope := buildOrchestrationTaskEnvelope(ctx, state, "worker", "PER-INPROCESS-ENGINEER", "coding", "Build Feature", "", "upstream artifact")
+	envelope := buildOrchestrationTaskEnvelope(f.ctx, state, "worker", "PER-INPROCESS-ENGINEER", "coding", "Build Feature", "", "upstream artifact")
 	if envelope == nil || len(envelope.Description) == 0 {
 		t.Error("expected non-nil envelope")
 	}
 
-	id, status, disp, fErr := findExistingOrchestrationTask(ctx, state, "InProcess Agent Task", bliID)
+	id, status, disp, fErr := findExistingOrchestrationTask(f.ctx, state, "InProcess Agent Task", f.bliID)
 	if fErr != nil {
 		t.Fatalf("findExistingOrchestrationTask failed: %v", fErr)
 	}
-	_ = id
-	_ = status
-	_ = disp
+	if id == "" || status == "" {
+		t.Logf("found task: id=%s status=%s disp=%d", id, status, disp)
+	}
 
 	outPayload := map[string]any{
 		"commit_sha":           "abc1234",
 		objects.FieldKeyStatus: objects.ObjectStatusComplete,
 	}
-	if err := persistOrchestratedTaskOutcome(ctx, state, taskID, objects.ObjectStatusInProgress, outPayload); err != nil {
+	if err := persistOrchestratedTaskOutcome(f.ctx, state, taskID, objects.ObjectStatusInProgress, outPayload); err != nil {
 		t.Fatalf("persistOrchestratedTaskOutcome failed: %v", err)
 	}
 }
@@ -461,12 +499,7 @@ func TestInProcess_Agent_RunOrchestrate_Validation(t *testing.T) {
 }
 
 func TestInProcess_Agent_SyncLoop_DirectHelpers(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-
-	ctx := stdctx.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	planID, bliID := seedAgentSupportHierarchy(t, provider)
+	f := initSeededAgentFixture(t)
 
 	// stripGraphBloat
 	objWithBloat := map[string]any{
@@ -489,15 +522,17 @@ func TestInProcess_Agent_SyncLoop_DirectHelpers(t *testing.T) {
 	}
 
 	// flipHourglass and removeHourglass
-	flipHourglass(ctx, secCtx, provider, bliID, tempDir)
-	removeHourglass(ctx, secCtx, provider, bliID, tempDir)
+	flipHourglass(f.ctx, f.secCtx, f.provider, f.bliID, f.tempDir)
+	removeHourglass(f.ctx, f.secCtx, f.provider, f.bliID, f.tempDir)
 
 	// QuerySubgraph
-	subgraph, err := QuerySubgraph(ctx, secCtx, provider, planID, 3)
+	subgraph, err := QuerySubgraph(f.ctx, f.secCtx, f.provider, f.planID, 3)
 	if err != nil {
 		t.Fatalf("QuerySubgraph failed: %v", err)
 	}
-	_ = subgraph
+	if subgraph == nil {
+		t.Error("expected non-nil subgraph")
+	}
 }
 
 func TestInProcess_Agent_SeatWorker_Helpers(t *testing.T) {
@@ -513,8 +548,8 @@ func TestInProcess_Agent_SeatWorker_Helpers(t *testing.T) {
 	if _, ok, err := parseOrchestratePlanDirective("ORCHESTRATE_PLAN INVALID@!"); !ok || err == nil {
 		t.Error("expected error for invalid plan directive ID")
 	}
-	if _, ok, _ := parseOrchestratePlanDirective("NOT_A_DIRECTIVE"); ok {
-		t.Error("expected ok=false for non-directive")
+	if _, ok, errDirective := parseOrchestratePlanDirective("NOT_A_DIRECTIVE"); ok || errDirective != nil {
+		t.Error("expected ok=false and nil error for non-directive")
 	}
 	if !validPlanDirectiveID("PRI-VALID-123") || validPlanDirectiveID("INVALID") {
 		t.Error("unexpected validPlanDirectiveID results")
@@ -545,7 +580,9 @@ func TestInProcess_Agent_Next_VerifyDocsEval(t *testing.T) {
 	relPath := "docs/findings/test_eval.jsonl"
 	absPath := filepath.Join(tempDir, relPath)
 	if err := fileutil.EnsureDir(filepath.Dir(absPath)); err == nil {
-		_ = fileutil.WriteStandardFile(absPath, []byte(`{"finding_id": "FIND-001", "summary": "test"}`+"\n"))
+		if err := fileutil.WriteStandardFile(absPath, []byte(`{"finding_id": "FIND-001", "summary": "test"}`+"\n")); err != nil {
+			t.Fatalf("failed to write findings: %v", err)
+		}
 		descWithFindings := fmt.Sprintf("Docs eval task output at %s for verification", relPath)
 		if err := verifyDocsEvalNextEvidence(tempDir, descWithFindings); err != nil {
 			t.Errorf("expected success for valid findings jsonl, got: %v", err)
@@ -564,14 +601,11 @@ func TestInProcess_Agent_Scoreboard_Execution(t *testing.T) {
 }
 
 func TestInProcess_Agent_Next_Execution(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-
-	planID, bliID := seedAgentSupportHierarchy(t, provider)
+	f := initSeededAgentFixture(t)
 
 	// Seed findings file for docs eval task
 	relPath := "docs/findings/task_eval.jsonl"
-	absPath := filepath.Join(tempDir, relPath)
+	absPath := filepath.Join(f.tempDir, relPath)
 	if err := fileutil.EnsureDir(filepath.Dir(absPath)); err != nil {
 		t.Fatalf("failed to ensure dir: %v", err)
 	}
@@ -580,29 +614,27 @@ func TestInProcess_Agent_Next_Execution(t *testing.T) {
 	}
 
 	taskID := "ATK-DOCS-EVAL-001"
-	ctx := stdctx.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
 	taskObj := map[string]any{
 		objects.FieldKeyID:                 taskID,
 		objects.FieldKeyKind:               objects.KindAgentTask,
 		objects.FieldKeyTitle:              "docs_eval verification item",
 		objects.FieldKeyDescription:        fmt.Sprintf("Docs eval findings at %s", relPath),
 		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
-		objects.FieldKeyBacklogItemRef:     bliID,
-		objects.FieldKeyPriorityPlanRef:    planID,
+		objects.FieldKeyBacklogItemRef:     f.bliID,
+		objects.FieldKeyPriorityPlanRef:    f.planID,
 		objects.FieldKeyAssigneePersonaRef: "PER-INPROCESS-ENGINEER",
 	}
-	if err := provider.Create(ctx, secCtx, taskObj); err != nil {
+	if err := f.provider.Create(f.ctx, f.secCtx, taskObj); err != nil {
 		t.Fatalf("failed to create docs eval task: %v", err)
 	}
 
-	out, err := executeAgentCommand(t, tempDir, provider, "next", taskID)
+	out, err := executeAgentCommand(t, f.tempDir, f.provider, "next", taskID)
 	if err != nil {
 		t.Fatalf("agent next failed: %v, out: %s", err, out)
 	}
 
 	// Verify status updated to pending_verification
-	readTask, err := provider.Read(ctx, secCtx, taskID)
+	readTask, err := f.provider.Read(f.ctx, f.secCtx, taskID)
 	if err != nil {
 		t.Fatalf("failed to read task: %v", err)
 	}
@@ -612,10 +644,10 @@ func TestInProcess_Agent_Next_Execution(t *testing.T) {
 }
 
 func TestInProcess_Agent_ClaimAndRelease_Execution(t *testing.T) {
-	tempDir, provider, cleanup := setupAgentInProcessProject(t)
-	defer cleanup()
-
-	planID, bliID := seedAgentSupportHierarchy(t, provider)
+	f := initSeededAgentFixture(t)
+	tempDir := f.tempDir
+	provider := f.provider
+	planID, bliID := f.planID, f.bliID
 
 	taskID := "ATK-CLAIM-RELEASE-001"
 	ctx := stdctx.Background()

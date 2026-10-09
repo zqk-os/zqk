@@ -2,7 +2,6 @@ package community
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -25,7 +24,7 @@ func TestNotarizationGate_FunctionalAcceptance(t *testing.T) {
 	// Create temporary dummy binary file to test signing & notarization metadata emission
 	tmpDir := t.TempDir()
 	dummyBin := filepath.Join(tmpDir, "dummy-binary")
-	if err := os.WriteFile(dummyBin, []byte("#!/bin/sh\necho test\n"), paths.DirPerm755); err != nil {
+	if err := fileutil.WriteFile(dummyBin, []byte("#!/bin/sh\necho test\n"), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write dummy binary: %v", err)
 	}
 
@@ -40,7 +39,7 @@ func TestNotarizationGate_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("expected notarization receipt at %s", receiptPath)
 	}
 
-	receiptBytes, err := os.ReadFile(receiptPath)
+	receiptBytes, err := fileutil.ReadFile(receiptPath)
 	if err != nil {
 		t.Fatalf("failed to read receipt: %v", err)
 	}
@@ -77,7 +76,7 @@ func TestNotarizationGate_BoundaryAndErrorHandling(t *testing.T) {
 	// Create dummy archive and test --verify flag
 	tmpDir := t.TempDir()
 	dummyArchive := filepath.Join(tmpDir, "dummy-archive.tar.gz")
-	if err := os.WriteFile(dummyArchive, []byte("fake archive contents"), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(dummyArchive, []byte("fake archive contents"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write dummy archive: %v", err)
 	}
 
@@ -107,7 +106,7 @@ func TestNotarizationGate_IntegrationAndConformance(t *testing.T) {
 		t.Fatalf("expected package-community.sh at %s", packageScript)
 	}
 
-	contentBytes, err := os.ReadFile(packageScript)
+	contentBytes, err := fileutil.ReadFile(packageScript)
 	if err != nil {
 		t.Fatalf("failed to read package-community.sh: %v", err)
 	}

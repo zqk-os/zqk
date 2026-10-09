@@ -2,12 +2,13 @@ package validation
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/graph/provider"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestIDValidator_LoadingAndPathsExtended(t *testing.T) {
@@ -63,7 +64,7 @@ kind: sample_kind
 id_pattern: "^SMP-[0-9]+$"
 prefixes: ["SMP-"]
 `
-	if err := os.WriteFile(specFile, []byte(specContent), 0644); err != nil {
+	if err := fileutil.WriteFile(specFile, []byte(specContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write temp spec file: %v", err)
 	}
 
@@ -78,15 +79,15 @@ prefixes: ["SMP-"]
 	// findPathByWalkingUp and hasMarkerInDir
 	markerDir := t.TempDir()
 	subDir := filepath.Join(markerDir, "nested", "level")
-	if err := os.MkdirAll(subDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(subDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create nested dirs: %v", err)
 	}
 	gitMarker := filepath.Join(markerDir, ".git")
-	if err := os.Mkdir(gitMarker, 0755); err != nil {
+	if err := fileutil.MkdirAll(gitMarker, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create marker dir: %v", err)
 	}
 	targetFile := filepath.Join(markerDir, "file.txt")
-	if err := os.WriteFile(targetFile, []byte("ok"), 0644); err != nil {
+	if err := fileutil.WriteFile(targetFile, []byte("ok"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write target file: %v", err)
 	}
 

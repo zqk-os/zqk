@@ -83,7 +83,7 @@ func QuerySubgraph(ctx context.Context, secCtx *storage.SecurityContext, sp stor
 	}
 
 	visited := make(map[string]bool)
-	var deps []map[string]any
+	deps := make([]map[string]any, 0)
 
 	var traverse func(currentID string, currentDepth int)
 	traverse = func(currentID string, currentDepth int) {

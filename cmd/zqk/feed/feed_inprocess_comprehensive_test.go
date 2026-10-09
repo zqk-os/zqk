@@ -26,6 +26,11 @@ import (
 var feedTestMu sync.Mutex
 
 func setupFeedTestProject(t *testing.T) (string, func()) {
+	root, _, cleanup := setupFeedTestProjectWithStorage(t)
+	return root, cleanup
+}
+
+func setupFeedTestProjectWithStorage(t *testing.T) (string, storage.ObjectStorageProvider, func()) {
 	feedTestMu.Lock()
 	t.Cleanup(func() { feedTestMu.Unlock() })
 
@@ -34,7 +39,7 @@ func setupFeedTestProject(t *testing.T) (string, func()) {
 		SeedSchemaPlane: true,
 	})
 	enableAgentChatChannelForTest(t, p.Root)
-	return p.Root, func() {}
+	return p.Root, p.FileStorage, func() {}
 }
 
 func enableAgentChatChannelForTest(t *testing.T, tempDir string) {

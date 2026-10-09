@@ -9,6 +9,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type devcontainerConfig struct {
@@ -38,7 +39,7 @@ func TestDevcontainer_FunctionalAcceptance(t *testing.T) {
 		}
 	}
 
-	data, err := os.ReadFile(jsonPath)
+	data, err := fileutil.ReadFile(jsonPath)
 	if err != nil {
 		t.Fatalf("failed to read devcontainer.json: %v", err)
 	}
@@ -128,16 +129,16 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 	// Sub-test 2: Malformed JSON syntax
 	t.Run("MalformedJSON", func(t *testing.T) {
 		badDir := filepath.Join(tmpDir, "bad_json")
-		if err := os.MkdirAll(badDir, paths.DirPerm755); err != nil {
+		if err := fileutil.MkdirAll(badDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(badDir, "devcontainer.json"), []byte("{not_json: true}\n"), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(badDir, "devcontainer.json"), []byte("{not_json: true}\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write file: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(badDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(badDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write Dockerfile: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(badDir, "post-create.sh"), []byte("#!/bin/bash\n"), paths.DirPerm755); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(badDir, "post-create.sh"), []byte("#!/bin/bash\n"), paths.DirPerm755); err != nil {
 			t.Fatalf("failed to write post-create.sh: %v", err)
 		}
 
@@ -151,7 +152,7 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
 	// Sub-test 3: Missing required port 8443
 	t.Run("MissingPort8443", func(t *testing.T) {
 		noPortDir := filepath.Join(tmpDir, "no_port")
-		if err := os.MkdirAll(noPortDir, paths.DirPerm755); err != nil {
+		if err := fileutil.MkdirAll(noPortDir, paths.DirPerm755); err != nil {
 			t.Fatalf("failed to create dir: %v", err)
 		}
 		invalidJSON := `{
@@ -166,13 +167,13 @@ func TestDevcontainer_BoundaryAndErrorHandling(t *testing.T) {
     }
   }
 }`
-		if err := os.WriteFile(filepath.Join(noPortDir, "devcontainer.json"), []byte(invalidJSON), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(noPortDir, "devcontainer.json"), []byte(invalidJSON), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write file: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(noPortDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), paths.FilePerm644); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(noPortDir, "Dockerfile"), []byte("FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04\nUSER vscode\n"), paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write Dockerfile: %v", err)
 		}
-		if err := os.WriteFile(filepath.Join(noPortDir, "post-create.sh"), []byte("#!/bin/bash\n"), paths.DirPerm755); err != nil {
+		if err := fileutil.WriteFile(filepath.Join(noPortDir, "post-create.sh"), []byte("#!/bin/bash\n"), paths.DirPerm755); err != nil {
 			t.Fatalf("failed to write post-create.sh: %v", err)
 		}
 
@@ -210,7 +211,7 @@ func TestDevcontainer_IntegrationAndConformance(t *testing.T) {
 
 	// Verify Dockerfile has multi-arch compatible instructions
 	dockerfilePath := filepath.Join(devcontainerDir, "Dockerfile")
-	dockerBytes, err := os.ReadFile(dockerfilePath)
+	dockerBytes, err := fileutil.ReadFile(dockerfilePath)
 	if err != nil {
 		t.Fatalf("failed reading Dockerfile: %v", err)
 	}
