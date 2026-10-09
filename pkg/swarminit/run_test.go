@@ -2,7 +2,6 @@ package swarminit
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"

@@ -2,7 +2,6 @@ package supply_test
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
