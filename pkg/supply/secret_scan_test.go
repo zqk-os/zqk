@@ -1,12 +1,12 @@
 package supply
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -24,7 +24,7 @@ func TestSecretScan(t *testing.T) {
 	// 1. Clean directory passes secret scan
 	cleanDir := t.TempDir()
 	cleanFile := filepath.Join(cleanDir, "clean.go")
-	err := os.WriteFile(cleanFile, []byte("package main\n\nfunc main() {}\n"), 0644)
+	err := fileutil.WriteFile(cleanFile, []byte("package main\n\nfunc main() {}\n"), paths.FilePerm644)
 	require.NoError(t, err)
 
 	cmd := testkit.ManagedCommand(t, t.Context(), "sh", scriptPath, cleanDir)
@@ -35,7 +35,7 @@ func TestSecretScan(t *testing.T) {
 	dirtyDir := t.TempDir()
 	dirtyFile := filepath.Join(dirtyDir, "config.go")
 	dummyToken := "git" + "hub_pat_11AAAAAAA0123456789012345678901234567890123456789012345678901234567890123456789012"
-	err = os.WriteFile(dirtyFile, []byte("const ApiKey = \""+dummyToken+"\"\n"), 0644)
+	err = fileutil.WriteFile(dirtyFile, []byte("const ApiKey = \""+dummyToken+"\"\n"), paths.FilePerm644)
 	require.NoError(t, err)
 
 	failCmd := testkit.ManagedCommand(t, t.Context(), "sh", scriptPath, dirtyDir)

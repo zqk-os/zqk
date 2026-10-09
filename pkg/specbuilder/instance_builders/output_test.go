@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -118,7 +119,7 @@ func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing
 	tmp := t.TempDir()
 	specPath := filepath.Join(tmp, "widget.yaml")
 	specYAML := "schema_version: \"1.0.0\"\nontology: widget\nfields:\n  title:\n    type: string\n"
-	if err := os.WriteFile(specPath, []byte(specYAML), 0o600); err != nil {
+	if err := fileutil.WriteFile(specPath, []byte(specYAML), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	toolDir := filepath.Join(tmp, "instance_builders")
@@ -126,7 +127,7 @@ func TestGenerateInstanceBuilderFromSpec_writesSiblingWithoutRegistry(t *testing
 		t.Fatal(err)
 	}
 	out := filepath.Join(tmp, generatedInstancePackage, "widget_instance_builder.go")
-	data, err := os.ReadFile(out)
+	data, err := fileutil.ReadFile(out)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,11 +151,11 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 	packRoot := filepath.Join(root, "packs", "workgen_sibling")
 	t.Cleanup(func() { _ = fileutil.RemoveAll(packRoot) })
 	specPath := filepath.Join(packRoot, "widget.yaml")
-	if err := os.MkdirAll(packRoot, 0o755); err != nil {
+	if err := fileutil.MkdirAll(packRoot, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
 	specYAML := "schema_version: \"1.0.0\"\nontology: widget\nfields:\n  title:\n    type: string\n"
-	if err := os.WriteFile(specPath, []byte(specYAML), 0o600); err != nil {
+	if err := fileutil.WriteFile(specPath, []byte(specYAML), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	toolDir := filepath.Join(packRoot, "instance_builders")
@@ -172,13 +173,13 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 func TestGeneratedGoalPackCompiles(t *testing.T) {
 	root := moduleRoot(t)
 	packRoot := filepath.Join(root, "packs", "workgen_goal")
-	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	t.Cleanup(func() { _ = fileutil.RemoveAll(packRoot) })
 	specPath := filepath.Join(root, "packs", "work", "specs", "goal.yaml")
 	toolDir := filepath.Join(packRoot, "instance_builders")
 	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "2.0.0"); err != nil {
 		t.Fatal(err)
 	}
-	enumSrc, err := os.ReadFile(filepath.Join(packRoot, generatedEnumPackage, "goal", "enums_generated.go"))
+	enumSrc, err := fileutil.ReadFile(filepath.Join(packRoot, generatedEnumPackage, "goal", "enums_generated.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +204,7 @@ func TestGeneratedGoalPackCompiles(t *testing.T) {
 func TestGeneratedWorkPackKindsCompile(t *testing.T) {
 	root := moduleRoot(t)
 	packRoot := filepath.Join(root, "packs", "workgen_kinds")
-	t.Cleanup(func() { _ = os.RemoveAll(packRoot) })
+	t.Cleanup(func() { _ = fileutil.RemoveAll(packRoot) })
 	toolDir := filepath.Join(packRoot, "instance_builders")
 	specs := []string{
 		filepath.Join(root, "packs", "work", "specs", "goal.yaml"),

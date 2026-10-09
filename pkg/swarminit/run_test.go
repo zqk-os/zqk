@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestRun_unknownExecutorFailClosed(t *testing.T) {
@@ -37,7 +38,7 @@ func TestRun_dryRunDoesNotWriteSeatsOrInstall(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	seatsPath := filepath.Join(root, "seats-sentinel.json")
-	if err := os.WriteFile(seatsPath, []byte("keep\n"), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(seatsPath, []byte("keep\n"), paths.FilePerm600); err != nil {
 		t.Fatal(err)
 	}
 	store := map[string]map[string]any{
@@ -76,7 +77,7 @@ func TestRun_dryRunDoesNotWriteSeatsOrInstall(t *testing.T) {
 	if saved || installed {
 		t.Fatalf("dry-run wrote seats=%v install=%v", saved, installed)
 	}
-	body, err := os.ReadFile(seatsPath) //nolint:gosec
+	body, err := fileutil.ReadFile(seatsPath) //nolint:gosec
 	if err != nil || string(body) != "keep\n" {
 		t.Fatalf("sentinel mutated: %s %v", body, err)
 	}

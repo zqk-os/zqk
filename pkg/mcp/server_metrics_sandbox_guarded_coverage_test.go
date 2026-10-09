@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"

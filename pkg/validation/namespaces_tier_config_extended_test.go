@@ -1,9 +1,11 @@
 package validation
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestNamespacesConfig_Helpers(t *testing.T) {
@@ -85,7 +87,7 @@ validation:
       required: 1
       pattern: 2
 `
-	if err := os.WriteFile(tierFile, []byte(yamlContent), 0644); err != nil {
+	if err := fileutil.WriteFile(tierFile, []byte(yamlContent), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write temp tier file: %v", err)
 	}
 

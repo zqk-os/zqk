@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -35,7 +36,7 @@ func TestSupplyChain_FailClosedCosign_StaticFloor(t *testing.T) {
 	// Operational test: execute _verify_checksums_signature in bash with missing signature and ZQK_REQUIRE_COSIGN=1
 	tmpDir := t.TempDir()
 	checksumsFile := filepath.Join(tmpDir, "checksums.txt")
-	err = os.WriteFile(checksumsFile, []byte("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  empty.tar.gz\n"), 0644)
+	err = fileutil.WriteFile(checksumsFile, []byte("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  empty.tar.gz\n"), paths.FilePerm644)
 	require.NoError(t, err)
 
 	startIdx := strings.Index(content, "_verify_checksums_signature() {")

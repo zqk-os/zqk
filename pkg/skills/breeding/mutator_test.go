@@ -2,12 +2,13 @@ package breeding
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/llm"
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockLLMClient struct {
@@ -23,7 +24,7 @@ func (m *mockLLMClient) GenerateCompletion(ctx context.Context, prompt string, s
 func TestLLMSkillMutator_WithLLM(t *testing.T) {
 	tmpDir := t.TempDir()
 	origFile := filepath.Join(tmpDir, "SKILL.md")
-	if err := os.WriteFile(origFile, []byte("# Original Skill\nDo task"), 0644); err != nil {
+	if err := fileutil.WriteFile(origFile, []byte("# Original Skill\nDo task"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write original skill: %v", err)
 	}
 
@@ -41,7 +42,7 @@ func TestLLMSkillMutator_WithLLM(t *testing.T) {
 		t.Errorf("expected distinct new path, got %s", newPath)
 	}
 
-	content, err := os.ReadFile(newPath)
+	content, err := fileutil.ReadFile(newPath)
 	if err != nil {
 		t.Fatalf("failed to read mutated file: %v", err)
 	}
@@ -54,7 +55,7 @@ func TestLLMSkillMutator_WithLLM(t *testing.T) {
 func TestLLMSkillMutator_Fallback(t *testing.T) {
 	tmpDir := t.TempDir()
 	origFile := filepath.Join(tmpDir, "SKILL.md")
-	if err := os.WriteFile(origFile, []byte("# Original Skill\nDo task"), 0644); err != nil {
+	if err := fileutil.WriteFile(origFile, []byte("# Original Skill\nDo task"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write original skill: %v", err)
 	}
 
@@ -66,7 +67,7 @@ func TestLLMSkillMutator_Fallback(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	content, err := os.ReadFile(newPath)
+	content, err := fileutil.ReadFile(newPath)
 	if err != nil {
 		t.Fatalf("failed to read mutated file: %v", err)
 	}

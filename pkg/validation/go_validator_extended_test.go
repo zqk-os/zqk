@@ -2,12 +2,12 @@ package validation
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestGoValidator_BasicsAndFeatures(t *testing.T) {
@@ -453,7 +453,7 @@ func TestGoValidator_CustomRulesCriteriaAndOwnerRef(t *testing.T) {
 func TestGoValidator_LoadDynamicRulesForKind(t *testing.T) {
 	tmpDir := t.TempDir()
 	rulesDir := filepath.Join(tmpDir, paths.ProcessDir, "validation_rules")
-	if err := os.MkdirAll(rulesDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(rulesDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create rulesDir: %v", err)
 	}
 
@@ -464,7 +464,7 @@ rule_type: field_presence
 parameters:
   field_name: assignee
 `
-	if err := os.WriteFile(filepath.Join(rulesDir, "rule1.yaml"), []byte(ruleYaml), 0644); err != nil {
+	if err := fileutil.WriteFile(filepath.Join(rulesDir, "rule1.yaml"), []byte(ruleYaml), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write rule file: %v", err)
 	}
 

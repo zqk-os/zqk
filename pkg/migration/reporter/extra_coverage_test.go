@@ -3,9 +3,10 @@ package reporter
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestExtraReporterRecordsAndFormats(t *testing.T) {
@@ -34,7 +35,7 @@ func TestExtraReporterRecordsAndFormats(t *testing.T) {
 	if err := r.GenerateJSON(jsonPath); err != nil {
 		t.Fatal(err)
 	}
-	raw, err := os.ReadFile(jsonPath)
+	raw, err := fileutil.ReadFile(jsonPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +47,7 @@ func TestExtraReporterRecordsAndFormats(t *testing.T) {
 	if err := r.GenerateMarkdown(mdPath); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(mdPath); err != nil {
+	if _, err := fileutil.Stat(mdPath); err != nil {
 		t.Fatal(err)
 	}
 	if err := r.GenerateJSON(filepath.Join(dir, "missing", "no.json")); err == nil {
