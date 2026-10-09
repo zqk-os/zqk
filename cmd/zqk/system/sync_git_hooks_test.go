@@ -162,4 +162,3 @@ func TestEnsureGitHooks_PreCommitSkipsZqkVetInConsumerRepo(t *testing.T) {
 		t.Errorf("pre-commit missing guard: if [ -f \"$REPO_ROOT/cmd/zqk-vet/main.go\" ]; then")
 	}
 }
-
