@@ -269,7 +269,7 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 	}
 
 	status, _ := updatedTask[objects.FieldKeyStatus].(string)
-	if status != objects.ObjectStatusFailed {
+	if status != objects.ObjectStatusError {
 		t.Errorf("Expected task status to be 'error', got '%s'", status)
 	}
 
