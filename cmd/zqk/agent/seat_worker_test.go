@@ -101,9 +101,12 @@ func TestParseOrchestratePlanDirectiveRejectsUnsafeID(t *testing.T) {
 }
 
 func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
-	t.Parallel()
-
+	// Serial: avoid TempDir cleanup races on .zqk under parallel suite runs
 	root := t.TempDir()
+	t.Cleanup(func() {
+		_ = fileutil.RemoveAll(filepath.Join(root, paths.ProjectDataDir))
+	})
+
 	binDir := filepath.Join(root, "bin")
 	if err := fileutil.MkdirAll(binDir, paths.DirPerm750); err != nil {
 		t.Fatal(err)
@@ -114,7 +117,13 @@ func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	out, err := triggerPlanOrchestration(context.Background(), nil, nil, root, "PRI-123")
+	store := newMockHelperStore()
+	store.objs["PRI-123"] = map[string]any{
+		objects.FieldKeyKind:   objects.KindPriorityPlan,
+		objects.FieldKeyStatus: objects.ObjectStatusActive,
+	}
+
+	out, err := triggerPlanOrchestration(context.Background(), store, nil, root, "PRI-123")
 	if err != nil {
 		t.Fatalf("trigger plan orchestration: %v", err)
 	}
@@ -136,7 +145,7 @@ func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
 	} else if !strings.Contains(msg, "PRI-123") {
 		t.Fatalf("cooldown msg = %q", msg)
 	}
-	if _, err := triggerPlanOrchestration(context.Background(), nil, nil, root, "PRI-123"); err != nil {
+	if _, err := triggerPlanOrchestration(context.Background(), store, nil, root, "PRI-123"); err != nil {
 		t.Fatalf("second trigger: %v", err)
 	}
 }

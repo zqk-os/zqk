@@ -413,3 +413,231 @@ func TestPredicates_FullCoverage(t *testing.T) {
 		t.Fatalf("expected fail when operate_release has no ack evidence, got %+v", res)
 	}
 }
+
+func TestPredicatesExtended_Coverage(t *testing.T) {
+	ctx := context.Background()
+	tempDir := t.TempDir()
+
+	// 1. predCommandExitCode
+	res := EvalPredicate(ctx, "command_exit_code:", Chunk{}, EvalOptions{})
+	if res.OK || res.Detail != "missing command string" {
+		t.Fatalf("expected missing command string, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "command_exit_code:echo ok", Chunk{}, EvalOptions{RunCommands: false})
+	if !res.OK || !res.Skipped {
+		t.Fatalf("expected skipped when RunCommands=false, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "command_exit_code:exit 0", Chunk{}, EvalOptions{
+		RunCommands: true,
+		ProjectRoot: tempDir,
+	})
+	if !res.OK || res.Detail != "command exited 0" {
+		t.Fatalf("expected exit 0 OK, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "command_exit_code:exit 1", Chunk{}, EvalOptions{
+		RunCommands: true,
+		ProjectRoot: tempDir,
+	})
+	if res.OK || !strings.Contains(res.Detail, "command failed") {
+		t.Fatalf("expected command failed, got %+v", res)
+	}
+
+	// 2. predContentHashMatches
+	res = EvalPredicate(ctx, "content_hash_matches:", Chunk{}, EvalOptions{})
+	if res.OK || res.Detail != "missing path for content_hash_matches" {
+		t.Fatalf("expected missing path, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "content_hash_matches:file.txt", Chunk{}, EvalOptions{ProjectRoot: ""})
+	if res.OK || !res.Skipped || res.Detail != "no project root" {
+		t.Fatalf("expected no project root, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "content_hash_matches:nonexistent.txt", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if res.OK || !strings.Contains(res.Detail, "target file does not exist") {
+		t.Fatalf("expected file does not exist, got %+v", res)
+	}
+
+	testFile := filepath.Join(tempDir, "sample.txt")
+	_ = fileutil.WriteFile(testFile, []byte("content"), fileutil.StandardFilePerm)
+	res = EvalPredicate(ctx, "content_hash_matches:sample.txt", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if !res.OK || !strings.Contains(res.Detail, "content_hash verified") {
+		t.Fatalf("expected hash verified, got %+v", res)
+	}
+
+	// 3. predContentSizePositive
+	res = EvalPredicate(ctx, "content_size_positive:", Chunk{}, EvalOptions{})
+	if res.OK || res.Detail != "missing target for content_size_positive" {
+		t.Fatalf("expected missing target, got %+v", res)
+	}
+
+	emptyFile := filepath.Join(tempDir, "empty.txt")
+	_ = fileutil.WriteFile(emptyFile, []byte(""), fileutil.StandardFilePerm)
+	res = EvalPredicate(ctx, "content_size_positive:empty.txt", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if res.OK || !strings.Contains(res.Detail, "size is 0 bytes") {
+		t.Fatalf("expected 0 bytes fail, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "content_size_positive:sample.txt", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if !res.OK || !strings.Contains(res.Detail, "file size") {
+		t.Fatalf("expected positive file size, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "content_size_positive:other.txt", Chunk{}, EvalOptions{ProjectRoot: ""})
+	if !res.OK || res.Detail != "content size positive verified" {
+		t.Fatalf("expected verified for non-path, got %+v", res)
+	}
+
+	// 4. predFieldMatches
+	res = EvalPredicate(ctx, "field_matches:", Chunk{}, EvalOptions{})
+	if res.OK || res.Detail != "want field_matches:{field}:{regex}" {
+		t.Fatalf("expected invalid format, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "field_matches:field:[invalid(regex", Chunk{}, EvalOptions{})
+	if res.OK || !strings.Contains(res.Detail, "invalid regex") {
+		t.Fatalf("expected regex error, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "field_matches:status:^ready$", Chunk{}, EvalOptions{})
+	if !res.OK || res.Detail != "field matches pattern" {
+		t.Fatalf("expected field matches, got %+v", res)
+	}
+
+	// 5. predQueryMetric
+	res = EvalPredicate(ctx, "query_metric:coverage >= 80", Chunk{}, EvalOptions{})
+	if !res.OK || !strings.Contains(res.Detail, "coverage") {
+		t.Fatalf("expected metric satisfied, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "query_metric:bad_metric_syntax", Chunk{}, EvalOptions{})
+	if res.OK {
+		t.Fatalf("expected metric parse error, got %+v", res)
+	}
+
+	// 6. predASTSemanticMatch
+	res = EvalPredicate(ctx, "ast_semantic_match:", Chunk{}, EvalOptions{})
+	if res.OK || res.Detail != "want ast_semantic_match:{path}:{constraint}" {
+		t.Fatalf("expected format error, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "ast_semantic_match:pkg:no_raw_panics", Chunk{}, EvalOptions{ProjectRoot: ""})
+	if res.OK || !res.Skipped || res.Detail != "no project root" {
+		t.Fatalf("expected skipped with no project root, got %+v", res)
+	}
+
+	// Create test go files in tempDir
+	srcDir := filepath.Join(tempDir, "asttest")
+	_ = fileutil.MkdirAll(srcDir, fileutil.StandardDirPerm)
+	panicSrc := `package asttest
+func Bad() {
+	panic("crash")
+}
+`
+	_ = fileutil.WriteFile(filepath.Join(srcDir, "bad.go"), []byte(panicSrc), fileutil.StandardFilePerm)
+
+	cleanSrc := `package asttest
+type MyCustomService struct{}
+func Good() string {
+	return "ok"
+}
+`
+	cleanDir := filepath.Join(tempDir, "astclean")
+	_ = fileutil.MkdirAll(cleanDir, fileutil.StandardDirPerm)
+	_ = fileutil.WriteFile(filepath.Join(cleanDir, "clean.go"), []byte(cleanSrc), fileutil.StandardFilePerm)
+
+	// no_raw_panics on badDir -> fail
+	res = EvalPredicate(ctx, "ast_semantic_match:asttest:no_raw_panics", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if res.OK || !strings.Contains(res.Detail, "detected raw panic") {
+		t.Fatalf("expected panic detected, got %+v", res)
+	}
+
+	// no_raw_panics on cleanDir -> pass
+	res = EvalPredicate(ctx, "ast_semantic_match:astclean:no_raw_panics", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if !res.OK || !strings.Contains(res.Detail, "zero raw panics") {
+		t.Fatalf("expected zero raw panics, got %+v", res)
+	}
+
+	// symbol_present
+	res = EvalPredicate(ctx, "ast_semantic_match:astclean:symbol_present:MyCustomService", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if !res.OK || !strings.Contains(res.Detail, "symbol \"MyCustomService\" verified present") {
+		t.Fatalf("expected symbol present, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "ast_semantic_match:astclean:symbol_present:NonExistentSymbol", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if res.OK || !strings.Contains(res.Detail, "expected symbol \"NonExistentSymbol\" not found") {
+		t.Fatalf("expected symbol not found, got %+v", res)
+	}
+
+	// symbol_absent
+	res = EvalPredicate(ctx, "ast_semantic_match:astclean:symbol_absent:NonExistentSymbol", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if !res.OK || !strings.Contains(res.Detail, "verified absent") {
+		t.Fatalf("expected symbol absent, got %+v", res)
+	}
+
+	res = EvalPredicate(ctx, "ast_semantic_match:astclean:symbol_absent:MyCustomService", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if res.OK || !strings.Contains(res.Detail, "forbidden symbol \"MyCustomService\" found") {
+		t.Fatalf("expected forbidden symbol found, got %+v", res)
+	}
+
+	// unknown constraint
+	res = EvalPredicate(ctx, "ast_semantic_match:astclean:unknown_constraint", Chunk{}, EvalOptions{ProjectRoot: tempDir})
+	if res.OK || !strings.Contains(res.Detail, "unknown ast constraint") {
+		t.Fatalf("expected unknown constraint, got %+v", res)
+	}
+
+	// 7. Standard checks pass
+	res = EvalPredicate(ctx, "standard_checks_pass", Chunk{}, EvalOptions{})
+	if !res.OK || res.Detail != "standard checks pass" {
+		t.Fatalf("expected standard checks pass, got %+v", res)
+	}
+}
+
+func TestInitChunks_And_ApplyVerify(t *testing.T) {
+	tempDir := t.TempDir()
+
+	// InitChunksFile
+	p, created, err := InitChunksFile(tempDir, false)
+	if err != nil || !created {
+		t.Fatalf("InitChunksFile failed: %v, created=%v", err, created)
+	}
+
+	// Calling InitChunksFile again without force should not recreate
+	_, created, err = InitChunksFile(tempDir, false)
+	if err != nil || created {
+		t.Fatalf("expected created=false on existing chunks file, got created=%v, err=%v", created, err)
+	}
+
+	// Calling InitChunksFile with force should succeed and recreate
+	_, created, err = InitChunksFile(tempDir, true)
+	if err != nil || !created {
+		t.Fatalf("expected created=true with force, got created=%v, err=%v", created, err)
+	}
+
+	// Load initialized chunks
+	chunks, err := LoadChunks(p)
+	if err != nil || len(chunks) == 0 {
+		t.Fatalf("failed to load initialized chunks: %v", err)
+	}
+
+	// ApplyIndependentVerifyYes
+	updated, err := ApplyIndependentVerifyYes(p, []string{chunks[0].ChunkID})
+	if err != nil || updated == 0 {
+		t.Fatalf("ApplyIndependentVerifyYes failed: %v, updated=%d", err, updated)
+	}
+
+	// Apply again should update 0 because it's already yes
+	updated, err = ApplyIndependentVerifyYes(p, []string{chunks[0].ChunkID})
+	if err != nil || updated != 0 {
+		t.Fatalf("expected 0 updated, got %d, err=%v", updated, err)
+	}
+
+	// Apply on empty slice
+	updated, err = ApplyIndependentVerifyYes(p, nil)
+	if err != nil || updated != 0 {
+		t.Fatalf("expected 0 updated for nil slice, got %d", updated)
+	}
+}

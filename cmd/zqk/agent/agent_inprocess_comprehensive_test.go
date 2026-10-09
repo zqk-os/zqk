@@ -63,7 +63,9 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 	}
 	_ = provider.Create(stdctx.Background(), pkgctx.NewSystemSecurityContext(), defaultOp)
 
-	return p.Root, provider, func() {}
+	return p.Root, provider, func() {
+		_ = fileutil.RemoveAll(filepath.Join(p.Root, paths.ProjectDataDir))
+	}
 }
 
 func setAgentCLIContext(t *testing.T, cmd *cobra.Command, projectRoot string, storageProvider storage.ObjectStorageProvider) stdctx.Context {

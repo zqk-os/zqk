@@ -17,6 +17,7 @@ import (
 	clitool "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -184,6 +185,9 @@ func setTestCLIContext(t *testing.T, cmd *cobra.Command, projectRoot string, sto
 
 // TestBulkUpdateCmd tests the zqk object bulk update command
 func TestBulkUpdateCmd(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping slow TestBulkUpdateCmd in short mode")
+	}
 	testCases := []struct {
 		name         string
 		setupObjects []map[string]any
@@ -389,10 +393,10 @@ func TestBulkUpdateCmd(t *testing.T) {
 			os.Stdout = w
 
 			outCh := make(chan string)
-			go func() {
+			goroutinelabels.NewGoroutine("capture_stdout", "bulk_update_test").StartSimple(func() {
 				out, _ := io.ReadAll(r)
 				outCh <- string(out)
-			}()
+			})
 
 			// Create command
 			rootCmd := clitool.NewCommandBuilder("zqk").Build()

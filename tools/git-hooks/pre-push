@@ -60,7 +60,8 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 # Codebase Verification Gate (zqk-vet)
 # Secondary defense: catches any bypass of pre-commit (e.g. git commit --no-verify)
-if [ -d "$REPO_ROOT/.zqk" ]; then
+# NOTE: zqk-vet only applies to ZQK engine codebases (identified by presence of cmd/zqk-vet/main.go).
+if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
 	ZQK_VET_BIN=""
 	NEED_VET_BUILD=0
 	if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
@@ -70,7 +71,7 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 	fi
 
 	if [ "$NEED_VET_BUILD" -eq 1 ]; then
-		if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+		if command -v go >/dev/null 2>&1; then
 			echo "⚙️  [ZQK PRE-PUSH] Compiling bin/zqk-vet..."
 			mkdir -p "$REPO_ROOT/bin"
 			go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
@@ -96,6 +97,9 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 			exit 1
 		fi
 	fi
+fi
+
+if [ -d "$REPO_ROOT/.zqk" ]; then
 
 	# ---------------------------------------------------------------------------
 	# Attention-Hailing Mechanism & Project-Specific Pre-Push Batteries

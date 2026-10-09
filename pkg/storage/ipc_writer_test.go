@@ -4,11 +4,13 @@ import (
 	"context"
 	"net"
 	"net/rpc"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockHangingDaemon struct{}
@@ -21,11 +23,13 @@ func (d *mockHangingDaemon) WriteObject(args *IPCWriterArgs, reply *bool) error 
 
 func TestIPCWriter_ContextCancellation(t *testing.T) {
 	// Setup a real Unix domain socket with a hanging RPC receiver in /tmp to satisfy macOS path limit
-	sockDir, err := os.MkdirTemp("/tmp", "ipctest")
+	sockDir, err := fileutil.MkdirTemp("/tmp", "ipctest*")
 	if err != nil {
 		t.Fatalf("mkdir temp: %v", err)
 	}
-	defer os.RemoveAll(sockDir)
+	t.Cleanup(func() {
+		_ = fileutil.RemoveAll(sockDir)
+	})
 	sockPath := filepath.Join(sockDir, "mock.sock")
 
 	server := rpc.NewServer()
@@ -39,15 +43,17 @@ func TestIPCWriter_ContextCancellation(t *testing.T) {
 	}
 	defer listener.Close()
 
-	go func() {
+	goroutinelabels.NewGoroutine("ipc_writer_test", "mock rpc accept loop").StartSimple(func() {
 		for {
 			conn, err := listener.Accept()
 			if err != nil {
 				return
 			}
-			go server.ServeConn(conn)
+			goroutinelabels.NewGoroutine("ipc_writer_test", "serve mock rpc conn").StartSimple(func() {
+				server.ServeConn(conn)
+			})
 		}
-	}()
+	})
 
 	writer, err := NewIPCWriter(sockPath)
 	if err != nil {

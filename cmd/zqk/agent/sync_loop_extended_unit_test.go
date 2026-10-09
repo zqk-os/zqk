@@ -290,7 +290,7 @@ func TestSyncLoop_StepVerification_FailedAndMaxAttempts(t *testing.T) {
 	bypassCtx := pkgctx.WithBypassCache(context.Background())
 	updated, err := store.Read(bypassCtx, secCtx, taskID)
 	require.NoError(t, err)
-	assert.Equal(t, objects.ObjectStatusFailed, updated[objects.FieldKeyStatus])
+	assert.Equal(t, objects.ObjectStatusError, updated[objects.FieldKeyStatus])
 
 	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
 	if writeQueue != nil {

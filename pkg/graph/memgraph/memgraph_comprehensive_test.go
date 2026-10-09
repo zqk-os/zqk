@@ -934,3 +934,121 @@ func TestMemgraphConnection_CloseAndRollbackBranches(t *testing.T) {
 		t.Fatalf("Close failed: %v", err)
 	}
 }
+
+func TestMemgraphConnection_UpdateEdgeAndNestedTransactions(t *testing.T) {
+	ctx := context.Background()
+	conn := &memgraphConnection{
+		BaseConnection: &provider.BaseConnection{},
+		boltClient:     &boltClient{},
+	}
+	edge := neo4j.Relationship{
+		ElementId: "r1",
+		StartId:   1,
+		EndId:     2,
+		Type:      "CALLS",
+		Props:     map[string]any{"weight": 2.0},
+	}
+	rec := &neo4j.Record{
+		Keys:   []string{"r"},
+		Values: []any{edge},
+	}
+	tx := &memgraphTransaction{
+		conn:       conn,
+		explicitTx: &mockBoltTx{records: []*neo4j.Record{rec}},
+	}
+	conn.SetOpenTransaction(tx)
+
+	// 1. UpdateEdge with empty properties
+	err := conn.UpdateEdge(ctx, "a", "b", "CALLS", provider.EdgeUpdates{})
+	if err != nil {
+		t.Fatalf("UpdateEdge empty properties failed: %v", err)
+	}
+
+	// 2. UpdateEdge with multiple properties
+	err = conn.UpdateEdge(ctx, "a", "b", "CALLS", provider.EdgeUpdates{
+		Properties: map[string]any{
+			"weight": 5.0,
+			"active": true,
+		},
+	})
+	if err != nil {
+		t.Fatalf("UpdateEdge with properties failed: %v", err)
+	}
+
+	// 3. UpdateEdge nil bolt client error
+	nilConn := &memgraphConnection{BaseConnection: &provider.BaseConnection{}}
+	if err := nilConn.UpdateEdge(ctx, "a", "b", "CALLS", provider.EdgeUpdates{}); err == nil {
+		t.Fatal("expected error on nil bolt client")
+	}
+
+	// 4. Nested transaction branches
+	if tx.SupportsNestedTransactions() {
+		t.Fatal("expected SupportsNestedTransactions to be false")
+	}
+	if _, err := tx.BeginNestedTransaction(ctx); err == nil {
+		t.Fatal("expected error from BeginNestedTransaction")
+	}
+	if parent := tx.GetParent(); parent != nil {
+		t.Fatalf("expected nil parent, got %v", parent)
+	}
+	txChild := &memgraphTransaction{
+		conn:   conn,
+		parent: tx,
+	}
+	if txChild.GetParent() != tx {
+		t.Fatal("expected parent transaction to match")
+	}
+}
+
+func TestMemgraphTransaction_RollbackVariants(t *testing.T) {
+	ctx := context.Background()
+	conn := &memgraphConnection{
+		BaseConnection: &provider.BaseConnection{},
+		boltClient:     &boltClient{},
+	}
+
+	// 1. Rollback when explicitTx is nil
+	txNil := &memgraphTransaction{conn: conn}
+	if err := txNil.Rollback(ctx); err != nil {
+		t.Fatalf("Rollback with nil explicitTx failed: %v", err)
+	}
+	// Calling Rollback again (already rolled back)
+	if err := txNil.Rollback(ctx); err != nil {
+		t.Fatalf("Rollback second time failed: %v", err)
+	}
+
+	// 2. Rollback when already committed
+	txCommitted := &memgraphTransaction{
+		conn:       conn,
+		explicitTx: &mockBoltTx{},
+	}
+	if err := txCommitted.Commit(ctx); err != nil {
+		t.Fatalf("Commit failed: %v", err)
+	}
+	if err := txCommitted.Rollback(ctx); err == nil {
+		t.Fatal("expected error rolling back already committed transaction")
+	}
+
+	// 3. Rollback when explicitTx is present
+	txActive := &memgraphTransaction{
+		conn:       conn,
+		explicitTx: &mockBoltTx{},
+	}
+	if err := txActive.Rollback(ctx); err != nil {
+		t.Fatalf("Rollback with active explicitTx failed: %v", err)
+	}
+
+	// 4. Client Ping and Close with nil / initialized driver
+	c := &Client{}
+	if err := c.Ping(ctx); err == nil {
+		t.Fatal("expected error from Ping with nil driver")
+	}
+	if err := c.Close(ctx); err != nil {
+		t.Fatalf("expected nil from Close with nil driver, got %v", err)
+	}
+
+	// 5. NewClient invalid URI
+	if _, err := NewClient("invalid-scheme://", "user", "pass"); err == nil {
+		t.Fatal("expected error from NewClient with invalid URI")
+	}
+}

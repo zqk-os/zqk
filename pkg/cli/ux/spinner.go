@@ -85,6 +85,21 @@ func StartSpinner(message string) {
 	}
 }
 
+// ClearSpinner stops the active terminal spinner immediately, clears its final message,
+// and clears the line in the terminal.
+func ClearSpinner() {
+	uxMu.Lock()
+	defer uxMu.Unlock()
+
+	if globalSpinner != nil && globalSpinner.Active() {
+		globalSpinner.FinalMSG = ""
+		globalSpinner.Stop()
+		if isTTY && !suppressed {
+			_, _ = os.Stdout.WriteString("\r\033[K")
+		}
+	}
+}
+
 // StopSpinner stops the terminal spinner, indicating success or failure,
 // and optionally replacing the message.
 func StopSpinner(success bool, finalMessage string) {
@@ -99,6 +114,9 @@ func StopSpinner(success bool, finalMessage string) {
 	}
 
 	if globalSpinner != nil {
+		if !globalSpinner.Active() {
+			return
+		}
 		if success {
 			globalSpinner.FinalMSG = color.GreenString("✓ ") + finalMessage + "\n"
 		} else {

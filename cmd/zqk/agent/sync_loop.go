@@ -347,7 +347,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 			// EXIT CONDITION
 			status := koi.Status(currentTask)
-			if status == objects.ObjectStatusImplemented || status == objects.ObjectStatusFailed {
+			if status == objects.ObjectStatusImplemented || status == objects.ObjectStatusFailed || status == objects.ObjectStatusError {
 				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Task complete, status: %s\n", status))); wErr != nil {
 					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
@@ -500,7 +500,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 						}
 						// Persist steps + status in one mutation so a status-only write cannot
 						// race and leave steps stuck at pending_verification.
-						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed, stepFieldUpdates); errMut != nil {
+						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusError, stepFieldUpdates); errMut != nil {
 							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Failed to apply state mutation: %v\n", errMut))); wErr != nil {
 								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 							}
@@ -588,12 +588,12 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 			if len(aggregatedValidationSteps) == 0 || allStepsCompleted {
 				finalStatus := objects.ObjectStatusImplemented
 				if hasFailedSteps {
-					finalStatus = objects.ObjectStatusFailed
+					finalStatus = objects.ObjectStatusError
 				} else if isAgentWorktree(proc.ProjectRoot()) {
 					// Swarm sync-loop: build-gate then commit worktree branch before teardown.
 					wtRoot := proc.ProjectRoot()
 					if bErr := worktreeBuildCheck(ctx, wtRoot); bErr != nil {
-						finalStatus = objects.ObjectStatusFailed
+						finalStatus = objects.ObjectStatusError
 						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree build gate failed for %s: %v\n", taskID, bErr))); wErr != nil {
 							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 						}
@@ -612,7 +612,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 						mainRepo, rErr := agentWorktreeMainRepo(wtRoot)
 						if rErr != nil {
-							finalStatus = objects.ObjectStatusFailed
+							finalStatus = objects.ObjectStatusError
 							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree studio checkout unresolved for %s: %v\n", taskID, rErr))); wErr != nil {
 								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 							}
@@ -620,7 +620,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 							mergeCmd := execwrap.Command("git", "merge", branchName)
 							mergeCmd.Dir = mainRepo
 							if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
-								finalStatus = objects.ObjectStatusFailed
+								finalStatus = objects.ObjectStatusError
 								if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out)))); wErr != nil {
 									logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 								}
@@ -948,7 +948,7 @@ func createIdempotencyAuditStamp(ctx context.Context, secCtx *storage.SecurityCo
 }
 
 func transitionToError(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, taskID string, currentTask map[string]any, validator *mutation.Validator, auditStream *audit.AuditStream) {
-	if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); err != nil {
+	if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusError); err != nil {
 		logging.FluentEvent(logging.GetLogger()).Error("Failed to transition to error", err).Log()
 	}
 }

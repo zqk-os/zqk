@@ -165,6 +165,7 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 		if fos, ok := store.(*storage.FileObjectStorage); ok {
 			_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, fos))
 		}
+		_ = fileutil.RemoveAll(filepath.Join(root, paths.ProjectDataDir))
 	})
 
 	// Create an agent_skill to satisfy CRIT-PERSONA-SKILL-BOUND
@@ -269,7 +270,7 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 	}
 
 	status, _ := updatedTask[objects.FieldKeyStatus].(string)
-	if status != objects.ObjectStatusFailed {
+	if status != objects.ObjectStatusError {
 		t.Errorf("Expected task status to be 'error', got '%s'", status)
 	}
 
