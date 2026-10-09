@@ -20,7 +20,7 @@ var referenceNow = time.Date(2026, 9, 13, 12, 0, 0, 0, time.UTC)
 func writeLockFile(t *testing.T, dir, name string, modTime time.Time) string {
 	t.Helper()
 	p := filepath.Join(dir, name)
-	if err := os.WriteFile(p, []byte(""), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(p, []byte(""), paths.FilePerm600); err != nil {
 		t.Fatalf("write %s: %v", name, err)
 	}
 	if err := os.Chtimes(p, modTime, modTime); err != nil {
@@ -31,14 +31,14 @@ func writeLockFile(t *testing.T, dir, name string, modTime time.Time) string {
 
 func mustNotExist(t *testing.T, p string) {
 	t.Helper()
-	if _, err := os.Stat(p); !errors.Is(err, os.ErrNotExist) {
+	if _, err := fileutil.Stat(p); !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("expected %s to be removed, stat err=%v", p, err)
 	}
 }
 
 func mustExist(t *testing.T, p string) {
 	t.Helper()
-	if _, err := os.Stat(p); err != nil {
+	if _, err := fileutil.Stat(p); err != nil {
 		t.Fatalf("expected %s to persist: %v", p, err)
 	}
 }
@@ -127,7 +127,7 @@ func TestSweep_RootIsFileFailsClosed(t *testing.T) {
 	t.Parallel()
 
 	f := filepath.Join(t.TempDir(), "notadir")
-	if err := os.WriteFile(f, []byte(""), paths.FilePerm600); err != nil {
+	if err := fileutil.WriteFile(f, []byte(""), paths.FilePerm600); err != nil {
 		t.Fatalf("write: %v", err)
 	}
 
@@ -142,7 +142,7 @@ func TestSweep_SubdirectoriesAreUntouched(t *testing.T) {
 
 	dir := t.TempDir()
 	sub := filepath.Join(dir, "nested")
-	if err := os.MkdirAll(sub, paths.DirPerm750); err != nil {
+	if err := fileutil.MkdirAll(sub, paths.DirPerm750); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	// Even a stale .lock inside a subdirectory must NOT be removed: the sweep

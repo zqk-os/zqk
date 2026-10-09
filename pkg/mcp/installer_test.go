@@ -2,7 +2,6 @@ package mcp_test
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -37,7 +36,7 @@ func TestInstallToIDE_PreservesExistingServers(t *testing.T) {
 	}
 	initialBytes, err := json.MarshalIndent(initialConfig, "", "  ")
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(configPath, initialBytes, paths.FilePerm644))
+	require.NoError(t, fileutil.WriteFile(configPath, initialBytes, paths.FilePerm644))
 
 	logger := logging.GetLoggerFromProfile("")
 	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
@@ -47,7 +46,7 @@ func TestInstallToIDE_PreservesExistingServers(t *testing.T) {
 	require.NoError(t, err)
 
 	// Read updated config
-	updatedBytes, err := os.ReadFile(configPath)
+	updatedBytes, err := fileutil.ReadFile(configPath)
 	require.NoError(t, err)
 
 	var updatedConfig struct {
@@ -86,7 +85,7 @@ func TestInstallToIDE_ClaudeDesktop(t *testing.T) {
 	err := mcp.InstallToIDE("Claude Desktop", configPath, fakeExec, tmpDir, logger)
 	require.NoError(t, err)
 
-	updatedBytes, err := os.ReadFile(configPath)
+	updatedBytes, err := fileutil.ReadFile(configPath)
 	require.NoError(t, err)
 
 	var config struct {
@@ -115,12 +114,12 @@ func TestInstallToIDE_Idempotent(t *testing.T) {
 
 	// First install
 	require.NoError(t, mcp.InstallToIDE("Cursor (Workspace)", configPath, fakeExec, tmpDir, logger))
-	bytesFirst, err := os.ReadFile(configPath)
+	bytesFirst, err := fileutil.ReadFile(configPath)
 	require.NoError(t, err)
 
 	// Second install
 	require.NoError(t, mcp.InstallToIDE("Cursor (Workspace)", configPath, fakeExec, tmpDir, logger))
-	bytesSecond, err := os.ReadFile(configPath)
+	bytesSecond, err := fileutil.ReadFile(configPath)
 	require.NoError(t, err)
 
 	assert.Equal(t, string(bytesFirst), string(bytesSecond), "subsequent install calls must be idempotent")

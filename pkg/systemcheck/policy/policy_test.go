@@ -2,10 +2,11 @@ package policy
 
 import (
 	"context"
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestDocLinksGate(t *testing.T) {
@@ -13,22 +14,22 @@ func TestDocLinksGate(t *testing.T) {
 
 	// Setup fake docs structure
 	docsDir := filepath.Join(tempDir, "docs")
-	_ = os.MkdirAll(docsDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(docsDir, paths.DirPerm755)
 
 	quadrants := []string{"tutorials", "howto", "manual", "explanation"}
 	for _, q := range quadrants {
 		qDir := filepath.Join(docsDir, q)
-		_ = os.MkdirAll(qDir, paths.DirPerm755)
-		_ = os.WriteFile(filepath.Join(qDir, "guide.md"), []byte("# Guide"), paths.FilePerm644)
+		_ = fileutil.MkdirAll(qDir, paths.DirPerm755)
+		_ = fileutil.WriteFile(filepath.Join(qDir, "guide.md"), []byte("# Guide"), paths.FilePerm644)
 	}
 
-	_ = os.WriteFile(filepath.Join(tempDir, "CONTRIBUTING.md"), []byte("# Contrib"), paths.FilePerm644)
-	_ = os.WriteFile(filepath.Join(tempDir, "CODE_OF_CONDUCT.md"), []byte("# COC"), paths.FilePerm644)
-	_ = os.MkdirAll(filepath.Join(tempDir, ".github"), paths.DirPerm755)
-	_ = os.WriteFile(filepath.Join(tempDir, ".github", "PULL_REQUEST_TEMPLATE.md"), []byte("# PR"), paths.FilePerm644)
+	_ = fileutil.WriteFile(filepath.Join(tempDir, "CONTRIBUTING.md"), []byte("# Contrib"), paths.FilePerm644)
+	_ = fileutil.WriteFile(filepath.Join(tempDir, "CODE_OF_CONDUCT.md"), []byte("# COC"), paths.FilePerm644)
+	_ = fileutil.MkdirAll(filepath.Join(tempDir, ".github"), paths.DirPerm755)
+	_ = fileutil.WriteFile(filepath.Join(tempDir, ".github", "PULL_REQUEST_TEMPLATE.md"), []byte("# PR"), paths.FilePerm644)
 
 	// Valid INDEX.md
-	_ = os.WriteFile(filepath.Join(docsDir, "INDEX.md"), []byte(`
+	_ = fileutil.WriteFile(filepath.Join(docsDir, "INDEX.md"), []byte(`
 [Tutorial](tutorials/guide.md)
 [External](https://example.com)
 [Anchor](#section)
@@ -44,7 +45,7 @@ func TestDocLinksGate(t *testing.T) {
 	}
 
 	// Break link
-	_ = os.WriteFile(filepath.Join(docsDir, "INDEX.md"), []byte(`
+	_ = fileutil.WriteFile(filepath.Join(docsDir, "INDEX.md"), []byte(`
 [Broken](nonexistent/file.md)
 `), paths.FilePerm644)
 
@@ -58,7 +59,7 @@ func TestSecretsGate(t *testing.T) {
 	tempDir := t.TempDir()
 
 	cleanFile := filepath.Join(tempDir, "clean.txt")
-	_ = os.WriteFile(cleanFile, []byte("regular text with no secrets"), paths.FilePerm644)
+	_ = fileutil.WriteFile(cleanFile, []byte("regular text with no secrets"), paths.FilePerm644)
 
 	gate := &SecretsGate{}
 	res, err := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir})
@@ -71,7 +72,7 @@ func TestSecretsGate(t *testing.T) {
 
 	// Inject secret (constructed dynamically to avoid tripping scanner on test source)
 	leakFile := filepath.Join(tempDir, "leak.txt")
-	_ = os.WriteFile(leakFile, []byte("api_key = "+"AKIA"+"IOSFODNN7EXAMPLE\n"), paths.FilePerm644)
+	_ = fileutil.WriteFile(leakFile, []byte("api_key = "+"AKIA"+"IOSFODNN7EXAMPLE\n"), paths.FilePerm644)
 
 	resLeak, _ := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir})
 	if resLeak.Passed {
@@ -105,7 +106,7 @@ func TestIsSecretScannerExemptTestFixture(t *testing.T) {
 func TestStorageBoundariesGate(t *testing.T) {
 	tempDir := t.TempDir()
 	storageDir := filepath.Join(tempDir, "pkg", "storage")
-	_ = os.MkdirAll(storageDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(storageDir, paths.DirPerm755)
 
 	gate := &StorageBoundariesGate{}
 	res, err := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir})
@@ -118,9 +119,9 @@ func TestStorageBoundariesGate(t *testing.T) {
 
 	// Create subpackage wal importing sibling file
 	walDir := filepath.Join(storageDir, "wal")
-	_ = os.MkdirAll(walDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(walDir, paths.DirPerm755)
 	badFile := filepath.Join(walDir, "bad.go")
-	_ = os.WriteFile(badFile, []byte(`package wal
+	_ = fileutil.WriteFile(badFile, []byte(`package wal
 
 import "github.com/zqk-os/zqk/pkg/storage/file"
 `), paths.FilePerm644)
@@ -134,10 +135,10 @@ import "github.com/zqk-os/zqk/pkg/storage/file"
 func TestGoroutinesGate(t *testing.T) {
 	tempDir := t.TempDir()
 	pkgDir := filepath.Join(tempDir, "pkg", "myfeature")
-	_ = os.MkdirAll(pkgDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(pkgDir, paths.DirPerm755)
 
 	cleanFile := filepath.Join(pkgDir, "clean.go")
-	_ = os.WriteFile(cleanFile, []byte(`package myfeature
+	_ = fileutil.WriteFile(cleanFile, []byte(`package myfeature
 func Run() {
 	// do nothing
 }
@@ -155,7 +156,7 @@ func Run() {
 	// Bare goroutine
 	badFile := filepath.Join(pkgDir, "bad.go")
 	badCode := "package myfeature\nfunc Bad() {\n\t" + "go" + " func() {\n\t\t// bare\n\t}()\n}\n"
-	_ = os.WriteFile(badFile, []byte(badCode), paths.FilePerm644)
+	_ = fileutil.WriteFile(badFile, []byte(badCode), paths.FilePerm644)
 
 	resBad, _ := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir, Files: []string{badFile}})
 	if resBad.Passed {
@@ -165,7 +166,7 @@ func Run() {
 	// Bare errgroup .Go spawn
 	badErrgroupFile := filepath.Join(pkgDir, "bad_errgroup.go")
 	badErrgroupCode := "package myfeature\nfunc BadEG(g interface{ Go(func() error) }) {\n\tg.Go(func() error {\n\t\treturn nil\n\t})\n}\n"
-	_ = os.WriteFile(badErrgroupFile, []byte(badErrgroupCode), paths.FilePerm644)
+	_ = fileutil.WriteFile(badErrgroupFile, []byte(badErrgroupCode), paths.FilePerm644)
 
 	resBadEG, _ := gate.Run(context.Background(), RunOptions{ProjectRoot: tempDir, Files: []string{badErrgroupFile}})
 	if resBadEG.Passed {

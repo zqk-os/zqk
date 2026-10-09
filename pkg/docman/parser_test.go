@@ -1,10 +1,11 @@
 package docman
 
 import (
-	"github.com/zqk-os/zqk/pkg/paths"
-	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestToTitleCase(t *testing.T) {
@@ -43,7 +44,7 @@ This is the system architecture overview document explaining the kernel layers.
 
 Some details.
 `
-	if err := os.WriteFile(docFile, []byte(content), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(docFile, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write test doc: %v", err)
 	}
 
@@ -68,7 +69,7 @@ func TestParser_FallbackToFilename(t *testing.T) {
 
 	content := `Just some content without an h1 heading.
 `
-	if err := os.WriteFile(docFile, []byte(content), paths.FilePerm644); err != nil {
+	if err := fileutil.WriteFile(docFile, []byte(content), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write test doc: %v", err)
 	}
 

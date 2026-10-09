@@ -732,6 +732,18 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 	}
 	v.mu.Lock()
 	v.lastUpdated = env.MaterializedAt
+	if v.plans == nil {
+		v.plans = make(map[string]*PlanNode)
+	}
+	if v.backlogs == nil {
+		v.backlogs = make(map[string]*BacklogNode)
+	}
+	if v.tasks == nil {
+		v.tasks = make(map[string]*TaskNode)
+	}
+	if v.cvsSessions == nil {
+		v.cvsSessions = make(map[string]*CVSNode)
+	}
 	if env.Payload.LeadPlan != nil && env.Payload.LeadPlan.ID != "" {
 		v.plans[env.Payload.LeadPlan.ID] = &PlanNode{
 			ID:     env.Payload.LeadPlan.ID,
