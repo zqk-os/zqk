@@ -17,6 +17,8 @@ import (
 
 func NewJoinCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewJoinCommandBuilder()
+	cmd.Flags().String("alias", "", "peer alias")
+	cmd.Flags().Bool("interactive", false, "prompt for confirmation")
 	cli.BindAsyncProgress(cmd, runJoin)
 	return cmd
 }
