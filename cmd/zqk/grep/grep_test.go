@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/search"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,6 +26,17 @@ func TestNewGrepCmd(t *testing.T) {
 	assert.NotNil(t, cmd.Flags().Lookup("ast"))
 	assert.NotNil(t, cmd.Flags().Lookup("max-tokens"))
 	assert.NotNil(t, cmd.Flags().Lookup("format"))
+}
+
+func TestAuditGrep(t *testing.T) {
+	auditor := qa.NewASTAuditor()
+	violations, err := auditor.AuditFile("grep.go")
+	require.NoError(t, err)
+	for _, v := range violations {
+		if v.Severity == "high" || v.Severity == "medium" || v.Severity == "error" {
+			t.Errorf("Prohibited violation [%s] %s at line %d: %s", v.Severity, v.Type, v.Pos.Line, v.Message)
+		}
+	}
 }
 
 func setupTestCodebase(t *testing.T) string {
