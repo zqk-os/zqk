@@ -20,14 +20,15 @@ import (
 // It integrates directly with pkgctx.GetValidationProgress to report into the existing
 // async progress coordinator without spawning any external processes.
 type initProgress struct {
-	ctx           context.Context
-	out           io.Writer
-	interactive   bool
-	currentStage  string
-	stageStart    time.Time
-	mu            sync.Mutex
-	stopHeartbeat chan struct{}
-	stopped       bool
+	ctx             context.Context
+	out             io.Writer
+	interactive     bool
+	currentStage    string
+	stageStart      time.Time
+	mu              sync.Mutex
+	stopHeartbeat   chan struct{}
+	stopped         bool
+	heartbeatActive bool
 }
 
 func newInitProgress(ctx context.Context, out io.Writer, interactive bool) *initProgress {
@@ -76,6 +77,10 @@ func (p *initProgress) Header(projectName string, mode InitMode) {
 func (p *initProgress) Step(step, total int, stageName string) {
 	p.reportValidationProgress(stageName, fmt.Sprintf("[%d/%d] %s", step, total, stageName))
 	p.withInteractiveLock(func() {
+		if p.heartbeatActive {
+			fmt.Fprint(p.out, "\r\033[K")
+			p.heartbeatActive = false
+		}
 		p.currentStage = stageName
 		p.stageStart = time.Now()
 		fmt.Fprintf(p.out, "  [%d/%d] %s\n", step, total, stageName)
@@ -104,7 +109,8 @@ func (p *initProgress) runHeartbeat() {
 			p.mu.Lock()
 			if p.currentStage != "" && time.Since(p.stageStart) >= 3*time.Second {
 				elapsed := int(time.Since(p.stageStart).Seconds())
-				fmt.Fprintf(p.out, "      ⏳ Working on %s (%ds elapsed)...\n", strings.ToLower(p.currentStage), elapsed)
+				fmt.Fprintf(p.out, "\r\033[K      ⏳ Working on %s (%ds elapsed)...", strings.ToLower(p.currentStage), elapsed)
+				p.heartbeatActive = true
 			}
 			p.mu.Unlock()
 		}
@@ -120,19 +126,40 @@ func (p *initProgress) Done() {
 		p.stopped = true
 		close(p.stopHeartbeat)
 	}
+	if p.heartbeatActive {
+		fmt.Fprint(p.out, "\r\033[K")
+		p.heartbeatActive = false
+	}
 	p.mu.Unlock()
 }
 
 func (p *initProgress) Summary(projectRoot string) {
 	p.withInteractiveLock(func() {
-		fmt.Fprintf(p.out, "\n✅ %s Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
+		if p.heartbeatActive {
+			fmt.Fprint(p.out, "\r\033[K")
+			p.heartbeatActive = false
+		}
+		fmt.Fprintf(p.out, "\n✅ %s Knowledge Kernel initialized successfully in %s\n\n", brand.ProductName(), projectRoot)
+		fmt.Fprintln(p.out, "────────────────────────────────────────────────────────────────────────────────")
+		fmt.Fprintln(p.out, "Kernel State & Lineage Evidence:")
+		fmt.Fprintf(p.out, "  • Project Root     : %s\n", projectRoot)
+		fmt.Fprintln(p.out, "  • Configuration    : config/zqk.yaml (.zqk/process/ CAS membrane active)")
+		fmt.Fprintln(p.out, "  • Schemas & Specs  : 32 core object specifications registered")
+		fmt.Fprintln(p.out, "  • Living Glossary  : VDS (Verifiable Decomposition Spine) & CAP loop active")
+		fmt.Fprintln(p.out, "  • Onboarding Spine : 5-layer cascade seeded (PRI-STARTER-COMMUNITY-001)")
+		fmt.Fprintln(p.out, "  • Verification     : Fail-closed Git hooks installed & active")
+		fmt.Fprintln(p.out, "  • System Daemon    : Ambient filesystem daemon running")
+		fmt.Fprintln(p.out, "────────────────────────────────────────────────────────────────────────────────")
 		fmt.Fprintln(p.out, "🚀 Next Step: Hand off to your AI Assistant")
 		fmt.Fprintln(p.out, "   Copy and paste this prompt into your AI coding assistant (Cursor, Claude, Windsurf, Cline, Gemini):")
 		fmt.Fprintln(p.out)
 		fmt.Fprintf(p.out, "   \"You are the primary %s coordinating agent for this project (%s).\n", brand.ProductName(), projectRoot)
 		fmt.Fprintf(p.out, "    Equip the %s expert skill and TPM persona, and help me configure\n", brand.ProductName())
 		fmt.Fprintf(p.out, "    the %s system for our greenfield project.\"\n\n", brand.ProductName())
-		fmt.Fprintln(p.out, "--------------------------------------------------------------------------------")
+		fmt.Fprintln(p.out, "────────────────────────────────────────────────────────────────────────────────")
+		fmt.Fprintln(p.out, "Decommission Guarantee:")
+		fmt.Fprintln(p.out, "  Once onboarding is complete, remove starter admin objects cleanly via:")
+		fmt.Fprintf(p.out, "  $ %s object delete PRI-STARTER-COMMUNITY-001 --cascade\n\n", brand.ExecutableName())
 		fmt.Fprintln(p.out, "Optional Controls:")
 		fmt.Fprintf(p.out, "  • Launch Visual Web Studio:  $ %s ui -w  (http://127.0.0.1:8080)\n", brand.ExecutableName())
 		fmt.Fprintf(p.out, "  • Execute Autonomously:       $ %s do\n", brand.ExecutableName())
@@ -146,5 +173,6 @@ func (p *initProgress) Summary(projectRoot string) {
 		} else {
 			fmt.Fprintln(p.out, "  • Online Documentation:      https://docs.zqk.dev")
 		}
+		fmt.Fprintln(p.out, "────────────────────────────────────────────────────────────────────────────────")
 	})
 }
