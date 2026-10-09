@@ -221,6 +221,11 @@ func TestObjectIDCache_IsPopulatedForProject(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SetupTestEnvironment: %v", err)
 	}
+	t.Cleanup(func() {
+		_ = WaitProjectCacheBackgroundWork(context.Background(), projectRoot)
+		_ = testkit.RunStandardTeardown(testkit.TempProjectTeardown(projectRoot, proj.FileStorage))
+		_ = fileutil.RemoveAll(projectRoot)
+	})
 
 	cache := NewObjectIDCache()
 
@@ -426,6 +431,11 @@ func TestObjectIDCache_BuildExcludesHighVolumeKinds(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SetupTestEnvironment: %v", err)
 	}
+	t.Cleanup(func() {
+		_ = WaitProjectCacheBackgroundWork(context.Background(), projectRoot)
+		_ = testkit.RunStandardTeardown(testkit.TempProjectTeardown(projectRoot, proj.FileStorage))
+		_ = fileutil.RemoveAll(projectRoot)
+	})
 
 	criteriaDir := datacell.CellCASPrimaryDir(projectRoot, "criteria")
 	auditDir := datacell.StreamCurrentKindDir(projectRoot, objects.KindAuditEvent)
@@ -467,6 +477,9 @@ func TestDiscoverFromCache_StreamAndFilter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SetupTestEnvironment: %v", err)
 	}
+	t.Cleanup(func() {
+		_ = WaitProjectCacheBackgroundWork(context.Background(), projectRoot)
+	})
 	testkit.RegisterStandardTeardown(t, testkit.TeardownOptions{
 		ProjectRoot:           projectRoot,
 		StripProcessArtifacts: true,
@@ -751,6 +764,7 @@ func TestObjectIDCache_BuildCache_BuildsReverseReferenceIndex(t *testing.T) {
 		t.Fatalf("SetupTestEnvironment: %v", err)
 	}
 	t.Cleanup(func() {
+		_ = WaitProjectCacheBackgroundWork(context.Background(), projectRoot)
 		resetDir, err := fileutil.MkdirTemp("", "zqk-audit-global-reset")
 		if err != nil {
 			_ = testkit.RunStandardTeardown(testkit.TeardownOptions{

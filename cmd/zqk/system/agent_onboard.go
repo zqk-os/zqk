@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/agentonboard"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -63,6 +64,9 @@ func runAgentOnboard(cmd *cobra.Command, _ []string) error {
 			return errfmt.Newf("agent-onboard").Wrap(err)
 		}
 		if !detectOnly && !dryRun {
+			if _, err := agentfeed.RefreshPeerSeatsFromLivePIDs(root, false); err != nil {
+				logging.Fluent(logger).Warn("Failed to refresh peer seats during agent-onboard").WithError(err).Log()
+			}
 			if err := EnsureGitHooks(root, logger); err != nil {
 				logging.Fluent(logger).Warn("Failed to ensure git pre-commit hook during agent-onboard").WithError(err).Log()
 			}
