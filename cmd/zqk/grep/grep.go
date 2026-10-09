@@ -71,7 +71,7 @@ func NewGrepCmd() *cobra.Command {
 			if len(args) == 1 {
 				if pathFlag != "" {
 					query = args[0]
-				} else if (astKind != "" || astReceiver != "") && (fileutil.Exists(args[0]) || strings.Contains(args[0], "/")) {
+				} else if (astMode || astKind != "" || astReceiver != "" || reindex || (fileutil.Exists(args[0]) && !fileutil.IsRegularFile(args[0]))) && (fileutil.Exists(args[0]) || strings.Contains(args[0], "/")) {
 					searchPath = args[0]
 				} else {
 					query = args[0]
@@ -87,7 +87,13 @@ func NewGrepCmd() *cobra.Command {
 				return fmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations("search query required (e.g. zqk grep 'pattern')"))
 			}
 
-			engine := search.NewEngine(".")
+			engineRoot := "."
+			if searchPath != "" && searchPath != "." {
+				engineRoot = searchPath
+			} else {
+				engineRoot = paths.ResolveProjectRoot(".")
+			}
+			engine := search.NewEngine(engineRoot)
 
 			mode := search.ModeText
 			if astMode || astKind != "" || astReceiver != "" {

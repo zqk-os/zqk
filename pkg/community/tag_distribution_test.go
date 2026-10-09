@@ -16,11 +16,11 @@ import (
 func TestTagDistribution_FunctionalAcceptance(t *testing.T) {
 	// 1. Tag format validation
 	validTags := []string{
-		"v2.9.4-rc1",
+		"v0.1.0-rc1",
 		"v0.1.0-rc.1",
 		"v1.0.0-rc.2",
 		"v3.0.0-beta.1",
-		"v2.9.4-rc1+20260916",
+		"v0.1.0-rc1+20260916",
 	}
 
 	for _, tag := range validTags {
@@ -33,9 +33,9 @@ func TestTagDistribution_FunctionalAcceptance(t *testing.T) {
 	tmpDir := t.TempDir()
 	mockChecksums := make(map[string]string)
 	for _, p := range SupportedPlatforms {
-		archive := FormatArchiveName("v2.9.4-rc1", p.OS, p.Arch)
+		archive := FormatArchiveName("v0.1.0-rc1", p.OS, p.Arch)
 		archivePath := filepath.Join(tmpDir, archive)
-		content := []byte("binary payload for " + p.OS + "/" + p.Arch + " at tag v2.9.4-rc1")
+		content := []byte("binary payload for " + p.OS + "/" + p.Arch + " at tag v0.1.0-rc1")
 		if err := fileutil.WriteFile(archivePath, content, paths.FilePerm644); err != nil {
 			t.Fatalf("failed to write mock archive: %v", err)
 		}
@@ -64,7 +64,7 @@ func TestTagDistribution_FunctionalAcceptance(t *testing.T) {
 	}
 
 	// 3. Formula generation
-	formula, err := GenerateHomebrewFormula("v2.9.4-rc1", mockChecksums)
+	formula, err := GenerateHomebrewFormula("v0.1.0-rc1", mockChecksums)
 	if err != nil {
 		t.Fatalf("GenerateHomebrewFormula failed: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestTagDistribution_FunctionalAcceptance(t *testing.T) {
 		t.Errorf("generated formula missing class declaration")
 	}
 	for _, p := range SupportedPlatforms {
-		archive := FormatArchiveName("v2.9.4-rc1", p.OS, p.Arch)
+		archive := FormatArchiveName("v0.1.0-rc1", p.OS, p.Arch)
 		if !strings.Contains(formula, mockChecksums[archive]) {
 			t.Errorf("formula missing expected hash for %s", archive)
 		}
@@ -89,13 +89,13 @@ func TestTagDistribution_BoundaryAndErrorHandling(t *testing.T) {
 	// 1. Invalid tag rejection
 	invalidTags := []string{
 		"",
-		"2.9.4-rc1",     // missing 'v' prefix
+		"0.1.0-rc1",     // missing 'v' prefix
 		"v",             // empty version
 		"v1",            // incomplete semver
 		"v1.0",          // incomplete semver
 		"v1.0.0.0",      // quad-part version
 		"latest",        // non-version
-		"v2.9.4-rc@bad", // invalid characters in prerelease
+		"v0.1.0-rc@bad", // invalid characters in prerelease
 	}
 
 	for _, tag := range invalidTags {
@@ -119,9 +119,9 @@ func TestTagDistribution_BoundaryAndErrorHandling(t *testing.T) {
 
 	// 3. Incomplete checksums map in formula generation
 	incompleteChecksums := map[string]string{
-		FormatArchiveName("v2.9.4-rc1", "darwin", "arm64"): "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+		FormatArchiveName("v0.1.0-rc1", "darwin", "arm64"): "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
 	}
-	_, err := GenerateHomebrewFormula("v2.9.4-rc1", incompleteChecksums)
+	_, err := GenerateHomebrewFormula("v0.1.0-rc1", incompleteChecksums)
 	if err == nil {
 		t.Errorf("expected incomplete checksums map to fail formula generation, but passed")
 	}

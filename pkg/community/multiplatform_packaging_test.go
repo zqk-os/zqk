@@ -27,7 +27,7 @@ func TestMultiPlatformPackaging_FunctionalAcceptance(t *testing.T) {
 	}
 
 	distDir := t.TempDir()
-	cmd := execwrap.Command("bash", pkgScript, "v2.9.4", "--dry")
+	cmd := execwrap.Command("bash", pkgScript, "v0.1.0-test", "--dry")
 	cmd.Dir = root
 	cmd.Env = append(cmd.Environ(), "ZQK_DIST_DIR="+distDir)
 	out, err := cmd.CombinedOutput()
@@ -37,7 +37,7 @@ func TestMultiPlatformPackaging_FunctionalAcceptance(t *testing.T) {
 
 	// 1. Verify 4 platform archives exist
 	for _, p := range SupportedPlatforms {
-		archive := FormatArchiveName("2.9.4", p.OS, p.Arch)
+		archive := FormatArchiveName("0.1.0-test", p.OS, p.Arch)
 		archivePath := filepath.Join(distDir, archive)
 		if !fileutil.Exists(archivePath) {
 			t.Errorf("expected release archive %s not found", archive)
@@ -56,7 +56,7 @@ func TestMultiPlatformPackaging_BoundaryAndErrorHandling(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	// ParseChecksumManifest invalid length
-	invalidContent := "abc1234  zqk-community_2.9.4_darwin_arm64.tar.gz\n"
+	invalidContent := "abc1234  zqk-community_0.1.0-test_darwin_arm64.tar.gz\n"
 	if _, err := ParseChecksumManifest(invalidContent); err == nil {
 		t.Errorf("expected error parsing invalid hash length, got nil")
 	}
@@ -113,8 +113,8 @@ func TestMultiPlatformPackaging_IntegrationAndConformance(t *testing.T) {
 	}
 
 	// Verify format archive name adheres to canonical naming convention
-	archName := FormatArchiveName("v2.9.4", "darwin", "arm64")
-	if archName != "zqk-community_2.9.4_darwin_arm64.tar.gz" {
+	archName := FormatArchiveName("v0.1.0-test", "darwin", "arm64")
+	if archName != "zqk-community_0.1.0-test_darwin_arm64.tar.gz" {
 		t.Errorf("unexpected archive name format: %s", archName)
 	}
 	if strings.Contains(archName, "studio") {
