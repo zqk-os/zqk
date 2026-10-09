@@ -101,9 +101,12 @@ func TestParseOrchestratePlanDirectiveRejectsUnsafeID(t *testing.T) {
 }
 
 func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
-	t.Parallel()
-
+	// Serial: avoid TempDir cleanup races on .zqk under parallel suite runs
 	root := t.TempDir()
+	t.Cleanup(func() {
+		_ = fileutil.RemoveAll(filepath.Join(root, paths.ProjectDataDir))
+	})
+
 	binDir := filepath.Join(root, "bin")
 	if err := fileutil.MkdirAll(binDir, paths.DirPerm750); err != nil {
 		t.Fatal(err)
