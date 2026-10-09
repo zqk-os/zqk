@@ -24,7 +24,7 @@ func TestDistributionChannels_FunctionalAcceptance(t *testing.T) {
 	}
 
 	distDir := t.TempDir()
-	cmd := execwrap.Command("bash", pkgScript, "v2.9.4", "--dry")
+	cmd := execwrap.Command("bash", pkgScript, "v0.1.0-test", "--dry")
 	cmd.Dir = root
 	cmd.Env = append(cmd.Environ(), "ZQK_DIST_DIR="+distDir)
 	out, err := cmd.CombinedOutput()
@@ -34,7 +34,7 @@ func TestDistributionChannels_FunctionalAcceptance(t *testing.T) {
 
 	// 1. Verify all 4 platform tarballs exist
 	for _, p := range SupportedPlatforms {
-		archive := FormatArchiveName("2.9.4", p.OS, p.Arch)
+		archive := FormatArchiveName("0.1.0-test", p.OS, p.Arch)
 		archivePath := filepath.Join(distDir, archive)
 		if !fileutil.Exists(archivePath) {
 			t.Errorf("expected release archive %s not found", archive)
@@ -68,7 +68,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	// 1. Create mock archives
 	mockChecksums := make(map[string]string)
 	for _, p := range SupportedPlatforms {
-		archive := FormatArchiveName("2.9.4", p.OS, p.Arch)
+		archive := FormatArchiveName("0.1.0-test", p.OS, p.Arch)
 		archivePath := filepath.Join(tmpDir, archive)
 		content := []byte("mock binary archive content for " + p.OS + "/" + p.Arch)
 		if err := fileutil.WriteFile(archivePath, content, paths.FilePerm644); err != nil {
@@ -97,7 +97,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// 3. Test corrupted archive detection
-	firstArchive := FormatArchiveName("2.9.4", SupportedPlatforms[0].OS, SupportedPlatforms[0].Arch)
+	firstArchive := FormatArchiveName("0.1.0-test", SupportedPlatforms[0].OS, SupportedPlatforms[0].Arch)
 	firstArchivePath := filepath.Join(tmpDir, firstArchive)
 	if err := fileutil.WriteFile(firstArchivePath, []byte("tampered content"), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to corrupt archive: %v", err)
@@ -115,7 +115,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// 5. Test formula mismatch detection
-	formulaContent, err := GenerateHomebrewFormula("2.9.4", mockChecksums)
+	formulaContent, err := GenerateHomebrewFormula("0.1.0-test", mockChecksums)
 	if err != nil {
 		t.Fatalf("GenerateHomebrewFormula failed: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestDistributionChannels_BoundaryAndErrorHandling(t *testing.T) {
 	}
 
 	// Corrupt formula sha256
-	corruptedFormula := strings.Replace(formulaContent, mockChecksums[FormatArchiveName("2.9.4", "darwin", "arm64")], "0000000000000000000000000000000000000000000000000000000000000000", 1)
+	corruptedFormula := strings.Replace(formulaContent, mockChecksums[FormatArchiveName("0.1.0-test", "darwin", "arm64")], "0000000000000000000000000000000000000000000000000000000000000000", 1)
 	corruptedFormulaPath := filepath.Join(tmpDir, "zqk_corrupt.rb")
 	if err := fileutil.WriteFile(corruptedFormulaPath, []byte(corruptedFormula), paths.FilePerm644); err != nil {
 		t.Fatalf("failed to write corrupted formula: %v", err)

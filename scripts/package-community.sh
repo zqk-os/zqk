@@ -229,10 +229,6 @@ class Zqk < Formula
 end
 EOF
 
-# Update repo-level Formula if in standard repository tree
-if [ -d "${REPO_ROOT}/Formula" ]; then
-  cp "${DIST_DIR}/Formula/zqk.rb" "${REPO_ROOT}/Formula/zqk.rb"
-fi
 
 # Synthesize release notes and changelog
 echo ""
