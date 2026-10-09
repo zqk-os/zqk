@@ -14,22 +14,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	pkgmcp "github.com/zqk-os/zqk/pkg/mcp"
-	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestMCP_SocketBridge_ProxyStreaming tests the proxy command as a socket bridge
 // forwarding JSON-RPC payloads between client streams and the MCP daemon TCP endpoint.
 func TestMCP_SocketBridge_ProxyStreaming(t *testing.T) {
-	tempDir, cleanup := setupMCPTestProject(t)
+	tempDir, provider, cleanup := setupMCPTestProjectWithStorage(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -76,11 +68,13 @@ func TestMCP_SocketBridge_ProxyStreaming(t *testing.T) {
 	if !pd.IsDaemonAlive() {
 		t.Error("expected IsDaemonAlive to be true after sync probe")
 	}
-	_ = pd.PublishDaemonEvent(stdctx.Background(), "test.event", "SEAT-1", "EV-1")
+	if errPub := pd.PublishDaemonEvent(stdctx.Background(), "test.event", "SEAT-1", "EV-1"); errPub != nil {
+		t.Logf("publish daemon event: %v", errPub)
+	}
 	hb, hbf, rec := pd.GetProxyDaemonStats()
-	_ = hb
-	_ = hbf
-	_ = rec
+	if hb < 0 || hbf < 0 || rec < 0 {
+		t.Errorf("unexpected negative daemon stats")
+	}
 
 	// Unreachable TCP address branch
 	cmdUnreach := NewProxyCmd()
@@ -88,7 +82,9 @@ func TestMCP_SocketBridge_ProxyStreaming(t *testing.T) {
 	setMCPCLIContext(t, cmdUnreach, tempDir, provider)
 	ctxUnreach, cancelUnreach := stdctx.WithTimeout(stdctx.Background(), 50*time.Millisecond)
 	defer cancelUnreach()
-	_ = cmdUnreach.ExecuteContext(ctxUnreach)
+	if errExec := cmdUnreach.ExecuteContext(ctxUnreach); errExec != nil && errExec != stdctx.Canceled {
+		t.Logf("unreach execution: %v", errExec)
+	}
 }
 
 // TestMCP_RunServerMethod_TransportMatrix tests transport modes in runServerMethod
@@ -135,13 +131,14 @@ func TestMCP_RunServerMethod_TransportMatrix(t *testing.T) {
 	server.RequestProcessShutdown("test transport matrix shutdown")
 
 	errServe := runServerMethod(server, nil, logger)
-	_ = errServe
+	if errServe != nil {
+		t.Logf("runServerMethod: %v", errServe)
+	}
 }
 
 // TestMCP_ToolRegistrations_ListAndFormat verifies tool listing across
 // plain name and with-command annotation formatting.
 func TestMCP_ToolRegistrations_ListAndFormat(t *testing.T) {
-	_ = setupMCPTestProject
 
 	cmd := clitool.NewCommandBuilder("zqk").Build()
 	subCmd := &cobra.Command{
@@ -201,21 +198,17 @@ func TestMCP_ToolRegistrations_ListAndFormat(t *testing.T) {
 
 // TestMCP_Install_Boundaries tests the install command behavior when run inside vs outside project root.
 func TestMCP_Install_Boundaries(t *testing.T) {
-	tempDir, cleanup := setupMCPTestProject(t)
+	tempDir, provider, cleanup := setupMCPTestProjectWithStorage(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
 
 	// Valid project root install
 	out, err := executeMCPCommand(t, tempDir, provider, "install")
 	if err != nil {
 		t.Fatalf("mcp install in project failed: %v", err)
 	}
-	_ = out
+	if out == "" {
+		t.Log("mcp install completed with empty output")
+	}
 }
 
 // TestMCP_DaemonControl_Boundaries tests process alive, PID resolution, and binary resolution edge cases.
@@ -273,7 +266,9 @@ func TestMCP_DaemonControl_Boundaries(t *testing.T) {
 func TestMCP_ParseMCPCmdContext(t *testing.T) {
 	cmd := NewProxyCmd()
 	cmd.SetArgs([]string{"--tcp", "127.0.0.1:8888"})
-	_ = cmd.ParseFlags([]string{"--tcp", "127.0.0.1:8888"})
+	if errParse := cmd.ParseFlags([]string{"--tcp", "127.0.0.1:8888"}); errParse != nil {
+		t.Fatalf("parse flags: %v", errParse)
+	}
 
 	addr, logger, err := parseMCPCmdContext(cmd)
 	if err != nil {
@@ -288,7 +283,9 @@ func TestMCP_ParseMCPCmdContext(t *testing.T) {
 
 	// Default TCP resolution when flag not passed
 	cmdDefault := NewProxyCmd()
-	_ = cmdDefault.ParseFlags([]string{})
+	if errParse := cmdDefault.ParseFlags([]string{}); errParse != nil {
+		t.Fatalf("parse flags default: %v", errParse)
+	}
 	addrDefault, _, errDefault := parseMCPCmdContext(cmdDefault)
 	if errDefault != nil {
 		t.Fatalf("parseMCPCmdContext default failed: %v", errDefault)

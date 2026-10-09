@@ -16,23 +16,21 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+func initSeededFeedTestProject(t *testing.T) (string, storage.ObjectStorageProvider) {
+	tempDir, provider, cleanup := setupFeedTestProjectWithStorage(t)
+	t.Cleanup(cleanup)
+	seedFeedSupportObjects(t, provider)
+	return tempDir, provider
+}
 
 // TestSubscriberStreaming_LoopHandshakeAndEvents tests runSubscriberLoop covering
 // the MCP JSON-RPC protocol handshake, subscription, event stream dispatching,
 // error line handling, and graceful connection shutdown.
 func TestSubscriberStreaming_LoopHandshakeAndEvents(t *testing.T) {
-	tempDir, cleanup := setupFeedTestProject(t)
-	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedFeedSupportObjects(t, provider)
+	tempDir, provider := initSeededFeedTestProject(t)
 
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -54,16 +52,24 @@ func TestSubscriberStreaming_LoopHandshakeAndEvents(t *testing.T) {
 
 			reader := bufio.NewReader(conn)
 
+			writeLine := func(payload string) {
+				if _, err := conn.Write([]byte(payload + "\n")); err != nil {
+					return
+				}
+			}
+
 			// 1. Expect initialize request
 			line, err := reader.ReadString('\n')
 			if err != nil {
 				return
 			}
 			var initReq map[string]any
-			_ = json.Unmarshal([]byte(line), &initReq)
+			if err := json.Unmarshal([]byte(line), &initReq); err != nil {
+				return
+			}
 
 			// Respond to initialize with id=1
-			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","id":1,"result":{"capabilities":{}}}` + "\n"))
+			writeLine(`{"jsonrpc":"2.0","id":1,"result":{"capabilities":{}}}`)
 
 			// 2. Expect notifications/initialized
 			_, err = reader.ReadString('\n')
@@ -77,19 +83,19 @@ func TestSubscriberStreaming_LoopHandshakeAndEvents(t *testing.T) {
 				return
 			}
 			// Respond to subscribe with id=2
-			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","id":2,"result":{"subscribed":true}}` + "\n"))
+			writeLine(`{"jsonrpc":"2.0","id":2,"result":{"subscribed":true}}`)
 
 			// 4. Send malformed json line to test unmarshal error recovery
-			_, _ = conn.Write([]byte(`{not valid json}` + "\n"))
+			writeLine(`{not valid json}`)
 
 			// 5. Send unrelated event notification (ignored by subscriber)
-			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"peer.heartbeat"}}}` + "\n"))
+			writeLine(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"peer.heartbeat"}}}`)
 
 			// 6. Send action.required notification
-			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action.required"}}}` + "\n"))
+			writeLine(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action.required"}}}`)
 
 			// 7. Send action_required notification
-			_, _ = conn.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action_required"}}}` + "\n"))
+			writeLine(`{"jsonrpc":"2.0","method":"notifications/event","params":{"event":{"type":"action_required"}}}`)
 
 			// Allow client to process events
 			time.Sleep(50 * time.Millisecond)
@@ -115,15 +121,7 @@ func TestSubscriberStreaming_LoopHandshakeAndEvents(t *testing.T) {
 // TestFeedAck_ErrorAndValidationMatrix tests the acknowledgment command boundary
 // conditions, input validations, impersonation rejections, and await completions.
 func TestFeedAck_ErrorAndValidationMatrix(t *testing.T) {
-	tempDir, cleanup := setupFeedTestProject(t)
-	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedFeedSupportObjects(t, provider)
+	tempDir, provider := initSeededFeedTestProject(t)
 
 	// 1. Missing --agent-id
 	if _, err := executeFeedCommand(t, tempDir, provider, "ack", "--in-reply-to", "EVT-1", "--persona-ref", "PER-COMMUNITY-SOFTWARE-ENGINEER"); err == nil {
@@ -202,19 +200,13 @@ func TestFeedAck_ErrorAndValidationMatrix(t *testing.T) {
 // TestFeedBridgeIngest_ComprehensiveMatrix tests payload flag mutual exclusion,
 // inline payloads, feed ID matching & mismatch validation, no-ack and no-wake flags.
 func TestFeedBridgeIngest_ComprehensiveMatrix(t *testing.T) {
-	tempDir, cleanup := setupFeedTestProject(t)
-	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedFeedSupportObjects(t, provider)
+	tempDir, provider := initSeededFeedTestProject(t)
 
 	// 1. Both --payload and --payload-file
 	dummyFile := filepath.Join(tempDir, "payload.json")
-	_ = fileutil.WriteStandardFile(dummyFile, []byte(`{"channel":"generic","text":"test"}`))
+	if err := fileutil.WriteStandardFile(dummyFile, []byte(`{"channel":"generic","text":"test"}`)); err != nil {
+		t.Fatalf("failed to write dummy file: %v", err)
+	}
 	if _, err := executeFeedCommand(t, tempDir, provider, "bridge-ingest", "--channel", "generic", "--payload", `{"text":"test"}`, "--payload-file", dummyFile); err == nil {
 		t.Error("expected error when both --payload and --payload-file are specified")
 	}
@@ -270,7 +262,9 @@ func TestFeedBridgeIngest_ComprehensiveMatrix(t *testing.T) {
 		if err != nil {
 			t.Fatalf("bridge-ingest with matching feed-id failed: %v", err)
 		}
-		_ = matchOut
+		if matchOut == "" {
+			t.Log("bridge-ingest matching returned empty output")
+		}
 
 		// 7. Ingest with mismatching --feed-id
 		_, errMismatch := executeFeedCommand(t, tempDir, provider, "bridge-ingest",
