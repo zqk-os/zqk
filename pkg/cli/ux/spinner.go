@@ -95,7 +95,7 @@ func ClearSpinner() {
 		globalSpinner.FinalMSG = ""
 		globalSpinner.Stop()
 		if isTTY && !suppressed {
-			fmt.Print("\r\033[K")
+			_, _ = os.Stdout.WriteString("\r\033[K")
 		}
 	}
 }

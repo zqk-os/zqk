@@ -137,3 +137,29 @@ func TestEnsureGitHooks_InstallsPreCommitAndPrePush(t *testing.T) {
 		t.Errorf("pre-push missing zqk-vet verification gate")
 	}
 }
+
+func TestEnsureGitHooks_PreCommitSkipsZqkVetInConsumerRepo(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	gitDir := filepath.Join(root, ".git")
+	if err := fileutil.EnsureDir(gitDir); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := EnsureGitHooks(root, nil); err != nil {
+		t.Fatalf("EnsureGitHooks failed: %v", err)
+	}
+
+	preCommit := filepath.Join(gitDir, "hooks", "pre-commit")
+	content, err := fileutil.ReadFile(preCommit)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify that the hook guards zqk-vet with cmd/zqk-vet/main.go check
+	if !bytes.Contains(content, []byte(`if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then`)) {
+		t.Errorf("pre-commit missing guard: if [ -f \"$REPO_ROOT/cmd/zqk-vet/main.go\" ]; then")
+	}
+}
+

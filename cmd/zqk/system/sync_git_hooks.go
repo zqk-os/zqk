@@ -426,83 +426,87 @@ fi
 
 export PATH="/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin:$GOPATH/bin:$PATH"
 
-# 5. Codebase Verification Gate (zqk-vet)
+# 5. Codebase Verification Gate (zqk-vet) & Staged Go Source Hygiene
 # Enforces AST hygiene (paths, permissions, CLI names, raw goroutines), tree policing, and invariants.
-ZQK_VET_BIN=""
+# NOTE: zqk-vet and internal Go source hygiene only apply to ZQK engine codebases
+# (identified by the presence of cmd/zqk-vet/main.go). In consumer/bare repos, this gate is cleanly skipped.
+if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+	ZQK_VET_BIN=""
 
-# Rebuild zqk-vet if missing or if sources/config are newer than the binary
-NEED_VET_BUILD=0
-if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
-	NEED_VET_BUILD=1
-elif [ -n "$(find "$REPO_ROOT/cmd/zqk-vet" "$REPO_ROOT/pkg/vet" "$REPO_ROOT/config/gates.yaml" -newer "$REPO_ROOT/bin/zqk-vet" 2>/dev/null)" ]; then
-	NEED_VET_BUILD=1
-fi
-
-if [ "$NEED_VET_BUILD" -eq 1 ]; then
-	if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
-		echo "⚙️  [ZQK PRE-COMMIT] Compiling bin/zqk-vet..."
-		mkdir -p "$REPO_ROOT/bin"
-		go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
+	# Rebuild zqk-vet if missing or if sources/config are newer than the binary
+	NEED_VET_BUILD=0
+	if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		NEED_VET_BUILD=1
+	elif [ -n "$(find "$REPO_ROOT/cmd/zqk-vet" "$REPO_ROOT/pkg/vet" "$REPO_ROOT/config/gates.yaml" -newer "$REPO_ROOT/bin/zqk-vet" 2>/dev/null)" ]; then
+		NEED_VET_BUILD=1
 	fi
-fi
 
-if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
-	ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
-elif command -v zqk-vet >/dev/null 2>&1; then
-	ZQK_VET_BIN="$(command -v zqk-vet)"
-fi
-
-if [ -z "$ZQK_VET_BIN" ]; then
-	echo "❌ [ZQK PRE-COMMIT] Failed to find or compile zqk-vet verification engine! Aborting commit." >&2
-	echo "   Ensure 'go' is installed and available in PATH to compile bin/zqk-vet." >&2
-	exit 1
-fi
-
-echo "🛡️  [ZQK PRE-COMMIT] Running zqk-vet hygiene and tree police checks..."
-VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
-if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
-	echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing." >&2
-	exit 1
-fi
-
-# 6. Staged Go Source Hygiene Ratchet Gate
-# Enforces that all newly added or modified Go files strictly use:
-# - goroutinelabels instead of raw 'go func('
-# - pkg/utils/fileutil instead of raw os.WriteFile/ReadFile/MkdirAll
-STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$' || true)
-if [ -n "$STAGED_GO_FILES" ]; then
-	RAW_GOROUTINE_VIOLATIONS=0
-	FILEUTIL_VIOLATIONS=0
-	for gf in $STAGED_GO_FILES; do
-		# Skip exemptions (vendor, testdata, goroutinelabels itself, fileutil itself)
-		case "$gf" in
-			vendor/*|*/testdata/*|testdata/*|pkg/goroutinelabels/*|pkg/utils/fileutil/*)
-				continue
-				;;
-		esac
-
-		# Check for raw goroutines
-		if git show ":$gf" 2>/dev/null | grep -E '^[[:space:]]*go[[:space:]]+func\(' >/dev/null 2>&1; then
-			echo "❌ [ZQK PRE-COMMIT] Raw goroutine violation in staged file: $gf" >&2
-			echo "   Naked 'go func()' is strictly prohibited (POL-CONCURRENCY)." >&2
-			echo "   Use goroutinelabels.NewGoroutine(\"<name>\", \"<purpose>\").StartSimple(...) instead." >&2
-			RAW_GOROUTINE_VIOLATIONS=$((RAW_GOROUTINE_VIOLATIONS + 1))
+	if [ "$NEED_VET_BUILD" -eq 1 ]; then
+		if command -v go >/dev/null 2>&1; then
+			echo "⚙️  [ZQK PRE-COMMIT] Compiling bin/zqk-vet..."
+			mkdir -p "$REPO_ROOT/bin"
+			go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
 		fi
+	fi
 
-		# Check for direct os filesystem calls instead of fileutil
-		if git show ":$gf" 2>/dev/null | grep -E '\bos\.(WriteFile|ReadFile|Mkdir|MkdirAll|RemoveAll)\(' >/dev/null 2>&1; then
-			echo "❌ [ZQK PRE-COMMIT] Filesystem abstraction violation in staged file: $gf" >&2
-			echo "   Direct standard library 'os.*' filesystem operations prohibited." >&2
-			echo "   Use 'github.com/zqk-os/zqk/pkg/utils/fileutil' (e.g. fileutil.WriteFile, fileutil.ReadFile, fileutil.MkdirAll)." >&2
-			FILEUTIL_VIOLATIONS=$((FILEUTIL_VIOLATIONS + 1))
-		fi
-	done
+	if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
+	elif command -v zqk-vet >/dev/null 2>&1; then
+		ZQK_VET_BIN="$(command -v zqk-vet)"
+	fi
 
-	if [ "$RAW_GOROUTINE_VIOLATIONS" -gt 0 ] || [ "$FILEUTIL_VIOLATIONS" -gt 0 ]; then
-		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
-		echo "❌ [ZQK PRE-COMMIT] Staged Go source hygiene gate failed ($RAW_GOROUTINE_VIOLATIONS goroutine, $FILEUTIL_VIOLATIONS filesystem violations)." >&2
-		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+	if [ -z "$ZQK_VET_BIN" ]; then
+		echo "❌ [ZQK PRE-COMMIT] Failed to find or compile zqk-vet verification engine! Aborting commit." >&2
+		echo "   Ensure 'go' is installed and available in PATH to compile bin/zqk-vet." >&2
 		exit 1
+	fi
+
+	echo "🛡️  [ZQK PRE-COMMIT] Running zqk-vet hygiene and tree police checks..."
+	VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
+	if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
+		echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing." >&2
+		exit 1
+	fi
+
+	# 6. Staged Go Source Hygiene Ratchet Gate
+	# Enforces that all newly added or modified Go files strictly use:
+	# - goroutinelabels instead of raw 'go func('
+	# - pkg/utils/fileutil instead of raw os.WriteFile/ReadFile/MkdirAll
+	STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$' || true)
+	if [ -n "$STAGED_GO_FILES" ]; then
+		RAW_GOROUTINE_VIOLATIONS=0
+		FILEUTIL_VIOLATIONS=0
+		for gf in $STAGED_GO_FILES; do
+			# Skip exemptions (vendor, testdata, goroutinelabels itself, fileutil itself)
+			case "$gf" in
+				vendor/*|*/testdata/*|testdata/*|pkg/goroutinelabels/*|pkg/utils/fileutil/*)
+					continue
+					;;
+			esac
+
+			# Check for raw goroutines
+			if git show ":$gf" 2>/dev/null | grep -E '^[[:space:]]*go[[:space:]]+func\(' >/dev/null 2>&1; then
+				echo "❌ [ZQK PRE-COMMIT] Raw goroutine violation in staged file: $gf" >&2
+				echo "   Naked 'go func()' is strictly prohibited (POL-CONCURRENCY)." >&2
+				echo "   Use goroutinelabels.NewGoroutine(\"<name>\", \"<purpose>\").StartSimple(...) instead." >&2
+				RAW_GOROUTINE_VIOLATIONS=$((RAW_GOROUTINE_VIOLATIONS + 1))
+			fi
+
+			# Check for direct os filesystem calls instead of fileutil
+			if git show ":$gf" 2>/dev/null | grep -E '\bos\.(WriteFile|ReadFile|Mkdir|MkdirAll|RemoveAll)\(' >/dev/null 2>&1; then
+				echo "❌ [ZQK PRE-COMMIT] Filesystem abstraction violation in staged file: $gf" >&2
+				echo "   Direct standard library 'os.*' filesystem operations prohibited." >&2
+				echo "   Use 'github.com/zqk-os/zqk/pkg/utils/fileutil' (e.g. fileutil.WriteFile, fileutil.ReadFile, fileutil.MkdirAll)." >&2
+				FILEUTIL_VIOLATIONS=$((FILEUTIL_VIOLATIONS + 1))
+			fi
+		done
+
+		if [ "$RAW_GOROUTINE_VIOLATIONS" -gt 0 ] || [ "$FILEUTIL_VIOLATIONS" -gt 0 ]; then
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			echo "❌ [ZQK PRE-COMMIT] Staged Go source hygiene gate failed ($RAW_GOROUTINE_VIOLATIONS goroutine, $FILEUTIL_VIOLATIONS filesystem violations)." >&2
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			exit 1
+		fi
 	fi
 fi
 `
@@ -569,7 +573,8 @@ REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 # Codebase Verification Gate (zqk-vet)
 # Secondary defense: catches any bypass of pre-commit (e.g. git commit --no-verify)
-if [ -d "$REPO_ROOT/.zqk" ]; then
+# NOTE: zqk-vet only applies to ZQK engine codebases (identified by presence of cmd/zqk-vet/main.go).
+if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
 	ZQK_VET_BIN=""
 	NEED_VET_BUILD=0
 	if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
@@ -579,7 +584,7 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 	fi
 
 	if [ "$NEED_VET_BUILD" -eq 1 ]; then
-		if command -v go >/dev/null 2>&1 && [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+		if command -v go >/dev/null 2>&1; then
 			echo "⚙️  [ZQK PRE-PUSH] Compiling bin/zqk-vet..."
 			mkdir -p "$REPO_ROOT/bin"
 			go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
@@ -605,6 +610,9 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 			exit 1
 		fi
 	fi
+fi
+
+if [ -d "$REPO_ROOT/.zqk" ]; then
 
 	# ---------------------------------------------------------------------------
 	# Attention-Hailing Mechanism & Project-Specific Pre-Push Batteries

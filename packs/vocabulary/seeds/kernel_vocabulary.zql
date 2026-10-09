@@ -75,13 +75,13 @@ UPSERT glossary_term ID "GLS-ACRONYM-CRIT" {
 };
 
 UPSERT glossary_term ID "GLS-ACRONYM-VDS" {
-    title: "VDS (Verifiable Decomposition Spine)",
+    title: "VDS (Verification & Verifiable Decomposition Spine)",
     category: "verification",
     scheme_ref: "VOC-KERNEL-ACRONYMS",
     context_scope: "operational",
     definition: "The 5-layer unbroken verification lineage connecting Vision, Goals, Plans, Requirements/Criteria, and Backlog Items to ensure fail-closed execution.",
-    agent_prompts: "Expanded meaning: Verifiable Decomposition Spine. Use for progressive disclosure.",
-    machine_hints: "{\"acronym\":\"VDS\",\"full_name\":\"Verifiable Decomposition Spine\",\"related_refs\":[\"CRIT\",\"TST\",\"CEF\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
+    agent_prompts: "Expanded meaning: Verification & Verifiable Decomposition Spine. Use for progressive disclosure.",
+    machine_hints: "{\"acronym\":\"VDS\",\"full_name\":\"Verification & Verifiable Decomposition Spine\",\"related_refs\":[\"CRIT\",\"TST\",\"CEF\"],\"scheme_ref\":\"VOC-KERNEL-ACRONYMS\"}"
 };
 
 UPSERT glossary_term ID "GLS-ACRONYM-TCFG" {

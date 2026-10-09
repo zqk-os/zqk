@@ -201,7 +201,7 @@ func CanonicalSeedTerms() []Acronym {
 		},
 		{
 			Code:        "VDS",
-			FullName:    "Verifiable Decomposition Spine",
+			FullName:    "Verification & Verifiable Decomposition Spine",
 			SchemeRef:   KernelAcronymsSchemeID,
 			Category:    "verification",
 			Definition:  "The 5-layer unbroken verification lineage connecting Vision, Goals, Plans, Requirements/Criteria, and Backlog Items to ensure fail-closed execution.",
