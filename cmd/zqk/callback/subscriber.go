@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // Subscriber defines the interface for reactive listeners responding to callback entries.
@@ -18,6 +17,9 @@ type Subscriber interface {
 	Name() string
 	Notify(ctx context.Context, entry *CallbackEntry) error
 }
+
+// CallbackSubscriber is an alias for Subscriber for explicit semantic naming across event bus domains.
+type CallbackSubscriber = Subscriber
 
 // FuncSubscriber allows registering closure handlers as callback subscribers.
 type FuncSubscriber struct {
@@ -162,45 +164,6 @@ func (s *KernelWALSubscriber) synthesizeEvent(entry *CallbackEntry) *lifecycle.L
 	return event
 }
 
-// ShockwaveSubscriber emits reactive invalidation shockwaves when callback payloads indicate mutation.
-type ShockwaveSubscriber struct {
-	bus *storage.InvalidationShockwaveBus
-}
-
-// NewShockwaveSubscriber creates a subscriber linked to an invalidation bus.
-func NewShockwaveSubscriber(bus *storage.InvalidationShockwaveBus) *ShockwaveSubscriber {
-	if bus == nil {
-		bus = storage.GetGlobalInvalidationBus()
-	}
-	return &ShockwaveSubscriber{bus: bus}
-}
-
-// Name returns the shockwave subscriber identifier.
-func (s *ShockwaveSubscriber) Name() string {
-	return "shockwave"
-}
-
-// Notify broadcasts a storage MutationEvent shockwave across the system bus.
-func (s *ShockwaveSubscriber) Notify(ctx context.Context, entry *CallbackEntry) error {
-	if entry == nil || entry.Payload == nil || s.bus == nil {
-		return nil
-	}
-	payload := entry.Payload
-	objID, _ := payload["object_id"].(string)
-	kind, _ := payload[objects.FieldKeyKind].(string)
-	if objID == emptyValue {
-		objID, _ = payload["job_id"].(string)
-		kind = "scheduler_job"
-	}
-	s.bus.Broadcast(ctx, storage.MutationEvent{
-		Op:         storage.MutationOpPut,
-		Kind:       kind,
-		ID:         objID,
-		Timestamp:  entry.Timestamp,
-		ObjectData: payload,
-	})
-	return nil
-}
 
 // MultiSubscriberDispatcher coordinates and fans out callback events across registered subscribers.
 type MultiSubscriberDispatcher struct {
