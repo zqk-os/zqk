@@ -25,6 +25,15 @@ func runCoordinatorRouterSync(emitCtx context.Context, work func(ctx context.Con
 // context before running—router.Emit never runs. For async stages, cancel must be deferred inside
 // the callback passed to StartWithContext, not at Emit scope. This helper encodes that pairing.
 func runCoordinatorRouterAsync(emitCtx context.Context, goroutineName, goroutinePurpose string, work func(ctx context.Context)) {
+	var nilCoord *Coordinator
+	nilCoord.runRouterAsync(emitCtx, goroutineName, goroutinePurpose, work)
+}
+
+// runRouterAsync schedules router work on a labeled goroutine tracked by c.wg.
+func (c *Coordinator) runRouterAsync(emitCtx context.Context, goroutineName, goroutinePurpose string, work func(ctx context.Context)) {
+	if c != nil {
+		c.wg.Add(1)
+	}
 	routerCtx, cancel := context.WithTimeout(emitCtx, coordinatorRouterTimeout)
 	bud := goroutinelabels.DefaultBudget()
 	b := goroutinelabels.NewGoroutine(goroutineName, goroutinePurpose)
@@ -32,6 +41,9 @@ func runCoordinatorRouterAsync(emitCtx context.Context, goroutineName, goroutine
 		b = b.WithBudget(bud)
 	}
 	b.StartWithContext(routerCtx, func(ctx context.Context) error {
+		if c != nil {
+			defer c.wg.Done()
+		}
 		defer cancel()
 		work(ctx)
 		return nil

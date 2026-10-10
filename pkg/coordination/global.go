@@ -2,6 +2,7 @@ package coordination
 
 import (
 	"sync"
+	"time"
 )
 
 var (
@@ -44,4 +45,16 @@ func ResetGlobalCoordinator() {
 	defer globalCoordinatorMu.Unlock()
 
 	globalCoordinator = nil
+}
+
+// DrainGlobalCoordinator waits up to timeout for all in-flight router and subscriber goroutines on the global coordinator to complete.
+func DrainGlobalCoordinator(timeout time.Duration) error {
+	globalCoordinatorMu.RLock()
+	c := globalCoordinator
+	globalCoordinatorMu.RUnlock()
+
+	if coord, ok := c.(*Coordinator); ok && coord != nil {
+		return coord.Drain(timeout)
+	}
+	return nil
 }

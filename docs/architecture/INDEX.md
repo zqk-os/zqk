@@ -53,6 +53,7 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Dynamic Subscriber Topology Partitioning & Work-Stealing](./DYNAMIC_SUBSCRIBER_WORK_STEALING.md)**: Virtual-node consistent hash rings, Chase-Lev work-stealing deques, and lossless dynamic shard rebalancing across event mesh subscribers.
 - **[Dynamic Subscriber Topology Work-Stealing Specification](./DYNAMIC_SUBSCRIBER_TOPOLOGY_WORK_STEALING.md)**: Complete topological specification for subscriber work stealing and partition mapping.
 - **[Distributed Gossip Membership and Peer Failure Detector](./DISTRIBUTED_GOSSIP_FAILURE_DETECTOR.md)**: SWIM protocol implementation with indirect probing, suspicion timers, incarnation monotonicity, and self-healing cluster recovery.
+- **[Adaptive Backoff Exponential Jitter and Quorum Damping](./ADAPTIVE_BACKOFF_QUORUM_DAMPING.md)**: Decorrelated exponential jitter backoff, sliding-window token bucket rate limiting, and storm quorum damping.
 
 ---
 
