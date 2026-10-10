@@ -159,9 +159,9 @@ zqk_callback_dispatch_latency_nanoseconds_count{subscriber="metrics_subscriber"}
 
 | Requirement / Criterion | Description | Verification Method | Status |
 | :--- | :--- | :--- | :--- |
-| **REQ-1791668749463744000-2549107b** | Event-Driven Metrics Aggregation and Zero-Allocation Telemetry Dispatch. | Unit, Concurrency, and AST Hygiene Suites | Verified |
-| **CRIT-1791668750264615000-d18dc08a** | `MetricsSubscriber` implementation conforming to `CallbackSubscriber`, dispatch counters, latency percentiles, ring buffer telemetry, fast telemetry hooks. | `TestMetricsSubscriber_ZeroAllocations`<br>`TestMetricsSubscriber_LatencyPercentiles`<br>`TestMetricsSubscriber_RingBufferTelemetry` | Verified |
-| **CRIT-1791668750264616000-9af77270** | Thread-safe atomic operations (lock-free), zero allocations per event, graceful handling of empty/nil metrics or zero elapsed times, `-race` clean. | `TestMetricsSubscriber_ZeroAllocations`<br>`TestMetricsSubscriber_CounterIncrementsAndErrorTracking`<br>`TestMetricsSubscriber_ConcurrentDispatches` | Verified |
-| **CRIT-1791668750264617000-3245ac11** | Complete architectural documentation in `docs/architecture/EVENT_DRIVEN_METRICS_TELEMETRY.md`. | Traceability and Specification Review | Verified |
-| **TST-1791668750264615001-3eb74d68** | Test Suite in `cmd/zqk/callback/metrics_subscriber_test.go`. | Unit, Concurrency, and Race Detection Suite (passed) | Verified |
+| **REQ-EVENT-METRICS-TELEMETRY** | Event-Driven Metrics Aggregation and Zero-Allocation Telemetry Dispatch. | Unit, Concurrency, and AST Hygiene Suites | Verified |
+| **CRIT-METRICS-SUBSCRIBER-DISPATCH** | `MetricsSubscriber` implementation conforming to `CallbackSubscriber`, dispatch counters, latency percentiles, ring buffer telemetry, fast telemetry hooks. | `TestMetricsSubscriber_ZeroAllocations`<br>`TestMetricsSubscriber_LatencyPercentiles`<br>`TestMetricsSubscriber_RingBufferTelemetry` | Verified |
+| **CRIT-METRICS-LOCKFREE-ATOMIC** | Thread-safe atomic operations (lock-free), zero allocations per event, graceful handling of empty/nil metrics or zero elapsed times, `-race` clean. | `TestMetricsSubscriber_ZeroAllocations`<br>`TestMetricsSubscriber_CounterIncrementsAndErrorTracking`<br>`TestMetricsSubscriber_ConcurrentDispatches` | Verified |
+| **CRIT-METRICS-ARCH-SPEC** | Complete architectural documentation in `docs/architecture/EVENT_DRIVEN_METRICS_TELEMETRY.md`. | Traceability and Specification Review | Verified |
+| **TST-METRICS-SUBSCRIBER-SUITE** | Test Suite in `cmd/zqk/callback/metrics_subscriber_test.go`. | Unit, Concurrency, and Race Detection Suite (passed) | Verified |
 
