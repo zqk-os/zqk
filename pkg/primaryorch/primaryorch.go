@@ -8,7 +8,11 @@ package primaryorch
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,10 +39,11 @@ const DefaultAgentIDFallback = "primary"
 
 // Known adapter names (vendor-specific implementations behind a stable contract).
 const (
-	AdapterScript    = "script"     // run argv with message as final arg (e.g. wake-agy.sh)
-	AdapterAgentChat = "agent_chat" // append to agent chat channel JSONL
-	AdapterInbox     = "inbox"      // write under .zqk/inbox/<agent_id>/
-	AdapterNoop      = "noop"       // record success without I/O (tests / dry-run)
+	AdapterScript      = "script"      // run argv with message as final arg (e.g. wake-agy.sh)
+	AdapterAgentChat   = "agent_chat"  // append to agent chat channel JSONL
+	AdapterInbox       = "inbox"       // write under .zqk/inbox/<agent_id>/
+	AdapterNoop        = "noop"        // record success without I/O (tests / dry-run)
+	AdapterAntigravity = "antigravity" // native agentapi wake with CSRF token & LS address
 )
 
 const (
@@ -53,13 +58,18 @@ type Binding struct {
 	SchemaVersion string `json:"schema_version"`
 	// AgentID is a stable identity (e.g. peer-tpm-01, peer-agent-01, human).
 	AgentID string `json:"agent_id"`
-	// Adapter selects the wake transport (script | agent_chat | inbox | noop).
+	// Adapter selects the wake transport (script | agent_chat | inbox | noop | antigravity).
 	Adapter string `json:"adapter"`
 	// Script is relative to project root or absolute; used when Adapter=script.
 	Script string `json:"script,omitempty"`
 	// InboxSubdir overrides the inbox leaf when Adapter=inbox (default: agent_id).
 	InboxSubdir string `json:"inbox_subdir,omitempty"`
-	Note        string `json:"note,omitempty"`
+	// Antigravity connection parameters when Adapter=antigravity
+	LSAddress      string `json:"ls_address,omitempty"`
+	CSRFToken      string `json:"csrf_token,omitempty"`
+	ConversationID string `json:"conversation_id,omitempty"`
+	PID            int    `json:"pid,omitempty"`
+	Note           string `json:"note,omitempty"`
 }
 
 // WakeRequest is a TPM/attentiveness wake payload.
@@ -162,8 +172,10 @@ func ResolveAdapter(b Binding) (Adapter, error) {
 		return InboxAdapter{}, nil
 	case AdapterNoop:
 		return NoopAdapter{}, nil
+	case AdapterAntigravity:
+		return AntigravityAdapter{}, nil
 	default:
-		return nil, errfmt.Errorf("primaryorch: unknown adapter %q (want script|agent_chat|inbox|noop)", b.Adapter)
+		return nil, errfmt.Errorf("primaryorch: unknown adapter %q (want script|agent_chat|inbox|noop|antigravity)", b.Adapter)
 	}
 }
 
@@ -313,4 +325,195 @@ func sanitizePathSegment(s string) string {
 		return "unnamed"
 	}
 	return out
+}
+
+// AntigravityAdapter dispatches wakes natively via agentapi send-message with
+// ANTIGRAVITY_CSRF_TOKEN and ANTIGRAVITY_LS_ADDRESS injected into the process environment.
+type AntigravityAdapter struct {
+	AgentAPIBin string
+}
+
+func (AntigravityAdapter) Name() string { return AdapterAntigravity }
+
+func (a AntigravityAdapter) Wake(ctx context.Context, projectRoot string, b Binding, req WakeRequest) (WakeResult, error) {
+	// 1. Resolve connection parameters: LS address, CSRF token, conversation ID, PID.
+	lsAddr := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_LS_ADDRESS").OrDefault(b.LSAddress))
+	csrf := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_CSRF_TOKEN").OrDefault(b.CSRFToken))
+	convID := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_CONVERSATION_ID").OrDefault(b.ConversationID))
+
+	pid := b.PID
+	if pidStr := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_PID").OrDefault("")); pidStr != "" {
+		if parsed, err := strconv.Atoi(pidStr); err == nil && parsed > 0 {
+			pid = parsed
+		}
+	}
+
+	// Fallback to peer_seats.json if any parameters are still missing.
+	if lsAddr == "" || csrf == "" || convID == "" || pid <= 0 {
+		peerSeats := loadPeerSeatsConfig(projectRoot)
+		// Try matching seat by b.AgentID
+		if seat, ok := peerSeats[b.AgentID]; ok {
+			if lsAddr == "" {
+				lsAddr = strings.TrimSpace(seat.LSAddress)
+			}
+			if csrf == "" {
+				csrf = strings.TrimSpace(seat.CSRFToken)
+			}
+			if convID == "" {
+				convID = strings.TrimSpace(seat.Conversation)
+			}
+			if pid <= 0 && seat.PID > 0 {
+				pid = seat.PID
+			}
+		}
+		// If still missing, check any seat with non-empty fields
+		if convID == "" || pid <= 0 || lsAddr == "" || csrf == "" {
+			for _, seat := range peerSeats {
+				if convID == "" && strings.TrimSpace(seat.Conversation) != "" {
+					convID = strings.TrimSpace(seat.Conversation)
+				}
+				if pid <= 0 && seat.PID > 0 {
+					pid = seat.PID
+				}
+				if lsAddr == "" && strings.TrimSpace(seat.LSAddress) != "" {
+					lsAddr = strings.TrimSpace(seat.LSAddress)
+				}
+				if csrf == "" && strings.TrimSpace(seat.CSRFToken) != "" {
+					csrf = strings.TrimSpace(seat.CSRFToken)
+				}
+			}
+		}
+	}
+
+	// Fallback to AGY_CONVERSATION_ID env var if convID is still empty
+	if convID == "" {
+		convID = strings.TrimSpace(zqkenv.Get("AGY_CONVERSATION_ID").OrDefault(""))
+	}
+
+	// Validate required parameters
+	if lsAddr == "" {
+		return WakeResult{}, errfmt.Errorf("primaryorch: antigravity adapter: missing LS address (set ANTIGRAVITY_LS_ADDRESS or ls_address in binding)")
+	}
+	if csrf == "" {
+		return WakeResult{}, errfmt.Errorf("primaryorch: antigravity adapter: missing CSRF token (set ANTIGRAVITY_CSRF_TOKEN or csrf_token in binding)")
+	}
+	if convID == "" {
+		return WakeResult{}, errfmt.Errorf("primaryorch: antigravity adapter: missing conversation ID (set ANTIGRAVITY_CONVERSATION_ID or conversation_id in binding)")
+	}
+
+	// 2. Resolve agentapi executable
+	agentapiBin := a.AgentAPIBin
+	if agentapiBin == "" {
+		var err error
+		agentapiBin, err = resolveAgentAPIBin()
+		if err != nil {
+			return WakeResult{}, err
+		}
+	} else {
+		// Verify custom bin exists
+		if p := findExecutable(agentapiBin); p == "" {
+			return WakeResult{}, errfmt.Errorf("primaryorch: antigravity adapter: agentapi executable not found: %s", agentapiBin)
+		}
+	}
+
+	msg := req.Message
+	if strings.TrimSpace(msg) == "" {
+		msg = defaultWakeMessage(req)
+	}
+
+	// 3. Dispatch wake via agentapi send-message
+	cmd := execwrap.CommandContext(ctx, agentapiBin, "send-message", convID, msg)
+	if projectRoot != "" {
+		cmd.Dir = projectRoot
+	}
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env,
+		"ANTIGRAVITY_LS_ADDRESS="+lsAddr,
+		"ANTIGRAVITY_CSRF_TOKEN="+csrf,
+		"ANTIGRAVITY_CONVERSATION_ID="+convID,
+	)
+	if pid > 0 {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("ANTIGRAVITY_PID=%d", pid))
+	}
+
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return WakeResult{}, errfmt.Newf("primaryorch: antigravity agentapi send-message failed: %s", strings.TrimSpace(string(out))).Wrap(err)
+	}
+	if strings.Contains(string(out), `"error"`) {
+		return WakeResult{}, errfmt.Errorf("primaryorch: antigravity agentapi response error: %s", strings.TrimSpace(string(out)))
+	}
+
+	return WakeResult{
+		AgentID:     b.AgentID,
+		Adapter:     AdapterAntigravity,
+		DeliveredTo: "antigravity:" + convID,
+	}, nil
+}
+
+type peerSeatEntry struct {
+	PID          int    `json:"pid"`
+	Conversation string `json:"conversation"`
+	LSAddress    string `json:"ls_address"`
+	CSRFToken    string `json:"csrf_token"`
+}
+
+type peerSeatsDoc struct {
+	Seats map[string]peerSeatEntry `json:"seats"`
+}
+
+func loadPeerSeatsConfig(projectRoot string) map[string]peerSeatEntry {
+	if projectRoot == "" {
+		return nil
+	}
+	p := paths.PeerSeatsPath(projectRoot)
+	raw, err := fileutil.ReadFile(p)
+	if err != nil {
+		return nil
+	}
+	var doc peerSeatsDoc
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		return nil
+	}
+	return doc.Seats
+}
+
+func resolveAgentAPIBin() (string, error) {
+	if bin := strings.TrimSpace(zqkenv.Get("AGENTAPI").OrDefault("")); bin != "" {
+		if p := findExecutable(bin); p != "" {
+			return p, nil
+		}
+	}
+	if bin := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_AGENTAPI_EXE").OrDefault("")); bin != "" {
+		if p := findExecutable(bin); p != "" {
+			return p, nil
+		}
+	}
+	if p, err := exec.LookPath("agentapi"); err == nil {
+		return p, nil
+	}
+	if home, err := os.UserHomeDir(); err == nil {
+		p := filepath.Join(home, ".gemini", "antigravity-cli", "bin", "agentapi")
+		if fileutil.IsRegularFile(p) {
+			return p, nil
+		}
+	}
+	if p, err := exec.LookPath("agy"); err == nil {
+		return p, nil
+	}
+	return "", errfmt.Errorf("primaryorch: antigravity adapter: agentapi executable not found")
+}
+
+func findExecutable(pathOrName string) string {
+	s := strings.TrimSpace(pathOrName)
+	if s == "" {
+		return ""
+	}
+	if fileutil.IsRegularFile(s) {
+		return s
+	}
+	if p, err := exec.LookPath(s); err == nil {
+		return p
+	}
+	return ""
 }

@@ -203,18 +203,23 @@ func (r *JobWakerRegistry) AwaitJobWithWAL(
 	pollInterval time.Duration,
 ) (*LifecycleEvent, error) {
 	pollCtx, cancelPoll := context.WithCancel(ctx)
-	defer cancelPoll()
 
 	ch, unregister := r.Register(jobID)
 	defer unregister()
 
+	pollDone := make(chan struct{})
 	goroutinelabels.NewGoroutine("lifecycle_waker_wal_poll", "poll WAL for scheduler callback").StartSimple(func() {
+		defer close(pollDone)
 		PollLifecycleWAL(pollCtx, projectRoot, pollInterval, func(ev *LifecycleEvent) {
 			if ev != nil && ev.EventType == EventTypeSchedulerCallback {
 				r.Dispatch(ev)
 			}
 		}, nil)
 	})
+	defer func() {
+		cancelPoll()
+		<-pollDone
+	}()
 
 	select {
 	case <-ctx.Done():

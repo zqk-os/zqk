@@ -10,6 +10,7 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -868,5 +869,76 @@ exit 0
 	err := h.executeDispatchStage(context.Background(), mockExe, "PRI-DONE-PLAN", "cap_stage_dispatch", nil, true)
 	if err != nil {
 		t.Fatalf("expected nil error for complete priority plan, got: %v", err)
+	}
+}
+
+func TestCapOrchestratorHandler_IdleGroomingWakesTPM(t *testing.T) {
+	tempDir := t.TempDir()
+	t.Cleanup(func() {
+		whatsnext.WaitForReconcile(2 * time.Second)
+	})
+
+	origStages := whatsnext.CapStages
+	whatsnext.CapStages = []string{"shutdown"}
+	defer func() { whatsnext.CapStages = origStages }()
+
+	mockZqk := filepath.Join(tempDir, "zqk")
+	script := `#!/bin/bash
+exit 0
+`
+	if err := fileutil.WriteFile(mockZqk, []byte(script), paths.DirPerm755); err != nil {
+		t.Fatalf("failed to write mock zqk: %v", err)
+	}
+
+	oldPath := zqkenv.OSPath().Get()
+	t.Setenv(zqkenv.OSPath().Name(), tempDir+string(fileutil.PathListSeparator)+oldPath)
+
+	// Write system-check cache and align cache to prevent FillItem compilation
+	checkPath := filepath.Join(tempDir, paths.ProjectDataDir, paths.LogsDir, "system-check.json")
+	_ = fileutil.MkdirAll(filepath.Dir(checkPath), paths.DirPerm755)
+	_ = fileutil.WriteFile(checkPath, []byte(`{"measured_at":"2026-10-10T12:00:00Z","summary":{"total_objects":1}}`), paths.FilePerm644)
+	alignPath := filepath.Join(tempDir, paths.ProjectDataDir, paths.StateDir, "ambient", "align-latest.json")
+	_ = fileutil.MkdirAll(filepath.Dir(alignPath), paths.DirPerm755)
+	_ = fileutil.WriteFile(alignPath, []byte(`{"aligned_at":"2026-10-10T12:00:00Z"}`), paths.FilePerm644)
+
+	mStorage := &mockCapStorage{
+		listed: map[string][]map[string]any{
+			objects.KindPriorityPlan: {
+				{
+					objects.FieldKeyID:     "PRI-GROOM-1",
+					objects.FieldKeyKind:   objects.KindPriorityPlan,
+					objects.FieldKeyStatus: objects.ObjectStatusGrooming,
+					objects.FieldKeyTitle:  "Grooming Cycle",
+				},
+			},
+			objects.KindBacklogItem: {
+				{
+					objects.FieldKeyID:              "BLI-COMPLETED",
+					objects.FieldKeyStatus:          objects.ObjectStatusComplete,
+					objects.FieldKeyPriorityPlanRef: "PRI-GROOM-1",
+				},
+			},
+		},
+	}
+	h := NewCapOrchestratorHandler(mStorage, tempDir, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)))
+
+	job := &ScheduledJob{
+		ID:      "SCH-CAP-GROOM",
+		JobType: "cap_orchestrator",
+	}
+
+	err := h.Execute(context.Background(), job)
+	if err != nil {
+		t.Fatalf("expected success, got error: %v", err)
+	}
+
+	eventPath := datacell.AgentChatChannelEventsJSONLPath(tempDir)
+	raw, err := fileutil.ReadFile(eventPath)
+	if err != nil {
+		t.Fatalf("expected agent_chat_channel events file to exist: %v", err)
+	}
+	content := string(raw)
+	if !strings.Contains(content, "PRI-GROOM-1") || !strings.Contains(content, "tpm") {
+		t.Fatalf("expected wake event for PRI-GROOM-1 and tpm in %s, got: %s", eventPath, content)
 	}
 }
