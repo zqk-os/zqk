@@ -1,6 +1,10 @@
 {
   "commands_without_specs": [
-    "system validate-schema"
+    "matrix dimensions",
+    "matrix evaluate",
+    "matrix inventory",
+    "matrix stamp",
+    "matrix verify"
   ],
   "specs_without_commands": []
 }

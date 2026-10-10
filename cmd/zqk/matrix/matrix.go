@@ -7,6 +7,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/quality"
@@ -17,6 +18,9 @@ func resolveProjectRoot(cmd *cobra.Command) (string, error) {
 	projectRoot := ""
 	if ctx != nil {
 		projectRoot = ctx.ProjectRoot
+	}
+	if projectRoot == "" && cmd != nil && cmd.Context() != nil {
+		projectRoot = pkgctx.GetLifecycleProjectRoot(cmd.Context())
 	}
 	if projectRoot == "" {
 		projectRoot = cli.ResolveProjectRoot(".")
@@ -67,6 +71,11 @@ func NewMatrixCmd() *cobra.Command {
 	cmd.AddCommand(NewMatrixGetCmd())
 	cmd.AddCommand(NewMatrixUpdateCmd())
 	cmd.AddCommand(NewMatrixValidateCmd())
+	cmd.AddCommand(NewMatrixVerifyCmd())
+	cmd.AddCommand(NewMatrixEvaluateCmd())
+	cmd.AddCommand(NewMatrixStampCmd())
+	cmd.AddCommand(NewMatrixDimensionsCmd())
+	cmd.AddCommand(NewMatrixInventoryCmd())
 	return cmd
 }
 

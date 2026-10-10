@@ -1,0 +1,70 @@
+# Machine-readable profile for Continuous Source Verification Matrix (CSVM) traceability.
+# Tracks every repository file across canonical dimensions: HCODE, EFFPERF, ERRHYG, CONCURR, SECOBS, DOCSIG.
+schema_version: 1
+profile_id: source_code_verification_v1
+evaluation_surface_label: Continuous Source Verification Matrix (CSVM) across all project files
+
+default_paths:
+  active: docs/quality/SOURCE_CODE_VERIFICATION_MATRIX.csv
+
+fieldnames:
+  - file_path
+  - file_class
+  - evidence_sha
+  - HCODE
+  - EFFPERF
+  - ERRHYG
+  - CONCURR
+  - SECOBS
+  - DOCSIG
+  - diamond_score
+  - verified_status
+  - evaluator
+  - last_verified_at
+  - cvs_id
+  - notes
+
+completion:
+  gate_columns:
+    - verified_status
+  done_values:
+    - "passed"
+    - "verified"
+
+column_semantics:
+  file_path:
+    role: artifact_identity
+  file_class:
+    role: free_text
+  evidence_sha:
+    role: evidence_sha
+  HCODE:
+    role: free_text
+    rubric_anchor: docs/quality/dimensions/HCODE.md
+  EFFPERF:
+    role: free_text
+    rubric_anchor: docs/quality/dimensions/EFFPERF.md
+  ERRHYG:
+    role: free_text
+    rubric_anchor: docs/quality/dimensions/ERRHYG.md
+  CONCURR:
+    role: free_text
+    rubric_anchor: docs/quality/dimensions/CONCURR.md
+  SECOBS:
+    role: free_text
+    rubric_anchor: docs/quality/dimensions/SECOBS.md
+  DOCSIG:
+    role: free_text
+    rubric_anchor: docs/quality/dimensions/DOCSIG.md
+  diamond_score:
+    role: free_text
+  verified_status:
+    role: free_text
+  evaluator:
+    role: free_text
+  last_verified_at:
+    role: free_text
+  cvs_id:
+    role: free_text
+  notes:
+    role: free_text

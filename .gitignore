@@ -55,6 +55,10 @@ pr_body*.txt
 .zqk/autofix/
 .zqk/cache/
 .zqk/testscan_cache.json
+.zqk/verification_matrix.json
+.zqk/literal_inventory.json
+.zqk/scorecards/
+pkg/bootstrap/archive/.*
 # Private signing keys. Nothing here has ever been tracked; this keeps it that way,
 # because one `git add -A` in a repo with public-push gates is all it would take.
 .zqk/keystore/

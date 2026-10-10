@@ -238,6 +238,12 @@ func TestSyncLoop_StepVerification_Passed(t *testing.T) {
 	updated, err := store.Read(bypassCtx, secCtx, taskID)
 	require.NoError(t, err)
 	assert.Equal(t, objects.ObjectStatusImplemented, updated[objects.FieldKeyStatus])
+
+	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
+	if writeQueue != nil {
+		_ = writeQueue.FlushAll(1 * time.Second)
+	}
+	time.Sleep(50 * time.Millisecond)
 }
 
 func TestSyncLoop_StepVerification_FailedAndMaxAttempts(t *testing.T) {
