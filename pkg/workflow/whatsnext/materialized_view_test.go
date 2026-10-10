@@ -106,6 +106,26 @@ func waitForReconcile(t *testing.T, timeout time.Duration) {
 	t.Fatalf("timed out waiting for background reconciler")
 }
 
+func setupScannedTestView(t *testing.T) (string, *mockStorageProvider, *WhatsNextMaterializedView) {
+	t.Helper()
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+	view := NewWhatsNextMaterializedView(tempDir)
+	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
+		t.Fatalf("scan failed: %v", err)
+	}
+	return tempDir, mockSp, view
+}
+
+func setupReconcileTestEnv(t *testing.T, delay time.Duration) (string, *mockStorageProvider) {
+	t.Helper()
+	atomic.StoreUint32(&isReconciling, 0)
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+	mockSp.scanDelay = delay
+	return tempDir, mockSp
+}
+
 func TestWhatsNextMaterializedViewPredicates(t *testing.T) {
 	// 1. EvaluatePhiLead: in_progress should win over active, active_order asc breaks ties
 	plans := []*PlanNode{
@@ -214,13 +234,7 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewIncrementalWALUpdate(t *testing.T) {
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("scan failed: %v", err)
-	}
+	_, _, view := setupScannedTestView(t)
 
 	// Apply lifecycle event: BLI-001 transitions from planned -> in_progress
 	ev := &lifecycle.LifecycleEvent{
@@ -244,10 +258,8 @@ func TestWhatsNextMaterializedViewIncrementalWALUpdate(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
+	tempDir, mockSp := setupReconcileTestEnv(t, 100*time.Millisecond)
 	defer atomic.StoreUint32(&isReconciling, 0)
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-	mockSp.scanDelay = 100 * time.Millisecond // simulate storage scan
 
 	// Case 1: Cold boot - lite file missing
 	start := time.Now()
@@ -326,10 +338,8 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewDebounceConcurrency(t *testing.T) {
+	tempDir, mockSp := setupReconcileTestEnv(t, 20*time.Millisecond)
 	defer atomic.StoreUint32(&isReconciling, 0)
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-	mockSp.scanDelay = 20 * time.Millisecond
 
 	// Trigger 10 simultaneous async rebuilds
 	var wg sync.WaitGroup
@@ -381,13 +391,7 @@ func BenchmarkWhatsNextMaterializedViewHotPath(b *testing.B) {
 // Reactive view projections adhere to the non-blocking zero-scan contract and sub-5ms SLA.
 func TestReactiveViewsAccumulatorConformance(t *testing.T) {
 	t.Parallel()
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("scan failed: %v", err)
-	}
+	tempDir, mockSp, view := setupScannedTestView(t)
 	if err := view.SaveToLiteFile(); err != nil {
 		t.Fatalf("save lite file failed: %v", err)
 	}

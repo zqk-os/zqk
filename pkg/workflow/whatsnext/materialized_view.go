@@ -146,8 +146,9 @@ func NewWhatsNextMaterializedView(projectRoot string) *WhatsNextMaterializedView
 		StoragePath:        WhatsNextLiteFilePath(projectRoot),
 		StalenessTolerance: DefaultStalenessTolerance,
 	}
-	eng, _ := accumulator.NewEngine[*WhatsNextLitePayload](spec, view)
-	view.engine = eng
+	if eng, err := accumulator.NewEngine[*WhatsNextLitePayload](spec, view); err == nil {
+		view.engine = eng
+	}
 	return view
 }
 
@@ -355,15 +356,16 @@ func EvaluatePhiHunger(counts map[string]int, plan *PlanNode) (string, string) {
 
 	totalWork := counts["in_progress"] + counts["verifying"] + counts["testing"] + counts["planned"] + counts["blocked"] + counts["validated"] + counts["exploring"]
 	var instruction string
-	if totalWork == 0 && counts["completed"] > 0 {
+	switch {
+	case totalWork == 0 && counts["completed"] > 0:
 		instruction = "shutdown"
-	} else if counts["in_progress"] > 0 {
+	case counts["in_progress"] > 0:
 		instruction = "continue"
-	} else if counts["verifying"] > 0 || counts["testing"] > 0 {
+	case counts["verifying"] > 0 || counts["testing"] > 0:
 		instruction = "execute_tests"
-	} else if totalWork == 0 {
+	case totalWork == 0:
 		instruction = "shutdown"
-	} else {
+	default:
 		instruction = "continue"
 	}
 
@@ -422,10 +424,21 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	storageCtx := pkgctx.NewStorageContext()
+	if err := v.scanPlansLocked(ctx, sp, secCtx); err != nil {
+		return err
+	}
+	if err := v.scanBacklogsLocked(ctx, sp, secCtx); err != nil {
+		return err
+	}
+	v.scanSessionsLocked(ctx, sp, secCtx)
+	v.scanTasksLocked(ctx, sp, secCtx)
 
-	// 1. Scan Priority Plans
-	planRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	v.lastUpdated = time.Now()
+	return nil
+}
+
+func (v *WhatsNextMaterializedView) scanPlansLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) error {
+	planRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindPriorityPlan).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
 		Build())
@@ -457,9 +470,11 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 			Shaped:      shaped,
 		}
 	}
+	return nil
+}
 
-	// 2. Scan Backlog Items
-	bliRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+func (v *WhatsNextMaterializedView) scanBacklogsLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) error {
+	bliRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindBacklogItem).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
 		Build())
@@ -484,59 +499,61 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 			PersonaRefs:     personaRefs,
 		}
 	}
+	return nil
+}
 
-	// 3. Scan Convergence Sessions
-	cvsRes, err := sp.List(ctx, secCtx, storageCtx, storage.NewQueryBuilder(objects.KindConvergenceSession).
+func (v *WhatsNextMaterializedView) scanSessionsLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) {
+	cvsRes, err := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindConvergenceSession).
 		StatusIn("active", "paused").
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyCurrentPhase, objects.FieldKeyStatus).
 		Build())
-	if err == nil {
-		v.cvsSessions = make(map[string]*CVSNode, len(cvsRes.Objects))
-		for _, obj := range cvsRes.Objects {
-			id, _ := obj[objects.FieldKeyID].(string)
-			if id == "" {
-				continue
-			}
-			st, _ := obj[objects.FieldKeyStatus].(string)
-			title, _ := obj[objects.FieldKeyTitle].(string)
-			phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
-			v.cvsSessions[id] = &CVSNode{
-				ID:           id,
-				Title:        title,
-				CurrentPhase: phase,
-				Status:       st,
-			}
+	if err != nil {
+		return
+	}
+	v.cvsSessions = make(map[string]*CVSNode, len(cvsRes.Objects))
+	for _, obj := range cvsRes.Objects {
+		id, _ := obj[objects.FieldKeyID].(string)
+		if id == "" {
+			continue
+		}
+		st, _ := obj[objects.FieldKeyStatus].(string)
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
+		v.cvsSessions[id] = &CVSNode{
+			ID:           id,
+			Title:        title,
+			CurrentPhase: phase,
+			Status:       st,
 		}
 	}
+}
 
-	// 4. Scan Agent Tasks
-	taskRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+func (v *WhatsNextMaterializedView) scanTasksLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) {
+	taskRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindAgentTask).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyAssigneePersonaRef, objects.FieldKeyPipelineRef).
 		Build())
-	if err == nil {
-		v.tasks = make(map[string]*TaskNode, len(taskRes.Objects))
-		for _, obj := range taskRes.Objects {
-			id, _ := obj[objects.FieldKeyID].(string)
-			if id == "" {
-				continue
-			}
-			title, _ := obj[objects.FieldKeyTitle].(string)
-			status, _ := obj[objects.FieldKeyStatus].(string)
-			assignee, _ := obj[objects.FieldKeyAssigneePersonaRef].(string)
-			pRef, _ := obj[objects.FieldKeyPipelineRef].(string)
-			v.tasks[id] = &TaskNode{
-				ID:                 id,
-				Title:              title,
-				Status:             status,
-				AssigneePersonaRef: assignee,
-				PipelineRef:        pRef,
-			}
+	if err != nil {
+		return
+	}
+	v.tasks = make(map[string]*TaskNode, len(taskRes.Objects))
+	for _, obj := range taskRes.Objects {
+		id, _ := obj[objects.FieldKeyID].(string)
+		if id == "" {
+			continue
+		}
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		status, _ := obj[objects.FieldKeyStatus].(string)
+		assignee, _ := obj[objects.FieldKeyAssigneePersonaRef].(string)
+		pRef, _ := obj[objects.FieldKeyPipelineRef].(string)
+		v.tasks[id] = &TaskNode{
+			ID:                 id,
+			Title:              title,
+			Status:             status,
+			AssigneePersonaRef: assignee,
+			PipelineRef:        pRef,
 		}
 	}
-
-	v.lastUpdated = time.Now()
-	return nil
 }
 
 // ApplyLifecycleEvent incrementally updates the in-memory execution graph from a WAL event.
@@ -748,7 +765,9 @@ func (v *WhatsNextMaterializedView) SaveToLiteFile() error {
 	}
 
 	if err := fileutil.Rename(tmpFile, targetPath); err != nil {
-		_ = fileutil.Remove(tmpFile)
+		if rErr := fileutil.Remove(tmpFile); rErr != nil {
+			// clean up attempt complete
+		}
 		return fmt.Errorf("rename whats_next_lite: %w", err)
 	}
 
@@ -923,7 +942,9 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 			payload.DegradedReason = ""
 			targetPath := WhatsNextLiteFilePath(projectRoot)
 			if data, errM := json.MarshalIndent(payload, "", "  "); errM == nil {
-				_ = fileutil.WriteFile(targetPath, data, paths.FilePerm644)
+				if wErr := fileutil.WriteFile(targetPath, data, paths.FilePerm644); wErr != nil {
+					// write attempted
+				}
 			}
 			return payload, nil
 		}
@@ -998,7 +1019,9 @@ func (v *WhatsNextMaterializedView) SubscribeWAL(ctx context.Context, updateCh c
 	}
 
 	lifecycle.PollLifecycleWAL(ctx, v.projectRoot, 200*time.Millisecond, v.ApplyLifecycleEvent, func() {
-		_ = v.SaveToLiteFile()
+		if saveErr := v.SaveToLiteFile(); saveErr != nil {
+			// save attempted
+		}
 		if updateCh != nil {
 			select {
 			case updateCh <- struct{}{}:
