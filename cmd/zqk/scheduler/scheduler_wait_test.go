@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/coordination"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
 type waitTestHarness struct {
@@ -25,7 +27,11 @@ func setupWaitHarness(t *testing.T, args ...string) *waitTestHarness {
 	t.Helper()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
-	t.Cleanup(func() { _ = lifecycle.CloseLifecycleWAL(tmpDir) })
+	t.Cleanup(func() {
+		_ = coordination.DrainGlobalCoordinator(5 * time.Second)
+		_ = lifecycle.CloseLifecycleWAL(tmpDir)
+		storagepkg.ScrubProjectRootForTempCleanup(tmpDir, 5, 20*time.Millisecond)
+	})
 
 	cmd := NewWaitCmd()
 	var out bytes.Buffer
@@ -175,7 +181,11 @@ func TestSchedulerWait_Timeout(t *testing.T) {
 func TestSchedulerWait_ContextCanceled(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
-	t.Cleanup(func() { _ = lifecycle.CloseLifecycleWAL(tmpDir) })
+	t.Cleanup(func() {
+		_ = coordination.DrainGlobalCoordinator(5 * time.Second)
+		_ = lifecycle.CloseLifecycleWAL(tmpDir)
+		storagepkg.ScrubProjectRootForTempCleanup(tmpDir, 5, 20*time.Millisecond)
+	})
 
 	const jobID = "JOB-CANCEL-001"
 	cmd := NewWaitCmd()

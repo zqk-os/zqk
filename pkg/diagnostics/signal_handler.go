@@ -48,6 +48,7 @@ func SetupSignalHandler(ctx context.Context, projectRoot, prefix string) {
 		WithContext(ctx).
 		WithBudget(bud).
 		StartSimple(func() {
+			defer signal.Stop(sigChan)
 			for {
 				select {
 				case <-ctx.Done():

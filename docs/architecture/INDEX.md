@@ -50,6 +50,7 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Ambient Signal Action Rubric](./AMBIENT_SIGNAL_ACTION_RUBRIC.md)**: Ambient filesystem watcher events, heuristics evaluation, and proactive maintenance signals.
 - **[Async Check Discovery Decoupling](./ASYNC_CHECK_DISCOVERY_DECOUPLING.md)**: Decoupling disk discovery from validation pipelines to prevent CLI timeout stalls.
 - **[Service Adapter Specification](./SERVICE_ADAPTER_SPECIFICATION.md)**: Unified abstraction across macOS `launchd`, Linux `systemd`, and standalone foreground runners.
+- **[Adaptive Backoff Exponential Jitter and Quorum Damping](./ADAPTIVE_BACKOFF_QUORUM_DAMPING.md)**: Decorrelated exponential jitter backoff, sliding-window token bucket rate limiting, and storm quorum damping.
 
 ---
 

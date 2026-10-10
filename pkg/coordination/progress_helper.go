@@ -405,3 +405,11 @@ func (h *ProgressHelper) EmitCompletion(
 
 	return nil
 }
+
+// Drain waits up to timeout for all in-flight coordinator router and subscriber goroutines to complete.
+func (h *ProgressHelper) Drain(timeout time.Duration) error {
+	if h != nil && h.coordinator != nil {
+		return h.coordinator.Drain(timeout)
+	}
+	return nil
+}
