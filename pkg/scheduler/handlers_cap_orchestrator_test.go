@@ -10,6 +10,7 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -870,3 +871,58 @@ exit 0
 		t.Fatalf("expected nil error for complete priority plan, got: %v", err)
 	}
 }
+
+func TestCapOrchestratorHandler_IdleGroomingWakesTPM(t *testing.T) {
+	tempDir := t.TempDir()
+	t.Cleanup(func() {
+		whatsnext.WaitForReconcile(2 * time.Second)
+	})
+
+	mockZqk := filepath.Join(tempDir, "zqk")
+	script := `#!/bin/bash
+if [[ "$1" == "workflow" && "$2" == "whats-next" ]]; then
+	cat <<EOF
+{"agent_instruction":"shutdown","active_plans":[{"id":"PRI-GROOM-1","status":"grooming","title":"Grooming Cycle"}]}
+EOF
+	exit 0
+fi
+exit 1
+`
+	if err := fileutil.WriteFile(mockZqk, []byte(script), paths.DirPerm755); err != nil {
+		t.Fatalf("failed to write mock zqk: %v", err)
+	}
+
+	oldPath := zqkenv.OSPath().Get()
+	t.Setenv(zqkenv.OSPath().Name(), tempDir+string(fileutil.PathListSeparator)+oldPath)
+
+	storage := &mockStorage{data: map[string]map[string]any{
+		"PRI-GROOM-1": {
+			objects.FieldKeyID:     "PRI-GROOM-1",
+			objects.FieldKeyKind:   objects.KindPriorityPlan,
+			objects.FieldKeyStatus: objects.ObjectStatusGrooming,
+			objects.FieldKeyTitle:  "Grooming Cycle",
+		},
+	}}
+	h := NewCapOrchestratorHandler(storage, tempDir, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)))
+
+	job := &ScheduledJob{
+		ID:      "SCH-CAP-GROOM",
+		JobType: "cap_orchestrator",
+	}
+
+	err := h.Execute(context.Background(), job)
+	if err != nil {
+		t.Fatalf("expected success, got error: %v", err)
+	}
+
+	eventPath := datacell.AgentChatChannelEventsJSONLPath(tempDir)
+	raw, err := fileutil.ReadFile(eventPath)
+	if err != nil {
+		t.Fatalf("expected agent_chat_channel events file to exist: %v", err)
+	}
+	content := string(raw)
+	if !strings.Contains(content, "PRI-GROOM-1") || !strings.Contains(content, "tpm") {
+		t.Fatalf("expected wake event for PRI-GROOM-1 and tpm in %s, got: %s", eventPath, content)
+	}
+}
+
