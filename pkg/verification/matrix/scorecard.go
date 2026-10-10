@@ -269,4 +269,3 @@ func (sc *FileScorecard) FindingsCSV() string {
 	}
 	return b.String()
 }
-

@@ -961,4 +961,3 @@ func TestPluggableCheckPrimitives_Integration(t *testing.T) {
 		t.Errorf("expected agent check score 5, got %v", resAgt.DiamondScore)
 	}
 }
-
