@@ -170,7 +170,8 @@ type FileObjectStorage struct {
 	orphanCleanupQueue *caspkg.CASOrphanCleanupQueue
 
 	// Pluggable kind processor adapters for domain gates and invariants
-	kindProcessors *KindProcessorRegistry
+	kindProcessors   *KindProcessorRegistry
+	kindProcessorsMu sync.RWMutex
 
 	// Write-behind (Option B): WAL + buffer + background worker for fast create/delete.
 	writeBuf          *ObjectWriteBuffer
@@ -453,6 +454,15 @@ func (f *FileObjectStorage) ValidateObject(ctx context.Context, obj map[string]a
 
 // GetKindProcessors returns the kind processor adapter registry, initializing it if needed.
 func (f *FileObjectStorage) GetKindProcessors() *KindProcessorRegistry {
+	f.kindProcessorsMu.RLock()
+	kp := f.kindProcessors
+	f.kindProcessorsMu.RUnlock()
+	if kp != nil {
+		return kp
+	}
+
+	f.kindProcessorsMu.Lock()
+	defer f.kindProcessorsMu.Unlock()
 	if f.kindProcessors == nil {
 		f.kindProcessors = NewKindProcessorRegistry()
 	}
@@ -461,5 +471,7 @@ func (f *FileObjectStorage) GetKindProcessors() *KindProcessorRegistry {
 
 // SetKindProcessorRegistry replaces the kind processor adapter registry.
 func (f *FileObjectStorage) SetKindProcessorRegistry(r *KindProcessorRegistry) {
+	f.kindProcessorsMu.Lock()
+	defer f.kindProcessorsMu.Unlock()
 	f.kindProcessors = r
 }
