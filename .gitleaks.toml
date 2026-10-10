@@ -1,0 +1,5 @@
+[allowlist]
+description = "Ignore test files with synthetic object IDs matching key patterns"
+paths = [
+  '''cmd/zqk/callback/shockwave_subscriber_test\.go''',
+]

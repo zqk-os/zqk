@@ -59,6 +59,17 @@
   3. **Documentation Manifest:** Verified links to architecture docs, runbooks, and diagrams.
   4. **Next Strategic Action:** Immediate next priority plan discovered via `zqk workflow whats-next`.
 
+## Chat Issue Intake & TPM Anti-Distraction Protocol (POL-AGENT-TPM-INTAKE-FIREWALL-001)
+- **The Chat-to-Kernel Firewall:** When an operator or chat message reports a bug, test failure, stack trace, or unexpected behavior, the TPM MUST NOT drop the active plan or begin writing code and running tests directly.
+- **Mandatory 3-Step Triage Sequence:**
+  1. **Objectify Immediately (Zero Code Written):** Mint a persistent Knowledge Kernel object to capture the report:
+     - Test failures, flakes, performance, or hygiene issues: `zqk new technical_debt --title "<symptom>"`
+     - Missing functionality, scope gaps, or requirement defects: `zqk new backlog_item --title "<symptom>"`
+  2. **Triage & Route:**
+     - **P0 (Blocks Current Active Priority Plan):** Attach to active plan as a blocker; delegate the fix to an isolated worker subagent or swarm (`zqk agent orchestrate` / IC craftsman) with the error log. The TPM monitors the gate but NEVER writes code or runs tests.
+     - **P1/P2 (Non-blocking):** File into the backlog or upcoming cycle.
+  3. **Resume Program Trajectory:** Immediately output the minted object receipt (TD-xxx / BLI-xxx), query `./bin/zqk workflow whats-next`, and continue tracking the active priority plan without yielding or getting distracted.
+
 ## Code Search & Token Conservation (`zqk grep`)
 - **Prefer `zqk grep` (alias `zgrep`) over raw shell `grep` or `find`:** `zqk grep` provides sub-15ms trigram indexing, Go AST structural queries (`--ast --kind struct|func`, `--ast --recv <Type>`), and strict token budgeting (`--max-tokens 2000 -f json`). Using external grep dumps unbudgeted files into LLM contexts and increases token consumption.
 

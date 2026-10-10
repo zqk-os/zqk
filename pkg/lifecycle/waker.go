@@ -39,6 +39,9 @@ func GetGlobalJobWakerRegistry() *JobWakerRegistry {
 	return globalWakerRegistry
 }
 
+// GlobalJobWakerRegistry is the package-level instance of the singleton job waker registry.
+var GlobalJobWakerRegistry = GetGlobalJobWakerRegistry()
+
 // Name returns the identifier of the waker registry.
 func (r *JobWakerRegistry) Name() string {
 	return "job_waker_registry"
@@ -111,10 +114,38 @@ func (r *JobWakerRegistry) removeChannel(target chan *LifecycleEvent) {
 	}
 }
 
-// Dispatch broadcasts a scheduler_callback event to all matching job wakers.
+// Unregister removes a registered channel for a specific job ID or wildcard subscriber.
+func (r *JobWakerRegistry) Unregister(jobID string, target <-chan *LifecycleEvent) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if subs, ok := r.subscribers[jobID]; ok {
+		for i, ch := range subs {
+			if (<-chan *LifecycleEvent)(ch) == target {
+				r.subscribers[jobID] = append(subs[:i], subs[i+1:]...)
+				if len(r.subscribers[jobID]) == 0 {
+					delete(r.subscribers, jobID)
+				}
+				return
+			}
+		}
+	}
+
+	for i, ch := range r.wildcardSubscribers {
+		if (<-chan *LifecycleEvent)(ch) == target {
+			r.wildcardSubscribers = append(r.wildcardSubscribers[:i], r.wildcardSubscribers[i+1:]...)
+			return
+		}
+	}
+}
+
+// Dispatch broadcasts a scheduler_callback or mutation event to all matching job wakers.
 // Delivery is non-blocking to protect the caller from lagging consumers.
 func (r *JobWakerRegistry) Dispatch(ev *LifecycleEvent) int {
-	if ev == nil || ev.EventType != EventTypeSchedulerCallback {
+	if ev == nil {
+		return 0
+	}
+	if ev.EventType != "" && ev.EventType != EventTypeSchedulerCallback && ev.EventType != EventTypeStatusTransition {
 		return 0
 	}
 
