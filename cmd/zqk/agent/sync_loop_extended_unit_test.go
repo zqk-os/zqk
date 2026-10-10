@@ -99,6 +99,12 @@ func TestSyncLoop_AlreadyImplemented(t *testing.T) {
 	case <-time.After(10 * time.Second):
 		t.Fatal("timed out waiting for runSyncLoop on completed task")
 	}
+
+	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
+	if writeQueue != nil {
+		_ = writeQueue.FlushAll(1 * time.Second)
+	}
+	time.Sleep(50 * time.Millisecond)
 }
 
 func TestSyncLoop_NoStepsTransition(t *testing.T) {

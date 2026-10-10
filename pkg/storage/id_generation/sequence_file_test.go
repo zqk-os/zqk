@@ -49,4 +49,3 @@ func TestAllocateSequenceRange_Concurrent(t *testing.T) {
 		t.Errorf("expected %d unique IDs, got %d", numGoroutines*allocationsPerGoroutine, len(seen))
 	}
 }
-
