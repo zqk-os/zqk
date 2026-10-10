@@ -127,7 +127,9 @@ func TestEventHub_EnableEventSourcingAndPublish(t *testing.T) {
 		t.Fatalf("Publish ev3 failed: %v", err)
 	}
 
-	time.Sleep(200 * time.Millisecond)
+	// Allow asynchronous ambient_audit goroutines to finish disk emission
+	// before t.TempDir() executes directory cleanup.
+	time.Sleep(1 * time.Second)
 }
 
 func TestCoachHeuristics_AppendTip(t *testing.T) {

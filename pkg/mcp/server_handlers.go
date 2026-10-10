@@ -94,6 +94,7 @@ func (s *Server) setupHandlers() *MethodRouter {
 	// Must not return MethodNotFound (-32601); that logged noise and paired with Writer
 	// rebind bugs that dropped IDE's MCP session (core-backlog).
 	router.RegisterFunc(notificationMethodEvent, s.handleNotificationEvent)
+	router.RegisterFunc(notificationMethodMessage, s.handleNotificationMessage)
 
 	return router
 }
