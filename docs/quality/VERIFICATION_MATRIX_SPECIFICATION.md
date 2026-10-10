@@ -50,3 +50,68 @@ To eliminate rampant hardcoding while accommodating legitimate, unique log state
 - **◆◆◆◇◇ (3 Diamonds - Pass with Remediation Backlog)**: Minor issues present, non-blocking for local development, blocking for production release.
 - **◆◆◇◇◇ (2 Diamonds - Failing)**: 1 or more high violations (e.g. raw permissions, missing context timeout).
 - **◆◇◇◇◇ (1 Diamond - Critical Failure)**: Critical violations (e.g. hardcoded release version, naked goroutine, hardcoded secret, swallowed error).
+
+---
+
+## 5. Universal Multi-Language Configuration (`.matrix.yaml`)
+To ensure portability across any repository, language, or ecosystem without hardcoding host-language ASTs, the engine is configured via a declarative `.matrix.yaml` profile:
+
+```yaml
+version: 1
+matrix:
+  name: source_code_verification
+  dimensions:
+    - code: HCODE
+      name: Hardcoded Logic and Literal Eradication
+      severity: critical
+    - code: EFFPERF
+      name: Efficiency and Resource Hygiene
+      severity: high
+    - code: ERRHYG
+      name: Error Hygiene and Resilience
+      severity: high
+    - code: SECOBS
+      name: Zero-PII and Structured Observability
+      severity: critical
+    - code: DOCSIG
+      name: Contracts and Documentation
+      severity: medium
+
+classes:
+  source_code:
+    match: ["**/*.py", "**/*.ts", "**/*.go", "**/*.rs", "**/*.java", "**/*.c", "**/*.cpp"]
+    exclude: ["**/vendor/**", "**/node_modules/**", "**/*_test.*", "**/test_*.py"]
+    checks:
+      - dimension: HCODE
+        type: pattern
+        rules: [no_user_home_paths, no_raw_permissions, no_release_tags, no_hardcoded_secrets]
+      - dimension: SECOBS
+        type: pattern
+        rules: [no_private_keys, no_hardcoded_tokens]
+
+  test_code:
+    match: ["**/*_test.go", "**/*.test.ts", "**/test_*.py", "**/tests/**"]
+    checks:
+      - dimension: SECOBS
+        type: pattern
+        rules: [no_hardcoded_tokens]
+
+  documentation:
+    match: ["**/*.md", "**/*.rst", "docs/**"]
+    checks:
+      - dimension: DOCSIG
+        type: command
+        command: "markdownlint --config .markdownlint.yaml {file}"
+
+ledger:
+  path: .zqk/quality/matrix_cache.json
+  algorithm: sha256
+```
+
+### Pluggable Check Primitives
+1. **`pattern`**: Declarative regex and literal string analysis running in pure text space without AST compiler bindings.
+2. **`command`**: Spawns an external command or linter (`eslint`, `ruff`, `cargo clippy`, `golangci-lint`) and maps return codes/stdout to findings.
+3. **`agent`**: Passes file content and evaluation rubrics to adversarial LLM agents returning structured diamond scores.
+
+### Ecosystem Decoupling & Optional Adapters
+The matrix engine produces standard, self-contained JSON and Markdown scorecards. Optional adapters (e.g. `--adapter zqk`) bridge findings to host platforms (such as minting ZQK Knowledge Kernel `technical_debt` or `backlog_item` objects) without contaminating the core engine with enterprise or kernel dependencies.

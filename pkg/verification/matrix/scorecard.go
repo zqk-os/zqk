@@ -1,17 +1,14 @@
 package matrix
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -24,7 +21,7 @@ type FileScorecard struct {
 	EvaluatedAt      time.Time        `json:"evaluated_at"`
 	Evaluator        string           `json:"evaluator"`
 	Dimension        DimensionCode    `json:"dimension"`
-	PolicyID         string           `json:"policy_id"`
+	PolicyID         string           `json:"policy_id,omitempty"`
 	Status           CheckStatus      `json:"status"`
 	DiamondScore     DiamondScore     `json:"diamond_score"`
 	DiamondLabel     string           `json:"diamond_label"`
@@ -32,7 +29,7 @@ type FileScorecard struct {
 	PolicyEvaluation PolicyEvaluation `json:"policy_evaluation"`
 }
 
-// PolicyEvaluation captures the central policy engine's verdict against invisible thresholds.
+// PolicyEvaluation captures the evaluation verdict against quality thresholds.
 type PolicyEvaluation struct {
 	EvaluatedAt         time.Time         `json:"evaluated_at"`
 	Passed              bool              `json:"passed"`
@@ -41,19 +38,20 @@ type PolicyEvaluation struct {
 	Remediation         *RemediationBlock `json:"remediation,omitempty"`
 }
 
-// RemediationBlock tracks the automatically minted kernel objects assigned to the fixer persona.
+// RemediationBlock tracks remediation tasks or issues assigned to address failures.
 type RemediationBlock struct {
 	TechnicalDebtID string    `json:"technical_debt_id,omitempty"`
 	BacklogItemID   string    `json:"backlog_item_id,omitempty"`
+	IssueID         string    `json:"issue_id,omitempty"`
 	AssignedPersona string    `json:"assigned_persona,omitempty"`
 	MintedAt        time.Time `json:"minted_at,omitempty"`
 	Status          string    `json:"status"` // "pending", "resolved"
 }
 
 // ScorecardPath returns the canonical path on disk for a file's evaluation scorecard.
-func ScorecardPath(repoRoot string, relFilePath string) string {
+func ScorecardPath(storageDir string, relFilePath string) string {
 	encoded := strings.ReplaceAll(relFilePath, "/", "__")
-	return filepath.Join(repoRoot, paths.ProjectDataDir, "scorecards", encoded+".json")
+	return filepath.Join(storageDir, "scorecards", encoded+".json")
 }
 
 // SaveScorecard persists the scorecard to disk atomically.
@@ -62,7 +60,7 @@ func (e *Engine) SaveScorecard(sc *FileScorecard) error {
 		return errfmt.Errorf("invalid scorecard: file_path required")
 	}
 
-	scPath := ScorecardPath(e.repoRoot, sc.FilePath)
+	scPath := ScorecardPath(e.storageDir, sc.FilePath)
 	if err := fileutil.MkdirAll(filepath.Dir(scPath), fileutil.StandardDirPerm); err != nil {
 		return errfmt.Errorf("failed to create scorecards directory: %w", err)
 	}
@@ -77,7 +75,7 @@ func (e *Engine) SaveScorecard(sc *FileScorecard) error {
 
 // LoadScorecard loads a stored scorecard for a given file.
 func (e *Engine) LoadScorecard(relFilePath string) (*FileScorecard, error) {
-	scPath := ScorecardPath(e.repoRoot, relFilePath)
+	scPath := ScorecardPath(e.storageDir, relFilePath)
 	data, err := fileutil.ReadFile(scPath)
 	if err != nil {
 		return nil, err
@@ -91,9 +89,8 @@ func (e *Engine) LoadScorecard(relFilePath string) (*FileScorecard, error) {
 	return &sc, nil
 }
 
-// EvaluateScorecard evaluates a file's findings against the dimension policy rules and invisible thresholds.
-// If the policy check fails and autoMint is true, it automatically mints remediation kernel objects
-// (technical_debt and backlog_item) assigned to the fixer persona (PER-COMMUNITY-SOFTWARE-ENGINEER).
+// EvaluateScorecard evaluates a file's findings against dimension rules and quality thresholds.
+// If the check fails and autoMint is true, it invokes the pluggable RemediationHook (if registered).
 func (e *Engine) EvaluateScorecard(ctx context.Context, sc *FileScorecard, autoMint bool) (*PolicyEvaluation, error) {
 	if sc == nil {
 		return nil, errfmt.Errorf("nil scorecard provided")
@@ -109,7 +106,7 @@ func (e *Engine) EvaluateScorecard(ctx context.Context, sc *FileScorecard, autoM
 		}
 	}
 
-	// 2. Invisible Threshold Evaluation
+	// 2. Threshold Evaluation
 	thresholdFailures := make([]string, 0)
 	criticalCount := 0
 	errorCount := 0
@@ -167,13 +164,20 @@ func (e *Engine) EvaluateScorecard(ctx context.Context, sc *FileScorecard, autoM
 		}
 	}
 
-	// 4. Auto-Mint Remediation Objects if Policy Failed
+	// 4. Auto-Mint Remediation if policy check failed
 	if !passed && autoMint && (eval.Remediation == nil || eval.Remediation.Status == "resolved") {
-		remediationBlock, err := e.mintRemediationObjects(ctx, sc, thresholdFailures)
-		if err != nil {
-			return nil, errfmt.Errorf("failed to auto-mint remediation objects: %w", err)
+		if e.remediation != nil {
+			remediationBlock, err := e.remediation.OnPolicyFailure(ctx, sc, thresholdFailures)
+			if err != nil {
+				return nil, errfmt.Errorf("failed to execute remediation hook: %w", err)
+			}
+			eval.Remediation = remediationBlock
+		} else {
+			eval.Remediation = &RemediationBlock{
+				Status:   "pending",
+				MintedAt: time.Now().UTC(),
+			}
 		}
-		eval.Remediation = remediationBlock
 	}
 
 	sc.PolicyEvaluation = eval
@@ -184,134 +188,85 @@ func (e *Engine) EvaluateScorecard(ctx context.Context, sc *FileScorecard, autoM
 	return &eval, nil
 }
 
-// mintRemediationObjects programmatically materializes technical_debt and backlog_item into the kernel.
-func (e *Engine) mintRemediationObjects(ctx context.Context, sc *FileScorecard, failures []string) (*RemediationBlock, error) {
-	dimCode := string(sc.Dimension)
-	if dimCode == "" {
-		dimCode = "HCODE"
+// ToJSON serializes the scorecard to a formatted JSON string.
+func (sc *FileScorecard) ToJSON() (string, error) {
+	data, err := json.MarshalIndent(sc, "", "  ")
+	if err != nil {
+		return "", errfmt.Errorf("failed to marshal scorecard to json: %w", err)
 	}
-
-	execCtx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
-	defer cancel()
-
-	// Resolve executable
-	exe := filepath.Join(e.repoRoot, "bin", "zqk")
-	if _, err := fileutil.Stat(exe); err != nil {
-		exe, err = fileutil.Executable()
-		if err != nil || exe == "" {
-			exe = "zqk"
-		}
-	}
-
-	// 1. Build Technical Debt Payload
-	findingsMd := strings.Builder{}
-	for _, fail := range failures {
-		findingsMd.WriteString(fmt.Sprintf("- %s\n", fail))
-	}
-	for _, f := range sc.Findings {
-		findingsMd.WriteString(fmt.Sprintf("- Line %d: [%s] %s (%s)\n", f.Line, f.Severity, f.Message, f.RuleID))
-	}
-
-	tdeTitle := fmt.Sprintf("Remediate %s policy violations in %s", dimCode, sc.FilePath)
-	tdeDesc := fmt.Sprintf(`### Continuous Verification Policy Violation: %s
-**File**: %s
-**Evidence SHA**: %s
-**Evaluator**: %s
-**Policy ID**: %s
-**Score**: %s
-
-#### Observed Failures:
-%s
-
-#### Actionable Remediation Guidance:
-1. Examine %s at the flagged line numbers.
-2. Extract all hardcoded strings, release tags, and permissions into canonical constants or configuration.
-3. Validate fixes by running:
-   `+"`"+`%s`+"`"+`
-`, dimCode, sc.FilePath, sc.ContentHash, sc.Evaluator, sc.PolicyID, sc.DiamondLabel, findingsMd.String(), sc.FilePath, paths.CLIInvocation("matrix verify --file "+sc.FilePath))
-
-	targetDate := time.Now().AddDate(0, 0, 14).Format("2006-01-02")
-	tdeYaml := fmt.Sprintf(`kind: technical_debt
-title: %q
-description: %q
-debt_type: maintainability
-impact_assessment: critical
-target_resolution_date: %q
-file_path: %q
-goal_refs:
-  - GOAL-LAUNCH-SURFACE-COMPLETENESS
-tags:
-  - matrix-failure
-  - %s
-  - auto-minted-remediation
-`, tdeTitle, tdeDesc, targetDate, sc.FilePath, dimCode)
-
-	tmpTdePath := filepath.Join(e.repoRoot, paths.ProjectDataDir, fmt.Sprintf("tmp-tde-%d.yaml", time.Now().UnixNano()))
-	if err := fileutil.WriteSecureFile(tmpTdePath, []byte(tdeYaml)); err != nil {
-		return nil, fmt.Errorf("failed to write temp tde yaml: %w", err)
-	}
-	defer func() { _ = fileutil.Remove(tmpTdePath) }()
-
-	tdeCmd := exec.CommandContext(execCtx, exe, "object", "create", "technical_debt", "--file", tmpTdePath, "--promote")
-	tdeCmd.Dir = e.repoRoot
-	var tdeOut, tdeErr bytes.Buffer
-	tdeCmd.Stdout = &tdeOut
-	tdeCmd.Stderr = &tdeErr
-	if err := tdeCmd.Run(); err != nil {
-		return nil, fmt.Errorf("failed to create technical_debt: %w, out: %s, err: %s", err, tdeOut.String(), tdeErr.String())
-	}
-
-	tdeID := extractObjectIDFromOutput(tdeOut.String())
-
-	// 2. Build Backlog Item Payload
-	bliTitle := fmt.Sprintf("[Fixer] Remediate %s violations in %s", dimCode, sc.FilePath)
-	bliDesc := fmt.Sprintf("Remediate hardcoded literals and policy violations in %s as specced in %s.", sc.FilePath, tdeID)
-
-	bliYaml := fmt.Sprintf(`kind: backlog_item
-title: %q
-description: %q
-goal_refs:
-  - GOAL-LAUNCH-SURFACE-COMPLETENESS
-persona_refs:
-  - PER-COMMUNITY-SOFTWARE-ENGINEER
-`, bliTitle, bliDesc)
-
-	tmpBliPath := filepath.Join(e.repoRoot, paths.ProjectDataDir, fmt.Sprintf("tmp-bli-%d.yaml", time.Now().UnixNano()))
-	if err := fileutil.WriteSecureFile(tmpBliPath, []byte(bliYaml)); err != nil {
-		return nil, fmt.Errorf("failed to write temp bli yaml: %w", err)
-	}
-	defer func() { _ = fileutil.Remove(tmpBliPath) }()
-
-	bliCmd := exec.CommandContext(execCtx, exe, "object", "create", "backlog_item", "--file", tmpBliPath, "--promote")
-	bliCmd.Dir = e.repoRoot
-	var bliOut, bliErr bytes.Buffer
-	bliCmd.Stdout = &bliOut
-	bliCmd.Stderr = &bliErr
-	if err := bliCmd.Run(); err != nil {
-		return nil, fmt.Errorf("failed to create backlog_item: %w, out: %s, err: %s", err, bliOut.String(), bliErr.String())
-	}
-
-	bliID := extractObjectIDFromOutput(bliOut.String())
-
-	return &RemediationBlock{
-		TechnicalDebtID: tdeID,
-		BacklogItemID:   bliID,
-		AssignedPersona: "PER-COMMUNITY-SOFTWARE-ENGINEER",
-		MintedAt:        time.Now().UTC(),
-		Status:          "pending",
-	}, nil
+	return string(data), nil
 }
 
-func extractObjectIDFromOutput(out string) string {
-	// e.g. "✓ Object TDE-001 created successfully"
-	lines := strings.Split(out, "\n")
-	for _, l := range lines {
-		fields := strings.Fields(l)
-		for _, f := range fields {
-			if strings.HasPrefix(f, "TDE-") || strings.HasPrefix(f, "BLI-") {
-				return strings.Trim(f, ",.:;\"'")
+// ToMarkdown formats the scorecard into a portable Markdown report.
+func (sc *FileScorecard) ToMarkdown() string {
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("# File Verification Scorecard: `%s`\n\n", sc.FilePath))
+	b.WriteString("| Property | Value |\n")
+	b.WriteString("| :--- | :--- |\n")
+	b.WriteString(fmt.Sprintf("| **File Class** | `%s` |\n", sc.FileClass))
+	b.WriteString(fmt.Sprintf("| **Evidence SHA-256** | `%s` |\n", sc.ContentHash))
+	b.WriteString(fmt.Sprintf("| **Evaluator** | `%s` |\n", sc.Evaluator))
+	b.WriteString(fmt.Sprintf("| **Dimension** | `%s` |\n", sc.Dimension))
+	if sc.PolicyID != "" {
+		b.WriteString(fmt.Sprintf("| **Policy ID** | `%s` |\n", sc.PolicyID))
+	}
+	b.WriteString(fmt.Sprintf("| **Score** | %s |\n", sc.DiamondLabel))
+	b.WriteString(fmt.Sprintf("| **Status** | `%s` |\n", sc.Status))
+	b.WriteString(fmt.Sprintf("| **Evaluated At** | `%s` |\n", sc.EvaluatedAt.Format(time.RFC3339)))
+	b.WriteString("\n")
+
+	b.WriteString("## Findings\n\n")
+	if len(sc.Findings) == 0 {
+		b.WriteString("No findings reported. File is clean.\n\n")
+	} else {
+		b.WriteString("| Line | Severity | Message | Rule ID |\n")
+		b.WriteString("| :--- | :--- | :--- | :--- |\n")
+		for _, f := range sc.Findings {
+			b.WriteString(fmt.Sprintf("| %d | `%s` | %s | `%s` |\n", f.Line, f.Severity, f.Message, f.RuleID))
+		}
+		b.WriteString("\n")
+	}
+
+	b.WriteString("## Policy Evaluation\n\n")
+	if sc.PolicyEvaluation.Passed {
+		b.WriteString("**Result**: `PASSED` - File satisfies all invisible thresholds and rules.\n")
+	} else {
+		b.WriteString("**Result**: `FAILED` - Policy thresholds violated.\n\n")
+		if len(sc.PolicyEvaluation.ThresholdFailures) > 0 {
+			b.WriteString("### Threshold Failures\n")
+			for _, failure := range sc.PolicyEvaluation.ThresholdFailures {
+				b.WriteString(fmt.Sprintf("- ✖ %s\n", failure))
 			}
+			b.WriteString("\n")
 		}
 	}
-	return ""
+
+	if sc.PolicyEvaluation.Remediation != nil {
+		b.WriteString("### Remediation\n")
+		b.WriteString(fmt.Sprintf("- Status: `%s`\n", sc.PolicyEvaluation.Remediation.Status))
+		if sc.PolicyEvaluation.Remediation.TechnicalDebtID != "" {
+			b.WriteString(fmt.Sprintf("- Technical Debt ID: `%s`\n", sc.PolicyEvaluation.Remediation.TechnicalDebtID))
+		}
+		if sc.PolicyEvaluation.Remediation.BacklogItemID != "" {
+			b.WriteString(fmt.Sprintf("- Backlog Item ID: `%s`\n", sc.PolicyEvaluation.Remediation.BacklogItemID))
+		}
+		if sc.PolicyEvaluation.Remediation.IssueID != "" {
+			b.WriteString(fmt.Sprintf("- Issue ID: `%s`\n", sc.PolicyEvaluation.Remediation.IssueID))
+		}
+		b.WriteString("\n")
+	}
+
+	return b.String()
 }
+
+// FindingsCSV exports the scorecard findings in CSV format.
+func (sc *FileScorecard) FindingsCSV() string {
+	var b strings.Builder
+	b.WriteString("file,line,severity,rule_id,message\n")
+	for _, f := range sc.Findings {
+		escapedMsg := strings.ReplaceAll(f.Message, `"`, `""`)
+		b.WriteString(fmt.Sprintf("%q,%d,%q,%q,%q\n", sc.FilePath, f.Line, f.Severity, f.RuleID, escapedMsg))
+	}
+	return b.String()
+}
+

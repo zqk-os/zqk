@@ -1,0 +1,88 @@
+# Default Configuration for Continuous Source Verification Matrix
+# Place at .matrix.yaml in project root or specify with --config
+version: 1
+matrix:
+  name: source_code_verification
+  dimensions:
+    - code: HCODE
+      name: Hardcoded Logic and Literal Eradication
+      severity: critical
+      description: Zero hardcoded workstation paths, versions, raw permissions, ports, and duplicate string literals.
+    - code: EFFPERF
+      name: Efficiency and Resource Hygiene
+      severity: high
+      description: Zero unbounded loops, mandatory context timeouts, and bounded buffers.
+    - code: ERRHYG
+      name: Error Hygiene and Resilience
+      severity: high
+      description: Zero swallowed errors, structured error wrapping, and fail-closed safety.
+    - code: CONCURR
+      name: Concurrency Lifecycle and Named Goroutines
+      severity: critical
+      description: Zero naked goroutines, mandatory goroutinelabels, and explicit termination.
+    - code: SECOBS
+      name: Zero-PII Security and Structured Observability
+      severity: critical
+      description: Zero hardcoded credentials, zero PII in logs, and structured observability.
+    - code: DOCSIG
+      name: API Contracts and Documentation
+      severity: medium
+      description: 100% exported symbol documentation coverage and contract synchronization.
+
+classes:
+  source_code:
+    match:
+      - "**/*.py"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.go"
+      - "**/*.rs"
+      - "**/*.java"
+      - "**/*.c"
+      - "**/*.cpp"
+    exclude:
+      - "**/vendor/**"
+      - "**/node_modules/**"
+      - "**/*_test.*"
+      - "**/*.test.ts"
+      - "**/test_*.py"
+    checks:
+      - dimension: HCODE
+        type: pattern
+        rules:
+          - no_user_home_paths
+          - no_raw_permissions
+          - no_release_tags
+          - no_hardcoded_secrets
+      - dimension: SECOBS
+        type: pattern
+        rules:
+          - no_private_keys
+          - no_hardcoded_tokens
+
+  test_code:
+    match:
+      - "**/*_test.go"
+      - "**/*.test.ts"
+      - "**/test_*.py"
+      - "**/tests/**"
+    checks:
+      - dimension: SECOBS
+        type: pattern
+        rules:
+          - no_hardcoded_tokens
+
+  documentation:
+    match:
+      - "**/*.md"
+      - "**/*.rst"
+      - "docs/**"
+    checks:
+      - dimension: DOCSIG
+        type: pattern
+        rules:
+          - no_broken_links
+
+ledger:
+  path: .zqk/quality/matrix_cache.json
+  algorithm: sha256

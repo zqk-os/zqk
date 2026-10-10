@@ -9,20 +9,29 @@ import (
 type FileClass string
 
 const (
-	ClassGoProd     FileClass = "go-production"
-	ClassGoTest     FileClass = "go-test"
+	ClassSource     FileClass = "source"
+	ClassTest       FileClass = "test"
 	ClassScript     FileClass = "scripts"
 	ClassConfigFile FileClass = "config"
 	ClassDocs       FileClass = "docs"
 	ClassOther      FileClass = "other"
+
+	// Backwards-compatible aliases for Go projects
+	ClassGoProd FileClass = ClassSource
+	ClassGoTest FileClass = ClassTest
 )
 
-// CheckKind represents whether a check is programmatic or conducted by an adversarial agent.
+// CheckKind represents whether a check is pattern-based, external command, or conducted by an adversarial agent.
 type CheckKind string
 
 const (
-	CheckKindProgrammatic CheckKind = "programmatic"
-	CheckKindAdversarial  CheckKind = "adversarial_agent"
+	CheckKindPattern CheckKind = "pattern"
+	CheckKindCommand CheckKind = "command"
+	CheckKindAgent   CheckKind = "agent"
+
+	// Backwards-compatible aliases
+	CheckKindProgrammatic CheckKind = CheckKindPattern
+	CheckKindAdversarial  CheckKind = CheckKindAgent
 )
 
 // CheckStatus represents the state of a verification check on a file.
@@ -35,7 +44,7 @@ const (
 	CheckStatusSkipped CheckStatus = "skipped"
 )
 
-// DimensionCode represents authoritative evaluation dimensions in the knowledge kernel.
+// DimensionCode represents standard evaluation dimensions across codebases.
 type DimensionCode string
 
 const (
@@ -45,23 +54,26 @@ const (
 	DimensionCONCURR DimensionCode = "CONCURR"
 	DimensionSECOBS  DimensionCode = "SECOBS"
 	DimensionDOCSIG  DimensionCode = "DOCSIG"
+	DimensionLINT    DimensionCode = "LINT"
 )
 
-// DimensionSpec defines canonical metadata and policy bindings for an evaluation dimension.
+// DimensionSpec defines metadata and policy bindings for an evaluation dimension.
 type DimensionSpec struct {
-	Code        DimensionCode `json:"code"`
-	Name        string        `json:"name"`
-	PolicyID    string        `json:"policy_id"`
-	Description string        `json:"description"`
-	Severity    string        `json:"severity"`
+	Code        DimensionCode `json:"code" yaml:"code"`
+	Name        string        `json:"name" yaml:"name"`
+	Category    string        `json:"category,omitempty" yaml:"category,omitempty"`
+	PolicyID    string        `json:"policy_id,omitempty" yaml:"policy_id,omitempty"`
+	Description string        `json:"description" yaml:"description"`
+	Severity    string        `json:"severity" yaml:"severity"`
 }
 
-// DefaultDimensions returns the canonical evaluation dimension specifications.
+// DefaultDimensions returns universal evaluation dimension specifications.
 func DefaultDimensions() []DimensionSpec {
 	return []DimensionSpec{
 		{
 			Code:        DimensionHCODE,
 			Name:        "Hardcoded Logic and Literal Eradication",
+			Category:    "maintainability",
 			PolicyID:    "POL-CODE-HARDCODING-001",
 			Description: "Zero hardcoded paths, versions, raw permissions, ports, and duplicate string literals.",
 			Severity:    "critical",
@@ -69,36 +81,41 @@ func DefaultDimensions() []DimensionSpec {
 		{
 			Code:        DimensionEFFPERF,
 			Name:        "Efficiency, Complexity, and Resource Hygiene",
+			Category:    "performance",
 			PolicyID:    "POL-CODE-EFFPERF-001",
-			Description: "Zero unbounded O(N^2) loops, mandatory context timeouts, and bounded buffers.",
+			Description: "Zero unbounded O(N^2) loops, bounded buffer allocations, and resource limits.",
 			Severity:    "high",
 		},
 		{
 			Code:        DimensionERRHYG,
 			Name:        "Error Hygiene, Wrapping, and Fail-Closed Resilience",
+			Category:    "reliability",
 			PolicyID:    "POL-CODE-ERRHYG-001",
 			Description: "Zero swallowed errors, structured error wrapping, and fail-closed safety.",
 			Severity:    "high",
 		},
 		{
 			Code:        DimensionCONCURR,
-			Name:        "Concurrency Lifecycle and Named Goroutines",
+			Name:        "Concurrency Lifecycle and Resource Safety",
+			Category:    "concurrency",
 			PolicyID:    "POL-CODE-CONCURRENCY-001",
-			Description: "Zero naked goroutines, mandatory goroutinelabels, and explicit termination.",
+			Description: "Zero leaked background workers, explicit lifecycle management, and clean shutdown.",
 			Severity:    "critical",
 		},
 		{
 			Code:        DimensionSECOBS,
 			Name:        "Zero-PII Security and Structured Observability",
+			Category:    "security",
 			PolicyID:    "POL-CODE-SECOBS-001",
-			Description: "Zero hardcoded credentials, zero PII in logs, and structured observability.",
+			Description: "Zero hardcoded credentials, zero PII in logs, and structured audit logs.",
 			Severity:    "critical",
 		},
 		{
 			Code:        DimensionDOCSIG,
 			Name:        "API Signatures, Documentation, and Contracts",
+			Category:    "documentation",
 			PolicyID:    "POL-CODE-DOCSIG-001",
-			Description: "100% exported symbol GoDoc coverage and contract synchronization.",
+			Description: "100% exported API documentation coverage and contract synchronization.",
 			Severity:    "medium",
 		},
 	}
@@ -183,12 +200,28 @@ type FileEntry struct {
 
 // ClassConfig defines rules and required verification checks for a class of files.
 type ClassConfig struct {
-	Name            FileClass `json:"name"`
-	Description     string    `json:"description"`
-	Extensions      []string  `json:"extensions"`
-	MatchPatterns   []string  `json:"match_patterns,omitempty"`
-	ExcludePatterns []string  `json:"exclude_patterns,omitempty"`
-	RequiredChecks  []string  `json:"required_checks"`
+	Name            FileClass `json:"name" yaml:"name"`
+	Description     string    `json:"description" yaml:"description"`
+	Extensions      []string  `json:"extensions" yaml:"extensions"`
+	MatchPatterns   []string  `json:"match_patterns,omitempty" yaml:"match_patterns,omitempty"`
+	ExcludePatterns []string  `json:"exclude_patterns,omitempty" yaml:"exclude_patterns,omitempty"`
+	RequiredChecks  []string  `json:"required_checks" yaml:"required_checks"`
+}
+
+// Profile defines declarative file classification rules, glob matchers, and required checks.
+type Profile struct {
+	Name        string                    `json:"name" yaml:"name"`
+	Description string                    `json:"description,omitempty" yaml:"description,omitempty"`
+	Classes     map[FileClass]ClassConfig `json:"classes" yaml:"classes"`
+}
+
+// LedgerRecord represents an individual content-addressed verification record tracking file status.
+type LedgerRecord struct {
+	FilePath  string        `json:"file_path"`
+	SHA256    string        `json:"sha256"`
+	Dimension DimensionCode `json:"dimension"`
+	Status    CheckStatus   `json:"status"`
+	StampedBy string        `json:"stamped_by"`
 }
 
 // MatrixLedger is the root persistent schema for the verification matrix.
@@ -212,4 +245,10 @@ type CheckDefinition struct {
 	Kind          CheckKind
 	TargetClasses []FileClass
 	Runner        CheckRunner
+}
+
+// RemediationHook provides an interface for external systems (e.g., ticket trackers, issue managers, or orchestrators)
+// to automatically act upon policy failures and create remediation items.
+type RemediationHook interface {
+	OnPolicyFailure(ctx context.Context, sc *FileScorecard, failures []string) (*RemediationBlock, error)
 }

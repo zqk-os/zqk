@@ -46,7 +46,7 @@ func runMatrixVerify(cmd *cobra.Command, _ []string) error {
 		Name:          "Hardcoded Logic Scanner",
 		Description:   "Programmatic detection of raw permissions, release tags, and hardcoded literals",
 		Kind:          matrix.CheckKindProgrammatic,
-		TargetClasses: []matrix.FileClass{matrix.ClassGoProd, matrix.ClassGoTest, matrix.ClassScript, matrix.ClassConfigFile},
+		TargetClasses: []matrix.FileClass{matrix.ClassSource, matrix.ClassTest, matrix.ClassScript, matrix.ClassConfigFile},
 		Runner:        scanner,
 	})
 

@@ -57,28 +57,41 @@ func (r *CheckRegistry) All() []CheckDefinition {
 type Engine struct {
 	mu            sync.RWMutex
 	repoRoot      string
+	storageDir    string
 	ledgerPath    string
 	inventoryPath string
 	classifier    *Classifier
 	registry      *CheckRegistry
 	ledger        *MatrixLedger
 	inventory     *LiteralInventory
+	remediation   RemediationHook
+}
+
+func resolveStorageAndLedgerPaths(repoRoot, storageOrLedgerPath string) (string, string) {
+	if storageOrLedgerPath == "" {
+		dir := filepath.Join(repoRoot, ".matrix")
+		return dir, filepath.Join(dir, "verification_matrix.json")
+	}
+	if strings.HasSuffix(storageOrLedgerPath, ".json") {
+		return filepath.Dir(storageOrLedgerPath), storageOrLedgerPath
+	}
+	return storageOrLedgerPath, filepath.Join(storageOrLedgerPath, "verification_matrix.json")
 }
 
 // NewEngine initializes a matrix verification engine.
-func NewEngine(repoRoot string, ledgerPath string, registry *CheckRegistry) (*Engine, error) {
+// storageOrLedgerPath can be a directory (defaults to .matrix) or a path to a ledger JSON file.
+func NewEngine(repoRoot string, storageOrLedgerPath string, registry *CheckRegistry) (*Engine, error) {
 	if repoRoot == "" {
 		repoRoot = "."
-	}
-	if ledgerPath == "" {
-		ledgerPath = filepath.Join(repoRoot, paths.ProjectDataDir, "verification_matrix.json")
 	}
 	if registry == nil {
 		registry = NewCheckRegistry()
 	}
 
-	classifier := NewClassifier(DefaultClassConfigs())
-	invPath := filepath.Join(repoRoot, paths.ProjectDataDir, "literal_inventory.json")
+	storageDir, ledgerPath := resolveStorageAndLedgerPaths(repoRoot, storageOrLedgerPath)
+
+	classifier := NewClassifier(DefaultProfile())
+	invPath := filepath.Join(storageDir, "literal_inventory.json")
 	inventory, err := NewLiteralInventory(invPath)
 	if err != nil && !fileutil.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to load literal inventory: %w", err)
@@ -86,6 +99,7 @@ func NewEngine(repoRoot string, ledgerPath string, registry *CheckRegistry) (*En
 
 	e := &Engine{
 		repoRoot:      repoRoot,
+		storageDir:    storageDir,
 		ledgerPath:    ledgerPath,
 		inventoryPath: invPath,
 		classifier:    classifier,
@@ -104,6 +118,20 @@ func NewEngine(repoRoot string, ledgerPath string, registry *CheckRegistry) (*En
 	}
 
 	return e, nil
+}
+
+// SetRemediationHook registers an external remediation hook for policy failures.
+func (e *Engine) SetRemediationHook(hook RemediationHook) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.remediation = hook
+}
+
+// StorageDir returns the directory where matrix artifacts and scorecards are stored.
+func (e *Engine) StorageDir() string {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.storageDir
 }
 
 func (e *Engine) loadLedger() error {
@@ -182,57 +210,34 @@ func (e *Engine) resolveTargetFile(relPath string) (fs.FileInfo, string, error) 
 	return info, hash, nil
 }
 
-// EvaluateFile evaluates a single file, leveraging cached results if the SHA-256 hash matches.
-func (e *Engine) EvaluateFile(ctx context.Context, relPath string, force bool) (*FileEntry, bool, error) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-
-	info, hash, err := e.resolveTargetFile(relPath)
-	if err != nil {
-		return nil, false, err
-	}
-
-	class := e.classifier.Classify(relPath)
-	classCfg := e.ledger.Classes[class]
-
-	existing, found := e.ledger.Files[relPath]
-
-	// Cache Hit Check: If content hash matches and all required checks have passed, return cached entry.
-	if found && !force && existing.ContentHash == hash {
-		allSatisfied := true
-		for _, reqCheck := range classCfg.RequiredChecks {
-			res, ok := existing.Checks[reqCheck]
-			if !ok || res.Status != CheckStatusPassed {
-				allSatisfied = false
-				break
-			}
-		}
-		if allSatisfied {
-			return &existing, true, nil // Cache Hit!
-		}
-	}
-
-	// Cache Miss or Hash Changed: Evaluate checks
-	entry := FileEntry{
+func (e *Engine) initFileEntry(relPath string, info fs.FileInfo, hash string) FileEntry {
+	return FileEntry{
 		Path:        relPath,
 		ContentHash: hash,
-		Class:       class,
+		Class:       e.classifier.Classify(relPath),
 		Size:        info.Size(),
 		ModTime:     info.ModTime().UTC(),
 		Checks:      make(map[string]CheckResult),
 	}
+}
 
-	// Preserve manual/agent evaluations if the hash is identical
-	if found && existing.ContentHash == hash {
-		for k, v := range existing.Checks {
-			entry.Checks[k] = v
+func (e *Engine) isCacheSatisfied(existing FileEntry, hash string, classCfg ClassConfig, force bool) bool {
+	if force || existing.ContentHash != hash {
+		return false
+	}
+	for _, reqCheck := range classCfg.RequiredChecks {
+		res, ok := existing.Checks[reqCheck]
+		if !ok || res.Status != CheckStatusPassed {
+			return false
 		}
 	}
+	return true
+}
 
+func (e *Engine) executeRequiredChecks(ctx context.Context, entry *FileEntry, classCfg ClassConfig) {
 	for _, checkID := range classCfg.RequiredChecks {
 		checkDef, exists := e.registry.Get(checkID)
 		if !exists || checkDef.Runner == nil {
-			// If check requires manual agent evaluation (e.g. Czar), mark pending unless already stamped for this hash
 			if prevRes, ok := entry.Checks[checkID]; ok && prevRes.Status == CheckStatusPassed {
 				continue
 			}
@@ -246,7 +251,7 @@ func (e *Engine) EvaluateFile(ctx context.Context, relPath string, force bool) (
 			continue
 		}
 
-		res, err := checkDef.Runner.Run(ctx, e.repoRoot, &entry)
+		res, err := checkDef.Runner.Run(ctx, e.repoRoot, entry)
 		if err != nil {
 			res = CheckResult{
 				CheckID:     checkID,
@@ -258,8 +263,9 @@ func (e *Engine) EvaluateFile(ctx context.Context, relPath string, force bool) (
 		}
 		entry.Checks[checkID] = res
 	}
+}
 
-	// Assemble and evaluate file scorecard
+func (e *Engine) applyScorecardEvaluation(ctx context.Context, entry *FileEntry, relPath string, hash string, class FileClass) {
 	allFindings := make([]Finding, 0)
 	for _, res := range entry.Checks {
 		allFindings = append(allFindings, res.Findings...)
@@ -290,6 +296,36 @@ func (e *Engine) EvaluateFile(ctx context.Context, relPath string, force bool) (
 			}
 		}
 	}
+}
+
+// EvaluateFile evaluates a single file, leveraging cached results if the SHA-256 hash matches.
+func (e *Engine) EvaluateFile(ctx context.Context, relPath string, force bool) (*FileEntry, bool, error) {
+	info, hash, err := e.resolveTargetFile(relPath)
+	if err != nil {
+		return nil, false, err
+	}
+
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	class := e.classifier.Classify(relPath)
+	classCfg := e.ledger.Classes[class]
+
+	existing, found := e.ledger.Files[relPath]
+	if found && e.isCacheSatisfied(existing, hash, classCfg, force) {
+		return &existing, true, nil // Cache Hit!
+	}
+
+	// Cache Miss or Hash Changed: Evaluate checks
+	entry := e.initFileEntry(relPath, info, hash)
+	if found && existing.ContentHash == hash {
+		for k, v := range existing.Checks {
+			entry.Checks[k] = v
+		}
+	}
+
+	e.executeRequiredChecks(ctx, &entry, classCfg)
+	e.applyScorecardEvaluation(ctx, &entry, relPath, hash, class)
 
 	e.ledger.Files[relPath] = entry
 	return &entry, false, nil
@@ -307,14 +343,7 @@ func (e *Engine) RecordAgentCheck(relPath string, checkID string, status CheckSt
 
 	entry, ok := e.ledger.Files[relPath]
 	if !ok || entry.ContentHash != hash {
-		entry = FileEntry{
-			Path:        relPath,
-			ContentHash: hash,
-			Class:       e.classifier.Classify(relPath),
-			Size:        info.Size(),
-			ModTime:     info.ModTime().UTC(),
-			Checks:      make(map[string]CheckResult),
-		}
+		entry = e.initFileEntry(relPath, info, hash)
 	}
 
 	if entry.Checks == nil {
@@ -342,11 +371,17 @@ func (e *Engine) EvaluateAll(ctx context.Context, force bool) (*Summary, error) 
 
 	ignoredDirs := map[string]bool{
 		".git":               true,
+		".matrix":            true,
 		paths.ProjectDataDir: true,
 		".gemini":            true,
 		"vendor":             true,
 		"bin":                true,
 		"node_modules":       true,
+		"build":              true,
+		"dist":               true,
+		".cache":             true,
+		".venv":              true,
+		"__pycache__":        true,
 	}
 
 	err := filepath.WalkDir(e.repoRoot, func(path string, d fs.DirEntry, err error) error {
@@ -394,17 +429,7 @@ func (e *Engine) EvaluateAll(ctx context.Context, force bool) (*Summary, error) 
 
 		stats := summary.ByClass[entry.Class]
 		stats.Total++
-
-		if hasFailed {
-			summary.ViolatingFiles++
-			stats.Violating++
-		} else if hasPending {
-			summary.PendingFiles++
-			stats.Pending++
-		} else {
-			summary.CleanFiles++
-			stats.Clean++
-		}
+		recordSummaryStatus(summary, &stats, hasFailed, hasPending)
 		summary.ByClass[entry.Class] = stats
 
 		return nil
@@ -415,6 +440,20 @@ func (e *Engine) EvaluateAll(ctx context.Context, force bool) (*Summary, error) 
 	}
 
 	return summary, nil
+}
+
+func recordSummaryStatus(summary *Summary, stats *ClassStats, hasFailed, hasPending bool) {
+	switch {
+	case hasFailed:
+		summary.ViolatingFiles++
+		stats.Violating++
+	case hasPending:
+		summary.PendingFiles++
+		stats.Pending++
+	default:
+		summary.CleanFiles++
+		stats.Clean++
+	}
 }
 
 // Inventory returns the active literal inventory.
@@ -517,7 +556,9 @@ func (e *Engine) StampFileCheck(ctx context.Context, req StampRequest) (*CheckRe
 				_ = count
 			}
 		}
-		_ = e.inventory.Save()
+		if invErr := e.inventory.Save(); invErr != nil {
+			return nil, fmt.Errorf("failed to save literal inventory: %w", invErr)
+		}
 	}
 
 	e.mu.Lock()
@@ -525,14 +566,7 @@ func (e *Engine) StampFileCheck(ctx context.Context, req StampRequest) (*CheckRe
 
 	entry, exists := e.ledger.Files[req.Path]
 	if !exists || entry.ContentHash != currentHash {
-		entry = FileEntry{
-			Path:        req.Path,
-			ContentHash: currentHash,
-			Class:       e.classifier.Classify(req.Path),
-			Size:        info.Size(),
-			ModTime:     info.ModTime().UTC(),
-			Checks:      make(map[string]CheckResult),
-		}
+		entry = e.initFileEntry(req.Path, info, currentHash)
 	}
 	if entry.Checks == nil {
 		entry.Checks = make(map[string]CheckResult)
@@ -553,3 +587,45 @@ func (e *Engine) StampFileCheck(ctx context.Context, req StampRequest) (*CheckRe
 
 	return &result, nil
 }
+
+// SetClassifier sets a custom classifier on the engine.
+func (e *Engine) SetClassifier(c *Classifier) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.classifier = c
+	if c != nil && c.Profile() != nil {
+		e.ledger.Classes = c.Profile().Classes
+	}
+}
+
+// Classifier returns the engine's active classifier.
+func (e *Engine) Classifier() *Classifier {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.classifier
+}
+
+// Records returns all content-addressed ledger records tracking (file_path, sha256, dimension, status, stamped_by).
+func (e *Engine) Records() []LedgerRecord {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	records := make([]LedgerRecord, 0)
+	for path, file := range e.ledger.Files {
+		for _, check := range file.Checks {
+			dim := check.Dimension
+			if dim == "" {
+				dim = DimensionCode(check.CheckID)
+			}
+			records = append(records, LedgerRecord{
+				FilePath:  path,
+				SHA256:    file.ContentHash,
+				Dimension: dim,
+				Status:    check.Status,
+				StampedBy: check.Evaluator,
+			})
+		}
+	}
+	return records
+}
+

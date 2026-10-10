@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -75,7 +74,7 @@ func (inv *LiteralInventory) Save() error {
 		return nil
 	}
 
-	if err := fileutil.MkdirAll(filepath.Dir(inv.storePath), paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(filepath.Dir(inv.storePath), fileutil.StandardDirPerm); err != nil {
 		return err
 	}
 
