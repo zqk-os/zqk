@@ -1,10 +1,4 @@
 {
-  "commands_without_specs": [
-    "matrix dimensions",
-    "matrix evaluate",
-    "matrix inventory",
-    "matrix stamp",
-    "matrix verify"
-  ],
+  "commands_without_specs": [],
   "specs_without_commands": []
 }

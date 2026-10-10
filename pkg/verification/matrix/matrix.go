@@ -553,4 +553,3 @@ func (e *Engine) StampFileCheck(ctx context.Context, req StampRequest) (*CheckRe
 
 	return &result, nil
 }
-

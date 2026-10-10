@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: inventory
+short: Inspect the repository-wide string literal inventory and deduplication status
+description: |-
+  Queries the Global String Literal Inventory to detect duplicated literals across
+  the codebase. Identifies strings violating the single-occurrence tolerance policy (>=2 occurrences).
+flags:
+  - name: duplicates-only
+    type: bool
+    description: Show only string literals with >= 2 occurrences
+    default: true
+  - name: all
+    type: bool
+    description: Show all recorded string literals

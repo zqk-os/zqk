@@ -239,9 +239,7 @@ impact_assessment: critical
 target_resolution_date: %q
 file_path: %q
 goal_refs:
-  - GOAL-1791592660506411000-b96ebd2d
-related_object_refs:
-  - PRI-1791592787014288000-10a49b6b
+  - GOAL-LAUNCH-SURFACE-COMPLETENESS
 tags:
   - matrix-failure
   - %s
@@ -272,14 +270,11 @@ tags:
 	bliYaml := fmt.Sprintf(`kind: backlog_item
 title: %q
 description: %q
-priority_plan_ref: PRI-1791592787014288000-10a49b6b
 goal_refs:
-  - GOAL-1791592660506411000-b96ebd2d
+  - GOAL-LAUNCH-SURFACE-COMPLETENESS
 persona_refs:
   - PER-COMMUNITY-SOFTWARE-ENGINEER
-technical_debt_refs:
-  - %s
-`, bliTitle, bliDesc, tdeID)
+`, bliTitle, bliDesc)
 
 	tmpBliPath := filepath.Join(e.repoRoot, paths.ProjectDataDir, fmt.Sprintf("tmp-bli-%d.yaml", time.Now().UnixNano()))
 	if err := fileutil.WriteSecureFile(tmpBliPath, []byte(bliYaml)); err != nil {
@@ -308,7 +303,7 @@ technical_debt_refs:
 }
 
 func extractObjectIDFromOutput(out string) string {
-	// e.g. "✓ Object TDE-1791595147038955000-6c15355f created successfully"
+	// e.g. "✓ Object TDE-001 created successfully"
 	lines := strings.Split(out, "\n")
 	for _, l := range lines {
 		fields := strings.Fields(l)

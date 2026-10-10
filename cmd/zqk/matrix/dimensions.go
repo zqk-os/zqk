@@ -14,20 +14,20 @@ func NewMatrixDimensionsCmd() *cobra.Command {
 	builder.WithLong(`Displays the authoritative evaluation dimensions (HCODE, EFFPERF, ERRHYG, CONCURR, SECOBS, DOCSIG)
 tracked in the Continuous Source Verification Matrix, along with their bound Knowledge Kernel policy IDs.`)
 	builder.WithRunE(func(cmd *cobra.Command, _ []string) error {
-			dims := matrix.DefaultDimensions()
+		dims := matrix.DefaultDimensions()
 
-			cmd.Println("================================================================================")
-			cmd.Println("  Continuous Source Verification Matrix: Canonical Evaluation Dimensions")
-			cmd.Println("================================================================================")
-			for _, d := range dims {
-				cmd.Printf("Code     : %s\n", d.Code)
-				cmd.Printf("Name     : %s\n", d.Name)
-				cmd.Printf("Policy   : %s\n", d.PolicyID)
-				cmd.Printf("Severity : %s\n", d.Severity)
-				cmd.Printf("Scope    : %s\n", d.Description)
-				cmd.Println("--------------------------------------------------------------------------------")
-			}
-			return nil
+		cmd.Println("================================================================================")
+		cmd.Println("  Continuous Source Verification Matrix: Canonical Evaluation Dimensions")
+		cmd.Println("================================================================================")
+		for _, d := range dims {
+			cmd.Printf("Code     : %s\n", d.Code)
+			cmd.Printf("Name     : %s\n", d.Name)
+			cmd.Printf("Policy   : %s\n", d.PolicyID)
+			cmd.Printf("Severity : %s\n", d.Severity)
+			cmd.Printf("Scope    : %s\n", d.Description)
+			cmd.Println("--------------------------------------------------------------------------------")
+		}
+		return nil
 	})
 	cmd := builder.Build()
 	cmd.Example = paths.RewriteCanonicalCLIInvocations(`  zqk matrix dimensions`)

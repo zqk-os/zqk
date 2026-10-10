@@ -514,5 +514,3 @@ func TestEvaluateScorecard_ThresholdsAndScorecards(t *testing.T) {
 		t.Errorf("expected scorecard status to be failed, got %s", badSc.Status)
 	}
 }
-
-
