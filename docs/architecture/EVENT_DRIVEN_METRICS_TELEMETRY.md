@@ -3,7 +3,7 @@
 ## Executive Summary
 As the ZQK Knowledge Kernel processes high-frequency callback event streams—spanning scheduler job completions, TUI invalidation shockwaves, agent coordination correspondence, and multi-tenant task dispatches—telemetry instrumentation must observe pipeline health without inducing heap allocation churn or lock contention.
 
-Standard telemetry collectors allocate heap memory for event envelopes, dynamic metric labels, and map lookups. Under 50,000 events/second, allocation-heavy metrics trigger frequent garbage collection cycles, degrading p99 dispatch latency.
+Standard telemetry collectors allocate heap memory for event envelopes, dynamic metric labels, and map lookups. Under high event throughput (50,000+ events/second), allocation-heavy metrics trigger frequent garbage collection cycles, degrading p99 dispatch latency.
 
 This specification details `MetricsSubscriber`, a high-throughput, zero-heap-allocation telemetry aggregator implemented in `cmd/zqk/callback/metrics_subscriber.go`.
 
@@ -15,19 +15,21 @@ This specification details `MetricsSubscriber`, a high-throughput, zero-heap-all
 flowchart TD
     subgraph Ingestion ["Ingestion & Dispatch Engine"]
         Stream["Callback Event Stream"] --> Dispatcher["MultiSubscriberDispatcher"]
-        Dispatcher --> Metrics["MetricsSubscriber (EventSubscriber)"]
+        Dispatcher --> Metrics["MetricsSubscriber (CallbackSubscriber)"]
     end
 
     subgraph HotPath ["Zero-Allocation Hot Path (<50ns)"]
-        Metrics --> AtomicCounters["Atomic Counters (TotalReceived, Dispatched, Dropped, Failures)"]
-        Metrics --> LatencyCalc["Bitwise Logarithmic Latency Bucket (bits.Len64)"]
-        LatencyCalc --> Buckets["Atomic Latency Buckets [16]uint64 (<1µs to >16ms)"]
+        Metrics --> FastDispatch["DispatchTelemetryFast(entry, elapsed)"]
+        FastDispatch --> AtomicCounters["Atomic Counters (TotalDispatched, Errors, Retries, Received, Dropped)"]
+        FastDispatch --> LatencyCalc["Bitwise Logarithmic Latency Bucket (bits.Len64)"]
+        LatencyCalc --> Buckets["Atomic Latency Buckets [64]atomic.Int64 (<1ns to >100s)"]
+        Metrics --> RingObs["Ring Buffer Telemetry (Size, Capacity, Evictions)"]
     end
 
-    subgraph PrometheusScrape ["Prometheus Pull Exporter (/metrics)"]
-        Scrape["Prometheus Scraper"] --> Export["ExportPrometheus()"]
-        Export --> Snapshot["Snapshot() (Atomic Load Copy)"]
-        Snapshot --> PromFormat["Standard Prometheus Text Exposition Format"]
+    subgraph TelemetryExport ["Telemetry Export Engine"]
+        Metrics --> Snapshot["Snapshot() (Atomic Load Copy & Percentile Interpolation)"]
+        Snapshot --> Percentiles["P50, P95, P99 Tail Latency Calculations"]
+        Snapshot --> PrometheusScrape["Prometheus Text Exposition Format (ExportPrometheus)"]
     end
 ```
 
@@ -35,65 +37,131 @@ flowchart TD
 
 ## 1. Zero-Allocation Hot Path Design
 
-`MetricsSubscriber` implements the canonical `EventSubscriber` interface:
+`MetricsSubscriber` implements the canonical `CallbackSubscriber` (and `Subscriber`) interface:
 ```go
-type EventSubscriber interface {
+type Subscriber interface {
     Name() string
-    OnEvent(entry *CallbackEntry) error
+    Notify(ctx context.Context, entry *CallbackEntry) error
 }
+
+type CallbackSubscriber = Subscriber
 ```
 
 ### Hot-Path Guarantees:
-1. **0 Heap Allocations**: All counters are fixed-size atomic integers (`uint64` and `int64`). No strings are formatted and no intermediate slices or interfaces are instantiated on the dispatch path. Verified via `testing.AllocsPerRun(1000, ...)` returning `0`.
-2. **Lockless Bitwise Latency Histogram**: Microsecond latency is computed from `time.Since(entry.CreatedAt).Microseconds()`. The power-of-two bucket index is determined via hardware bitwise instructions (`math/bits.Len64(latencyUs) - 1`), avoiding loops or float divisions.
-3. **Cache Line Isolation & Concurrency**: Atomic operations (`atomic.AddUint64`, `atomic.StoreInt64`) guarantee thread safety across concurrent goroutine pools without global mutex contention.
+1. **0 Heap Allocations**: All counters are fixed-size atomic integers (`atomic.Int64`). No intermediate slices, interfaces, or dynamic formatting occur on the dispatch path. Verified via `testing.AllocsPerRun(1000, ...)` returning `0`.
+2. **Lockless Bitwise Latency Histogram**: Nanosecond latency is mapped into power-of-two logarithmic buckets via single hardware bitwise instructions (`math/bits.Len64(uint64(ns))`), avoiding loops, float divisions, or mutexes.
+3. **Cache Line Isolation & Concurrency**: Atomic operations (`atomic.Int64.Add`, `atomic.Int64.Store`, `atomic.Int64.Load`) guarantee thread safety across concurrent goroutine pools without global mutex contention.
+4. **Fail-Closed Nil Safety**: Nil entries or empty metrics increment `totalErrors` and return `nil`, never panicking or destabilizing dispatch pipelines. Zero or negative elapsed durations are safely recorded in bucket 0 without mathematical errors.
 
 ---
 
-## 2. Power-of-Two Latency Histogram
+## 2. Power-of-Two Latency Histogram & Percentiles
 
-Latency distributions are discretized into 16 power-of-two logarithmic buckets:
+Latency distributions are discretized into 64 power-of-two logarithmic buckets (`[64]atomic.Int64`):
 
-| Bucket Index | Microsecond Range | Upper Bound (`le`) |
+| Bucket Index | Nanosecond Range | Representation |
 | :--- | :--- | :--- |
-| `0` | `< 1 µs` | `1` |
-| `1` | `1 µs – 2 µs` | `2` |
-| `2` | `2 µs – 4 µs` | `4` |
-| `3` | `4 µs – 8 µs` | `8` |
-| `4` | `8 µs – 16 µs` | `16` |
-| `...` | `...` | `...` |
-| `14` | `8192 µs – 16384 µs` | `16384` |
-| `15` | `>= 16384 µs (~16.4ms)` | `+Inf` |
+| `0` | `<= 0 ns` | Zero / non-positive elapsed time |
+| `1` | `1 ns` | Sub-nanosecond / 1ns |
+| `2` | `2 ns – 3 ns` | `2^1` to `2^2 - 1` |
+| `10` | `512 ns – 1023 ns` | ~1 µs |
+| `20` | `524,288 ns – 1,048,575 ns` | ~1 ms |
+| `30` | `536,870,912 ns – 1,073,741,823 ns` | ~1 s |
+| `63` | `>= 2^62 ns` | Upper bound |
+
+### Percentile Calculation (`P50`, `P95`, `P99`)
+`MetricsSnapshot` provides rank-based quantile interpolation across the 64 buckets:
+```go
+type MetricsSnapshot struct {
+    Name                string
+    TotalDispatched     int64
+    TotalErrors         int64
+    TotalRetries        int64
+    TotalReceived       int64
+    TotalDropped        int64
+    CircuitBreakerTrips int64
+    ActiveInFlight      int64
+    P50                 time.Duration
+    P95                 time.Duration
+    P99                 time.Duration
+    RingBufferSize      int64
+    RingBufferCapacity  int64
+    RingBufferEvictions int64
+    LatencyBuckets      [LatencyBucketCount]int64
+}
+```
+Linear interpolation within the winning bucket calculates precise percentiles:
+$$\text{interpolated} = \text{lower} + \frac{\text{rankInBucket} - 1}{\text{bucketCount}} \times (\text{upper} - \text{lower})$$
+
+Guarantees $0 \le P50 \le P95 \le P99$.
 
 ---
 
-## 3. Prometheus Exposition Format
+## 3. Ring Buffer & Telemetry Observation
 
-The subscriber exposes metrics in the standard Prometheus text format via `ExportPrometheus()`:
+`MetricsSubscriber` provides real-time tracking of circular ring buffer status:
+- **`RecordRingBuffer(size, capacity, evicted int64)`**: Directly updates size, capacity, and dropped/evicted counts.
+- **`AttachRingBuffer(rb *RingBuffer)`**: Samples depth, capacity, and evicted count from a single `RingBuffer` with nil safety.
+- **`AttachShardedRingBuffer(srb *ShardedRingBuffer)`**: Samples aggregate depth, total capacity, and cumulative evictions across partitioned shards.
+
+---
+
+## 4. Telemetry Export & Prometheus Integration
+
+`ExportPrometheus()` produces standard Prometheus text exposition format:
 
 ```prometheus
-# HELP zqk_callback_events_total Total number of callback events processed by subscriber
+# HELP zqk_callback_events_total Total callback events processed
 # TYPE zqk_callback_events_total counter
-zqk_callback_events_total{subscriber="telemetry_metrics_subscriber",status="received"} 100000
-zqk_callback_events_total{subscriber="telemetry_metrics_subscriber",status="dispatched"} 100000
-zqk_callback_events_total{subscriber="telemetry_metrics_subscriber",status="dropped"} 0
-zqk_callback_events_total{subscriber="telemetry_metrics_subscriber",status="failures"} 0
+zqk_callback_events_total{subscriber="metrics_subscriber",status="received"} 100000
+zqk_callback_events_total{subscriber="metrics_subscriber",status="dispatched"} 100000
+zqk_callback_events_total{subscriber="metrics_subscriber",status="errors"} 0
+zqk_callback_events_total{subscriber="metrics_subscriber",status="retries"} 0
+zqk_callback_events_total{subscriber="metrics_subscriber",status="dropped"} 0
 
-# HELP zqk_callback_circuit_breaker_trips_total Total number of circuit breaker trips
+# HELP zqk_callback_active_in_flight Active dispatches in flight
+# TYPE zqk_callback_active_in_flight gauge
+zqk_callback_active_in_flight{subscriber="metrics_subscriber"} 0
+
+# HELP zqk_callback_circuit_breaker_trips_total Total circuit breaker trips
 # TYPE zqk_callback_circuit_breaker_trips_total counter
-zqk_callback_circuit_breaker_trips_total{subscriber="telemetry_metrics_subscriber"} 0
+zqk_callback_circuit_breaker_trips_total{subscriber="metrics_subscriber"} 0
 
-# HELP zqk_callback_dispatch_latency_microseconds_bucket Power-of-two histogram of dispatch latency in microseconds
-# TYPE zqk_callback_dispatch_latency_microseconds_bucket histogram
-zqk_callback_dispatch_latency_microseconds_bucket{subscriber="telemetry_metrics_subscriber",le="1"} 45200
+# HELP zqk_callback_ring_buffer_size Current ring buffer queue size
+# TYPE zqk_callback_ring_buffer_size gauge
+zqk_callback_ring_buffer_size{subscriber="metrics_subscriber"} 0
+
+# HELP zqk_callback_ring_buffer_capacity Ring buffer maximum capacity
+# TYPE zqk_callback_ring_buffer_capacity gauge
+zqk_callback_ring_buffer_capacity{subscriber="metrics_subscriber"} 4096
+
+# HELP zqk_callback_ring_buffer_evictions_total Ring buffer evictions count
+# TYPE zqk_callback_ring_buffer_evictions_total counter
+zqk_callback_ring_buffer_evictions_total{subscriber="metrics_subscriber"} 0
+
+# HELP zqk_callback_dispatch_latency_nanoseconds Latency summary percentiles
+# TYPE zqk_callback_dispatch_latency_nanoseconds summary
+zqk_callback_dispatch_latency_nanoseconds{subscriber="metrics_subscriber",quantile="0.50"} 125000
+zqk_callback_dispatch_latency_nanoseconds{subscriber="metrics_subscriber",quantile="0.95"} 980000
+zqk_callback_dispatch_latency_nanoseconds{subscriber="metrics_subscriber",quantile="0.99"} 5200000
+
+# HELP zqk_callback_dispatch_latency_nanoseconds_bucket Power-of-two latency histogram
+# TYPE zqk_callback_dispatch_latency_nanoseconds_bucket histogram
+zqk_callback_dispatch_latency_nanoseconds_bucket{subscriber="metrics_subscriber",le="0"} 0
 ...
-zqk_callback_dispatch_latency_microseconds_bucket{subscriber="telemetry_metrics_subscriber",le="+Inf"} 100000
-zqk_callback_dispatch_latency_microseconds_count{subscriber="telemetry_metrics_subscriber"} 100000
+zqk_callback_dispatch_latency_nanoseconds_bucket{subscriber="metrics_subscriber",le="+Inf"} 100000
+zqk_callback_dispatch_latency_nanoseconds_count{subscriber="metrics_subscriber"} 100000
 ```
 
 ---
 
-## 4. Verification & Done Gates
-- **AST Hygiene**: Zero naked goroutines; all worker pools bounded via `goroutinelabels.NewPool`.
-- **Race Safety**: Tested under 16 concurrent workers with 5,000 events each (80,000 concurrent mutations) with `-race` exiting 0.
-- **Traceability**: Sealed against Knowledge Kernel objects `PRI-1791667600249750000-6d1581de` and `BLI-1791668750264615000-0b9ca060`.
+## 5. Verification Traceability Matrix
+
+| Requirement / Criterion | Description | Verification Method | Status |
+| :--- | :--- | :--- | :--- |
+| **REQ-EVENT-DRIVEN-METRICS** | Event-Driven Metrics Aggregation and Zero-Allocation Telemetry Dispatch. | Unit, Concurrency, and AST Hygiene Suites | Verified |
+| **CRIT-SUBSCRIBER-DISPATCH-METRICS** | `MetricsSubscriber` implementation conforming to `CallbackSubscriber`, dispatch counters, latency percentiles, ring buffer telemetry, fast telemetry hooks. | `TestMetricsSubscriber_ZeroAllocations`<br>`TestMetricsSubscriber_LatencyPercentiles`<br>`TestMetricsSubscriber_RingBufferTelemetry` | Verified |
+| **CRIT-METRICS-BOUNDARY-AND-ERROR** | Thread-safe atomic operations (lock-free), zero allocations per event, graceful handling of empty/nil metrics or zero elapsed times, `-race` clean. | `TestMetricsSubscriber_ZeroAllocations`<br>`TestMetricsSubscriber_CounterIncrementsAndErrorTracking`<br>`TestMetricsSubscriber_ConcurrentDispatches` | Verified |
+| **CRIT-METRICS-ARCHITECTURE-DOC** | Complete architectural documentation in `docs/architecture/EVENT_DRIVEN_METRICS_TELEMETRY.md`. | Traceability and Specification Review | Verified |
+| **TST-METRICS-UNIFIED-VERIFICATION** | Test Suite in `cmd/zqk/callback/metrics_subscriber_test.go`. | Unit, Concurrency, and Race Detection Suite (passed) | Verified |
+
