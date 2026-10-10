@@ -311,3 +311,81 @@ func (s *Server) getQueueConfig() QueueConfig {
 
 	return config
 }
+
+// BroadcastNotification broadcasts a JSON-RPC notification to all connected clients.
+// It uses non-blocking enqueue on each client's message queue to prevent slow clients
+// from blocking the server or other clients.
+// Returns the number of clients to which the notification was successfully dispatched.
+func (s *Server) BroadcastNotification(method string, params any) int {
+	if s == nil || s.shutdownFlag.Load() == 1 {
+		return 0
+	}
+	select {
+	case <-s.shutdownCtx.Done():
+		return 0
+	default:
+	}
+
+	notification := map[string]any{
+		jsonrpcFieldJSONRPC: JSONRPCVersion,
+		jsonrpcFieldMethod:  method,
+		jsonrpcFieldParams:  params,
+	}
+
+	data, err := json.Marshal(notification)
+	if err != nil {
+		return 0
+	}
+
+	sent := 0
+
+	// 1. Broadcast to all active multi-client connections
+	s.withClientsReadLock(func() bool {
+		for _, client := range s.clients {
+			if client != nil && client.Queue != nil && client.Format != nil {
+				if client.Queue.Enqueue(data, client.Format, "high", nil) {
+					sent++
+				}
+			}
+		}
+		return true
+	})
+
+	// 2. If no multi-client recipients or stdio transport is active, deliver to transportWriter
+	if sent == 0 {
+		var writer *bufio.Writer
+		var format *MessageFormat
+		_ = concurrency.RunInRLockWithLogger(
+			&s.transportMu, LockNameMcpServerGetTransportFallback, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+			func() error {
+				writer = s.transportWriter
+				format = s.transportFormat
+				return nil
+			},
+		)
+		if writer != nil && format != nil {
+			q := s.queueForWriter(writer, format)
+			if q != nil && q.Enqueue(data, format, "high", nil) {
+				sent++
+			} else {
+				transport := NewDefaultTransport()
+				if err := transport.WriteMessage(writer, data, format); err == nil {
+					sent++
+				}
+			}
+		}
+	}
+
+	return sent
+}
+
+// BroadcastMessage sends a notifications/message JSON-RPC notification to all connected clients.
+func (s *Server) BroadcastMessage(message, messageType, priority string) int {
+	params := map[string]any{
+		"message":                message,
+		"message_type":           messageType,
+		objects.FieldKeyPriority: priority,
+		"timestamp":              zqktime.NowRFC3339UTC(),
+	}
+	return s.BroadcastNotification(notificationMethodMessage, params)
+}

@@ -42,6 +42,12 @@ const (
 	// Prompt events (for future use)
 	EventTypePromptAvailable EventType = "prompt.available"
 	EventTypeActionRequired  EventType = "action.required"
+
+	// Task waker & lifecycle notification events
+	EventTypeTaskWaker                EventType = "task_waker"
+	EventTypeTaskWakerDot             EventType = "task.waker"
+	EventTypeLifecycleEvent           EventType = "lifecycle.event"
+	EventTypeLifecycleEventUnderscore EventType = "lifecycle_event"
 )
 
 // Event represents a structured event that can be emitted and subscribed to

@@ -48,6 +48,17 @@ func BootPayload() string {
   4. Claim or shape the first BLI (`+"`"+paths.RewriteCanonicalCLIInvocations(`zqk agent claim ...`)+"`"+` or kernel object creation).
   5. Continue the execution chain without yielding control to an idle wait state.
 
+## Chat Issue Intake & TPM Anti-Distraction Protocol (POL-AGENT-TPM-INTAKE-FIREWALL-001)
+- **The Chat-to-Kernel Firewall:** When an operator or chat message reports a bug, test failure, stack trace, or unexpected behavior, the TPM MUST NOT drop the active plan or begin writing code and running tests directly.
+- **Mandatory 3-Step Triage Sequence:**
+  1. **Objectify Immediately (Zero Code Written):** Mint a persistent Knowledge Kernel object to capture the report:
+     - Test failures, flakes, performance, or hygiene issues: `+"`"+paths.RewriteCanonicalCLIInvocations(`zqk new technical_debt --title "<symptom>"`)+"`"+`
+     - Missing functionality, scope gaps, or requirement defects: `+"`"+paths.RewriteCanonicalCLIInvocations(`zqk new backlog_item --title "<symptom>"`)+"`"+`
+  2. **Triage & Route:**
+     - **P0 (Blocks Current Active Priority Plan):** Attach to active plan as a blocker; delegate the fix to an isolated worker subagent or swarm (`+"`"+paths.RewriteCanonicalCLIInvocations(`zqk agent orchestrate`)+"`"+` / IC craftsman) with the error log. The TPM monitors the gate but NEVER writes code or runs tests.
+     - **P1/P2 (Non-blocking):** File into the backlog or upcoming cycle.
+  3. **Resume Program Trajectory:** Immediately output the minted object receipt (TD-xxx / BLI-xxx), query `+"`"+paths.RewriteCanonicalCLIInvocations(`./bin/zqk workflow whats-next`)+"`"+`, and continue tracking the active priority plan without yielding or getting distracted.
+
 ## Code Search & Token Conservation (`+"`"+`%s grep`+"`"+`)
 - **Prefer `+"`"+`%s grep`+"`"+` (alias `+"`zgrep`"+`) over raw shell `+"`grep`"+` or `+"`find`"+`:** `+"`"+`%s grep`+"`"+` provides sub-15ms trigram indexing, Go AST structural queries (`+"`--ast --kind struct|func`"+`, `+"`--ast --recv <Type>`"+`), and strict token budgeting (`+"`--max-tokens 2000 -f json`"+`). Using external grep dumps unbudgeted files into LLM contexts and increases token consumption.
 `, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)

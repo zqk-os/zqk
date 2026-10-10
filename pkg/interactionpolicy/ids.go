@@ -15,6 +15,7 @@ const (
 	EventStratplanAhead   = "stratplan_ahead"
 	EventCommsFail        = "comms_fail"
 	EventLifecycleBlocked = "lifecycle_blocked"
+	EventChatIssueIntake  = "chat_issue_intake"
 )
 
 // Known interaction policy IDs (kernel objects). Catalog text is the fast pong;
@@ -26,4 +27,5 @@ const (
 	PolicyTPMTracePipeline = "POL-AGENT-TPM-TRACE-PIPELINE-001"
 	PolicyCommsRemedy      = "POL-AGENT-COMMS-REMEDY-WAKE-001"
 	PolicyInteractionMeta  = "POL-AGENT-INTERACTION-POLICY-001"
+	PolicyTPMIntakeFirewall = "POL-AGENT-TPM-INTAKE-FIREWALL-001"
 )

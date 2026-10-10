@@ -60,6 +60,14 @@ var catalog = []catalogEntry{
 		},
 	},
 	{
+		events: []string{EventChatIssueIntake},
+		step: Step{
+			PolicyID:    PolicyTPMIntakeFirewall,
+			GuidingStep: "Chat issue reported: do NOT write code, edit files, or run tests directly. Objectify immediately into technical_debt (for bugs/flakes) or backlog_item (for feature gaps). If P0 blocker, delegate fix to worker swarm via agent orchestrate. Resume active priority plan.",
+			CommandHint: "new technical_debt --title <symptom>",
+		},
+	},
+	{
 		// Idle with planned>0: lead priority_plan has planned BLIs with resolved ambiguity.
 		// Anti-piecemeal invariant: mandate/suggest deterministic swarm orchestration over onsie-twosie claiming.
 		// TRACK: POL-DEFAULT-ec693f64f7c81640

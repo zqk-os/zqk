@@ -251,6 +251,9 @@ func runServe(cmd *cobra.Command, args []string) error {
 		})
 	}
 
+	// Attach Zero-Idle JobWakerRegistry and LifecycleEventWAL event streamer to MCP notifications
+	mcp.AttachZeroIdleWakerStream(server, projectRoot)
+
 	// One-stop-shop for expensive components: set instance context so handlers and in-process CLI
 	// can access storage and registries from the same container (application container).
 	ic := &dispatch.InstanceContext{
