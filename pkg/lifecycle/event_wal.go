@@ -144,7 +144,9 @@ func migrateLifecycleWALToCanonicalNames(projectRoot string) error {
 	ckLegacy := legacy + lifecycleWALCheckpointExt
 	ckCanonical := canonical + lifecycleWALCheckpointExt
 	if _, err := fileutil.Stat(ckLegacy); err == nil {
-		_ = fileutil.Rename(ckLegacy, ckCanonical)
+		if renameErr := fileutil.Rename(ckLegacy, ckCanonical); renameErr != nil {
+			return errfmt.Errorf("failed to rename lifecycle checkpoint: %w", renameErr)
+		}
 	}
 	return nil
 }
