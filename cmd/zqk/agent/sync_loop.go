@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/maintenance"
@@ -259,8 +260,13 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		}
 	})
 
-	poller := time.NewTicker(2 * time.Second)
+	const fallbackHeartbeat = 5 * time.Second
+	poller := time.NewTicker(fallbackHeartbeat)
 	defer poller.Stop()
+
+	wakerCh, unregisterWaker := lifecycle.GlobalJobWakerRegistry.Register(taskID)
+	defer unregisterWaker()
+	defer lifecycle.GlobalJobWakerRegistry.Unregister(taskID, wakerCh)
 
 	auditStream := audit.NewAuditStream(proc.ProjectRoot())
 	validator := mutation.NewValidator(nil)
@@ -304,38 +310,52 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("orchestrator timeout")
+		case <-cmd.Context().Done():
+			return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
+		case <-wakerCh:
+			// Reactive instant wake upon scheduler job completion or mutation event
+			draining := true
+			for draining {
+				select {
+				case <-wakerCh:
+				default:
+					draining = false
+				}
+			}
 		case <-poller.C:
-			loopCount++
-			if loopCount > guardCfg.MaxSyncLoops {
-				// Transition to error state before aborting
-				currentTask, rErr := sp.Read(ctx, secCtx, taskID)
-				if rErr == nil {
-					if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
-						logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on loop limit", aErr).
-							String("task_id", taskID).Log()
-					}
-				}
-				return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
-			}
-			// 1. FRESH STATE READ EVERY TICK
-			bypassCtx := pkgctx.WithBypassCache(ctx)
-			currentTask, err := sp.Read(bypassCtx, secCtx, taskID)
-			if err != nil {
-				return errfmt.Newf("failed to read agent task: %s", taskID).Wrap(err)
-			}
+			// Fallback heartbeat ticker to protect against dropped events
+		}
 
-			fp := taskProgressFingerprint(currentTask)
-			isStagnant := stagnation.lastFP != "" && fp == stagnation.lastFP
-			if isStagnant {
-				storePath := datacell.AgentIdleStorePath(proc.ProjectRoot())
-				if store, err := agentidle.NewFileStore(storePath); err == nil {
-					// Hardcoded 2s since the poller is 2s
-					if accErr := store.Accumulate("sync-loop-agent", taskID, 2*time.Second); accErr != nil {
-						logging.FluentEvent(logging.GetLogger()).Warn("Failed to accumulate agent idle time").
-							WithError(accErr).String("task_id", taskID).Log()
-					}
+		loopCount++
+		if loopCount > guardCfg.MaxSyncLoops {
+			// Transition to error state before aborting
+			currentTask, rErr := sp.Read(ctx, secCtx, taskID)
+			if rErr == nil {
+				if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on loop limit", aErr).
+						String("task_id", taskID).Log()
 				}
 			}
+			return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
+		}
+		// 1. FRESH STATE READ EVERY TICK
+		bypassCtx := pkgctx.WithBypassCache(ctx)
+		currentTask, err := sp.Read(bypassCtx, secCtx, taskID)
+		if err != nil {
+			return errfmt.Newf("failed to read agent task: %s", taskID).Wrap(err)
+		}
+
+		fp := taskProgressFingerprint(currentTask)
+		isStagnant := stagnation.lastFP != "" && fp == stagnation.lastFP
+		if isStagnant {
+			storePath := datacell.AgentIdleStorePath(proc.ProjectRoot())
+			if store, err := agentidle.NewFileStore(storePath); err == nil {
+				if accErr := store.Accumulate("sync-loop-agent", taskID, fallbackHeartbeat); accErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Warn("Failed to accumulate agent idle time").
+						WithError(accErr).String("task_id", taskID).Log()
+				}
+			}
+		}
 
 			if stagnation.Observe(fp) {
 				if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
@@ -844,8 +864,6 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 			}
 			continue
-
-		}
 	}
 }
 
