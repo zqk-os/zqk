@@ -34,6 +34,7 @@ func NewSchedulerCmd() *cobra.Command {
 	schedulerCmd.AddCommand(NewClearIssuesCmd())
 	schedulerCmd.AddCommand(NewEventsCmd())
 	schedulerCmd.AddCommand(NewConfigCmd())
+	schedulerCmd.AddCommand(NewWaitCmd())
 	// Host OS unit install/start/status (launchd/systemd) — reliable supervisor path.
 	// TRACK: docs/architecture/SCHEDULER_HOST_SERVICE_AND_CLUSTER_STATUS.md
 	schedulerCmd.AddCommand(NewServiceCmd())

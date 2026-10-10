@@ -730,3 +730,26 @@ func NewSchedulerTriggerCommandBuilder() *cobra.Command {
 		},
 	})
 }
+
+// NewSchedulerWaitCommandBuilder creates a new scheduler wait <job_id> command builder
+func NewSchedulerWaitCommandBuilder() *cobra.Command {
+	return buildSchedulerCommand(SchedulerCommandConfig{
+		Use:   "wait <job_id>",
+		Short: "Wait for a scheduler job to complete reactively via WAL wakers",
+		Description: []string{
+			"Wait for a background scheduler job callback execution to complete using",
+			"reactive Knowledge Kernel WAL replay and in-memory job wakers.",
+			"Avoids idle polling stalls and exits 0 on completion with result metadata.",
+		},
+		Examples: []string{
+			"Wait for job completion with default timeout (5m)", "%s scheduler wait SCH-001",
+			"Wait with custom timeout and poll interval", "%s scheduler wait SCH-001 --timeout 2m --poll-interval 100ms",
+			"Wait and output JSON result", "%s scheduler wait SCH-001 --format json",
+		},
+		ExcludeFlags: []string{"output", "verbose", "quiet", "timeout", "columns"},
+		Flags: func(builder *clipkg.CommandBuilder) {
+			builder.AddDurationFlag("timeout", "", "5m", "Maximum duration to wait for job completion")
+			builder.AddDurationFlag("poll-interval", "", "50ms", "Interval between WAL replay polling checks")
+		},
+	})
+}
