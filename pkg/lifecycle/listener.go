@@ -85,7 +85,6 @@ func NewListener(projectRoot string, wal *LifecycleEventWAL, rules []TransitionR
 		wakers:         make(map[string]CallbackWaker),
 		checkpointPath: wal.CheckpointPath(),
 	}
-	l.wakers[GetGlobalJobWakerRegistry().Name()] = GetGlobalJobWakerRegistry()
 	return l
 }
 
@@ -166,7 +165,11 @@ func (l *Listener) Run(ctx context.Context) error {
 		l.cursor = next
 		l.mu.Unlock()
 		if replayed > 0 {
-			_ = l.saveCheckpoint()
+			if saveErr := l.saveCheckpoint(); saveErr != nil {
+				logging.FluentEvent(logger).Debug("Lifecycle listener: save checkpoint failed").
+					WithError(saveErr).
+					Log()
+			}
 			poll = WALIdlePollMin
 		} else {
 			poll = NextWALIdlePoll(poll)
@@ -202,15 +205,33 @@ func (l *Listener) processEvent(ev *LifecycleEvent) error {
 	case EventTypeSchedulerCallback:
 		wakers := l.snapshotWakersLocked()
 		if len(wakers) > 0 {
+			evCopy := *ev
 			goroutinelabels.NewGoroutine("lifecycle_waker_dispatch", "dispatch scheduler callback to wakers").StartSimple(func() {
 				ctx := pkgctx.NewSystemContext()
+				logger := logging.NewEventLogger(ctx)
 				for _, waker := range wakers {
-					_ = waker.Wake(ctx, ev)
+					if err := waker.Wake(ctx, &evCopy); err != nil {
+						logging.FluentEvent(logger).Warn("Lifecycle listener: callback waker returned error").
+							WithError(err).
+							Log()
+					}
 				}
 			})
 		}
 	}
 	return nil
+}
+
+// DispatchCallbackNow synchronously dispatches a callback event to all registered wakers.
+func (l *Listener) DispatchCallbackNow(ctx context.Context, ev *LifecycleEvent) []error {
+	wakers := l.Wakers()
+	var errs []error
+	for _, waker := range wakers {
+		if err := waker.Wake(ctx, ev); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errs
 }
 
 func (l *Listener) tryFireRulesLocked(criterionID, scopeKey string, scope map[string]string) {
