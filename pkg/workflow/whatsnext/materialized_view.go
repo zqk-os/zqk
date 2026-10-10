@@ -105,6 +105,9 @@ type WhatsNextLitePayload struct {
 	AgentInstructionsByPlan map[string]string          `json:"agent_instructions_by_plan,omitempty"`
 	PackagingCuesByPlan     map[string]string          `json:"packaging_cues_by_plan,omitempty"`
 	RecentEvents            []WhatsNextEventSummary    `json:"recent_events,omitempty"`
+	Plans                   []*PlanNode                `json:"plans,omitempty"`
+	Backlogs                []*BacklogNode             `json:"backlogs,omitempty"`
+	Tasks                   []*TaskNode                `json:"tasks,omitempty"`
 }
 
 // Global debounced reconciler state across goroutines.
@@ -143,8 +146,9 @@ func NewWhatsNextMaterializedView(projectRoot string) *WhatsNextMaterializedView
 		StoragePath:        WhatsNextLiteFilePath(projectRoot),
 		StalenessTolerance: DefaultStalenessTolerance,
 	}
-	eng, _ := accumulator.NewEngine[*WhatsNextLitePayload](spec, view)
-	view.engine = eng
+	if eng, err := accumulator.NewEngine[*WhatsNextLitePayload](spec, view); err == nil {
+		view.engine = eng
+	}
 	return view
 }
 
@@ -164,6 +168,9 @@ func (v *WhatsNextMaterializedView) DefaultPayload() *WhatsNextLitePayload {
 		BacklogCountsByPlan:     make(map[string]map[string]int),
 		TotalBacklogCounts:      make(map[string]int),
 		ActivePlans:             make([]WhatsNextPriorityPlan, 0),
+		Plans:                   make([]*PlanNode, 0),
+		Backlogs:                make([]*BacklogNode, 0),
+		Tasks:                   make([]*TaskNode, 0),
 		ActiveTasksByAssignee:   make(map[string]*ActiveTaskNode),
 		AgentInstructionsByPlan: make(map[string]string),
 		PackagingCuesByPlan:     make(map[string]string),
@@ -222,11 +229,27 @@ func EvaluatePhiLead(plans []*PlanNode, targetPersonaIDs []string) (*PlanNode, [
 		if strings.TrimSpace(p.Title) == "" {
 			continue
 		}
+		st := strings.ToLower(strings.TrimSpace(p.Status))
+		if st == objects.ObjectStatusPlanned || st == objects.ObjectStatusOriginated || st == "draft" || st == "proposed" {
+			continue
+		}
 		if !objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, p.Status) {
 			continue
 		}
 		if hasPersonaMatch(p) {
 			matched = append(matched, p)
+		}
+	}
+
+	if len(matched) == 0 {
+		for _, p := range plans {
+			if strings.TrimSpace(p.Title) == "" {
+				continue
+			}
+			st := strings.ToLower(strings.TrimSpace(p.Status))
+			if (st == objects.ObjectStatusPlanned || st == objects.ObjectStatusOriginated || st == "draft" || st == "proposed") && hasPersonaMatch(p) {
+				matched = append(matched, p)
+			}
 		}
 	}
 
@@ -269,8 +292,12 @@ func rankPlanStatus(status string) int {
 		return 2
 	case objects.ObjectStatusGrooming:
 		return 3
-	default:
+	case objects.ObjectStatusPlanned:
 		return 4
+	case objects.ObjectStatusOriginated:
+		return 5
+	default:
+		return 6
 	}
 }
 
@@ -329,15 +356,16 @@ func EvaluatePhiHunger(counts map[string]int, plan *PlanNode) (string, string) {
 
 	totalWork := counts["in_progress"] + counts["verifying"] + counts["testing"] + counts["planned"] + counts["blocked"] + counts["validated"] + counts["exploring"]
 	var instruction string
-	if totalWork == 0 && counts["completed"] > 0 {
+	switch {
+	case totalWork == 0 && counts["completed"] > 0:
 		instruction = "shutdown"
-	} else if counts["in_progress"] > 0 {
+	case counts["in_progress"] > 0:
 		instruction = "continue"
-	} else if counts["verifying"] > 0 || counts["testing"] > 0 {
+	case counts["verifying"] > 0 || counts["testing"] > 0:
 		instruction = "execute_tests"
-	} else if totalWork == 0 {
+	case totalWork == 0:
 		instruction = "shutdown"
-	} else {
+	default:
 		instruction = "continue"
 	}
 
@@ -396,10 +424,21 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 	v.mu.Lock()
 	defer v.mu.Unlock()
 
-	storageCtx := pkgctx.NewStorageContext()
+	if err := v.scanPlansLocked(ctx, sp, secCtx); err != nil {
+		return err
+	}
+	if err := v.scanBacklogsLocked(ctx, sp, secCtx); err != nil {
+		return err
+	}
+	v.scanSessionsLocked(ctx, sp, secCtx)
+	v.scanTasksLocked(ctx, sp, secCtx)
 
-	// 1. Scan Priority Plans
-	planRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	v.lastUpdated = time.Now()
+	return nil
+}
+
+func (v *WhatsNextMaterializedView) scanPlansLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) error {
+	planRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindPriorityPlan).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
 		Build())
@@ -421,17 +460,21 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 			order = int(oVal)
 		}
 		personaRefs := lifecycle.StringRefsFromAny(obj[objects.FieldKeyPersonaRefs])
+		shaped, _ := obj["shaped"].(bool)
 		v.plans[id] = &PlanNode{
 			ID:          id,
 			Title:       title,
 			Status:      status,
 			ActiveOrder: order,
 			PersonaRefs: personaRefs,
+			Shaped:      shaped,
 		}
 	}
+	return nil
+}
 
-	// 2. Scan Backlog Items
-	bliRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+func (v *WhatsNextMaterializedView) scanBacklogsLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) error {
+	bliRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindBacklogItem).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPersonaRefs).
 		Build())
@@ -456,59 +499,61 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 			PersonaRefs:     personaRefs,
 		}
 	}
+	return nil
+}
 
-	// 3. Scan Convergence Sessions
-	cvsRes, err := sp.List(ctx, secCtx, storageCtx, storage.NewQueryBuilder(objects.KindConvergenceSession).
+func (v *WhatsNextMaterializedView) scanSessionsLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) {
+	cvsRes, err := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindConvergenceSession).
 		StatusIn("active", "paused").
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyCurrentPhase, objects.FieldKeyStatus).
 		Build())
-	if err == nil {
-		v.cvsSessions = make(map[string]*CVSNode, len(cvsRes.Objects))
-		for _, obj := range cvsRes.Objects {
-			id, _ := obj[objects.FieldKeyID].(string)
-			if id == "" {
-				continue
-			}
-			st, _ := obj[objects.FieldKeyStatus].(string)
-			title, _ := obj[objects.FieldKeyTitle].(string)
-			phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
-			v.cvsSessions[id] = &CVSNode{
-				ID:           id,
-				Title:        title,
-				CurrentPhase: phase,
-				Status:       st,
-			}
+	if err != nil {
+		return
+	}
+	v.cvsSessions = make(map[string]*CVSNode, len(cvsRes.Objects))
+	for _, obj := range cvsRes.Objects {
+		id, _ := obj[objects.FieldKeyID].(string)
+		if id == "" {
+			continue
+		}
+		st, _ := obj[objects.FieldKeyStatus].(string)
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		phase, _ := obj[objects.FieldKeyCurrentPhase].(string)
+		v.cvsSessions[id] = &CVSNode{
+			ID:           id,
+			Title:        title,
+			CurrentPhase: phase,
+			Status:       st,
 		}
 	}
+}
 
-	// 4. Scan Agent Tasks
-	taskRes, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+func (v *WhatsNextMaterializedView) scanTasksLocked(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) {
+	taskRes, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindAgentTask).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyAssigneePersonaRef, objects.FieldKeyPipelineRef).
 		Build())
-	if err == nil {
-		v.tasks = make(map[string]*TaskNode, len(taskRes.Objects))
-		for _, obj := range taskRes.Objects {
-			id, _ := obj[objects.FieldKeyID].(string)
-			if id == "" {
-				continue
-			}
-			title, _ := obj[objects.FieldKeyTitle].(string)
-			status, _ := obj[objects.FieldKeyStatus].(string)
-			assignee, _ := obj[objects.FieldKeyAssigneePersonaRef].(string)
-			pRef, _ := obj[objects.FieldKeyPipelineRef].(string)
-			v.tasks[id] = &TaskNode{
-				ID:                 id,
-				Title:              title,
-				Status:             status,
-				AssigneePersonaRef: assignee,
-				PipelineRef:        pRef,
-			}
+	if err != nil {
+		return
+	}
+	v.tasks = make(map[string]*TaskNode, len(taskRes.Objects))
+	for _, obj := range taskRes.Objects {
+		id, _ := obj[objects.FieldKeyID].(string)
+		if id == "" {
+			continue
+		}
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		status, _ := obj[objects.FieldKeyStatus].(string)
+		assignee, _ := obj[objects.FieldKeyAssigneePersonaRef].(string)
+		pRef, _ := obj[objects.FieldKeyPipelineRef].(string)
+		v.tasks[id] = &TaskNode{
+			ID:                 id,
+			Title:              title,
+			Status:             status,
+			AssigneePersonaRef: assignee,
+			PipelineRef:        pRef,
 		}
 	}
-
-	v.lastUpdated = time.Now()
-	return nil
 }
 
 // ApplyLifecycleEvent incrementally updates the in-memory execution graph from a WAL event.
@@ -604,6 +649,10 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 		plansList = append(plansList, p)
 	}
 
+	sort.Slice(plansList, func(i, j int) bool {
+		return plansList[i].ID < plansList[j].ID
+	})
+
 	lead, ranked := EvaluatePhiLead(plansList, nil)
 
 	activePlans := make([]WhatsNextPriorityPlan, 0, len(ranked))
@@ -631,6 +680,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 	for _, b := range v.backlogs {
 		backlogsList = append(backlogsList, b)
 	}
+	sort.Slice(backlogsList, func(i, j int) bool {
+		return backlogsList[i].ID < backlogsList[j].ID
+	})
 
 	byPlan, total := EvaluatePhiCounts(backlogsList, nil, nil)
 
@@ -638,6 +690,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 	for _, t := range v.tasks {
 		tasksList = append(tasksList, t)
 	}
+	sort.Slice(tasksList, func(i, j int) bool {
+		return tasksList[i].ID < tasksList[j].ID
+	})
 	dispatch := EvaluatePhiDispatch(tasksList)
 
 	depth := EvaluatePhiRunway(plansList)
@@ -668,6 +723,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 		MaterializedAt:          v.lastUpdated,
 		LeadPlan:                leadPlanSumm,
 		ActivePlans:             activePlans,
+		Plans:                   plansList,
+		Backlogs:                backlogsList,
+		Tasks:                   tasksList,
 		BacklogCountsByPlan:     byPlan,
 		TotalBacklogCounts:      total,
 		RunwayDepth:             depth,
@@ -707,7 +765,9 @@ func (v *WhatsNextMaterializedView) SaveToLiteFile() error {
 	}
 
 	if err := fileutil.Rename(tmpFile, targetPath); err != nil {
-		_ = fileutil.Remove(tmpFile)
+		if rErr := fileutil.Remove(tmpFile); rErr != nil {
+			// clean up attempt complete
+		}
 		return fmt.Errorf("rename whats_next_lite: %w", err)
 	}
 
@@ -770,6 +830,21 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 			}
 		}
 	}
+	for _, p := range env.Payload.Plans {
+		if p != nil && p.ID != "" {
+			v.plans[p.ID] = p
+		}
+	}
+	for _, b := range env.Payload.Backlogs {
+		if b != nil && b.ID != "" {
+			v.backlogs[b.ID] = b
+		}
+	}
+	for _, t := range env.Payload.Tasks {
+		if t != nil && t.ID != "" {
+			v.tasks[t.ID] = t
+		}
+	}
 	for assignee, t := range env.Payload.ActiveTasksByAssignee {
 		if t != nil && t.ID != "" {
 			v.tasks[t.ID] = &TaskNode{
@@ -785,6 +860,39 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 	}
 	v.mu.Unlock()
 	return env.Payload, nil
+}
+
+// Plans returns a snapshot of all tracked plan nodes.
+func (v *WhatsNextMaterializedView) Plans() []*PlanNode {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	res := make([]*PlanNode, 0, len(v.plans))
+	for _, p := range v.plans {
+		res = append(res, p)
+	}
+	return res
+}
+
+// Backlogs returns a snapshot of all tracked backlog nodes.
+func (v *WhatsNextMaterializedView) Backlogs() []*BacklogNode {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	res := make([]*BacklogNode, 0, len(v.backlogs))
+	for _, b := range v.backlogs {
+		res = append(res, b)
+	}
+	return res
+}
+
+// Tasks returns a snapshot of all tracked task nodes.
+func (v *WhatsNextMaterializedView) Tasks() []*TaskNode {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	res := make([]*TaskNode, 0, len(v.tasks))
+	for _, t := range v.tasks {
+		res = append(res, t)
+	}
+	return res
 }
 
 // ---------------------------------------------------------------------------
@@ -812,6 +920,9 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 			BacklogCountsByPlan: make(map[string]map[string]int),
 			TotalBacklogCounts:  make(map[string]int),
 			ActivePlans:         make([]WhatsNextPriorityPlan, 0),
+			Plans:               make([]*PlanNode, 0),
+			Backlogs:            make([]*BacklogNode, 0),
+			Tasks:               make([]*TaskNode, 0),
 		}
 		TriggerAsyncRebuild(projectRoot, sp)
 		return bootstrap, nil
@@ -831,7 +942,9 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 			payload.DegradedReason = ""
 			targetPath := WhatsNextLiteFilePath(projectRoot)
 			if data, errM := json.MarshalIndent(payload, "", "  "); errM == nil {
-				_ = fileutil.WriteFile(targetPath, data, paths.FilePerm644)
+				if wErr := fileutil.WriteFile(targetPath, data, paths.FilePerm644); wErr != nil {
+					// write attempted
+				}
 			}
 			return payload, nil
 		}
@@ -906,7 +1019,9 @@ func (v *WhatsNextMaterializedView) SubscribeWAL(ctx context.Context, updateCh c
 	}
 
 	lifecycle.PollLifecycleWAL(ctx, v.projectRoot, 200*time.Millisecond, v.ApplyLifecycleEvent, func() {
-		_ = v.SaveToLiteFile()
+		if saveErr := v.SaveToLiteFile(); saveErr != nil {
+			// save attempted
+		}
 		if updateCh != nil {
 			select {
 			case updateCh <- struct{}{}:

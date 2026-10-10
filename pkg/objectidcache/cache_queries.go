@@ -545,3 +545,41 @@ func flushPendingObjectIDCachePersist() {
 		}
 	}
 }
+
+// StopObjectIDCachePersistForTest cancels any pending debounce timer and unbinds root for tests.
+func StopObjectIDCachePersistForTest(projectRoot string) {
+	persistMu.Lock()
+	if persistTimer != nil {
+		persistTimer.Stop()
+		persistTimer = nil
+	}
+	persistFirstAt.Store(0)
+	persistDirty.Store(false)
+	persistMu.Unlock()
+	if projectRoot != emptyValue {
+		if cur, ok := persistRoot.Load().(string); ok && cur == projectRoot {
+			persistRoot.Store(emptyValue)
+		}
+	}
+}
+
+// TeardownObjectIDCacheTestRoot cancels background timers, flushes/shuts down CAS queues,
+// shuts down cached storage providers, and cleanly scrubs temp test project roots.
+func TeardownObjectIDCacheTestRoot(projectRoot string) {
+	if projectRoot == emptyValue {
+		return
+	}
+	StopObjectIDCachePersistForTest(projectRoot)
+	storage.StopReverseReferenceIndexPersistForTest(projectRoot)
+	storage.StopHighVolumeEventCachePersistForTest(projectRoot)
+	caspkg.RemoveListingIndexWriteQueueForProjectRoot(projectRoot)
+	if provider, ok := storage.GetGlobalStorageProviderCache().Get(projectRoot); ok && provider != nil {
+		shutdownCtx, cancel := stdcontext.WithTimeout(stdcontext.Background(), 2*time.Second)
+		_ = provider.Shutdown(shutdownCtx)
+		cancel()
+		storage.GetGlobalStorageProviderCache().Delete(projectRoot)
+	}
+	GetGlobalObjectIDCache().ClearInMemoryCache(projectRoot)
+	storage.GetGlobalReverseReferenceIndex().Clear()
+	storage.ScrubProjectRootForTempCleanup(projectRoot, 20, 10*time.Millisecond)
+}

@@ -365,6 +365,9 @@ func TestAuditAndObservers(t *testing.T) {
 
 func TestGlobalQueriesAndInvalidations(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	if err := fileutil.MkdirAll(datacell.ProcessPrimaryDir(root), paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
@@ -390,6 +393,9 @@ func TestGlobalQueriesAndInvalidations(t *testing.T) {
 
 func TestBuildCache_AndReverseReferenceScan(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	kindDir := datacell.CellCASPrimaryDir(root, "backlog_items")
 	_ = fileutil.MkdirAll(kindDir, paths.DirPerm755)
 
@@ -415,6 +421,9 @@ func TestBuildCache_AndReverseReferenceScan(t *testing.T) {
 
 func TestLoadCache_AndPersistenceCycle(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(procDir, paths.DirPerm755)
 
@@ -455,6 +464,9 @@ func TestLoadCache_AndPersistenceCycle(t *testing.T) {
 
 func TestReverseReferenceIndexSync_Execution(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(procDir, paths.DirPerm755)
 
@@ -475,6 +487,9 @@ func TestReverseReferenceIndexSync_Execution(t *testing.T) {
 
 func TestStaleAndBucketIndexing(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	cache := NewObjectIDCache()
 
 	missingFile := filepath.Join(root, "non_existent.yaml")
@@ -505,6 +520,9 @@ func TestStaleAndBucketIndexing(t *testing.T) {
 
 func TestPendingDrainingAndFlush(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(procDir, paths.DirPerm755)
 
@@ -562,6 +580,9 @@ func TestNormalizeByKindKeys(t *testing.T) {
 
 func TestTryLoadObjectIDCacheOnly_AndEnsureReady(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(procDir, paths.DirPerm755)
 
@@ -592,6 +613,9 @@ func TestTryLoadObjectIDCacheOnly_AndEnsureReady(t *testing.T) {
 
 func TestGlobalCacheInvalidationsWithData(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(procDir, paths.DirPerm755)
 
@@ -640,6 +664,9 @@ func TestGlobalCacheInvalidationsWithData(t *testing.T) {
 
 func TestIsStale_Comprehensive(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(filepath.Join(procDir, "goals"), paths.DirPerm755)
 
@@ -697,6 +724,9 @@ func TestIsStale_Comprehensive(t *testing.T) {
 
 func TestDrainObjectIDCachePending_WithJournal(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(procDir, paths.DirPerm755)
 
@@ -715,6 +745,9 @@ func TestDrainObjectIDCachePending_WithJournal(t *testing.T) {
 
 func TestBuildCache_FastLoadAndCanceled(t *testing.T) {
 	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
 	procDir := datacell.ProcessPrimaryDir(root)
 	_ = fileutil.MkdirAll(filepath.Join(procDir, "goals"), paths.DirPerm755)
 

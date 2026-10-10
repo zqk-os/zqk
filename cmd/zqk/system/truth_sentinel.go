@@ -20,6 +20,7 @@ import (
 // NewTruthSentinelCmd creates a new truth-sentinel command
 func NewTruthSentinelCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemTruthSentinelCommandBuilder()
+	cli.RequireStorage(cmd, true)
 	cmd.RunE = runTruthSentinel
 	return cmd
 }

@@ -58,6 +58,8 @@ const (
 	EventTypeCriterionSatisfied EventType = "criterion_satisfied"
 	// EventTypeReferenceLinked records that a reference link was created or updated between objects.
 	EventTypeReferenceLinked EventType = "reference_linked"
+	// EventTypeSchedulerCallback records a background scheduler job callback execution event.
+	EventTypeSchedulerCallback EventType = "scheduler_callback"
 )
 
 // LifecycleEvent is one durable record in the lifecycle event WAL.
@@ -142,7 +144,9 @@ func migrateLifecycleWALToCanonicalNames(projectRoot string) error {
 	ckLegacy := legacy + lifecycleWALCheckpointExt
 	ckCanonical := canonical + lifecycleWALCheckpointExt
 	if _, err := fileutil.Stat(ckLegacy); err == nil {
-		_ = fileutil.Rename(ckLegacy, ckCanonical)
+		if renameErr := fileutil.Rename(ckLegacy, ckCanonical); renameErr != nil {
+			return errfmt.Errorf("failed to rename lifecycle checkpoint: %w", renameErr)
+		}
 	}
 	return nil
 }

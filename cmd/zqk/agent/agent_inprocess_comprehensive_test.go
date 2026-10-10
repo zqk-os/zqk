@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/spf13/cobra"
 	clitool "github.com/zqk-os/zqk/pkg/cli"
@@ -31,8 +32,9 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 
 	t.Setenv("ZQK_TEST_BYPASS_GITEVIDENCE", "1")
 	p := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
-		Kind:            "cmd.agent.comprehensive",
-		SeedSchemaPlane: true,
+		Kind:                     "cmd.agent.comprehensive",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
 	})
 	provider := p.FileStorage
 	testkit.RegisterStorageTestCleanup(t, p.Root, provider)
@@ -73,9 +75,7 @@ func setupAgentInProcessProject(t *testing.T) (string, storage.ObjectStorageProv
 	}
 
 	return p.Root, provider, func() {
-		if err := fileutil.RemoveAll(filepath.Join(p.Root, paths.ProjectDataDir)); err != nil {
-			t.Logf("cleanup: %v", err)
-		}
+		storage.ScrubProjectRootForTempCleanup(filepath.Join(p.Root, paths.ProjectDataDir), 20, 10*time.Millisecond)
 	}
 }
 

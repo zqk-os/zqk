@@ -231,6 +231,9 @@ func TestStorageExtended_Invalidation(t *testing.T) {
 
 func TestStorageExtended_ObjectDraftPlane(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() {
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, nil))
+	})
 
 	storage, err := NewFileObjectStorage(tmpDir)
 	require.NoError(t, err)
@@ -286,6 +289,9 @@ func TestStorageExtended_Cleanup(t *testing.T) {
 
 func TestStorageExtended_BucketingStrategyStorage_Lifecycle(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() {
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, nil))
+	})
 
 	fileStorage := NewFileBucketStrategyStorage(tmpDir)
 	require.NotNil(t, fileStorage)
@@ -494,6 +500,9 @@ func TestStorageExtended_WorkflowConstraintValidator_Advanced(t *testing.T) {
 
 func TestStorageExtended_WALFacade_Operations(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() {
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, nil))
+	})
 
 	// NewObjectWAL and GetWALPath
 	walObj, err := NewObjectWAL(tmpDir)
@@ -550,6 +559,9 @@ func TestStorageExtended_WALFacade_Operations(t *testing.T) {
 
 func TestStorageExtended_FileCASImpl(t *testing.T) {
 	tmpDir := t.TempDir()
+	t.Cleanup(func() {
+		_ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, nil))
+	})
 
 	storage, err := NewFileObjectStorage(tmpDir)
 	require.NoError(t, err)

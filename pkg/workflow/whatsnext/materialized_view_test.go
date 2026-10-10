@@ -106,6 +106,26 @@ func waitForReconcile(t *testing.T, timeout time.Duration) {
 	t.Fatalf("timed out waiting for background reconciler")
 }
 
+func setupScannedTestView(t *testing.T) (string, *mockStorageProvider, *WhatsNextMaterializedView) {
+	t.Helper()
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+	view := NewWhatsNextMaterializedView(tempDir)
+	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
+		t.Fatalf("scan failed: %v", err)
+	}
+	return tempDir, mockSp, view
+}
+
+func setupReconcileTestEnv(t *testing.T, delay time.Duration) (string, *mockStorageProvider) {
+	t.Helper()
+	atomic.StoreUint32(&isReconciling, 0)
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+	mockSp.scanDelay = delay
+	return tempDir, mockSp
+}
+
 func TestWhatsNextMaterializedViewPredicates(t *testing.T) {
 	// 1. EvaluatePhiLead: in_progress should win over active, active_order asc breaks ties
 	plans := []*PlanNode{
@@ -214,13 +234,7 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewIncrementalWALUpdate(t *testing.T) {
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("scan failed: %v", err)
-	}
+	_, _, view := setupScannedTestView(t)
 
 	// Apply lifecycle event: BLI-001 transitions from planned -> in_progress
 	ev := &lifecycle.LifecycleEvent{
@@ -244,10 +258,8 @@ func TestWhatsNextMaterializedViewIncrementalWALUpdate(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
+	tempDir, mockSp := setupReconcileTestEnv(t, 100*time.Millisecond)
 	defer atomic.StoreUint32(&isReconciling, 0)
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-	mockSp.scanDelay = 100 * time.Millisecond // simulate storage scan
 
 	// Case 1: Cold boot - lite file missing
 	start := time.Now()
@@ -326,10 +338,8 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewDebounceConcurrency(t *testing.T) {
+	tempDir, mockSp := setupReconcileTestEnv(t, 20*time.Millisecond)
 	defer atomic.StoreUint32(&isReconciling, 0)
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-	mockSp.scanDelay = 20 * time.Millisecond
 
 	// Trigger 10 simultaneous async rebuilds
 	var wg sync.WaitGroup
@@ -381,13 +391,7 @@ func BenchmarkWhatsNextMaterializedViewHotPath(b *testing.B) {
 // Reactive view projections adhere to the non-blocking zero-scan contract and sub-5ms SLA.
 func TestReactiveViewsAccumulatorConformance(t *testing.T) {
 	t.Parallel()
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("scan failed: %v", err)
-	}
+	tempDir, mockSp, view := setupScannedTestView(t)
 	if err := view.SaveToLiteFile(); err != nil {
 		t.Fatalf("save lite file failed: %v", err)
 	}
@@ -559,5 +563,120 @@ func TestEvaluatePhiLead_GhostPlanFilter(t *testing.T) {
 	}
 	if len(ranked) != 1 || ranked[0].ID != "PRI-REAL-001" {
 		t.Fatalf("expected only real plan in ranked, got %v", ranked)
+	}
+}
+
+func TestWhatsNextMaterializedView_GraphHydrationFromLiteFile(t *testing.T) {
+	tempDir := t.TempDir()
+	view := NewWhatsNextMaterializedView(tempDir)
+	view.plans["PRI-001"] = &PlanNode{
+		ID:     "PRI-001",
+		Title:  "Test Plan",
+		Status: "planned",
+	}
+	view.backlogs["BLI-001"] = &BacklogNode{
+		ID:              "BLI-001",
+		Title:           "Test Backlog",
+		Status:          "originated",
+		PriorityPlanRef: "PRI-001",
+	}
+	view.tasks["ATK-001"] = &TaskNode{
+		ID:     "ATK-001",
+		Title:  "Test Task",
+		Status: "in_progress",
+	}
+
+	if err := view.SaveToLiteFile(); err != nil {
+		t.Fatalf("failed to save lite file: %v", err)
+	}
+
+	freshView := NewWhatsNextMaterializedView(tempDir)
+	payload, err := freshView.LoadFromLiteFile()
+	if err != nil {
+		t.Fatalf("failed to load lite file: %v", err)
+	}
+	if payload == nil {
+		t.Fatal("expected non-nil payload")
+	}
+
+	plans := freshView.Plans()
+	if len(plans) != 1 || plans[0].ID != "PRI-001" {
+		t.Fatalf("expected hydrated plan PRI-001, got %v", plans)
+	}
+
+	backlogs := freshView.Backlogs()
+	if len(backlogs) != 1 || backlogs[0].ID != "BLI-001" {
+		t.Fatalf("expected hydrated backlog BLI-001, got %v", backlogs)
+	}
+
+	tasks := freshView.Tasks()
+	if len(tasks) != 1 || tasks[0].ID != "ATK-001" {
+		t.Fatalf("expected hydrated task ATK-001, got %v", tasks)
+	}
+}
+
+func TestEvaluatePhiLead_PlannedFallback(t *testing.T) {
+	plans := []*PlanNode{
+		{
+			ID:     "PRI-COMPLETED-001",
+			Title:  "Completed Plan",
+			Status: "complete",
+		},
+		{
+			ID:     "PRI-PLANNED-001",
+			Title:  "Next Planned Sprint",
+			Status: "planned",
+		},
+	}
+
+	lead, ranked := EvaluatePhiLead(plans, nil)
+	if lead == nil || lead.ID != "PRI-PLANNED-001" {
+		t.Fatalf("expected fallback to PRI-PLANNED-001, got %v", lead)
+	}
+	if len(ranked) != 1 || ranked[0].ID != "PRI-PLANNED-001" {
+		t.Fatalf("expected ranked list with PRI-PLANNED-001, got %v", ranked)
+	}
+}
+
+func TestEvaluatePhiLead_OriginatedFallback(t *testing.T) {
+	plans := []*PlanNode{
+		{
+			ID:     "PRI-ORIG-001",
+			Title:  "Originated Initiative",
+			Status: "originated",
+		},
+		{
+			ID:     "PRI-PLAN-001",
+			Title:  "Planned Sprint",
+			Status: "planned",
+		},
+	}
+
+	lead, ranked := EvaluatePhiLead(plans, nil)
+	if lead == nil || lead.ID != "PRI-PLAN-001" {
+		t.Fatalf("expected planned plan to rank before originated, got %v", lead)
+	}
+	if len(ranked) != 2 {
+		t.Fatalf("expected 2 ranked plans, got %d", len(ranked))
+	}
+	if ranked[0].ID != "PRI-PLAN-001" || ranked[1].ID != "PRI-ORIG-001" {
+		t.Fatalf("unexpected order: %s, %s", ranked[0].ID, ranked[1].ID)
+	}
+}
+
+func TestWhatsNextMaterializedView_RoundTripDeterminism(t *testing.T) {
+	tempDir := t.TempDir()
+	view := NewWhatsNextMaterializedView(tempDir)
+	view.plans["PRI-002"] = &PlanNode{ID: "PRI-002", Title: "Plan B", Status: "active", ActiveOrder: 2}
+	view.plans["PRI-001"] = &PlanNode{ID: "PRI-001", Title: "Plan A", Status: "active", ActiveOrder: 1}
+	view.backlogs["BLI-002"] = &BacklogNode{ID: "BLI-002", Title: "Task B", Status: "planned"}
+	view.backlogs["BLI-001"] = &BacklogNode{ID: "BLI-001", Title: "Task A", Status: "in_progress"}
+
+	payload := view.BuildPayloadLocked()
+	if len(payload.Plans) != 2 || payload.Plans[0].ID != "PRI-001" || payload.Plans[1].ID != "PRI-002" {
+		t.Fatalf("expected plans sorted by ID: %v", payload.Plans)
+	}
+	if len(payload.Backlogs) != 2 || payload.Backlogs[0].ID != "BLI-001" || payload.Backlogs[1].ID != "BLI-002" {
+		t.Fatalf("expected backlogs sorted by ID: %v", payload.Backlogs)
 	}
 }

@@ -338,7 +338,7 @@ func (f *FileObjectStorage) Shutdown(ctx context.Context) error {
 	var shutdownErr error
 	if f.projectRoot != emptyValue {
 		q := caspkg.GetListingIndexWriteQueueForProjectRoot(f.projectRoot)
-		if q != nil && q.SkipShutdownCoordinatorCheck.Load() {
+		if q != nil && (q.SkipShutdownCoordinatorCheck.Load() || !IsProbableGitWorktreeRoot(f.projectRoot)) {
 			if err := q.InitiateShutdown(); err != nil {
 				shutdownErr = err
 			}

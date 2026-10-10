@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -159,11 +160,13 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	engineRoot := "."
-	if opts.Path != "" && opts.Path != "." {
+	projectRoot := paths.ResolveProjectRoot(".")
+	if projectRoot == "" {
+		projectRoot = "."
+	}
+	engineRoot := projectRoot
+	if opts.Path != "" && filepath.IsAbs(opts.Path) {
 		engineRoot = opts.Path
-	} else {
-		engineRoot = paths.ResolveProjectRoot(".")
 	}
 	engine := search.NewEngine(engineRoot)
 

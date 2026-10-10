@@ -208,9 +208,23 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 			personaIDs := resolveWhatsNextPersonaIDs(ctx, sp, projectRoot, personaFlag, agentIDFlag)
 			columnIDs := planPersonaFilter(ctx, sp, projectRoot, agentIDFlag, personaIDs)
 			_, summ, act := resolvePriorityPlanForWhatsNext(ctx, sp, explicit, columnIDs)
+			if summ == nil && len(columnIDs) > 0 {
+				_, summ, act = resolvePriorityPlanForWhatsNext(ctx, sp, explicit, nil)
+			}
 			if summ != nil {
 				out.PriorityPlan = summ
 				out.ActivePlans = act
+			}
+		}
+
+		if out.PriorityPlan == nil && len(lite.Plans) > 0 {
+			leadNode, _ := whatsnext.EvaluatePhiLead(lite.Plans, nil)
+			if leadNode != nil && strings.TrimSpace(leadNode.Title) != "" {
+				out.PriorityPlan = &whatsNextPriorityPlan{
+					ID:     leadNode.ID,
+					Title:  leadNode.Title,
+					Status: leadNode.Status,
+				}
 			}
 		}
 
@@ -331,6 +345,9 @@ func runWhatsNextSyncSweep(cmd *cobra.Command, args []string, proc *cli.Processo
 	columnIDs := planPersonaFilter(ctx, sp, projectRoot, agentIDFlag, personaIDs)
 
 	planID, planSumm, activePlans := resolvePriorityPlanForWhatsNext(ctx, sp, strings.TrimSpace(priFlag), columnIDs)
+	if planSumm == nil && len(columnIDs) > 0 {
+		planID, planSumm, activePlans = resolvePriorityPlanForWhatsNext(ctx, sp, strings.TrimSpace(priFlag), nil)
+	}
 	out.PriorityPlan = planSumm
 	out.ActivePlans = activePlans
 
@@ -641,8 +658,8 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 				Build())
 			if err == nil {
 				for _, obj := range res.Objects {
-					st := koi.Status(obj)
-					if objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, st) && hasPersonaMatch(obj, personaIDs) {
+					st := strings.ToLower(strings.TrimSpace(koi.Status(obj)))
+					if (objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, st) || st == objects.ObjectStatusPlanned || st == objects.ObjectStatusOriginated || st == "draft" || st == "proposed") && hasPersonaMatch(obj, personaIDs) {
 						candidates = append(candidates, obj)
 					}
 				}
@@ -651,6 +668,9 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp workflowStorage, ex
 	}
 
 	if len(candidates) == 0 {
+		if len(personaIDs) > 0 {
+			return resolvePriorityPlanForWhatsNext(ctx, sp, explicit, nil)
+		}
 		return "", nil, nil
 	}
 
