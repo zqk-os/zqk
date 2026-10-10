@@ -18,9 +18,34 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
-	root, store := setupSyncLoopTestProject(t)
+func createSyncLoopTestTask(t *testing.T, store storage.ObjectStorageProvider, taskID, title, effort string) *pkgctx.SecurityContext {
+	ctx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentTask)
+	ctx = storage.WithSkipWriteBehind(ctx)
+	secCtx := pkgctx.NewSystemSecurityContext()
 
+	task := map[string]any{
+		objects.FieldKeyID:                 taskID,
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              title,
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeySchemaVersion:      "2.0.0",
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaOrchestratorAlpha,
+		objects.FieldKeyEstimatedEffort:    effort,
+	}
+	storage.CreateCASVisible(t, store, ctx, secCtx, task, objects.ObjectStatusInProgress)
+	return secCtx
+}
+
+func dispatchTestCallbackEvent(taskID string, timestamp time.Time) int {
+	return lifecycle.GlobalJobWakerRegistry.Dispatch(&lifecycle.LifecycleEvent{
+		EventType: lifecycle.EventTypeSchedulerCallback,
+		ID:        taskID,
+		ToStatus:  "completed",
+		Ts:        timestamp,
+	})
+}
+
+func setupBinaryCandidate(t *testing.T) {
 	if wd, err := fileutil.Getwd(); err == nil {
 		if modRoot, err := paths.ModuleRootFromPath(wd); err == nil {
 			candidate := filepath.Join(modRoot, "bin", "zqk")
@@ -29,22 +54,15 @@ func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
+	root, store := setupSyncLoopTestProject(t)
+	setupBinaryCandidate(t)
 
 	taskID := "ATK-reactive-instant-wake"
-	ctx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentTask)
-	ctx = storage.WithSkipWriteBehind(ctx)
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	task := map[string]any{
-		objects.FieldKeyID:                 taskID,
-		objects.FieldKeyKind:               objects.KindAgentTask,
-		objects.FieldKeyTitle:              "Reactive Instant Wake Test",
-		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
-		objects.FieldKeySchemaVersion:      "2.0.0",
-		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaOrchestratorAlpha,
-		objects.FieldKeyEstimatedEffort:    "30m",
-	}
-	storage.CreateCASVisible(t, store, ctx, secCtx, task, objects.ObjectStatusInProgress)
+	secCtx := createSyncLoopTestTask(t, store, taskID, "Reactive Instant Wake Test", "30m")
+	require.NotNil(t, secCtx)
 
 	cmd := NewSyncLoopCmd()
 	cmd.SetArgs([]string{taskID})
@@ -70,17 +88,13 @@ func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
 	// Flush CAS index to ensure visibility
 	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
 	if writeQueue != nil {
-		_ = writeQueue.FlushAll(1 * time.Second)
+		flushErr := writeQueue.FlushAll(1 * time.Second)
+		require.NoError(t, flushErr)
 	}
 
 	// Dispatch the waker event and measure response latency
 	t0 := time.Now()
-	dispatched := lifecycle.GlobalJobWakerRegistry.Dispatch(&lifecycle.LifecycleEvent{
-		EventType: lifecycle.EventTypeSchedulerCallback,
-		ID:        taskID,
-		ToStatus:  "completed",
-		Ts:        t0,
-	})
+	dispatched := dispatchTestCallbackEvent(taskID, t0)
 	require.GreaterOrEqual(t, dispatched, 1, "expected waker event to be dispatched to active sync-loop listener")
 
 	select {
@@ -88,18 +102,13 @@ func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
 		elapsed := time.Since(t0)
 		require.NoError(t, loopErr)
 		t.Logf("Reactive wake latency: %v", elapsed)
-		// Functional verification: unblocks well within the 5s fallback polling latency window
 		require.Less(t, elapsed, 2500*time.Millisecond, "sync-loop did not wake up reactively within fallback polling window")
 	case <-time.After(15 * time.Second):
 		t.Fatal("timed out waiting for reactive sync loop exit")
 	}
 
 	// Clean defer unregistration verification: after loop returns, registry must have 0 listeners
-	afterDispatch := lifecycle.GlobalJobWakerRegistry.Dispatch(&lifecycle.LifecycleEvent{
-		EventType: lifecycle.EventTypeSchedulerCallback,
-		ID:        taskID,
-		ToStatus:  "completed",
-	})
+	afterDispatch := dispatchTestCallbackEvent(taskID, time.Time{})
 	require.Equal(t, 0, afterDispatch, "expected waker channel to be unregistered after sync loop exits")
 }
 
@@ -109,12 +118,7 @@ func TestSyncLoop_WakerChannelDeliveryLatency(t *testing.T) {
 	defer unregister()
 
 	t0 := time.Now()
-	dispatched := lifecycle.GlobalJobWakerRegistry.Dispatch(&lifecycle.LifecycleEvent{
-		EventType: lifecycle.EventTypeSchedulerCallback,
-		ID:        taskID,
-		ToStatus:  "completed",
-		Ts:        t0,
-	})
+	dispatched := dispatchTestCallbackEvent(taskID, t0)
 	require.Equal(t, 1, dispatched)
 
 	select {
@@ -132,20 +136,8 @@ func TestSyncLoop_ContextCancellationCleanExit(t *testing.T) {
 	_, store := setupSyncLoopTestProject(t)
 
 	taskID := "ATK-cancel-clean-exit"
-	ctx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentTask)
-	ctx = storage.WithSkipWriteBehind(ctx)
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	task := map[string]any{
-		objects.FieldKeyID:                 taskID,
-		objects.FieldKeyKind:               objects.KindAgentTask,
-		objects.FieldKeyTitle:              "Cancel Clean Exit Test",
-		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
-		objects.FieldKeySchemaVersion:      "2.0.0",
-		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaOrchestratorAlpha,
-		objects.FieldKeyEstimatedEffort:    "15m",
-	}
-	storage.CreateCASVisible(t, store, ctx, secCtx, task, objects.ObjectStatusInProgress)
+	cancelSecCtx := createSyncLoopTestTask(t, store, taskID, "Cancel Clean Exit Test", "15m")
+	require.NotNil(t, cancelSecCtx)
 
 	cmd := NewSyncLoopCmd()
 	cmd.SetArgs([]string{taskID})
@@ -169,10 +161,6 @@ func TestSyncLoop_ContextCancellationCleanExit(t *testing.T) {
 	}
 
 	// Verify waker was cleaned up
-	remaining := lifecycle.GlobalJobWakerRegistry.Dispatch(&lifecycle.LifecycleEvent{
-		EventType: lifecycle.EventTypeSchedulerCallback,
-		ID:        taskID,
-		ToStatus:  "completed",
-	})
+	remaining := dispatchTestCallbackEvent(taskID, time.Time{})
 	require.Equal(t, 0, remaining, "expected no lingering waker listeners after cancellation")
 }
