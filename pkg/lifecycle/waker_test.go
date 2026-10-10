@@ -325,3 +325,39 @@ func TestAwaitJobWithWAL_PackageLevel(t *testing.T) {
 		t.Errorf("unexpected event received: %+v", ev)
 	}
 }
+
+func TestJobWakerRegistry_ExplicitUnregister(t *testing.T) {
+	registry := NewJobWakerRegistry()
+	defer registry.Close()
+
+	jobID := "JOB-EXPLICIT-UNREG-001"
+	ch, _ := registry.Register(jobID)
+
+	// Explicit unregister via Unregister method
+	registry.Unregister(jobID, ch)
+
+	// Dispatch event; should not reach channel
+	dispatched := registry.Dispatch(&LifecycleEvent{
+		EventType: EventTypeSchedulerCallback,
+		ID:        jobID,
+		ToStatus:  "completed",
+	})
+	if dispatched != 0 {
+		t.Errorf("expected 0 dispatched events after Unregister, got %d", dispatched)
+	}
+
+	select {
+	case <-ch:
+		t.Fatalf("received unexpected event on unregistered channel")
+	default:
+	}
+}
+
+func TestGlobalJobWakerRegistry_Singleton(t *testing.T) {
+	if GlobalJobWakerRegistry == nil {
+		t.Fatal("expected GlobalJobWakerRegistry to be non-nil")
+	}
+	if GlobalJobWakerRegistry != GetGlobalJobWakerRegistry() {
+		t.Error("expected GlobalJobWakerRegistry to match GetGlobalJobWakerRegistry()")
+	}
+}
