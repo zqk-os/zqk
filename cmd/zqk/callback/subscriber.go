@@ -189,6 +189,19 @@ func (d *MultiSubscriberDispatcher) Register(sub Subscriber) {
 	d.subscribers[sub.Name()] = sub
 }
 
+// RegisterResilient wraps the given subscriber with adaptive backpressure, concurrency throttling, and circuit breaking before registering.
+func (d *MultiSubscriberDispatcher) RegisterResilient(sub Subscriber, cfg ResilientSubscriberConfig) *ResilientSubscriber {
+	if sub == nil {
+		return nil
+	}
+	if cfg.Logger == nil {
+		cfg.Logger = d.logger
+	}
+	resilient := NewResilientSubscriber(sub, cfg)
+	d.Register(resilient)
+	return resilient
+}
+
 // Unregister removes a subscriber by name.
 func (d *MultiSubscriberDispatcher) Unregister(name string) {
 	d.mu.Lock()
