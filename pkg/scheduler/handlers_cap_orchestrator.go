@@ -455,6 +455,32 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 	case "cap_stage_sentinel":
 		stageErr = h.executeSentinelStage(timeoutCtx, exe)
 	case "", "wait", "shutdown":
+		if instruction == "" || instruction == "shutdown" {
+			hasGrooming := false
+			groomingPlanID := ""
+			if result.PriorityPlan != nil && result.PriorityPlan.Status == objects.ObjectStatusGrooming {
+				hasGrooming = true
+				groomingPlanID = result.PriorityPlan.ID
+			}
+			for _, p := range result.ActivePlans {
+				if p.Status == objects.ObjectStatusGrooming {
+					hasGrooming = true
+					if groomingPlanID == "" {
+						groomingPlanID = p.ID
+					}
+					break
+				}
+			}
+			if hasGrooming {
+				targetPlanID := planID
+				if targetPlanID == "" {
+					targetPlanID = groomingPlanID
+				}
+				h.logger.Info("cap_orchestrator_grooming_wake_tpm", logging.PlanIDField(targetPlanID))
+				h.wakeAgentAndScheduleHourglass(targetPlanID, "tpm")
+				return nil
+			}
+		}
 		h.logger.Info("cap_orchestrator_idle", logging.String("instruction", instruction))
 		return nil
 	default:
