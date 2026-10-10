@@ -1,0 +1,10 @@
+$schema: ../_schemas/command_spec.schema.json
+name: dimensions
+short: Inspect registered quality dimensions and verification policies
+description: |-
+  Lists all registered quality dimensions (e.g. HCODE, EFFPERF, ERRHYG, CONCURR, SECOBS, DOCSIG)
+  and their associated kernel verification policies.
+flags:
+  - name: json
+    type: bool
+    description: Output dimensions in JSON format

@@ -1,0 +1,27 @@
+$schema: ../_schemas/command_spec.schema.json
+name: stamp
+short: Record an agent or manual adversarial inspection pass for a file
+description: |-
+  Records an agent or human inspection stamp for a specific file and check ID.
+  The check is recorded against the file's current SHA-256 hash.
+flags:
+  - name: file
+    type: string
+    description: Target relative file path to stamp (required)
+    required: true
+  - name: check
+    type: string
+    description: Check identifier to stamp (e.g. anti-hardcoding-czar)
+    default: anti-hardcoding-czar
+  - name: agent
+    type: string
+    description: Evaluating agent or persona identifier
+    default: PER-HARDCODING-ERADICATION-CZAR
+  - name: status
+    type: string
+    description: Check outcome status (passed, failed)
+    default: passed
+  - name: feedback
+    type: string
+    description: Explanatory notes or evaluation feedback
+    default: Adversarial anti-hardcoding evaluation completed

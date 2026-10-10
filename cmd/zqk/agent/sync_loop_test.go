@@ -160,8 +160,11 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 	if err != nil {
 		t.Fatalf("GetOrCreate storage: %v", err)
 	}
-	testkit.RegisterStorageTestCleanup(t, root, store)
 	t.Cleanup(func() {
+		writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
+		if writeQueue != nil {
+			_ = writeQueue.FlushAll(1 * time.Second)
+		}
 		if fos, ok := store.(*storage.FileObjectStorage); ok {
 			_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, fos))
 		}

@@ -6,6 +6,10 @@ matrices:
     profile: docs/quality/cef_diamond_scorecard_matrix_profile.yaml
     session_ref_column: cvs_id
   codebase_vetting:
-    csv: docs/quality/CODEBASE_VETTING_MATRIX.csv
-    profile: docs/quality/codebase_vetting_matrix_profile.yaml
+    csv: docs/quality/CEF_DIAMOND_SCORECARD_MATRIX.csv
+    profile: docs/quality/cef_diamond_scorecard_matrix_profile.yaml
+    session_ref_column: cvs_id
+  source_code_verification:
+    csv: docs/quality/SOURCE_CODE_VERIFICATION_MATRIX.csv
+    profile: docs/quality/source_code_verification_matrix_profile.yaml
     session_ref_column: cvs_id

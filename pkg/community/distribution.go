@@ -1,16 +1,14 @@
 package community
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"path/filepath"
 	"regexp"
 	"strings"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/verification/matrix"
 )
 
 // TargetPlatform defines an operating system and architecture pair.
@@ -111,17 +109,7 @@ end
 
 // ComputeFileSHA256 returns the lowercase hex sha256 of the given file path.
 func ComputeFileSHA256(filePath string) (string, error) {
-	f, err := fileutil.OpenRead(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer func() { _ = f.Close() }()
-
-	hasher := sha256.New()
-	if _, err := io.Copy(hasher, f); err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(hasher.Sum(nil)), nil
+	return matrix.ComputeFileHash(filePath)
 }
 
 // VerifyChecksumManifest verifies all archives listed in checksums.txt exist in distDir and match hashes.

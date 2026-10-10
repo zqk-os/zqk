@@ -1,0 +1,14 @@
+$schema: ../_schemas/command_spec.schema.json
+name: verify
+short: Fast-path verification of repository files against class-based quality matrix
+description: |-
+  Evaluates project files against class-based verification rules (such as hardcoded logic,
+  magic strings, raw permissions, and static version tags). Uses SHA-256 content hashes to cache
+  passed results, skipping re-evaluation unless file content changes.
+flags:
+  - name: file
+    type: string
+    description: Target specific relative file path to verify
+  - name: force
+    type: bool
+    description: Force re-evaluation of all files, ignoring cached passes

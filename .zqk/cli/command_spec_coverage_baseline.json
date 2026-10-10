@@ -1,6 +1,4 @@
 {
-  "commands_without_specs": [
-    "system validate-schema"
-  ],
+  "commands_without_specs": [],
   "specs_without_commands": []
 }

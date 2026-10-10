@@ -42,7 +42,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [circuitbreaker](./circuitbreaker/) | `github.com/zqk-os/zqk/pkg/circuitbreaker` | 5+4 | 4 | - | ❌ - | Fault tolerance circuit breaker pattern preventing cascade failures in distributed calls. |
 | [cleanup](./cleanup/) | `github.com/zqk-os/zqk/pkg/cleanup` | 1+1 | 1 | - | ❌ - | Workspace cleanup, orphaned temp file purging, and transient artifact garbage collection. |
 | [cli](./cli/) | `github.com/zqk-os/zqk/pkg/cli` | 51+34 | 34 | bldr_cli_cmd_v1, commands, +3 more | ✅ [README](./cli/README.md) | This package provides the command-line interface infrastructure for zqk, following the spec-driven builder pattern established... |
-| [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+14 | 14 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
+| [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+1 | 1 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
 | [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 16+47 | 47 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
@@ -119,14 +119,14 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [mcp](./mcp/) | `github.com/zqk-os/zqk/pkg/mcp` | 139+121 | 121 | ideadapter, mcp_helpers, testing | ✅ [README](./mcp/README.md) | This package provides a complete MCP server implementation that enables AI assistants and other MCP clients to interact with th... |
 | [mesh](./mesh/) | `github.com/zqk-os/zqk/pkg/mesh` | 10+12 | 12 | multimodal | ❌ - | Peer-to-peer agent mesh networking, ambient signal exchange, and distributed sync. |
 | [metricpack](./metricpack/) | `github.com/zqk-os/zqk/pkg/metricpack` | 1+0 | 0 | - | ❌ - | System and agent metric definitions pack for performance tracking. |
-| [metrics](./metrics/) | `github.com/zqk-os/zqk/pkg/metrics` | 25+17 | 17 | tsdb | ❌ - | Lock operation names for RunInLockWithLogger / RunInRLockWithLogger. CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A. |
+| [metrics](./metrics/) | `github.com/zqk-os/zqk/pkg/metrics` | 25+24 | 24 | tsdb | ❌ - | Lock operation names for RunInLockWithLogger / RunInRLockWithLogger. CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A. |
 | [metricsrecording](./metricsrecording/) | `github.com/zqk-os/zqk/pkg/metricsrecording` | 2+2 | 2 | - | ❌ - | Centralizes whether test runs should record metrics (storage counters, pipeline sampling, metric object creation). Production b... |
-| [migration](./migration/) | `github.com/zqk-os/zqk/pkg/migration` | 10+7 | 7 | detector, exporter, +6 more | ✅ [README](./migration/README.md) | This package implements the file-based to graph backend migration tools as defined in the Migration Strategy v1.0. |
+| [migration](./migration/) | `github.com/zqk-os/zqk/pkg/migration` | 10+8 | 8 | detector, exporter, +6 more | ✅ [README](./migration/README.md) | This package implements the file-based to graph backend migration tools as defined in the Migration Strategy v1.0. |
 | [mutation](./mutation/) | `github.com/zqk-os/zqk/pkg/mutation` | 7+10 | 10 | - | ❌ - | Atomic kernel object mutation, version incrementing, and change event publishing. |
 | [nildecode](./nildecode/) | `github.com/zqk-os/zqk/pkg/nildecode` | 1+1 | 1 | - | ❌ - | Generic helpers for type assertions with non-zero checks. Kept separate from pkg/pipeline so low-level packages (e.g. pkg/objec... |
 | [objectcreate](./objectcreate/) | `github.com/zqk-os/zqk/pkg/objectcreate` | 0+1 | 1 | - | ❌ - | Knowledge Kernel object creation helpers and schema validation. |
 | [objectget](./objectget/) | `github.com/zqk-os/zqk/pkg/objectget` | 8+4 | 4 | - | ❌ - | Object retrieval, lazy loading, dereferencing, and relationship expansion. |
-| [objectidcache](./objectidcache/) | `github.com/zqk-os/zqk/pkg/objectidcache` | 11+5 | 5 | - | ❌ - | The ObjectIDCache implementation extracted from cmd/zqk/system. CLI audit, coordinator events, cache-item strategy, and project... |
+| [objectidcache](./objectidcache/) | `github.com/zqk-os/zqk/pkg/objectidcache` | 11+6 | 6 | - | ❌ - | The ObjectIDCache implementation extracted from cmd/zqk/system. CLI audit, coordinator events, cache-item strategy, and project... |
 | [objectrecord](./objectrecord/) | `github.com/zqk-os/zqk/pkg/objectrecord` | 1+2 | 2 | - | ❌ - | Objectrecord component and domain abstractions for ZQK Core. |
 | [objects](./objects/) | `github.com/zqk-os/zqk/pkg/objects` | 88+94 | 94 | koi | ❌ - | Kernel object graph repository, schema registration, and persistence adapters. |
 | [observability](./observability/) | `github.com/zqk-os/zqk/pkg/observability` | 1+2 | 2 | - | ❌ - | Telemetry, distributed tracing spans, and operational visibility. |
@@ -216,8 +216,8 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [utils](./utils/) | `github.com/zqk-os/zqk/pkg/utils` | 0+0 | 0 | chunking, fileutil, +3 more | ❌ - | Generic cross-cutting utility functions and data structures. |
 | [validation](./validation/) | `github.com/zqk-os/zqk/pkg/validation` | 67+98 | 98 | qa, scenario | ✅ [README](./validation/README.md) | This package provides object validation for zqk: instance validation (schema, lifecycle, semantic types), ID validation (prefix... |
 | [vds](./vds/) | `github.com/zqk-os/zqk/pkg/vds` | 10+6 | 6 | - | ❌ - | Verifiable Decomposition Spine (VDS) verification, traceability, and done-gates. |
-| [verification](./verification/) | `github.com/zqk-os/zqk/pkg/verification` | 1+2 | 2 | - | ❌ - | Formal verification of kernel constraints, schemas, and invariants. |
-| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 13+5 | 5 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
+| [verification](./verification/) | `github.com/zqk-os/zqk/pkg/verification` | 1+2 | 2 | matrix | ❌ - | Formal verification of kernel constraints, schemas, and invariants. |
+| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 13+6 | 6 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
 | [vocabularypack](./vocabularypack/) | `github.com/zqk-os/zqk/pkg/vocabularypack` | 1+0 | 0 | - | ❌ - | Canonical domain terminology and glossary definitions pack. |
 | [walutil](./walutil/) | `github.com/zqk-os/zqk/pkg/walutil` | 3+3 | 3 | - | ❌ - | Walutil component and domain abstractions for ZQK Core. |
 | [when](./when/) | `github.com/zqk-os/zqk/pkg/when` | 5+4 | 4 | - | ❌ - | When component and domain abstractions for ZQK Core. |
@@ -572,6 +572,7 @@ pkg/
 │   └── scenario/
 ├── vds/          # Verifiable Decomposition Spine (VDS) verification, traceabil
 ├── verification/          # Formal verification of kernel constraints, schemas, and inva
+│   └── matrix/
 ├── vet/          # Code quality vetting, static analysis rules, and repository 
 ├── vocabularypack/          # Canonical domain terminology and glossary definitions pack.
 ├── walutil/          # Walutil component and domain abstractions for ZQK Core.

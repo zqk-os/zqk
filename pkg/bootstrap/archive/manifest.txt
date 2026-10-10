@@ -185,11 +185,16 @@
 ./cli_specs/kind_pack_command.yaml
 ./cli_specs/learn_command.yaml
 ./cli_specs/matrix/
+./cli_specs/matrix/dimensions_command.yaml
+./cli_specs/matrix/evaluate_command.yaml
 ./cli_specs/matrix/get_command.yaml
+./cli_specs/matrix/inventory_command.yaml
 ./cli_specs/matrix/list_command.yaml
 ./cli_specs/matrix/report_command.yaml
+./cli_specs/matrix/stamp_command.yaml
 ./cli_specs/matrix/update_command.yaml
 ./cli_specs/matrix/validate_command.yaml
+./cli_specs/matrix/verify_command.yaml
 ./cli_specs/matrix_command.yaml
 ./cli_specs/mcp/
 ./cli_specs/mcp/ensure_command.yaml
