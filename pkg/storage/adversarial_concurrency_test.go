@@ -5,6 +5,7 @@ package storage
 import (
 	"context"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"strings"
 	"sync"
 	"testing"
@@ -45,7 +46,9 @@ func TestAdversarialConcurrency(t *testing.T) {
 	// 4. Start Writers (simulating agents)
 	for i := 0; i < numWriters; i++ {
 		wg.Add(1)
-		go func(writerID int) {
+		wID := i
+		goroutinelabels.NewGoroutine("storage_adversarial_test", "stress writer worker").StartSimple(func() {
+			writerID := wID
 			defer wg.Done()
 			ticker := time.NewTicker(50 * time.Millisecond)
 			defer ticker.Stop()
@@ -82,13 +85,15 @@ func TestAdversarialConcurrency(t *testing.T) {
 					}
 				}
 			}
-		}(i)
+		})
 	}
 
 	// 5. Start Aggregators (simulating maintenance jobs)
 	for i := 0; i < numAggregators; i++ {
 		wg.Add(1)
-		go func(aggID int) {
+		aID := i
+		goroutinelabels.NewGoroutine("storage_adversarial_test", "stress aggregator worker").StartSimple(func() {
+			aggID := aID
 			defer wg.Done()
 			ticker := time.NewTicker(500 * time.Millisecond)
 			defer ticker.Stop()
@@ -115,7 +120,7 @@ func TestAdversarialConcurrency(t *testing.T) {
 					}
 				}
 			}
-		}(i)
+		})
 	}
 
 	// 6. Run Stress Test
@@ -126,10 +131,10 @@ func TestAdversarialConcurrency(t *testing.T) {
 
 	// Wait with timeout
 	done := make(chan struct{})
-	go func() {
+	goroutinelabels.NewGoroutine("storage_adversarial_test", "wg wait monitor").StartSimple(func() {
 		wg.Wait()
 		close(done)
-	}()
+	})
 
 	select {
 	case <-done:

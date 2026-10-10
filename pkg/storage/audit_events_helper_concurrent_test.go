@@ -83,7 +83,7 @@ func TestCreateAuditEventWithBuilder_Concurrent(t *testing.T) {
 
 	// Wait for all goroutines to complete
 	waitDone := make(chan struct{})
-	go func() { defer close(waitDone); wg.Wait() }()
+	goroutinelabels.NewGoroutine("storage_audit_test", "wg waitDone monitor").StartSimple(func() { defer close(waitDone); wg.Wait() })
 	select {
 	case <-waitDone:
 	case <-time.After(5 * time.Second):
@@ -155,7 +155,7 @@ func TestCreateAuditEventWithBuilder_ConcurrentIDGeneration(t *testing.T) {
 	}
 
 	waitDone := make(chan struct{})
-	go func() { defer close(waitDone); wg.Wait() }()
+	goroutinelabels.NewGoroutine("storage_audit_test", "wg waitDone monitor").StartSimple(func() { defer close(waitDone); wg.Wait() })
 	select {
 	case <-waitDone:
 	case <-time.After(5 * time.Second):

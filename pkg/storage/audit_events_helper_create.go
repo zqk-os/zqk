@@ -58,13 +58,14 @@ func CreateAuditEventWithBuilder(
 	}
 
 	// Prevent cycles: don't create audit events during audit event creation
-	if audit.IsCreatingEvent() {
+	if audit.IsCreatingEventContext(ctx) {
 		return nil // Best effort - skip to prevent infinite recursion
 	}
 
 	audit.ApplySessionEnv(options)
 
 	defer audit.BeginEventCreation()()
+	ctx = audit.WithCreatingEvent(ctx)
 
 	// Get storage provider - use provided one, or get from cache (avoids expensive factory creation)
 	if storageProvider == nil {

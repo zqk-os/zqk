@@ -209,7 +209,7 @@ func ValidateReleaseTag(tag string) error {
 		return fmt.Errorf("release tag %q must start with 'v' prefix", tag)
 	}
 	if !releaseTagRegex.MatchString(tag) {
-		return fmt.Errorf("release tag %q is not a valid semantic version tag (expected format e.g. v0.1.0-rc1)", tag)
+		return fmt.Errorf("release tag %q is not a valid semantic version tag (expected format e.g. vX.Y.Z or vX.Y.Z-rc1)", tag)
 	}
 	return nil
 }

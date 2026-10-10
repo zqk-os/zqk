@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -126,7 +127,7 @@ func TestResourceCache_InFlightGetSafety(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
 
-	go func() {
+	goroutinelabels.NewGoroutine("resource_cache_test", "in-flight get safety worker").StartSimple(func() {
 		if _, err := rc.GetOrCreate(ctx, "inflight-key", func(ctx context.Context, key string) (string, error) {
 			close(started)
 			<-release
@@ -134,7 +135,7 @@ func TestResourceCache_InFlightGetSafety(t *testing.T) {
 		}); err != nil {
 			t.Errorf("unexpected error in background GetOrCreate: %v", err)
 		}
-	}()
+	})
 
 	<-started
 
@@ -188,10 +189,10 @@ func TestResourceCache_ConcurrentRetryOnTransientFailure(t *testing.T) {
 
 	// Goroutine 0 triggers the first attempt which will fail
 	wg.Add(1)
-	go func() {
+	goroutinelabels.NewGoroutine("resource_cache_test", "concurrent retry first attempt worker").StartSimple(func() {
 		defer wg.Done()
 		results[0], errs[0] = rc.GetOrCreate(ctx, "concurrent-key", initFn)
-	}()
+	})
 
 	// Wait until goroutine 0 has entered initFn
 	<-firstAttemptStarted
@@ -200,10 +201,10 @@ func TestResourceCache_ConcurrentRetryOnTransientFailure(t *testing.T) {
 	for i := 1; i < 5; i++ {
 		idx := i
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("resource_cache_test", "concurrent retry joint worker").StartSimple(func() {
 			defer wg.Done()
 			results[idx], errs[idx] = rc.GetOrCreate(ctx, "concurrent-key", initFn)
-		}()
+		})
 	}
 
 	// Small pause so concurrent callers join the wait on ready channel
@@ -238,7 +239,7 @@ func TestResourceCache_ContextCancellationDuringWait(t *testing.T) {
 	block := make(chan struct{})
 	defer close(block)
 
-	go func() {
+	goroutinelabels.NewGoroutine("resource_cache_test", "slow-key background worker").StartSimple(func() {
 		if _, err := rc.GetOrCreate(context.Background(), "slow-key", func(ctx context.Context, key string) (string, error) {
 			close(started)
 			<-block
@@ -246,7 +247,7 @@ func TestResourceCache_ContextCancellationDuringWait(t *testing.T) {
 		}); err != nil {
 			t.Errorf("unexpected error in background GetOrCreate: %v", err)
 		}
-	}()
+	})
 
 	<-started
 
