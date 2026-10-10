@@ -337,23 +337,12 @@ func (AntigravityAdapter) Name() string { return AdapterAntigravity }
 
 func (a AntigravityAdapter) Wake(ctx context.Context, projectRoot string, b Binding, req WakeRequest) (WakeResult, error) {
 	// 1. Resolve connection parameters: LS address, CSRF token, conversation ID, PID.
-	lsAddr := strings.TrimSpace(os.Getenv("ANTIGRAVITY_LS_ADDRESS"))
-	if lsAddr == "" {
-		lsAddr = strings.TrimSpace(b.LSAddress)
-	}
-
-	csrf := strings.TrimSpace(os.Getenv("ANTIGRAVITY_CSRF_TOKEN"))
-	if csrf == "" {
-		csrf = strings.TrimSpace(b.CSRFToken)
-	}
-
-	convID := strings.TrimSpace(os.Getenv("ANTIGRAVITY_CONVERSATION_ID"))
-	if convID == "" {
-		convID = strings.TrimSpace(b.ConversationID)
-	}
+	lsAddr := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_LS_ADDRESS").OrDefault(b.LSAddress))
+	csrf := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_CSRF_TOKEN").OrDefault(b.CSRFToken))
+	convID := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_CONVERSATION_ID").OrDefault(b.ConversationID))
 
 	pid := b.PID
-	if pidStr := strings.TrimSpace(os.Getenv("ANTIGRAVITY_PID")); pidStr != "" {
+	if pidStr := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_PID").OrDefault("")); pidStr != "" {
 		if parsed, err := strconv.Atoi(pidStr); err == nil && parsed > 0 {
 			pid = parsed
 		}
@@ -398,7 +387,7 @@ func (a AntigravityAdapter) Wake(ctx context.Context, projectRoot string, b Bind
 
 	// Fallback to AGY_CONVERSATION_ID env var if convID is still empty
 	if convID == "" {
-		convID = strings.TrimSpace(os.Getenv("AGY_CONVERSATION_ID"))
+		convID = strings.TrimSpace(zqkenv.Get("AGY_CONVERSATION_ID").OrDefault(""))
 	}
 
 	// Validate required parameters
@@ -490,12 +479,12 @@ func loadPeerSeatsConfig(projectRoot string) map[string]peerSeatEntry {
 }
 
 func resolveAgentAPIBin() (string, error) {
-	if bin := strings.TrimSpace(os.Getenv("AGENTAPI")); bin != "" {
+	if bin := strings.TrimSpace(zqkenv.Get("AGENTAPI").OrDefault("")); bin != "" {
 		if p := findExecutable(bin); p != "" {
 			return p, nil
 		}
 	}
-	if bin := strings.TrimSpace(os.Getenv("ANTIGRAVITY_AGENTAPI_EXE")); bin != "" {
+	if bin := strings.TrimSpace(zqkenv.Get("ANTIGRAVITY_AGENTAPI_EXE").OrDefault("")); bin != "" {
 		if p := findExecutable(bin); p != "" {
 			return p, nil
 		}

@@ -183,8 +183,9 @@ Dispatched events are enqueued into partition shards with sub-microsecond latenc
 
 | Requirement / Criterion | Description | Verification Method | Status |
 | :--- | :--- | :--- | :--- |
-| **REQ-1791632572341991000-fca30a54** | High-performance sharded ring buffers and automatic WAL retention truncation. | Unit, Concurrency, and Integration Suites | Verified |
-| **CRIT-1791632573738758000-31ddf72e** | Thread-safe push/pop, partition sharding on JobID, bounded capacity, FIFO eviction. | `TestRingBuffer_BasicPushPopDrain`<br>`TestRingBuffer_CircularWrapAround`<br>`TestRingBuffer_OverflowAndEviction`<br>`TestShardedRingBuffer_HashPartitioning` | Verified |
-| **CRIT-1791632573738759000-227394aa** | Committed watermark calculation, WAL truncation hook, race-clean concurrency, leak resilience. | `TestShardedRingBuffer_CommittedWatermarkAcrossShards`<br>`TestShardedRingBuffer_ConcurrentPushAndDrain`<br>`TestShardedRingBuffer_WALTruncationHook`<br>`TestTruncateLifecycleWALFile` | Verified |
-| **CRIT-1791632573738760000-c4bffd2b** | Architectural documentation specifying topology, hashing, watermark calculation, and protocol. | `docs/architecture/SHARDED_RING_BUFFER_WAL_TRUNCATION.md` | Verified |
-| **TST-1791632573738758001-5dddab9c** | Unified verification group for ring buffer and WAL truncation. | `go test -v -race ./cmd/zqk/callback/...` | Verified |
+| **REQ-SHARDED-RING-BUFFER-WAL-TRUNCATION** | High-performance sharded ring buffers and automatic WAL retention truncation. | Unit, Concurrency, and Integration Suites | Verified |
+| **CRIT-RING-BUFFER-THREADSAFE-FIFO** | Thread-safe push/pop, partition sharding on JobID, bounded capacity, FIFO eviction. | `TestRingBuffer_BasicPushPopDrain`<br>`TestRingBuffer_CircularWrapAround`<br>`TestRingBuffer_OverflowAndEviction`<br>`TestShardedRingBuffer_HashPartitioning` | Verified |
+| **CRIT-RING-BUFFER-WATERMARK-TRUNCATION** | Committed watermark calculation, WAL truncation hook, race-clean concurrency, leak resilience. | `TestShardedRingBuffer_CommittedWatermarkAcrossShards`<br>`TestShardedRingBuffer_ConcurrentPushAndDrain`<br>`TestShardedRingBuffer_WALTruncationHook`<br>`TestTruncateLifecycleWALFile` | Verified |
+| **CRIT-RING-BUFFER-ARCHITECTURE-DOC** | Architectural documentation specifying topology, hashing, watermark calculation, and protocol. | `docs/architecture/SHARDED_RING_BUFFER_WAL_TRUNCATION.md` | Verified |
+| **TST-RING-BUFFER-UNIFIED-VERIFICATION** | Unified verification group for ring buffer and WAL truncation. | `go test -v -race ./cmd/zqk/callback/...` | Verified |
+
