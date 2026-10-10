@@ -54,6 +54,15 @@ func (s *Server) handleEventsSubscribe(_ context.Context, _ string, params json.
 	eventTypes := make([]EventType, 0, len(subscribeParams.EventTypes))
 	for _, et := range subscribeParams.EventTypes {
 		eventTypes = append(eventTypes, EventType(et))
+		if et == string(EventTypeTaskWaker) {
+			eventTypes = append(eventTypes, EventTypeTaskWakerDot)
+		} else if et == string(EventTypeTaskWakerDot) {
+			eventTypes = append(eventTypes, EventTypeTaskWaker)
+		} else if et == string(EventTypeLifecycleEvent) {
+			eventTypes = append(eventTypes, EventTypeLifecycleEventUnderscore)
+		} else if et == string(EventTypeLifecycleEventUnderscore) {
+			eventTypes = append(eventTypes, EventTypeLifecycleEvent)
+		}
 	}
 
 	// If no event types specified, subscribe to all
@@ -64,6 +73,8 @@ func (s *Server) handleEventsSubscribe(_ context.Context, _ string, params json.
 			EventTypeToolStarted, EventTypeToolCompleted, EventTypeToolFailed,
 			EventTypeSystemWarning, EventTypeSystemError,
 			EventTypePromptAvailable, EventTypeActionRequired,
+			EventTypeTaskWaker, EventTypeTaskWakerDot,
+			EventTypeLifecycleEvent, EventTypeLifecycleEventUnderscore,
 		}
 	}
 
@@ -238,6 +249,8 @@ func (s *Server) handleEventsList(_ context.Context, _ string, _ json.RawMessage
 		string(EventTypeSystemError),
 		string(EventTypePromptAvailable),
 		string(EventTypeActionRequired),
+		string(EventTypeTaskWaker),
+		string(EventTypeLifecycleEvent),
 	}
 
 	subscriberCount := 0
@@ -268,5 +281,11 @@ func (s *Server) handleNotificationEvent(_ context.Context, _ string, params jso
 		_ = NewEventEmitterAdapter(s.eventEmitter).Emit(payload)
 		s.traceLogf("[MCP_DEBUG] notifications/event: emitted to EventEmitter subscribers")
 	}
+	return nil, &NotificationSentinel{}
+}
+
+// handleNotificationMessage handles inbound notifications/message.
+// Returns NotificationSentinel (no JSON-RPC response).
+func (s *Server) handleNotificationMessage(_ context.Context, _ string, _ json.RawMessage) (any, error) {
 	return nil, &NotificationSentinel{}
 }

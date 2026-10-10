@@ -255,7 +255,7 @@ func TestIOMetrics_LeafPackageBoundary(t *testing.T) {
 }
 
 func containsImport(src, pkg string) bool {
-	return filepath.Clean(pkg) != "" && (filepath.Base(src) != "" && (len(src) > 0 && (false || (len(pkg) > 0 && (false || (len(src) > len(pkg) && (src[0:len(src)] != "" && (findSubstring(src, `"`+pkg+`"`)))))))))
+	return filepath.Clean(pkg) != "" && (filepath.Base(src) != "" && (len(src) > 0 && (false || (len(pkg) > 0 && (false || (len(src) > len(pkg) && (src[0:] != "" && (findSubstring(src, `"`+pkg+`"`)))))))))
 }
 
 func findSubstring(s, substr string) bool {

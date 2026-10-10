@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/maintenance"
@@ -259,8 +260,13 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		}
 	})
 
-	poller := time.NewTicker(2 * time.Second)
+	const fallbackHeartbeat = 5 * time.Second
+	poller := time.NewTicker(fallbackHeartbeat)
 	defer poller.Stop()
+
+	wakerCh, unregisterWaker := lifecycle.GlobalJobWakerRegistry.Register(taskID)
+	defer unregisterWaker()
+	defer lifecycle.GlobalJobWakerRegistry.Unregister(taskID, wakerCh)
 
 	auditStream := audit.NewAuditStream(proc.ProjectRoot())
 	validator := mutation.NewValidator(nil)
@@ -304,258 +310,262 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		select {
 		case <-ctx.Done():
 			return fmt.Errorf("orchestrator timeout")
+		case <-cmd.Context().Done():
+			return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
+		case <-wakerCh:
+			// Reactive instant wake upon scheduler job completion or mutation event
+			draining := true
+			for draining {
+				select {
+				case <-wakerCh:
+				default:
+					draining = false
+				}
+			}
 		case <-poller.C:
-			loopCount++
-			if loopCount > guardCfg.MaxSyncLoops {
-				// Transition to error state before aborting
-				currentTask, rErr := sp.Read(ctx, secCtx, taskID)
-				if rErr == nil {
-					if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
-						logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on loop limit", aErr).
-							String("task_id", taskID).Log()
-					}
-				}
-				return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
-			}
-			// 1. FRESH STATE READ EVERY TICK
-			bypassCtx := pkgctx.WithBypassCache(ctx)
-			currentTask, err := sp.Read(bypassCtx, secCtx, taskID)
-			if err != nil {
-				return errfmt.Newf("failed to read agent task: %s", taskID).Wrap(err)
-			}
+			// Fallback heartbeat ticker to protect against dropped events
+		}
 
-			fp := taskProgressFingerprint(currentTask)
-			isStagnant := stagnation.lastFP != "" && fp == stagnation.lastFP
-			if isStagnant {
-				storePath := datacell.AgentIdleStorePath(proc.ProjectRoot())
-				if store, err := agentidle.NewFileStore(storePath); err == nil {
-					// Hardcoded 2s since the poller is 2s
-					if accErr := store.Accumulate("sync-loop-agent", taskID, 2*time.Second); accErr != nil {
-						logging.FluentEvent(logging.GetLogger()).Warn("Failed to accumulate agent idle time").
-							WithError(accErr).String("task_id", taskID).Log()
-					}
-				}
-			}
-
-			if stagnation.Observe(fp) {
+		loopCount++
+		if loopCount > guardCfg.MaxSyncLoops {
+			// Transition to error state before aborting
+			currentTask, rErr := sp.Read(ctx, secCtx, taskID)
+			if rErr == nil {
 				if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on stagnation", aErr).
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on loop limit", aErr).
 						String("task_id", taskID).Log()
 				}
-				return fmt.Errorf("sync-loop stagnation: no progress for %d ticks (fingerprint unchanged), aborting", guardCfg.MaxStagnantProgressTicks)
 			}
+			return fmt.Errorf("max sync loop limit reached (%d), aborting to prevent infinite cycle", guardCfg.MaxSyncLoops)
+		}
+		// 1. FRESH STATE READ EVERY TICK
+		bypassCtx := pkgctx.WithBypassCache(ctx)
+		currentTask, err := sp.Read(bypassCtx, secCtx, taskID)
+		if err != nil {
+			return errfmt.Newf("failed to read agent task: %s", taskID).Wrap(err)
+		}
 
-			// EXIT CONDITION
-			status := koi.Status(currentTask)
-			if status == objects.ObjectStatusImplemented || status == objects.ObjectStatusFailed || status == objects.ObjectStatusError {
-				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Task complete, status: %s\n", status))); wErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-				}
-				return nil
-			}
-
-			// Resolve Bounded Context via QuerySubgraph
-			// Reduced depth to 1 to prevent exploding context window with 2nd degree connections
-			deps, err := QuerySubgraph(bypassCtx, secCtx, sp, taskID, 1)
-			if err != nil {
-				logging.FluentEvent(logging.GetLogger()).Error("ERROR at QuerySubgraph", err).Log()
-				return errfmt.Newf("subgraph resolution failed").Wrap(err)
-			}
-
-			// Build aggregated payload of completeness_validation steps and policy validation_overlays
-			var aggregatedValidationSteps []map[string]any
-
-			// 1. Native completeness_validation steps
-			cvList := koi.GetSlice(currentTask, objects.FieldKeyCompletenessValidation)
-			if cvList == nil {
-				// Fallback to task_steps if completeness_validation is absent, preserving existing behavior
-				cvList = koi.GetSlice(currentTask, objects.FieldKeyTaskSteps)
-			}
-			for _, stepRaw := range cvList {
-				if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
-					aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
+		fp := taskProgressFingerprint(currentTask)
+		isStagnant := stagnation.lastFP != "" && fp == stagnation.lastFP
+		if isStagnant {
+			storePath := datacell.AgentIdleStorePath(proc.ProjectRoot())
+			if store, err := agentidle.NewFileStore(storePath); err == nil {
+				if accErr := store.Accumulate("sync-loop-agent", taskID, fallbackHeartbeat); accErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Warn("Failed to accumulate agent idle time").
+						WithError(accErr).String("task_id", taskID).Log()
 				}
 			}
+		}
 
-			// 2. Query for applicable policies and extract validation_overlays
-			policyFilter := storage.ListFilter{Kind: objects.KindPolicy}
-			if policies, pErr := sp.List(ctx, secCtx, &storage.StorageContext{}, policyFilter); pErr == nil && policies != nil {
-				currentKind := koi.Kind(currentTask)
-				for _, pol := range policies.Objects {
-					applicability := koi.GetMap(pol, objects.FieldKeyApplicability)
-					if applicability != nil {
-						objectTypes := koi.GetStringSlice(applicability, "object_types")
-						applies := false
-						for _, ot := range objectTypes {
-							if ot == currentKind {
-								applies = true
-								break
+		if stagnation.Observe(fp) {
+			if aErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); aErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on stagnation", aErr).
+					String("task_id", taskID).Log()
+			}
+			return fmt.Errorf("sync-loop stagnation: no progress for %d ticks (fingerprint unchanged), aborting", guardCfg.MaxStagnantProgressTicks)
+		}
+
+		// EXIT CONDITION
+		status := koi.Status(currentTask)
+		if status == objects.ObjectStatusImplemented || status == objects.ObjectStatusFailed || status == objects.ObjectStatusError {
+			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Task complete, status: %s\n", status))); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+			}
+			return nil
+		}
+
+		// Resolve Bounded Context via QuerySubgraph
+		// Reduced depth to 1 to prevent exploding context window with 2nd degree connections
+		deps, err := QuerySubgraph(bypassCtx, secCtx, sp, taskID, 1)
+		if err != nil {
+			logging.FluentEvent(logging.GetLogger()).Error("ERROR at QuerySubgraph", err).Log()
+			return errfmt.Newf("subgraph resolution failed").Wrap(err)
+		}
+
+		// Build aggregated payload of completeness_validation steps and policy validation_overlays
+		var aggregatedValidationSteps []map[string]any
+
+		// 1. Native completeness_validation steps
+		cvList := koi.GetSlice(currentTask, objects.FieldKeyCompletenessValidation)
+		if cvList == nil {
+			// Fallback to task_steps if completeness_validation is absent, preserving existing behavior
+			cvList = koi.GetSlice(currentTask, objects.FieldKeyTaskSteps)
+		}
+		for _, stepRaw := range cvList {
+			if stepMap, ok3 := stepRaw.(map[string]any); ok3 {
+				aggregatedValidationSteps = append(aggregatedValidationSteps, stepMap)
+			}
+		}
+
+		// 2. Query for applicable policies and extract validation_overlays
+		policyFilter := storage.ListFilter{Kind: objects.KindPolicy}
+		if policies, pErr := sp.List(ctx, secCtx, &storage.StorageContext{}, policyFilter); pErr == nil && policies != nil {
+			currentKind := koi.Kind(currentTask)
+			for _, pol := range policies.Objects {
+				applicability := koi.GetMap(pol, objects.FieldKeyApplicability)
+				if applicability != nil {
+					objectTypes := koi.GetStringSlice(applicability, "object_types")
+					applies := false
+					for _, ot := range objectTypes {
+						if ot == currentKind {
+							applies = true
+							break
+						}
+					}
+					if applies {
+						for _, overlayRaw := range koi.GetSlice(pol, objects.FieldKeyValidationOverlays) {
+							if overlayMap, ok3 := overlayRaw.(map[string]any); ok3 {
+								aggregatedValidationSteps = append(aggregatedValidationSteps, overlayMap)
 							}
 						}
-						if applies {
-							for _, overlayRaw := range koi.GetSlice(pol, objects.FieldKeyValidationOverlays) {
-								if overlayMap, ok3 := overlayRaw.(map[string]any); ok3 {
-									aggregatedValidationSteps = append(aggregatedValidationSteps, overlayMap)
-								}
-							}
-						}
 					}
 				}
 			}
+		}
 
-			if status == objects.ObjectStatusPendingVerification {
-				// The Doer completed its implementation via zqk_agent_next and wants verification.
-				// 1. Mark any 'pending_implementation' step as 'verified' (since they are now done)
-				// 2. Transition the first 'pending' validation step to 'pending_verification'.
-				updated := false
-				for i, stepMap := range aggregatedValidationSteps {
-					st := koi.Status(stepMap)
-					if st == objects.ObjectStatusPendingImplementation {
-						koi.SetStatus(stepMap, objects.ObjectStatusVerified)
-						aggregatedValidationSteps[i] = stepMap
-						updated = true
-					} else if st == objects.ObjectStatusPending || st == objects.ObjectStatusRejected || st == "" {
-						koi.SetStatus(stepMap, objects.ObjectStatusPendingVerification)
-						aggregatedValidationSteps[i] = stepMap
-						updated = true
-						break
-					}
-				}
-				if updated {
-					updates := map[string]any{}
-					if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
-						updates[objects.FieldKeyCompletenessValidation] = aggregatedValidationSteps
-					} else {
-						updates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
-					}
-					if uErr := sp.Update(ctx, secCtx, taskID, updates); uErr != nil {
-						logging.FluentEvent(logging.GetLogger()).Error("Failed to update validation steps", uErr).
-							String("task_id", taskID).Log()
-						return errfmt.Newf("failed to update validation steps for task %s", taskID).Wrap(uErr)
-					}
-				}
-				if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
-					if !strings.Contains(err.Error(), "already exists") {
-						logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task to in_progress from pending_verification", err).Log()
-						return errfmt.Newf("failed to transition task %s to in_progress", taskID).Wrap(err)
-					}
-				}
-				status = objects.ObjectStatusInProgress
-			}
-
-			if status != objects.ObjectStatusInProgress {
-				koi.SetStatus(currentTask, objects.ObjectStatusInProgress)
-				if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
-					if strings.Contains(err.Error(), "already exists") {
-						logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
-					} else {
-						return errfmt.Newf("failed to transition task %s to in_progress", taskID).Wrap(err)
-					}
-				}
-			}
-
-			// ---> SYSTEM VERIFICATION LAYER (BLIND, OBJECTIVE, PROGRAMMATIC) <---
-			// The verifier does not understand or care about what was implemented. It only evaluates constraints.
-			verificationTriggered := false
-
-			// 3. Execute the aggregated payload
-			var updatedSteps []any
-			hasFailedSteps := false
-			allStepsCompleted := true
+		if status == objects.ObjectStatusPendingVerification {
+			// The Doer completed its implementation via zqk_agent_next and wants verification.
+			// 1. Mark any 'pending_implementation' step as 'verified' (since they are now done)
+			// 2. Transition the first 'pending' validation step to 'pending_verification'.
+			updated := false
 			for i, stepMap := range aggregatedValidationSteps {
-				stepStatus := koi.Status(stepMap)
-
-				if stepStatus == objects.ObjectStatusPending || stepStatus == objects.ObjectStatusPendingImplementation || stepStatus == objects.ObjectStatusPendingVerification || stepStatus == "" {
-					// We only process if it's pending OR pending_verification.
-					// if pending_implementation, we should have started it above. but just in case it falls through, we skip.
-					if stepStatus == objects.ObjectStatusPendingImplementation {
-						continue
-					}
-					allStepsCompleted = false
+				st := koi.Status(stepMap)
+				if st == objects.ObjectStatusPendingImplementation {
+					koi.SetStatus(stepMap, objects.ObjectStatusVerified)
+					aggregatedValidationSteps[i] = stepMap
+					updated = true
+				} else if st == objects.ObjectStatusPending || st == objects.ObjectStatusRejected || st == "" {
+					koi.SetStatus(stepMap, objects.ObjectStatusPendingVerification)
+					aggregatedValidationSteps[i] = stepMap
+					updated = true
+					break
 				}
+			}
+			if updated {
+				updates := map[string]any{}
+				if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+					updates[objects.FieldKeyCompletenessValidation] = aggregatedValidationSteps
+				} else {
+					updates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
+				}
+				if uErr := sp.Update(ctx, secCtx, taskID, updates); uErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to update validation steps", uErr).
+						String("task_id", taskID).Log()
+					return errfmt.Newf("failed to update validation steps for task %s", taskID).Wrap(uErr)
+				}
+			}
+			if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
+				if !strings.Contains(err.Error(), "already exists") {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task to in_progress from pending_verification", err).Log()
+					return errfmt.Newf("failed to transition task %s to in_progress", taskID).Wrap(err)
+				}
+			}
+			status = objects.ObjectStatusInProgress
+		}
 
-				// If any step is pending, the system intercepts and executes the dumb programmatic algorithm
-				if stepStatus == objects.ObjectStatusPendingVerification {
-					verificationTriggered = true
+		if status != objects.ObjectStatusInProgress {
+			koi.SetStatus(currentTask, objects.ObjectStatusInProgress)
+			if err := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusInProgress); err != nil {
+				if strings.Contains(err.Error(), "already exists") {
+					logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
+				} else {
+					return errfmt.Newf("failed to transition task %s to in_progress", taskID).Wrap(err)
+				}
+			}
+		}
 
-					// Track and check verification attempts
-					attempts := koi.GetIntOr(stepMap, objects.FieldKeyVerificationAttempts, 0) + 1
-					koi.Set(stepMap, objects.FieldKeyVerificationAttempts, attempts)
+		// ---> SYSTEM VERIFICATION LAYER (BLIND, OBJECTIVE, PROGRAMMATIC) <---
+		// The verifier does not understand or care about what was implemented. It only evaluates constraints.
+		verificationTriggered := false
 
-					maxAttempts := guardCfg.MaxVerificationAttempts
+		// 3. Execute the aggregated payload
+		var updatedSteps []any
+		hasFailedSteps := false
+		allStepsCompleted := true
+		for i, stepMap := range aggregatedValidationSteps {
+			stepStatus := koi.Status(stepMap)
 
-					if attempts > maxAttempts {
-						koi.SetStatus(stepMap, objects.ObjectStatusFailed)
-						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Max verification loop limit reached (%d/%d attempts). Aborting task.", attempts, maxAttempts))
+			if stepStatus == objects.ObjectStatusPending || stepStatus == objects.ObjectStatusPendingImplementation || stepStatus == objects.ObjectStatusPendingVerification || stepStatus == "" {
+				// We only process if it's pending OR pending_verification.
+				// if pending_implementation, we should have started it above. but just in case it falls through, we skip.
+				if stepStatus == objects.ObjectStatusPendingImplementation {
+					continue
+				}
+				allStepsCompleted = false
+			}
 
-						// Update the steps slice
-						aggregatedValidationSteps[i] = stepMap
-						hasFailedSteps = true
+			// If any step is pending, the system intercepts and executes the dumb programmatic algorithm
+			if stepStatus == objects.ObjectStatusPendingVerification {
+				verificationTriggered = true
 
-						stepFieldUpdates := map[string]any{}
-						if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
-							stepFieldUpdates[objects.FieldKeyCompletenessValidation] = aggregatedValidationSteps
-						} else {
-							stepFieldUpdates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
-						}
-						// Persist steps + status in one mutation so a status-only write cannot
-						// race and leave steps stuck at pending_verification.
-						if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusError, stepFieldUpdates); errMut != nil {
-							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Failed to apply state mutation: %v\n", errMut))); wErr != nil {
-								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-							}
-						}
+				// Track and check verification attempts
+				attempts := koi.GetIntOr(stepMap, objects.FieldKeyVerificationAttempts, 0) + 1
+				koi.Set(stepMap, objects.FieldKeyVerificationAttempts, attempts)
 
-						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Max verification loop limit reached (%d/%d attempts). Transitioning task %s to error.\n", attempts, maxAttempts, taskID))); wErr != nil {
+				maxAttempts := guardCfg.MaxVerificationAttempts
+
+				if attempts > maxAttempts {
+					koi.SetStatus(stepMap, objects.ObjectStatusFailed)
+					koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Max verification loop limit reached (%d/%d attempts). Aborting task.", attempts, maxAttempts))
+
+					// Update the steps slice
+					aggregatedValidationSteps[i] = stepMap
+					hasFailedSteps = true
+
+					stepFieldUpdates := map[string]any{}
+					if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+						stepFieldUpdates[objects.FieldKeyCompletenessValidation] = aggregatedValidationSteps
+					} else {
+						stepFieldUpdates[objects.FieldKeyTaskSteps] = aggregatedValidationSteps
+					}
+					// Persist steps + status in one mutation so a status-only write cannot
+					// race and leave steps stuck at pending_verification.
+					if errMut := applyStateMutationWithFields(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusError, stepFieldUpdates); errMut != nil {
+						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Failed to apply state mutation: %v\n", errMut))); wErr != nil {
 							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 						}
-						updatedSteps = append(updatedSteps, stepMap)
-						continue
 					}
 
-					// Inject task context into stepMap for verification engine
-					stepMap["task_id"] = taskID
-					if arts := koi.GetSlice(currentTask, objects.FieldKeyArtifacts); arts != nil {
-						stepMap[objects.FieldKeyArtifacts] = arts
-					}
-
-					// The system is blind to implementation details. Execute the Universal Verification DSL.
-					result, err := verification.RunVerification(ctx, secCtx, sp, stepMap)
-
-					if err != nil {
-						koi.SetStatus(stepMap, objects.ObjectStatusFailed)
-						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Internal Verification Engine Error: %v", err))
-					} else if !result.Passed {
-						koi.SetStatus(stepMap, objects.ObjectStatusRejected)
-						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Attempt %d/%d: %s", attempts, maxAttempts, result.Feedback))
-					} else {
-						koi.SetStatus(stepMap, objects.ObjectStatusVerified)
-						koi.Set(stepMap, objects.FieldKeyVerificationFeedback, result.Feedback)
-					}
-
-					stepName := koi.GetString(stepMap, objects.FieldKeyName)
-					newStepStatus := koi.Status(stepMap)
-					auditStream.Publish(ctx, audit.AuditRecord{
-						ID:        fmt.Sprintf("overlay-update-%s-%s", taskID, stepName),
-						Action:    "validation_overlay",
-						Target:    taskID,
-						Timestamp: time.Now().Format(time.RFC3339),
-						Status:    newStepStatus,
-						Overlay:   stepName,
-					})
-
-					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("⚙️ System Verification Result: %v (Feedback: %s)\n", result.Passed, result.Feedback))); wErr != nil {
+					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Max verification loop limit reached (%d/%d attempts). Transitioning task %s to error.\n", attempts, maxAttempts, taskID))); wErr != nil {
 						logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 					}
-
-					currentStepStatus := koi.Status(stepMap)
-					if currentStepStatus == objects.ObjectStatusFailed || currentStepStatus == objects.ObjectStatusRejected {
-						hasFailedSteps = true
-					}
-
-					// Only evaluate one pending step at a time to maintain the rigid sequence
 					updatedSteps = append(updatedSteps, stepMap)
 					continue
+				}
+
+				// Inject task context into stepMap for verification engine
+				stepMap["task_id"] = taskID
+				if arts := koi.GetSlice(currentTask, objects.FieldKeyArtifacts); arts != nil {
+					stepMap[objects.FieldKeyArtifacts] = arts
+				}
+
+				// The system is blind to implementation details. Execute the Universal Verification DSL.
+				result, err := verification.RunVerification(ctx, secCtx, sp, stepMap)
+
+				if err != nil {
+					koi.SetStatus(stepMap, objects.ObjectStatusFailed)
+					koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Internal Verification Engine Error: %v", err))
+				} else if !result.Passed {
+					koi.SetStatus(stepMap, objects.ObjectStatusRejected)
+					koi.Set(stepMap, objects.FieldKeyVerificationFeedback, fmt.Sprintf("Attempt %d/%d: %s", attempts, maxAttempts, result.Feedback))
+				} else {
+					koi.SetStatus(stepMap, objects.ObjectStatusVerified)
+					koi.Set(stepMap, objects.FieldKeyVerificationFeedback, result.Feedback)
+				}
+
+				stepName := koi.GetString(stepMap, objects.FieldKeyName)
+				newStepStatus := koi.Status(stepMap)
+				auditStream.Publish(ctx, audit.AuditRecord{
+					ID:        fmt.Sprintf("overlay-update-%s-%s", taskID, stepName),
+					Action:    "validation_overlay",
+					Target:    taskID,
+					Timestamp: time.Now().Format(time.RFC3339),
+					Status:    newStepStatus,
+					Overlay:   stepName,
+				})
+
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("⚙️ System Verification Result: %v (Feedback: %s)\n", result.Passed, result.Feedback))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 				}
 
 				currentStepStatus := koi.Status(stepMap)
@@ -563,289 +573,297 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 					hasFailedSteps = true
 				}
 
+				// Only evaluate one pending step at a time to maintain the rigid sequence
 				updatedSteps = append(updatedSteps, stepMap)
+				continue
 			}
 
-			// If the system intercepted a verification step, we persist the result and SKIP the LLM Doer phase
-			if verificationTriggered {
-				// We update whatever field we sourced from. To be safe, update task_steps and completeness_validation
-				updates := map[string]any{}
-				if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
-					updates[objects.FieldKeyCompletenessValidation] = updatedSteps
-				} else {
-					updates[objects.FieldKeyTaskSteps] = updatedSteps
-				}
+			currentStepStatus := koi.Status(stepMap)
+			if currentStepStatus == objects.ObjectStatusFailed || currentStepStatus == objects.ObjectStatusRejected {
+				hasFailedSteps = true
+			}
 
-				if uErr := sp.Update(ctx, secCtx, taskID, updates); uErr != nil {
-					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ System verification layer failed to persist update: %v\n", uErr))); wErr != nil {
+			updatedSteps = append(updatedSteps, stepMap)
+		}
+
+		// If the system intercepted a verification step, we persist the result and SKIP the LLM Doer phase
+		if verificationTriggered {
+			// We update whatever field we sourced from. To be safe, update task_steps and completeness_validation
+			updates := map[string]any{}
+			if _, ok := currentTask[objects.FieldKeyCompletenessValidation]; ok {
+				updates[objects.FieldKeyCompletenessValidation] = updatedSteps
+			} else {
+				updates[objects.FieldKeyTaskSteps] = updatedSteps
+			}
+
+			if uErr := sp.Update(ctx, secCtx, taskID, updates); uErr != nil {
+				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ System verification layer failed to persist update: %v\n", uErr))); wErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+				}
+			}
+			// Continue the sync loop. The Doer will only be summoned if there are no pending_verification steps.
+			continue
+		}
+
+		if len(aggregatedValidationSteps) == 0 || allStepsCompleted {
+			finalStatus := objects.ObjectStatusImplemented
+			if hasFailedSteps {
+				finalStatus = objects.ObjectStatusError
+			} else if isAgentWorktree(proc.ProjectRoot()) {
+				// Swarm sync-loop: build-gate then commit worktree branch before teardown.
+				wtRoot := proc.ProjectRoot()
+				if bErr := worktreeBuildCheck(ctx, wtRoot); bErr != nil {
+					finalStatus = objects.ObjectStatusError
+					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree build gate failed for %s: %v\n", taskID, bErr))); wErr != nil {
 						logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 					}
-				}
-				// Continue the sync loop. The Doer will only be summoned if there are no pending_verification steps.
-				continue
-			}
+				} else {
+					branchName := "agent/" + taskID
+					addCmd := execwrap.Command("git", "add", "-A")
+					addCmd.Dir = wtRoot
+					if addErr := addCmd.Run(); addErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Warn("git add failed in worktree").WithError(addErr).Log()
+					}
+					commitCmd := execwrap.Command("git", "commit", "-m", "Agent implementation for "+taskID)
+					commitCmd.Dir = wtRoot
+					if commitErr := commitCmd.Run(); commitErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Warn("git commit failed in worktree").WithError(commitErr).Log()
+					}
 
-			if len(aggregatedValidationSteps) == 0 || allStepsCompleted {
-				finalStatus := objects.ObjectStatusImplemented
-				if hasFailedSteps {
-					finalStatus = objects.ObjectStatusError
-				} else if isAgentWorktree(proc.ProjectRoot()) {
-					// Swarm sync-loop: build-gate then commit worktree branch before teardown.
-					wtRoot := proc.ProjectRoot()
-					if bErr := worktreeBuildCheck(ctx, wtRoot); bErr != nil {
+					mainRepo, rErr := agentWorktreeMainRepo(wtRoot)
+					if rErr != nil {
 						finalStatus = objects.ObjectStatusError
-						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree build gate failed for %s: %v\n", taskID, bErr))); wErr != nil {
+						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree studio checkout unresolved for %s: %v\n", taskID, rErr))); wErr != nil {
 							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 						}
 					} else {
-						branchName := "agent/" + taskID
-						addCmd := execwrap.Command("git", "add", "-A")
-						addCmd.Dir = wtRoot
-						if addErr := addCmd.Run(); addErr != nil {
-							logging.FluentEvent(logging.GetLogger()).Warn("git add failed in worktree").WithError(addErr).Log()
-						}
-						commitCmd := execwrap.Command("git", "commit", "-m", "Agent implementation for "+taskID)
-						commitCmd.Dir = wtRoot
-						if commitErr := commitCmd.Run(); commitErr != nil {
-							logging.FluentEvent(logging.GetLogger()).Warn("git commit failed in worktree").WithError(commitErr).Log()
-						}
-
-						mainRepo, rErr := agentWorktreeMainRepo(wtRoot)
-						if rErr != nil {
+						mergeCmd := execwrap.Command("git", "merge", branchName)
+						mergeCmd.Dir = mainRepo
+						if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
 							finalStatus = objects.ObjectStatusError
-							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree studio checkout unresolved for %s: %v\n", taskID, rErr))); wErr != nil {
+							if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out)))); wErr != nil {
 								logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 							}
-						} else {
-							mergeCmd := execwrap.Command("git", "merge", branchName)
-							mergeCmd.Dir = mainRepo
-							if out, mErr := mergeCmd.CombinedOutput(); mErr != nil {
-								finalStatus = objects.ObjectStatusError
-								if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree merge failed for %s: %v\n%s\n", taskID, mErr, string(out)))); wErr != nil {
-									logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-								}
-							}
 						}
 					}
 				}
-				// Always tear down agent worktrees on terminal (success or fail).
-				// previously only cleaned on success → orphan pile.
-				if isAgentWorktree(proc.ProjectRoot()) {
-					mainRepo, rErr := agentWorktreeMainRepo(proc.ProjectRoot())
-					if rErr != nil {
-						if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree teardown skipped for %s: %v\n", taskID, rErr))); wErr != nil {
-							logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-						}
-					} else {
-						maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
-						if cErr := maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID); cErr != nil {
-							logging.FluentEvent(logging.GetLogger()).Warn("Worktree cleanup failed").WithError(cErr).Log()
-						}
+			}
+			// Always tear down agent worktrees on terminal (success or fail).
+			// previously only cleaned on success → orphan pile.
+			if isAgentWorktree(proc.ProjectRoot()) {
+				mainRepo, rErr := agentWorktreeMainRepo(proc.ProjectRoot())
+				if rErr != nil {
+					if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("❌ Worktree teardown skipped for %s: %v\n", taskID, rErr))); wErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 					}
-				}
-				currentKind := koi.Kind(currentTask)
-				if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, finalStatus); err != nil {
-					if strings.Contains(err.Error(), "already exists") {
-						logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
-					} else {
-						return errfmt.Newf("failed to apply state mutation for %s", taskID).Wrap(err)
-					}
-				}
-				continue
-			}
-			// ---> END SYSTEM VERIFICATION LAYER <---
-
-			bundle := buildContextBundle(currentTask, deps)
-
-			// Phase 2: Construct prompt and call LLM
-			bundleBytes, _ := json.MarshalIndent(bundle, "", "  ")
-
-			taskTitleObj := koi.Title(currentTask)
-			taskDescObj := koi.GetString(currentTask, objects.FieldKeyDescription)
-			displayTitle := taskTitleObj
-			if displayTitle == "" {
-				displayTitle = taskID
-			}
-			if taskDescObj != "" {
-				displayTitle += "\n\nDescription:\n" + taskDescObj
-			}
-
-			if stepsRaw := koi.GetSlice(currentTask, objects.FieldKeyTaskSteps); stepsRaw != nil {
-				if stepsJson, err := json.MarshalIndent(stepsRaw, "", "  "); err == nil {
-					displayTitle += "\n\nSteps:\n" + string(stepsJson)
-				}
-			}
-
-			// Process interjections
-			var hasNewInterjections bool
-			if interjections := koi.GetSlice(currentTask, objects.FieldKeyInterjections); interjections != nil {
-				for i, rawInj := range interjections {
-					if inj, isMap := rawInj.(map[string]any); isMap {
-						if koi.IsStatus(inj, objects.ObjectStatusUnread) {
-							hasNewInterjections = true
-							msg := koi.GetString(inj, "message")
-							displayTitle += fmt.Sprintf("\n\nCRITICAL OVERRIDE (Interjection from %s at %s):\n%s\n", inj["from"], inj["timestamp"], msg)
-							koi.SetStatus(inj, objects.ObjectStatusRead)
-							interjections[i] = inj
-						}
-					}
-				}
-				if hasNewInterjections {
-					currentTask[objects.FieldKeyInterjections] = interjections
-					if uErr := sp.Update(ctx, secCtx, taskID, currentTask); uErr != nil {
-						logging.FluentEvent(logging.GetLogger()).Error("Failed to update task interjections", uErr).
-							String("task_id", taskID).Log()
-						return errfmt.Newf("failed to persist interjections for task %s", taskID).Wrap(uErr)
+				} else {
+					maintenanceService := maintenance.NewGitMaintenanceService(mainRepo)
+					if cErr := maintenanceService.CleanupWorktreeAndBranchForID(ctx, taskID); cErr != nil {
+						logging.FluentEvent(logging.GetLogger()).Warn("Worktree cleanup failed").WithError(cErr).Log()
 					}
 				}
 			}
-
-			// 1. Construct Stateless Prompt
-			prompt := fmt.Sprintf("Task ID: %s\n\nTask Graph Bundle:\n```json\n%s\n```\n\nAnalyze the context and provide a single mutation to advance the state.", taskID, string(bundleBytes))
-
-			// 2. Invoke LLM with Strict Schema Contract
-			systemPrompt := "You are the ZQK Graph-State Sync Loop LLM node. Your goal is to consume the Task Graph Bundle and produce a single state transition mutation. You must strictly output ONLY valid JSON matching the schema.\nSchema:\n" + mutation.OutputSchema()
-
-			// Token budget gate: fit prompt before call
-			fittedPrompt, estTokens, budgetOK := tokenTracker.FitUserPrompt(systemPrompt, prompt)
-			logging.FluentEvent(logging.GetLogger()).Info("Sync-loop token budget check").
-				WithFields(
-					logging.Int("estimatedTokens", estTokens),
-					logging.Int("budgetLimit", tokenTracker.BudgetLimit()),
-					logging.Int("contextWindow", tokenTracker.ContextWindow),
-					logging.Bool("fitted", budgetOK),
-					logging.Bool("truncated", fittedPrompt != prompt),
-				).
-				Log()
-			if !budgetOK {
-				budgetErr := fmt.Errorf("sync-loop prompt exceeds token budget after truncation: %d tokens (limit %d)", estTokens, tokenTracker.BudgetLimit())
-				if wErr := cli.WriteOutput(cmd, []byte(budgetErr.Error()+"\n")); wErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+			currentKind := koi.Kind(currentTask)
+			if err := applyStateMutation(ctx, secCtx, sp, taskID, currentKind, validator, auditStream, finalStatus); err != nil {
+				if strings.Contains(err.Error(), "already exists") {
+					logging.FluentEvent(logging.GetLogger()).Warn("Audit event for state mutation already exists, skipping")
+				} else {
+					return errfmt.Newf("failed to apply state mutation for %s", taskID).Wrap(err)
 				}
-				if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on token budget exceeded", mErr).
+			}
+			continue
+		}
+		// ---> END SYSTEM VERIFICATION LAYER <---
+
+		bundle := buildContextBundle(currentTask, deps)
+
+		// Phase 2: Construct prompt and call LLM
+		bundleBytes, _ := json.MarshalIndent(bundle, "", "  ")
+
+		taskTitleObj := koi.Title(currentTask)
+		taskDescObj := koi.GetString(currentTask, objects.FieldKeyDescription)
+		displayTitle := taskTitleObj
+		if displayTitle == "" {
+			displayTitle = taskID
+		}
+		if taskDescObj != "" {
+			displayTitle += "\n\nDescription:\n" + taskDescObj
+		}
+
+		if stepsRaw := koi.GetSlice(currentTask, objects.FieldKeyTaskSteps); stepsRaw != nil {
+			if stepsJson, err := json.MarshalIndent(stepsRaw, "", "  "); err == nil {
+				displayTitle += "\n\nSteps:\n" + string(stepsJson)
+			}
+		}
+
+		// Process interjections
+		var hasNewInterjections bool
+		if interjections := koi.GetSlice(currentTask, objects.FieldKeyInterjections); interjections != nil {
+			for i, rawInj := range interjections {
+				if inj, isMap := rawInj.(map[string]any); isMap {
+					if koi.IsStatus(inj, objects.ObjectStatusUnread) {
+						hasNewInterjections = true
+						msg := koi.GetString(inj, "message")
+						displayTitle += fmt.Sprintf("\n\nCRITICAL OVERRIDE (Interjection from %s at %s):\n%s\n", inj["from"], inj["timestamp"], msg)
+						koi.SetStatus(inj, objects.ObjectStatusRead)
+						interjections[i] = inj
+					}
+				}
+			}
+			if hasNewInterjections {
+				currentTask[objects.FieldKeyInterjections] = interjections
+				if uErr := sp.Update(ctx, secCtx, taskID, currentTask); uErr != nil {
+					logging.FluentEvent(logging.GetLogger()).Error("Failed to update task interjections", uErr).
 						String("task_id", taskID).Log()
-				}
-				return budgetErr
-			}
-			prompt = fittedPrompt
-
-			resp, err := llmClient.GenerateCompletion(ctx, prompt, systemPrompt)
-			if err != nil {
-				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("LLM error: %v\n", err))); wErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-				}
-				if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on LLM error", mErr).
-						String("task_id", taskID).Log()
-				}
-				return err
-			}
-
-			// 3. Validate & Map to Mutation
-			var mut mutation.Mutation
-			cleanResp := strings.TrimPrefix(strings.TrimSpace(resp), "```json")
-			cleanResp = strings.TrimPrefix(cleanResp, "```")
-			cleanResp = strings.TrimSuffix(cleanResp, "```")
-			cleanResp = strings.TrimSpace(cleanResp)
-
-			if uErr := json.Unmarshal([]byte(cleanResp), &mut); uErr != nil {
-				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Failed to parse mutation: %v\nRAW:\n%s\n", uErr, cleanResp))); wErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-				}
-				if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on unmarshal error", mErr).
-						String("task_id", taskID).Log()
-				}
-				continue
-			}
-
-			// 4. Validation & Idempotency Key
-			ik := mutation.BuildIDKey(taskID, &mut)
-			safeIdempotencyKey := "AUD-" + strings.ReplaceAll(ik, "::", "-")
-			if _, rErr := sp.Read(ctx, secCtx, safeIdempotencyKey); rErr == nil {
-				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation %s already committed, skipping.\n", ik))); wErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-				}
-				continue
-			}
-
-			// 5. Audit Hook PreFlight
-			auditStream.Publish(ctx, audit.AuditRecord{
-				ID:        ik,
-				Action:    "pre_flight",
-				Target:    taskID,
-				Timestamp: time.Now().Format(time.RFC3339),
-			})
-
-			// 6. HIL Gate Safety Check
-			if vErr := validator.ValidateAndRoute(ctx, taskID, &mut); vErr != nil {
-				if bErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusBlocked}); bErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("Failed to set task status to blocked", bErr).Log()
-				}
-				if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation blocked by safety gate: %v\n", vErr))); wErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
-				}
-				continue
-			}
-
-			// 7. Commit Mutation to Graph Kernel
-			tx, txErr := sp.BeginTransaction(ctx)
-			if txErr != nil {
-				return errfmt.Newf("failed to begin tx").Wrap(txErr)
-			}
-
-			if auditErr := createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut); auditErr != nil {
-				if rbErr := tx.Rollback(ctx); rbErr != nil {
-					return errfmt.Newf("failed to create idempotency stamp").Wrap(errors.Join(auditErr, rbErr))
-				}
-				return errfmt.Newf("failed to create idempotency stamp").Wrap(auditErr)
-			}
-
-			switch mut.Action {
-			case mutation.ActionUpdateNode:
-				if len(mut.Fields) > 0 {
-					if uErr := tx.Update(ctx, secCtx, mut.TargetID, mut.Fields); uErr != nil {
-						if rbErr := tx.Rollback(ctx); rbErr != nil {
-							return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(errors.Join(uErr, rbErr))
-						}
-						return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(uErr)
-					}
-				}
-			case mutation.ActionCreateNode:
-				if cErr := tx.Create(ctx, secCtx, mut.Fields); cErr != nil {
-					if rbErr := tx.Rollback(ctx); rbErr != nil {
-						return errfmt.Newf("failed to create node").Wrap(errors.Join(cErr, rbErr))
-					}
-					return errfmt.Newf("failed to create node").Wrap(cErr)
+					return errfmt.Newf("failed to persist interjections for task %s", taskID).Wrap(uErr)
 				}
 			}
+		}
 
-			if cErr := tx.Commit(ctx); cErr != nil {
-				return errfmt.Newf("failed to commit mutation").Wrap(cErr)
+		// 1. Construct Stateless Prompt
+		prompt := fmt.Sprintf("Task ID: %s\n\nTask Graph Bundle:\n```json\n%s\n```\n\nAnalyze the context and provide a single mutation to advance the state.", taskID, string(bundleBytes))
+
+		// 2. Invoke LLM with Strict Schema Contract
+		systemPrompt := "You are the ZQK Graph-State Sync Loop LLM node. Your goal is to consume the Task Graph Bundle and produce a single state transition mutation. You must strictly output ONLY valid JSON matching the schema.\nSchema:\n" + mutation.OutputSchema()
+
+		// Token budget gate: fit prompt before call
+		fittedPrompt, estTokens, budgetOK := tokenTracker.FitUserPrompt(systemPrompt, prompt)
+		logging.FluentEvent(logging.GetLogger()).Info("Sync-loop token budget check").
+			WithFields(
+				logging.Int("estimatedTokens", estTokens),
+				logging.Int("budgetLimit", tokenTracker.BudgetLimit()),
+				logging.Int("contextWindow", tokenTracker.ContextWindow),
+				logging.Bool("fitted", budgetOK),
+				logging.Bool("truncated", fittedPrompt != prompt),
+			).
+			Log()
+		if !budgetOK {
+			budgetErr := fmt.Errorf("sync-loop prompt exceeds token budget after truncation: %d tokens (limit %d)", estTokens, tokenTracker.BudgetLimit())
+			if wErr := cli.WriteOutput(cmd, []byte(budgetErr.Error()+"\n")); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 			}
-
-			auditStream.Publish(ctx, audit.AuditRecord{
-				ID:        ik,
-				Action:    "applied",
-				Target:    taskID,
-				Timestamp: time.Now().Format(time.RFC3339),
-				Status:    objects.ObjectStatusSuccess,
-			})
-
-			if mut.StatusTransition != "" && !koi.IsStatus(currentTask, mut.StatusTransition) {
-				if sErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition}); sErr != nil {
-					logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task status", sErr).Log()
-					return errfmt.Newf("failed to transition task status to %s", mut.StatusTransition).Wrap(sErr)
-				}
+			if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on token budget exceeded", mErr).
+					String("task_id", taskID).Log()
 			}
+			return budgetErr
+		}
+		prompt = fittedPrompt
 
-			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Committed mutation %s\n", ik))); wErr != nil {
+		resp, err := llmClient.GenerateCompletion(ctx, prompt, systemPrompt)
+		if err != nil {
+			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("LLM error: %v\n", err))); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+			}
+			if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on LLM error", mErr).
+					String("task_id", taskID).Log()
+			}
+			return err
+		}
+
+		// 3. Validate & Map to Mutation
+		var mut mutation.Mutation
+		cleanResp := strings.TrimPrefix(strings.TrimSpace(resp), "```json")
+		cleanResp = strings.TrimPrefix(cleanResp, "```")
+		cleanResp = strings.TrimSuffix(cleanResp, "```")
+		cleanResp = strings.TrimSpace(cleanResp)
+
+		if uErr := json.Unmarshal([]byte(cleanResp), &mut); uErr != nil {
+			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Failed to parse mutation: %v\nRAW:\n%s\n", uErr, cleanResp))); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+			}
+			if mErr := applyStateMutation(ctx, secCtx, sp, taskID, koi.Kind(currentTask), validator, auditStream, objects.ObjectStatusFailed); mErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("Failed to apply failure state mutation on unmarshal error", mErr).
+					String("task_id", taskID).Log()
+			}
+			continue
+		}
+
+		// 4. Validation & Idempotency Key
+		ik := mutation.BuildIDKey(taskID, &mut)
+		safeIdempotencyKey := "AUD-" + strings.ReplaceAll(ik, "::", "-")
+		if _, rErr := sp.Read(ctx, secCtx, safeIdempotencyKey); rErr == nil {
+			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation %s already committed, skipping.\n", ik))); wErr != nil {
 				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 			}
 			continue
-
 		}
+
+		// 5. Audit Hook PreFlight
+		auditStream.Publish(ctx, audit.AuditRecord{
+			ID:        ik,
+			Action:    "pre_flight",
+			Target:    taskID,
+			Timestamp: time.Now().Format(time.RFC3339),
+		})
+
+		// 6. HIL Gate Safety Check
+		if vErr := validator.ValidateAndRoute(ctx, taskID, &mut); vErr != nil {
+			if bErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: objects.ObjectStatusBlocked}); bErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("Failed to set task status to blocked", bErr).Log()
+			}
+			if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Mutation blocked by safety gate: %v\n", vErr))); wErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+			}
+			continue
+		}
+
+		// 7. Commit Mutation to Graph Kernel
+		tx, txErr := sp.BeginTransaction(ctx)
+		if txErr != nil {
+			return errfmt.Newf("failed to begin tx").Wrap(txErr)
+		}
+
+		if auditErr := createIdempotencyAuditStamp(ctx, secCtx, tx, ik, taskID, &mut); auditErr != nil {
+			if rbErr := tx.Rollback(ctx); rbErr != nil {
+				return errfmt.Newf("failed to create idempotency stamp").Wrap(errors.Join(auditErr, rbErr))
+			}
+			return errfmt.Newf("failed to create idempotency stamp").Wrap(auditErr)
+		}
+
+		switch mut.Action {
+		case mutation.ActionUpdateNode:
+			if len(mut.Fields) > 0 {
+				if uErr := tx.Update(ctx, secCtx, mut.TargetID, mut.Fields); uErr != nil {
+					if rbErr := tx.Rollback(ctx); rbErr != nil {
+						return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(errors.Join(uErr, rbErr))
+					}
+					return errfmt.Newf("failed to update node %s", mut.TargetID).Wrap(uErr)
+				}
+			}
+		case mutation.ActionCreateNode:
+			if cErr := tx.Create(ctx, secCtx, mut.Fields); cErr != nil {
+				if rbErr := tx.Rollback(ctx); rbErr != nil {
+					return errfmt.Newf("failed to create node").Wrap(errors.Join(cErr, rbErr))
+				}
+				return errfmt.Newf("failed to create node").Wrap(cErr)
+			}
+		}
+
+		if cErr := tx.Commit(ctx); cErr != nil {
+			return errfmt.Newf("failed to commit mutation").Wrap(cErr)
+		}
+
+		auditStream.Publish(ctx, audit.AuditRecord{
+			ID:        ik,
+			Action:    "applied",
+			Target:    taskID,
+			Timestamp: time.Now().Format(time.RFC3339),
+			Status:    objects.ObjectStatusSuccess,
+		})
+
+		if mut.StatusTransition != "" && !koi.IsStatus(currentTask, mut.StatusTransition) {
+			if sErr := sp.Update(ctx, secCtx, taskID, map[string]any{objects.FieldKeyStatus: mut.StatusTransition}); sErr != nil {
+				logging.FluentEvent(logging.GetLogger()).Error("Failed to transition task status", sErr).Log()
+				return errfmt.Newf("failed to transition task status to %s", mut.StatusTransition).Wrap(sErr)
+			}
+		}
+
+		if wErr := cli.WriteOutput(cmd, []byte(fmt.Sprintf("Committed mutation %s\n", ik))); wErr != nil {
+			logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
+		}
+		continue
 	}
 }
 

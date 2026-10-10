@@ -682,7 +682,7 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 	var parts []string
 	switch amb.SeatMode {
 	case SeatModeTPMProcessAdmin:
-		parts = append(parts, "TPM seat: process administration only (POL-AGENT-TPM-PROCESS-ADMIN-001) — maintain active_order, shovel-ready columns, align cache; do NOT claim/orchestrate peer whats-next BLIs")
+		parts = append(parts, "TPM seat: process administration only (POL-AGENT-TPM-PROCESS-ADMIN-001 / POL-AGENT-TPM-INTAKE-FIREWALL-001) — objectify chat reports to TD/BLI; delegate P0s to worker swarms; maintain active_order, shovel-ready columns, align cache; do NOT write code, run tests, or claim peer BLIs")
 	case SeatModePeerExecution:
 		parts = append(parts, "peer seat: execute the whats-next priority_plan the system proposes; claim BLIs; prepare-context + orchestrate/subagent scale-up (WFL-SUBAGENT-DISPATCH); hourglass on handoffs")
 	}
