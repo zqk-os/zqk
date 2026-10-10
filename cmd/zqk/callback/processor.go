@@ -27,6 +27,7 @@ type Processor struct {
 	outputFormat  string // canonical outputtypes ID (e.g. text, jsonl, json)
 	processorCtx  context.Context
 	processorStop context.CancelFunc
+	dispatcher    *MultiSubscriberDispatcher
 	mu            sync.Mutex
 	logger        logging.Logger
 }
@@ -70,12 +71,16 @@ func (p *Processor) Initialize(projectRoot, logFile string, appendMode bool, que
 			p.appendMode = appendMode
 			p.outputFormat = outputtypes.Normalize(format)
 
+			p.dispatcher = NewMultiSubscriberDispatcher(p.logger)
+			p.dispatcher.Register(NewFileLogSubscriber(p))
+			if projectRoot != emptyValue {
+				p.dispatcher.Register(NewKernelWALSubscriber(projectRoot))
+			}
+			p.dispatcher.Register(NewShockwaveSubscriber(nil))
+
 			// Create or update queue
 			if p.queue == nil {
 				p.queue = NewQueue(queueSize, sorter, p.logger)
-			} else {
-				// Update queue configuration if needed
-				// For now, queue config is set at creation
 			}
 
 			// Stop existing processor if running
@@ -90,6 +95,35 @@ func (p *Processor) Initialize(projectRoot, logFile string, appendMode bool, que
 			return nil
 		},
 	)
+}
+
+func (p *Processor) ensureDispatcher() {
+	if p.dispatcher == nil {
+		p.dispatcher = NewMultiSubscriberDispatcher(p.logger)
+		p.dispatcher.Register(NewFileLogSubscriber(p))
+		if p.projectRoot != emptyValue {
+			p.dispatcher.Register(NewKernelWALSubscriber(p.projectRoot))
+		}
+		p.dispatcher.Register(NewShockwaveSubscriber(nil))
+	}
+}
+
+// RegisterSubscriber registers an event subscriber to receive callback notifications.
+func (p *Processor) RegisterSubscriber(sub Subscriber) {
+	p.ensureDispatcher()
+	p.dispatcher.Register(sub)
+}
+
+// UnregisterSubscriber removes an event subscriber by name.
+func (p *Processor) UnregisterSubscriber(name string) {
+	p.ensureDispatcher()
+	p.dispatcher.Unregister(name)
+}
+
+// GetSubscribers returns all currently registered subscribers.
+func (p *Processor) GetSubscribers() []Subscriber {
+	p.ensureDispatcher()
+	return p.dispatcher.Subscribers()
 }
 
 // Shutdown shuts down the processor
@@ -184,8 +218,18 @@ func (p *Processor) ProcessDirect(projectRoot, logFile string, appendMode bool, 
 	)
 }
 
-// processEntry processes a single callback entry
+// processEntry processes a single callback entry through the multi-subscriber dispatcher
 func (p *Processor) processEntry(entry *CallbackEntry) error {
+	p.ensureDispatcher()
+	ctx := p.processorCtx
+	if ctx == nil {
+		ctx = pkgctx.NewSystemContext()
+	}
+	return p.dispatcher.Dispatch(ctx, entry)
+}
+
+// writeLogEntryToFile formats and appends a single callback entry to the target log file.
+func (p *Processor) writeLogEntryToFile(entry *CallbackEntry) error {
 	// Determine log file
 	logFile := p.logFile
 	if logFile == emptyValue {
@@ -198,9 +242,6 @@ func (p *Processor) processEntry(entry *CallbackEntry) error {
 	}
 
 	// Ensure parent directory exists for custom log file paths
-	// This allows callbacks to write to custom paths specified by users
-	// Permission errors from os.MkdirAll will bubble up naturally if the
-	// system user (scheduler context) doesn't have permission to create directories
 	dirPath := filepath.Dir(logFile)
 	if err := fileutil.MkdirAll(dirPath, paths.DirPerm755); err != nil {
 		return errfmt.Errorf("failed to create log directory %s: %w", dirPath, err)
