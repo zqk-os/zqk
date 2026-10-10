@@ -105,6 +105,9 @@ type WhatsNextLitePayload struct {
 	AgentInstructionsByPlan map[string]string          `json:"agent_instructions_by_plan,omitempty"`
 	PackagingCuesByPlan     map[string]string          `json:"packaging_cues_by_plan,omitempty"`
 	RecentEvents            []WhatsNextEventSummary    `json:"recent_events,omitempty"`
+	Plans                   []*PlanNode                `json:"plans,omitempty"`
+	Backlogs                []*BacklogNode             `json:"backlogs,omitempty"`
+	Tasks                   []*TaskNode                `json:"tasks,omitempty"`
 }
 
 // Global debounced reconciler state across goroutines.
@@ -164,6 +167,9 @@ func (v *WhatsNextMaterializedView) DefaultPayload() *WhatsNextLitePayload {
 		BacklogCountsByPlan:     make(map[string]map[string]int),
 		TotalBacklogCounts:      make(map[string]int),
 		ActivePlans:             make([]WhatsNextPriorityPlan, 0),
+		Plans:                   make([]*PlanNode, 0),
+		Backlogs:                make([]*BacklogNode, 0),
+		Tasks:                   make([]*TaskNode, 0),
 		ActiveTasksByAssignee:   make(map[string]*ActiveTaskNode),
 		AgentInstructionsByPlan: make(map[string]string),
 		PackagingCuesByPlan:     make(map[string]string),
@@ -222,11 +228,27 @@ func EvaluatePhiLead(plans []*PlanNode, targetPersonaIDs []string) (*PlanNode, [
 		if strings.TrimSpace(p.Title) == "" {
 			continue
 		}
+		st := strings.ToLower(strings.TrimSpace(p.Status))
+		if st == objects.ObjectStatusPlanned || st == objects.ObjectStatusOriginated || st == "draft" || st == "proposed" {
+			continue
+		}
 		if !objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, p.Status) {
 			continue
 		}
 		if hasPersonaMatch(p) {
 			matched = append(matched, p)
+		}
+	}
+
+	if len(matched) == 0 {
+		for _, p := range plans {
+			if strings.TrimSpace(p.Title) == "" {
+				continue
+			}
+			st := strings.ToLower(strings.TrimSpace(p.Status))
+			if (st == objects.ObjectStatusPlanned || st == objects.ObjectStatusOriginated || st == "draft" || st == "proposed") && hasPersonaMatch(p) {
+				matched = append(matched, p)
+			}
 		}
 	}
 
@@ -269,8 +291,12 @@ func rankPlanStatus(status string) int {
 		return 2
 	case objects.ObjectStatusGrooming:
 		return 3
-	default:
+	case objects.ObjectStatusPlanned:
 		return 4
+	case objects.ObjectStatusOriginated:
+		return 5
+	default:
+		return 6
 	}
 }
 
@@ -421,12 +447,14 @@ func (v *WhatsNextMaterializedView) ScanFromStorageWithSecurity(ctx context.Cont
 			order = int(oVal)
 		}
 		personaRefs := lifecycle.StringRefsFromAny(obj[objects.FieldKeyPersonaRefs])
+		shaped, _ := obj["shaped"].(bool)
 		v.plans[id] = &PlanNode{
 			ID:          id,
 			Title:       title,
 			Status:      status,
 			ActiveOrder: order,
 			PersonaRefs: personaRefs,
+			Shaped:      shaped,
 		}
 	}
 
@@ -604,6 +632,10 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 		plansList = append(plansList, p)
 	}
 
+	sort.Slice(plansList, func(i, j int) bool {
+		return plansList[i].ID < plansList[j].ID
+	})
+
 	lead, ranked := EvaluatePhiLead(plansList, nil)
 
 	activePlans := make([]WhatsNextPriorityPlan, 0, len(ranked))
@@ -631,6 +663,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 	for _, b := range v.backlogs {
 		backlogsList = append(backlogsList, b)
 	}
+	sort.Slice(backlogsList, func(i, j int) bool {
+		return backlogsList[i].ID < backlogsList[j].ID
+	})
 
 	byPlan, total := EvaluatePhiCounts(backlogsList, nil, nil)
 
@@ -638,6 +673,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 	for _, t := range v.tasks {
 		tasksList = append(tasksList, t)
 	}
+	sort.Slice(tasksList, func(i, j int) bool {
+		return tasksList[i].ID < tasksList[j].ID
+	})
 	dispatch := EvaluatePhiDispatch(tasksList)
 
 	depth := EvaluatePhiRunway(plansList)
@@ -668,6 +706,9 @@ func (v *WhatsNextMaterializedView) BuildPayloadLocked() *WhatsNextLitePayload {
 		MaterializedAt:          v.lastUpdated,
 		LeadPlan:                leadPlanSumm,
 		ActivePlans:             activePlans,
+		Plans:                   plansList,
+		Backlogs:                backlogsList,
+		Tasks:                   tasksList,
 		BacklogCountsByPlan:     byPlan,
 		TotalBacklogCounts:      total,
 		RunwayDepth:             depth,
@@ -770,6 +811,21 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 			}
 		}
 	}
+	for _, p := range env.Payload.Plans {
+		if p != nil && p.ID != "" {
+			v.plans[p.ID] = p
+		}
+	}
+	for _, b := range env.Payload.Backlogs {
+		if b != nil && b.ID != "" {
+			v.backlogs[b.ID] = b
+		}
+	}
+	for _, t := range env.Payload.Tasks {
+		if t != nil && t.ID != "" {
+			v.tasks[t.ID] = t
+		}
+	}
 	for assignee, t := range env.Payload.ActiveTasksByAssignee {
 		if t != nil && t.ID != "" {
 			v.tasks[t.ID] = &TaskNode{
@@ -785,6 +841,39 @@ func (v *WhatsNextMaterializedView) LoadFromLiteFile() (*WhatsNextLitePayload, e
 	}
 	v.mu.Unlock()
 	return env.Payload, nil
+}
+
+// Plans returns a snapshot of all tracked plan nodes.
+func (v *WhatsNextMaterializedView) Plans() []*PlanNode {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	res := make([]*PlanNode, 0, len(v.plans))
+	for _, p := range v.plans {
+		res = append(res, p)
+	}
+	return res
+}
+
+// Backlogs returns a snapshot of all tracked backlog nodes.
+func (v *WhatsNextMaterializedView) Backlogs() []*BacklogNode {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	res := make([]*BacklogNode, 0, len(v.backlogs))
+	for _, b := range v.backlogs {
+		res = append(res, b)
+	}
+	return res
+}
+
+// Tasks returns a snapshot of all tracked task nodes.
+func (v *WhatsNextMaterializedView) Tasks() []*TaskNode {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
+	res := make([]*TaskNode, 0, len(v.tasks))
+	for _, t := range v.tasks {
+		res = append(res, t)
+	}
+	return res
 }
 
 // ---------------------------------------------------------------------------
@@ -812,6 +901,9 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 			BacklogCountsByPlan: make(map[string]map[string]int),
 			TotalBacklogCounts:  make(map[string]int),
 			ActivePlans:         make([]WhatsNextPriorityPlan, 0),
+			Plans:               make([]*PlanNode, 0),
+			Backlogs:            make([]*BacklogNode, 0),
+			Tasks:               make([]*TaskNode, 0),
 		}
 		TriggerAsyncRebuild(projectRoot, sp)
 		return bootstrap, nil
