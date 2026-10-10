@@ -680,4 +680,3 @@ func TestWhatsNextMaterializedView_RoundTripDeterminism(t *testing.T) {
 		t.Fatalf("expected backlogs sorted by ID: %v", payload.Backlogs)
 	}
 }
-
