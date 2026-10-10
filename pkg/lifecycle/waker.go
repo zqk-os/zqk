@@ -56,9 +56,7 @@ func newClosedWakerChannel() (<-chan *LifecycleEvent, func()) {
 	return closedCh, func() {}
 }
 
-// Register registers interest in a specific scheduler job ID.
-// It returns a receive-only channel and a cleanup function to unregister.
-func (r *JobWakerRegistry) Register(jobID string) (<-chan *LifecycleEvent, func()) {
+func (r *JobWakerRegistry) registerChannel(bufferSize int, assign func(ch chan *LifecycleEvent)) (<-chan *LifecycleEvent, func()) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -66,59 +64,49 @@ func (r *JobWakerRegistry) Register(jobID string) (<-chan *LifecycleEvent, func(
 		return newClosedWakerChannel()
 	}
 
-	ch := make(chan *LifecycleEvent, 1)
-	r.subscribers[jobID] = append(r.subscribers[jobID], ch)
+	ch := make(chan *LifecycleEvent, bufferSize)
+	assign(ch)
 
-	unregister := func() {
-		r.unregisterChannel(jobID, ch)
+	return ch, func() {
+		r.removeChannel(ch)
 	}
+}
 
-	return ch, unregister
+// Register registers interest in a specific scheduler job ID.
+// It returns a receive-only channel and a cleanup function to unregister.
+func (r *JobWakerRegistry) Register(jobID string) (<-chan *LifecycleEvent, func()) {
+	return r.registerChannel(1, func(ch chan *LifecycleEvent) {
+		r.subscribers[jobID] = append(r.subscribers[jobID], ch)
+	})
 }
 
 // RegisterWildcard registers interest in all scheduler job callback events.
 func (r *JobWakerRegistry) RegisterWildcard() (<-chan *LifecycleEvent, func()) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if r.closed {
-		return newClosedWakerChannel()
-	}
-
-	ch := make(chan *LifecycleEvent, 16)
-	r.wildcardSubscribers = append(r.wildcardSubscribers, ch)
-
-	unregister := func() {
-		r.unregisterWildcard(ch)
-	}
-
-	return ch, unregister
+	return r.registerChannel(16, func(ch chan *LifecycleEvent) {
+		r.wildcardSubscribers = append(r.wildcardSubscribers, ch)
+	})
 }
 
-func (r *JobWakerRegistry) unregisterChannel(jobID string, target chan *LifecycleEvent) {
+func (r *JobWakerRegistry) removeChannel(target chan *LifecycleEvent) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	subs := r.subscribers[jobID]
-	for i, ch := range subs {
-		if ch == target {
-			r.subscribers[jobID] = append(subs[:i], subs[i+1:]...)
-			break
+	for jobID, subs := range r.subscribers {
+		for i, ch := range subs {
+			if ch == target {
+				r.subscribers[jobID] = append(subs[:i], subs[i+1:]...)
+				if len(r.subscribers[jobID]) == 0 {
+					delete(r.subscribers, jobID)
+				}
+				return
+			}
 		}
 	}
-	if len(r.subscribers[jobID]) == 0 {
-		delete(r.subscribers, jobID)
-	}
-}
-
-func (r *JobWakerRegistry) unregisterWildcard(target chan *LifecycleEvent) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
 
 	for i, ch := range r.wildcardSubscribers {
 		if ch == target {
 			r.wildcardSubscribers = append(r.wildcardSubscribers[:i], r.wildcardSubscribers[i+1:]...)
-			break
+			return
 		}
 	}
 }
