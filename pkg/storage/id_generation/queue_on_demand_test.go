@@ -259,7 +259,7 @@ func TestQueueManager_ConcurrentQueueCreation(t *testing.T) {
 		})
 	}
 	waitDone := make(chan struct{})
-	go func() { defer close(waitDone); wg.Wait() }()
+	goroutinelabels.NewGoroutine("id_generation_test", "wg waitDone monitor").StartSimple(func() { defer close(waitDone); wg.Wait() })
 	select {
 	case <-waitDone:
 	case <-time.After(5 * time.Second):

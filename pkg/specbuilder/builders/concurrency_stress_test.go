@@ -2,6 +2,7 @@ package builders_test
 
 import (
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"io"
 	"path/filepath"
 	"sync"
@@ -38,7 +39,9 @@ func TestConcurrencyStressAllGenerators(t *testing.T) {
 	wg.Add(numGoroutines)
 
 	for i := 0; i < numGoroutines; i++ {
-		go func(id int) {
+		iID := i
+		goroutinelabels.NewGoroutine("builders_test", "stress all generators worker").StartSimple(func() {
+			id := iID
 			defer wg.Done()
 
 			tmpDir, err := fileutil.MkdirTemp("", fmt.Sprintf("stress-test-%d-", id))
@@ -102,7 +105,7 @@ func TestConcurrencyStressAllGenerators(t *testing.T) {
 			if err := scenarioGen.GenerateFromSpecs([]mcptesting.ScenarioSpec{scenarioSpec}); err != nil {
 				t.Errorf("[Routine %d] ScenarioGenerator failed: %v", id, err)
 			}
-		}(i)
+		})
 	}
 
 	wg.Wait()
@@ -175,7 +178,7 @@ func TestBaseGeneratorConcurrency(t *testing.T) {
 	wg.Add(numGoroutines)
 
 	for i := 0; i < numGoroutines; i++ {
-		go func() {
+		goroutinelabels.NewGoroutine("builders_test", "base generator specs worker").StartSimple(func() {
 			defer wg.Done()
 			// Concurrently call GenerateFromSpecs
 			_, err := bg.GenerateFromSpecs(specs)
@@ -188,7 +191,7 @@ func TestBaseGeneratorConcurrency(t *testing.T) {
 			if err != nil {
 				t.Errorf("GenerateAndWriteFromSpecs failed: %v", err)
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
@@ -232,7 +235,9 @@ func TestInstanceBuilderNotThreadSafe(t *testing.T) {
 	wg.Add(concurrentUsers)
 
 	for i := 0; i < concurrentUsers; i++ {
-		go func(id int) {
+		iID := i
+		goroutinelabels.NewGoroutine("builders_test", "shared builder test worker").StartSimple(func() {
+			id := iID
 			defer wg.Done()
 			builder.ID(fmt.Sprintf("ACC-%d", id))
 			builder.SetField("value", fmt.Sprintf("val-%d", id))
@@ -242,7 +247,7 @@ func TestInstanceBuilderNotThreadSafe(t *testing.T) {
 				errors = append(errors, err)
 				mu.Unlock()
 			}
-		}(i)
+		})
 	}
 
 	wg.Wait()

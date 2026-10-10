@@ -7,6 +7,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 type mockTransport struct {
@@ -77,11 +79,11 @@ func TestBuilderThreadSafety(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 50; i++ {
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrent api client execution").StartSimple(func() {
 			defer wg.Done()
 			req, _ := http.NewRequest("GET", "http://example.com", nil)
 			_, _ = client.Do(req)
-		}()
+		})
 	}
 	wg.Wait()
 }

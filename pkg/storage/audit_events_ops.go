@@ -216,7 +216,7 @@ func createCreateAuditEvent(ctx context.Context, projectRoot, id, kind, filePath
 	// Prevent infinite recursion: don't create audit events for audit events
 	// This prevents writeObjectToCAS -> createCreateAuditEvent -> CreateAuditEventWithBuilder -> Create -> writeObjectToCAS loop
 	// Also check context to prevent cycles even if kind is different
-	if kind == objects.KindAuditEvent || IsCreatingAuditEvent() {
+	if kind == objects.KindAuditEvent || IsCreatingAuditEventContext(ctx) {
 		return nil // Best effort - skip audit events for audit events or during audit event creation
 	}
 

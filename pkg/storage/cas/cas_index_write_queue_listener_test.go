@@ -2,6 +2,7 @@ package cas
 
 import (
 	"context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"path/filepath"
 	"sync"
 	"sync/atomic"
@@ -140,21 +141,21 @@ func TestListingIndexWriteQueue_ConcurrencySafety(t *testing.T) {
 	var completedCount atomic.Int32
 
 	wg.Add(2)
-	go func() {
+	goroutinelabels.NewGoroutine("cas_listener_test", "q1 enqueue update worker").StartSimple(func() {
 		defer wg.Done()
 		done, err := q1.EnqueueUpdateWithCallback(kind1, "obj-q1", "hash-q1", cas1)
 		require.NoError(t, err)
 		<-done
 		completedCount.Add(1)
-	}()
+	})
 
-	go func() {
+	goroutinelabels.NewGoroutine("cas_listener_test", "q2 enqueue update worker").StartSimple(func() {
 		defer wg.Done()
 		done, err := q2.EnqueueUpdateWithCallback(kind2, "obj-q2", "hash-q2", cas2)
 		require.NoError(t, err)
 		<-done
 		completedCount.Add(1)
-	}()
+	})
 
 	wg.Wait()
 	require.Equal(t, int32(2), completedCount.Load())

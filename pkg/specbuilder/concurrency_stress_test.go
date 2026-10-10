@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
@@ -41,7 +42,9 @@ func TestConcurrencySpecGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -50,7 +53,7 @@ func TestConcurrencySpecGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllSpecs failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -64,7 +67,9 @@ func TestConcurrencyAPIGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -73,7 +78,7 @@ func TestConcurrencyAPIGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllAPIs failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -87,7 +92,9 @@ func TestConcurrencyConfigGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -96,7 +103,7 @@ func TestConcurrencyConfigGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllConfigs failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -110,7 +117,9 @@ func TestConcurrencyLifecycleGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -119,7 +128,7 @@ func TestConcurrencyLifecycleGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllLifecycles failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -133,7 +142,9 @@ func TestConcurrencyProfileGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -142,7 +153,7 @@ func TestConcurrencyProfileGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllProfiles failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -156,7 +167,9 @@ func TestConcurrencyRoutingRuleGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -165,7 +178,7 @@ func TestConcurrencyRoutingRuleGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllRoutingRules failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -179,7 +192,9 @@ func TestConcurrencyTraitGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -188,7 +203,7 @@ func TestConcurrencyTraitGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateAllTraits failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -219,7 +234,9 @@ func TestConcurrencyScenarioGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := w
+		goroutinelabels.NewGoroutine("specbuilder_test", "concurrency stress worker").StartSimple(func() {
+			workerID := wID
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				tmpDir := t.TempDir()
@@ -228,7 +245,7 @@ func TestConcurrencyScenarioGenerator(t *testing.T) {
 					t.Errorf("worker %d iteration %d: GenerateFromSpecs failed: %v", workerID, i, err)
 				}
 			}
-		}(w)
+		})
 	}
 	wg.Wait()
 }
@@ -311,7 +328,7 @@ func TestConcurrencyBaseGenerator(t *testing.T) {
 	var wg sync.WaitGroup
 	for w := 0; w < workers; w++ {
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("specbuilder_test", "base generator concurrency").StartSimple(func() {
 			defer wg.Done()
 			for i := 0; i < iterations; i++ {
 				// Test concurrent reads/generation
@@ -323,7 +340,7 @@ func TestConcurrencyBaseGenerator(t *testing.T) {
 					t.Errorf("Expected %d artifacts, got %d", len(specs), len(artifacts))
 				}
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

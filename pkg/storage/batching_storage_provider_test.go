@@ -8,6 +8,7 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -61,7 +62,7 @@ func TestBatchingStorageProvider_Batching(t *testing.T) {
 	// Send 5 creates concurrently to trigger batch size flush
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
-		go func(i int) {
+		goroutinelabels.NewGoroutine("batching_test", "batching worker").StartSimple(func() {
 			defer wg.Done()
 			obj := map[string]any{
 				objects.FieldKeyKind: "test",
@@ -71,7 +72,7 @@ func TestBatchingStorageProvider_Batching(t *testing.T) {
 			if err != nil {
 				t.Errorf("Create failed: %v", err)
 			}
-		}(i)
+		})
 	}
 
 	wg.Wait()
@@ -105,7 +106,7 @@ func TestBatchingStorageProvider_Timeout(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 2; i++ {
 		wg.Add(1)
-		go func(i int) {
+		goroutinelabels.NewGoroutine("batching_test", "timeout worker").StartSimple(func() {
 			defer wg.Done()
 			obj := map[string]any{
 				objects.FieldKeyKind: "test",
@@ -115,7 +116,7 @@ func TestBatchingStorageProvider_Timeout(t *testing.T) {
 			if err != nil {
 				t.Errorf("Create failed: %v", err)
 			}
-		}(i)
+		})
 	}
 
 	wg.Wait()
@@ -227,7 +228,7 @@ func TestBatchingStorageProvider_BulkCreatePartialFailureNoGhostACK(t *testing.T
 	errs := make([]error, 2)
 	for i := 0; i < 2; i++ {
 		wg.Add(1)
-		go func(i int) {
+		goroutinelabels.NewGoroutine("batching_test", "timeout worker").StartSimple(func() {
 			defer wg.Done()
 			obj := map[string]any{
 				objects.FieldKeyKind: "test",
@@ -235,7 +236,7 @@ func TestBatchingStorageProvider_BulkCreatePartialFailureNoGhostACK(t *testing.T
 				// no status → fail-closed if bulk ACKs without error index
 			}
 			errs[i] = batcher.Create(ctx, secCtx, obj)
-		}(i)
+		})
 	}
 	wg.Wait()
 	// BulkCreate fails index 1 and sets status on index 0 → one nil ACK, one forced error.
@@ -290,14 +291,14 @@ func TestBatchingStorageProvider_LifetimeCounters(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 3; i++ {
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("batching_test", "lifetime counter worker").StartSimple(func() {
 			defer wg.Done()
 			obj := map[string]any{
 				objects.FieldKeyKind: "test",
 				objects.FieldKeyID:   "test-id",
 			}
 			_ = batcher.Create(ctx, secCtx, obj)
-		}()
+		})
 	}
 	wg.Wait()
 

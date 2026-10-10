@@ -8,6 +8,7 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -126,9 +127,10 @@ func TestFileObjectStorage_Create_HonestContextCancellationUnderContention(t *te
 	errCh := make(chan error, numConcurrent)
 	for i := 0; i < numConcurrent; i++ {
 		id := fmt.Sprintf("BLI-TEST-CONCURRENT-%03d", i)
-		go func(objID string) {
+		oID := id
+		goroutinelabels.NewGoroutine("file_create_timeout_test", "concurrent valid creations worker").StartSimple(func() {
 			obj := map[string]any{
-				objects.FieldKeyID:            objID,
+				objects.FieldKeyID:            oID,
 				objects.FieldKeyKind:          "backlog_item",
 				objects.FieldKeyTitle:         "Concurrent Item",
 				objects.FieldKeyStatus:        objects.ObjectStatusExploring,
@@ -137,7 +139,7 @@ func TestFileObjectStorage_Create_HonestContextCancellationUnderContention(t *te
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 			errCh <- fos.Create(ctx, secCtx, obj)
-		}(id)
+		})
 	}
 
 	for i := 0; i < numConcurrent; i++ {

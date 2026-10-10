@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -439,6 +440,7 @@ func TestReverseReferenceIndex_ProjectScopedIsolation(t *testing.T) {
 func TestReverseReferenceIndex_MultiTenantConcurrentAccess(t *testing.T) {
 	ctx, cancel := stdcontext.WithCancel(stdcontext.Background())
 	defer cancel()
+	_ = ctx
 
 	const numProjects = 5
 	const numOps = 20
@@ -446,22 +448,24 @@ func TestReverseReferenceIndex_MultiTenantConcurrentAccess(t *testing.T) {
 	done := make(chan struct{})
 	for p := 0; p < numProjects; p++ {
 		projPath := filepath.Join("/tmp", "concurrent-proj", string(rune('a'+p)))
-		go func(ctx stdcontext.Context, path string, id int) {
+		pID := p
+		pathCopy := projPath
+		goroutinelabels.NewGoroutine("reverse_reference_index_test", "multitenant concurrent worker").StartSimple(func() {
 			defer func() { done <- struct{}{} }()
-			idx := GetReverseReferenceIndexForProject(path)
+			idx := GetReverseReferenceIndexForProject(pathCopy)
 			for i := 0; i < numOps; i++ {
-				child := "BLI-" + string(rune('A'+id))
-				parent := "REQ-" + string(rune('A'+id))
+				child := "BLI-" + string(rune('A'+pID))
+				parent := "REQ-" + string(rune('A'+pID))
 				idx.AddReference(child, parent)
 				deps := idx.GetDependents(parent)
 				if len(deps) == 0 {
-					t.Errorf("expected non-empty dependents in project %s", path)
+					t.Errorf("expected non-empty dependents in project %s", pathCopy)
 				}
 				if i%5 == 0 {
 					idx.RemoveReference(child, parent)
 				}
 			}
-		}(ctx, projPath, p)
+		})
 	}
 
 	for p := 0; p < numProjects; p++ {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"path/filepath"
 	"runtime"
 	"sync"
@@ -106,9 +107,10 @@ func TestDrainDarwinSyncQueue_ConcurrencyAndShutdownDrain(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < workerCount; i++ {
 		wg.Add(1)
-		go func(workerID int) {
+		wID := i
+		goroutinelabels.NewGoroutine("filecas_test", "darwin sync queue worker").StartSimple(func() {
 			defer wg.Done()
-			path := filepath.Join(tmpDir, fmt.Sprintf(testFixtureFilenameConcur, workerID))
+			path := filepath.Join(tmpDir, fmt.Sprintf(testFixtureFilenameConcur, wID))
 			if err := fileutil.WriteFile(path, []byte(testPayloadData), fileutil.StandardFilePerm); err != nil {
 				return
 			}
@@ -117,7 +119,7 @@ func TestDrainDarwinSyncQueue_ConcurrencyAndShutdownDrain(t *testing.T) {
 				return
 			}
 			_ = CasPublishSyncFileOS(f)
-		}(i)
+		})
 	}
 	wg.Wait()
 
