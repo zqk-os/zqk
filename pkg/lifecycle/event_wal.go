@@ -243,6 +243,12 @@ func PollLifecycleWAL(
 	onEvent func(ev *LifecycleEvent),
 	onBatchComplete func(),
 ) {
+	select {
+	case <-ctx.Done():
+		return
+	default:
+	}
+
 	wal, err := GetOrCreateLifecycleWAL(projectRoot)
 	if err != nil {
 		return
