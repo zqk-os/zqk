@@ -8,23 +8,43 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 )
 
-func TestSchedulerWait_DispatchImmediate(t *testing.T) {
+type waitTestHarness struct {
+	tmpDir string
+	cmd    *cobra.Command
+	out    *bytes.Buffer
+	ctx    context.Context
+}
+
+func setupWaitHarness(t *testing.T, args ...string) *waitTestHarness {
+	t.Helper()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
 
-	jobID := "JOB-DISPATCH-001"
 	cmd := NewWaitCmd()
 	var out bytes.Buffer
 	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &out)
 	cmd.SetContext(ctx)
 	cmd.SetOut(&out)
 	cmd.SetErr(&out)
-	cmd.SetArgs([]string{jobID, "--poll-interval", "20ms", "--timeout", "5s"})
+	cmd.SetArgs(args)
+
+	return &waitTestHarness{
+		tmpDir: tmpDir,
+		cmd:    cmd,
+		out:    &out,
+		ctx:    ctx,
+	}
+}
+
+func TestSchedulerWait_DispatchImmediate(t *testing.T) {
+	const jobID = "JOB-DISPATCH-001"
+	h := setupWaitHarness(t, jobID, "--poll-interval", "20ms", "--timeout", "5s")
 
 	goroutinelabels.NewGoroutine("test_wait_dispatch", "dispatch event for wait test").StartSimple(func() {
 		time.Sleep(30 * time.Millisecond)
@@ -40,11 +60,11 @@ func TestSchedulerWait_DispatchImmediate(t *testing.T) {
 		})
 	})
 
-	if err := cmd.ExecuteContext(ctx); err != nil {
+	if err := h.cmd.ExecuteContext(h.ctx); err != nil {
 		t.Fatalf("unexpected error executing wait command: %v", err)
 	}
 
-	output := out.String()
+	output := h.out.String()
 	if !strings.Contains(output, jobID) {
 		t.Errorf("expected output to contain job ID %s, got: %s", jobID, output)
 	}
@@ -57,17 +77,8 @@ func TestSchedulerWait_DispatchImmediate(t *testing.T) {
 }
 
 func TestSchedulerWait_FormatJSON(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
-
-	jobID := "JOB-JSON-001"
-	cmd := NewWaitCmd()
-	var out bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &out)
-	cmd.SetContext(ctx)
-	cmd.SetOut(&out)
-	cmd.SetErr(&out)
-	cmd.SetArgs([]string{jobID, "--format", "json", "--poll-interval", "20ms", "--timeout", "5s"})
+	const jobID = "JOB-JSON-001"
+	h := setupWaitHarness(t, jobID, "--format", "json", "--poll-interval", "20ms", "--timeout", "5s")
 
 	goroutinelabels.NewGoroutine("test_wait_json_dispatch", "dispatch event for json test").StartSimple(func() {
 		time.Sleep(30 * time.Millisecond)
@@ -83,13 +94,13 @@ func TestSchedulerWait_FormatJSON(t *testing.T) {
 		})
 	})
 
-	if err := cmd.ExecuteContext(ctx); err != nil {
+	if err := h.cmd.ExecuteContext(h.ctx); err != nil {
 		t.Fatalf("unexpected error executing wait command: %v", err)
 	}
 
 	var res WaitResult
-	if err := json.Unmarshal(out.Bytes(), &res); err != nil {
-		t.Fatalf("failed to unmarshal JSON output: %v, raw: %s", err, out.String())
+	if err := json.Unmarshal(h.out.Bytes(), &res); err != nil {
+		t.Fatalf("failed to unmarshal JSON output: %v, raw: %s", err, h.out.String())
 	}
 
 	if res.JobID != jobID {
@@ -107,15 +118,14 @@ func TestSchedulerWait_FormatJSON(t *testing.T) {
 }
 
 func TestSchedulerWait_WALReplay(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
+	const jobID = "JOB-WAL-REPLAY-001"
+	h := setupWaitHarness(t, jobID, "--poll-interval", "20ms", "--timeout", "5s")
 
-	wal, err := lifecycle.NewLifecycleEventWAL(tmpDir)
+	wal, err := lifecycle.NewLifecycleEventWAL(h.tmpDir)
 	if err != nil {
 		t.Fatalf("failed to create WAL: %v", err)
 	}
 
-	jobID := "JOB-WAL-REPLAY-001"
 	walEvent := &lifecycle.LifecycleEvent{
 		EventType: lifecycle.EventTypeSchedulerCallback,
 		ID:        jobID,
@@ -133,19 +143,11 @@ func TestSchedulerWait_WALReplay(t *testing.T) {
 		t.Fatalf("failed to sync WAL: %v", err)
 	}
 
-	cmd := NewWaitCmd()
-	var out bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &out)
-	cmd.SetContext(ctx)
-	cmd.SetOut(&out)
-	cmd.SetErr(&out)
-	cmd.SetArgs([]string{jobID, "--poll-interval", "20ms", "--timeout", "5s"})
-
-	if err := cmd.ExecuteContext(ctx); err != nil {
+	if err := h.cmd.ExecuteContext(h.ctx); err != nil {
 		t.Fatalf("unexpected error executing wait command with WAL replay: %v", err)
 	}
 
-	output := out.String()
+	output := h.out.String()
 	if !strings.Contains(output, jobID) {
 		t.Errorf("expected output to contain job ID %s, got: %s", jobID, output)
 	}
@@ -155,19 +157,10 @@ func TestSchedulerWait_WALReplay(t *testing.T) {
 }
 
 func TestSchedulerWait_Timeout(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
+	const jobID = "JOB-TIMEOUT-001"
+	h := setupWaitHarness(t, jobID, "--poll-interval", "10ms", "--timeout", "50ms")
 
-	jobID := "JOB-TIMEOUT-001"
-	cmd := NewWaitCmd()
-	var out bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &out)
-	cmd.SetContext(ctx)
-	cmd.SetOut(&out)
-	cmd.SetErr(&out)
-	cmd.SetArgs([]string{jobID, "--poll-interval", "10ms", "--timeout", "50ms"})
-
-	err := cmd.ExecuteContext(ctx)
+	err := h.cmd.ExecuteContext(h.ctx)
 	if err == nil {
 		t.Fatalf("expected error on timeout, got nil")
 	}
@@ -181,11 +174,11 @@ func TestSchedulerWait_ContextCanceled(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
 
-	jobID := "JOB-CANCEL-001"
+	const jobID = "JOB-CANCEL-001"
 	cmd := NewWaitCmd()
 	var out bytes.Buffer
 	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // Cancel before execution
+	cancel()
 
 	cmdCtx := pkgctx.WithCommandOutputWriter(ctx, &out)
 	cmd.SetContext(cmdCtx)
@@ -204,17 +197,8 @@ func TestSchedulerWait_ContextCanceled(t *testing.T) {
 }
 
 func TestSchedulerWait_FailedJobStatus(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
-
-	jobID := "JOB-FAILED-001"
-	cmd := NewWaitCmd()
-	var out bytes.Buffer
-	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &out)
-	cmd.SetContext(ctx)
-	cmd.SetOut(&out)
-	cmd.SetErr(&out)
-	cmd.SetArgs([]string{jobID, "--poll-interval", "20ms", "--timeout", "5s"})
+	const jobID = "JOB-FAILED-001"
+	h := setupWaitHarness(t, jobID, "--poll-interval", "20ms", "--timeout", "5s")
 
 	goroutinelabels.NewGoroutine("test_wait_failed_dispatch", "dispatch failed event for wait test").StartSimple(func() {
 		time.Sleep(30 * time.Millisecond)
@@ -227,11 +211,11 @@ func TestSchedulerWait_FailedJobStatus(t *testing.T) {
 		})
 	})
 
-	if err := cmd.ExecuteContext(ctx); err != nil {
+	if err := h.cmd.ExecuteContext(h.ctx); err != nil {
 		t.Fatalf("unexpected error executing wait command: %v", err)
 	}
 
-	output := out.String()
+	output := h.out.String()
 	if !strings.Contains(output, "failed") {
 		t.Errorf("expected output to contain status failed, got: %s", output)
 	}
