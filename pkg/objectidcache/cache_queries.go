@@ -351,12 +351,14 @@ func UpdateObjectIDCache(id, kind, filePath string) error {
 		return err
 	}
 
-	// Create audit event for cache update
+	// Create audit event for cache update (skip audit_event to prevent recursive storms)
 	operation := "Cache entry updated for new object"
 	if existed {
 		operation = "Cache entry updated for modified object"
 	}
-	emitCacheAudit("cache_update", id, kind, filePath, operation, "low", "human")
+	if kind != "audit_event" && kind != objects.KindAuditEvent {
+		emitCacheAudit("cache_update", id, kind, filePath, operation, "low", "human")
+	}
 
 	persistCacheChanges(cache, emptyValue, "Failed to save cache after update")
 

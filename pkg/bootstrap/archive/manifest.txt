@@ -325,6 +325,7 @@
 ./cli_specs/scheduler/test_failures/rerun_command.yaml
 ./cli_specs/scheduler/test_failures_command.yaml
 ./cli_specs/scheduler/trigger_command.yaml
+./cli_specs/scheduler/wait_command.yaml
 ./cli_specs/scheduler_command.yaml
 ./cli_specs/schemas/
 ./cli_specs/schemas/blocking_check_config.schema.json

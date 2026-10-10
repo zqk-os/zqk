@@ -6,10 +6,13 @@ package id_generation
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"golang.org/x/sys/unix"
 
@@ -22,6 +25,22 @@ import (
 
 const sequenceFilePrefix = ".next_"
 const sequenceFileSuffix = "_seq"
+
+var (
+	seqFileLocks   = make(map[string]*sync.Mutex)
+	seqFileLocksMu sync.Mutex
+)
+
+func getSeqFileMutex(path string) *sync.Mutex {
+	seqFileLocksMu.Lock()
+	defer seqFileLocksMu.Unlock()
+	m, ok := seqFileLocks[path]
+	if !ok {
+		m = &sync.Mutex{}
+		seqFileLocks[path] = m
+	}
+	return m
+}
 
 // AllocateSequenceRange atomically allocates the next count IDs from the sequence file in dir.
 // File is named .next_<prefix>_seq (e.g. .next_AUD_seq). Uses flock(LOCK_EX) so only one process
@@ -41,14 +60,33 @@ func AllocateSequenceRange(dir, prefix string, minDigits, startAt, count int, se
 		safePrefix = "seq"
 	}
 	seqPath := filepath.Join(dir, sequenceFilePrefix+safePrefix+sequenceFileSuffix)
+	procMu := getSeqFileMutex(seqPath)
+	procMu.Lock()
+	defer procMu.Unlock()
+
 	file, err := fileutil.OpenFile(seqPath, fileutil.O_RDWR|fileutil.O_CREATE, paths.FilePerm600)
 	if err != nil {
 		return nil, errfmt.Newf(ConstOpenSequenceFile).Wrap(err)
 	}
 	defer file.Close()
 
-	if err := syscallutil.FileFlock(file, unix.LOCK_EX); err != nil {
-		return nil, errfmt.Newf(ConstLockSequenceFile).Wrap(err)
+	deadline := time.Now().Add(5 * time.Second)
+	backoff := 5 * time.Millisecond
+	for {
+		flockErr := syscallutil.FileFlock(file, unix.LOCK_EX|unix.LOCK_NB)
+		if flockErr == nil {
+			break
+		}
+		if !errors.Is(flockErr, unix.EWOULDBLOCK) && !errors.Is(flockErr, unix.EAGAIN) {
+			return nil, errfmt.Newf(ConstLockSequenceFile).Wrap(flockErr)
+		}
+		if time.Now().After(deadline) {
+			return nil, errfmt.Newf(ConstLockSequenceFile).Wrap(flockErr)
+		}
+		time.Sleep(backoff)
+		if backoff < 100*time.Millisecond {
+			backoff *= 2
+		}
 	}
 	defer func() {
 		logging.LogSwallowedError(syscallutil.FileFlock(file, unix.LOCK_UN))

@@ -129,8 +129,17 @@ func TestKeepAliveHeartbeat_Integration(t *testing.T) {
 		t.Errorf("Keep-alive should be updated: timestamp1 = %v, timestamp2 = %v", timestamp1, timestamp2)
 	}
 
-	// Verify IsSchedulerAlive detects it as alive
-	isAlive, lastKeepAlive, err := IsSchedulerAlive(testRoot)
+	// Verify IsSchedulerAlive detects it as alive (bounded poll to allow asynchronous keepalive writes under CI load)
+	var isAlive bool
+	var lastKeepAlive time.Time
+	aliveDeadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(aliveDeadline) {
+		isAlive, lastKeepAlive, err = IsSchedulerAlive(testRoot)
+		if err == nil && isAlive && !lastKeepAlive.IsZero() {
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 	if err != nil {
 		t.Fatalf("IsSchedulerAlive() error = %v", err)
 	}

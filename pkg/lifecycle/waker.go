@@ -174,6 +174,9 @@ func (r *JobWakerRegistry) AwaitJobWithWAL(
 	pollCtx, cancelPoll := context.WithCancel(ctx)
 	defer cancelPoll()
 
+	ch, unregister := r.Register(jobID)
+	defer unregister()
+
 	goroutinelabels.NewGoroutine("lifecycle_waker_wal_poll", "poll WAL for scheduler callback").StartSimple(func() {
 		PollLifecycleWAL(pollCtx, projectRoot, pollInterval, func(ev *LifecycleEvent) {
 			if ev != nil && ev.EventType == EventTypeSchedulerCallback {
@@ -182,7 +185,25 @@ func (r *JobWakerRegistry) AwaitJobWithWAL(
 		}, nil)
 	})
 
-	return r.AwaitJob(ctx, jobID)
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case ev, ok := <-ch:
+		if !ok || ev == nil {
+			return nil, errfmt.Errorf("waker channel closed without event")
+		}
+		return ev, nil
+	}
+}
+
+// AwaitJobWithWAL awaits a job using the global waker registry and WAL replay.
+func AwaitJobWithWAL(
+	ctx context.Context,
+	projectRoot string,
+	jobID string,
+	pollInterval time.Duration,
+) (*LifecycleEvent, error) {
+	return GetGlobalJobWakerRegistry().AwaitJobWithWAL(ctx, projectRoot, jobID, pollInterval)
 }
 
 // Close closes the registry and cleans up all registered channels.

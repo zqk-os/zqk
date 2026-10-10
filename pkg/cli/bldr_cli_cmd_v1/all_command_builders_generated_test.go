@@ -358,6 +358,7 @@ var allCommandBuilders = []struct {
 	{"NewSchedulerTestCommandBuilder", NewSchedulerTestCommandBuilder},
 	{"NewSchedulerTestFailuresCommandBuilder", NewSchedulerTestFailuresCommandBuilder},
 	{"NewSchedulerTriggerCommandBuilder", NewSchedulerTriggerCommandBuilder},
+	{"NewSchedulerWaitCommandBuilder", NewSchedulerWaitCommandBuilder},
 	{"NewSchedulerCommandBuilder", NewSchedulerCommandBuilder},
 	{"NewSchedulerEscalateCommandBuilder", NewSchedulerEscalateCommandBuilder},
 	{"NewSchedulerTestFailuresAnalyzeCommandBuilder", NewSchedulerTestFailuresAnalyzeCommandBuilder},

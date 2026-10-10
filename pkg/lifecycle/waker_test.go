@@ -234,3 +234,94 @@ func TestListener_SchedulerCallbackIntegration(t *testing.T) {
 	cancel()
 	<-runErrCh
 }
+
+func TestJobWakerRegistry_AwaitJobWithWAL(t *testing.T) {
+	tempDir := t.TempDir()
+	wal, err := NewLifecycleEventWAL(tempDir)
+	if err != nil {
+		t.Fatalf("failed to create WAL: %v", err)
+	}
+
+	registry := NewJobWakerRegistry()
+	defer registry.Close()
+
+	jobID := "JOB-AWAIT-WAL-001"
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	goroutinelabels.NewGoroutine("test_waker_wal_writer", "write callback event to WAL").StartSimple(func() {
+		time.Sleep(25 * time.Millisecond)
+		ev := &LifecycleEvent{
+			EventType: EventTypeSchedulerCallback,
+			ID:        jobID,
+			Kind:      "scheduler_job",
+			ToStatus:  "completed",
+			Ts:        time.Now(),
+		}
+		_ = wal.Append(ev)
+		_ = wal.Sync()
+	})
+
+	ev, err := registry.AwaitJobWithWAL(ctx, tempDir, jobID, 10*time.Millisecond)
+	if err != nil {
+		t.Fatalf("unexpected error from AwaitJobWithWAL: %v", err)
+	}
+	if ev.ID != jobID || ev.ToStatus != "completed" {
+		t.Errorf("unexpected event received: %+v", ev)
+	}
+}
+
+func TestJobWakerRegistry_AwaitJobWithWAL_Timeout(t *testing.T) {
+	tempDir := t.TempDir()
+	_, err := NewLifecycleEventWAL(tempDir)
+	if err != nil {
+		t.Fatalf("failed to create WAL: %v", err)
+	}
+
+	registry := NewJobWakerRegistry()
+	defer registry.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+
+	_, err = registry.AwaitJobWithWAL(ctx, tempDir, "JOB-NONEXISTENT", 10*time.Millisecond)
+	if err == nil {
+		t.Fatalf("expected error on timeout, got nil")
+	}
+	if err != context.DeadlineExceeded {
+		t.Errorf("expected DeadlineExceeded, got: %v", err)
+	}
+}
+
+func TestAwaitJobWithWAL_PackageLevel(t *testing.T) {
+	tempDir := t.TempDir()
+	wal, err := NewLifecycleEventWAL(tempDir)
+	if err != nil {
+		t.Fatalf("failed to create WAL: %v", err)
+	}
+
+	jobID := "JOB-PKG-AWAIT-001"
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	goroutinelabels.NewGoroutine("test_pkg_wal_writer", "write event for package await").StartSimple(func() {
+		time.Sleep(25 * time.Millisecond)
+		ev := &LifecycleEvent{
+			EventType: EventTypeSchedulerCallback,
+			ID:        jobID,
+			Kind:      "scheduler_job",
+			ToStatus:  "completed",
+			Ts:        time.Now(),
+		}
+		_ = wal.Append(ev)
+		_ = wal.Sync()
+	})
+
+	ev, err := AwaitJobWithWAL(ctx, tempDir, jobID, 10*time.Millisecond)
+	if err != nil {
+		t.Fatalf("unexpected error from package-level AwaitJobWithWAL: %v", err)
+	}
+	if ev.ID != jobID || ev.ToStatus != "completed" {
+		t.Errorf("unexpected event received: %+v", ev)
+	}
+}

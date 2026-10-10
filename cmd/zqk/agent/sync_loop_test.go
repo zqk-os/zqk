@@ -94,8 +94,9 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 	cwd, _ := fileutil.Getwd()
 	repoRoot := filepath.Join(cwd, "..", "..", "..")
 	project := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
-		Kind:            "agent_sync_loop",
-		SkipFileStorage: true,
+		Kind:                     "agent_sync_loop",
+		SkipFileStorage:          true,
+		ForceRemoveRootOnCleanup: true,
 		AppendStagesBeforeStorage: func(root string) []testkit.NamedTestStep {
 			return []testkit.NamedTestStep{{
 				Name: "seed_agent_sync_loop_project",
@@ -160,15 +161,18 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 	if err != nil {
 		t.Fatalf("GetOrCreate storage: %v", err)
 	}
+	testkit.RegisterStorageTestCleanup(t, root, store)
 	t.Cleanup(func() {
 		writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
 		if writeQueue != nil {
 			_ = writeQueue.FlushAll(1 * time.Second)
 		}
-		if fos, ok := store.(*storage.FileObjectStorage); ok {
-			_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, fos))
-		}
+		fos, _ := store.(*storage.FileObjectStorage)
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, fos))
+		storage.ScrubProjectRootForTempCleanup(filepath.Join(root, paths.ProjectDataDir), 40, 25*time.Millisecond)
 		_ = fileutil.RemoveAll(filepath.Join(root, paths.ProjectDataDir))
+		_ = fileutil.RemoveAll(filepath.Join(root, paths.GitWorktreeMetadataEntry))
+		_ = fileutil.RemoveAll(root)
 	})
 
 	// Create an agent_skill to satisfy CRIT-PERSONA-SKILL-BOUND

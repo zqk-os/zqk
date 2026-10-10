@@ -104,11 +104,16 @@ func writePIDFile(projectRoot string) error {
 		return errfmt.Newf("failed to create scheduler directory").Wrap(err)
 	}
 
-	// Write PID to file
+	// Write PID to file atomically via temporary file
 	pid := os.Getpid()
 	pidStr := strconv.Itoa(pid)
-	if err := fileutil.WriteFile(pidFilePath, []byte(pidStr), paths.FilePerm644); err != nil {
+	tmpFile := fmt.Sprintf("%s.tmp.%d", pidFilePath, pid)
+	if err := fileutil.WriteFile(tmpFile, []byte(pidStr), paths.FilePerm644); err != nil {
 		return errfmt.Newf("failed to write PID file").Wrap(err)
+	}
+	if err := fileutil.Rename(tmpFile, pidFilePath); err != nil {
+		_ = fileutil.Remove(tmpFile)
+		return errfmt.Newf("failed to update PID file").Wrap(err)
 	}
 
 	return nil
@@ -484,10 +489,15 @@ func writeKeepAlive(projectRoot string) error {
 		return errfmt.Newf("failed to create scheduler directory").Wrap(err)
 	}
 
-	// Write current timestamp (RFC3339 format)
+	// Write current timestamp (RFC3339 format) atomically via temporary file
 	timestamp := zqktime.NowRFC3339UTC()
-	if err := fileutil.WriteFile(keepAlivePath, []byte(timestamp), paths.FilePerm644); err != nil {
+	tmpFile := fmt.Sprintf("%s.tmp.%d", keepAlivePath, os.Getpid())
+	if err := fileutil.WriteFile(tmpFile, []byte(timestamp), paths.FilePerm644); err != nil {
 		return errfmt.Newf("failed to write keep-alive file").Wrap(err)
+	}
+	if err := fileutil.Rename(tmpFile, keepAlivePath); err != nil {
+		_ = fileutil.Remove(tmpFile)
+		return errfmt.Newf("failed to update keep-alive file").Wrap(err)
 	}
 
 	return nil
@@ -550,6 +560,11 @@ func IsSchedulerAlive(projectRoot string) (bool, time.Time, error) {
 
 	// Check keep-alive file
 	lastKeepAlive, err := readKeepAlive(projectRoot)
+	if err != nil && !strings.Contains(err.Error(), "does not exist") {
+		// Transient failure (timeout, contention) — retry once after a short delay
+		time.Sleep(pidFileRetryDelay)
+		lastKeepAlive, err = readKeepAlive(projectRoot)
+	}
 	if err != nil {
 		// Keep-alive file doesn't exist or can't be read
 		return false, time.Time{}, nil

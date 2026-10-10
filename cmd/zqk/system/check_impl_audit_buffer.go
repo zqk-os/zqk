@@ -578,6 +578,9 @@ func acquireAuditStorage(projectRoot, eventDesc string) (storage.ObjectStoragePr
 
 // createCacheAuditEvent creates an audit event for cache operations
 func createCacheAuditEvent(eventType, targetID, targetKind, targetPath, operation, severity string, profile string) {
+	if targetKind == objects.KindAuditEvent || targetKind == "audit_event" || eventType == "cache_update" {
+		return
+	}
 	projectRoot := ProjectRootOrResolve("")
 	if projectRoot == emptyValue {
 		// Can't create audit event without project root
