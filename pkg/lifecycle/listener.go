@@ -24,6 +24,36 @@ type TransitionRequest struct {
 	ToStatus string
 }
 
+// CallbackWaker defines a receiver that is signaled when a callback event is replayed from the WAL.
+type CallbackWaker interface {
+	Name() string
+	Wake(ctx context.Context, ev *LifecycleEvent) error
+}
+
+// FuncCallbackWaker enables closure functions to act as callback wakers.
+type FuncCallbackWaker struct {
+	name string
+	fn   func(ctx context.Context, ev *LifecycleEvent) error
+}
+
+// NewFuncCallbackWaker creates a new FuncCallbackWaker.
+func NewFuncCallbackWaker(name string, fn func(ctx context.Context, ev *LifecycleEvent) error) *FuncCallbackWaker {
+	return &FuncCallbackWaker{name: name, fn: fn}
+}
+
+// Name returns the identifier of the waker.
+func (f *FuncCallbackWaker) Name() string {
+	return f.name
+}
+
+// Wake invokes the underlying closure with the lifecycle event.
+func (f *FuncCallbackWaker) Wake(ctx context.Context, ev *LifecycleEvent) error {
+	if f.fn == nil {
+		return nil
+	}
+	return f.fn(ctx, ev)
+}
+
 // Listener reads the lifecycle WAL, accumulates criteria, and enqueues transition requests.
 // Run one listener per project root (single goroutine). Bounded: no unbounded goroutines.
 type Listener struct {
@@ -36,6 +66,7 @@ type Listener struct {
 	// satisfied: set of (criterion_id, scope_key) that have been satisfied
 	satisfied      map[string]struct{}
 	fired          map[string]struct{} // rule key -> fired, so we don't double-fire
+	wakers         map[string]CallbackWaker
 	cursor         walutil.ReplayCursor
 	mu             sync.Mutex
 	checkpointPath string
@@ -43,7 +74,7 @@ type Listener struct {
 
 // NewListener creates a listener that reads from wal, evaluates rules, and sends transitions to transitionCh.
 func NewListener(projectRoot string, wal *LifecycleEventWAL, rules []TransitionRule, transitionCh chan<- TransitionRequest, getStorage StorageProviderForCriterion) *Listener {
-	return &Listener{
+	l := &Listener{
 		projectRoot:    projectRoot,
 		wal:            wal,
 		rules:          rules,
@@ -51,8 +82,46 @@ func NewListener(projectRoot string, wal *LifecycleEventWAL, rules []TransitionR
 		getStorage:     getStorage,
 		satisfied:      make(map[string]struct{}),
 		fired:          make(map[string]struct{}),
+		wakers:         make(map[string]CallbackWaker),
 		checkpointPath: wal.CheckpointPath(),
 	}
+	l.wakers[GetGlobalJobWakerRegistry().Name()] = GetGlobalJobWakerRegistry()
+	return l
+}
+
+// RegisterWaker registers a callback waker on the listener.
+func (l *Listener) RegisterWaker(waker CallbackWaker) {
+	if waker == nil {
+		return
+	}
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.wakers == nil {
+		l.wakers = make(map[string]CallbackWaker)
+	}
+	l.wakers[waker.Name()] = waker
+}
+
+// UnregisterWaker removes a callback waker by name.
+func (l *Listener) UnregisterWaker(name string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	delete(l.wakers, name)
+}
+
+// Wakers returns a snapshot of all registered callback wakers.
+func (l *Listener) Wakers() []CallbackWaker {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.snapshotWakersLocked()
+}
+
+func (l *Listener) snapshotWakersLocked() []CallbackWaker {
+	list := make([]CallbackWaker, 0, len(l.wakers))
+	for _, w := range l.wakers {
+		list = append(list, w)
+	}
+	return list
 }
 
 // Run runs the listener loop: load checkpoint, replay from WAL, process events, save checkpoint.
@@ -128,6 +197,16 @@ func (l *Listener) processEvent(ev *LifecycleEvent) error {
 				ctx := pkgctx.NewSystemContext()
 				TryEmitForMilestonesContainingCriterion(ctx, l.projectRoot, ev.ID, l.getStorage)
 				TryEmitForBacklogItemsContainingCriterion(ctx, l.projectRoot, ev.ID, l.getStorage)
+			})
+		}
+	case EventTypeSchedulerCallback:
+		wakers := l.snapshotWakersLocked()
+		if len(wakers) > 0 {
+			goroutinelabels.NewGoroutine("lifecycle_waker_dispatch", "dispatch scheduler callback to wakers").StartSimple(func() {
+				ctx := pkgctx.NewSystemContext()
+				for _, waker := range wakers {
+					_ = waker.Wake(ctx, ev)
+				}
 			})
 		}
 	}

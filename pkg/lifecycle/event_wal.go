@@ -58,6 +58,8 @@ const (
 	EventTypeCriterionSatisfied EventType = "criterion_satisfied"
 	// EventTypeReferenceLinked records that a reference link was created or updated between objects.
 	EventTypeReferenceLinked EventType = "reference_linked"
+	// EventTypeSchedulerCallback records a background scheduler job callback execution event.
+	EventTypeSchedulerCallback EventType = "scheduler_callback"
 )
 
 // LifecycleEvent is one durable record in the lifecycle event WAL.

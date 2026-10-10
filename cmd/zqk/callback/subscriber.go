@@ -151,7 +151,7 @@ func (s *KernelWALSubscriber) synthesizeEvent(entry *CallbackEntry) *lifecycle.L
 		event.ToStatus = toStatus
 		return event
 	}
-	event.EventType = lifecycle.EventType("scheduler_callback")
+	event.EventType = lifecycle.EventTypeSchedulerCallback
 	event.ID = jobID
 	event.Kind = "scheduler_job"
 	if success, ok := payload["success"].(bool); ok && success {
