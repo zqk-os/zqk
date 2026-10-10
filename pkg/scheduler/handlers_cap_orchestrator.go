@@ -434,7 +434,11 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 			return nil
 		}
 	}
-	switch instruction {
+	cleanInstruction := strings.TrimSpace(instruction)
+	if idx := strings.LastIndex(cleanInstruction, "\n"); idx >= 0 {
+		cleanInstruction = strings.TrimSpace(cleanInstruction[idx+1:])
+	}
+	switch cleanInstruction {
 	case "cap_stage_review":
 		stageErr = h.executeReviewStage(timeoutCtx, exe)
 	case "cap_stage_metrics":
@@ -455,7 +459,7 @@ func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob)
 	case "cap_stage_sentinel":
 		stageErr = h.executeSentinelStage(timeoutCtx, exe)
 	case "", "wait", "shutdown":
-		if instruction == "" || instruction == "shutdown" {
+		if cleanInstruction == "" || cleanInstruction == "shutdown" {
 			hasGrooming := false
 			groomingPlanID := ""
 			if result.PriorityPlan != nil && result.PriorityPlan.Status == objects.ObjectStatusGrooming {
