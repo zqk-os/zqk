@@ -164,7 +164,6 @@ func (s *KernelWALSubscriber) synthesizeEvent(entry *CallbackEntry) *lifecycle.L
 	return event
 }
 
-
 // MultiSubscriberDispatcher coordinates and fans out callback events across registered subscribers.
 type MultiSubscriberDispatcher struct {
 	mu          sync.RWMutex

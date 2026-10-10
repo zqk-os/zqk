@@ -105,10 +105,10 @@ case <-wakerCh:
 
 ## 6. TPM Traceability
 
-- **Requirement**: `REQ-1791618261909567000-28b31661`
-- **Backlog Item**: `BLI-1791618263412927000-bcea41a4`
-- **Test Case**: `TST-1791618263412927001-245dfd61`
+- **Requirement**: `REQ-REACTIVE-AGENT-SYNC-LOOP`
+- **Backlog Item**: `BLI-REACTIVE-AGENT-SYNC-LOOP`
+- **Test Case**: `TST-REACTIVE-AGENT-SYNC-LOOP`
 - **Criteria**:
-  - `CRIT-1791618263412927000-ab3c79b9`: Functional acceptance (reactive waker integration)
-  - `CRIT-1791618263412928000-337c12b7`: Boundary & error handling (defer unregistration, fallback heartbeat)
-  - `CRIT-1791618263412929000-ca808b32`: Architecture documentation & Knowledge Base entry
+  - `CRIT-REACTIVE-WAKER-INTEGRATION`: Functional acceptance (reactive waker integration)
+  - `CRIT-REACTIVE-SYNC-ERROR-HANDLING`: Boundary & error handling (defer unregistration, fallback heartbeat)
+  - `CRIT-REACTIVE-SYNC-DOCS`: Architecture documentation & Knowledge Base entry
