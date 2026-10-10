@@ -942,4 +942,3 @@ exit 0
 		t.Fatalf("expected wake event for PRI-GROOM-1 and tpm in %s, got: %s", eventPath, content)
 	}
 }
-
