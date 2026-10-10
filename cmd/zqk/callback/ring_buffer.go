@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/walutil"
@@ -413,10 +414,10 @@ func (s *ShardedRingBuffer) ShardIndexFor(entry *CallbackEntry) int {
 }
 
 func extractKeyFromPayload(payload map[string]any) string {
-	if objID, ok := payload["object_id"].(string); ok && objID != "" {
+	if objID := objects.GetString(payload, "object_id"); objID != "" {
 		return objID
 	}
-	if id, ok := payload["id"].(string); ok && id != "" {
+	if id := objects.GetString(payload, "id"); id != "" {
 		return id
 	}
 	return ""
@@ -498,24 +499,9 @@ func (s *ShardedRingBuffer) DrainAll(maxPerShard int) []*CallbackEntry {
 // CommittedWatermark calculates the minimum committed watermark among all active shards.
 // Active shards are partitions that have received at least one event.
 func (s *ShardedRingBuffer) CommittedWatermark() int64 {
-	var minWatermark int64 = -1
-	activeShards := 0
-
-	for _, shard := range s.shards {
-		if shard.TotalPushed() == 0 {
-			continue
-		}
-		activeShards++
-		wm := shard.Watermark()
-		if minWatermark == -1 || wm < minWatermark {
-			minWatermark = wm
-		}
-	}
-
-	if activeShards == 0 || minWatermark < 0 {
-		return 0
-	}
-	return minWatermark
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.committedWatermarkLocked()
 }
 
 // SetWALTruncator assigns the WAL truncation driver.
