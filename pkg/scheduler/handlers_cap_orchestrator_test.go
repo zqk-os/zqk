@@ -878,15 +878,13 @@ func TestCapOrchestratorHandler_IdleGroomingWakesTPM(t *testing.T) {
 		whatsnext.WaitForReconcile(2 * time.Second)
 	})
 
+	origStages := whatsnext.CapStages
+	whatsnext.CapStages = []string{"shutdown"}
+	defer func() { whatsnext.CapStages = origStages }()
+
 	mockZqk := filepath.Join(tempDir, "zqk")
 	script := `#!/bin/bash
-if [[ "$1" == "workflow" && "$2" == "whats-next" ]]; then
-	cat <<EOF
-{"agent_instruction":"shutdown","active_plans":[{"id":"PRI-GROOM-1","status":"grooming","title":"Grooming Cycle"}]}
-EOF
-	exit 0
-fi
-exit 1
+exit 0
 `
 	if err := fileutil.WriteFile(mockZqk, []byte(script), paths.DirPerm755); err != nil {
 		t.Fatalf("failed to write mock zqk: %v", err)
@@ -895,15 +893,34 @@ exit 1
 	oldPath := zqkenv.OSPath().Get()
 	t.Setenv(zqkenv.OSPath().Name(), tempDir+string(fileutil.PathListSeparator)+oldPath)
 
-	storage := &mockStorage{data: map[string]map[string]any{
-		"PRI-GROOM-1": {
-			objects.FieldKeyID:     "PRI-GROOM-1",
-			objects.FieldKeyKind:   objects.KindPriorityPlan,
-			objects.FieldKeyStatus: objects.ObjectStatusGrooming,
-			objects.FieldKeyTitle:  "Grooming Cycle",
+	// Write system-check cache and align cache to prevent FillItem compilation
+	checkPath := filepath.Join(tempDir, paths.ProjectDataDir, paths.LogsDir, "system-check.json")
+	_ = fileutil.MkdirAll(filepath.Dir(checkPath), paths.DirPerm755)
+	_ = fileutil.WriteFile(checkPath, []byte(`{"measured_at":"2026-10-10T12:00:00Z","summary":{"total_objects":1}}`), paths.FilePerm644)
+	alignPath := filepath.Join(tempDir, paths.ProjectDataDir, paths.StateDir, "ambient", "align-latest.json")
+	_ = fileutil.MkdirAll(filepath.Dir(alignPath), paths.DirPerm755)
+	_ = fileutil.WriteFile(alignPath, []byte(`{"aligned_at":"2026-10-10T12:00:00Z"}`), paths.FilePerm644)
+
+	mStorage := &mockCapStorage{
+		listed: map[string][]map[string]any{
+			objects.KindPriorityPlan: {
+				{
+					objects.FieldKeyID:     "PRI-GROOM-1",
+					objects.FieldKeyKind:   objects.KindPriorityPlan,
+					objects.FieldKeyStatus: objects.ObjectStatusGrooming,
+					objects.FieldKeyTitle:  "Grooming Cycle",
+				},
+			},
+			objects.KindBacklogItem: {
+				{
+					objects.FieldKeyID:              "BLI-COMPLETED",
+					objects.FieldKeyStatus:          objects.ObjectStatusComplete,
+					objects.FieldKeyPriorityPlanRef: "PRI-GROOM-1",
+				},
+			},
 		},
-	}}
-	h := NewCapOrchestratorHandler(storage, tempDir, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)))
+	}
+	h := NewCapOrchestratorHandler(mStorage, tempDir, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem)))
 
 	job := &ScheduledJob{
 		ID:      "SCH-CAP-GROOM",
