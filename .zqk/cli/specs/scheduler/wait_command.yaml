@@ -1,0 +1,40 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "wait <job_id>"
+short: "Wait for a scheduler job to complete reactively via WAL wakers"
+description: |
+  Wait for a background scheduler job callback execution to complete using
+  reactive Knowledge Kernel WAL replay and in-memory job wakers.
+  Avoids idle polling stalls and exits 0 on completion with result metadata.
+
+args:
+  type: "exact"
+  count: 1
+
+flags:
+  - name: "timeout"
+    type: "duration"
+    default: "5m"
+    description: "Maximum duration to wait for job completion"
+  - name: "poll-interval"
+    type: "duration"
+    default: "50ms"
+    description: "Interval between WAL replay polling checks"
+
+help:
+  examples:
+    - comment: "Wait for job completion with default timeout (5m)"
+      command: "%s scheduler wait SCH-001"
+    - comment: "Wait with custom timeout and poll interval"
+      command: "%s scheduler wait SCH-001 --timeout 2m --poll-interval 100ms"
+    - comment: "Wait and output JSON result"
+      command: "%s scheduler wait SCH-001 --format json"
+  exclude_flags:
+    - "output"
+    - "verbose"
+    - "quiet"
+    - "columns"
+
+run_e: "runWait"
+async: false
+common_flags: true
