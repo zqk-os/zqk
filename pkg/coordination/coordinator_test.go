@@ -1,11 +1,12 @@
 package coordination
 
 import (
-	"github.com/zqk-os/zqk/pkg/datacell"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-
+	"context"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/datacell"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -290,5 +291,52 @@ func TestResolveLogLevel_QueueShutdownNoiseSuppression(t *testing.T) {
 				t.Errorf("resolveLogLevel() = %v, want %v", level, tt.expectedLevel)
 			}
 		})
+	}
+}
+
+func TestCoordinator_DrainAndWait(t *testing.T) {
+	coordinator := NewCoordinator(CoordinatorConfig{})
+	// Fast drain when no async tasks
+	if err := coordinator.Drain(100 * time.Millisecond); err != nil {
+		t.Fatalf("Drain on empty coordinator failed: %v", err)
+	}
+
+	coordinator.runRouterAsync(pkgctx.NewSystemContext(), "test_router", "test_purpose", func(ctx context.Context) {
+		time.Sleep(20 * time.Millisecond)
+	})
+
+	if err := coordinator.Drain(500 * time.Millisecond); err != nil {
+		t.Fatalf("Drain with active router failed: %v", err)
+	}
+	coordinator.Wait()
+}
+
+func TestProgressHelper_Drain(t *testing.T) {
+	var nilHelper *ProgressHelper
+	if err := nilHelper.Drain(100 * time.Millisecond); err != nil {
+		t.Fatalf("Drain on nil helper failed: %v", err)
+	}
+
+	coord := NewCoordinator(CoordinatorConfig{})
+	helper := NewProgressHelper(coord, t.TempDir(), "op-drain", "test_op", "system")
+	if err := helper.Drain(100 * time.Millisecond); err != nil {
+		t.Fatalf("Drain on helper failed: %v", err)
+	}
+}
+
+func TestDrainGlobalCoordinator(t *testing.T) {
+	old := GetCoordinator()
+	defer SetGlobalCoordinator(old)
+
+	coord := NewCoordinator(CoordinatorConfig{})
+	SetGlobalCoordinator(coord)
+
+	if err := DrainGlobalCoordinator(100 * time.Millisecond); err != nil {
+		t.Fatalf("DrainGlobalCoordinator failed: %v", err)
+	}
+
+	ResetGlobalCoordinator()
+	if err := DrainGlobalCoordinator(100 * time.Millisecond); err != nil {
+		t.Fatalf("DrainGlobalCoordinator on nil coordinator failed: %v", err)
 	}
 }
