@@ -40,6 +40,39 @@ func GetOrCreateLifecycleWAL(projectRoot string) (*LifecycleEventWAL, error) {
 	return w, nil
 }
 
+// CloseLifecycleWAL closes and removes the cached lifecycle event WAL for projectRoot.
+func CloseLifecycleWAL(projectRoot string) error {
+	if projectRoot == emptyValue {
+		return nil
+	}
+	walCacheMu.Lock()
+	w := walCache[projectRoot]
+	delete(walCache, projectRoot)
+	walCacheMu.Unlock()
+	if w != nil {
+		return w.Close()
+	}
+	return nil
+}
+
+// ResetLifecycleWALCache closes all cached WALs and clears the map.
+func ResetLifecycleWALCache() error {
+	walCacheMu.Lock()
+	cached := walCache
+	walCache = make(map[string]*LifecycleEventWAL)
+	walCacheMu.Unlock()
+
+	var firstErr error
+	for _, w := range cached {
+		if w != nil {
+			if err := w.Close(); err != nil && firstErr == nil {
+				firstErr = err
+			}
+		}
+	}
+	return firstErr
+}
+
 func appendLifecycleEvent(projectRoot string, ev *LifecycleEvent) {
 	if projectRoot == emptyValue {
 		return

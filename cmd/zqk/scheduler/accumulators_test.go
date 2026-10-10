@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/accumulator"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 )
 
 type testSchedulerSubscriber struct {
@@ -38,4 +39,8 @@ func TestStartSupervisedAccumulators(t *testing.T) {
 	if !sub.started {
 		t.Errorf("expected test subscriber to be started by StartSupervisedAccumulators")
 	}
+
+	cancel()
+	time.Sleep(30 * time.Millisecond)
+	_ = lifecycle.CloseLifecycleWAL(tempDir)
 }
