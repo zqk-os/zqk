@@ -18,7 +18,7 @@ func TestSpecDrivenUpdateModes(t *testing.T) {
 		t.Fatalf("Failed to initialize storage: %v", err)
 	}
 
-	t.Cleanup(func() { _ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, nil)) })
+	t.Cleanup(func() { _ = RunProjectTestTeardown(TempProjectTeardown(tmpDir, f)) })
 
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()

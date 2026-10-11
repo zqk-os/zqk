@@ -73,7 +73,7 @@ func (c *Coordinator) buildEmitPipeline(eventCtx *EventContext) *pipeline.Pipeli
 		} else {
 			b.AddStage(stageCoordinatorEmitTriggerLoggingAsync, func(pctx *pipeline.Context, payload any) (any, error) {
 				ev := payload.(*EventContext)
-				runCoordinatorRouterAsync(pctx.Ctx, "coordinator_logging_router", "coordination.emit/"+stageCoordinatorEmitTriggerLoggingAsync, func(ctx context.Context) {
+				c.runRouterAsync(pctx.Ctx, "coordinator_logging_router", "coordination.emit/"+stageCoordinatorEmitTriggerLoggingAsync, func(ctx context.Context) {
 					_ = c.emitLoggingRouter(ctx, ev) //nolint:errcheck // Async, best-effort
 				})
 				return payload, nil
@@ -93,7 +93,7 @@ func (c *Coordinator) buildEmitPipeline(eventCtx *EventContext) *pipeline.Pipeli
 		} else {
 			b.AddStage(stageCoordinatorEmitTriggerAuditAsync, func(pctx *pipeline.Context, payload any) (any, error) {
 				ev := payload.(*EventContext)
-				runCoordinatorRouterAsync(pctx.Ctx, "coordinator_audit_router", "coordination.emit/"+stageCoordinatorEmitTriggerAuditAsync, func(ctx context.Context) {
+				c.runRouterAsync(pctx.Ctx, "coordinator_audit_router", "coordination.emit/"+stageCoordinatorEmitTriggerAuditAsync, func(ctx context.Context) {
 					_ = c.emitAuditRouter(ctx, ev) //nolint:errcheck // Async, best-effort
 				})
 				return payload, nil
@@ -104,7 +104,7 @@ func (c *Coordinator) buildEmitPipeline(eventCtx *EventContext) *pipeline.Pipeli
 	if eventCtx.EmitMetrics && metricsrecording.Enabled() {
 		b.AddStage(stageCoordinatorEmitTriggerMetrics, func(pctx *pipeline.Context, payload any) (any, error) {
 			ev := payload.(*EventContext)
-			runCoordinatorRouterAsync(pctx.Ctx, "coordinator_metrics_router", "coordination.emit/"+stageCoordinatorEmitTriggerMetrics, func(ctx context.Context) {
+			c.runRouterAsync(pctx.Ctx, "coordinator_metrics_router", "coordination.emit/"+stageCoordinatorEmitTriggerMetrics, func(ctx context.Context) {
 				_ = c.emitMetricsRouter(ctx, ev) //nolint:errcheck // Async, best-effort
 			})
 			return payload, nil
@@ -121,7 +121,7 @@ func (c *Coordinator) buildEmitPipeline(eventCtx *EventContext) *pipeline.Pipeli
 		} else {
 			b.AddStage(stageCoordinatorEmitTriggerOperationalAsync, func(pctx *pipeline.Context, payload any) (any, error) {
 				ev := payload.(*EventContext)
-				runCoordinatorRouterAsync(pctx.Ctx, "coordinator_operational_router", "coordination.emit/"+stageCoordinatorEmitTriggerOperationalAsync, func(ctx context.Context) {
+				c.runRouterAsync(pctx.Ctx, "coordinator_operational_router", "coordination.emit/"+stageCoordinatorEmitTriggerOperationalAsync, func(ctx context.Context) {
 					c.emitOperationalEvent(ctx, ev)
 				})
 				return payload, nil

@@ -18,7 +18,8 @@ type CallbackEntry struct {
 	Payload   map[string]any
 	Timestamp time.Time
 	JobID     string
-	Priority  int // Higher priority processed first
+	Priority  int   // Higher priority processed first
+	Seq       int64 // Sequence number for WAL watermark tracking and ordering
 }
 
 // Queue manages a queue of callback entries with sorting
