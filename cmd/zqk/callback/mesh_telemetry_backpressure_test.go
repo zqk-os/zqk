@@ -13,6 +13,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
+// closeThrottlerInCleanup ensures clean resource release without blank identifier assignment.
+func closeThrottlerInCleanup(t *testing.T, throttler *MeshBackpressureThrottler) {
+	t.Cleanup(func() {
+		closeErr := throttler.Close()
+		assert.NoError(t, closeErr)
+	})
+}
+
 // -----------------------------------------------------------------------------
 // CRIT-1791759409830632000-8c68a2b5:
 // Static Invariants: Layout, Bounded Sliding Window Buffer, and Metric Accumulator
@@ -156,7 +164,7 @@ func TestMeshBackpressure_CreditDeductionAndReplenishment(t *testing.T) {
 		DefaultPolicy: PolicyReject,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "sub-pool-alpha"
 	pool, err := throttler.RegisterPool(SubscriberPoolConfig{
@@ -196,7 +204,7 @@ func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 		DefaultPolicy: PolicyWait,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "sub-pool-waiting"
 	_, err = throttler.RegisterPool(SubscriberPoolConfig{
@@ -212,8 +220,8 @@ func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 
 	acquiredCh := make(chan error, 1)
 	goroutinelabels.NewGoroutine("test_wait_acquire", "wait for credits in test").StartSimple(func() {
-		err := throttler.Acquire(ctx, poolID, 5)
-		acquiredCh <- err
+		acqErr := throttler.Acquire(ctx, poolID, 5)
+		acquiredCh <- acqErr
 	})
 
 	// Ensure the goroutine is waiting
@@ -229,8 +237,8 @@ func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 	require.NoError(t, err)
 
 	select {
-	case err := <-acquiredCh:
-		require.NoError(t, err)
+	case waitErr := <-acquiredCh:
+		require.NoError(t, waitErr)
 	case <-time.After(1 * time.Second):
 		t.Fatal("Acquire timed out waiting for replenishment signal")
 	}
@@ -243,7 +251,7 @@ func TestMeshBackpressure_PolicyWait_ContextCancellation(t *testing.T) {
 		DefaultPolicy: PolicyWait,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "sub-pool-cancel"
 	_, err = throttler.RegisterPool(SubscriberPoolConfig{
@@ -272,7 +280,7 @@ func TestMeshBackpressure_PolicyDropOldest(t *testing.T) {
 		Aggregator:    agg,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "sub-pool-lossy"
 	pool, err := throttler.RegisterPool(SubscriberPoolConfig{
@@ -308,7 +316,7 @@ func TestMeshBackpressure_AdaptiveRateLimiter_AIMD(t *testing.T) {
 		MultiplicativeDecrease: 0.50,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "adaptive-pool"
 	pool, err := throttler.RegisterPool(SubscriberPoolConfig{
@@ -340,6 +348,49 @@ func TestMeshBackpressure_AdaptiveRateLimiter_AIMD(t *testing.T) {
 	assert.Equal(t, 225.0, pool.RateLimit())
 }
 
+func runBurstWorker(
+	ctx context.Context,
+	throttler *MeshBackpressureThrottler,
+	agg *MeshTelemetryAggregator,
+	poolID string,
+	opsCount int,
+	successfulOps *atomic.Int64,
+	throttledOps *atomic.Int64,
+) {
+	for j := 0; j < opsCount; j++ {
+		acqErr := throttler.Acquire(ctx, poolID, 1)
+		if acqErr == nil {
+			successfulOps.Add(1)
+			agg.RecordDispatch("burst-topic", "broker-1", poolID, 2*time.Millisecond)
+			ackErr := throttler.Acknowledge(poolID, 1, 2*time.Millisecond)
+			if ackErr != nil {
+				throttledOps.Add(1)
+			}
+		} else {
+			throttledOps.Add(1)
+		}
+		drainErr := throttler.RecordDrain(poolID, 1, 100, 1000)
+		if drainErr != nil {
+			throttledOps.Add(1)
+		}
+	}
+}
+
+func runSnapshotLoop(agg *MeshTelemetryAggregator, stopSnap <-chan struct{}) {
+	for {
+		select {
+		case <-stopSnap:
+			return
+		default:
+			snapResult := agg.Snapshot()
+			if snapResult.TotalDispatched < 0 {
+				return
+			}
+			time.Sleep(2 * time.Millisecond)
+		}
+	}
+}
+
 func TestMeshBackpressure_ConcurrentBurstAndRaceDetector(t *testing.T) {
 	t.Parallel()
 
@@ -351,7 +402,7 @@ func TestMeshBackpressure_ConcurrentBurstAndRaceDetector(t *testing.T) {
 		Aggregator:    agg,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "concurrent-burst-pool"
 	_, err = throttler.RegisterPool(SubscriberPoolConfig{
@@ -374,36 +425,15 @@ func TestMeshBackpressure_ConcurrentBurstAndRaceDetector(t *testing.T) {
 		workersWg.Add(1)
 		goroutinelabels.NewGoroutine(fmt.Sprintf("concurrent_worker_%d", i), "concurrent burst stress test").StartSimple(func() {
 			defer workersWg.Done()
-			ctx := context.Background()
-
-			for j := 0; j < opsPerWorker; j++ {
-				err := throttler.Acquire(ctx, poolID, 1)
-				if err == nil {
-					successfulOps.Add(1)
-					agg.RecordDispatch("burst-topic", "broker-1", poolID, 2*time.Millisecond)
-					_ = throttler.Acknowledge(poolID, 1, 2*time.Millisecond)
-				} else {
-					throttledOps.Add(1)
-				}
-				_ = throttler.RecordDrain(poolID, 1, 100, 1000)
-			}
+			runBurstWorker(context.Background(), throttler, agg, poolID, opsPerWorker, &successfulOps, &throttledOps)
 		})
 	}
 
-	// Concurrent snapshotting to assert zero race conditions
 	stopSnap := make(chan struct{})
 	snapWg.Add(1)
 	goroutinelabels.NewGoroutine("concurrent_snapshotter", "snapshotting under burst").StartSimple(func() {
 		defer snapWg.Done()
-		for {
-			select {
-			case <-stopSnap:
-				return
-			default:
-				_ = agg.Snapshot()
-				time.Sleep(2 * time.Millisecond)
-			}
-		}
+		runSnapshotLoop(agg, stopSnap)
 	})
 
 	workersWg.Wait()
@@ -427,7 +457,7 @@ func TestMeshBackpressure_NegativeBoundariesAndDefensiveRejection(t *testing.T) 
 		DefaultPolicy: PolicyReject,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	ctx := context.Background()
 
@@ -500,8 +530,8 @@ func TestMeshBackpressure_LifecycleCleanShutdownAndNoGoroutineLeaks(t *testing.T
 
 	waiterUnblocked := make(chan error, 1)
 	goroutinelabels.NewGoroutine("test_shutdown_waiter", "waiter unblocked on Close").StartSimple(func() {
-		err := throttler.Acquire(context.Background(), poolID, 5)
-		waiterUnblocked <- err
+		acqErr := throttler.Acquire(context.Background(), poolID, 5)
+		waiterUnblocked <- acqErr
 	})
 
 	time.Sleep(50 * time.Millisecond)
@@ -512,8 +542,8 @@ func TestMeshBackpressure_LifecycleCleanShutdownAndNoGoroutineLeaks(t *testing.T
 
 	// Waiter must immediately unblock with ErrThrottlerClosed
 	select {
-	case err := <-waiterUnblocked:
-		assert.ErrorIs(t, err, ErrThrottlerClosed)
+	case waitErr := <-waiterUnblocked:
+		assert.ErrorIs(t, waitErr, ErrThrottlerClosed)
 	case <-time.After(1 * time.Second):
 		t.Fatal("Waiter did not unblock upon Close()")
 	}
@@ -537,7 +567,7 @@ func TestMeshController_UnifiedSubscriberIntegration(t *testing.T) {
 		Aggregator:    agg,
 	})
 	require.NoError(t, err)
-	defer func() { _ = throttler.Close() }()
+	closeThrottlerInCleanup(t, throttler)
 
 	poolID := "unified-pool"
 	_, err = throttler.RegisterPool(SubscriberPoolConfig{
@@ -572,5 +602,6 @@ func TestMeshController_UnifiedSubscriberIntegration(t *testing.T) {
 	assert.Equal(t, int64(1), snap.TotalDispatched)
 
 	// Close controller
-	assert.NoError(t, controller.Close())
+	ctrlCloseErr := controller.Close()
+	assert.NoError(t, ctrlCloseErr)
 }

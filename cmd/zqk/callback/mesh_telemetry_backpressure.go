@@ -11,7 +11,7 @@ import (
 
 // Default telemetry and backpressure watermark constants.
 const (
-	DefaultWindowDuration               = 10 * time.Second
+	DefaultWindowDuration              = 10 * time.Second
 	DefaultWindowBucketCount            = 10
 	DefaultMeshTelemetrySubscriberName  = "mesh_telemetry_aggregator"
 	DefaultMeshControllerName           = "mesh_telemetry_backpressure_controller"
@@ -24,13 +24,13 @@ const (
 
 // Error definitions for telemetry and backpressure boundaries.
 var (
-	ErrInvalidConfiguration = errfmt.Errorf("invalid configuration parameters")
-	ErrSubscriberNotFound   = errfmt.Errorf("subscriber pool not found")
-	ErrInvalidCreditAmount  = errfmt.Errorf("credit amount must be greater than zero")
-	ErrCreditExhausted      = errfmt.Errorf("subscriber credit budget exhausted")
+	ErrInvalidConfiguration  = errfmt.Errorf("invalid configuration parameters")
+	ErrSubscriberNotFound    = errfmt.Errorf("subscriber pool not found")
+	ErrInvalidCreditAmount   = errfmt.Errorf("credit amount must be greater than zero")
+	ErrCreditExhausted       = errfmt.Errorf("subscriber credit budget exhausted")
 	ErrDebtThresholdExceeded = errfmt.Errorf("credit request exceeds permissible debt threshold")
-	ErrNilTelemetryEntry    = errfmt.Errorf("telemetry callback entry cannot be nil")
-	ErrThrottlerClosed      = errfmt.Errorf("mesh backpressure throttler is closed")
+	ErrNilTelemetryEntry     = errfmt.Errorf("telemetry callback entry cannot be nil")
+	ErrThrottlerClosed       = errfmt.Errorf("mesh backpressure throttler is closed")
 )
 
 // BackpressurePolicy specifies worker queue shedding behavior under load.
@@ -123,17 +123,21 @@ func (b *SlidingWindowBuffer) getOrInitBucket(t time.Time) *windowBucket {
 	return bucket
 }
 
+func durationToLatencyBucketIndex(d time.Duration) int {
+	ns := uint64(d.Nanoseconds())
+	idx := bits.Len64(ns)
+	if idx >= LatencyBucketCount {
+		return LatencyBucketCount - 1
+	}
+	return idx
+}
+
 func recordLatencyToBucket(buckets *[LatencyBucketCount]int64, d time.Duration) {
 	if d <= 0 {
 		buckets[0]++
 		return
 	}
-	ns := d.Nanoseconds()
-	bucket := bits.Len64(uint64(ns))
-	if bucket >= LatencyBucketCount {
-		bucket = LatencyBucketCount - 1
-	}
-	buckets[bucket]++
+	buckets[durationToLatencyBucketIndex(d)]++
 }
 
 // Record records events into the active sub-bucket matching time t.
@@ -424,9 +428,15 @@ func (a *MeshTelemetryAggregator) Notify(ctx context.Context, entry *CallbackEnt
 
 	var topic, broker, subscriber string
 	if entry.Payload != nil {
-		topic, _ = entry.Payload[MetricKeyTopic].(string)
-		broker, _ = entry.Payload[MetricKeyBroker].(string)
-		subscriber, _ = entry.Payload[MetricKeySubscriber].(string)
+		if v, ok := entry.Payload[MetricKeyTopic].(string); ok {
+			topic = v
+		}
+		if v, ok := entry.Payload[MetricKeyBroker].(string); ok {
+			broker = v
+		}
+		if v, ok := entry.Payload[MetricKeySubscriber].(string); ok {
+			subscriber = v
+		}
 	}
 
 	var elapsed time.Duration
@@ -494,6 +504,37 @@ func (p *SubscriberPool) RateLimit() float64 {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	return p.rateLimit
+}
+
+func (p *SubscriberPool) replenishAndBroadcast(amount int64) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	p.credits += amount
+	if p.maxCredits > 0 && p.credits > p.maxCredits {
+		p.credits = p.maxCredits
+	}
+
+	close(p.notifyCh)
+	p.notifyCh = make(chan struct{})
+}
+
+func (p *SubscriberPool) acknowledgeAndReplenish(credits int64) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.inFlight > 0 {
+		p.inFlight--
+	}
+	if credits > 0 {
+		p.credits += credits
+		if p.maxCredits > 0 && p.credits > p.maxCredits {
+			p.credits = p.maxCredits
+		}
+	}
+
+	close(p.notifyCh)
+	p.notifyCh = make(chan struct{})
 }
 
 // ThrottlerConfig configures backpressure thresholds, default shedding policy, and AIMD parameters.
@@ -580,13 +621,16 @@ func (t *MeshBackpressureThrottler) GetPool(poolID string) (*SubscriberPool, err
 	return pool, nil
 }
 
+func (t *MeshBackpressureThrottler) resolvePoolForCredits(poolID string, credits int64) (*SubscriberPool, error) {
+	if credits <= 0 {
+		return nil, ErrInvalidCreditAmount
+	}
+	return t.GetPool(poolID)
+}
+
 // Acquire requests credits for a subscriber pool, blocking or shedding according to policy.
 func (t *MeshBackpressureThrottler) Acquire(ctx context.Context, poolID string, credits int64) error {
-	if credits <= 0 {
-		return ErrInvalidCreditAmount
-	}
-
-	pool, err := t.GetPool(poolID)
+	pool, err := t.resolvePoolForCredits(poolID, credits)
 	if err != nil {
 		return err
 	}
@@ -653,25 +697,12 @@ func (t *MeshBackpressureThrottler) Acquire(ctx context.Context, poolID string, 
 
 // Replenish adds credits to a subscriber pool and notifies blocked waiters.
 func (t *MeshBackpressureThrottler) Replenish(poolID string, credits int64) error {
-	if credits <= 0 {
-		return ErrInvalidCreditAmount
-	}
-
-	pool, err := t.GetPool(poolID)
+	pool, err := t.resolvePoolForCredits(poolID, credits)
 	if err != nil {
 		return err
 	}
 
-	pool.mu.Lock()
-	defer pool.mu.Unlock()
-
-	pool.credits += credits
-	if pool.maxCredits > 0 && pool.credits > pool.maxCredits {
-		pool.credits = pool.maxCredits
-	}
-
-	close(pool.notifyCh)
-	pool.notifyCh = make(chan struct{})
+	pool.replenishAndBroadcast(credits)
 	return nil
 }
 
@@ -682,21 +713,7 @@ func (t *MeshBackpressureThrottler) Acknowledge(poolID string, credits int64, la
 		return err
 	}
 
-	pool.mu.Lock()
-	defer pool.mu.Unlock()
-
-	if pool.inFlight > 0 {
-		pool.inFlight--
-	}
-	if credits > 0 {
-		pool.credits += credits
-		if pool.maxCredits > 0 && pool.credits > pool.maxCredits {
-			pool.credits = pool.maxCredits
-		}
-	}
-
-	close(pool.notifyCh)
-	pool.notifyCh = make(chan struct{})
+	pool.acknowledgeAndReplenish(credits)
 	return nil
 }
 
