@@ -188,4 +188,3 @@ Dispatched events are enqueued into partition shards with sub-microsecond latenc
 | **CRIT-RING-BUFFER-WATERMARK-TRUNCATION** | Committed watermark calculation, WAL truncation hook, race-clean concurrency, leak resilience. | `TestShardedRingBuffer_CommittedWatermarkAcrossShards`<br>`TestShardedRingBuffer_ConcurrentPushAndDrain`<br>`TestShardedRingBuffer_WALTruncationHook`<br>`TestTruncateLifecycleWALFile` | Verified |
 | **CRIT-RING-BUFFER-ARCHITECTURE-DOC** | Architectural documentation specifying topology, hashing, watermark calculation, and protocol. | `docs/architecture/SHARDED_RING_BUFFER_WAL_TRUNCATION.md` | Verified |
 | **TST-RING-BUFFER-UNIFIED-VERIFICATION** | Unified verification group for ring buffer and WAL truncation. | `go test -v -race ./cmd/zqk/callback/...` | Verified |
-
