@@ -355,6 +355,30 @@ if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
 	fi
 fi
 
+# 0b. Upstream Base-Synchronization Gate (POL-WORKFLOW-003)
+# Any integration/feature branch MUST be rooted on the latest tip of origin/main.
+if [ "$CURRENT_BRANCH" != "main" ] && [ "$CURRENT_BRANCH" != "master" ]; then
+	if git rev-parse --verify origin/main >/dev/null 2>&1; then
+		BEHIND_COUNT="$(git rev-list --count HEAD..origin/main 2>/dev/null || echo "0")"
+		if [ "$BEHIND_COUNT" -gt 0 ]; then
+			if [ "${ZQK_ALLOW_STALE_BASE}" != "1" ]; then
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "❌ [ZQK PRE-COMMIT] FAIL-CLOSED UPSTREAM SYNC VIOLATION (POL-WORKFLOW-003)" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "Branch '$CURRENT_BRANCH' is behind 'origin/main' by $BEHIND_COUNT commit(s)." >&2
+				echo "Committing on a stale base causes PR merge conflicts and triggers redundant 40m CI builds." >&2
+				echo "" >&2
+				echo "Remediation:" >&2
+				echo "  1. git fetch origin" >&2
+				echo "  2. git checkout main && git merge --ff-only origin/main" >&2
+				echo "  3. git checkout $CURRENT_BRANCH && git rebase main" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				exit 1
+			fi
+		fi
+	fi
+fi
+
 # 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
 # Any staged file under .zqk/process/**/*.yaml must:
 # a) Have its filename match sha256 of its staged content (CAS content-addressable hash invariant)
@@ -565,6 +589,31 @@ while read -r local_ref local_oid remote_ref remote_oid; do
 		exit 1
 	fi
 done
+
+# 0b. Upstream Base-Synchronization Gate (POL-WORKFLOW-003)
+# Any integration/feature branch MUST be rooted on the latest tip of origin/main.
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+if [ "$CURRENT_BRANCH" != "main" ] && [ "$CURRENT_BRANCH" != "master" ]; then
+	if git rev-parse --verify origin/main >/dev/null 2>&1; then
+		BEHIND_COUNT="$(git rev-list --count HEAD..origin/main 2>/dev/null || echo "0")"
+		if [ "$BEHIND_COUNT" -gt 0 ]; then
+			if [ "${ZQK_ALLOW_STALE_BASE}" != "1" ]; then
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "❌ [ZQK PRE-PUSH] FAIL-CLOSED UPSTREAM SYNC VIOLATION (POL-WORKFLOW-003)" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "Branch '$CURRENT_BRANCH' is behind 'origin/main' by $BEHIND_COUNT commit(s)." >&2
+				echo "Pushing a stale branch causes PR merge conflicts and triggers redundant 40m CI builds." >&2
+				echo "" >&2
+				echo "Remediation:" >&2
+				echo "  1. git fetch origin" >&2
+				echo "  2. git checkout main && git merge --ff-only origin/main" >&2
+				echo "  3. git checkout $CURRENT_BRANCH && git rebase main" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				exit 1
+			fi
+		fi
+	fi
+fi
 
 # Augment PATH so git GUI clients and subshells find go and tools
 export PATH="/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin:$GOPATH/bin:$PATH"
