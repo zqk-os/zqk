@@ -54,6 +54,7 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Dynamic Subscriber Topology Work-Stealing Specification](./DYNAMIC_SUBSCRIBER_TOPOLOGY_WORK_STEALING.md)**: Complete topological specification for subscriber work stealing and partition mapping.
 - **[Distributed Gossip Membership and Peer Failure Detector](./DISTRIBUTED_GOSSIP_FAILURE_DETECTOR.md)**: SWIM protocol implementation with indirect probing, suspicion timers, incarnation monotonicity, and self-healing cluster recovery.
 - **[Adaptive Backoff Exponential Jitter and Quorum Damping](./ADAPTIVE_BACKOFF_QUORUM_DAMPING.md)**: Decorrelated exponential jitter backoff, sliding-window token bucket rate limiting, and storm quorum damping.
+- **[Distributed Event Mesh Telemetry Aggregation & Adaptive Backpressure Throttling](./EVENT_MESH_TELEMETRY_BACKPRESSURE.md)**: Zero-allocation bounded sliding window telemetry aggregation, credit-based backpressure protocol, and AIMD congestion control across subscriber worker pools.
 
 ---
 
