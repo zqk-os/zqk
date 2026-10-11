@@ -50,6 +50,7 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Ambient Signal Action Rubric](./AMBIENT_SIGNAL_ACTION_RUBRIC.md)**: Ambient filesystem watcher events, heuristics evaluation, and proactive maintenance signals.
 - **[Async Check Discovery Decoupling](./ASYNC_CHECK_DISCOVERY_DECOUPLING.md)**: Decoupling disk discovery from validation pipelines to prevent CLI timeout stalls.
 - **[Service Adapter Specification](./SERVICE_ADAPTER_SPECIFICATION.md)**: Unified abstraction across macOS `launchd`, Linux `systemd`, and standalone foreground runners.
+- **[Zero-Copy Shared-Memory IPC and Vectorized Batch Delivery](./ZERO_COPY_SHARED_MEMORY_IPC.md)**: Zero-copy memory-mapped ring buffers, lock-free MPMC queue sequencing, cache-line isolation, and vectorized callback delivery.
 
 ---
 
