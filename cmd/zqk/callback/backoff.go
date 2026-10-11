@@ -170,6 +170,7 @@ func (c *AdaptiveBackoffCalculator) Calculate(attempt int, prevSleep time.Durati
 	if delta <= 0 {
 		delay = c.cfg.MinDelay
 	} else {
+		// #nosec G404 - math/rand/v2 is safe and zero-allocation for non-cryptographic backoff jitter
 		delay = c.cfg.MinDelay + time.Duration(rand.Int64N(int64(delta)+1))
 	}
 
