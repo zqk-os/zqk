@@ -25,6 +25,7 @@ func setupWaitHarness(t *testing.T, args ...string) *waitTestHarness {
 	t.Helper()
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
+	t.Cleanup(func() { _ = lifecycle.CloseLifecycleWAL(tmpDir) })
 
 	cmd := NewWaitCmd()
 	var out bytes.Buffer
@@ -125,6 +126,7 @@ func TestSchedulerWait_WALReplay(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create WAL: %v", err)
 	}
+	defer func() { _ = wal.Close() }()
 
 	walEvent := &lifecycle.LifecycleEvent{
 		EventType: lifecycle.EventTypeSchedulerCallback,
@@ -173,6 +175,7 @@ func TestSchedulerWait_Timeout(t *testing.T) {
 func TestSchedulerWait_ContextCanceled(t *testing.T) {
 	tmpDir := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", tmpDir)
+	t.Cleanup(func() { _ = lifecycle.CloseLifecycleWAL(tmpDir) })
 
 	const jobID = "JOB-CANCEL-001"
 	cmd := NewWaitCmd()
