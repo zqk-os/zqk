@@ -230,22 +230,20 @@ func NewSharedMemoryRingBuffer(capacity uint32, slotPayloadSize uint32) (*Shared
 	return NewInMemoryRingBuffer(capacity, slotPayloadSize)
 }
 
-// NewInMemoryRingBuffer creates an in-memory ring buffer backed by an allocated byte slice.
-func NewInMemoryRingBuffer(capacity uint32, slotPayloadSize uint32) (*SharedMemoryRingBuffer, error) {
+func normalizeRingCapacity(capacity, slotPayloadSize uint32) (uint32, uint32, error) {
 	if capacity == 0 {
 		capacity = DefaultSlotCapacity
 	}
 	if (capacity & (capacity - 1)) != 0 {
-		return nil, ErrInvalidCapacity
+		return 0, 0, ErrInvalidCapacity
 	}
 	if slotPayloadSize == 0 {
 		slotPayloadSize = DefaultSlotPayloadSize
 	}
+	return capacity, slotPayloadSize, nil
+}
 
-	slotSize := calculateAlignedSlotSize(slotPayloadSize)
-	totalSize := int(SHMDataOffset) + int(capacity)*int(slotSize)
-	data := make([]byte, totalSize)
-
+func initializeSegmentHeader(data []byte, capacity, slotPayloadSize, slotSize uint32) SHMHeader {
 	var header SHMHeader
 	copy(header.Magic[:], SHMMagic)
 	header.Version = SHMVersion
@@ -254,11 +252,25 @@ func NewInMemoryRingBuffer(capacity uint32, slotPayloadSize uint32) (*SharedMemo
 	header.SlotPayloadSize = slotPayloadSize
 	header.SlotSize = slotSize
 	writeHeader(data, &header)
+	return header
+}
+
+// NewInMemoryRingBuffer creates an in-memory ring buffer backed by an allocated byte slice.
+func NewInMemoryRingBuffer(capacity uint32, slotPayloadSize uint32) (*SharedMemoryRingBuffer, error) {
+	capVal, payloadVal, err := normalizeRingCapacity(capacity, slotPayloadSize)
+	if err != nil {
+		return nil, err
+	}
+
+	slotSize := calculateAlignedSlotSize(payloadVal)
+	totalSize := int(SHMDataOffset) + int(capVal)*int(slotSize)
+	data := make([]byte, totalSize)
+	header := initializeSegmentHeader(data, capVal, payloadVal, slotSize)
 
 	ring := &SharedMemoryRingBuffer{
-		capacity:        capacity,
-		mask:            uint64(capacity - 1),
-		slotPayloadSize: slotPayloadSize,
+		capacity:        capVal,
+		mask:            uint64(capVal - 1),
+		slotPayloadSize: payloadVal,
 		slotSize:        slotSize,
 		totalSize:       totalSize,
 		data:            data,
@@ -270,14 +282,9 @@ func NewInMemoryRingBuffer(capacity uint32, slotPayloadSize uint32) (*SharedMemo
 
 // OpenMemoryMappedRingBuffer opens or creates a memory-mapped segment file backing the ring buffer.
 func OpenMemoryMappedRingBuffer(filePath string, capacity uint32, slotPayloadSize uint32) (*SharedMemoryRingBuffer, error) {
-	if capacity == 0 {
-		capacity = DefaultSlotCapacity
-	}
-	if (capacity & (capacity - 1)) != 0 {
-		return nil, ErrInvalidCapacity
-	}
-	if slotPayloadSize == 0 {
-		slotPayloadSize = DefaultSlotPayloadSize
+	capVal, payloadVal, normErr := normalizeRingCapacity(capacity, slotPayloadSize)
+	if normErr != nil {
+		return nil, normErr
 	}
 
 	if err := fileutil.MkdirAll(filepath.Dir(filePath), paths.DirPerm755); err != nil {
@@ -293,7 +300,7 @@ func OpenMemoryMappedRingBuffer(filePath string, capacity uint32, slotPayloadSiz
 	}
 
 	if isNew {
-		return createFreshMmapRingBuffer(file, filePath, capacity, slotPayloadSize)
+		return createFreshMmapRingBuffer(file, filePath, capVal, payloadVal)
 	}
 	return openExistingMmapRingBuffer(file, filePath, fileInfo.Size())
 }
@@ -318,14 +325,7 @@ func createFreshMmapRingBuffer(file *os.File, filePath string, capacity uint32, 
 		return nil, errfmt.Newf("failed to memory map shm file %q", filePath).Wrap(err)
 	}
 
-	var header SHMHeader
-	copy(header.Magic[:], SHMMagic)
-	header.Version = SHMVersion
-	header.HeaderSize = SHMHeaderSize
-	header.SlotCapacity = capacity
-	header.SlotPayloadSize = slotPayloadSize
-	header.SlotSize = slotSize
-	writeHeader(data, &header)
+	header := initializeSegmentHeader(data, capacity, slotPayloadSize, slotSize)
 
 	ring := &SharedMemoryRingBuffer{
 		capacity:        capacity,

@@ -13,446 +13,437 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-func TestSHM_SingleProducerSingleConsumer_FIFOAndZeroCopy(t *testing.T) {
-	t.Parallel()
-
-	t.Run("in_memory_fifo_and_zero_copy", func(t *testing.T) {
-		const capacity = 64
-		const payloadSize = 256
-		ring, err := NewInMemoryRingBuffer(capacity, payloadSize)
-		if err != nil {
-			t.Fatalf("failed to create in-memory ring buffer: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
-
-		if ring.Capacity() != capacity {
-			t.Fatalf("expected capacity %d, got %d", capacity, ring.Capacity())
-		}
-		if ring.SlotPayloadSize() != payloadSize {
-			t.Fatalf("expected slot payload size %d, got %d", payloadSize, ring.SlotPayloadSize())
-		}
-
-		const totalEntries = 200 // > 3x capacity to test wraparound
-		for i := 0; i < totalEntries; i++ {
-			msg := fmt.Sprintf("payload-%06d", i)
-			slot, commit, reserveErr := ring.Reserve(uint32(len(msg)))
-			if reserveErr != nil {
-				t.Fatalf("reserve error at index %d: %v", i, reserveErr)
-			}
-
-			// Verify zero-copy: address of slot[0] resides within ring.data backing buffer
-			slotIdx := int(ring.Tail()-1) & int(ring.mask)
-			expectedSlotStart := uintptr(unsafe.Pointer(&ring.slots[slotIdx].payload[0]))
-			actualSlotStart := uintptr(unsafe.Pointer(&slot[0]))
-			if expectedSlotStart != actualSlotStart {
-				t.Fatalf("zero-copy violation at index %d: expected %x, got %x", i, expectedSlotStart, actualSlotStart)
-			}
-
-			copy(slot, msg)
-			commit()
-
-			// Immediately read back to keep ring bounded
-			readSlot, release, readErr := ring.ReserveRead()
-			if readErr != nil {
-				t.Fatalf("read error at index %d: %v", i, readErr)
-			}
-			if string(readSlot) != msg {
-				t.Fatalf("payload mismatch: expected %q, got %q", msg, string(readSlot))
-			}
-			release()
-		}
-
-		if !ring.IsEmpty() {
-			t.Fatalf("expected ring to be empty, size is %d", ring.Size())
-		}
-	})
-
-	t.Run("mmap_fifo_and_persistence", func(t *testing.T) {
-		tmpDir := t.TempDir()
-		shmPath := filepath.Join(tmpDir, "test_shm.seg")
-
-		const capacity = 32
-		const payloadSize = 128
-		ring, err := OpenMemoryMappedRingBuffer(shmPath, capacity, payloadSize)
-		if err != nil {
-			t.Fatalf("failed to open memory-mapped ring buffer: %v", err)
-		}
-
-		const count = 50
-		for i := 0; i < count; i++ {
-			msg := fmt.Sprintf("persisted-%04d", i)
-			slot, commit, rErr := ring.Reserve(uint32(len(msg)))
-			if rErr != nil {
-				t.Fatalf("reserve error at %d: %v", i, rErr)
-			}
-			copy(slot, msg)
-			commit()
-
-			readSlot, release, rdErr := ring.ReserveRead()
-			if rdErr != nil {
-				t.Fatalf("read error at %d: %v", i, rdErr)
-			}
-			if string(readSlot) != msg {
-				t.Fatalf("read mismatch: expected %q, got %q", msg, string(readSlot))
-			}
-			release()
-		}
-
-		// Write two entries and close without reading
-		slot1, commit1, _ := ring.Reserve(uint32(len("item1")))
-		copy(slot1, "item1")
-		commit1()
-
-		slot2, commit2, _ := ring.Reserve(uint32(len("item2")))
-		copy(slot2, "item2")
-		commit2()
-
-		if err := ring.Close(); err != nil {
-			t.Fatalf("failed to close ring buffer: %v", err)
-		}
-
-		// Reopen existing segment file and read the remaining entries
-		reopened, err := OpenExistingMemoryMappedRingBuffer(shmPath)
-		if err != nil {
-			t.Fatalf("failed to reopen existing shm segment: %v", err)
-		}
-		defer func() { _ = reopened.Close() }()
-
-		if reopened.Size() != 2 {
-			t.Fatalf("expected size 2 in reopened segment, got %d", reopened.Size())
-		}
-
-		r1, rel1, err1 := reopened.ReserveRead()
-		if err1 != nil || string(r1) != "item1" {
-			t.Fatalf("expected item1, got %q (err=%v)", string(r1), err1)
-		}
-		rel1()
-
-		r2, rel2, err2 := reopened.ReserveRead()
-		if err2 != nil || string(r2) != "item2" {
-			t.Fatalf("expected item2, got %q (err=%v)", string(r2), err2)
-		}
-		rel2()
-
-		if !reopened.IsEmpty() {
-			t.Fatalf("expected reopened ring to be empty after reads")
-		}
-	})
-
-	t.Run("write_batch_and_read_batch", func(t *testing.T) {
-		ring, err := NewInMemoryRingBuffer(64, 512)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
-
-		entries := []CallbackEntry{
-			{JobID: "job-1", Priority: 10, Seq: 101, Payload: map[string]any{"action": "start"}},
-			{JobID: "job-2", Priority: 20, Seq: 102, Payload: map[string]any{"action": "progress"}},
-			{JobID: "job-3", Priority: 30, Seq: 103, Payload: map[string]any{"action": "complete"}},
-		}
-
-		written, err := ring.WriteBatch(entries)
-		if err != nil {
-			t.Fatalf("write batch failed: %v", err)
-		}
-		if written != len(entries) {
-			t.Fatalf("expected %d written, got %d", len(entries), written)
-		}
-
-		readEntries, err := ring.ReadBatch(10)
-		if err != nil {
-			t.Fatalf("read batch failed: %v", err)
-		}
-		if len(readEntries) != len(entries) {
-			t.Fatalf("expected %d entries read, got %d", len(entries), len(readEntries))
-		}
-
-		for i, expected := range entries {
-			actual := readEntries[i]
-			if actual.JobID != expected.JobID || actual.Priority != expected.Priority || actual.Seq != expected.Seq {
-				t.Fatalf("entry %d mismatch: expected %+v, got %+v", i, expected, actual)
-			}
-			if actual.Payload["action"] != expected.Payload["action"] {
-				t.Fatalf("payload mismatch at %d: expected %v, got %v", i, expected.Payload["action"], actual.Payload["action"])
-			}
-		}
-	})
+func safeCloseRing(t *testing.T, ring *SharedMemoryRingBuffer) {
+	if ring != nil {
+		closeErr := ring.Close()
+		assert.NoError(t, closeErr)
+	}
 }
 
-func TestSHM_VectorizedBatchDelivery_Triggers(t *testing.T) {
+func safeCloseDispatcher(t *testing.T, sub *VectorizedBatchDispatcher) {
+	if sub != nil {
+		closeErr := sub.Close()
+		assert.NoError(t, closeErr)
+	}
+}
+
+func createTestFile(t *testing.T, path string, data []byte) {
+	writeErr := fileutil.WriteFile(path, data, paths.FilePerm644)
+	require.NoError(t, writeErr)
+}
+
+func createSampleEntry(jobID string, seq int64, priority int) *CallbackEntry {
+	return &CallbackEntry{
+		JobID:     jobID,
+		Seq:       seq,
+		Priority:  priority,
+		Timestamp: time.Now(),
+		Payload:   map[string]any{"job_id": jobID, "seq": seq},
+	}
+}
+
+func TestSHM_InMemoryFIFOAndZeroCopy(t *testing.T) {
 	t.Parallel()
 
-	t.Run("batch_capacity_fullness_trigger", func(t *testing.T) {
-		const batchCap = 5
-		var mu sync.Mutex
-		var batches [][]*CallbackEntry
+	const capacity = 64
+	const payloadSize = 256
+	ring, err := NewInMemoryRingBuffer(capacity, payloadSize)
+	require.NoError(t, err)
+	defer safeCloseRing(t, ring)
 
-		batchDelivered := make(chan struct{}, 10)
+	assert.Equal(t, capacity, int(ring.Capacity()))
+	assert.Equal(t, payloadSize, int(ring.SlotPayloadSize()))
 
-		cfg := DefaultVectorizedBatchConfig()
-		cfg.BatchCapacity = batchCap
-		cfg.FlushInterval = 10 * time.Minute // Large timeout so only capacity triggers flush
-		cfg.Handler = func(ctx context.Context, batch []*CallbackEntry) error {
-			mu.Lock()
-			copied := make([]*CallbackEntry, len(batch))
-			copy(copied, batch)
-			batches = append(batches, copied)
-			mu.Unlock()
-			batchDelivered <- struct{}{}
-			return nil
+	const totalEntries = 200
+	for i := 0; i < totalEntries; i++ {
+		msg := fmt.Sprintf("payload-%06d", i)
+		slot, commit, reserveErr := ring.Reserve(uint32(len(msg)))
+		require.NoError(t, reserveErr)
+
+		slotIdx := int(ring.Tail()-1) & int(ring.mask)
+		expectedSlotStart := uintptr(unsafe.Pointer(&ring.slots[slotIdx].payload[0]))
+		actualSlotStart := uintptr(unsafe.Pointer(&slot[0]))
+		assert.Equal(t, expectedSlotStart, actualSlotStart)
+
+		copy(slot, msg)
+		commit()
+
+		readSlot, release, readErr := ring.ReserveRead()
+		require.NoError(t, readErr)
+		assert.Equal(t, msg, string(readSlot))
+		release()
+	}
+
+	assert.True(t, ring.IsEmpty())
+}
+
+func TestSHM_MmapFIFOAndPersistence(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	shmPath := filepath.Join(tmpDir, "test_shm.seg")
+
+	const capacity = 32
+	const payloadSize = 128
+	ring, err := OpenMemoryMappedRingBuffer(shmPath, capacity, payloadSize)
+	require.NoError(t, err)
+
+	const count = 50
+	for i := 0; i < count; i++ {
+		msg := fmt.Sprintf("persisted-%04d", i)
+		slot, commit, rErr := ring.Reserve(uint32(len(msg)))
+		require.NoError(t, rErr)
+		copy(slot, msg)
+		commit()
+
+		readSlot, release, rdErr := ring.ReserveRead()
+		require.NoError(t, rdErr)
+		assert.Equal(t, msg, string(readSlot))
+		release()
+	}
+
+	slot1, commit1, err1 := ring.Reserve(uint32(len("item1")))
+	require.NoError(t, err1)
+	copy(slot1, "item1")
+	commit1()
+
+	slot2, commit2, err2 := ring.Reserve(uint32(len("item2")))
+	require.NoError(t, err2)
+	copy(slot2, "item2")
+	commit2()
+
+	require.NoError(t, ring.Close())
+
+	reopened, reopenErr := OpenExistingMemoryMappedRingBuffer(shmPath)
+	require.NoError(t, reopenErr)
+	defer safeCloseRing(t, reopened)
+
+	assert.Equal(t, uint64(2), reopened.Size())
+
+	r1, rel1, r1Err := reopened.ReserveRead()
+	require.NoError(t, r1Err)
+	assert.Equal(t, "item1", string(r1))
+	rel1()
+
+	r2, rel2, r2Err := reopened.ReserveRead()
+	require.NoError(t, r2Err)
+	assert.Equal(t, "item2", string(r2))
+	rel2()
+
+	assert.True(t, reopened.IsEmpty())
+}
+
+func TestSHM_WriteBatchAndReadBatch(t *testing.T) {
+	t.Parallel()
+
+	ring, err := NewInMemoryRingBuffer(64, 512)
+	require.NoError(t, err)
+	defer safeCloseRing(t, ring)
+
+	entries := []CallbackEntry{
+		{JobID: "job-1", Priority: 10, Seq: 101, Payload: map[string]any{"action": "start"}},
+		{JobID: "job-2", Priority: 20, Seq: 102, Payload: map[string]any{"action": "progress"}},
+		{JobID: "job-3", Priority: 30, Seq: 103, Payload: map[string]any{"action": "complete"}},
+	}
+
+	written, wErr := ring.WriteBatch(entries)
+	require.NoError(t, wErr)
+	assert.Equal(t, len(entries), written)
+
+	readEntries, rErr := ring.ReadBatch(10)
+	require.NoError(t, rErr)
+	require.Equal(t, len(entries), len(readEntries))
+
+	for i, expected := range entries {
+		assert.Equal(t, expected.JobID, readEntries[i].JobID)
+		assert.Equal(t, expected.Priority, readEntries[i].Priority)
+		assert.Equal(t, expected.Seq, readEntries[i].Seq)
+	}
+}
+
+func TestSHM_ZeroCopyWriteAndDrainBatch(t *testing.T) {
+	t.Parallel()
+
+	ring, err := NewSharedMemoryRingBuffer(64, 512)
+	require.NoError(t, err)
+	defer safeCloseRing(t, ring)
+
+	for i := 0; i < 20; i++ {
+		entry := createSampleEntry(fmt.Sprintf("shm-job-%d", i), int64(i+1), i*5)
+		ok := ring.WriteEntry(entry)
+		assert.True(t, ok)
+	}
+
+	assert.Equal(t, uint64(20), ring.Size())
+
+	batch1 := ring.DrainBatch(10)
+	require.Len(t, batch1, 10)
+	assert.Equal(t, int64(10), ring.Watermark())
+
+	batch2 := ring.DrainBatch(20)
+	require.Len(t, batch2, 10)
+	assert.Equal(t, int64(20), ring.Watermark())
+	assert.True(t, ring.IsEmpty())
+}
+
+func TestSHM_SegmentRolloverAndWatermarking(t *testing.T) {
+	t.Parallel()
+
+	const capacity = 16
+	ring, err := NewInMemoryRingBuffer(capacity, 256)
+	require.NoError(t, err)
+	defer safeCloseRing(t, ring)
+
+	for cycle := 0; cycle < 3; cycle++ {
+		for i := 0; i < capacity; i++ {
+			entry := createSampleEntry(fmt.Sprintf("roll-%d-%d", cycle, i), int64(cycle*capacity+i+1), 1)
+			ok := ring.WriteEntry(entry)
+			assert.True(t, ok)
 		}
+		batch := ring.DrainBatch(capacity)
+		require.Len(t, batch, capacity)
+	}
 
-		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("failed to create subscriber: %v", err)
-		}
-		defer func() { _ = sub.Close() }()
+	assert.True(t, ring.RolloverCount() >= 2)
+	assert.True(t, ring.Watermark() >= int64(3*capacity))
+}
 
-		// Send 4 entries (not reaching capacity 5)
-		for i := 0; i < 4; i++ {
-			entry := &CallbackEntry{JobID: fmt.Sprintf("job-%d", i), Seq: int64(i)}
-			if err := sub.Notify(context.Background(), entry); err != nil {
-				t.Fatalf("notify error: %v", err)
-			}
-		}
+func TestSHM_VectorizedBatch_CapacityTrigger(t *testing.T) {
+	t.Parallel()
 
-		// Verify no batch triggered yet
-		select {
-		case <-batchDelivered:
-			t.Fatalf("unexpected batch delivery before reaching capacity")
-		case <-time.After(50 * time.Millisecond):
-			// Expected: no batch yet
-		}
+	const batchCap = 5
+	var mu sync.Mutex
+	var batches [][]*CallbackEntry
+	batchDelivered := make(chan struct{}, 10)
 
-		// Send 5th entry (reaches capacity 5)
-		entry5 := &CallbackEntry{JobID: "job-4", Seq: 4}
-		if err := sub.Notify(context.Background(), entry5); err != nil {
-			t.Fatalf("notify error: %v", err)
-		}
+	cfg := DefaultVectorizedBatchConfig()
+	cfg.BatchCapacity = batchCap
+	cfg.FlushInterval = 10 * time.Minute
+	cfg.Handler = func(ctx context.Context, batch []*CallbackEntry) error {
+		mu.Lock()
+		copied := make([]*CallbackEntry, len(batch))
+		copy(copied, batch)
+		batches = append(batches, copied)
+		mu.Unlock()
+		batchDelivered <- struct{}{}
+		return nil
+	}
 
-		// Verify immediate batch delivery
-		select {
-		case <-batchDelivered:
-			mu.Lock()
-			if len(batches) != 1 {
-				mu.Unlock()
-				t.Fatalf("expected 1 batch, got %d", len(batches))
-			}
-			if len(batches[0]) != batchCap {
-				mu.Unlock()
-				t.Fatalf("expected batch of %d entries, got %d", batchCap, len(batches[0]))
-			}
-			mu.Unlock()
-		case <-time.After(500 * time.Millisecond):
-			t.Fatalf("timeout waiting for batch fullness delivery")
-		}
-	})
+	sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
+	require.NoError(t, err)
+	defer safeCloseDispatcher(t, sub)
 
-	t.Run("ticker_timeout_flush_trigger", func(t *testing.T) {
-		const batchCap = 100 // High capacity so ticker flushes first
-		const flushInterval = 20 * time.Millisecond
-		var mu sync.Mutex
-		var batches [][]*CallbackEntry
-		batchDelivered := make(chan struct{}, 10)
+	for i := 0; i < 4; i++ {
+		entry := &CallbackEntry{JobID: fmt.Sprintf("job-%d", i), Seq: int64(i)}
+		require.NoError(t, sub.Notify(context.Background(), entry))
+	}
 
-		cfg := DefaultVectorizedBatchConfig()
-		cfg.BatchCapacity = batchCap
-		cfg.FlushInterval = flushInterval
-		cfg.Handler = func(ctx context.Context, batch []*CallbackEntry) error {
-			mu.Lock()
-			copied := make([]*CallbackEntry, len(batch))
-			copy(copied, batch)
-			batches = append(batches, copied)
-			mu.Unlock()
-			batchDelivered <- struct{}{}
-			return nil
-		}
+	select {
+	case <-batchDelivered:
+		t.Fatalf("unexpected batch delivery before capacity reached")
+	case <-time.After(50 * time.Millisecond):
+	}
 
-		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("failed to create subscriber: %v", err)
-		}
-		defer func() { _ = sub.Close() }()
+	entry5 := &CallbackEntry{JobID: "job-4", Seq: 4}
+	require.NoError(t, sub.Notify(context.Background(), entry5))
 
-		// Send 3 entries
-		for i := 0; i < 3; i++ {
-			entry := &CallbackEntry{JobID: fmt.Sprintf("ticker-job-%d", i), Seq: int64(i)}
-			if err := sub.Notify(context.Background(), entry); err != nil {
-				t.Fatalf("notify error: %v", err)
-			}
-		}
+	select {
+	case <-batchDelivered:
+		mu.Lock()
+		assert.Len(t, batches, 1)
+		assert.Len(t, batches[0], batchCap)
+		mu.Unlock()
+	case <-time.After(500 * time.Millisecond):
+		t.Fatalf("timeout waiting for batch fullness delivery")
+	}
+}
 
-		// Wait for ticker flush
-		select {
-		case <-batchDelivered:
-			mu.Lock()
-			if len(batches) != 1 {
-				mu.Unlock()
-				t.Fatalf("expected 1 batch from ticker flush, got %d", len(batches))
-			}
-			if len(batches[0]) != 3 {
-				mu.Unlock()
-				t.Fatalf("expected 3 entries in flushed batch, got %d", len(batches[0]))
-			}
-			mu.Unlock()
-		case <-time.After(500 * time.Millisecond):
-			t.Fatalf("timeout waiting for ticker flush delivery")
-		}
-	})
+func TestSHM_VectorizedBatch_TickerTrigger(t *testing.T) {
+	t.Parallel()
 
-	t.Run("subscriber_with_ring_buffer_sink", func(t *testing.T) {
-		ring, err := NewInMemoryRingBuffer(64, 512)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+	const batchCap = 100
+	const flushInterval = 20 * time.Millisecond
+	var mu sync.Mutex
+	var batches [][]*CallbackEntry
+	batchDelivered := make(chan struct{}, 10)
 
-		cfg := DefaultVectorizedBatchConfig()
-		cfg.BatchCapacity = 4
-		cfg.FlushInterval = 20 * time.Millisecond
-		cfg.RingBuffer = ring
+	cfg := DefaultVectorizedBatchConfig()
+	cfg.BatchCapacity = batchCap
+	cfg.FlushInterval = flushInterval
+	cfg.Handler = func(ctx context.Context, batch []*CallbackEntry) error {
+		mu.Lock()
+		copied := make([]*CallbackEntry, len(batch))
+		copy(copied, batch)
+		batches = append(batches, copied)
+		mu.Unlock()
+		batchDelivered <- struct{}{}
+		return nil
+	}
 
-		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("failed to create subscriber: %v", err)
-		}
-		defer func() { _ = sub.Close() }()
+	sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
+	require.NoError(t, err)
+	defer safeCloseDispatcher(t, sub)
 
-		for i := 0; i < 4; i++ {
-			entry := &CallbackEntry{JobID: fmt.Sprintf("sink-job-%d", i), Seq: int64(i + 1)}
-			if err := sub.Notify(context.Background(), entry); err != nil {
-				t.Fatalf("notify error: %v", err)
-			}
-		}
+	for i := 0; i < 3; i++ {
+		entry := &CallbackEntry{JobID: fmt.Sprintf("ticker-job-%d", i), Seq: int64(i)}
+		require.NoError(t, sub.Notify(context.Background(), entry))
+	}
 
-		// Wait briefly for worker to write to ring buffer
-		time.Sleep(50 * time.Millisecond)
+	select {
+	case <-batchDelivered:
+		mu.Lock()
+		assert.Len(t, batches, 1)
+		assert.Len(t, batches[0], 3)
+		mu.Unlock()
+	case <-time.After(500 * time.Millisecond):
+		t.Fatalf("timeout waiting for ticker flush delivery")
+	}
+}
 
-		readEntries, err := ring.ReadBatch(10)
-		if err != nil {
-			t.Fatalf("read batch error: %v", err)
-		}
-		if len(readEntries) != 4 {
-			t.Fatalf("expected 4 entries written into ring buffer, got %d", len(readEntries))
-		}
-		for i, entry := range readEntries {
-			expectedJobID := fmt.Sprintf("sink-job-%d", i)
-			if entry.JobID != expectedJobID {
-				t.Fatalf("expected %q, got %q", expectedJobID, entry.JobID)
-			}
-		}
-	})
+func TestSHM_VectorizedBatch_RingBufferSink(t *testing.T) {
+	t.Parallel()
+
+	ring, err := NewInMemoryRingBuffer(64, 512)
+	require.NoError(t, err)
+	defer safeCloseRing(t, ring)
+
+	cfg := DefaultVectorizedBatchConfig()
+	cfg.BatchCapacity = 4
+	cfg.FlushInterval = 20 * time.Millisecond
+	cfg.RingBuffer = ring
+
+	sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
+	require.NoError(t, err)
+	defer safeCloseDispatcher(t, sub)
+
+	for i := 0; i < 4; i++ {
+		entry := &CallbackEntry{JobID: fmt.Sprintf("sink-job-%d", i), Seq: int64(i + 1)}
+		require.NoError(t, sub.Notify(context.Background(), entry))
+	}
+
+	time.Sleep(50 * time.Millisecond)
+
+	readEntries, rErr := ring.ReadBatch(10)
+	require.NoError(t, rErr)
+	require.Len(t, readEntries, 4)
+
+	for i, entry := range readEntries {
+		assert.Equal(t, fmt.Sprintf("sink-job-%d", i), entry.JobID)
+	}
+}
+
+func spawnStressConsumers(ctx context.Context, ring *SharedMemoryRingBuffer, numConsumers, totalItems int, recMap *sync.Map, consTotal *atomic.Int64, wg *sync.WaitGroup) {
+	wg.Add(numConsumers)
+	for c := 0; c < numConsumers; c++ {
+		goroutinelabels.NewGoroutine("test_shm_consumer", "concurrent stress consumer").
+			WithWaitGroup(wg).
+			StartWithContext(ctx, func(cCtx context.Context) error {
+				for {
+					if consTotal.Load() >= int64(totalItems) {
+						return nil
+					}
+					slot, release, err := ring.ReserveRead()
+					if err != nil {
+						if errors.Is(err, ErrRingBufferEmpty) {
+							select {
+							case <-cCtx.Done():
+								return nil
+							default:
+								time.Sleep(100 * time.Microsecond)
+								continue
+							}
+						}
+						if errors.Is(err, ErrRingBufferClosed) {
+							return nil
+						}
+						return err
+					}
+
+					var val int
+					parsed, scanErr := fmt.Sscanf(string(slot), "item-%d", &val)
+					release()
+					if scanErr == nil && parsed == 1 {
+						recMap.Store(val, true)
+						consTotal.Add(1)
+					}
+				}
+			})
+	}
+}
+
+func spawnStressProducers(ctx context.Context, ring *SharedMemoryRingBuffer, numProducers, itemsPerProducer int, wg *sync.WaitGroup) {
+	wg.Add(numProducers)
+	for p := 0; p < numProducers; p++ {
+		producerID := p
+		goroutinelabels.NewGoroutine("test_shm_producer", "concurrent stress producer").
+			WithWaitGroup(wg).
+			StartWithContext(ctx, func(pCtx context.Context) error {
+				start := producerID * itemsPerProducer
+				end := start + itemsPerProducer
+				for i := start; i < end; i++ {
+					msg := fmt.Sprintf("item-%d", i)
+					for {
+						slot, commit, err := ring.Reserve(uint32(len(msg)))
+						if err != nil {
+							if errors.Is(err, ErrRingBufferFull) {
+								select {
+								case <-pCtx.Done():
+									return nil
+								default:
+									time.Sleep(50 * time.Microsecond)
+									continue
+								}
+							}
+							return err
+						}
+						copy(slot, msg)
+						commit()
+						break
+					}
+				}
+				return nil
+			})
+	}
+}
+
+func runConcurrentStress(t *testing.T, ring *SharedMemoryRingBuffer) {
+	const numProducers = 4
+	const numConsumers = 4
+	const itemsPerProducer = 250
+	const totalItems = numProducers * itemsPerProducer
+
+	var receivedMap sync.Map
+	var consumedTotal atomic.Int64
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var wgConsumers sync.WaitGroup
+	spawnStressConsumers(ctx, ring, numConsumers, totalItems, &receivedMap, &consumedTotal, &wgConsumers)
+
+	var wgProducers sync.WaitGroup
+	spawnStressProducers(ctx, ring, numProducers, itemsPerProducer, &wgProducers)
+
+	wgProducers.Wait()
+	wgConsumers.Wait()
+
+	assert.Equal(t, int64(totalItems), consumedTotal.Load())
 }
 
 func TestSHM_ConcurrentMultiProducerMultiConsumer_RaceDetector(t *testing.T) {
 	t.Parallel()
 
-	runConcurrentStress := func(t *testing.T, ring *SharedMemoryRingBuffer) {
-		const numProducers = 4
-		const numConsumers = 4
-		const itemsPerProducer = 250
-		const totalItems = numProducers * itemsPerProducer
-
-		var receivedMap sync.Map
-		var consumedTotal atomic.Int64
-
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		var wgConsumers sync.WaitGroup
-		for c := 0; c < numConsumers; c++ {
-			goroutinelabels.NewGoroutine("test_shm_consumer", "concurrent stress consumer").
-				WithWaitGroup(&wgConsumers).
-				StartWithContext(ctx, func(cCtx context.Context) error {
-					for {
-						if consumedTotal.Load() >= totalItems {
-							return nil
-						}
-						slot, release, err := ring.ReserveRead()
-						if err != nil {
-							if errors.Is(err, ErrRingBufferEmpty) {
-								if consumedTotal.Load() >= totalItems {
-									return nil
-								}
-								select {
-								case <-cCtx.Done():
-									return nil
-								default:
-									time.Sleep(100 * time.Microsecond)
-									continue
-								}
-							}
-							if errors.Is(err, ErrRingBufferClosed) {
-								return nil
-							}
-							return err
-						}
-
-						var val int
-						_, scanErr := fmt.Sscanf(string(slot), "item-%d", &val)
-						release()
-						if scanErr == nil {
-							if _, loaded := receivedMap.LoadOrStore(val, true); loaded {
-								t.Errorf("duplicate item %d detected", val)
-							}
-							consumedTotal.Add(1)
-						}
-					}
-				})
-		}
-
-		var wgProducers sync.WaitGroup
-		for p := 0; p < numProducers; p++ {
-			producerID := p
-			goroutinelabels.NewGoroutine("test_shm_producer", "concurrent stress producer").
-				WithWaitGroup(&wgProducers).
-				StartWithContext(ctx, func(pCtx context.Context) error {
-					start := producerID * itemsPerProducer
-					end := start + itemsPerProducer
-					for i := start; i < end; i++ {
-						msg := fmt.Sprintf("item-%d", i)
-						for {
-							slot, commit, err := ring.Reserve(uint32(len(msg)))
-							if err != nil {
-								if errors.Is(err, ErrRingBufferFull) {
-									select {
-									case <-pCtx.Done():
-										return nil
-									default:
-										time.Sleep(50 * time.Microsecond)
-										continue
-									}
-								}
-								return err
-							}
-							copy(slot, msg)
-							commit()
-							break
-						}
-					}
-					return nil
-				})
-		}
-
-		wgProducers.Wait()
-		wgConsumers.Wait()
-
-		if consumedTotal.Load() != totalItems {
-			t.Fatalf("expected %d total consumed items, got %d", totalItems, consumedTotal.Load())
-		}
-	}
-
 	t.Run("concurrent_in_memory", func(t *testing.T) {
 		ring, err := NewInMemoryRingBuffer(128, 64)
-		if err != nil {
-			t.Fatalf("failed to create in-memory ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+		require.NoError(t, err)
+		defer safeCloseRing(t, ring)
 		runConcurrentStress(t, ring)
 	})
 
@@ -460,10 +451,8 @@ func TestSHM_ConcurrentMultiProducerMultiConsumer_RaceDetector(t *testing.T) {
 		tmpDir := t.TempDir()
 		shmPath := filepath.Join(tmpDir, "stress_shm.seg")
 		ring, err := OpenMemoryMappedRingBuffer(shmPath, 128, 64)
-		if err != nil {
-			t.Fatalf("failed to create mmap ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+		require.NoError(t, err)
+		defer safeCloseRing(t, ring)
 		runConcurrentStress(t, ring)
 	})
 }
@@ -471,10 +460,8 @@ func TestSHM_ConcurrentMultiProducerMultiConsumer_RaceDetector(t *testing.T) {
 func TestSHM_ZeroAllocationHotPath(t *testing.T) {
 	t.Run("reserve_and_release_hot_path_zero_allocs", func(t *testing.T) {
 		ring, err := NewInMemoryRingBuffer(128, 64)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+		require.NoError(t, err)
+		defer safeCloseRing(t, ring)
 
 		payload := []byte("hot-path-bench-bytes")
 		payloadSize := uint32(len(payload))
@@ -491,26 +478,24 @@ func TestSHM_ZeroAllocationHotPath(t *testing.T) {
 			if rdErr != nil {
 				t.Fatalf("read error: %v", rdErr)
 			}
-			_ = readSlot
+			if len(readSlot) == 0 {
+				t.Fatalf("empty payload")
+			}
 			release()
 		})
 
-		if allocs != 0.0 {
-			t.Fatalf("expected 0.0 allocs/op in ring buffer hot path, got %.2f", allocs)
-		}
+		assert.Equal(t, 0.0, allocs)
 	})
 
 	t.Run("vectorized_subscriber_notify_hot_path_zero_allocs", func(t *testing.T) {
 		cfg := DefaultVectorizedBatchConfig()
 		cfg.QueueCapacity = 2000
 		cfg.BatchCapacity = 500
-		cfg.FlushInterval = 1 * time.Hour // Do not trigger ticker during micro-alloc check
+		cfg.FlushInterval = 1 * time.Hour
 
 		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("failed to create subscriber: %v", err)
-		}
-		defer func() { _ = sub.Close() }()
+		require.NoError(t, err)
+		defer safeCloseDispatcher(t, sub)
 
 		entry := &CallbackEntry{
 			JobID:    "bench-job-1",
@@ -520,38 +505,32 @@ func TestSHM_ZeroAllocationHotPath(t *testing.T) {
 
 		ctx := context.Background()
 		allocs := testing.AllocsPerRun(1000, func() {
-			if notifyErr := sub.Notify(ctx, entry); notifyErr != nil {
+			notifyErr := sub.Notify(ctx, entry)
+			if notifyErr != nil {
 				t.Fatalf("notify error: %v", notifyErr)
 			}
 		})
 
-		if allocs != 0.0 {
-			t.Fatalf("expected 0.0 allocs/op in subscriber Notify hot path, got %.2f", allocs)
-		}
+		assert.Equal(t, 0.0, allocs)
 	})
 }
 
-func TestSHM_ErrorBoundaries_HeaderAndCorruption(t *testing.T) {
+func TestSHM_ErrorBoundaries_TruncatedFiles(t *testing.T) {
 	t.Parallel()
 
 	t.Run("truncated_file_below_header_size", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		shmPath := filepath.Join(tmpDir, "short_header.seg")
-		if err := fileutil.WriteFile(shmPath, make([]byte, 30), 0644); err != nil {
-			t.Fatalf("failed to write truncated file: %v", err)
-		}
+		createTestFile(t, shmPath, make([]byte, 30))
 
 		_, err := OpenExistingMemoryMappedRingBuffer(shmPath)
-		if !errors.Is(err, ErrTruncatedFile) {
-			t.Fatalf("expected ErrTruncatedFile, got: %v", err)
-		}
+		assert.True(t, errors.Is(err, ErrTruncatedFile))
 	})
 
 	t.Run("truncated_file_below_total_payload_size", func(t *testing.T) {
 		tmpDir := t.TempDir()
 		shmPath := filepath.Join(tmpDir, "truncated_body.seg")
 
-		// Prepare valid 64-byte header
 		headerBuf := make([]byte, 100)
 		var h SHMHeader
 		copy(h.Magic[:], SHMMagic)
@@ -562,15 +541,15 @@ func TestSHM_ErrorBoundaries_HeaderAndCorruption(t *testing.T) {
 		h.SlotSize = calculateAlignedSlotSize(128)
 		writeHeader(headerBuf, &h)
 
-		if err := fileutil.WriteFile(shmPath, headerBuf, 0644); err != nil {
-			t.Fatalf("failed to write file: %v", err)
-		}
+		createTestFile(t, shmPath, headerBuf)
 
 		_, err := OpenExistingMemoryMappedRingBuffer(shmPath)
-		if !errors.Is(err, ErrTruncatedFile) {
-			t.Fatalf("expected ErrTruncatedFile, got: %v", err)
-		}
+		assert.True(t, errors.Is(err, ErrTruncatedFile))
 	})
+}
+
+func TestSHM_ErrorBoundaries_MagicAndChecksum(t *testing.T) {
+	t.Parallel()
 
 	t.Run("invalid_magic_bytes", func(t *testing.T) {
 		tmpDir := t.TempDir()
@@ -585,14 +564,10 @@ func TestSHM_ErrorBoundaries_HeaderAndCorruption(t *testing.T) {
 		binary.LittleEndian.PutUint32(buf[24:28], calculateAlignedSlotSize(64))
 		binary.LittleEndian.PutUint32(buf[32:36], crc32.ChecksumIEEE(buf[:32]))
 
-		if err := fileutil.WriteFile(shmPath, buf, 0644); err != nil {
-			t.Fatalf("failed to write file: %v", err)
-		}
+		createTestFile(t, shmPath, buf)
 
 		_, err := OpenExistingMemoryMappedRingBuffer(shmPath)
-		if !errors.Is(err, ErrInvalidMagic) {
-			t.Fatalf("expected ErrInvalidMagic, got: %v", err)
-		}
+		assert.True(t, errors.Is(err, ErrInvalidMagic))
 	})
 
 	t.Run("corrupted_header_checksum", func(t *testing.T) {
@@ -609,122 +584,90 @@ func TestSHM_ErrorBoundaries_HeaderAndCorruption(t *testing.T) {
 		h.SlotSize = calculateAlignedSlotSize(64)
 		writeHeader(buf, &h)
 
-		// Corrupt one byte in the header
 		buf[10] ^= 0xFF
-
-		if err := fileutil.WriteFile(shmPath, buf, 0644); err != nil {
-			t.Fatalf("failed to write file: %v", err)
-		}
+		createTestFile(t, shmPath, buf)
 
 		_, err := OpenExistingMemoryMappedRingBuffer(shmPath)
-		if !errors.Is(err, ErrCorruptedHeader) {
-			t.Fatalf("expected ErrCorruptedHeader, got: %v", err)
-		}
+		assert.True(t, errors.Is(err, ErrCorruptedHeader))
 	})
+}
+
+func TestSHM_ErrorBoundaries_CapacityAndBufferLimits(t *testing.T) {
+	t.Parallel()
 
 	t.Run("invalid_capacity_non_power_of_two", func(t *testing.T) {
 		_, err := NewInMemoryRingBuffer(100, 64)
-		if !errors.Is(err, ErrInvalidCapacity) {
-			t.Fatalf("expected ErrInvalidCapacity, got: %v", err)
-		}
+		assert.True(t, errors.Is(err, ErrInvalidCapacity))
 	})
 
 	t.Run("payload_exceeds_slot_size", func(t *testing.T) {
 		ring, err := NewInMemoryRingBuffer(16, 64)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+		require.NoError(t, err)
+		defer safeCloseRing(t, ring)
 
 		_, _, rErr := ring.Reserve(100)
-		if !errors.Is(rErr, ErrPayloadTooLarge) {
-			t.Fatalf("expected ErrPayloadTooLarge, got: %v", rErr)
-		}
+		assert.True(t, errors.Is(rErr, ErrPayloadTooLarge))
 	})
 
 	t.Run("ring_buffer_saturation_full", func(t *testing.T) {
 		ring, err := NewInMemoryRingBuffer(4, 32)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+		require.NoError(t, err)
+		defer safeCloseRing(t, ring)
 
 		for i := 0; i < 4; i++ {
 			slot, commit, rErr := ring.Reserve(10)
-			if rErr != nil {
-				t.Fatalf("unexpected reserve error at %d: %v", i, rErr)
-			}
+			require.NoError(t, rErr)
 			copy(slot, "item")
 			commit()
 		}
 
-		if !ring.IsFull() {
-			t.Fatalf("expected ring buffer to be full")
-		}
+		assert.True(t, ring.IsFull())
 
-		// 5th reservation must fail fail-closed
 		_, _, fullErr := ring.Reserve(10)
-		if !errors.Is(fullErr, ErrRingBufferFull) {
-			t.Fatalf("expected ErrRingBufferFull, got: %v", fullErr)
-		}
+		assert.True(t, errors.Is(fullErr, ErrRingBufferFull))
 	})
 
 	t.Run("empty_ring_buffer_read", func(t *testing.T) {
 		ring, err := NewInMemoryRingBuffer(4, 32)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		defer func() { _ = ring.Close() }()
+		require.NoError(t, err)
+		defer safeCloseRing(t, ring)
 
 		_, _, emptyErr := ring.ReserveRead()
-		if !errors.Is(emptyErr, ErrRingBufferEmpty) {
-			t.Fatalf("expected ErrRingBufferEmpty, got: %v", emptyErr)
-		}
+		assert.True(t, errors.Is(emptyErr, ErrRingBufferEmpty))
 	})
+}
+
+func TestSHM_ErrorBoundaries_ClosedAndNil(t *testing.T) {
+	t.Parallel()
 
 	t.Run("nil_callback_entry_boundary", func(t *testing.T) {
 		cfg := DefaultVectorizedBatchConfig()
 		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("failed to create subscriber: %v", err)
-		}
-		defer func() { _ = sub.Close() }()
+		require.NoError(t, err)
+		defer safeCloseDispatcher(t, sub)
 
 		nilErr := sub.Notify(context.Background(), nil)
-		if !errors.Is(nilErr, ErrNilCallbackEntry) {
-			t.Fatalf("expected ErrNilCallbackEntry, got: %v", nilErr)
-		}
+		assert.True(t, errors.Is(nilErr, ErrNilCallbackEntry))
 	})
 
 	t.Run("closed_ring_and_subscriber_boundaries", func(t *testing.T) {
 		ring, err := NewInMemoryRingBuffer(16, 64)
-		if err != nil {
-			t.Fatalf("failed to create ring: %v", err)
-		}
-		if err := ring.Close(); err != nil {
-			t.Fatalf("failed to close ring: %v", err)
-		}
+		require.NoError(t, err)
+		require.NoError(t, ring.Close())
+
 		_, _, closedErr := ring.Reserve(10)
-		if !errors.Is(closedErr, ErrRingBufferClosed) {
-			t.Fatalf("expected ErrRingBufferClosed from Reserve, got: %v", closedErr)
-		}
+		assert.True(t, errors.Is(closedErr, ErrRingBufferClosed))
+
 		_, _, closedReadErr := ring.ReserveRead()
-		if !errors.Is(closedReadErr, ErrRingBufferClosed) {
-			t.Fatalf("expected ErrRingBufferClosed from ReserveRead, got: %v", closedReadErr)
-		}
+		assert.True(t, errors.Is(closedReadErr, ErrRingBufferClosed))
 
 		cfg := DefaultVectorizedBatchConfig()
 		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("failed to create subscriber: %v", err)
-		}
-		if err := sub.Close(); err != nil {
-			t.Fatalf("failed to close subscriber: %v", err)
-		}
+		require.NoError(t, err)
+		require.NoError(t, sub.Close())
+
 		subErr := sub.Notify(context.Background(), &CallbackEntry{JobID: "test"})
-		if !errors.Is(subErr, ErrSubscriberClosed) {
-			t.Fatalf("expected ErrSubscriberClosed from Notify, got: %v", subErr)
-		}
+		assert.True(t, errors.Is(subErr, ErrSubscriberClosed))
 	})
 }
 
@@ -742,24 +685,29 @@ func TestSHM_CleanShutdownAndZeroLeaks(t *testing.T) {
 		}
 
 		sub, err := NewVectorizedBatchSubscriber(context.Background(), cfg)
-		if err != nil {
-			t.Fatalf("iteration %d: failed to create subscriber: %v", iteration, err)
-		}
+		require.NoError(t, err)
 
 		const total = 50
 		for i := 0; i < total; i++ {
 			entry := &CallbackEntry{JobID: fmt.Sprintf("leak-test-%d", i), Seq: int64(i)}
-			if err := sub.Notify(context.Background(), entry); err != nil {
-				t.Fatalf("iteration %d: notify error: %v", iteration, err)
-			}
+			require.NoError(t, sub.Notify(context.Background(), entry))
 		}
 
-		if err := sub.Close(); err != nil {
-			t.Fatalf("iteration %d: close error: %v", iteration, err)
-		}
-
-		if received.Load() != total {
-			t.Fatalf("iteration %d: expected %d received, got %d", iteration, total, received.Load())
-		}
+		require.NoError(t, sub.Close())
+		assert.Equal(t, int64(total), received.Load())
 	}
+}
+
+func TestSHM_SegmentRecovery(t *testing.T) {
+	t.Parallel()
+
+	seg := NewSharedMemorySegment(0, 32, 128)
+	assert.False(t, seg.IsCorrupted())
+
+	seg.MarkCorrupted()
+	assert.True(t, seg.IsCorrupted())
+
+	recErr := seg.Recover()
+	assert.NoError(t, recErr)
+	assert.False(t, seg.IsCorrupted())
 }
