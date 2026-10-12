@@ -6,8 +6,10 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -36,7 +38,8 @@ type coordinatorState struct {
 
 type Coordinator struct {
 	state atomic.Pointer[coordinatorState]
-	mu    sync.Mutex // For writing updates
+	mu    sync.Mutex     // For writing updates
+	wg    sync.WaitGroup // Tracks in-flight router and subscriber goroutines
 
 	// Channel routers
 	loggingRouter     LoggingRouter
@@ -94,11 +97,41 @@ func NewCoordinator(config CoordinatorConfig) *Coordinator {
 		metricsRouter:     config.MetricsRouter,
 		operationalRouter: config.OperationalRouter,
 	}
+	if c.operationalRouter == nil {
+		c.operationalRouter = &DefaultOperationalRouter{coordinator: c}
+	} else if defOp, ok := c.operationalRouter.(*DefaultOperationalRouter); ok && defOp.coordinator == nil {
+		defOp.coordinator = c
+	}
+
 	c.state.Store(&coordinatorState{
 		subscribers: make(map[string]OperationalEventSubscriber),
 		typeIndex:   make(map[string][]string),
 	})
 	return c
+}
+
+// Wait blocks until all in-flight router and subscriber goroutines complete.
+func (c *Coordinator) Wait() {
+	c.wg.Wait()
+}
+
+// Drain waits up to timeout for all in-flight router and subscriber goroutines to complete.
+func (c *Coordinator) Drain(timeout time.Duration) error {
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine("coordinator_drain_wait", "wait for coordinator goroutines during drain").StartSimple(func() {
+		c.wg.Wait()
+		close(done)
+	})
+	if timeout <= 0 {
+		<-done
+		return nil
+	}
+	select {
+	case <-done:
+		return nil
+	case <-time.After(timeout):
+		return errfmt.Errorf("coordinator drain timed out after %v", timeout)
+	}
 }
 
 // Emit routes an event to all appropriate channels.
@@ -463,16 +496,24 @@ func (r *DefaultMetricsRouter) Emit(ctx context.Context, eventCtx *EventContext)
 }
 
 // DefaultOperationalRouter routes operational events to subscribers
-type DefaultOperationalRouter struct{}
+type DefaultOperationalRouter struct {
+	coordinator *Coordinator
+}
 
 func (r *DefaultOperationalRouter) Emit(ctx context.Context, event *OperationalEvent, subscribers []OperationalEventSubscriber) error {
 	// Non-blocking, best-effort: one async stage per subscriber (same cancel pairing as Emit operational branch).
 	for _, subscriber := range subscribers {
 		subRef := subscriber
 		sid := subRef.ID()
-		runCoordinatorRouterAsync(ctx, "coordination_event_subscriber", fmt.Sprintf("coordination.emit/TRIGGER_subscriber/%s", sid), func(ctx context.Context) {
-			_ = subRef.HandleEvent(event) //nolint:errcheck // Async, best-effort
-		})
+		if r != nil && r.coordinator != nil {
+			r.coordinator.runRouterAsync(ctx, "coordination_event_subscriber", fmt.Sprintf("coordination.emit/TRIGGER_subscriber/%s", sid), func(ctx context.Context) {
+				_ = subRef.HandleEvent(event) //nolint:errcheck // Async, best-effort
+			})
+		} else {
+			runCoordinatorRouterAsync(ctx, "coordination_event_subscriber", fmt.Sprintf("coordination.emit/TRIGGER_subscriber/%s", sid), func(ctx context.Context) {
+				_ = subRef.HandleEvent(event) //nolint:errcheck // Async, best-effort
+			})
+		}
 	}
 	return nil
 }
