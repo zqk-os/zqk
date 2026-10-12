@@ -50,13 +50,19 @@ func (h *wireCodecHarness) assertEntryEqual(t *testing.T, expected, actual *Call
 	assert.Equal(t, expected.Payload["code"], actual.Payload["code"])
 }
 
+func (h *wireCodecHarness) mustEncodeEntry(t *testing.T, entry *CallbackEntry, bufSize int) []byte {
+	t.Helper()
+	buf := make([]byte, bufSize)
+	encoded, err := h.codec.EncodeEntry(entry, buf[:0])
+	require.NoError(t, err)
+	return encoded
+}
+
 func TestWireProtocol_EncodeDecode_Single(t *testing.T) {
 	h := newWireCodecHarness(t)
 	entry := h.sampleEntry(42, "job-42")
 
-	buf := make([]byte, 1024)
-	encoded, err := h.codec.EncodeEntry(entry, buf[:0])
-	require.NoError(t, err)
+	encoded := h.mustEncodeEntry(t, entry, 1024)
 	assert.Greater(t, len(encoded), WireHeaderSize)
 
 	decoded, consumed, err := h.codec.DecodeEntry(encoded)
@@ -113,9 +119,7 @@ func TestWireProtocol_DeterministicChecksum_Validation(t *testing.T) {
 	h := newWireCodecHarness(t)
 	entry := h.sampleEntry(77, "job-crc-check")
 
-	buf := make([]byte, 1024)
-	encoded, err := h.codec.EncodeEntry(entry, buf[:0])
-	require.NoError(t, err)
+	encoded := h.mustEncodeEntry(t, entry, 1024)
 
 	// Verify tampering triggers checksum failure
 	tampered := bytes.Clone(encoded)
