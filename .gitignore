@@ -48,6 +48,7 @@ pr_body*.txt
 **/.zqk/streams/
 .agents/*
 !.agents/AGENTS.md
+!.agents/hooks.json
 .agent/*
 !.agent/skills/
 !.agent/hooks.json

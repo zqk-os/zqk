@@ -1,0 +1,25 @@
+{
+  "subagent-context-enforcer": {
+    "PreToolUse": [
+      {
+        "matcher": "invoke_subagent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook pre-subagent --vendor antigravity; else zqk agent hook pre-subagent --vendor antigravity; fi",
+            "timeout": 45
+          }
+        ]
+      }
+    ]
+  },
+  "cap-loop-anti-idle": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook stop --vendor antigravity; else zqk agent hook stop --vendor antigravity; fi",
+        "timeout": 15
+      }
+    ]
+  }
+}
