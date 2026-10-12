@@ -1046,23 +1046,46 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 	s.LastUpdated = time.Now()
 }
 
-func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEvent, ts time.Time) {
-	if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindCriteria {
-		tcID := ev.ID
-		critID := ev.TargetID
-		tc, ok := s.TestCases[tcID]
-		if !ok {
-			tc = s.hydrateTestCaseFromStorageLocked(tcID)
-			if tc == nil {
-				return
-			}
-			s.TestCases[tcID] = tc
-		} else if tc.Title == "" || tc.Lineage == nil {
-			s.enrichTestCaseFromStorageLocked(tc)
+func appendUniqueRef(slice *[]string, ref string) bool {
+	for _, r := range *slice {
+		if r == ref {
+			return false
 		}
-		s.ensureTestCaseInOrderLocked(tcID)
+	}
+	*slice = append(*slice, ref)
+	return true
+}
 
-		// Ensure criterion is in tc.Criteria
+func (s *DashboardState) getOrHydrateTestCaseLocked(tcID string) *TestCaseModel {
+	if tcID == "" {
+		return nil
+	}
+	tc, ok := s.TestCases[tcID]
+	if !ok {
+		tc = s.hydrateTestCaseFromStorageLocked(tcID)
+		if tc == nil {
+			return nil
+		}
+		s.TestCases[tcID] = tc
+	} else if tc.Title == "" || tc.Lineage == nil {
+		s.enrichTestCaseFromStorageLocked(tc)
+	}
+	s.ensureTestCaseInOrderLocked(tcID)
+	return tc
+}
+
+func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEvent, ts time.Time) {
+	if ev.Kind != objects.KindTestCase {
+		return
+	}
+	tc := s.getOrHydrateTestCaseLocked(ev.ID)
+	if tc == nil {
+		return
+	}
+
+	switch ev.TargetKind {
+	case objects.KindCriteria:
+		critID := ev.TargetID
 		found := false
 		for _, cr := range tc.Criteria {
 			if cr.ID == critID {
@@ -1078,66 +1101,23 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 			tc.TotalCriteria = len(tc.Criteria)
 			tc.RemainingOpenCount = tc.TotalCriteria - tc.CompletedCriteria
 		}
-
-		// Update CriteriaIndex
 		s.CriteriaIndex[critID] = append(s.CriteriaIndex[critID], tc)
-
 		s.appendRecentEvent(LifecycleEventSummary{
 			Timestamp:   ts,
 			EventType:   string(ev.EventType),
 			Kind:        ev.Kind,
-			ObjectID:    tcID,
+			ObjectID:    tc.ID,
 			CriterionID: critID,
-			Message:     fmt.Sprintf("LINKAGE SHOCKWAVE: Test Case %s ➔ Criterion %s", tcID, critID),
+			Message:     fmt.Sprintf("LINKAGE SHOCKWAVE: Test Case %s ➔ Criterion %s", tc.ID, critID),
 		})
-	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindBacklogItem {
-		tcID := ev.ID
-		bliID := ev.TargetID
-		tc, ok := s.TestCases[tcID]
-		if !ok {
-			tc = s.hydrateTestCaseFromStorageLocked(tcID)
-			if tc == nil {
-				return
-			}
-			s.TestCases[tcID] = tc
-		} else if tc.Title == "" || tc.Lineage == nil {
-			s.enrichTestCaseFromStorageLocked(tc)
-		}
-		s.ensureTestCaseInOrderLocked(tcID)
-		already := false
-		for _, r := range tc.BacklogItemRefs {
-			if r == bliID {
-				already = true
-				break
-			}
-		}
-		if !already {
-			tc.BacklogItemRefs = append(tc.BacklogItemRefs, bliID)
+
+	case objects.KindBacklogItem:
+		if appendUniqueRef(&tc.BacklogItemRefs, ev.TargetID) {
 			s.refreshLineageLocked(tc)
 		}
-	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindRequirement {
-		tcID := ev.ID
-		reqID := ev.TargetID
-		tc, ok := s.TestCases[tcID]
-		if !ok {
-			tc = s.hydrateTestCaseFromStorageLocked(tcID)
-			if tc == nil {
-				return
-			}
-			s.TestCases[tcID] = tc
-		} else if tc.Title == "" || tc.Lineage == nil {
-			s.enrichTestCaseFromStorageLocked(tc)
-		}
-		s.ensureTestCaseInOrderLocked(tcID)
-		already := false
-		for _, r := range tc.RequirementRefs {
-			if r == reqID {
-				already = true
-				break
-			}
-		}
-		if !already {
-			tc.RequirementRefs = append(tc.RequirementRefs, reqID)
+
+	case objects.KindRequirement:
+		if appendUniqueRef(&tc.RequirementRefs, ev.TargetID) {
 			s.refreshLineageLocked(tc)
 		}
 	}
