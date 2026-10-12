@@ -33,7 +33,8 @@ func (h *tokenBucketHarness) createLimiter(cap int64, rate float64, init int64) 
 	}
 	if init == 0 {
 		cfg.StartEmpty = true
-	} else if init > 0 {
+	}
+	if init > 0 {
 		cfg.InitialTokens = init
 	}
 	lim, err := NewTokenBucketLimiter(cfg)
@@ -55,7 +56,8 @@ func (h *tokenBucketHarness) createLimiterWithClock(cap int64, rate float64, ini
 	}
 	if init == 0 {
 		cfg.StartEmpty = true
-	} else if init > 0 {
+	}
+	if init > 0 {
 		cfg.InitialTokens = init
 	}
 	lim, err := NewTokenBucketLimiter(cfg)
