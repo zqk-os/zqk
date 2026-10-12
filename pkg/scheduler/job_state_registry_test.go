@@ -593,4 +593,3 @@ func TestJobStateRegistry_WriteThroughCacheAndKnownIdleTracking(t *testing.T) {
 	}
 	wg.Wait()
 }
-
