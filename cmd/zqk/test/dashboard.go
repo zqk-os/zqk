@@ -938,29 +938,7 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 						cr.LastSatisfied = ts
 					}
 				}
-				// Recount completed criteria
-				completed := 0
-				for _, cr := range tc.Criteria {
-					if isCriterionComplete(cr.Status) {
-						completed++
-					}
-				}
-				prevStatus := tc.Status
-				tc.CompletedCriteria = completed
-				tc.RemainingOpenCount = tc.TotalCriteria - completed
-				if tc.RemainingOpenCount <= 0 && tc.TotalCriteria > 0 {
-					tc.Status = objects.ObjectStatusComplete
-					if prevStatus != objects.ObjectStatusComplete {
-						s.appendRecentEvent(LifecycleEventSummary{
-							Timestamp:   ts,
-							EventType:   string(lifecycle.EventTypeStatusTransition),
-							Kind:        objects.KindTestCase,
-							ObjectID:    tc.ID,
-							CriterionID: critID,
-							Message:     fmt.Sprintf("TRACEABILITY CHAIN GRADUATED: %s (100%% criteria green) ➔ Moved to Regression Suite", tc.ID),
-						})
-					}
-				}
+				s.recalculateTestCaseGraduationLocked(tc, critID, ts)
 			}
 		}
 
@@ -989,28 +967,7 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 							}
 						}
 					}
-					completed := 0
-					for _, cr := range tc.Criteria {
-						if isCriterionComplete(cr.Status) {
-							completed++
-						}
-					}
-					prevStatus := tc.Status
-					tc.CompletedCriteria = completed
-					tc.RemainingOpenCount = tc.TotalCriteria - completed
-					if tc.RemainingOpenCount <= 0 && tc.TotalCriteria > 0 {
-						tc.Status = objects.ObjectStatusComplete
-						if prevStatus != objects.ObjectStatusComplete {
-							s.appendRecentEvent(LifecycleEventSummary{
-								Timestamp:   ts,
-								EventType:   string(lifecycle.EventTypeStatusTransition),
-								Kind:        objects.KindTestCase,
-								ObjectID:    tc.ID,
-								CriterionID: critID,
-								Message:     fmt.Sprintf("TRACEABILITY CHAIN GRADUATED: %s (100%% criteria green) ➔ Moved to Regression Suite", tc.ID),
-							})
-						}
-					}
+					s.recalculateTestCaseGraduationLocked(tc, critID, ts)
 				}
 			}
 			s.appendRecentEvent(LifecycleEventSummary{
@@ -1021,15 +978,8 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 				Message:     fmt.Sprintf("CRITERION %s: %s -> %s", critID, ev.FromStatus, ev.ToStatus),
 			})
 		} else if strings.EqualFold(ev.Kind, objects.KindTestCase) {
-			if tc, ok := s.TestCases[ev.ID]; ok {
+			if tc := s.getOrHydrateTestCaseLocked(ev.ID); tc != nil {
 				tc.Status = ev.ToStatus
-			} else {
-				tc = s.hydrateTestCaseFromStorageLocked(ev.ID)
-				if tc != nil {
-					tc.Status = ev.ToStatus
-					s.TestCases[ev.ID] = tc
-					s.ensureTestCaseInOrderLocked(ev.ID)
-				}
 			}
 			s.appendRecentEvent(LifecycleEventSummary{
 				Timestamp: ts,
@@ -1044,6 +994,31 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 	}
 
 	s.LastUpdated = time.Now()
+}
+
+func (s *DashboardState) recalculateTestCaseGraduationLocked(tc *TestCaseModel, critID string, ts time.Time) {
+	completed := 0
+	for _, cr := range tc.Criteria {
+		if isCriterionComplete(cr.Status) {
+			completed++
+		}
+	}
+	prevStatus := tc.Status
+	tc.CompletedCriteria = completed
+	tc.RemainingOpenCount = tc.TotalCriteria - completed
+	if tc.RemainingOpenCount <= 0 && tc.TotalCriteria > 0 {
+		tc.Status = objects.ObjectStatusComplete
+		if prevStatus != objects.ObjectStatusComplete {
+			s.appendRecentEvent(LifecycleEventSummary{
+				Timestamp:   ts,
+				EventType:   string(lifecycle.EventTypeStatusTransition),
+				Kind:        objects.KindTestCase,
+				ObjectID:    tc.ID,
+				CriterionID: critID,
+				Message:     fmt.Sprintf("TRACEABILITY CHAIN GRADUATED: %s (100%% criteria green) ➔ Moved to Regression Suite", tc.ID),
+			})
+		}
+	}
 }
 
 func appendUniqueRef(slice *[]string, ref string) bool {

@@ -313,24 +313,26 @@ func getOrInitDimension(m map[string]*MetricDimension, key string) *MetricDimens
 	return dim
 }
 
+func (a *MeshTelemetryAggregator) updateDimensions(topic, broker, subscriber string, update func(*MetricDimension)) {
+	if topic != "" {
+		update(getOrInitDimension(a.topics, topic))
+	}
+	if broker != "" {
+		update(getOrInitDimension(a.brokers, broker))
+	}
+	if subscriber != "" {
+		update(getOrInitDimension(a.subscribers, subscriber))
+	}
+}
+
 // RecordDispatch tracks an event dispatch across topic, broker, and subscriber dimensions.
 func (a *MeshTelemetryAggregator) RecordDispatch(topic, broker, subscriber string, latency time.Duration) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
 	a.totalDispatched++
-	now := a.clock()
-	a.windowBuffer.Record(now, 1, 0, 0, latency)
-
-	if topic != "" {
-		getOrInitDimension(a.topics, topic).TotalDispatched++
-	}
-	if broker != "" {
-		getOrInitDimension(a.brokers, broker).TotalDispatched++
-	}
-	if subscriber != "" {
-		getOrInitDimension(a.subscribers, subscriber).TotalDispatched++
-	}
+	a.windowBuffer.Record(a.clock(), 1, 0, 0, latency)
+	a.updateDimensions(topic, broker, subscriber, func(d *MetricDimension) { d.TotalDispatched++ })
 }
 
 // RecordReceive tracks an event receipt across topic, broker, and subscriber dimensions.
@@ -339,18 +341,8 @@ func (a *MeshTelemetryAggregator) RecordReceive(topic, broker, subscriber string
 	defer a.mu.Unlock()
 
 	a.totalReceived++
-	now := a.clock()
-	a.windowBuffer.Record(now, 0, 1, 0, 0)
-
-	if topic != "" {
-		getOrInitDimension(a.topics, topic).TotalReceived++
-	}
-	if broker != "" {
-		getOrInitDimension(a.brokers, broker).TotalReceived++
-	}
-	if subscriber != "" {
-		getOrInitDimension(a.subscribers, subscriber).TotalReceived++
-	}
+	a.windowBuffer.Record(a.clock(), 0, 1, 0, 0)
+	a.updateDimensions(topic, broker, subscriber, func(d *MetricDimension) { d.TotalReceived++ })
 }
 
 // RecordDrop tracks a dropped event and increments dimensional drop counters.
@@ -359,15 +351,8 @@ func (a *MeshTelemetryAggregator) RecordDrop(topic, subscriber, reason string) {
 	defer a.mu.Unlock()
 
 	a.totalDropped++
-	now := a.clock()
-	a.windowBuffer.Record(now, 0, 0, 1, 0)
-
-	if topic != "" {
-		getOrInitDimension(a.topics, topic).TotalDropped++
-	}
-	if subscriber != "" {
-		getOrInitDimension(a.subscribers, subscriber).TotalDropped++
-	}
+	a.windowBuffer.Record(a.clock(), 0, 0, 1, 0)
+	a.updateDimensions(topic, "", subscriber, func(d *MetricDimension) { d.TotalDropped++ })
 }
 
 // RecordCreditDebt sets the observed credit debt for a subscriber pool.
@@ -425,6 +410,14 @@ func (a *MeshTelemetryAggregator) Snapshot() MeshTelemetrySnapshot {
 	}
 }
 
+func payloadString(m map[string]any, key string) string {
+	if m == nil {
+		return ""
+	}
+	v, _ := m[key].(string)
+	return v
+}
+
 // Notify processes an incoming callback entry, recording dispatch and receive telemetry.
 func (a *MeshTelemetryAggregator) Notify(ctx context.Context, entry *CallbackEntry) error {
 	if entry == nil {
@@ -434,18 +427,9 @@ func (a *MeshTelemetryAggregator) Notify(ctx context.Context, entry *CallbackEnt
 		return ctx.Err()
 	}
 
-	var topic, broker, subscriber string
-	if entry.Payload != nil {
-		if v, ok := entry.Payload[MetricKeyTopic].(string); ok {
-			topic = v
-		}
-		if v, ok := entry.Payload[MetricKeyBroker].(string); ok {
-			broker = v
-		}
-		if v, ok := entry.Payload[MetricKeySubscriber].(string); ok {
-			subscriber = v
-		}
-	}
+	topic := payloadString(entry.Payload, MetricKeyTopic)
+	broker := payloadString(entry.Payload, MetricKeyBroker)
+	subscriber := payloadString(entry.Payload, MetricKeySubscriber)
 
 	var elapsed time.Duration
 	if !entry.Timestamp.IsZero() {
@@ -514,17 +498,24 @@ func (p *SubscriberPool) RateLimit() float64 {
 	return p.rateLimit
 }
 
-func (p *SubscriberPool) replenishAndBroadcast(amount int64) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
+func (p *SubscriberPool) addCreditsLocked(amount int64) {
 	p.credits += amount
 	if p.maxCredits > 0 && p.credits > p.maxCredits {
 		p.credits = p.maxCredits
 	}
+}
 
+func (p *SubscriberPool) broadcastLocked() {
 	close(p.notifyCh)
 	p.notifyCh = make(chan struct{})
+}
+
+func (p *SubscriberPool) replenishAndBroadcast(amount int64) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	p.addCreditsLocked(amount)
+	p.broadcastLocked()
 }
 
 func (p *SubscriberPool) acknowledgeAndReplenish(credits int64) {
@@ -535,14 +526,9 @@ func (p *SubscriberPool) acknowledgeAndReplenish(credits int64) {
 		p.inFlight--
 	}
 	if credits > 0 {
-		p.credits += credits
-		if p.maxCredits > 0 && p.credits > p.maxCredits {
-			p.credits = p.maxCredits
-		}
+		p.addCreditsLocked(credits)
 	}
-
-	close(p.notifyCh)
-	p.notifyCh = make(chan struct{})
+	p.broadcastLocked()
 }
 
 // ThrottlerConfig configures backpressure thresholds, default shedding policy, and AIMD parameters.
@@ -754,18 +740,22 @@ func (t *MeshBackpressureThrottler) RecordDrain(poolID string, drainedCount int6
 	defer pool.mu.Unlock()
 
 	if high > 0 && mult > 0 && utilization >= high {
-		pool.rateLimit *= mult
-		if pool.minRateLimit > 0 && pool.rateLimit < pool.minRateLimit {
-			pool.rateLimit = pool.minRateLimit
-		}
+		pool.rateLimit = clampRateLimit(pool.rateLimit*mult, pool.minRateLimit, pool.maxRateLimit)
 	} else if low > 0 && add > 0 && utilization <= low {
-		pool.rateLimit += add
-		if pool.maxRateLimit > 0 && pool.rateLimit > pool.maxRateLimit {
-			pool.rateLimit = pool.maxRateLimit
-		}
+		pool.rateLimit = clampRateLimit(pool.rateLimit+add, pool.minRateLimit, pool.maxRateLimit)
 	}
 
 	return nil
+}
+
+func clampRateLimit(rate, minRate, maxRate float64) float64 {
+	if minRate > 0 && rate < minRate {
+		return minRate
+	}
+	if maxRate > 0 && rate > maxRate {
+		return maxRate
+	}
+	return rate
 }
 
 // Notify routes a callback entry through the backpressure throttler.
