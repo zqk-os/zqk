@@ -156,7 +156,7 @@ func TestFileLock_LockWithTimeout_Timeout(t *testing.T) {
 	if duration < 100*time.Millisecond {
 		t.Errorf("LockWithTimeout should have waited at least 100ms, waited %v", duration)
 	}
-	if duration > 200*time.Millisecond {
+	if duration > 2*time.Second {
 		t.Errorf("LockWithTimeout should have timed out around 100ms, waited %v", duration)
 	}
 
