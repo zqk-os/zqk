@@ -53,7 +53,7 @@ var (
 	ErrInvalidCapacity    = errfmt.Errorf("slot capacity must be a positive power of two")
 	ErrCorruptedHeader    = errfmt.Errorf("corrupted shm segment header")
 	ErrCorruptedSegment   = errfmt.Errorf("corrupted shm segment detected")
-	ErrInvalidMagic       = errfmt.Errorf("invalid shm segment magic bytes")
+	ErrInvalidSHMMagic    = errfmt.Errorf("%w: invalid shm segment magic bytes", ErrInvalidMagic)
 	ErrUnsupportedVersion = errfmt.Errorf("unsupported shm layout version")
 	ErrTruncatedFile      = errfmt.Errorf("shm file is truncated")
 )
@@ -206,7 +206,7 @@ func validateAndParseHeader(buf []byte, expectedSize int64) (SHMHeader, error) {
 	header.Checksum = binary.LittleEndian.Uint32(buf[32:36])
 
 	if string(header.Magic[:]) != SHMMagic {
-		return header, errfmt.Errorf("%w: expected magic %q, got %q", ErrInvalidMagic, SHMMagic, string(header.Magic[:]))
+		return header, errfmt.Errorf("%w: expected magic %q, got %q", ErrInvalidSHMMagic, SHMMagic, string(header.Magic[:]))
 	}
 	actualChecksum := computeHeaderChecksum(buf)
 	if header.Checksum != actualChecksum {

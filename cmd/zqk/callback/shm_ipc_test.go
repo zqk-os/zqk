@@ -568,6 +568,7 @@ func TestSHM_ErrorBoundaries_MagicAndChecksum(t *testing.T) {
 
 		_, err := OpenExistingMemoryMappedRingBuffer(shmPath)
 		assert.True(t, errors.Is(err, ErrInvalidMagic))
+		assert.True(t, errors.Is(err, ErrInvalidSHMMagic))
 	})
 
 	t.Run("corrupted_header_checksum", func(t *testing.T) {
