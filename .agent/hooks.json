@@ -7,7 +7,7 @@
           {
             "type": "command",
             "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook pre-subagent --vendor antigravity; else zqk agent hook pre-subagent --vendor antigravity; fi",
-            "timeout": 15
+            "timeout": 45
           }
         ]
       }

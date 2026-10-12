@@ -50,6 +50,8 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Ambient Signal Action Rubric](./AMBIENT_SIGNAL_ACTION_RUBRIC.md)**: Ambient filesystem watcher events, heuristics evaluation, and proactive maintenance signals.
 - **[Async Check Discovery Decoupling](./ASYNC_CHECK_DISCOVERY_DECOUPLING.md)**: Decoupling disk discovery from validation pipelines to prevent CLI timeout stalls.
 - **[Service Adapter Specification](./SERVICE_ADAPTER_SPECIFICATION.md)**: Unified abstraction across macOS `launchd`, Linux `systemd`, and standalone foreground runners.
+- **[Dynamic Subscriber Topology Partitioning & Work-Stealing](./DYNAMIC_SUBSCRIBER_WORK_STEALING.md)**: Virtual-node consistent hash rings, Chase-Lev work-stealing deques, and lossless dynamic shard rebalancing across event mesh subscribers.
+- **[Dynamic Subscriber Topology Work-Stealing Specification](./DYNAMIC_SUBSCRIBER_TOPOLOGY_WORK_STEALING.md)**: Complete topological specification for subscriber work stealing and partition mapping.
 - **[Distributed Gossip Membership and Peer Failure Detector](./DISTRIBUTED_GOSSIP_FAILURE_DETECTOR.md)**: SWIM protocol implementation with indirect probing, suspicion timers, incarnation monotonicity, and self-healing cluster recovery.
 
 ---
