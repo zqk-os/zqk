@@ -331,31 +331,36 @@ func NewDeficitRoundRobinQueue(cfg DeficitRoundRobinConfig) *DeficitRoundRobinQu
 	}
 }
 
+func (drr *DeficitRoundRobinQueue) withLock(fn func() error) error {
+	drr.mu.Lock()
+	defer drr.mu.Unlock()
+	if drr.closed {
+		return ErrQueueClosed
+	}
+	return fn()
+}
+
 // RegisterSubscriber adds a new subscriber flow with optional custom quantum.
 func (drr *DeficitRoundRobinQueue) RegisterSubscriber(id string, quantum, maxDeficit int64, maxDepth int) error {
 	if id == "" {
 		return ErrInvalidConfiguration
 	}
-	drr.mu.Lock()
-	defer drr.mu.Unlock()
-
-	if drr.closed {
-		return ErrQueueClosed
-	}
-	if _, exists := drr.subscribers[id]; exists {
-		return ErrSubscriberExists
-	}
-	if quantum <= 0 {
-		quantum = drr.cfg.DefaultQuantum
-	}
-	if maxDeficit <= 0 {
-		maxDeficit = drr.cfg.DefaultMaxDeficit
-	}
-	if maxDepth <= 0 {
-		maxDepth = drr.cfg.DefaultMaxDepth
-	}
-	drr.subscribers[id] = newSubscriberQueue(id, quantum, maxDeficit, maxDepth)
-	return nil
+	return drr.withLock(func() error {
+		if _, exists := drr.subscribers[id]; exists {
+			return ErrSubscriberExists
+		}
+		if quantum <= 0 {
+			quantum = drr.cfg.DefaultQuantum
+		}
+		if maxDeficit <= 0 {
+			maxDeficit = drr.cfg.DefaultMaxDeficit
+		}
+		if maxDepth <= 0 {
+			maxDepth = drr.cfg.DefaultMaxDepth
+		}
+		drr.subscribers[id] = newSubscriberQueue(id, quantum, maxDeficit, maxDepth)
+		return nil
+	})
 }
 
 // Enqueue adds an entry with a given byte/token cost to the target subscriber queue.
@@ -366,33 +371,29 @@ func (drr *DeficitRoundRobinQueue) Enqueue(subscriberID string, entry *CallbackE
 	if cost <= 0 {
 		cost = 1
 	}
-	drr.mu.Lock()
-	defer drr.mu.Unlock()
-
-	if drr.closed {
-		return ErrQueueClosed
-	}
-	sq, exists := drr.subscribers[subscriberID]
-	if !exists {
-		sq = newSubscriberQueue(subscriberID, drr.cfg.DefaultQuantum, drr.cfg.DefaultMaxDeficit, drr.cfg.DefaultMaxDepth)
-		drr.subscribers[subscriberID] = sq
-	}
-	if len(sq.items) >= sq.maxDepth {
-		sq.totalDropped++
-		return ErrQueueFull
-	}
-	wasEmpty := len(sq.items) == 0
-	sq.items = append(sq.items, &DeficitQueueItem{
-		Entry:        entry,
-		Cost:         cost,
-		SubscriberID: subscriberID,
+	return drr.withLock(func() error {
+		sq, exists := drr.subscribers[subscriberID]
+		if !exists {
+			sq = newSubscriberQueue(subscriberID, drr.cfg.DefaultQuantum, drr.cfg.DefaultMaxDeficit, drr.cfg.DefaultMaxDepth)
+			drr.subscribers[subscriberID] = sq
+		}
+		if len(sq.items) >= sq.maxDepth {
+			sq.totalDropped++
+			return ErrQueueFull
+		}
+		wasEmpty := len(sq.items) == 0
+		sq.items = append(sq.items, &DeficitQueueItem{
+			Entry:        entry,
+			Cost:         cost,
+			SubscriberID: subscriberID,
+		})
+		sq.totalEnqueued++
+		if wasEmpty {
+			drr.activeList = append(drr.activeList, subscriberID)
+			drr.broadcastAvailable()
+		}
+		return nil
 	})
-	sq.totalEnqueued++
-	if wasEmpty {
-		drr.activeList = append(drr.activeList, subscriberID)
-		drr.broadcastAvailable()
-	}
-	return nil
 }
 
 // Dequeue extracts the next fair item according to DRR round-robin deficit allocation.
