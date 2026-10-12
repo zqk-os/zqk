@@ -94,17 +94,19 @@ func WriteVendorConfigs(projectRoot string, vendors []Vendor, dryRun, force bool
 			hooksAbs := filepath.Join(projectRoot, filepath.FromSlash(hooksRel))
 			if pathExists(hooksAbs) && !force {
 				out.Skipped = append(out.Skipped, hooksRel)
-			} else if dryRun {
-				out.Written = append(out.Written, hooksRel)
-			} else {
-				if err := fileutil.EnsureDir(filepath.Dir(hooksAbs)); err != nil {
-					return out, errfmt.Newf("ensure dir for %s", hooksRel).Wrap(err)
-				}
-				if err := fileutil.WriteSecureFile(hooksAbs, []byte(DefaultAgentHooksJSON())); err != nil {
-					return out, errfmt.Newf("write hooks config %s", hooksRel).Wrap(err)
-				}
-				out.Written = append(out.Written, hooksRel)
+				continue
 			}
+			if dryRun {
+				out.Written = append(out.Written, hooksRel)
+				continue
+			}
+			if err := fileutil.EnsureDir(filepath.Dir(hooksAbs)); err != nil {
+				return out, errfmt.Newf("ensure dir for %s", hooksRel).Wrap(err)
+			}
+			if err := fileutil.WriteSecureFile(hooksAbs, []byte(DefaultAgentHooksJSON())); err != nil {
+				return out, errfmt.Newf("write hooks config %s", hooksRel).Wrap(err)
+			}
+			out.Written = append(out.Written, hooksRel)
 		}
 	}
 

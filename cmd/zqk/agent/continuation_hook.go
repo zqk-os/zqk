@@ -4,16 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"io"
-	"os"
-	"path/filepath"
 )
 
 type continuationHookOutput struct {
@@ -22,12 +27,7 @@ type continuationHookOutput struct {
 }
 
 func newContinuationHookCmd() *cobra.Command {
-	var vendor string
-	var marker string
-	cmd := &cobra.Command{
-		Use:     "continuation",
-		Aliases: []string{"anti-idle", "stop"},
-		Short:   "Vendor-agnostic lifecycle continuation hook preventing premature agent halting",
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookContinuationCommandBuilder(), &cobra.Command{
 		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 			in := io.Reader(os.Stdin)
 			out := io.Writer(os.Stdout)
@@ -36,15 +36,17 @@ func newContinuationHookCmd() *cobra.Command {
 				out = cmd.OutOrStdout()
 			}
 			sec := procSecurity(proc)
+			vendor, _ := cmd.Flags().GetString("vendor")
+			marker, _ := cmd.Flags().GetString("marker")
+			agentID, _ := cmd.Flags().GetString("agent-id")
+			personaRef, _ := cmd.Flags().GetString("persona-ref")
 			markerPath := marker
 			if markerPath == "" {
 				markerPath = filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", "cap_loop_active")
 			}
-			return runContinuationHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, markerPath, in, out)
+			return runContinuationHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, markerPath, agentID, personaRef, in, out)
 		}),
-	}
-	cmd.Flags().StringVar(&vendor, "vendor", "antigravity", "Target agent host vendor format (antigravity, generic)")
-	cmd.Flags().StringVar(&marker, "marker", "", "Path to the autonomous cap loop active marker file")
+	})
 	return cmd
 }
 
@@ -55,6 +57,8 @@ func runContinuationHookWithDeps(
 	projectRoot string,
 	vendor string,
 	markerPath string,
+	agentID string,
+	personaRef string,
 	in io.Reader,
 	out io.Writer,
 ) error {
@@ -102,7 +106,37 @@ func runContinuationHookWithDeps(
 		}
 	}
 
-	reason := paths.RewriteCanonicalCLIInvocations(fmt.Sprintf("CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): Autonomous progression trigger. %s. Query zqk workflow whats-next and advance without idling. Do not stop.", activePlanInfo))
+	// 5. Query pending unacked steering messages from agentfeed correspondence
+	targetAgentID := strings.TrimSpace(agentID)
+	if targetAgentID == "" {
+		targetAgentID = strings.TrimSpace(os.Getenv("ZQK_AGENT_ID"))
+		if targetAgentID == "" {
+			targetAgentID = strings.TrimSpace(os.Getenv("ZQK_SEAT_ID"))
+		}
+		if targetAgentID == "" && projectRoot != "" {
+			targetAgentID = strings.TrimSpace(agentfeed.CoordinatorSeatID(projectRoot))
+			if targetAgentID == "" {
+				targetAgentID = strings.TrimSpace(agentfeed.WorkerSeatID(projectRoot))
+			}
+		}
+	}
+	var steeringNudge string
+	if targetAgentID != "" && projectRoot != "" {
+		seat := agentfeed.Seat{
+			AgentID:    targetAgentID,
+			PersonaRef: strings.TrimSpace(personaRef),
+		}
+		if snap, err := agentfeed.LoadCorrespondence(projectRoot, seat, 5); err == nil && len(snap.InboxUnacked) > 0 {
+			var msgSummaries []string
+			for _, item := range snap.InboxUnacked {
+				msgSummaries = append(msgSummaries, fmt.Sprintf("- [%s from %s]: %s", item.EventType, item.FromAgentID, item.Summary))
+			}
+			steeringNudge = fmt.Sprintf(" Pending steering inbox (%d unacked message(s)):\n%s.", len(snap.InboxUnacked), strings.Join(msgSummaries, "\n"))
+		}
+	}
+
+	promptMsg := fmt.Sprintf("CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): Autonomous progression trigger. %s.%s Query %s and advance without idling. Do not stop.", activePlanInfo, steeringNudge, paths.CLIInvocation("workflow whats-next"))
+	reason := paths.RewriteCanonicalCLIInvocations(promptMsg)
 	return emitContinuationDecision(out, "continue", reason)
 }
 
