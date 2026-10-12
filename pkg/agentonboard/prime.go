@@ -2,12 +2,54 @@ package agentonboard
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// DefaultAgentHooksJSON returns the default .agents/hooks.json content.
+func DefaultAgentHooksJSON() string {
+	exe := brand.ExecutableName()
+	return fmt.Sprintf(`{
+  "subagent-context-enforcer": {
+    "PreToolUse": [
+      {
+        "matcher": "invoke_subagent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -x ./bin/%s ]; then ./bin/%s agent hook pre-subagent --vendor antigravity; else %s agent hook pre-subagent --vendor antigravity; fi",
+            "timeout": 45
+          }
+        ]
+      }
+    ]
+  },
+  "cap-loop-anti-idle": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "if [ -x ./bin/%s ]; then ./bin/%s agent hook stop --vendor antigravity; else %s agent hook stop --vendor antigravity; fi",
+        "timeout": 15
+      }
+    ]
+  }
+}
+`, exe, exe, exe, exe, exe, exe)
+}
+
+func hasAgentHooksVendor(vendors []Vendor) bool {
+	for _, v := range vendors {
+		if v.ID == VendorAgentsMD || v.ID == VendorAgent || v.ID == VendorGemini {
+			return true
+		}
+	}
+	return false
+}
 
 // WriteResult summarizes a prime-workspace write pass.
 type WriteResult struct {
@@ -42,6 +84,30 @@ func WriteVendorConfigs(projectRoot string, vendors []Vendor, dryRun, force bool
 			out.Written = append(out.Written, relSlash)
 		}
 	}
+
+	if hasAgentHooksVendor(vendors) {
+		targetHooks := []string{".agents/hooks.json"}
+		if pathExists(filepath.Join(projectRoot, ".agent")) {
+			targetHooks = append(targetHooks, ".agent/hooks.json")
+		}
+		for _, hooksRel := range targetHooks {
+			hooksAbs := filepath.Join(projectRoot, filepath.FromSlash(hooksRel))
+			if pathExists(hooksAbs) && !force {
+				out.Skipped = append(out.Skipped, hooksRel)
+			} else if dryRun {
+				out.Written = append(out.Written, hooksRel)
+			} else {
+				if err := fileutil.EnsureDir(filepath.Dir(hooksAbs)); err != nil {
+					return out, errfmt.Newf("ensure dir for %s", hooksRel).Wrap(err)
+				}
+				if err := fileutil.WriteSecureFile(hooksAbs, []byte(DefaultAgentHooksJSON())); err != nil {
+					return out, errfmt.Newf("write hooks config %s", hooksRel).Wrap(err)
+				}
+				out.Written = append(out.Written, hooksRel)
+			}
+		}
+	}
+
 	return out, nil
 }
 

@@ -17,7 +17,7 @@
     "Stop": [
       {
         "type": "command",
-        "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook continuation --vendor antigravity; else zqk agent hook continuation --vendor antigravity; fi",
+        "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook stop --vendor antigravity; else zqk agent hook stop --vendor antigravity; fi",
         "timeout": 15
       }
     ]

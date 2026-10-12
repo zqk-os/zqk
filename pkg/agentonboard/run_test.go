@@ -257,3 +257,49 @@ func TestWriteVendorPacks(t *testing.T) {
 		t.Fatal("pack file missing")
 	}
 }
+
+func TestWriteVendorConfigs_ProvisionsAgentHooks(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	vendors := []Vendor{{
+		ID:             VendorAgentsMD,
+		ConfigRelPaths: []string{".agents/AGENTS.md"},
+	}}
+	wr, err := WriteVendorConfigs(root, vendors, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	hooksPath := filepath.Join(root, ".agents", "hooks.json")
+	if !pathExists(hooksPath) {
+		t.Fatalf("expected %s to be created, but missing; written=%v", hooksPath, wr.Written)
+	}
+
+	data, err := fileutil.ReadFile(hooksPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(data)
+	if !strings.Contains(content, "agent hook stop") {
+		t.Errorf("hooks.json does not contain 'agent hook stop':\n%s", content)
+	}
+	if !strings.Contains(content, "agent hook pre-subagent") {
+		t.Errorf("hooks.json does not contain 'agent hook pre-subagent':\n%s", content)
+	}
+
+	// Verify non-destructive default: existing file is skipped unless force is specified
+	wr2, err := WriteVendorConfigs(root, vendors, false, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	foundSkipped := false
+	for _, s := range wr2.Skipped {
+		if s == ".agents/hooks.json" {
+			foundSkipped = true
+			break
+		}
+	}
+	if !foundSkipped {
+		t.Fatalf("expected .agents/hooks.json in skipped, got: %v", wr2.Skipped)
+	}
+}
