@@ -203,3 +203,41 @@ func TestWireProtocol_ConcurrentEncodeDecode_Race(t *testing.T) {
 
 	wg.Wait()
 }
+
+func TestWireProtocol_PayloadSizeLimit_Validation(t *testing.T) {
+	h := newWireCodecHarness(t)
+
+	// 1. Verify decode rejects payloadLen exceeding WireMaxPayloadSize
+	hdr := make([]byte, WireHeaderSize)
+	binary.BigEndian.PutUint32(hdr[0:4], WireMagicHeader)
+	hdr[4] = WireProtocolVersion
+	binary.BigEndian.PutUint32(hdr[24:28], uint32(WireMaxPayloadSize+1))
+
+	dec, consumed, err := h.codec.DecodeEntry(hdr)
+	assert.Error(t, err)
+	assert.Nil(t, dec)
+	assert.Equal(t, 0, consumed)
+	assert.Contains(t, err.Error(), ErrMsgPayloadLengthTooLarge)
+
+	// 2. Verify decode rejects maximum uint32 payloadLen that would overflow arithmetic
+	binary.BigEndian.PutUint32(hdr[24:28], 0xFFFFFFFF)
+	dec, consumed, err = h.codec.DecodeEntry(hdr)
+	assert.Error(t, err)
+	assert.Nil(t, dec)
+	assert.Equal(t, 0, consumed)
+	assert.Contains(t, err.Error(), ErrMsgPayloadLengthTooLarge)
+
+	// 3. Verify encode rejects payload exceeding WireMaxPayloadSize
+	largePayload := make([]byte, WireMaxPayloadSize+1)
+	largeEntry := &CallbackEntry{
+		Payload: map[string]any{
+			"data": string(largePayload),
+		},
+		JobID: "job-oversize",
+	}
+
+	encoded, encErr := h.codec.EncodeEntry(largeEntry, nil)
+	assert.Error(t, encErr)
+	assert.Nil(t, encoded)
+	assert.Contains(t, encErr.Error(), ErrMsgPayloadTooLarge)
+}
