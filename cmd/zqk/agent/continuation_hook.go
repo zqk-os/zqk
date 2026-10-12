@@ -67,7 +67,9 @@ func runContinuationHookWithDeps(
 			}
 		}
 		if shouldRead {
-			_, _ = io.ReadAll(in)
+			if _, readErr := io.ReadAll(in); readErr != nil {
+				return readErr
+			}
 		}
 	}
 
