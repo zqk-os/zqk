@@ -21,6 +21,16 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+const (
+	defaultMarkerFilename = "cap_loop_active"
+	defaultActivePlanInfo = "Active cycle in progress"
+	activePlanInfoFmt     = "Active plan in progress: %s (%s)"
+	steeringSummaryFmt    = "- [%s from %s]: %s"
+	steeringNudgeFmt      = " Pending steering inbox (%d unacked message(s)):\n%s."
+	capPromptTemplate     = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): Autonomous progression trigger. %s.%s Query %s and advance without idling. Do not stop."
+	workflowWhatsNextCmd  = "workflow whats-next"
+)
+
 type continuationHookOutput struct {
 	Decision string `json:"decision"`
 	Reason   string `json:"reason,omitempty"`
@@ -36,13 +46,25 @@ func newContinuationHookCmd() *cobra.Command {
 				out = cmd.OutOrStdout()
 			}
 			sec := procSecurity(proc)
-			vendor, _ := cmd.Flags().GetString("vendor")
-			marker, _ := cmd.Flags().GetString("marker")
-			agentID, _ := cmd.Flags().GetString("agent-id")
-			personaRef, _ := cmd.Flags().GetString("persona-ref")
+			vendor, err := cmd.Flags().GetString("vendor")
+			if err != nil {
+				return err
+			}
+			marker, err := cmd.Flags().GetString("marker")
+			if err != nil {
+				return err
+			}
+			agentID, err := cmd.Flags().GetString("agent-id")
+			if err != nil {
+				return err
+			}
+			personaRef, err := cmd.Flags().GetString("persona-ref")
+			if err != nil {
+				return err
+			}
 			markerPath := marker
 			if markerPath == "" {
-				markerPath = filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", "cap_loop_active")
+				markerPath = filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", defaultMarkerFilename)
 			}
 			return runContinuationHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, markerPath, agentID, personaRef, in, out)
 		}),
@@ -79,7 +101,7 @@ func runContinuationHookWithDeps(
 
 	// 2. Resolve default marker if empty
 	if markerPath == "" && projectRoot != "" {
-		markerPath = filepath.Join(projectRoot, paths.ProjectDataDir, "state", "cap_loop_active")
+		markerPath = filepath.Join(projectRoot, paths.ProjectDataDir, "state", defaultMarkerFilename)
 	}
 
 	// 3. Inspect active marker existence
@@ -88,7 +110,7 @@ func runContinuationHookWithDeps(
 	}
 
 	// 4. Query active in-progress priority plan if storage is available
-	activePlanInfo := "Active cycle in progress"
+	activePlanInfo := defaultActivePlanInfo
 	if sp != nil {
 		filter := storage.ListFilter{
 			Kind: objects.KindPriorityPlan,
@@ -101,7 +123,7 @@ func runContinuationHookWithDeps(
 			pID, _ := first[objects.FieldKeyID].(string)
 			title, _ := first[objects.FieldKeyTitle].(string)
 			if pID != "" {
-				activePlanInfo = fmt.Sprintf("Active plan in progress: %s (%s)", title, pID)
+				activePlanInfo = fmt.Sprintf(activePlanInfoFmt, title, pID)
 			}
 		}
 	}
@@ -129,13 +151,13 @@ func runContinuationHookWithDeps(
 		if snap, err := agentfeed.LoadCorrespondence(projectRoot, seat, 5); err == nil && len(snap.InboxUnacked) > 0 {
 			var msgSummaries []string
 			for _, item := range snap.InboxUnacked {
-				msgSummaries = append(msgSummaries, fmt.Sprintf("- [%s from %s]: %s", item.EventType, item.FromAgentID, item.Summary))
+				msgSummaries = append(msgSummaries, fmt.Sprintf(steeringSummaryFmt, item.EventType, item.FromAgentID, item.Summary))
 			}
-			steeringNudge = fmt.Sprintf(" Pending steering inbox (%d unacked message(s)):\n%s.", len(snap.InboxUnacked), strings.Join(msgSummaries, "\n"))
+			steeringNudge = fmt.Sprintf(steeringNudgeFmt, len(snap.InboxUnacked), strings.Join(msgSummaries, "\n"))
 		}
 	}
 
-	promptMsg := fmt.Sprintf("CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): Autonomous progression trigger. %s.%s Query %s and advance without idling. Do not stop.", activePlanInfo, steeringNudge, paths.CLIInvocation("workflow whats-next"))
+	promptMsg := fmt.Sprintf(capPromptTemplate, activePlanInfo, steeringNudge, paths.CLIInvocation(workflowWhatsNextCmd))
 	reason := paths.RewriteCanonicalCLIInvocations(promptMsg)
 	return emitContinuationDecision(out, "continue", reason)
 }
