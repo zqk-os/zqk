@@ -65,13 +65,12 @@ func NewTokenBucketLimiter(cfg TokenBucketConfig) (*TokenBucketLimiter, error) {
 	if clock == nil {
 		clock = time.Now
 	}
-	var initTokens int64
+	initTokens := cfg.Capacity
+	if cfg.InitialTokens > 0 {
+		initTokens = cfg.InitialTokens
+	}
 	if cfg.StartEmpty {
 		initTokens = 0
-	} else if cfg.InitialTokens > 0 {
-		initTokens = cfg.InitialTokens
-	} else {
-		initTokens = cfg.Capacity
 	}
 	if initTokens > cfg.Capacity {
 		initTokens = cfg.Capacity
@@ -439,7 +438,8 @@ func (drr *DeficitRoundRobinQueue) stepDRRLocked() (*DeficitQueueItem, error) {
 			if len(sq.items) == 0 {
 				sq.deficit = 0
 				drr.removeActiveAt(drr.currentIndex)
-			} else if len(sq.items) > 0 && sq.items[0].Cost > sq.deficit {
+			}
+			if len(sq.items) > 0 && sq.items[0].Cost > sq.deficit {
 				// Cannot serve next packet for this subscriber without more quantum: advance to next subscriber
 				drr.currentIndex++
 			}
