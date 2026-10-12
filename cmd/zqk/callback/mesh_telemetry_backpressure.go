@@ -53,6 +53,14 @@ type WindowMetrics struct {
 	P99              time.Duration
 }
 
+// DropRate returns the ratio of dropped events to total dispatched events.
+func (m WindowMetrics) DropRate() float64 {
+	if m.TotalDispatched <= 0 {
+		return 0.0
+	}
+	return float64(m.TotalDropped) / float64(m.TotalDispatched)
+}
+
 type windowBucket struct {
 	startTime      time.Time
 	dispatched     int64
