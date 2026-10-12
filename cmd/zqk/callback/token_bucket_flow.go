@@ -262,12 +262,12 @@ type DeficitQueueItem struct {
 
 // DeficitSubscriberQueue represents a FIFO queue for a specific tenant/subscriber.
 type DeficitSubscriberQueue struct {
-	subscriberID string
-	items        []*DeficitQueueItem
-	quantum      int64
-	deficit      int64
-	maxDeficit   int64
-	maxDepth     int
+	subscriberID  string
+	items         []*DeficitQueueItem
+	quantum       int64
+	deficit       int64
+	maxDeficit    int64
+	maxDepth      int
 	totalEnqueued int64
 	totalDequeued int64
 	totalDropped  int64
