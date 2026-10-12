@@ -56,7 +56,6 @@ func registerTestWaitingPool(t *testing.T, throttler *MeshBackpressureThrottler,
 	require.NoError(t, err)
 }
 
-
 // -----------------------------------------------------------------------------
 // CRIT-1791759409830632000-8c68a2b5:
 // Static Invariants: Layout, Bounded Sliding Window Buffer, and Metric Accumulator
@@ -132,7 +131,7 @@ func TestMeshTelemetry_DimensionalAggregationAndSnapshots(t *testing.T) {
 
 	now := time.Now()
 	agg, err := NewMeshTelemetryAggregator(MeshTelemetryConfig{
-		Name: "test_aggregator",
+		Name:  "test_aggregator",
 		Clock: func() time.Time { return now },
 	})
 	require.NoError(t, err)
