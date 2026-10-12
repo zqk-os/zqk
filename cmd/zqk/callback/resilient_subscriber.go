@@ -276,7 +276,6 @@ func (r *ResilientSubscriber) dispatchGuarded(ctx context.Context, entry *Callba
 	return nil
 }
 
-
 // IsCircuitBreakerOpen checks if an error was caused by a tripped circuit breaker.
 func IsCircuitBreakerOpen(err error) bool {
 	if err == nil {

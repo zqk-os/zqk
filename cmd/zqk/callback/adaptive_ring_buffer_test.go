@@ -292,4 +292,3 @@ func pushEntryHelper(q *AdaptiveRingBufferQueue, jobID string) error {
 	_, err := q.Push(&CallbackEntry{JobID: jobID})
 	return err
 }
-

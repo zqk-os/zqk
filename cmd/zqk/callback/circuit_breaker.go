@@ -154,4 +154,3 @@ func (cb *AdaptiveCircuitBreaker) Trip() {
 func (cb *AdaptiveCircuitBreaker) Reset() {
 	cb.RecordSuccess()
 }
-
