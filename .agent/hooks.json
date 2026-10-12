@@ -12,5 +12,14 @@
         ]
       }
     ]
+  },
+  "cap-loop-anti-idle": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook continuation --vendor antigravity; else zqk agent hook continuation --vendor antigravity; fi",
+        "timeout": 15
+      }
+    ]
   }
 }

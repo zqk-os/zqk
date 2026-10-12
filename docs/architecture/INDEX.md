@@ -75,6 +75,7 @@ Documents governing multi-agent coordination, bounded domain packages, and exten
 - **[Package Consolidation Governance](./PACKAGE_CONSOLIDATION_GOVERNANCE.md)**: Package boundary hygiene, circular import prevention, and internal vs public API separation.
 - **[SpecBuilder CodeGen & Enum Consolidation](./SPECBUILDER_CODEGEN_CONSOLIDATION.md)**: SpecBuilder code generation, AST pruning, and domain enum aggregation.
 - **[Synthetic Constant Eradication Governance](./SYNTHETIC_CONSTANT_ERADICATION_GOVERNANCE.md)**: Elimination of stringly-typed magic constants in favor of canonical spec-derived constants.
+- **[Vendor-Agnostic Anti-Idle Continuation Hook Architecture](./VENDOR_AGNOSTIC_ANTI_IDLE_CONTINUATION_HOOK.md)**: Standardized lifecycle continuation hook adapters, non-interrupting steering feeds, and fail-closed anti-idleness in autonomous CAP loops.
 
 ---
 

@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"hash/crc32"
-	"math"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
@@ -18,6 +17,15 @@ const (
 
 	// WireHeaderSize is the fixed 32-byte binary header overhead per frame.
 	WireHeaderSize int = 32
+
+	// WireMaxPayloadSize is the maximum allowable payload size (64 MiB) to prevent allocation overflows (CWE-190).
+	WireMaxPayloadSize int = 64 * 1024 * 1024
+
+	// ErrMsgPayloadTooLarge is the error message returned when an encode payload exceeds WireMaxPayloadSize.
+	ErrMsgPayloadTooLarge = "payload exceeds maximum allowable size of 64 MiB"
+
+	// ErrMsgPayloadLengthTooLarge is the error message returned when a decode payload length exceeds WireMaxPayloadSize.
+	ErrMsgPayloadLengthTooLarge = "payload length exceeds maximum allowable size of 64 MiB"
 
 	// WireFlagCompressed indicates the frame payload is compressed.
 	WireFlagCompressed uint8 = 1 << 0
@@ -54,8 +62,8 @@ func (c *WireProtocolCodec) EncodeEntry(entry *CallbackEntry, buf []byte) ([]byt
 	}
 
 	payloadLen := len(payloadBytes)
-	if payloadLen > math.MaxInt-WireHeaderSize {
-		return nil, errfmt.Errorf("payload too large")
+	if payloadLen > WireMaxPayloadSize {
+		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
 	}
 	totalSize := WireHeaderSize + payloadLen
 
@@ -105,6 +113,9 @@ func (c *WireProtocolCodec) DecodeEntry(data []byte) (*CallbackEntry, int, error
 	}
 
 	payloadLen := int(binary.BigEndian.Uint32(data[24:28]))
+	if payloadLen > WireMaxPayloadSize {
+		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
+	}
 	expectedChecksum := binary.BigEndian.Uint32(data[28:32])
 	totalLen := WireHeaderSize + payloadLen
 
