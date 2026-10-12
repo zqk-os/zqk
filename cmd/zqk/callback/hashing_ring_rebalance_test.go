@@ -75,17 +75,21 @@ func (h *rebalanceTestHarness) assertHandoffPlan(plan map[string][]string, faile
 	}
 }
 
-func TestPartitionRebalancer_NodeAdditionMigration(t *testing.T) {
-	h := newRebalanceHarness(t)
+func (h *rebalanceTestHarness) setupMigrationTest(newNodes []string) (*ConsistentHashingRing, []PartitionMigration, int) {
+	h.t.Helper()
 	vnodes := 128
 	oldNodes := []string{"node-0", "node-1", "node-2", "node-3"}
-	newNodes := []string{"node-0", "node-1", "node-2", "node-3", "node-4"}
-
 	oldRing := h.createRing(vnodes, oldNodes...)
 	newRing := h.createRing(vnodes, newNodes...)
-
 	migrations, err := h.rebalancer.CalculateMigrations(oldRing, newRing)
-	require.NoError(t, err)
+	require.NoError(h.t, err)
+	return newRing, migrations, vnodes
+}
+
+func TestPartitionRebalancer_NodeAdditionMigration(t *testing.T) {
+	h := newRebalanceHarness(t)
+	newNodes := []string{"node-0", "node-1", "node-2", "node-3", "node-4"}
+	newRing, migrations, vnodes := h.setupMigrationTest(newNodes)
 
 	h.assertAddedNodeMigrations(migrations, "node-4", vnodes)
 
@@ -97,15 +101,8 @@ func TestPartitionRebalancer_NodeAdditionMigration(t *testing.T) {
 
 func TestPartitionRebalancer_NodeRemovalMigration(t *testing.T) {
 	h := newRebalanceHarness(t)
-	vnodes := 128
-	oldNodes := []string{"node-0", "node-1", "node-2", "node-3"}
 	remainingNodes := []string{"node-0", "node-2", "node-3"}
-
-	oldRing := h.createRing(vnodes, oldNodes...)
-	newRing := h.createRing(vnodes, remainingNodes...)
-
-	migrations, err := h.rebalancer.CalculateMigrations(oldRing, newRing)
-	require.NoError(t, err)
+	_, migrations, vnodes := h.setupMigrationTest(remainingNodes)
 
 	h.assertRemovedNodeMigrations(migrations, "node-1", vnodes, remainingNodes)
 }
