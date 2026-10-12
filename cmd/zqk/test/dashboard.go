@@ -98,6 +98,7 @@ type LifecycleEventSummary struct {
 type DashboardState struct {
 	mu                  sync.RWMutex
 	projectRoot         string
+	storage             storage.ObjectStorageProvider
 	TestCases           map[string]*TestCaseModel
 	TestCaseOrder       []string
 	CriteriaIndex       map[string][]*TestCaseModel // maps criterionID -> referencing test cases
@@ -226,10 +227,28 @@ func (s *DashboardState) ScanFromStorage(ctx context.Context, sp storage.ObjectS
 func (s *DashboardState) ScanFromStorageWithSecurity(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *storage.SecurityContext) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if sp != nil {
+		s.storage = sp
+	}
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 	return s.scanFromStorageLocked(ctx, sp, secCtx, s.projectRoot, true, "", "")
+}
+
+func (s *DashboardState) getOrInitStorageLocked(ctx context.Context) storage.ObjectStorageProvider {
+	if s.storage != nil {
+		return s.storage
+	}
+	if s.projectRoot == "" {
+		return nil
+	}
+	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
+	if err != nil || factory == nil {
+		return nil
+	}
+	s.storage = factory.GetStorage()
+	return s.storage
 }
 
 // WarmLiteFile builds and persists the materialized test dashboard lite file from storage.
@@ -1094,8 +1113,8 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 		}
 		if !already {
 			tc.BacklogItemRefs = append(tc.BacklogItemRefs, bliID)
+			s.refreshLineageLocked(tc)
 		}
-		s.refreshLineageLocked(tc)
 	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindRequirement {
 		tcID := ev.ID
 		reqID := ev.TargetID
@@ -1119,8 +1138,8 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 		}
 		if !already {
 			tc.RequirementRefs = append(tc.RequirementRefs, reqID)
+			s.refreshLineageLocked(tc)
 		}
-		s.refreshLineageLocked(tc)
 	}
 }
 
@@ -1140,11 +1159,10 @@ func (s *DashboardState) hydrateTestCaseFromStorageLocked(tcID string) *TestCase
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
-	if err != nil || factory == nil {
+	sp := s.getOrInitStorageLocked(ctx)
+	if sp == nil {
 		return nil
 	}
-	sp := factory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	tcObj, err := sp.Read(ctx, secCtx, tcID)
 	if err != nil || tcObj == nil {
@@ -1224,6 +1242,9 @@ func (s *DashboardState) enrichTestCaseFromStorageLocked(tc *TestCaseModel) {
 	}
 	hydrated := s.hydrateTestCaseFromStorageLocked(tc.ID)
 	if hydrated == nil {
+		if tc.Lineage == nil {
+			tc.Lineage = &LineageChain{}
+		}
 		return
 	}
 	if tc.Title == "" {
@@ -1248,7 +1269,11 @@ func (s *DashboardState) enrichTestCaseFromStorageLocked(tc *TestCaseModel) {
 		tc.GoalRefs = hydrated.GoalRefs
 	}
 	if tc.Lineage == nil {
-		tc.Lineage = hydrated.Lineage
+		if hydrated.Lineage != nil {
+			tc.Lineage = hydrated.Lineage
+		} else {
+			tc.Lineage = &LineageChain{}
+		}
 	}
 	if len(tc.Criteria) == 0 && len(hydrated.Criteria) > 0 {
 		tc.Criteria = hydrated.Criteria
@@ -1265,11 +1290,10 @@ func (s *DashboardState) refreshLineageLocked(tc *TestCaseModel) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
-	if err != nil || factory == nil {
+	sp := s.getOrInitStorageLocked(ctx)
+	if sp == nil {
 		return
 	}
-	sp := factory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	readWithCache := func(id string) map[string]any {
 		if id == "" {
