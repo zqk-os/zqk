@@ -12,14 +12,14 @@ import (
 // Default telemetry and backpressure watermark constants.
 const (
 	DefaultWindowDuration              = 10 * time.Second
-	DefaultWindowBucketCount            = 10
-	DefaultMeshTelemetrySubscriberName  = "mesh_telemetry_aggregator"
-	DefaultMeshControllerName           = "mesh_telemetry_backpressure_controller"
-	ReasonCreditExhausted               = "credit_exhausted"
-	MetricKeyTopic                      = "topic"
-	MetricKeyBroker                     = "broker"
-	MetricKeySubscriber                 = "subscriber"
-	MetricKeyStatus                     = "status"
+	DefaultWindowBucketCount           = 10
+	DefaultMeshTelemetrySubscriberName = "mesh_telemetry_aggregator"
+	DefaultMeshControllerName          = "mesh_telemetry_backpressure_controller"
+	ReasonCreditExhausted              = "credit_exhausted"
+	MetricKeyTopic                     = "topic"
+	MetricKeyBroker                    = "broker"
+	MetricKeySubscriber                = "subscriber"
+	MetricKeyStatus                    = "status"
 )
 
 // Error definitions for telemetry and backpressure boundaries.
