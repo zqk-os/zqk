@@ -45,6 +45,15 @@ func (h *wireBoundaryHarness) encodeSample(seq int64) []byte {
 	return encoded
 }
 
+func (h *wireBoundaryHarness) assertDecodeError(data []byte, expectedSubstr string) {
+	h.t.Helper()
+	decoded, bytesConsumed, err := h.codec.DecodeEntry(data)
+	assert.Error(h.t, err)
+	assert.Nil(h.t, decoded)
+	assert.Equal(h.t, 0, bytesConsumed)
+	assert.Contains(h.t, err.Error(), expectedSubstr)
+}
+
 func TestWireBoundary_NilEntryRejection(t *testing.T) {
 	h := newWireBoundaryHarness(t)
 	buf := make([]byte, 128)
@@ -59,21 +68,12 @@ func TestWireBoundary_CorruptedPayloadDetection(t *testing.T) {
 	h := newWireBoundaryHarness(t)
 	corrupted := bytes.Clone(h.encodeSample(88))
 	corrupted[len(corrupted)/2] ^= 0xAA
-
-	decoded, bytesConsumed, err := h.codec.DecodeEntry(corrupted)
-	assert.Error(t, err)
-	assert.Nil(t, decoded)
-	assert.Equal(t, 0, bytesConsumed)
-	assert.Contains(t, err.Error(), "crc32 checksum mismatch")
+	h.assertDecodeError(corrupted, "crc32 checksum mismatch")
 }
 
 func TestWireBoundary_TruncatedPayloadLength(t *testing.T) {
 	h := newWireBoundaryHarness(t)
 	truncated := h.encodeSample(99)[:WireHeaderSize+2]
-
-	decoded, bytesConsumed, err := h.codec.DecodeEntry(truncated)
-	assert.Error(t, err)
-	assert.Nil(t, decoded)
-	assert.Equal(t, 0, bytesConsumed)
-	assert.Contains(t, err.Error(), "incomplete frame data")
+	h.assertDecodeError(truncated, "incomplete frame data")
 }
+
