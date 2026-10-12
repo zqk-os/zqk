@@ -36,26 +36,25 @@ func TestGenerateTracePipelineBundle_FullGeneration(t *testing.T) {
 	if len(bundle.Objects.TestCases[0].RequirementRefs) != 1 || bundle.Objects.TestCases[0].RequirementRefs[0] != "REQ-1" {
 		t.Errorf("expected test case to reference REQ-1, got %v", bundle.Objects.TestCases[0].RequirementRefs)
 	}
-	// 1 backlog item is generated, implementing all 3 criteria
-	if len(bundle.Objects.BacklogItems) != 1 {
-		t.Errorf("expected 1 backlog item, got %d", len(bundle.Objects.BacklogItems))
+	// 3 atomic backlog items are generated, implementing each of the 3 criteria (2-5 BLIs per plan mandate)
+	if len(bundle.Objects.BacklogItems) != 3 {
+		t.Errorf("expected 3 atomic backlog items, got %d", len(bundle.Objects.BacklogItems))
 	}
 	if len(allCriteria) != 3 {
 		t.Errorf("expected allCriteria to contain 3 criteria IDs, got %d", len(allCriteria))
 	}
 
-	// Verify the Backlog Item references all 3 generated criteria and the test case
-	bli := bundle.Objects.BacklogItems[0]
-	if len(bli.CriteriaRefs) != 3 {
-		t.Errorf("expected backlog item to reference 3 criteria, got %d", len(bli.CriteriaRefs))
-	}
-	for _, critID := range allCriteria {
-		if !slices.Contains(bli.CriteriaRefs, critID) {
-			t.Errorf("backlog item missing reference to criteria %s", critID)
+	// Verify each Backlog Item references exactly 1 generated criterion and the unified test case
+	for idx, bli := range bundle.Objects.BacklogItems {
+		if len(bli.CriteriaRefs) != 1 {
+			t.Errorf("expected backlog item %d to reference 1 criterion, got %d", idx, len(bli.CriteriaRefs))
 		}
-	}
-	if len(bli.TestCaseRefs) != 1 || bli.TestCaseRefs[0] != bundle.Objects.TestCases[0].IDHint {
-		t.Errorf("expected backlog item to reference generated test case, got %v", bli.TestCaseRefs)
+		if !slices.Contains(allCriteria, bli.CriteriaRefs[0]) {
+			t.Errorf("backlog item %d references unknown criteria %s", idx, bli.CriteriaRefs[0])
+		}
+		if len(bli.TestCaseRefs) != 1 || bli.TestCaseRefs[0] != bundle.Objects.TestCases[0].IDHint {
+			t.Errorf("expected backlog item %d to reference generated test case, got %v", idx, bli.TestCaseRefs)
+		}
 	}
 }
 
@@ -87,13 +86,14 @@ func TestGenerateTracePipelineBundle_PartialExisting_RejectsSingle1to1Ratio(t *t
 		t.Errorf("expected allCriteria to include existing criteria CRIT-EXISTING-1")
 	}
 
-	// Backlog item must reference all 3 criteria (both existing and supplemental)
-	if len(bundle.Objects.BacklogItems) != 1 {
-		t.Fatalf("expected 1 backlog item, got %d", len(bundle.Objects.BacklogItems))
+	// 3 atomic backlog items are generated, one per criterion
+	if len(bundle.Objects.BacklogItems) != 3 {
+		t.Fatalf("expected 3 backlog items, got %d", len(bundle.Objects.BacklogItems))
 	}
-	bli := bundle.Objects.BacklogItems[0]
-	if len(bli.CriteriaRefs) != 3 {
-		t.Errorf("expected backlog item to reference all 3 criteria, got %d", len(bli.CriteriaRefs))
+	for idx, bli := range bundle.Objects.BacklogItems {
+		if len(bli.CriteriaRefs) != 1 {
+			t.Errorf("expected backlog item %d to reference 1 criterion, got %d", idx, len(bli.CriteriaRefs))
+		}
 	}
 }
 
@@ -213,12 +213,13 @@ func TestGenerateTracePipelineBundle_MilestoneTarget_SetsMilestoneRefs(t *testin
 	if bundle == nil {
 		t.Fatal("expected bundle for Milestone target")
 	}
-	if len(bundle.Objects.BacklogItems) != 1 {
-		t.Fatalf("expected 1 BacklogItem, got %d", len(bundle.Objects.BacklogItems))
+	if len(bundle.Objects.BacklogItems) != 3 {
+		t.Fatalf("expected 3 BacklogItems, got %d", len(bundle.Objects.BacklogItems))
 	}
-	bli := bundle.Objects.BacklogItems[0]
-	if len(bli.MilestoneRefs) != 1 || bli.MilestoneRefs[0] != "MIL-001" {
-		t.Errorf("expected BacklogItem MilestoneRefs ['MIL-001'], got %v", bli.MilestoneRefs)
+	for idx, bli := range bundle.Objects.BacklogItems {
+		if len(bli.MilestoneRefs) != 1 || bli.MilestoneRefs[0] != "MIL-001" {
+			t.Errorf("expected BacklogItem %d MilestoneRefs ['MIL-001'], got %v", idx, bli.MilestoneRefs)
+		}
 	}
 }
 
@@ -262,12 +263,13 @@ func TestGenerateTracePipelineBundle_Issue504_GoalSetsGoalRefsAndNoDummyPath(t *
 		t.Fatal("expected bundle for Goal target")
 	}
 
-	if len(bundle.Objects.BacklogItems) != 1 {
-		t.Fatalf("expected 1 BacklogItem, got %d", len(bundle.Objects.BacklogItems))
+	if len(bundle.Objects.BacklogItems) != 3 {
+		t.Fatalf("expected 3 BacklogItems, got %d", len(bundle.Objects.BacklogItems))
 	}
-	bli := bundle.Objects.BacklogItems[0]
-	if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-ENTERPRISE-001" {
-		t.Errorf("expected BacklogItem GoalRefs ['GOAL-ENTERPRISE-001'], got %v", bli.GoalRefs)
+	for idx, bli := range bundle.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-ENTERPRISE-001" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-ENTERPRISE-001'], got %v", idx, bli.GoalRefs)
+		}
 	}
 
 	if len(bundle.Objects.TestCases) != 1 {
