@@ -32,6 +32,7 @@ var allCommandBuilders = []struct {
 	{"NewAgentFeedWatchCommandBuilder", NewAgentFeedWatchCommandBuilder},
 	{"NewAgentGuidingStepCommandBuilder", NewAgentGuidingStepCommandBuilder},
 	{"NewAgentHookCommandBuilder", NewAgentHookCommandBuilder},
+	{"NewAgentHookContinuationCommandBuilder", NewAgentHookContinuationCommandBuilder},
 	{"NewAgentHookPreSubagentCommandBuilder", NewAgentHookPreSubagentCommandBuilder},
 	{"NewAgentNewCommandBuilder", NewAgentNewCommandBuilder},
 	{"NewAgentNextCommandBuilder", NewAgentNextCommandBuilder},
