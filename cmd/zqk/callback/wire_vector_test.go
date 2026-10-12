@@ -92,17 +92,27 @@ func BenchmarkWireProtocol_VectorizedBatchEncode(b *testing.B) {
 	entries, buf := makeBenchBatch(16)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = framer.EncodeBatch(entries, buf[:0])
+		batchBytes, err := framer.EncodeBatch(entries, buf[:0])
+		if err != nil || len(batchBytes) == 0 {
+			b.FailNow()
+		}
 	}
 }
 
 func BenchmarkWireProtocol_VectorizedBatchDecode(b *testing.B) {
 	framer := NewWireBatchFramer()
 	entries, buf := makeBenchBatch(16)
-	encoded, _ := framer.EncodeBatch(entries, buf[:0])
+	encoded, initErr := framer.EncodeBatch(entries, buf[:0])
+	if initErr != nil {
+		b.FailNow()
+	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = framer.DecodeBatch(encoded)
+		decoded, err := framer.DecodeBatch(encoded)
+		if err != nil || len(decoded) == 0 {
+			b.FailNow()
+		}
 	}
 }
+
 
