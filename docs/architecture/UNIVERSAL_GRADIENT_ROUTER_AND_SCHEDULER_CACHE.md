@@ -1,10 +1,8 @@
 # Universal Model Gradient Router & Scheduler Write-Through Cache Architecture
 
 > **Technical Specification:** `TSP-GRADIENT-ROUTER-SCHED-CACHE-001`  
-> **Requirement Reference:** `REQ-1791623864057902000-b99d99ed`  
-> **Acceptance Criteria:** `CRIT-1791623864578917000-b59d35b5`, `CRIT-1791623864578918000-3baafe70`, `CRIT-1791623864578919000-ec43ee48`  
 > **Status:** Implemented & Verified  
-> **Governing Plan:** `PRI-1791798179674758000-70914a05` (Cycle 39)  
+> **Target Release:** Zen Quantum Kernel v0.1.0  
 
 ---
 
@@ -77,10 +75,11 @@ flowchart LR
 
 ---
 
-## 4. Requirement Traceability Matrix
+## 4. Verification & Traceability Matrix
 
-| Requirement | Acceptance Criteria | Component | Verification Test Suite | Status |
+| Capability | Scope | Component | Verification Test Suite | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| `REQ-1791623864057902000-b99d99ed` | `CRIT-1791623864578917000-b59d35b5` (Functional Acceptance) | `pkg/scheduler/job_state_registry.go` | `pkg/scheduler/job_state_registry_cache_test.go` | Verified (Pass) |
-| `REQ-1791623864057902000-b99d99ed` | `CRIT-1791623864578918000-3baafe70` (Boundary & Errors) | `cmd/zqk/callback/shm_mmap_windows.go` | `cmd/zqk/callback/shm_ipc_test.go` | Verified (Pass) |
-| `REQ-1791623864057902000-b99d99ed` | `CRIT-1791623864578919000-ec43ee48` (Documentation) | `docs/architecture/UNIVERSAL_GRADIENT_ROUTER_AND_SCHEDULER_CACHE.md` | `docs/architecture/INDEX.md` | Verified (Pass) |
+| Scheduler Write-Through Cache | In-memory cache & mtime invalidation | `pkg/scheduler/job_state_registry.go` | `pkg/scheduler/job_state_registry_cache_test.go` | Verified (Pass) |
+| Win32 SHM Memory Mapping | Cross-platform shared memory mapping | `cmd/zqk/callback/shm_mmap_windows.go` | `cmd/zqk/callback/shm_ipc_test.go` | Verified (Pass) |
+| Fallback Synchronization | Write-back memory mapping | `cmd/zqk/callback/shm_mmap_other.go` | `cmd/zqk/callback/shm_ipc_test.go` | Verified (Pass) |
+| Gradient Router Dispatch | Model tier & tool routing | `pkg/router/gradient_router.go` | `pkg/router/gradient_router_test.go` | Verified (Pass) |
