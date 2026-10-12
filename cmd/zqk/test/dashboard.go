@@ -930,17 +930,7 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 		}
 
 		// Update linked criteria
-		if tcs, ok := s.CriteriaIndex[critID]; ok {
-			for _, tc := range tcs {
-				for _, cr := range tc.Criteria {
-					if cr.ID == critID {
-						cr.Status = objects.ObjectStatusComplete
-						cr.LastSatisfied = ts
-					}
-				}
-				s.recalculateTestCaseGraduationLocked(tc, critID, ts)
-			}
-		}
+		s.updateCriteriaStatusAndRecalculateLocked(critID, objects.ObjectStatusComplete, ts)
 
 		msg := fmt.Sprintf("CRITERION SATISFIED: %s", critID)
 		if scopeDesc != "" {
@@ -957,19 +947,7 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 	case lifecycle.EventTypeStatusTransition:
 		if strings.EqualFold(ev.Kind, objects.KindCriteria) || strings.EqualFold(ev.Kind, "criterion") {
 			critID := ev.ID
-			if tcs, ok := s.CriteriaIndex[critID]; ok {
-				for _, tc := range tcs {
-					for _, cr := range tc.Criteria {
-						if cr.ID == critID {
-							cr.Status = ev.ToStatus
-							if isCriterionComplete(ev.ToStatus) {
-								cr.LastSatisfied = ts
-							}
-						}
-					}
-					s.recalculateTestCaseGraduationLocked(tc, critID, ts)
-				}
-			}
+			s.updateCriteriaStatusAndRecalculateLocked(critID, ev.ToStatus, ts)
 			s.appendRecentEvent(LifecycleEventSummary{
 				Timestamp:   ts,
 				EventType:   string(ev.EventType),
@@ -994,6 +972,24 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 	}
 
 	s.LastUpdated = time.Now()
+}
+
+func (s *DashboardState) updateCriteriaStatusAndRecalculateLocked(critID, status string, ts time.Time) {
+	tcs, ok := s.CriteriaIndex[critID]
+	if !ok {
+		return
+	}
+	for _, tc := range tcs {
+		for _, cr := range tc.Criteria {
+			if cr.ID == critID {
+				cr.Status = status
+				if isCriterionComplete(status) {
+					cr.LastSatisfied = ts
+				}
+			}
+		}
+		s.recalculateTestCaseGraduationLocked(tc, critID, ts)
+	}
 }
 
 func (s *DashboardState) recalculateTestCaseGraduationLocked(tc *TestCaseModel, critID string, ts time.Time) {
