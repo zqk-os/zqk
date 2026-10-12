@@ -1,12 +1,14 @@
 package scheduler
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -474,3 +476,121 @@ func TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath(t *testing.T
 		t.Fatalf("expected at least one scheduled full cleanup attempt, got %d", fullCalls)
 	}
 }
+
+func TestJobStateRegistry_WriteThroughCacheAndKnownIdleTracking(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
+
+	const jobID = "SCH-cached-job"
+	const execID = "exec-cached-1"
+
+	// 1. Initially unknown job: GetExecutionState marks it known-idle
+	st, err := reg.GetExecutionState(jobID)
+	if err != nil {
+		t.Fatalf("GetExecutionState failed: %v", err)
+	}
+	if st != nil {
+		t.Fatalf("expected nil state for unknown job, got %+v", st)
+	}
+
+	reg.mu.RLock()
+	_, isIdle := reg.knownIdleJobs[jobID]
+	reg.mu.RUnlock()
+	if !isIdle {
+		t.Fatalf("expected job %q to be tracked in knownIdleJobs", jobID)
+	}
+
+	// 2. Register execution: write-through cache populated, removed from known-idle
+	if err := reg.RegisterExecution(jobID, execID, 4242); err != nil {
+		t.Fatalf("RegisterExecution failed: %v", err)
+	}
+
+	reg.mu.RLock()
+	cachedState, hasCache := reg.jobExecutionStateCache[jobID]
+	_, stillIdle := reg.knownIdleJobs[jobID]
+	reg.mu.RUnlock()
+
+	if !hasCache || cachedState == nil {
+		t.Fatalf("expected job %q in jobExecutionStateCache", jobID)
+	}
+	if stillIdle {
+		t.Fatalf("expected job %q removed from knownIdleJobs upon execution registration", jobID)
+	}
+	if cachedState.State != jobExecutionStateInProgress {
+		t.Fatalf("expected cached state %q, got %q", jobExecutionStateInProgress, cachedState.State)
+	}
+
+	// 3. Cache hit verification: even if file is removed from disk, in-memory cache returns state
+	diskFile := reg.stateFilePathForJobExecution(jobID, execID)
+	if err := fileutil.Remove(diskFile); err != nil {
+		t.Fatalf("failed to remove disk file: %v", err)
+	}
+	st, err = reg.GetExecutionState(jobID)
+	if err != nil {
+		t.Fatalf("GetExecutionState cache hit failed: %v", err)
+	}
+	if st == nil || st.ExecutionID != execID {
+		t.Fatalf("expected cached state to return execID %q, got %+v", execID, st)
+	}
+
+	// Restore file on disk for DeferExecution / CompleteExecution flow
+	if err := reg.UpdateState(jobID, st); err != nil {
+		t.Fatalf("UpdateState failed: %v", err)
+	}
+
+	// 4. DeferExecution: in-memory cache updated synchronously
+	deferUntil := time.Now().UTC().Add(30 * time.Minute)
+	if err := reg.DeferExecution(jobID, "backoff", &deferUntil); err != nil {
+		t.Fatalf("DeferExecution failed: %v", err)
+	}
+
+	st, err = reg.GetExecutionState(jobID)
+	if err != nil {
+		t.Fatalf("GetExecutionState failed: %v", err)
+	}
+	if st == nil || st.State != jobExecutionStateDeferred {
+		t.Fatalf("expected cached state %q, got %+v", jobExecutionStateDeferred, st)
+	}
+
+	// 5. CompleteExecution: marked terminal, known-idle tracked, GetExecutionState returns nil
+	if err := reg.CompleteExecution(jobID, execID, "completed"); err != nil {
+		t.Fatalf("CompleteExecution failed: %v", err)
+	}
+
+	st, err = reg.GetExecutionState(jobID)
+	if err != nil {
+		t.Fatalf("GetExecutionState failed: %v", err)
+	}
+	if st != nil {
+		t.Fatalf("expected nil for completed job, got %+v", st)
+	}
+
+	reg.mu.RLock()
+	_, completedIsIdle := reg.knownIdleJobs[jobID]
+	reg.mu.RUnlock()
+	if !completedIsIdle {
+		t.Fatalf("expected completed job %q to be marked known-idle", jobID)
+	}
+
+	// 6. Concurrent read/write stress test
+	var wg sync.WaitGroup
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		workerID := i
+		goroutinelabels.NewGoroutine("test.job_state_registry_worker", "concurrent read/write stress").StartSimple(func() {
+			defer wg.Done()
+			jID := fmt.Sprintf("SCH-worker-%d", workerID)
+			eID := fmt.Sprintf("exec-%d", workerID)
+
+			_, _ = reg.GetExecutionState(jID)
+			_ = reg.RegisterExecution(jID, eID, workerID)
+			_, _ = reg.GetExecutionState(jID)
+			_ = reg.CompleteExecution(jID, eID, "completed")
+			_, _ = reg.GetExecutionState(jID)
+		})
+	}
+	wg.Wait()
+}
+

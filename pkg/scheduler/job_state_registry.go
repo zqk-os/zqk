@@ -109,6 +109,14 @@ type JobStateRegistry struct {
 
 	mu sync.RWMutex
 
+	// jobExecutionStateCache provides an in-memory write-through cache for active and recent job states.
+	jobExecutionStateCache map[string]*JobExecutionState
+	// knownIdleJobs tracks jobs with no in-progress/deferred executions to eliminate redundant disk scans.
+	knownIdleJobs map[string]struct{}
+
+	fileCacheMu    sync.RWMutex
+	fileStateCache map[string]cachedFileState
+
 	// retention: how long completed/failed files are retained (best-effort cleanup).
 	retention time.Duration
 
@@ -124,6 +132,12 @@ type JobStateRegistry struct {
 	lastFullCleanupAt   time.Time
 	fullCleanupInFlight bool
 	fullCleanupTestHook func() // optional; tests count scheduled full cleanups
+}
+
+type cachedFileState struct {
+	modTime time.Time
+	size    int64
+	state   *JobExecutionState
 }
 
 // stateRetentionCleanupStats counts filesystem effects of retention cleanup (measurable operations signal).
@@ -158,10 +172,40 @@ func NewJobStateRegistry(projectRoot string) JobStateRegistryInterface {
 	stateDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir, paths.StateDir)
 	locksDir := filepath.Join(stateDir, "locks")
 	return &JobStateRegistry{
-		stateDir:  stateDir,
-		locksDir:  locksDir,
-		retention: 7 * 24 * time.Hour,
+		stateDir:               stateDir,
+		locksDir:               locksDir,
+		retention:              7 * 24 * time.Hour,
+		jobExecutionStateCache: make(map[string]*JobExecutionState),
+		knownIdleJobs:          make(map[string]struct{}),
+		fileStateCache:         make(map[string]cachedFileState),
 	}
+}
+
+func (r *JobStateRegistry) ensureCachesLocked() {
+	if r.jobExecutionStateCache == nil {
+		r.jobExecutionStateCache = make(map[string]*JobExecutionState)
+	}
+	if r.knownIdleJobs == nil {
+		r.knownIdleJobs = make(map[string]struct{})
+	}
+}
+
+func (r *JobStateRegistry) updateCacheActiveLocked(jobID string, state *JobExecutionState) {
+	r.ensureCachesLocked()
+	r.jobExecutionStateCache[jobID] = state
+	delete(r.knownIdleJobs, jobID)
+}
+
+func (r *JobStateRegistry) updateCacheTerminalLocked(jobID string, state *JobExecutionState) {
+	r.ensureCachesLocked()
+	r.jobExecutionStateCache[jobID] = state
+	r.knownIdleJobs[jobID] = struct{}{}
+}
+
+func (r *JobStateRegistry) markIdleLocked(jobID string) {
+	r.ensureCachesLocked()
+	r.jobExecutionStateCache[jobID] = nil
+	r.knownIdleJobs[jobID] = struct{}{}
 }
 
 // GetState returns the execution state for a job
@@ -171,7 +215,25 @@ func (r *JobStateRegistry) GetState(jobID string) (*JobExecutionState, error) {
 
 // UpdateState updates the execution state for a job
 func (r *JobStateRegistry) UpdateState(jobID string, state *JobExecutionState) error {
-	return r.writeStateAtomically(state)
+	if err := r.writeStateAtomically(state); err != nil {
+		return err
+	}
+	if state != nil {
+		id := jobID
+		if id == emptyValue {
+			id = state.JobID
+		}
+		if id != emptyValue {
+			r.mu.Lock()
+			if state.State == jobExecutionStateInProgress || state.State == jobExecutionStateDeferred {
+				r.updateCacheActiveLocked(id, state)
+			} else {
+				r.updateCacheTerminalLocked(id, state)
+			}
+			r.mu.Unlock()
+		}
+	}
+	return nil
 }
 
 // ListStates returns all in-progress states
@@ -226,7 +288,13 @@ func (r *JobStateRegistry) RegisterExecutionWithLease(jobID, executionID string,
 			return errfmt.Newf("create state dir").Wrap(err)
 		}
 		_ = r.writeStateHintsFile() // best-effort
-		return r.writeStateAtomically(state)
+		if err := r.writeStateAtomically(state); err != nil {
+			return err
+		}
+		r.mu.Lock()
+		r.updateCacheActiveLocked(jobID, state)
+		r.mu.Unlock()
+		return nil
 	}); err != nil {
 		return nil, err
 	}
@@ -244,7 +312,7 @@ func (r *JobStateRegistry) Summarize(staleAfter time.Duration) (*JobStateSummary
 	}
 	now := time.Now().UTC()
 	_ = r.forEachStateYAML(func(path string) error {
-		st, ok := readJobExecutionStateFile(path)
+		st, ok := r.readCachedJobExecutionStateFile(path)
 		if !ok {
 			return nil
 		}
@@ -269,6 +337,94 @@ func readJobExecutionStateFile(path string) (*JobExecutionState, bool) {
 		return nil, false
 	}
 	return &st, true
+}
+
+func cloneJobExecutionState(s *JobExecutionState) *JobExecutionState {
+	if s == nil {
+		return nil
+	}
+	cp := *s
+	if s.CompletedAt != nil {
+		t := *s.CompletedAt
+		cp.CompletedAt = &t
+	}
+	if s.DeferUntil != nil {
+		t := *s.DeferUntil
+		cp.DeferUntil = &t
+	}
+	if s.Lease != nil {
+		l := *s.Lease
+		cp.Lease = &l
+	}
+	return &cp
+}
+
+func (r *JobStateRegistry) getCachedFileState(path string, modTime time.Time, size int64) *JobExecutionState {
+	if r == nil {
+		return nil
+	}
+	r.fileCacheMu.RLock()
+	defer r.fileCacheMu.RUnlock()
+	if r.fileStateCache == nil {
+		return nil
+	}
+	c, ok := r.fileStateCache[path]
+	if !ok {
+		return nil
+	}
+	if c.size != size || !c.modTime.Equal(modTime) {
+		return nil
+	}
+	return c.state
+}
+
+func (r *JobStateRegistry) setCachedFileState(path string, modTime time.Time, size int64, state *JobExecutionState) {
+	if r == nil || state == nil {
+		return
+	}
+	r.fileCacheMu.Lock()
+	defer r.fileCacheMu.Unlock()
+	if r.fileStateCache == nil {
+		r.fileStateCache = make(map[string]cachedFileState)
+	}
+	r.fileStateCache[path] = cachedFileState{
+		modTime: modTime,
+		size:    size,
+		state:   cloneJobExecutionState(state),
+	}
+}
+
+func (r *JobStateRegistry) evictCachedFileState(path string) {
+	if r == nil {
+		return
+	}
+	r.fileCacheMu.Lock()
+	defer r.fileCacheMu.Unlock()
+	if r.fileStateCache != nil {
+		delete(r.fileStateCache, path)
+	}
+}
+
+func (r *JobStateRegistry) readCachedJobExecutionStateFile(path string) (*JobExecutionState, bool) {
+	fi, err := fileutil.Stat(path)
+	if err != nil {
+		r.evictCachedFileState(path)
+		return nil, false
+	}
+	modTime := fi.ModTime()
+	size := fi.Size()
+
+	if st := r.getCachedFileState(path, modTime, size); st != nil {
+		return cloneJobExecutionState(st), true
+	}
+
+	st, ok := readJobExecutionStateFile(path)
+	if !ok {
+		return nil, false
+	}
+
+	r.setCachedFileState(path, modTime, size, st)
+	return cloneJobExecutionState(st), true
 }
 
 func (r *JobStateRegistry) readStateDirEntries() ([]fileutil.DirEntry, error) {
@@ -303,7 +459,7 @@ func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, e
 			continue
 		}
 		flatPath := filepath.Join(r.stateDir, name)
-		st, ok := readJobExecutionStateFile(flatPath)
+		st, ok := r.readCachedJobExecutionStateFile(flatPath)
 		if !ok || strings.TrimSpace(st.JobID) == emptyValue || strings.TrimSpace(st.ExecutionID) == emptyValue {
 			continue
 		}
@@ -314,8 +470,9 @@ func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, e
 		if err := fileutil.MkdirAll(filepath.Dir(dest), paths.DirPerm755); err != nil {
 			continue
 		}
-		if st2, ok2 := readJobExecutionStateFile(dest); ok2 && st2.JobID == st.JobID && st2.ExecutionID == st.ExecutionID {
+		if st2, ok2 := r.readCachedJobExecutionStateFile(dest); ok2 && st2.JobID == st.JobID && st2.ExecutionID == st.ExecutionID {
 			_ = fileutil.Remove(flatPath)
+			r.evictCachedFileState(flatPath)
 			moved++
 			continue
 		}
@@ -324,11 +481,13 @@ func (r *JobStateRegistry) MigrateLegacyFlatStateFilesBestEffort() (moved int, e
 			if b, readErr := fileutil.ReadFile(flatPath); readErr == nil {
 				if err2 := fileutil.WriteFile(dest, b, paths.FilePerm600); err2 == nil {
 					_ = fileutil.Remove(flatPath)
+					r.evictCachedFileState(flatPath)
 					moved++
 				}
 			}
 			continue
 		}
+		r.evictCachedFileState(flatPath)
 		moved++
 	}
 	return moved, nil
@@ -352,7 +511,7 @@ func (r *JobStateRegistry) MigrateUnbucketedJobStateDirsBestEffort() (moved int,
 			continue
 		}
 		src := filepath.Join(r.stateDir, name)
-		jobID, jidErr := readJobIDFromJobStateDir(src)
+		jobID, jidErr := r.readJobIDFromJobStateDir(src)
 		if jidErr != nil || strings.TrimSpace(jobID) == emptyValue {
 			continue
 		}
@@ -431,6 +590,27 @@ func (r *JobStateRegistry) MigrateUnbucketedJobStateDirsBestEffort() (moved int,
 	return moved, nil
 }
 
+func (r *JobStateRegistry) readJobIDFromJobStateDir(dir string) (string, error) {
+	entries, err := fileutil.ReadDir(dir)
+	if err != nil {
+		return "", err
+	}
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
+			continue
+		}
+		st, ok := r.readCachedJobExecutionStateFile(filepath.Join(dir, e.Name()))
+		if !ok {
+			continue
+		}
+		if strings.TrimSpace(st.JobID) != emptyValue {
+			return st.JobID, nil
+		}
+	}
+
+	return "", nil
+}
+
 func readJobIDFromJobStateDir(dir string) (string, error) {
 	entries, err := fileutil.ReadDir(dir)
 	if err != nil {
@@ -478,7 +658,22 @@ func (r *JobStateRegistry) GetExecutionState(jobID string) (*JobExecutionState, 
 	}
 
 	r.mu.RLock()
-	defer r.mu.RUnlock()
+	if r.jobExecutionStateCache != nil {
+		if st, ok := r.jobExecutionStateCache[jobID]; ok {
+			r.mu.RUnlock()
+			if st == nil || (st.State != jobExecutionStateInProgress && st.State != jobExecutionStateDeferred) {
+				return nil, nil
+			}
+			return st, nil
+		}
+	}
+	if r.knownIdleJobs != nil {
+		if _, idle := r.knownIdleJobs[jobID]; idle {
+			r.mu.RUnlock()
+			return nil, nil
+		}
+	}
+	r.mu.RUnlock()
 
 	for _, jobDir := range jobStateDirsForLookup(r.stateDir, jobID) {
 		if entries, err := fileutil.ReadDir(jobDir); err == nil {
@@ -486,12 +681,15 @@ func (r *JobStateRegistry) GetExecutionState(jobID string) (*JobExecutionState, 
 				if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") {
 					continue
 				}
-				st, ok := readJobExecutionStateFile(filepath.Join(jobDir, e.Name()))
+				st, ok := r.readCachedJobExecutionStateFile(filepath.Join(jobDir, e.Name()))
 				if !ok || st.JobID != jobID {
 					continue
 				}
 				switch st.State {
 				case jobExecutionStateInProgress, jobExecutionStateDeferred:
+					r.mu.Lock()
+					r.updateCacheActiveLocked(jobID, st)
+					r.mu.Unlock()
 					return st, nil
 				}
 			}
@@ -501,21 +699,33 @@ func (r *JobStateRegistry) GetExecutionState(jobID string) (*JobExecutionState, 
 	// Legacy flat layout
 	entries, err := r.readStateDirEntries()
 	if err != nil || len(entries) == 0 {
+		if err == nil {
+			r.mu.Lock()
+			r.markIdleLocked(jobID)
+			r.mu.Unlock()
+		}
 		return nil, err
 	}
 	for _, e := range entries {
 		if e.IsDir() || !strings.HasSuffix(e.Name(), ".yaml") || isReservedStateEntry(e.Name()) {
 			continue
 		}
-		st, ok := readJobExecutionStateFile(filepath.Join(r.stateDir, e.Name()))
+		st, ok := r.readCachedJobExecutionStateFile(filepath.Join(r.stateDir, e.Name()))
 		if !ok || st.JobID != jobID {
 			continue
 		}
 		switch st.State {
 		case jobExecutionStateInProgress, jobExecutionStateDeferred:
+			r.mu.Lock()
+			r.updateCacheActiveLocked(jobID, st)
+			r.mu.Unlock()
 			return st, nil
 		}
 	}
+
+	r.mu.Lock()
+	r.markIdleLocked(jobID)
+	r.mu.Unlock()
 
 	return nil, nil
 }
@@ -557,7 +767,7 @@ func (r *JobStateRegistry) ListInProgress() ([]*JobExecutionState, error) {
 
 	var out []*JobExecutionState
 	_ = r.forEachStateYAML(func(path string) error {
-		st, ok := readJobExecutionStateFile(path)
+		st, ok := r.readCachedJobExecutionStateFile(path)
 		if !ok {
 			return nil
 		}
@@ -584,7 +794,7 @@ func (r *JobStateRegistry) CompleteExecution(jobID, executionID, result string) 
 
 		if strings.TrimSpace(jobID) != emptyValue {
 			p := r.stateFilePathForJobExecution(jobID, executionID)
-			if st, ok := readJobExecutionStateFile(p); ok && st.ExecutionID == executionID {
+			if st, ok := r.readCachedJobExecutionStateFile(p); ok && st.ExecutionID == executionID {
 				targetPath = p
 				target = st
 			}
@@ -630,6 +840,19 @@ func (r *JobStateRegistry) CompleteExecution(jobID, executionID, result string) 
 			_ = fileutil.Remove(tmp)
 			return errfmt.Newf("rename job state").Wrap(err)
 		}
+		if fi, err := fileutil.Stat(targetPath); err == nil {
+			r.setCachedFileState(targetPath, fi.ModTime(), fi.Size(), target)
+		}
+
+		resolvedJobID := target.JobID
+		if resolvedJobID == emptyValue {
+			resolvedJobID = jobID
+		}
+		if resolvedJobID != emptyValue {
+			r.mu.Lock()
+			r.updateCacheTerminalLocked(resolvedJobID, target)
+			r.mu.Unlock()
+		}
 
 		// Hot path: only scan this job's directory (O(executions for this job)), never the whole tree.
 		_ = r.cleanupCompletedInDirBestEffort(filepath.Dir(targetPath))
@@ -646,7 +869,7 @@ func (r *JobStateRegistry) findExecutionStateByExecutionID(executionID string) (
 		if target != nil {
 			return nil
 		}
-		st, ok := readJobExecutionStateFile(path)
+		st, ok := r.readCachedJobExecutionStateFile(path)
 		if !ok {
 			return nil
 		}
@@ -682,7 +905,7 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 						continue
 					}
 					path := filepath.Join(jobDir, e.Name())
-					st, ok := readJobExecutionStateFile(path)
+					st, ok := r.readCachedJobExecutionStateFile(path)
 					if !ok || st.JobID != jobID || st.State != jobExecutionStateInProgress {
 						continue
 					}
@@ -703,7 +926,7 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 					continue
 				}
 				path := filepath.Join(r.stateDir, e.Name())
-				st, ok := readJobExecutionStateFile(path)
+				st, ok := r.readCachedJobExecutionStateFile(path)
 				if !ok || st.JobID != jobID || st.State != jobExecutionStateInProgress {
 					continue
 				}
@@ -734,6 +957,13 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 			_ = fileutil.Remove(tmp)
 			return errfmt.Newf("rename job state").Wrap(err)
 		}
+		if fi, err := fileutil.Stat(targetPath); err == nil {
+			r.setCachedFileState(targetPath, fi.ModTime(), fi.Size(), target)
+		}
+
+		r.mu.Lock()
+		r.updateCacheActiveLocked(jobID, target)
+		r.mu.Unlock()
 
 		return nil
 	})
@@ -755,6 +985,9 @@ func (r *JobStateRegistry) writeStateAtomically(state *JobExecutionState) error 
 	if err := fileutil.Rename(tmp, statePath); err != nil {
 		_ = fileutil.Remove(tmp)
 		return errfmt.Newf("rename job state").Wrap(err)
+	}
+	if fi, err := fileutil.Stat(statePath); err == nil {
+		r.setCachedFileState(statePath, fi.ModTime(), fi.Size(), state)
 	}
 	return nil
 }
@@ -818,7 +1051,7 @@ func (r *JobStateRegistry) cleanupCompletedInDirBestEffort(jobDir string) error 
 }
 
 func (r *JobStateRegistry) maybeRemoveExpiredStateFile(path string, cutoff time.Time, stats *stateRetentionCleanupStats) {
-	st, ok := readJobExecutionStateFile(path)
+	st, ok := r.readCachedJobExecutionStateFile(path)
 	if !ok {
 		return
 	}
@@ -833,6 +1066,7 @@ func (r *JobStateRegistry) maybeRemoveExpiredStateFile(path string, cutoff time.
 		stats.RemoveErrors++
 		return
 	}
+	r.evictCachedFileState(path)
 	stats.RemovedStateFiles++
 	if rmErr := fileutil.Remove(filepath.Dir(path)); rmErr == nil {
 		stats.RemovedEmptyDirs++
