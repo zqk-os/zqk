@@ -114,5 +114,3 @@ func BenchmarkWireProtocol_VectorizedBatchDecode(b *testing.B) {
 		}
 	}
 }
-
-
