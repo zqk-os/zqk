@@ -104,3 +104,74 @@ To obtain $N$ replica nodes for fault tolerance:
 - **Memory Footprint**: $O(N \times V)$ integers and map entries. Highly compact, fitting entirely in L1/L2 CPU cache for typical cluster topologies.
 - **Uniformity Verification**: Evaluated under standard chi-square and standard deviation analysis across 20,000 synthetic partition keys, maintaining a coefficient of variation ($CV = \sigma / \mu < 0.15$), well within strict distributed systems tolerance limits.
 - **Concurrency & Thread Safety**: All read operations (`GetNode`, `GetNodes`, `Members`, `Size`) acquire `sync.RWMutex.RLock()`, enabling concurrent lookups across thousands of parallel worker goroutines. All mutations (`AddNode`, `RemoveNode`) acquire `sync.RWMutex.Lock()`.
+
+---
+
+## Dynamic Partition Rebalancing Fabric (`PartitionRebalancer`)
+
+In elastic swarm topologies, worker pods scale dynamically. The `PartitionRebalancer` calculates the exact minimal partition migration plan between ring states and orchestrates transient replica handoffs during node failures.
+
+### 1. Rebalancing Architecture
+
+```mermaid
+flowchart TD
+    subgraph TopologyShift ["Cluster Topology Shift"]
+        OldRing["Old Ring Topology (N nodes)"]
+        NewRing["New Ring Topology (N+1 or N-1 nodes)"]
+    end
+
+    subgraph RebalanceEngine ["PartitionRebalancer Engine"]
+        OldRing --> Diff["CalculateMigrations(oldRing, newRing)"]
+        NewRing --> Diff
+        Diff --> AddedVnodes["Detect Added Vnodes (Source -> New Target)"]
+        Diff --> RemovedVnodes["Detect Removed Vnodes (Leaving Source -> Successor Target)"]
+        Diff --> OwnerDelta["Detect Ownership Transitions"]
+    end
+
+    subgraph OutputPlan ["Migration & Handoff Plans"]
+        AddedVnodes --> Plan["[]PartitionMigration (Sorted by VnodeHash)"]
+        RemovedVnodes --> Plan
+        OwnerDelta --> Plan
+        FailedNode["Failed Node Event"] --> Handoff["PlanHandoff(failedNode, ring)"]
+        Handoff --> ReplicaMap["map[vnodeKey][]healthyReplicas"]
+    end
+```
+
+### 2. Partition Migration Delta Calculation (`CalculateMigrations`)
+
+`CalculateMigrations(oldRing, newRing *ConsistentHashingRing) ([]PartitionMigration, error)` determines the minimal set of virtual node partitions that must move when the cluster topology transitions:
+
+1. **Snapshot Isolation & Deadlock Prevention**: Atomically snapshots `ring`, `vnodes`, and `members` from `oldRing` and `newRing` independently under brief read locks (`RLock`), eliminating AB-BA lock inversion deadlocks.
+2. **Boundary Validation**:
+   - Returns `ErrNilRing` if either ring reference is `nil`.
+   - Returns `ErrEmptyRing` if either ring contains zero nodes or virtual tokens.
+   - Returns an empty list (`[]PartitionMigration{}`) without allocation if `oldRing` and `newRing` are structurally equivalent.
+3. **Three-Way Distribution Delta**:
+   - **Node Addition**: For every virtual token hash $h$ present in `newRing` but absent in `oldRing`, the rebalancer resolves the prior owner in `oldRing` via clockwise binary search. The migration records $h$, `SourceNode: oldOwner`, `TargetNode: newOwner`. Exactly $V / ((N+1) \times V) = 1/(N+1)$ of total partitions move.
+   - **Node Removal**: For every virtual token hash $h$ present in `oldRing` but absent in `newRing`, the rebalancer locates the successor owner in `newRing`. The migration records $h$, `SourceNode: leavingNode`, `TargetNode: successorNode`. Only the leaving node's partitions move to successors; non-leaving partitions remain undisturbed.
+   - **Ownership Mutation**: For any token hash present in both snapshots whose physical assignment differs, a migration entry is generated.
+4. **Deterministic Ordering**: The resulting migrations are sorted strictly ascending by `VnodeHash` to guarantee idempotent execution across all distributed observer agents.
+
+### 3. Handoff Protocol & Boundary Fault Recovery (`PlanHandoff`)
+
+`PlanHandoff(failedNode string, ring *ConsistentHashingRing) (map[string][]string, error)` maps each partition owned by a failed node to healthy replicas:
+
+1. **Validation & Fault Invariants**:
+   - Returns `ErrNilRing` if `ring == nil`.
+   - Returns `ErrEmptyRing` if `ring` has zero nodes.
+   - Returns typed error `ErrNodeNotFound` if `failedNode` is empty or not registered in `ring.members`.
+2. **Replica Preference Routing**:
+   - For each virtual token key `failedNode#vn<idx>` owned by `failedNode`, the rebalancer initiates a clockwise search starting from the token's position on the ring.
+   - Traverses clockwise around the ring, collecting distinct physical nodes while excluding `failedNode`.
+   - Populates `map[vnodeKey][]healthyReplicas` with healthy failover candidates ordered by proximity on the ring.
+3. **Single-Node Degradation**: If `failedNode` was the sole member ($N=1$), `PlanHandoff` returns entries with empty replica slices (`[]string{}`), signaling complete cluster isolation without crashing.
+
+### 4. Fault Tolerance Guarantees
+
+| Metric / Scenario | Guarantee | Verification |
+|---|---|---|
+| **Node Addition Migration Churn** | Minimal churn: exactly $\sim 1/(N+1)$ of partitions relocate | Verified by `TestPartitionRebalancer_NodeAdditionMigration` |
+| **Node Removal Migration Churn** | Strict confinement: only the leaving node's $V$ partitions move | Verified by `TestPartitionRebalancer_NodeRemovalMigration` |
+| **Replica Isolation** | Handoff candidate lists strictly exclude the failed node | Verified by `TestPartitionRebalancer_PlanHandoff` |
+| **Concurrency Safety** | Multi-threaded calculation and handoff resolution free of data races | Verified under `go test -race` with parallel goroutines |
+| **Boundary Protection** | Typed error rejection on nil, empty, or unmapped nodes | `ErrNilRing`, `ErrEmptyRing`, `ErrNodeNotFound` |
