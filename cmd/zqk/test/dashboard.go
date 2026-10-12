@@ -98,6 +98,7 @@ type LifecycleEventSummary struct {
 type DashboardState struct {
 	mu                  sync.RWMutex
 	projectRoot         string
+	storage             storage.ObjectStorageProvider
 	TestCases           map[string]*TestCaseModel
 	TestCaseOrder       []string
 	CriteriaIndex       map[string][]*TestCaseModel // maps criterionID -> referencing test cases
@@ -226,10 +227,28 @@ func (s *DashboardState) ScanFromStorage(ctx context.Context, sp storage.ObjectS
 func (s *DashboardState) ScanFromStorageWithSecurity(ctx context.Context, sp storage.ObjectStorageProvider, secCtx *storage.SecurityContext) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if sp != nil {
+		s.storage = sp
+	}
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 	return s.scanFromStorageLocked(ctx, sp, secCtx, s.projectRoot, true, "", "")
+}
+
+func (s *DashboardState) getOrInitStorageLocked(ctx context.Context) storage.ObjectStorageProvider {
+	if s.storage != nil {
+		return s.storage
+	}
+	if s.projectRoot == "" {
+		return nil
+	}
+	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
+	if err != nil || factory == nil {
+		return nil
+	}
+	s.storage = factory.GetStorage()
+	return s.storage
 }
 
 // WarmLiteFile builds and persists the materialized test dashboard lite file from storage.
@@ -911,39 +930,7 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 		}
 
 		// Update linked criteria
-		if tcs, ok := s.CriteriaIndex[critID]; ok {
-			for _, tc := range tcs {
-				for _, cr := range tc.Criteria {
-					if cr.ID == critID {
-						cr.Status = objects.ObjectStatusComplete
-						cr.LastSatisfied = ts
-					}
-				}
-				// Recount completed criteria
-				completed := 0
-				for _, cr := range tc.Criteria {
-					if isCriterionComplete(cr.Status) {
-						completed++
-					}
-				}
-				prevStatus := tc.Status
-				tc.CompletedCriteria = completed
-				tc.RemainingOpenCount = tc.TotalCriteria - completed
-				if tc.RemainingOpenCount <= 0 && tc.TotalCriteria > 0 {
-					tc.Status = objects.ObjectStatusComplete
-					if prevStatus != objects.ObjectStatusComplete {
-						s.appendRecentEvent(LifecycleEventSummary{
-							Timestamp:   ts,
-							EventType:   string(lifecycle.EventTypeStatusTransition),
-							Kind:        objects.KindTestCase,
-							ObjectID:    tc.ID,
-							CriterionID: critID,
-							Message:     fmt.Sprintf("TRACEABILITY CHAIN GRADUATED: %s (100%% criteria green) ➔ Moved to Regression Suite", tc.ID),
-						})
-					}
-				}
-			}
-		}
+		s.updateCriteriaStatusAndRecalculateLocked(critID, objects.ObjectStatusComplete, ts)
 
 		msg := fmt.Sprintf("CRITERION SATISFIED: %s", critID)
 		if scopeDesc != "" {
@@ -960,40 +947,7 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 	case lifecycle.EventTypeStatusTransition:
 		if strings.EqualFold(ev.Kind, objects.KindCriteria) || strings.EqualFold(ev.Kind, "criterion") {
 			critID := ev.ID
-			if tcs, ok := s.CriteriaIndex[critID]; ok {
-				for _, tc := range tcs {
-					for _, cr := range tc.Criteria {
-						if cr.ID == critID {
-							cr.Status = ev.ToStatus
-							if isCriterionComplete(ev.ToStatus) {
-								cr.LastSatisfied = ts
-							}
-						}
-					}
-					completed := 0
-					for _, cr := range tc.Criteria {
-						if isCriterionComplete(cr.Status) {
-							completed++
-						}
-					}
-					prevStatus := tc.Status
-					tc.CompletedCriteria = completed
-					tc.RemainingOpenCount = tc.TotalCriteria - completed
-					if tc.RemainingOpenCount <= 0 && tc.TotalCriteria > 0 {
-						tc.Status = objects.ObjectStatusComplete
-						if prevStatus != objects.ObjectStatusComplete {
-							s.appendRecentEvent(LifecycleEventSummary{
-								Timestamp:   ts,
-								EventType:   string(lifecycle.EventTypeStatusTransition),
-								Kind:        objects.KindTestCase,
-								ObjectID:    tc.ID,
-								CriterionID: critID,
-								Message:     fmt.Sprintf("TRACEABILITY CHAIN GRADUATED: %s (100%% criteria green) ➔ Moved to Regression Suite", tc.ID),
-							})
-						}
-					}
-				}
-			}
+			s.updateCriteriaStatusAndRecalculateLocked(critID, ev.ToStatus, ts)
 			s.appendRecentEvent(LifecycleEventSummary{
 				Timestamp:   ts,
 				EventType:   string(ev.EventType),
@@ -1002,15 +956,8 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 				Message:     fmt.Sprintf("CRITERION %s: %s -> %s", critID, ev.FromStatus, ev.ToStatus),
 			})
 		} else if strings.EqualFold(ev.Kind, objects.KindTestCase) {
-			if tc, ok := s.TestCases[ev.ID]; ok {
+			if tc := s.getOrHydrateTestCaseLocked(ev.ID); tc != nil {
 				tc.Status = ev.ToStatus
-			} else {
-				tc = s.hydrateTestCaseFromStorageLocked(ev.ID)
-				if tc != nil {
-					tc.Status = ev.ToStatus
-					s.TestCases[ev.ID] = tc
-					s.ensureTestCaseInOrderLocked(ev.ID)
-				}
 			}
 			s.appendRecentEvent(LifecycleEventSummary{
 				Timestamp: ts,
@@ -1027,23 +974,89 @@ func (s *DashboardState) handleLifecycleEventLocked(ev *lifecycle.LifecycleEvent
 	s.LastUpdated = time.Now()
 }
 
-func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEvent, ts time.Time) {
-	if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindCriteria {
-		tcID := ev.ID
-		critID := ev.TargetID
-		tc, ok := s.TestCases[tcID]
-		if !ok {
-			tc = s.hydrateTestCaseFromStorageLocked(tcID)
-			if tc == nil {
-				return
+func (s *DashboardState) updateCriteriaStatusAndRecalculateLocked(critID, status string, ts time.Time) {
+	tcs, ok := s.CriteriaIndex[critID]
+	if !ok {
+		return
+	}
+	for _, tc := range tcs {
+		for _, cr := range tc.Criteria {
+			if cr.ID == critID {
+				cr.Status = status
+				if isCriterionComplete(status) {
+					cr.LastSatisfied = ts
+				}
 			}
-			s.TestCases[tcID] = tc
-		} else if tc.Title == "" || tc.Lineage == nil {
-			s.enrichTestCaseFromStorageLocked(tc)
 		}
-		s.ensureTestCaseInOrderLocked(tcID)
+		s.recalculateTestCaseGraduationLocked(tc, critID, ts)
+	}
+}
 
-		// Ensure criterion is in tc.Criteria
+func (s *DashboardState) recalculateTestCaseGraduationLocked(tc *TestCaseModel, critID string, ts time.Time) {
+	completed := 0
+	for _, cr := range tc.Criteria {
+		if isCriterionComplete(cr.Status) {
+			completed++
+		}
+	}
+	prevStatus := tc.Status
+	tc.CompletedCriteria = completed
+	tc.RemainingOpenCount = tc.TotalCriteria - completed
+	if tc.RemainingOpenCount <= 0 && tc.TotalCriteria > 0 {
+		tc.Status = objects.ObjectStatusComplete
+		if prevStatus != objects.ObjectStatusComplete {
+			s.appendRecentEvent(LifecycleEventSummary{
+				Timestamp:   ts,
+				EventType:   string(lifecycle.EventTypeStatusTransition),
+				Kind:        objects.KindTestCase,
+				ObjectID:    tc.ID,
+				CriterionID: critID,
+				Message:     fmt.Sprintf("TRACEABILITY CHAIN GRADUATED: %s (100%% criteria green) ➔ Moved to Regression Suite", tc.ID),
+			})
+		}
+	}
+}
+
+func appendUniqueRef(slice *[]string, ref string) bool {
+	for _, r := range *slice {
+		if r == ref {
+			return false
+		}
+	}
+	*slice = append(*slice, ref)
+	return true
+}
+
+func (s *DashboardState) getOrHydrateTestCaseLocked(tcID string) *TestCaseModel {
+	if tcID == "" {
+		return nil
+	}
+	tc, ok := s.TestCases[tcID]
+	if !ok {
+		tc = s.hydrateTestCaseFromStorageLocked(tcID)
+		if tc == nil {
+			return nil
+		}
+		s.TestCases[tcID] = tc
+	} else if tc.Title == "" || tc.Lineage == nil {
+		s.enrichTestCaseFromStorageLocked(tc)
+	}
+	s.ensureTestCaseInOrderLocked(tcID)
+	return tc
+}
+
+func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEvent, ts time.Time) {
+	if ev.Kind != objects.KindTestCase {
+		return
+	}
+	tc := s.getOrHydrateTestCaseLocked(ev.ID)
+	if tc == nil {
+		return
+	}
+
+	switch ev.TargetKind {
+	case objects.KindCriteria:
+		critID := ev.TargetID
 		found := false
 		for _, cr := range tc.Criteria {
 			if cr.ID == critID {
@@ -1059,68 +1072,25 @@ func (s *DashboardState) handleReferenceLinkedLocked(ev *lifecycle.LifecycleEven
 			tc.TotalCriteria = len(tc.Criteria)
 			tc.RemainingOpenCount = tc.TotalCriteria - tc.CompletedCriteria
 		}
-
-		// Update CriteriaIndex
 		s.CriteriaIndex[critID] = append(s.CriteriaIndex[critID], tc)
-
 		s.appendRecentEvent(LifecycleEventSummary{
 			Timestamp:   ts,
 			EventType:   string(ev.EventType),
 			Kind:        ev.Kind,
-			ObjectID:    tcID,
+			ObjectID:    tc.ID,
 			CriterionID: critID,
-			Message:     fmt.Sprintf("LINKAGE SHOCKWAVE: Test Case %s ➔ Criterion %s", tcID, critID),
+			Message:     fmt.Sprintf("LINKAGE SHOCKWAVE: Test Case %s ➔ Criterion %s", tc.ID, critID),
 		})
-	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindBacklogItem {
-		tcID := ev.ID
-		bliID := ev.TargetID
-		tc, ok := s.TestCases[tcID]
-		if !ok {
-			tc = s.hydrateTestCaseFromStorageLocked(tcID)
-			if tc == nil {
-				return
-			}
-			s.TestCases[tcID] = tc
-		} else if tc.Title == "" || tc.Lineage == nil {
-			s.enrichTestCaseFromStorageLocked(tc)
+
+	case objects.KindBacklogItem:
+		if appendUniqueRef(&tc.BacklogItemRefs, ev.TargetID) {
+			s.refreshLineageLocked(tc)
 		}
-		s.ensureTestCaseInOrderLocked(tcID)
-		already := false
-		for _, r := range tc.BacklogItemRefs {
-			if r == bliID {
-				already = true
-				break
-			}
+
+	case objects.KindRequirement:
+		if appendUniqueRef(&tc.RequirementRefs, ev.TargetID) {
+			s.refreshLineageLocked(tc)
 		}
-		if !already {
-			tc.BacklogItemRefs = append(tc.BacklogItemRefs, bliID)
-		}
-		s.refreshLineageLocked(tc)
-	} else if ev.Kind == objects.KindTestCase && ev.TargetKind == objects.KindRequirement {
-		tcID := ev.ID
-		reqID := ev.TargetID
-		tc, ok := s.TestCases[tcID]
-		if !ok {
-			tc = s.hydrateTestCaseFromStorageLocked(tcID)
-			if tc == nil {
-				return
-			}
-			s.TestCases[tcID] = tc
-		} else if tc.Title == "" || tc.Lineage == nil {
-			s.enrichTestCaseFromStorageLocked(tc)
-		}
-		s.ensureTestCaseInOrderLocked(tcID)
-		already := false
-		for _, r := range tc.RequirementRefs {
-			if r == reqID {
-				already = true
-				break
-			}
-		}
-		if !already {
-			tc.RequirementRefs = append(tc.RequirementRefs, reqID)
-		}
-		s.refreshLineageLocked(tc)
 	}
 }
 
@@ -1140,11 +1110,10 @@ func (s *DashboardState) hydrateTestCaseFromStorageLocked(tcID string) *TestCase
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
-	if err != nil || factory == nil {
+	sp := s.getOrInitStorageLocked(ctx)
+	if sp == nil {
 		return nil
 	}
-	sp := factory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	tcObj, err := sp.Read(ctx, secCtx, tcID)
 	if err != nil || tcObj == nil {
@@ -1224,6 +1193,9 @@ func (s *DashboardState) enrichTestCaseFromStorageLocked(tc *TestCaseModel) {
 	}
 	hydrated := s.hydrateTestCaseFromStorageLocked(tc.ID)
 	if hydrated == nil {
+		if tc.Lineage == nil {
+			tc.Lineage = &LineageChain{}
+		}
 		return
 	}
 	if tc.Title == "" {
@@ -1248,7 +1220,11 @@ func (s *DashboardState) enrichTestCaseFromStorageLocked(tc *TestCaseModel) {
 		tc.GoalRefs = hydrated.GoalRefs
 	}
 	if tc.Lineage == nil {
-		tc.Lineage = hydrated.Lineage
+		if hydrated.Lineage != nil {
+			tc.Lineage = hydrated.Lineage
+		} else {
+			tc.Lineage = &LineageChain{}
+		}
 	}
 	if len(tc.Criteria) == 0 && len(hydrated.Criteria) > 0 {
 		tc.Criteria = hydrated.Criteria
@@ -1265,11 +1241,10 @@ func (s *DashboardState) refreshLineageLocked(tc *TestCaseModel) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 
-	factory, err := storage.NewStorageFactory(ctx, s.projectRoot)
-	if err != nil || factory == nil {
+	sp := s.getOrInitStorageLocked(ctx)
+	if sp == nil {
 		return
 	}
-	sp := factory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 	readWithCache := func(id string) map[string]any {
 		if id == "" {

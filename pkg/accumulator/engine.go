@@ -349,7 +349,31 @@ func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) 
 		return
 	}
 
-	var cursor walutil.ReplayCursor
+	checkpointPath := ""
+	if e.spec.StoragePath != "" {
+		checkpointPath = e.spec.StoragePath + ".cursor"
+	}
+	saveCheckpoint := func(c walutil.ReplayCursor) {
+		if checkpointPath != "" {
+			_ = fileutil.WriteFile(checkpointPath, walutil.FormatReplayCursorCheckpoint(c), paths.FilePerm644)
+		}
+	}
+	loadCheckpoint := func() walutil.ReplayCursor {
+		if checkpointPath == "" {
+			return walutil.ReplayCursor{}
+		}
+		data, readErr := fileutil.ReadFile(checkpointPath)
+		if readErr != nil {
+			return walutil.ReplayCursor{}
+		}
+		parsed, parseErr := walutil.ParseReplayCursorCheckpoint(data)
+		if parseErr != nil {
+			return walutil.ReplayCursor{}
+		}
+		return parsed
+	}
+
+	cursor := loadCheckpoint()
 	heartbeatInterval := e.spec.StalenessTolerance / 2
 	if heartbeatInterval <= 0 {
 		heartbeatInterval = time.Minute
@@ -381,6 +405,9 @@ func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) 
 
 		if err == nil {
 			cursor = newCursor
+			if newEvents > 0 {
+				saveCheckpoint(cursor)
+			}
 		}
 
 		now := time.Now()
@@ -388,6 +415,7 @@ func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) 
 			e.SetLastUpdated(now)
 			_ = e.SaveToLiteFile()
 			lastHeartbeat = now
+			saveCheckpoint(cursor)
 			if updateCh != nil {
 				select {
 				case updateCh <- struct{}{}:
@@ -401,6 +429,7 @@ func (e *Engine[T]) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) 
 			e.SetLastUpdated(now)
 			_ = e.SaveToLiteFile()
 			lastHeartbeat = now
+			saveCheckpoint(cursor)
 		}
 
 		select {

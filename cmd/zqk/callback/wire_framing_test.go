@@ -143,6 +143,7 @@ func TestWire_CorruptedHeaderAndBoundaryErrors(t *testing.T) {
 		badMagic[0] = 'X'
 		_, _, err := DecodeFrame(badMagic)
 		assert.ErrorIs(t, err, ErrInvalidMagic)
+		assert.ErrorIs(t, err, ErrInvalidWireMagic)
 	})
 
 	t.Run(`checksum_mismatch`, func(t *testing.T) {

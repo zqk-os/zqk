@@ -273,23 +273,21 @@ type DeficitSubscriberQueue struct {
 	totalDropped  int64
 }
 
+func resolvePositive[T ~int | ~int64](val, defaultVal T) T {
+	if val <= 0 {
+		return defaultVal
+	}
+	return val
+}
+
 func newSubscriberQueue(id string, quantum, maxDeficit int64, maxDepth int) *DeficitSubscriberQueue {
-	if quantum <= 0 {
-		quantum = DefaultDeficitQuantum
-	}
-	if maxDeficit <= 0 {
-		maxDeficit = DefaultMaxDeficit
-	}
-	if maxDepth <= 0 {
-		maxDepth = DefaultMaxQueueDepth
-	}
 	return &DeficitSubscriberQueue{
 		subscriberID: id,
 		items:        make([]*DeficitQueueItem, 0, 16),
-		quantum:      quantum,
+		quantum:      resolvePositive(quantum, DefaultDeficitQuantum),
 		deficit:      0,
-		maxDeficit:   maxDeficit,
-		maxDepth:     maxDepth,
+		maxDeficit:   resolvePositive(maxDeficit, DefaultMaxDeficit),
+		maxDepth:     resolvePositive(maxDepth, DefaultMaxQueueDepth),
 	}
 }
 
@@ -314,17 +312,12 @@ type DeficitRoundRobinQueue struct {
 
 // NewDeficitRoundRobinQueue initializes a fair queueing manager.
 func NewDeficitRoundRobinQueue(cfg DeficitRoundRobinConfig) *DeficitRoundRobinQueue {
-	if cfg.DefaultQuantum <= 0 {
-		cfg.DefaultQuantum = DefaultDeficitQuantum
-	}
-	if cfg.DefaultMaxDeficit <= 0 {
-		cfg.DefaultMaxDeficit = DefaultMaxDeficit
-	}
-	if cfg.DefaultMaxDepth <= 0 {
-		cfg.DefaultMaxDepth = DefaultMaxQueueDepth
-	}
 	return &DeficitRoundRobinQueue{
-		cfg:         cfg,
+		cfg: DeficitRoundRobinConfig{
+			DefaultQuantum:    resolvePositive(cfg.DefaultQuantum, DefaultDeficitQuantum),
+			DefaultMaxDeficit: resolvePositive(cfg.DefaultMaxDeficit, DefaultMaxDeficit),
+			DefaultMaxDepth:   resolvePositive(cfg.DefaultMaxDepth, DefaultMaxQueueDepth),
+		},
 		subscribers: make(map[string]*DeficitSubscriberQueue),
 		activeList:  make([]string, 0),
 		notifyCh:    make(chan struct{}),
@@ -349,16 +342,12 @@ func (drr *DeficitRoundRobinQueue) RegisterSubscriber(id string, quantum, maxDef
 		if _, exists := drr.subscribers[id]; exists {
 			return ErrSubscriberExists
 		}
-		if quantum <= 0 {
-			quantum = drr.cfg.DefaultQuantum
-		}
-		if maxDeficit <= 0 {
-			maxDeficit = drr.cfg.DefaultMaxDeficit
-		}
-		if maxDepth <= 0 {
-			maxDepth = drr.cfg.DefaultMaxDepth
-		}
-		drr.subscribers[id] = newSubscriberQueue(id, quantum, maxDeficit, maxDepth)
+		drr.subscribers[id] = newSubscriberQueue(
+			id,
+			resolvePositive(quantum, drr.cfg.DefaultQuantum),
+			resolvePositive(maxDeficit, drr.cfg.DefaultMaxDeficit),
+			resolvePositive(maxDepth, drr.cfg.DefaultMaxDepth),
+		)
 		return nil
 	})
 }

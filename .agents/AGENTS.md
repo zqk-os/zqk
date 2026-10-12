@@ -28,11 +28,12 @@
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into `waiting_for_input` (idle), halting autonomous loop flow.
 - **Strict Post-Merge Self-Continuation Protocol:**
-  1. Merge PR & promote stable binary (`./scripts/install.sh && ./bin/zqk mcp ensure`).
-  2. Query `./bin/zqk workflow whats-next`.
-  3. Immediately create/checkout the next integration branch (`git checkout -b integration/<pri-id> origin/main`).
-  4. Claim or shape the first BLI (`zqk agent claim ...` or kernel object creation).
-  5. Continue the execution chain without yielding control to an idle wait state.
+  1. Fetch and fast-forward local main to origin/main (`git fetch origin && git checkout main && git merge --ff-only origin/main`). Never branch off stale local main (enforced fail-closed by Gate 0b POL-WORKFLOW-003).
+  2. Rebuild product binary & promote (`go build -o bin/zqk ./cmd/zqk && ./bin/zqk mcp ensure`).
+  3. Query `./bin/zqk workflow whats-next`.
+  4. Immediately create/checkout the next integration branch from origin/main (`git checkout -b integration/<pri-id> origin/main`).
+  5. Claim or shape the first BLI (`zqk agent claim ...` or kernel object creation).
+  6. Continue the execution chain without yielding control to an idle wait state.
 
 ## Process Administration & Management: Kernel Objects (Shift-Left Directive)
 - **Shift-Left Upfront Discipline:** Do not wait for `zqk-vet` or git commit check-valves to catch bad slicing or scope creep. Agents must follow the canonical relational model out of the gate:

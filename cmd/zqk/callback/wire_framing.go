@@ -44,6 +44,7 @@ const (
 // Standard wire framing error values.
 var (
 	ErrInvalidMagic     = errors.New(ErrTextInvalidMagic)
+	ErrInvalidWireMagic = ErrInvalidMagic
 	ErrHeaderTruncated  = errors.New(ErrTextHeaderTruncated)
 	ErrPayloadTruncated = errors.New(ErrTextPayloadTruncated)
 	ErrChecksumMismatch = errors.New(ErrTextChecksumMismatch)

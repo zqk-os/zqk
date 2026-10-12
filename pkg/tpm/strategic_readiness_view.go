@@ -697,6 +697,10 @@ func (v *StrategicReadinessView) GetSnapshot() *StrategicReadinessLitePayload {
 
 // SubscribeWAL starts a background listener on the lifecycle WAL for continuous incremental updates.
 func (v *StrategicReadinessView) SubscribeWAL(ctx context.Context, updateCh chan<- struct{}) {
+	if v.engine != nil {
+		v.engine.SubscribeWAL(ctx, updateCh)
+		return
+	}
 	lifecycle.PollLifecycleWAL(ctx, v.projectRoot, 200*time.Millisecond, v.ApplyLifecycleEvent, func() {
 		_ = v.SaveToLiteFile()
 		if updateCh != nil {
@@ -710,6 +714,10 @@ func (v *StrategicReadinessView) SubscribeWAL(ctx context.Context, updateCh chan
 
 // StartBackgroundWALSubscriber helper to launch SubscribeWAL with proper goroutine tracking.
 func (v *StrategicReadinessView) StartBackgroundWALSubscriber(ctx context.Context, updateCh chan<- struct{}) {
+	if v.engine != nil {
+		v.engine.StartBackgroundWALSubscriber(ctx, updateCh)
+		return
+	}
 	goroutinelabels.NewGoroutine("strategic-readiness-wal-subscriber", "subscribing to strategic lifecycle events").
 		StartSimple(func() {
 			v.SubscribeWAL(ctx, updateCh)
