@@ -303,4 +303,3 @@ func TestWriteVendorConfigs_ProvisionsAgentHooks(t *testing.T) {
 		t.Fatalf("expected .agents/hooks.json in skipped, got: %v", wr2.Skipped)
 	}
 }
-
