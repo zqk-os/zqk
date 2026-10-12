@@ -76,4 +76,3 @@ func TestWireBoundary_TruncatedPayloadLength(t *testing.T) {
 	truncated := h.encodeSample(99)[:WireHeaderSize+2]
 	h.assertDecodeError(truncated, "incomplete frame data")
 }
-
