@@ -95,3 +95,4 @@ The implementation is verified under `cmd/zqk/callback/token_bucket_flow_test.go
 4. **DRR Fair Scheduling**: Interleaved round-robin sequence verification between heavy ($C=100$) and light ($C=50$) subscribers.
 5. **Starvation Resistance**: Accumulation across multiple rounds for items exceeding single quantum allocation.
 6. **Concurrent Stress Safety**: Zero race conditions under concurrent multi-tenant producers and dispatchers.
+7. **Boundary Validation & Error Recovery**: Comprehensive rejection of unconfigured subscribers, closed queue submissions, and idempotent multi-close termination.

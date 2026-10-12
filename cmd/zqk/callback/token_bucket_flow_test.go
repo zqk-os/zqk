@@ -460,3 +460,36 @@ func TestFlowControl_ConcurrentStress_RaceSafety(t *testing.T) {
 	assert.Equal(t, expectedTotal, totalReceived.Load())
 }
 
+func TestFlowControlManager_BoundaryValidationAndErrorRecovery(t *testing.T) {
+	mgr, err := NewFlowControlManager(FlowControlConfig{
+		Limiter: TokenBucketConfig{
+			Capacity:   10,
+			RefillRate: 10,
+		},
+		Queue: DeficitRoundRobinConfig{
+			DefaultQuantum:    100,
+			DefaultMaxDeficit: 500,
+			DefaultMaxDepth:   10,
+		},
+	})
+	require.NoError(t, err)
+	defer mgr.Close()
+
+	// 1. Submit to unregistered subscriber
+	errSub := mgr.Submit("nonexistent-sub", &CallbackEntry{JobID: "e1"}, 1)
+	assert.ErrorIs(t, errSub, ErrSubscriberNotFound)
+
+	// 2. Register subscriber with nil
+	errReg := mgr.RegisterSubscriber(nil, 100, 500, 10)
+	assert.ErrorIs(t, errReg, ErrInvalidConfiguration)
+
+	// 3. Double Close idempotency
+	errClose1 := mgr.Close()
+	assert.NoError(t, errClose1)
+	errClose2 := mgr.Close()
+	assert.NoError(t, errClose2)
+
+	// 4. Submit after Close returns ErrLimiterClosed
+	errAfterClose := mgr.Submit("nonexistent-sub", &CallbackEntry{JobID: "e2"}, 1)
+	assert.ErrorIs(t, errAfterClose, ErrLimiterClosed)
+}
