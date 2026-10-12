@@ -209,16 +209,18 @@ func TestProcessor_FormatLogEntry_InvalidFormat(t *testing.T) {
 		t.Fatalf("failed to enqueue: %v", err)
 	}
 
-	// Wait for processing
-	time.Sleep(200 * time.Millisecond)
-
-	// Should still write (defaults to text format)
-	content, err := fileutil.ReadFile(logFile)
-	if err != nil {
-		t.Fatalf("failed to read log file: %v", err)
+	// Deterministically wait for async processing and file write
+	var content []byte
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		if data, readErr := fileutil.ReadFile(logFile); readErr == nil && len(data) > 0 {
+			content = data
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 
 	if len(content) == 0 {
-		t.Error("expected log file to have content even with invalid format")
+		t.Fatalf("expected log file %s to have content within deadline even with invalid format", logFile)
 	}
 }
