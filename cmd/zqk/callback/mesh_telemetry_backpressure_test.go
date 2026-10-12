@@ -21,6 +21,31 @@ func closeThrottlerInCleanup(t *testing.T, throttler *MeshBackpressureThrottler)
 	})
 }
 
+func setupTestThrottler(t *testing.T, policy BackpressurePolicy) *MeshBackpressureThrottler {
+	t.Helper()
+	th, err := NewMeshBackpressureThrottler(ThrottlerConfig{
+		DefaultPolicy: policy,
+	})
+	require.NoError(t, err)
+	closeThrottlerInCleanup(t, th)
+	return th
+}
+
+func setupTestThrottlerWithAgg(t *testing.T, policy BackpressurePolicy) (*MeshBackpressureThrottler, *MeshTelemetryAggregator) {
+	t.Helper()
+	agg, err := NewMeshTelemetryAggregator(MeshTelemetryConfig{})
+	require.NoError(t, err)
+
+	th, err := NewMeshBackpressureThrottler(ThrottlerConfig{
+		DefaultPolicy: policy,
+		Aggregator:    agg,
+	})
+	require.NoError(t, err)
+	closeThrottlerInCleanup(t, th)
+	return th, agg
+}
+
+
 // -----------------------------------------------------------------------------
 // CRIT-1791759409830632000-8c68a2b5:
 // Static Invariants: Layout, Bounded Sliding Window Buffer, and Metric Accumulator
@@ -160,11 +185,7 @@ func TestMeshTelemetry_DimensionalAggregationAndSnapshots(t *testing.T) {
 func TestMeshBackpressure_CreditDeductionAndReplenishment(t *testing.T) {
 	t.Parallel()
 
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyReject,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler := setupTestThrottler(t, PolicyReject)
 
 	poolID := "sub-pool-alpha"
 	pool, err := throttler.RegisterPool(SubscriberPoolConfig{
@@ -200,14 +221,10 @@ func TestMeshBackpressure_CreditDeductionAndReplenishment(t *testing.T) {
 func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 	t.Parallel()
 
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyWait,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler := setupTestThrottler(t, PolicyWait)
 
 	poolID := "sub-pool-waiting"
-	_, err = throttler.RegisterPool(SubscriberPoolConfig{
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{
 		PoolID:         poolID,
 		Policy:         PolicyWait,
 		InitialCredits: 0,
@@ -247,14 +264,10 @@ func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 func TestMeshBackpressure_PolicyWait_ContextCancellation(t *testing.T) {
 	t.Parallel()
 
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyWait,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler := setupTestThrottler(t, PolicyWait)
 
 	poolID := "sub-pool-cancel"
-	_, err = throttler.RegisterPool(SubscriberPoolConfig{
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{
 		PoolID:         poolID,
 		Policy:         PolicyWait,
 		InitialCredits: 0,
@@ -272,15 +285,7 @@ func TestMeshBackpressure_PolicyWait_ContextCancellation(t *testing.T) {
 func TestMeshBackpressure_PolicyDropOldest(t *testing.T) {
 	t.Parallel()
 
-	agg, err := NewMeshTelemetryAggregator(MeshTelemetryConfig{})
-	require.NoError(t, err)
-
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyDropOldest,
-		Aggregator:    agg,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler, agg := setupTestThrottlerWithAgg(t, PolicyDropOldest)
 
 	poolID := "sub-pool-lossy"
 	pool, err := throttler.RegisterPool(SubscriberPoolConfig{
@@ -394,18 +399,10 @@ func runSnapshotLoop(agg *MeshTelemetryAggregator, stopSnap <-chan struct{}) {
 func TestMeshBackpressure_ConcurrentBurstAndRaceDetector(t *testing.T) {
 	t.Parallel()
 
-	agg, err := NewMeshTelemetryAggregator(MeshTelemetryConfig{})
-	require.NoError(t, err)
-
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyReject,
-		Aggregator:    agg,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler, agg := setupTestThrottlerWithAgg(t, PolicyReject)
 
 	poolID := "concurrent-burst-pool"
-	_, err = throttler.RegisterPool(SubscriberPoolConfig{
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{
 		PoolID:         poolID,
 		Policy:         PolicyReject,
 		InitialCredits: 5000,
@@ -453,16 +450,12 @@ func TestMeshBackpressure_ConcurrentBurstAndRaceDetector(t *testing.T) {
 func TestMeshBackpressure_NegativeBoundariesAndDefensiveRejection(t *testing.T) {
 	t.Parallel()
 
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyReject,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler := setupTestThrottler(t, PolicyReject)
 
 	ctx := context.Background()
 
 	// 1. Invalid pool registration
-	_, err = throttler.RegisterPool(SubscriberPoolConfig{PoolID: ""})
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{PoolID: ""})
 	assert.ErrorIs(t, err, ErrInvalidConfiguration)
 
 	// 2. Unregistered pool lookup
@@ -515,13 +508,10 @@ func TestMeshBackpressure_NegativeBoundariesAndDefensiveRejection(t *testing.T) 
 func TestMeshBackpressure_LifecycleCleanShutdownAndNoGoroutineLeaks(t *testing.T) {
 	t.Parallel()
 
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyWait,
-	})
-	require.NoError(t, err)
+	throttler := setupTestThrottler(t, PolicyWait)
 
 	poolID := "shutdown-pool"
-	_, err = throttler.RegisterPool(SubscriberPoolConfig{
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{
 		PoolID:         poolID,
 		InitialCredits: 0,
 		MaxCredits:     10,
@@ -559,18 +549,10 @@ func TestMeshBackpressure_LifecycleCleanShutdownAndNoGoroutineLeaks(t *testing.T
 func TestMeshController_UnifiedSubscriberIntegration(t *testing.T) {
 	t.Parallel()
 
-	agg, err := NewMeshTelemetryAggregator(MeshTelemetryConfig{})
-	require.NoError(t, err)
-
-	throttler, err := NewMeshBackpressureThrottler(ThrottlerConfig{
-		DefaultPolicy: PolicyReject,
-		Aggregator:    agg,
-	})
-	require.NoError(t, err)
-	closeThrottlerInCleanup(t, throttler)
+	throttler, agg := setupTestThrottlerWithAgg(t, PolicyReject)
 
 	poolID := "unified-pool"
-	_, err = throttler.RegisterPool(SubscriberPoolConfig{
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{
 		PoolID:         poolID,
 		InitialCredits: 5,
 		MaxCredits:     10,
