@@ -49,6 +49,22 @@ func assertFencingToken(t *testing.T, e *LeaderElector, expected int64) {
 	}
 }
 
+type electorHarness struct {
+	ctx     context.Context
+	store   *MemoryLeaderLeaseStore
+	elector *LeaderElector
+}
+
+func newElectorHarness(t *testing.T, nodeID string, ttl time.Duration, dispatcher *MultiSubscriberDispatcher) electorHarness {
+	t.Helper()
+	store := NewMemoryLeaderLeaseStore()
+	return electorHarness{
+		ctx:     context.Background(),
+		store:   store,
+		elector: newTestElector(t, nodeID, store, ttl, dispatcher),
+	}
+}
+
 func assertTokenValidation(t *testing.T, e *LeaderElector, token int64, expected bool) {
 	t.Helper()
 	if got := e.ValidateFencingToken(token); got != expected {
@@ -58,14 +74,12 @@ func assertTokenValidation(t *testing.T, e *LeaderElector, token int64, expected
 
 func TestLeaderElector_SingleNodeCampaignAndElection(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
-	elector := newTestElector(t, "node-single", store, 500*time.Millisecond, nil)
+	h := newElectorHarness(t, "node-single", 500*time.Millisecond, nil)
 
-	assertRole(t, elector, RoleFollower)
-	assertLeader(t, elector, false)
+	assertRole(t, h.elector, RoleFollower)
+	assertLeader(t, h.elector, false)
 
-	won, err := elector.Campaign(ctx)
+	won, err := h.elector.Campaign(h.ctx)
 	if err != nil {
 		t.Fatalf("unexpected campaign error: %v", err)
 	}
@@ -73,14 +87,14 @@ func TestLeaderElector_SingleNodeCampaignAndElection(t *testing.T) {
 		t.Fatalf("expected single node to win campaign")
 	}
 
-	assertRole(t, elector, RoleLeader)
-	assertLeader(t, elector, true)
-	if got := elector.LeaderID(); got != "node-single" {
+	assertRole(t, h.elector, RoleLeader)
+	assertLeader(t, h.elector, true)
+	if got := h.elector.LeaderID(); got != "node-single" {
 		t.Fatalf("expected leader ID 'node-single', got %q", got)
 	}
-	assertFencingToken(t, elector, 1)
+	assertFencingToken(t, h.elector, 1)
 
-	lease := elector.CurrentLease()
+	lease := h.elector.CurrentLease()
 	if lease == nil {
 		t.Fatalf("expected non-nil lease for leader")
 	}
@@ -91,46 +105,41 @@ func TestLeaderElector_SingleNodeCampaignAndElection(t *testing.T) {
 
 func TestLeaderElector_LeaseRenewal(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
-	elector := newTestElector(t, "node-renew", store, 300*time.Millisecond, nil)
+	h := newElectorHarness(t, "node-renew", 300*time.Millisecond, nil)
 
-	won, err := elector.Campaign(ctx)
+	won, err := h.elector.Campaign(h.ctx)
 	if err != nil || !won {
 		t.Fatalf("campaign failed: won=%v, err=%v", won, err)
 	}
 
-	initialLease := elector.CurrentLease()
+	initialLease := h.elector.CurrentLease()
 	time.Sleep(50 * time.Millisecond)
 
-	if renewErr := elector.Renew(ctx); renewErr != nil {
+	if renewErr := h.elector.Renew(h.ctx); renewErr != nil {
 		t.Fatalf("unexpected renew error: %v", renewErr)
 	}
 
-	renewedLease := elector.CurrentLease()
+	renewedLease := h.elector.CurrentLease()
 	if !renewedLease.ExpiresAt.After(initialLease.ExpiresAt) {
 		t.Fatalf("expected renewed expiry %v to be after initial expiry %v", renewedLease.ExpiresAt, initialLease.ExpiresAt)
 	}
-	assertLeader(t, elector, true)
-	assertRole(t, elector, RoleLeader)
+	assertLeader(t, h.elector, true)
+	assertRole(t, h.elector, RoleLeader)
 }
 
 func TestLeaderElector_LeaseExpirationAndSuccession(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
 	ttl := 100 * time.Millisecond
+	h := newElectorHarness(t, "node-1", ttl, nil)
+	elector2 := newTestElector(t, "node-2", h.store, ttl, nil)
 
-	elector1 := newTestElector(t, "node-1", store, ttl, nil)
-	elector2 := newTestElector(t, "node-2", store, ttl, nil)
-
-	won1, err1 := elector1.Campaign(ctx)
+	won1, err1 := h.elector.Campaign(h.ctx)
 	if err1 != nil || !won1 {
 		t.Fatalf("node-1 campaign failed: won=%v, err=%v", won1, err1)
 	}
 
 	// While node-1 holds lease, node-2 campaign must fail
-	won2, err2 := elector2.Campaign(ctx)
+	won2, err2 := elector2.Campaign(h.ctx)
 	if err2 != nil {
 		t.Fatalf("node-2 campaign unexpected error: %v", err2)
 	}
@@ -143,11 +152,11 @@ func TestLeaderElector_LeaseExpirationAndSuccession(t *testing.T) {
 	time.Sleep(ttl + 30*time.Millisecond)
 
 	// Node 1 should now be expired
-	assertLeader(t, elector1, false)
-	assertRole(t, elector1, RoleFollower)
+	assertLeader(t, h.elector, false)
+	assertRole(t, h.elector, RoleFollower)
 
 	// Node 2 campaigns and wins succession
-	wonSuccession, errSucc := elector2.Campaign(ctx)
+	wonSuccession, errSucc := elector2.Campaign(h.ctx)
 	if errSucc != nil || !wonSuccession {
 		t.Fatalf("node-2 failed to succeed expired leader: won=%v, err=%v", wonSuccession, errSucc)
 	}
@@ -162,62 +171,57 @@ func TestLeaderElector_LeaseExpirationAndSuccession(t *testing.T) {
 
 func TestLeaderElector_SplitBrainFencingTokenRejection(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
-	elector := newTestElector(t, "node-split", store, 500*time.Millisecond, nil)
+	h := newElectorHarness(t, "node-split", 500*time.Millisecond, nil)
 
 	// Non-positive tokens rejected
-	assertTokenValidation(t, elector, 0, false)
-	assertTokenValidation(t, elector, -1, false)
+	assertTokenValidation(t, h.elector, 0, false)
+	assertTokenValidation(t, h.elector, -1, false)
 
 	// Campaign to establish fencing token 1
-	won, err := elector.Campaign(ctx)
+	won, err := h.elector.Campaign(h.ctx)
 	if err != nil || !won {
 		t.Fatalf("campaign failed: won=%v, err=%v", won, err)
 	}
-	assertFencingToken(t, elector, 1)
+	assertFencingToken(t, h.elector, 1)
 
 	// Active token is 1
-	assertTokenValidation(t, elector, 1, true)
+	assertTokenValidation(t, h.elector, 1, true)
 
 	// Advance to token 5
-	assertTokenValidation(t, elector, 5, true)
+	assertTokenValidation(t, h.elector, 5, true)
 
 	// Older tokens (1, 2, 3, 4) must now be rejected as stale split-brain tokens
-	assertTokenValidation(t, elector, 1, false)
-	assertTokenValidation(t, elector, 2, false)
-	assertTokenValidation(t, elector, 3, false)
-	assertTokenValidation(t, elector, 4, false)
+	assertTokenValidation(t, h.elector, 1, false)
+	assertTokenValidation(t, h.elector, 2, false)
+	assertTokenValidation(t, h.elector, 3, false)
+	assertTokenValidation(t, h.elector, 4, false)
 
 	// Monotonically equal or higher is accepted
-	assertTokenValidation(t, elector, 5, true)
-	assertTokenValidation(t, elector, 6, true)
+	assertTokenValidation(t, h.elector, 5, true)
+	assertTokenValidation(t, h.elector, 6, true)
 }
 
 func TestLeaderElector_VoluntaryStepDown(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
 	ttl := 1 * time.Second
+	h := newElectorHarness(t, "node-step-1", ttl, nil)
+	elector2 := newTestElector(t, "node-step-2", h.store, ttl, nil)
 
-	elector1 := newTestElector(t, "node-step-1", store, ttl, nil)
-	elector2 := newTestElector(t, "node-step-2", store, ttl, nil)
-
-	won1, err1 := elector1.Campaign(ctx)
+	won1, err1 := h.elector.Campaign(h.ctx)
 	if err1 != nil || !won1 {
 		t.Fatalf("node-step-1 campaign failed: won=%v, err=%v", won1, err1)
 	}
-	assertLeader(t, elector1, true)
+	assertLeader(t, h.elector, true)
 
 	// Voluntary step down
-	if err := elector1.StepDown(ctx); err != nil {
+	if err := h.elector.StepDown(h.ctx); err != nil {
 		t.Fatalf("step down failed: %v", err)
 	}
-	assertLeader(t, elector1, false)
-	assertRole(t, elector1, RoleFollower)
+	assertLeader(t, h.elector, false)
+	assertRole(t, h.elector, RoleFollower)
 
 	// Node 2 can immediately claim leadership without waiting for TTL
-	won2, err2 := elector2.Campaign(ctx)
+	won2, err2 := elector2.Campaign(h.ctx)
 	if err2 != nil || !won2 {
 		t.Fatalf("node-step-2 immediate takeover failed: won=%v, err=%v", won2, err2)
 	}
@@ -227,14 +231,14 @@ func TestLeaderElector_VoluntaryStepDown(t *testing.T) {
 
 func TestLeaderElector_ConcurrentCampaigns(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
 	nodeCount := 10
 	ttl := 2 * time.Second
+	h := newElectorHarness(t, "node-concurrent-0", ttl, nil)
 
 	electors := make([]*LeaderElector, nodeCount)
-	for i := 0; i < nodeCount; i++ {
-		electors[i] = newTestElector(t, fmt.Sprintf("node-concurrent-%d", i), store, ttl, nil)
+	electors[0] = h.elector
+	for i := 1; i < nodeCount; i++ {
+		electors[i] = newTestElector(t, fmt.Sprintf("node-concurrent-%d", i), h.store, ttl, nil)
 	}
 
 	var wg sync.WaitGroup
@@ -246,7 +250,7 @@ func TestLeaderElector_ConcurrentCampaigns(t *testing.T) {
 		goroutinelabels.NewGoroutine(fmt.Sprintf("concurrent_campaign_%d", idx), "concurrent campaign test").
 			StartSimple(func() {
 				defer wg.Done()
-				won, err := electors[idx].Campaign(ctx)
+				won, err := electors[idx].Campaign(h.ctx)
 				if err == nil && won {
 					winners.Add(1)
 				}
@@ -343,15 +347,12 @@ func TestLeaderElector_AutomaticFailoverWithBackgroundLoop(t *testing.T) {
 
 func TestLeaderElector_DispatcherAndSubscriberIntegration(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
-	store := NewMemoryLeaderLeaseStore()
 	dispatcher := NewMultiSubscriberDispatcher(nil)
+	h := newElectorHarness(t, "node-events", 500*time.Millisecond, dispatcher)
+	dispatcher.Register(h.elector)
 
-	elector := newTestElector(t, "node-events", store, 500*time.Millisecond, dispatcher)
-	dispatcher.Register(elector)
-
-	if elector.Name() != DefaultLeaderElectorSubscriberName {
-		t.Fatalf("expected subscriber name %q, got %q", DefaultLeaderElectorSubscriberName, elector.Name())
+	if h.elector.Name() != DefaultLeaderElectorSubscriberName {
+		t.Fatalf("expected subscriber name %q, got %q", DefaultLeaderElectorSubscriberName, h.elector.Name())
 	}
 
 	var transitionsReceived []string
@@ -369,18 +370,18 @@ func TestLeaderElector_DispatcherAndSubscriberIntegration(t *testing.T) {
 	dispatcher.Register(listener)
 
 	// Campaign -> triggers "elected"
-	won, err := elector.Campaign(ctx)
+	won, err := h.elector.Campaign(h.ctx)
 	if err != nil || !won {
 		t.Fatalf("campaign failed: won=%v, err=%v", won, err)
 	}
 
 	// Renew -> triggers "renewed"
-	if rErr := elector.Renew(ctx); rErr != nil {
+	if rErr := h.elector.Renew(h.ctx); rErr != nil {
 		t.Fatalf("renew failed: %v", rErr)
 	}
 
 	// StepDown -> triggers "stepped_down"
-	if sErr := elector.StepDown(ctx); sErr != nil {
+	if sErr := h.elector.StepDown(h.ctx); sErr != nil {
 		t.Fatalf("step down failed: %v", sErr)
 	}
 
@@ -399,7 +400,6 @@ func TestLeaderElector_DispatcherAndSubscriberIntegration(t *testing.T) {
 
 func TestLeaderElector_BoundaryAndErrorHandling(t *testing.T) {
 	t.Parallel()
-	ctx := context.Background()
 
 	// Empty node ID rejected
 	_, err := NewLeaderElector(LeaderElectorConfig{NodeID: ""})
@@ -407,16 +407,15 @@ func TestLeaderElector_BoundaryAndErrorHandling(t *testing.T) {
 		t.Fatalf("expected ErrInvalidNodeID, got %v", err)
 	}
 
-	store := NewMemoryLeaderLeaseStore()
-	elector := newTestElector(t, "node-err", store, 500*time.Millisecond, nil)
+	h := newElectorHarness(t, "node-err", 500*time.Millisecond, nil)
 
 	// Calling Renew when not leader returns ErrNotLeader
-	if renewErr := elector.Renew(ctx); renewErr != ErrNotLeader {
+	if renewErr := h.elector.Renew(h.ctx); renewErr != ErrNotLeader {
 		t.Fatalf("expected ErrNotLeader, got %v", renewErr)
 	}
 
 	// StepDown when not leader is safe no-op
-	if stepErr := elector.StepDown(ctx); stepErr != nil {
+	if stepErr := h.elector.StepDown(h.ctx); stepErr != nil {
 		t.Fatalf("unexpected step down error: %v", stepErr)
 	}
 
@@ -424,13 +423,13 @@ func TestLeaderElector_BoundaryAndErrorHandling(t *testing.T) {
 	canceledCtx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	_, campErr := elector.Campaign(canceledCtx)
+	_, campErr := h.elector.Campaign(canceledCtx)
 	if campErr == nil {
 		t.Fatalf("expected error on canceled context campaign")
 	}
 
 	// Notify with nil entry is safe
-	if notifyErr := elector.Notify(ctx, nil); notifyErr != nil {
+	if notifyErr := h.elector.Notify(h.ctx, nil); notifyErr != nil {
 		t.Fatalf("unexpected notify error on nil entry: %v", notifyErr)
 	}
 }

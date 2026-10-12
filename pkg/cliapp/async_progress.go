@@ -220,14 +220,17 @@ func RunWithAsyncProgress(
 		var exitCoder interface{ ExitCode() int }
 		if errors.As(err, &exitCoder) && exitCoder.ExitCode() == 3 {
 			_ = helper.EmitCompletion(ctx, duration, "Complete with warnings", nil)
+			_ = helper.Drain(5 * time.Second)
 			return err
 		}
 		_ = helper.EmitError(ctx, err, "Operation failed", nil)
+		_ = helper.Drain(5 * time.Second)
 		return err
 	}
 	if tracker != nil {
 		tracker.Complete(fmt.Sprintf("%s completed", operationType))
 	}
 	_ = helper.EmitCompletion(ctx, duration, "Complete", nil)
+	_ = helper.Drain(5 * time.Second)
 	return nil
 }

@@ -54,6 +54,7 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Dynamic Subscriber Topology Work-Stealing Specification](./DYNAMIC_SUBSCRIBER_TOPOLOGY_WORK_STEALING.md)**: Complete topological specification for subscriber work stealing and partition mapping.
 - **[Distributed Gossip Membership and Peer Failure Detector](./DISTRIBUTED_GOSSIP_FAILURE_DETECTOR.md)**: SWIM protocol implementation with indirect probing, suspicion timers, incarnation monotonicity, and self-healing cluster recovery.
 - **[Distributed Dead-Letter Queue (DLQ), Poison Pill Quarantine, and Automated Event Redrive Engine](./DISTRIBUTED_DEAD_LETTER_QUARANTINE_REDRIVE.md)**: Tamper-evident QuarantineEnvelope cryptographic checksums, PoisonPillQuarantine isolation vaults, and automated redrive with exponential backoff and jitter.
+- **[Adaptive Backoff Exponential Jitter and Quorum Damping](./ADAPTIVE_BACKOFF_QUORUM_DAMPING.md)**: Decorrelated exponential jitter backoff, sliding-window token bucket rate limiting, and storm quorum damping.
 
 ---
 
