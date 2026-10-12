@@ -27,24 +27,16 @@ func newTokenBucketHarness(t *testing.T) *tokenBucketHarness {
 
 func (h *tokenBucketHarness) createLimiter(cap int64, rate float64, init int64) *TokenBucketLimiter {
 	h.t.Helper()
-	cfg := TokenBucketConfig{
-		Capacity:   cap,
-		RefillRate: rate,
-	}
-	if init == 0 {
-		cfg.StartEmpty = true
-	}
-	if init > 0 {
-		cfg.InitialTokens = init
-	}
-	lim, err := NewTokenBucketLimiter(cfg)
-	require.NoError(h.t, err)
-	h.limiter = lim
-	h.t.Cleanup(func() {
-		errClose := lim.Close()
-		assert.NoError(h.t, errClose)
-	})
-	return lim
+	return h.createLimiterWithClock(cap, rate, init, nil)
+}
+
+func (h *tokenBucketHarness) expectDequeue(drr *DeficitRoundRobinQueue, expectedSub, expectedJob string) {
+	h.t.Helper()
+	item, err := drr.Dequeue()
+	assert.NoError(h.t, err)
+	require.NotNil(h.t, item)
+	assert.Equal(h.t, expectedSub, item.SubscriberID)
+	assert.Equal(h.t, expectedJob, item.Entry.JobID)
 }
 
 func (h *tokenBucketHarness) createLimiterWithClock(cap int64, rate float64, init int64, clock func() time.Time) *TokenBucketLimiter {
@@ -288,29 +280,10 @@ func TestDeficitRoundRobin_FairQueueingAndStarvationPrevention(t *testing.T) {
 	// sub-B gets quantum 100 -> deficit=100. Item cost 50 <= 100 -> pops item B-0, deficit=50.
 	//   Item cost B-1 (50) <= deficit(50) -> pops item B-1, deficit=0.
 	// Both subscribers make verified forward progress without starvation.
-	item1, err1 := drr.Dequeue()
-	assert.NoError(t, err1)
-	require.NotNil(t, item1)
-	assert.Equal(t, "sub-A", item1.SubscriberID)
-	assert.Equal(t, "job-A-0", item1.Entry.JobID)
-
-	item2, err2 := drr.Dequeue()
-	assert.NoError(t, err2)
-	require.NotNil(t, item2)
-	assert.Equal(t, "sub-B", item2.SubscriberID)
-	assert.Equal(t, "job-B-0", item2.Entry.JobID)
-
-	item3, err3 := drr.Dequeue()
-	assert.NoError(t, err3)
-	require.NotNil(t, item3)
-	assert.Equal(t, "sub-B", item3.SubscriberID)
-	assert.Equal(t, "job-B-1", item3.Entry.JobID)
-
-	item4, err4 := drr.Dequeue()
-	assert.NoError(t, err4)
-	require.NotNil(t, item4)
-	assert.Equal(t, "sub-A", item4.SubscriberID)
-	assert.Equal(t, "job-A-1", item4.Entry.JobID)
+	h.expectDequeue(drr, "sub-A", "job-A-0")
+	h.expectDequeue(drr, "sub-B", "job-B-0")
+	h.expectDequeue(drr, "sub-B", "job-B-1")
+	h.expectDequeue(drr, "sub-A", "job-A-1")
 }
 
 func TestDeficitRoundRobin_DeficitAccumulation(t *testing.T) {
@@ -329,17 +302,10 @@ func TestDeficitRoundRobin_DeficitAccumulation(t *testing.T) {
 	assert.NoError(t, errEnqSmall)
 
 	// sub-big deficit=50 (<100) -> accumulates, passes to sub-small deficit=50 (>=30) -> pops sub-small
-	item1, err1 := drr.Dequeue()
-	assert.NoError(t, err1)
-	require.NotNil(t, item1)
-	assert.Equal(t, "sub-small", item1.SubscriberID)
+	h.expectDequeue(drr, "sub-small", "job-small")
 
 	// Next round: sub-big deficit was 50 + quantum 50 = 100 >= 100 -> pops sub-big
-	item2, err2 := drr.Dequeue()
-	assert.NoError(t, err2)
-	require.NotNil(t, item2)
-	assert.Equal(t, "sub-big", item2.SubscriberID)
-	assert.Equal(t, "job-big", item2.Entry.JobID)
+	h.expectDequeue(drr, "sub-big", "job-big")
 }
 
 func TestDeficitRoundRobin_QueueFullAndClosed(t *testing.T) {
