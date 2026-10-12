@@ -45,6 +45,17 @@ func setupTestThrottlerWithAgg(t *testing.T, policy BackpressurePolicy) (*MeshBa
 	return th, agg
 }
 
+func registerTestWaitingPool(t *testing.T, throttler *MeshBackpressureThrottler, poolID string) {
+	t.Helper()
+	_, err := throttler.RegisterPool(SubscriberPoolConfig{
+		PoolID:         poolID,
+		Policy:         PolicyWait,
+		InitialCredits: 0,
+		MaxCredits:     10,
+	})
+	require.NoError(t, err)
+}
+
 
 // -----------------------------------------------------------------------------
 // CRIT-1791759409830632000-8c68a2b5:
@@ -224,13 +235,7 @@ func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 	throttler := setupTestThrottler(t, PolicyWait)
 
 	poolID := "sub-pool-waiting"
-	_, err := throttler.RegisterPool(SubscriberPoolConfig{
-		PoolID:         poolID,
-		Policy:         PolicyWait,
-		InitialCredits: 0,
-		MaxCredits:     10,
-	})
-	require.NoError(t, err)
+	registerTestWaitingPool(t, throttler, poolID)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -250,7 +255,7 @@ func TestMeshBackpressure_PolicyWaitAndReplenishmentWakeup(t *testing.T) {
 	}
 
 	// Replenish credits to unblock
-	err = throttler.Replenish(poolID, 5)
+	err := throttler.Replenish(poolID, 5)
 	require.NoError(t, err)
 
 	select {
@@ -267,18 +272,12 @@ func TestMeshBackpressure_PolicyWait_ContextCancellation(t *testing.T) {
 	throttler := setupTestThrottler(t, PolicyWait)
 
 	poolID := "sub-pool-cancel"
-	_, err := throttler.RegisterPool(SubscriberPoolConfig{
-		PoolID:         poolID,
-		Policy:         PolicyWait,
-		InitialCredits: 0,
-		MaxCredits:     10,
-	})
-	require.NoError(t, err)
+	registerTestWaitingPool(t, throttler, poolID)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
 	defer cancel()
 
-	err = throttler.Acquire(ctx, poolID, 5)
+	err := throttler.Acquire(ctx, poolID, 5)
 	assert.ErrorIs(t, err, context.DeadlineExceeded)
 }
 
@@ -511,12 +510,7 @@ func TestMeshBackpressure_LifecycleCleanShutdownAndNoGoroutineLeaks(t *testing.T
 	throttler := setupTestThrottler(t, PolicyWait)
 
 	poolID := "shutdown-pool"
-	_, err := throttler.RegisterPool(SubscriberPoolConfig{
-		PoolID:         poolID,
-		InitialCredits: 0,
-		MaxCredits:     10,
-	})
-	require.NoError(t, err)
+	registerTestWaitingPool(t, throttler, poolID)
 
 	waiterUnblocked := make(chan error, 1)
 	goroutinelabels.NewGoroutine("test_shutdown_waiter", "waiter unblocked on Close").StartSimple(func() {
@@ -527,7 +521,7 @@ func TestMeshBackpressure_LifecycleCleanShutdownAndNoGoroutineLeaks(t *testing.T
 	time.Sleep(50 * time.Millisecond)
 
 	// Close the throttler
-	err = throttler.Close()
+	err := throttler.Close()
 	require.NoError(t, err)
 
 	// Waiter must immediately unblock with ErrThrottlerClosed
