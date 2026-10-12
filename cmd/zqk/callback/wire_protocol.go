@@ -62,11 +62,17 @@ func (c *WireProtocolCodec) EncodeEntry(entry *CallbackEntry, buf []byte) ([]byt
 		return nil, errfmt.Newf("failed to marshal entry payload").Wrap(err)
 	}
 
+	if len(payloadBytes) > WireMaxPayloadSize {
+		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
+	}
 	payloadLen := len(payloadBytes)
-	if payloadLen > WireMaxPayloadSize || payloadLen > math.MaxInt-WireHeaderSize {
+	if payloadLen > math.MaxInt-WireHeaderSize {
 		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
 	}
 	totalSize := WireHeaderSize + payloadLen
+	if totalSize > WireMaxPayloadSize+WireHeaderSize {
+		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
+	}
 
 	target := buf
 	if cap(target) < totalSize {
@@ -114,7 +120,10 @@ func (c *WireProtocolCodec) DecodeEntry(data []byte) (*CallbackEntry, int, error
 	}
 
 	payloadLen := int(binary.BigEndian.Uint32(data[24:28]))
-	if payloadLen > WireMaxPayloadSize || payloadLen > math.MaxInt-WireHeaderSize {
+	if payloadLen > WireMaxPayloadSize {
+		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
+	}
+	if payloadLen > math.MaxInt-WireHeaderSize {
 		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
 	}
 	expectedChecksum := binary.BigEndian.Uint32(data[28:32])
