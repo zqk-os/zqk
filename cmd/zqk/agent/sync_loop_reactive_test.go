@@ -110,6 +110,8 @@ func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
 	// Clean defer unregistration verification: after loop returns, registry must have 0 listeners
 	afterDispatch := dispatchTestCallbackEvent(taskID, time.Time{})
 	require.Equal(t, 0, afterDispatch, "expected waker channel to be unregistered after sync loop exits")
+
+	storage.ScrubProjectRootForTempCleanup(filepath.Join(root, paths.ProjectDataDir), 20, 25*time.Millisecond)
 }
 
 func TestSyncLoop_WakerChannelDeliveryLatency(t *testing.T) {
@@ -133,7 +135,7 @@ func TestSyncLoop_WakerChannelDeliveryLatency(t *testing.T) {
 }
 
 func TestSyncLoop_ContextCancellationCleanExit(t *testing.T) {
-	_, store := setupSyncLoopTestProject(t)
+	root, store := setupSyncLoopTestProject(t)
 
 	taskID := "ATK-cancel-clean-exit"
 	cancelSecCtx := createSyncLoopTestTask(t, store, taskID, "Cancel Clean Exit Test", "15m")
@@ -163,4 +165,11 @@ func TestSyncLoop_ContextCancellationCleanExit(t *testing.T) {
 	// Verify waker was cleaned up
 	remaining := dispatchTestCallbackEvent(taskID, time.Time{})
 	require.Equal(t, 0, remaining, "expected no lingering waker listeners after cancellation")
+
+	// Flush CAS index and scrub project root to ensure all background write queues settle before TempDir cleanup
+	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
+	if writeQueue != nil {
+		_ = writeQueue.FlushAll(1 * time.Second)
+	}
+	storage.ScrubProjectRootForTempCleanup(filepath.Join(root, paths.ProjectDataDir), 20, 25*time.Millisecond)
 }
