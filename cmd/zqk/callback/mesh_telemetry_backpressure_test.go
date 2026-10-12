@@ -580,3 +580,11 @@ func TestMeshController_UnifiedSubscriberIntegration(t *testing.T) {
 	ctrlCloseErr := controller.Close()
 	assert.NoError(t, ctrlCloseErr)
 }
+
+func TestMeshTelemetry_WindowMetrics_DropRate(t *testing.T) {
+	metricsZero := WindowMetrics{TotalDispatched: 0, TotalDropped: 0}
+	assert.Equal(t, 0.0, metricsZero.DropRate())
+
+	metricsDropped := WindowMetrics{TotalDispatched: 100, TotalDropped: 15}
+	assert.InDelta(t, 0.15, metricsDropped.DropRate(), 0.0001)
+}

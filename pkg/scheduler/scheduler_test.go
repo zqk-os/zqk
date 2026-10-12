@@ -346,7 +346,7 @@ func TestPriorityDispatchJob_TimerMaintenance(t *testing.T) {
 }
 
 func TestScheduler_EmitTriggerQueueEvent(t *testing.T) {
-	t.Parallel()
+	// No t.Parallel(): shares global test environment
 	sched, _, cleanup := setupTestScheduler(t)
 	t.Cleanup(cleanup)
 
@@ -385,7 +385,7 @@ func TestScheduler_EmitTriggerQueueEvent(t *testing.T) {
 }
 
 func TestScheduler_JobInCache(t *testing.T) {
-	t.Parallel()
+	// No t.Parallel(): shares global test environment
 	sched, _, cleanup := setupTestScheduler(t)
 	t.Cleanup(cleanup)
 
@@ -631,7 +631,7 @@ func TestTriggerQueue_ReloadsForMissingJobSoNewTestBundlesRun(t *testing.T) {
 }
 
 func TestScheduler_TriggerJob(t *testing.T) {
-	t.Parallel()
+	// No t.Parallel(): setupSchedulerCompleteTestEnvironment sets ZQK_TEST_ROOT via os.Setenv (process-global)
 	sched, _, cleanup := setupTestScheduler(t)
 	t.Cleanup(cleanup)
 	t.Cleanup(func() {
