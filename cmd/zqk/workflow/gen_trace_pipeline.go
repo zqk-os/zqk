@@ -254,33 +254,51 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 		})
 	}
 
-	// Generate backlog item implementing all criteria
+	// Generate atomic backlog items implementing criteria (Shift-Left 2-5 BLIs per plan mandate)
 	if needBLI {
+		atomicBLIs := generateAtomicBacklogItems(title, targetID, targetReqID, pipelineStatus, ts, allCriteria, allTestCases, obj)
+		bundle.Objects.BacklogItems = append(bundle.Objects.BacklogItems, atomicBLIs...)
+	}
+
+	return bundle, allCriteria, needCriteria
+}
+
+// generateAtomicBacklogItems slices criteria across discrete atomic units of effort.
+func generateAtomicBacklogItems(
+	title string,
+	targetID string,
+	targetReqID string,
+	pipelineStatus string,
+	ts int64,
+	allCriteria []string,
+	allTestCases []string,
+	obj map[string]any,
+) []scenario.BacklogTemplate {
+	var bliReqRefs []string
+	if strings.HasPrefix(targetReqID, "REQ-") {
+		bliReqRefs = []string{targetReqID}
+	}
+	var bliMilRefs []string
+	if strings.HasPrefix(targetID, "MIL-") {
+		bliMilRefs = []string{targetID}
+	}
+	var bliGoalRefs []string
+	if strings.HasPrefix(targetID, "GOAL-") {
+		bliGoalRefs = []string{targetID}
+	} else if grefs, ok := obj[objects.FieldKeyGoalRefs].([]any); ok {
+		for _, g := range grefs {
+			s := strings.TrimSpace(fmt.Sprint(g))
+			if s != "" && s != "<nil>" {
+				bliGoalRefs = append(bliGoalRefs, s)
+			}
+		}
+	}
+
+	if len(allCriteria) <= 1 {
 		randomBytes := make([]byte, 4)
 		_, _ = rand.Read(randomBytes)
 		bliHint := fmt.Sprintf("BLI-%d-%x", ts, randomBytes)
-
-		var bliReqRefs []string
-		if strings.HasPrefix(targetReqID, "REQ-") {
-			bliReqRefs = []string{targetReqID}
-		}
-		var bliMilRefs []string
-		if strings.HasPrefix(targetID, "MIL-") {
-			bliMilRefs = []string{targetID}
-		}
-		var bliGoalRefs []string
-		if strings.HasPrefix(targetID, "GOAL-") {
-			bliGoalRefs = []string{targetID}
-		} else if grefs, ok := obj[objects.FieldKeyGoalRefs].([]any); ok {
-			for _, g := range grefs {
-				s := strings.TrimSpace(fmt.Sprint(g))
-				if s != "" && s != "<nil>" {
-					bliGoalRefs = append(bliGoalRefs, s)
-				}
-			}
-		}
-
-		bundle.Objects.BacklogItems = append(bundle.Objects.BacklogItems, scenario.BacklogTemplate{
+		return []scenario.BacklogTemplate{{
 			ID:              bliHint,
 			IDHint:          bliHint,
 			Title:           fmt.Sprintf("Implement: %s", title),
@@ -294,10 +312,57 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 			DocEntryRefs:    []string{},
 			Priority:        "high",
 			PriorityTier:    "P1",
-		})
+		}}
 	}
 
-	return bundle, allCriteria, needCriteria
+	suffixes := []struct {
+		titleSuffix string
+		descSuffix  string
+	}{
+		{
+			titleSuffix: "Core Capability & Functional Delivery",
+			descSuffix:  "Primary implementation and core deliverables",
+		},
+		{
+			titleSuffix: "Boundary Validation & Error Recovery",
+			descSuffix:  "Boundary handling, input validation, and negative testing",
+		},
+		{
+			titleSuffix: "Architecture Specification & Conformance",
+			descSuffix:  "Architectural documentation, specification, and compliance",
+		},
+	}
+
+	var blis []scenario.BacklogTemplate
+	for idx, critID := range allCriteria {
+		randomBytes := make([]byte, 4)
+		_, _ = rand.Read(randomBytes)
+		bliHint := fmt.Sprintf("BLI-%d-%x", ts+int64((idx+1)*500), randomBytes)
+
+		titleSuffix := fmt.Sprintf("Verification Facet %d", idx+1)
+		descSuffix := fmt.Sprintf("Implementation and verification for facet %d", idx+1)
+		if idx < len(suffixes) {
+			titleSuffix = suffixes[idx].titleSuffix
+			descSuffix = suffixes[idx].descSuffix
+		}
+
+		blis = append(blis, scenario.BacklogTemplate{
+			ID:              bliHint,
+			IDHint:          bliHint,
+			Title:           fmt.Sprintf("Implement: %s - %s", title, titleSuffix),
+			Description:     fmt.Sprintf("%s for: %s", descSuffix, title),
+			Status:          pipelineStatus,
+			CriteriaRefs:    []string{critID},
+			RequirementRefs: bliReqRefs,
+			MilestoneRefs:   bliMilRefs,
+			GoalRefs:        bliGoalRefs,
+			TestCaseRefs:    allTestCases,
+			DocEntryRefs:    []string{},
+			Priority:        "high",
+			PriorityTier:    "P1",
+		})
+	}
+	return blis
 }
 
 func validateTraceTargetKind(targetID string) error {
