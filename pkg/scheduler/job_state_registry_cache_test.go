@@ -85,7 +85,10 @@ func TestJobStateRegistry_WriteThroughCacheAndMTimeInvalidation(t *testing.T) {
 
 	// 5. Test cache eviction
 	reg.evictCachedFileState(statePath)
-	fiAfter, _ := fileutil.Stat(statePath)
+	fiAfter, statErr := fileutil.Stat(statePath)
+	if statErr != nil {
+		t.Fatalf("stat after eviction failed: %v", statErr)
+	}
 	if reg.getCachedFileState(statePath, fiAfter.ModTime(), fiAfter.Size()) != nil {
 		t.Fatalf("expected nil after cache eviction")
 	}
