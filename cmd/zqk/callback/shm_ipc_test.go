@@ -340,7 +340,6 @@ func TestSHM_VectorizedBatch_RingBufferSink(t *testing.T) {
 }
 
 func spawnStressConsumers(ctx context.Context, ring *SharedMemoryRingBuffer, numConsumers, totalItems int, recMap *sync.Map, consTotal *atomic.Int64, wg *sync.WaitGroup) {
-	wg.Add(numConsumers)
 	for c := 0; c < numConsumers; c++ {
 		goroutinelabels.NewGoroutine("test_shm_consumer", "concurrent stress consumer").
 			WithWaitGroup(wg).
@@ -379,7 +378,6 @@ func spawnStressConsumers(ctx context.Context, ring *SharedMemoryRingBuffer, num
 }
 
 func spawnStressProducers(ctx context.Context, ring *SharedMemoryRingBuffer, numProducers, itemsPerProducer int, wg *sync.WaitGroup) {
-	wg.Add(numProducers)
 	for p := 0; p < numProducers; p++ {
 		producerID := p
 		goroutinelabels.NewGoroutine("test_shm_producer", "concurrent stress producer").
