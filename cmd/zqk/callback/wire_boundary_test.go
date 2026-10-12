@@ -36,8 +36,9 @@ func (h *wireBoundaryHarness) createSampleEntry(seq int64) *CallbackEntry {
 	}
 }
 
-func (h *wireBoundaryHarness) encodeOrFatal(entry *CallbackEntry) []byte {
+func (h *wireBoundaryHarness) encodeSample(seq int64) []byte {
 	h.t.Helper()
+	entry := h.createSampleEntry(seq)
 	buf := make([]byte, 512)
 	encoded, err := h.codec.EncodeEntry(entry, buf[:0])
 	require.NoError(h.t, err)
@@ -56,10 +57,7 @@ func TestWireBoundary_NilEntryRejection(t *testing.T) {
 
 func TestWireBoundary_CorruptedPayloadDetection(t *testing.T) {
 	h := newWireBoundaryHarness(t)
-	entry := h.createSampleEntry(88)
-	encoded := h.encodeOrFatal(entry)
-
-	corrupted := bytes.Clone(encoded)
+	corrupted := bytes.Clone(h.encodeSample(88))
 	corrupted[len(corrupted)/2] ^= 0xAA
 
 	decoded, bytesConsumed, err := h.codec.DecodeEntry(corrupted)
@@ -71,10 +69,8 @@ func TestWireBoundary_CorruptedPayloadDetection(t *testing.T) {
 
 func TestWireBoundary_TruncatedPayloadLength(t *testing.T) {
 	h := newWireBoundaryHarness(t)
-	entry := h.createSampleEntry(99)
-	encoded := h.encodeOrFatal(entry)
+	truncated := h.encodeSample(99)[:WireHeaderSize+2]
 
-	truncated := encoded[:WireHeaderSize+2]
 	decoded, bytesConsumed, err := h.codec.DecodeEntry(truncated)
 	assert.Error(t, err)
 	assert.Nil(t, decoded)
