@@ -55,6 +55,8 @@ Documents governing persistent host processes, background watchers, and job conc
 - **[Distributed Gossip Membership and Peer Failure Detector](./DISTRIBUTED_GOSSIP_FAILURE_DETECTOR.md)**: SWIM protocol implementation with indirect probing, suspicion timers, incarnation monotonicity, and self-healing cluster recovery.
 - **[Distributed Dead-Letter Queue (DLQ), Poison Pill Quarantine, and Automated Event Redrive Engine](./DISTRIBUTED_DEAD_LETTER_QUARANTINE_REDRIVE.md)**: Tamper-evident QuarantineEnvelope cryptographic checksums, PoisonPillQuarantine isolation vaults, and automated redrive with exponential backoff and jitter.
 - **[Adaptive Backoff Exponential Jitter and Quorum Damping](./ADAPTIVE_BACKOFF_QUORUM_DAMPING.md)**: Decorrelated exponential jitter backoff, sliding-window token bucket rate limiting, and storm quorum damping.
+- **[Consistent Hashing Ring Topology & Virtual Node Distribution Fabric](./CONSISTENT_HASHING_RING_FABRIC.md)**: Virtual node topology, Murmur3/FNV-1a distribution, clockwise binary search routing, multi-replica fault tolerance, and dynamic partition rebalancing.
+- **[Distributed Event Mesh Telemetry Aggregation & Adaptive Backpressure Throttling](./EVENT_MESH_TELEMETRY_BACKPRESSURE.md)**: Zero-allocation bounded sliding window telemetry aggregation, credit-based backpressure protocol, and AIMD congestion control across subscriber worker pools.
 
 ---
 
