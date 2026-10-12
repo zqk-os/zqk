@@ -16,6 +16,14 @@ flags:
     type: string
     default: ""
     description: "Path to the autonomous cap loop active marker file"
+  - name: agent-id
+    type: string
+    default: ""
+    description: "Target seat agent ID to inspect pending steering feed"
+  - name: persona-ref
+    type: string
+    default: ""
+    description: "Target seat persona ref to inspect pending steering feed"
 args:
   type: no_args
 help:

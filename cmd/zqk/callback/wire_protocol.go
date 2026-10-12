@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"hash/crc32"
+	"math"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
@@ -62,7 +63,7 @@ func (c *WireProtocolCodec) EncodeEntry(entry *CallbackEntry, buf []byte) ([]byt
 	}
 
 	payloadLen := len(payloadBytes)
-	if payloadLen > WireMaxPayloadSize {
+	if payloadLen > WireMaxPayloadSize || payloadLen > math.MaxInt-WireHeaderSize {
 		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
 	}
 	totalSize := WireHeaderSize + payloadLen
@@ -113,7 +114,7 @@ func (c *WireProtocolCodec) DecodeEntry(data []byte) (*CallbackEntry, int, error
 	}
 
 	payloadLen := int(binary.BigEndian.Uint32(data[24:28]))
-	if payloadLen > WireMaxPayloadSize {
+	if payloadLen > WireMaxPayloadSize || payloadLen > math.MaxInt-WireHeaderSize {
 		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
 	}
 	expectedChecksum := binary.BigEndian.Uint32(data[28:32])

@@ -21,6 +21,8 @@ func NewAgentHookContinuationCommandBuilder() *cobra.Command {
 	builder.WithArgs(cobra.NoArgs)
 	builder.AddStringFlag("vendor", "", "antigravity", "Target agent host vendor format (antigravity, generic)")
 	builder.AddStringFlag("marker", "", "", "Path to the autonomous cap loop active marker file")
+	builder.AddStringFlag("agent-id", "", "", "Target seat agent ID to inspect pending steering feed")
+	builder.AddStringFlag("persona-ref", "", "", "Target seat persona ref to inspect pending steering feed")
 	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
