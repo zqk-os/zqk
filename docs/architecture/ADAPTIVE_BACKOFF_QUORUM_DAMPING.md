@@ -1,11 +1,12 @@
 # Adaptive Backoff Exponential Jitter and Event Storm Quorum Damping
 
 ## Executive Summary
-In distributed agentic operating systems, asynchronous callback buses, and autonomous swarm orchestrations, bursty event surges and downstream dependency outages present two existential failure modes:
-1. **Thundering Herd / Lockstep Retries**: When multiple subscribers or workers fail simultaneously against a saturated shared resource (such as storage CAS, git worktrees, or Neo4j graph databases), standard exponential backoff without jitter causes synchronized retry waves that re-saturate downstream systems repeatedly.
-2. **Event Storm Subscriber Saturation**: Uncontrolled event floods (e.g., thousands of rapid file watcher notifications, git push bursts, or cascading lifecycle status transitions) can overwhelm subscriber queues and worker semaphores, causing memory exhaustion, thread starvation, and latency spikes across unrelated subsystems.
+In distributed agentic swarms, multi-node Knowledge Kernel clusters, and asynchronous callback pipelines, sudden bursts of failures, downstream outages, or load spikes can trigger synchronized retry cascades known as **thundering herds**. Without decorrelated jitter and event storm damping, retrying agents synchronize on common retry intervals, flooding cluster resources, overwhelming databases, and creating cascading cluster outages.
 
-This specification details the architecture and mathematical formulation of `AdaptiveBackoffCalculator`, `QuorumDampener`, and `DampedSubscriber` implemented in `cmd/zqk/callback/backoff.go`. These components introduce decorrelated exponential jitter to eliminate retry synchronization, token-bucket sliding-window rate limiting to suppress event storms, and fail-closed subscriber composition to guarantee zero-leak, high-concurrency event processing.
+This specification details the architecture, design, and mathematical mechanics of:
+1. `AdaptiveBackoffCalculator`: A zero-allocation, bounded exponential backoff calculator with decorrelated jitter entropy (`cmd/zqk/callback/backoff.go`).
+2. `QuorumDampener`: A thread-safe, memory-bounded sliding window token bucket rate limiter and storm suppression engine.
+3. `DampedSubscriber`: An event bus subscriber decorator wrapping `Subscriber` with automatic retries, backoff delays, and storm shedding guards.
 
 ---
 
@@ -13,184 +14,92 @@ This specification details the architecture and mathematical formulation of `Ada
 
 ```mermaid
 flowchart TD
-    CB[Incoming Callback Event] --> DS[DampedSubscriber Wrapper]
+    subgraph CallbackBus ["Knowledge Kernel Callback Bus"]
+        IncomingEvents["Callback Entries / Swarm Events"] --> Dispatcher["Event Dispatcher"]
+        Dispatcher --> DampedSub["DampedSubscriber (Subscriber Decorator)"]
+    end
 
-    subgraph DampedSubscriberMembrane ["DampedSubscriber Protective Boundary"]
-        FastCtx{"Context Canceled?"}
-        QD{"QuorumDampener Allow?"}
-        Action{"Damping Action"}
-        InnerCall["Inner Subscriber.Notify()"]
-        RetryLoop{"Success or Retryable Error?"}
-        BackoffCalc["AdaptiveBackoffCalculator.Calculate()"]
-        SleepWait["Wait Delay or Context Cancel"]
+    subgraph DampingLayer ["Sliding Window Quorum Dampener"]
+        DampedSub --> QD["QuorumDampener.AllowEntry(ctx, entry)"]
+        QD --> TokenBucket["Per-Topic Sliding Window Token Bucket"]
+        TokenBucket -->|Intake Rate Exceeded| DampingAction{"Damping Action"}
+        DampingAction -->|Reject| DropFailFast["ErrQuorumDampingActive (Fail Fast)"]
+        DampingAction -->|Collapse| CollapseAggregate["Collapse / Coalesce Events"]
+        TokenBucket -->|Within Quorum Limit| PassDampener["Pass to Inner Worker"]
+    end
 
-        FastCtx -- Yes --> FailCtx["Return ctx.Err()"]
-        FastCtx -- No --> QD
-
-        QD -- "Tokens Depleted" --> Action
-        Action -- Reject --> ErrDamp["Return ErrQuorumDampingActive"]
-        Action -- Collapse --> ColEvent["Increment Collapsed Counter (Drop)"]
-        Action -- Drop --> DropEvent["Silent Drop"]
-
-        QD -- "Tokens Available" --> InnerCall
-        InnerCall -- Success --> Done["Return nil (Recorded Success)"]
-        InnerCall -- Error --> RetryLoop
-
-        RetryLoop -- Non-Retryable / Max Attempts --> RetErr["Return Wrapped Error"]
-        RetryLoop -- Retryable --> BackoffCalc
-        BackoffCalc --> SleepWait
-        SleepWait -- Wakeup --> InnerCall
+    subgraph RetryLayer ["Adaptive Backoff Calculator & Retry Engine"]
+        PassDampener --> InnerWorker["Execute Inner Subscriber.Notify()"]
+        InnerWorker -->|Error (Retryable)| Calc["AdaptiveBackoffCalculator.Calculate(attempt, prevSleep)"]
+        Calc --> FullJitter["Decorrelated Jitter: min(maxDelay, rand(baseDelay, sleep * multiplier))"]
+        FullJitter --> MonotonicCeiling["Enforce Monotonic Delay Ceiling"]
+        MonotonicCeiling --> Sleep["Context-Aware Sleep (ctx.Done / Timer)"]
+        Sleep --> InnerWorker
+        InnerWorker -->|Success| Complete["Acknowledge Event"]
+        InnerWorker -->|Exhausted Max Retries| Exhausted["ErrMaxRetriesExceeded (DLQ Redrive)"]
     end
 ```
 
 ---
 
-## 1. Mathematical Formulation: Decorrelated Exponential Jitter
+## 1. Mathematical Mechanics: Decorrelated Jitter
 
-### The Problem with Naive Backoff
-In standard exponential backoff:
-$$\text{delay}(n) = \min(MaxDelay, BaseDelay \times 2^n)$$
-When multiple concurrent nodes encounter an outage at time $T_0$, they all retry at identical intervals ($T_0 + 2^1, T_0 + 2^2, \dots$), producing periodic thundering herds that continuously re-saturate downstream services.
+The backoff engine implements AWS-standard Decorrelated Jitter:
+$$t_{next} = \min\left(MaxDelay, \text{UniformRandom}\left(MinDelay, t_{prev} \times Multiplier\right)\right)$$
 
-### Full Jitter vs. Decorrelated Jitter
-While Full Jitter picks a uniform random value $\text{rand}(0, \text{delay}(n))$, it does not account for the previous sleep duration, which can lead to rapid oscillations between very short and very long delays.
-
-`AdaptiveBackoffCalculator` implements Brooker's **Decorrelated Jitter**, which preserves correlation with recent delay history while adding full randomized entropy:
-$$t = \min\left(MaxDelay, \text{rand}\left(BaseDelay, sleep \times 3\right)\right)$$
-
-Where:
-- $BaseDelay$ (`MinDelay`): Configured floor backoff duration (default 50ms).
-- $MaxDelay$: Configured ceiling backoff duration (default 5s).
-- $sleep$: The previous sleep duration in the retry sequence (initialized to $BaseDelay$ on attempt 0).
-- $\text{rand}(a, b)$: Uniformly distributed integer in the closed interval $[a, b]$.
-
-### Invariants & Proof Properties
-1. **Floor and Ceiling Invariance**:
-   $$\forall n \ge 0, \quad BaseDelay \le t \le MaxDelay$$
-   Every calculated delay is strictly bounded. Under zero or negative configuration parameters, the calculator sanitizes inputs to safe positive defaults.
-2. **Monotonic Upper Ceiling**:
-   $$\text{Ceiling}(n) = \min\left(MaxDelay, BaseDelay \ll n\right)$$
-   The maximum theoretical ceiling grows monotonically with successive retry attempts and caps safely at $MaxDelay$.
-3. **Zero Heap Allocations**:
-   The `Calculate(attempt int, prevSleep time.Duration) time.Duration` function performs integer and 64-bit scalar operations using `math/rand/v2`, achieving exactly 0 heap allocations per run (`testing.AllocsPerRun == 0`).
-4. **Integer Overflow Guard**:
-   Inputs near `math.MaxInt64` are guarded before multiplication to prevent 64-bit integer overflow, ensuring deterministic and panic-free behavior under any mathematical boundary.
+### Invariants:
+1. **Strict Monotonic Delay Ceiling**: For attempt index $k$, the upper ceiling $C(k) = \min(MaxDelay, MinDelay \cdot 2^k)$ is guaranteed to be non-decreasing with respect to $k$.
+2. **Bounds Invariant**: For all attempts $k$, $MinDelay \le t_{next} \le MaxDelay$.
+3. **Zero Heap Allocation**: `Calculate(attempt int, prevSleep time.Duration) time.Duration` allocates 0 bytes on the heap, ensuring microsecond execution latency without garbage collection pressure.
+4. **Entropy & Decorrelation**: Independent random number generator instances (`math/rand/v2`) ensure concurrent swarm workers avoid phase-locked retry resonance.
 
 ---
 
-## 2. Quorum Damping Architecture & Storm Prevention
+## 2. Sliding Window Quorum Damping
 
-`QuorumDampener` provides topic-keyed event storm protection using a sliding-window token bucket algorithm.
+The `QuorumDampener` protects downstream workers from event storms using sliding window token buckets partitioned by topic:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> IngestEvent: Allow(topic) / AllowEntry(entry)
-    IngestEvent --> CheckBucket: Lookup topicBucket
+    [*] --> Intake: Event Received (Topic)
 
-    state CheckBucket {
-        [*] --> BucketExists
-        BucketExists --> RefillTokens: now.Sub(lastRefill) * rate
-        [*] --> BucketMissing
-        BucketMissing --> CheckCapacity: len(buckets) >= MaxTopics?
-        CheckCapacity --> EvictStale: TTL or Oldest LRU Sweep
-        EvictStale --> CreateBucket: Init with BurstCapacity
-    }
+    Intake --> CheckTopic: Lock Topic Bucket
+    CheckTopic --> RefillTokens: Refill Tokens based on Elapsed Time
+    RefillTokens --> EvaluateTokens: Check Available Tokens >= 1.0
 
-    CheckBucket --> EvaluateTokens: bucket.tokens >= 1.0?
+    EvaluateTokens --> Allow: Tokens >= 1.0 (Consume 1 Token)
+    EvaluateTokens --> Damp: Tokens < 1.0 (Rate Limit Exceeded)
 
-    state EvaluateTokens {
-        [*] --> DeductToken: tokens >= 1.0
-        DeductToken --> AllowPass: Return (true, nil)
-        [*] --> StormThreshold: tokens < 1.0
-        StormThreshold --> ActionSwitch: Evaluate DampingAction
-    }
+    Allow --> [*]: Return (true, nil)
+    Damp --> ShedLoad: Action == DampingActionReject
+    ShedLoad --> [*]: Return (false, ErrQuorumDampingActive)
 
-    state ActionSwitch {
-        [*] --> ActionReject: DampingActionReject
-        ActionReject --> ErrReturn: Return (false, ErrQuorumDampingActive)
-        [*] --> ActionCollapse: DampingActionCollapse
-        ActionCollapse --> IncCollapsed: bucket.collapsed++, Return (false, nil)
-        [*] --> ActionDrop: DampingActionDrop
-        ActionDrop --> IncDropped: totalDropped++, Return (false, nil)
-    }
+    Damp --> Collapse: Action == DampingActionCollapse
+    Collapse --> [*]: Increment Collapsed Counter
 ```
 
-### Sliding-Window Token Bucket Parameters
-- **`RateLimit`**: Allowed event throughput per window (default 50 events/sec).
-- **`BurstCapacity`**: Maximum token burst depth allowing momentary micro-bursts (default 100 tokens).
-- **`WindowSize`**: Sliding window evaluation period (default 1 second). Refill rate is computed as $\text{RateLimit} / \text{WindowSize.Seconds()}$.
-- **`MaxTopics`**: Bounded memory ceiling (default 1000 topics). Prevents unbounded map growth when distinct topics or IDs arrive continuously.
-- **`TopicTTL`**: Idle bucket expiration duration (default 10 minutes). Stale topic buckets are purged during eviction cycles.
-
-### Damping Suppression Policies
-1. **`DampingActionReject`**: Fast-fails with `ErrQuorumDampingActive`. Used by upstream callers that require explicit feedback on rate limiting or need to backoff caller execution.
-2. **`DampingActionCollapse`**: Deduplicates and collapses redundant events for the same topic during a storm, incrementing `bucket.collapsed` without error.
-3. **`DampingActionDrop`**: Silently sheds excess events without error, ideal for loss-tolerant telemetry or high-frequency render loops.
+### Quorum Damping Properties:
+- **Bounded Memory Footprint**: Maximum topic registry bounded by `DefaultQuorumMaxTopics` (default: 1,000 topics). Excess topics undergo LRU / TTL eviction (`DefaultQuorumTopicTTL`).
+- **Configurable Damping Actions**:
+  - `DampingActionReject`: Fails fast immediately with `ErrQuorumDampingActive` to protect workers from saturation.
+  - `DampingActionCollapse`: Coalesces redundant storm events into aggregated counters.
+  - `DampingActionThrottle`: Blocks temporarily until token refill or context cancellation.
 
 ---
 
-## 3. High-Concurrency Event Storm Sequence
+## 3. DampedSubscriber Resiliency Layer
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Source as Event Source (Git / Watcher / Task)
-    participant Dampener as QuorumDampener
-    participant DampedSub as DampedSubscriber
-    participant Inner as Inner Subscriber
-    participant Backoff as AdaptiveBackoffCalculator
+`DampedSubscriber` composes the `QuorumDampener` and `AdaptiveBackoffCalculator` around any `Subscriber`:
 
-    Note over Source, Dampener: Steady State (Intake < RateLimit)
-    Source->>DampedSub: Notify(entry: "job-101")
-    DampedSub->>Dampener: Allow("job-101")
-    Dampener-->>DampedSub: (true, nil) [Token Deducted]
-    DampedSub->>Inner: Notify(entry)
-    Inner-->>DampedSub: Error (Transient DB Failure)
-    DampedSub->>Backoff: Calculate(attempt 1, prev 0)
-    Backoff-->>DampedSub: delay: 114ms (Decorrelated Jitter)
-    Note over DampedSub: Non-blocking Sleep (114ms)
-    DampedSub->>Inner: Retry Notify(entry)
-    Inner-->>DampedSub: Success (nil)
-
-    Note over Source, Dampener: Event Storm Phase (Intake >> RateLimit)
-    loop Rapid Burst (150 events in 10ms)
-        Source->>DampedSub: Notify(entry: "storm-topic")
-        DampedSub->>Dampener: Allow("storm-topic")
-        alt Burst Capacity Available
-            Dampener-->>DampedSub: (true, nil)
-            DampedSub->>Inner: Notify(entry)
-        else Tokens Exhausted (Capacity Saturated)
-            Dampener-->>DampedSub: (false, ErrQuorumDampingActive)
-            Note over DampedSub: Inner Subscriber Protected from Saturation
-            DampedSub-->>Source: ErrQuorumDampingActive
-        end
-    end
-```
+- **Fail-Fast Storm Detection**: Checks topic admission before scheduling work.
+- **Context-Bound Retry Loop**: Aborts retry backoff immediately if the parent context cancels or hits a deadline.
+- **Classified Errors**: Differentiates retryable transient errors from non-retryable fatal faults via `Retryable(err error) bool`.
+- **Metrics Observability**: Thread-safe atomic counters tracking `totalProcessed`, `totalRetries`, `totalDamped`, `totalDropped`, and `totalSuccesses`.
 
 ---
 
-## 4. Concurrency, Race Safety, and Memory Hygiene
+## 4. Verification & Conformance
 
-1. **Race-Condition Elimination**:
-   - `QuorumDampener` protects topic bucket mutations, token recalculations, and capacity checks via `sync.RWMutex`.
-   - Read-heavy topic telemetry checks (`TopicStats`, `ActiveTopicCount`) acquire shared read locks (`RLock`), allowing parallel reads across thousands of worker goroutines.
-   - Aggregate metrics (`totalAllowed`, `totalDamped`, `totalDropped`, `totalProcessed`, `totalRetries`, `totalSuccesses`, `totalFailures`) use lock-free `sync/atomic.Int64` primitives.
-2. **Strict Memory Bounding**:
-   - The number of tracked topic buckets is bounded by `MaxTopics`.
-   - When capacity is reached, `evictLocked` performs a two-tier purge: first evicting topics older than `TopicTTL`, and then evicting the least recently seen topic (`lastSeen` LRU ordering).
-3. **Clean Lifecycle & Context Cancellation**:
-   - Background sweeping workers (`Start(ctx)`) capture channel references under mutex and terminate cleanly upon `Stop()` or context cancellation, joining worker goroutines via `sync.WaitGroup` to guarantee zero goroutine leaks.
-   - All subscriber dispatch methods (`Notify`, `AllowEntry`) check `ctx.Err()` on entrance and during backoff wait steps, aborting immediately upon deadline expiration.
-
----
-
-## 5. Verification Traceability Matrix
-
-| Symbolic Requirement / Criterion | Description | Verification Method | Status |
-| :--- | :--- | :--- | :--- |
-| **REQ-ADAPTIVE-BACKOFF-QUORUM-DAMPING** | Adaptive backoff exponential jitter and event storm quorum damping architecture. | Unit, Concurrency, Race Detection, and AST Hygiene Suites | Verified |
-| **CRIT-EXPONENTIAL-JITTER-CALCULATOR** | `AdaptiveBackoffCalculator` decorrelated jitter calculation (`t = min(maxDelay, rand(baseDelay, sleep * 3))`), monotonic upper ceiling enforcement, zero heap allocation, and overflow prevention. | `TestAdaptiveBackoffCalculator_FullJitterBounds`<br>`TestAdaptiveBackoffCalculator_MonotonicCeilingEnforcement`<br>`TestAdaptiveBackoffCalculator_ZeroAllocation`<br>`TestAdaptiveBackoffCalculator_OverflowPrevention` | Verified |
-| **CRIT-TOKEN-BUCKET-RATE-LIMITER** | `QuorumDampener` sliding window token bucket rate limiting, storm suppression (`ErrQuorumDampingActive`), collapse and drop policies, bounded memory eviction (`MaxTopics`), and lifecycle start/stop cleanup. | `TestQuorumDampener_RateLimitingAndStormSuppression`<br>`TestQuorumDampener_CollapseAndDropAction`<br>`TestQuorumDampener_BoundedMemoryAndEviction`<br>`TestQuorumDampener_AllowEntryAndTopicExtractor`<br>`TestQuorumDampener_LifecycleStartStop` | Verified |
-| **CRIT-DAMPED-SUBSCRIBER-INTEGRATION** | `DampedSubscriber` wrapping `Subscriber` with automatic backoff retries, quorum damping gate, context cancellation, non-retryable error handling, and high-concurrency race safety. | `TestDampedSubscriber_AutomaticRetriesAndBackoff`<br>`TestDampedSubscriber_MaxRetriesExhaustion`<br>`TestDampedSubscriber_QuorumDampingStormRejection`<br>`TestDampedSubscriber_ContextCancellation`<br>`TestDampedSubscriber_NonRetryableError`<br>`TestDampedSubscriber_HighConcurrencyRace` | Verified |
-| **CRIT-ADAPTIVE-BACKOFF-DOC-SPEC** | Architectural specification authored in `docs/architecture/ADAPTIVE_BACKOFF_QUORUM_DAMPING.md` detailing mathematical formulas, state machine topology, memory bounding, and symbolic traceability. | Architectural Specification Review & Governance Compliance | Verified |
-| **TST-ADAPTIVE-BACKOFF-QUORUM-DAMPING** | Complete unit and concurrency verification suite in `cmd/zqk/callback/backoff_test.go`. | Full Package Test Suite with Race Detector (`go test -v -race ./cmd/zqk/callback/...`) | Verified |
+The implementation is verified by:
+- `cmd/zqk/callback/backoff_test.go`: Unit tests for jitter distribution, ceiling monotonicity, zero-allocation enforcement, and token bucket refills.
+- `cmd/zqk/callback/backoff_jitter_integration_test.go`: End-to-end multi-agent swarm simulation, concurrent entropy verification across 16 parallel workers, and burst event storm shedding.
