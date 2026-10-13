@@ -240,20 +240,6 @@ func (s *Scheduler) executeJobAfterHandlerReturns(
 
 	s.emitClusterStatusAfterJob(job, err)
 
-	if err := concurrency.RunInLockWithLogger(
-		&job.RunningMu, LockNameSchedulerJobClearContext, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
-		func() error {
-			job.executionCtx = nil
-			job.executionCancel = nil
-			job.Running = false
-			return nil
-		},
-	); err != nil {
-		SchedulerJobExecutionLog(s.logger).Warn("Failed to clear job execution context under lock").WithError(err).Log()
-	}
-
-	unregisterCallback()
-
 	if executionID != emptyValue && s.stateRegistry != nil {
 		completionState := jobExecStateFailed
 		completionEventType := jobExecEventFailed
@@ -292,9 +278,6 @@ func (s *Scheduler) executeJobAfterHandlerReturns(
 		}
 	}
 
-	s.handleJobExecutionOutcome(ctx, job, err, duration, opCallback, operationID)
-	s.TouchActivity()
-
 	invokeConfiguredCallback := shouldInvokeConfiguredJobCallback(ctx, job)
 	when.When(func() bool {
 		return invokeConfiguredCallback && err == nil && job.CallbackOnCompletion != emptyValue
@@ -326,6 +309,28 @@ func (s *Scheduler) executeJobAfterHandlerReturns(
 	}
 
 	s.updateJobInStorage(ctx, job)
+
+	s.handleJobExecutionOutcome(ctx, job, err, duration, opCallback, operationID)
+	s.TouchActivity()
+
+	// Close and flush buffered job log writer before unregistering running state
+	CloseJobLogWriter(s.getProjectRoot(), job.ID)
+
+	// Final step: clear execution context and Running flag under lock so observers (e.g. waitForJobFinalized)
+	// only observe Running == false after all storage, audit, event, and log writes are finalized.
+	if err := concurrency.RunInLockWithLogger(
+		&job.RunningMu, LockNameSchedulerJobClearContext, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			job.executionCtx = nil
+			job.executionCancel = nil
+			job.Running = false
+			return nil
+		},
+	); err != nil {
+		SchedulerJobExecutionLog(s.logger).Warn("Failed to clear job execution context under lock").WithError(err).Log()
+	}
+
+	unregisterCallback()
 }
 
 func shouldInvokeConfiguredJobCallback(ctx context.Context, job *ScheduledJob) bool {

@@ -82,20 +82,8 @@ func setupTestScheduler(t *testing.T) (sched *Scheduler, testRoot string, cleanu
 	restoreGlobal := WithGlobalSchedulerRollback()
 	t.Cleanup(restoreGlobal)
 
-	// Registered first so it runs after storage shutdown (t.Cleanup is LIFO): empties .zqk/process
-	// and .zqk so t.TempDir cleanup does not fail with "directory not empty" under bundle parallelism.
-	var stripRoot string
-	t.Cleanup(func() {
-		if stripRoot == emptyValue {
-			return
-		}
-		_ = fileutil.RemoveAll(datacell.ProcessPrimaryDir(stripRoot))          //nolint:errcheck // test cleanup
-		_ = fileutil.RemoveAll(filepath.Join(stripRoot, paths.ProjectDataDir)) //nolint:errcheck // test cleanup
-	})
-
 	// Use unified test environment setup
 	env := setupSchedulerCompleteTestEnvironment(t, nil)
-	stripRoot = env.TestRoot
 
 	// Ensure path alias cache is built for the test project so stream-backed storage
 	// (including scheduler_job create/update paths) can resolve paths without errors.
@@ -112,7 +100,27 @@ func setupTestScheduler(t *testing.T) (sched *Scheduler, testRoot string, cleanu
 	)
 	sched = schedIface.(*Scheduler)
 
-	return sched, env.TestRoot, env.Cleanup
+	var teardownOnce sync.Once
+	teardown := func() {
+		teardownOnce.Do(func() {
+			if sched != nil {
+				sched.Stop()
+			}
+			CloseAllJobLogWriters(env.TestRoot)
+			_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("scheduler_job", 2*time.Second) //nolint:errcheck // best-effort test cleanup
+			_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("audit_event", 2*time.Second)   //nolint:errcheck // best-effort test cleanup
+			storagepkg.FlushListingIndexForProjectRoot(env.TestRoot, "scheduler_job")
+			if env.Cleanup != nil {
+				env.Cleanup()
+			}
+			_ = fileutil.RemoveAll(datacell.ProcessPrimaryDir(env.TestRoot))          //nolint:errcheck // test cleanup
+			_ = fileutil.RemoveAll(filepath.Join(env.TestRoot, paths.ProjectDataDir)) //nolint:errcheck // test cleanup
+		})
+	}
+
+	t.Cleanup(teardown)
+
+	return sched, env.TestRoot, teardown
 }
 
 // createTestJob creates a test scheduler_job object in storage
@@ -634,10 +642,6 @@ func TestScheduler_TriggerJob(t *testing.T) {
 	// No t.Parallel(): setupSchedulerCompleteTestEnvironment sets ZQK_TEST_ROOT via os.Setenv (process-global)
 	sched, _, cleanup := setupTestScheduler(t)
 	t.Cleanup(cleanup)
-	t.Cleanup(func() {
-		_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("scheduler_job", 2*time.Second) //nolint:errcheck // best-effort test cleanup
-		_ = caspkg.GetGlobalListingIndexWriteQueue().FlushKind("audit_event", 2*time.Second)   //nolint:errcheck // best-effort test cleanup
-	})
 
 	// Set up security context with read + execute permissions
 	// TriggerJob() requires execute; loadAndScheduleJobs() requires read.

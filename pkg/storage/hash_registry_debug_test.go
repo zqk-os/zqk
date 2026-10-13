@@ -25,8 +25,11 @@ func TestHashRegistry_ContextCancellationTiming(t *testing.T) {
 		saveDone <- registry.Save()
 	})
 
-	// Wait a tiny bit for worker to start
-	time.Sleep(1 * time.Millisecond)
+	// Wait for worker to start without sleeping longer than saveBatchTimeout (5ms)
+	startDeadline := time.Now().Add(200 * time.Millisecond)
+	for registry.workerRunning.Load() == 0 && time.Now().Before(startDeadline) {
+		time.Sleep(50 * time.Microsecond)
+	}
 
 	// Verify worker is running
 	if registry.workerRunning.Load() == 0 {
