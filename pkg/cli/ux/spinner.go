@@ -145,15 +145,21 @@ func NewStepTracker(stepName string) *StepTracker {
 	return st
 }
 
-// Update updates the in-progress message for the active step.
-func (st *StepTracker) Update(detail string) {
+func (st *StepTracker) runIfActive(fn func()) {
 	st.mu.Lock()
 	defer st.mu.Unlock()
 	if !st.active {
 		return
 	}
-	msg := fmt.Sprintf("%s (%s)", st.stepName, detail)
-	StartSpinner(msg)
+	fn()
+}
+
+// Update updates the in-progress message for the active step.
+func (st *StepTracker) Update(detail string) {
+	st.runIfActive(func() {
+		msg := fmt.Sprintf("%s (%s)", st.stepName, detail)
+		StartSpinner(msg)
+	})
 }
 
 // Elapsed returns the duration since this step was started.
@@ -163,33 +169,26 @@ func (st *StepTracker) Elapsed() time.Duration {
 	return time.Since(st.startTime)
 }
 
+func (st *StepTracker) finish(success bool, summary string, err error) {
+	st.runIfActive(func() {
+		st.active = false
+		elapsed := time.Since(st.startTime).Round(time.Millisecond)
+		var msg string
+		if err != nil {
+			msg = fmt.Sprintf("%s: %v [%s]", summary, err, elapsed)
+		} else {
+			msg = fmt.Sprintf("%s [%s]", summary, elapsed)
+		}
+		StopSpinner(success, msg)
+	})
+}
+
 // Complete stops tracking and prints a success indicator with elapsed execution duration.
 func (st *StepTracker) Complete(summary string) {
-	st.mu.Lock()
-	defer st.mu.Unlock()
-	if !st.active {
-		return
-	}
-	st.active = false
-	elapsed := time.Since(st.startTime).Round(time.Millisecond)
-	msg := fmt.Sprintf("%s [%s]", summary, elapsed)
-	StopSpinner(true, msg)
+	st.finish(true, summary, nil)
 }
 
 // Fail stops tracking and prints a failure indicator with elapsed execution duration and error details.
 func (st *StepTracker) Fail(summary string, err error) {
-	st.mu.Lock()
-	defer st.mu.Unlock()
-	if !st.active {
-		return
-	}
-	st.active = false
-	elapsed := time.Since(st.startTime).Round(time.Millisecond)
-	var msg string
-	if err != nil {
-		msg = fmt.Sprintf("%s: %v [%s]", summary, err, elapsed)
-	} else {
-		msg = fmt.Sprintf("%s [%s]", summary, elapsed)
-	}
-	StopSpinner(false, msg)
+	st.finish(false, summary, err)
 }

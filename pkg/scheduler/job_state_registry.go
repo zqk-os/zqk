@@ -828,20 +828,8 @@ func (r *JobStateRegistry) CompleteExecution(jobID, executionID, result string) 
 			target.State = jobExecutionStateCompleted
 		}
 
-		b, err := yaml.Marshal(target)
-		if err != nil {
-			return errfmt.Newf("encode job state").Wrap(err)
-		}
-		tmp := filepath.Join(filepath.Dir(targetPath), fmt.Sprintf(".tmp-%d-%s", now.UnixNano(), filepath.Base(targetPath)))
-		if err := fileutil.WriteFile(tmp, b, paths.FilePerm600); err != nil {
-			return errfmt.Newf("write temp job state").Wrap(err)
-		}
-		if err := fileutil.Rename(tmp, targetPath); err != nil {
-			_ = fileutil.Remove(tmp)
-			return errfmt.Newf("rename job state").Wrap(err)
-		}
-		if fi, err := fileutil.Stat(targetPath); err == nil {
-			r.setCachedFileState(targetPath, fi.ModTime(), fi.Size(), target)
+		if err := r.writeStateToPathAtomically(targetPath, target); err != nil {
+			return err
 		}
 
 		resolvedJobID := target.JobID
@@ -945,20 +933,8 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 		target.PolicyReason = reason
 		target.DeferUntil = deferUntil
 
-		b, err := yaml.Marshal(target)
-		if err != nil {
-			return errfmt.Newf("encode job state").Wrap(err)
-		}
-		tmp := filepath.Join(filepath.Dir(targetPath), fmt.Sprintf(".tmp-%d-%s", time.Now().UnixNano(), filepath.Base(targetPath)))
-		if err := fileutil.WriteFile(tmp, b, paths.FilePerm600); err != nil {
-			return errfmt.Newf("write temp job state").Wrap(err)
-		}
-		if err := fileutil.Rename(tmp, targetPath); err != nil {
-			_ = fileutil.Remove(tmp)
-			return errfmt.Newf("rename job state").Wrap(err)
-		}
-		if fi, err := fileutil.Stat(targetPath); err == nil {
-			r.setCachedFileState(targetPath, fi.ModTime(), fi.Size(), target)
+		if err := r.writeStateToPathAtomically(targetPath, target); err != nil {
+			return err
 		}
 
 		r.mu.Lock()
@@ -969,27 +945,31 @@ func (r *JobStateRegistry) DeferExecution(jobID, reason string, deferUntil *time
 	})
 }
 
+func (r *JobStateRegistry) writeStateToPathAtomically(targetPath string, state *JobExecutionState) error {
+	b, err := yaml.Marshal(state)
+	if err != nil {
+		return errfmt.Newf("encode job state").Wrap(err)
+	}
+	tmp := filepath.Join(filepath.Dir(targetPath), fmt.Sprintf(".tmp-%d-%s", time.Now().UnixNano(), filepath.Base(targetPath)))
+	if err := fileutil.WriteFile(tmp, b, paths.FilePerm600); err != nil {
+		return errfmt.Newf("write temp job state").Wrap(err)
+	}
+	if err := fileutil.Rename(tmp, targetPath); err != nil {
+		_ = fileutil.Remove(tmp)
+		return errfmt.Newf("rename job state").Wrap(err)
+	}
+	if fi, err := fileutil.Stat(targetPath); err == nil {
+		r.setCachedFileState(targetPath, fi.ModTime(), fi.Size(), state)
+	}
+	return nil
+}
+
 func (r *JobStateRegistry) writeStateAtomically(state *JobExecutionState) error {
 	statePath := r.stateFilePathForJobExecution(state.JobID, state.ExecutionID)
 	if err := fileutil.MkdirAll(filepath.Dir(statePath), paths.DirPerm755); err != nil {
 		return errfmt.Newf("create job state dir").Wrap(err)
 	}
-	b, err := yaml.Marshal(state)
-	if err != nil {
-		return errfmt.Newf("encode job state").Wrap(err)
-	}
-	tmp := filepath.Join(filepath.Dir(statePath), fmt.Sprintf(".tmp-%d-%s", time.Now().UnixNano(), filepath.Base(statePath)))
-	if err := fileutil.WriteFile(tmp, b, paths.FilePerm600); err != nil {
-		return errfmt.Newf("write temp job state").Wrap(err)
-	}
-	if err := fileutil.Rename(tmp, statePath); err != nil {
-		_ = fileutil.Remove(tmp)
-		return errfmt.Newf("rename job state").Wrap(err)
-	}
-	if fi, err := fileutil.Stat(statePath); err == nil {
-		r.setCachedFileState(statePath, fi.ModTime(), fi.Size(), state)
-	}
-	return nil
+	return r.writeStateToPathAtomically(statePath, state)
 }
 
 // scheduleFullRetentionCleanup starts at most one full-tree retention pass, and not more often

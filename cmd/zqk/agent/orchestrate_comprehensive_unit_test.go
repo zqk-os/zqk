@@ -2,7 +2,6 @@ package agent
 
 import (
 	"context"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -17,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -142,7 +142,7 @@ func TestOrchestrate_NativeSwarmEligible(t *testing.T) {
 }
 
 func TestOrchestrate_ConfigureExecutorProcess_And_Args(t *testing.T) {
-	c := exec.Command("echo", "test")
+	c := testkit.ManagedCommand(t, t.Context(), "echo", "test")
 	configureOrchestrationExecutorProcess(c)
 	assert.NotNil(t, c.SysProcAttr)
 	assert.True(t, c.SysProcAttr.Setpgid)

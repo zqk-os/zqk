@@ -109,14 +109,14 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [kindsynonyms](./kindsynonyms/) | `github.com/zqk-os/zqk/pkg/kindsynonyms` | 1+1 | 1 | - | ❌ - | Synonym mapping, alias resolution, and plural-to-singular kind translation. |
 | [librarypack](./librarypack/) | `github.com/zqk-os/zqk/pkg/librarypack` | 1+0 | 0 | - | ❌ - | Reusable component library pack registering shared traits and behaviors. |
 | [license](./license/) | `github.com/zqk-os/zqk/pkg/license` | 1+1 | 1 | - | ❌ - | Open-source license compliance, copyright header verification, and SPDX tracking. |
-| [lifecycle](./lifecycle/) | `github.com/zqk-os/zqk/pkg/lifecycle` | 13+17 | 17 | - | ❌ - | Kernel object lifecycle state machine, phase transitions, and validation rules. |
+| [lifecycle](./lifecycle/) | `github.com/zqk-os/zqk/pkg/lifecycle` | 14+20 | 20 | - | ❌ - | Kernel object lifecycle state machine, phase transitions, and validation rules. |
 | [llm](./llm/) | `github.com/zqk-os/zqk/pkg/llm` | 14+13 | 13 | semanticcache | ❌ - | LLM client abstractions, prompt completion handlers, and model provider routing. |
 | [loader](./loader/) | `github.com/zqk-os/zqk/pkg/loader` | 3+4 | 4 | - | ✅ [README](./loader/README.md) | Abstract **component loader** pattern: shared state as atomics, callback on state change, configurable timeouts (default config... |
 | [localci](./localci/) | `github.com/zqk-os/zqk/pkg/localci` | 4+2 | 2 | - | ❌ - | Local CI runner simulation, fast-fail checks, and pre-push verification. |
 | [lockhealth](./lockhealth/) | `github.com/zqk-os/zqk/pkg/lockhealth` | 1+1 | 1 | - | ❌ - | Verified stale-lock cleanup primitives with fail-closed semantics, usable across subsystems (scheduler, file lock strategies, s... |
 | [logging](./logging/) | `github.com/zqk-os/zqk/pkg/logging` | 21+14 | 14 | - | ✅ [README](./logging/README.md) | This package provides structured logging with context-aware routing, MCP protocol protection, and multi-destination support. |
 | [maintenance](./maintenance/) | `github.com/zqk-os/zqk/pkg/maintenance` | 1+2 | 2 | - | ❌ - | Scheduled maintenance tasks, garbage collection, and database compaction. |
-| [mcp](./mcp/) | `github.com/zqk-os/zqk/pkg/mcp` | 139+121 | 121 | ideadapter, mcp_helpers, testing | ✅ [README](./mcp/README.md) | This package provides a complete MCP server implementation that enables AI assistants and other MCP clients to interact with th... |
+| [mcp](./mcp/) | `github.com/zqk-os/zqk/pkg/mcp` | 140+122 | 122 | ideadapter, mcp_helpers, testing | ✅ [README](./mcp/README.md) | This package provides a complete MCP server implementation that enables AI assistants and other MCP clients to interact with th... |
 | [mesh](./mesh/) | `github.com/zqk-os/zqk/pkg/mesh` | 10+12 | 12 | multimodal | ❌ - | Peer-to-peer agent mesh networking, ambient signal exchange, and distributed sync. |
 | [metricpack](./metricpack/) | `github.com/zqk-os/zqk/pkg/metricpack` | 1+0 | 0 | - | ❌ - | System and agent metric definitions pack for performance tracking. |
 | [metrics](./metrics/) | `github.com/zqk-os/zqk/pkg/metrics` | 25+24 | 24 | tsdb | ❌ - | Lock operation names for RunInLockWithLogger / RunInRLockWithLogger. CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A. |
@@ -148,7 +148,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [policyinterrupt](./policyinterrupt/) | `github.com/zqk-os/zqk/pkg/policyinterrupt` | 1+1 | 1 | - | ❌ - | Emergency policy interrupts, execution halting, and safety interlocks. |
 | [precommit](./precommit/) | `github.com/zqk-os/zqk/pkg/precommit` | 1+2 | 2 | - | ❌ - | Types and logic for the pre-commit hook that reads background-check results. Category files are written by scheduler jobs (lint... |
 | [predicate](./predicate/) | `github.com/zqk-os/zqk/pkg/predicate` | 2+2 | 2 | - | ❌ - | Predicate component and domain abstractions for ZQK Core. |
-| [primaryorch](./primaryorch/) | `github.com/zqk-os/zqk/pkg/primaryorch` | 3+4 | 4 | - | ❌ - | Primary agent orchestration engine, session coordination, and run tracking. |
+| [primaryorch](./primaryorch/) | `github.com/zqk-os/zqk/pkg/primaryorch` | 3+5 | 5 | - | ❌ - | Primary agent orchestration engine, session coordination, and run tracking. |
 | [process](./process/) | `github.com/zqk-os/zqk/pkg/process` | 3+3 | 3 | - | ❌ - | Operating system process management, PID tracking, and graceful signal handling. |
 | [processhygiene](./processhygiene/) | `github.com/zqk-os/zqk/pkg/processhygiene` | 6+15 | 15 | - | ❌ - | Workspace hygiene auditing, dead-code detection, and repository cleanliness. |
 | [processing](./processing/) | `github.com/zqk-os/zqk/pkg/processing` | 2+3 | 3 | - | ❌ - | Processing component and domain abstractions for ZQK Core. |
@@ -164,10 +164,11 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [resourcehygiene](./resourcehygiene/) | `github.com/zqk-os/zqk/pkg/resourcehygiene` | 5+2 | 2 | - | ❌ - | Resourcehygiene component and domain abstractions for ZQK Core. |
 | [rollback](./rollback/) | `github.com/zqk-os/zqk/pkg/rollback` | 6+3 | 3 | - | ❌ - | A reusable snapshot-and-rollback pattern for lifecycle transitions, maintenance tasks, and other operations. See docs/architect... |
 | [rollup](./rollup/) | `github.com/zqk-os/zqk/pkg/rollup` | 3+2 | 2 | - | ❌ - | Rollup component and domain abstractions for ZQK Core. |
+| [router](./router/) | `github.com/zqk-os/zqk/pkg/router` | 6+5 | 5 | - | ❌ - | Router component and domain abstractions for ZQK Core. |
 | [runtime](./runtime/) | `github.com/zqk-os/zqk/pkg/runtime` | 3+4 | 4 | - | ❌ - | Runtime environment detection, OS capabilities, and hardware specs. |
 | [safepath](./safepath/) | `github.com/zqk-os/zqk/pkg/safepath` | 1+1 | 1 | - | ❌ - | Builds filesystem paths confined under a root directory to mitigate directory traversal when joining untrusted or external segm... |
 | [scenario](./scenario/) | `github.com/zqk-os/zqk/pkg/scenario` | 6+7 | 7 | - | ❌ - | Convergence lifecycle end-to-end tests (storage-backed CVS updates). Coverage: measure → BuildSuggestedConvergenceSessionFields... |
-| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 201+250 | 250 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
+| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 201+251 | 251 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
 | [screencap](./screencap/) | `github.com/zqk-os/zqk/pkg/screencap` | 2+3 | 3 | - | ✅ [README](./screencap/README.md) | pkg/screencap provides headless and interactive terminal automation coupled with native screen, window, and rectangular region... |
 | [search](./search/) | `github.com/zqk-os/zqk/pkg/search` | 6+2 | 2 | - | ✅ [README](./search/README.md) | pkg/search provides an in-process, pure-Go code search engine featuring trigram inverted indexing, Go AST structural queries, a... |
 | [seatworker](./seatworker/) | `github.com/zqk-os/zqk/pkg/seatworker` | 1+2 | 2 | - | ✅ [README](./seatworker/README.md) | pkg/seatworker provides OS supervisor installation and lifecycle management for persistent autonomous agent worker processes (z... |
@@ -457,6 +458,7 @@ pkg/
 ├── resourcehygiene/          # Resourcehygiene component and domain abstractions for ZQK Co
 ├── rollback/          # A reusable snapshot-and-rollback pattern for lifecycle trans
 ├── rollup/          # Rollup component and domain abstractions for ZQK Core.
+├── router/          # Router component and domain abstractions for ZQK Core.
 ├── runtime/          # Runtime environment detection, OS capabilities, and hardware
 ├── safepath/          # Builds filesystem paths confined under a root directory to m
 ├── scenario/          # Convergence lifecycle end-to-end tests (storage-backed CVS u

@@ -1,16 +1,13 @@
 package matrix
 
 import (
-	"context"
 	"encoding/json"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/verification/matrix"
-	"github.com/zqk-os/zqk/pkg/verification/matrix/scanners"
 )
 
 // NewMatrixEvaluateCmd creates the matrix evaluate CLI command.
@@ -44,34 +41,20 @@ func runMatrixEvaluate(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	targetFile, _ := cmd.Flags().GetString("file")
-	dimStr, _ := cmd.Flags().GetString("dimension")
-	autoMint, _ := cmd.Flags().GetBool("auto-mint")
-	evaluator, _ := cmd.Flags().GetString("evaluator")
-	outputJSON, _ := cmd.Flags().GetBool("json")
+	flags := cmd.Flags()
+	targetFile, _ := flags.GetString("file")
+	dimStr, _ := flags.GetString("dimension")
+	autoMint, _ := flags.GetBool("auto-mint")
+	evaluator, _ := flags.GetString("evaluator")
+	outputJSON, _ := flags.GetBool("json")
 
-	registry := matrix.NewCheckRegistry()
-	scanner := scanners.NewHardcodedLogicScanner()
-	registry.Register(matrix.CheckDefinition{
-		ID:            "hardcoded-logic",
-		Name:          "Hardcoded Logic Scanner",
-		Description:   "Programmatic detection of raw permissions, release tags, and hardcoded literals",
-		Kind:          matrix.CheckKindProgrammatic,
-		TargetClasses: []matrix.FileClass{matrix.ClassSource, matrix.ClassTest, matrix.ClassScript, matrix.ClassConfigFile},
-		Runner:        scanner,
-	})
-
-	ledgerPath := filepath.Join(projectRoot, paths.ProjectDataDir, "verification_matrix.json")
-	engine, err := matrix.NewEngine(projectRoot, ledgerPath, registry)
+	engine, err := initMatrixEngine(projectRoot, defaultMatrixRegistry())
 	if err != nil {
-		return errfmt.Errorf("failed to initialize verification matrix: %w", err)
+		return err
 	}
 	engine.SetRemediationHook(NewZQKRemediationHook(projectRoot))
 
-	ctx := cmd.Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
+	ctx := cmdContext(cmd)
 
 	// 1. Force evaluation of the file through the engine
 	_, _, err = engine.EvaluateFile(ctx, targetFile, true)
