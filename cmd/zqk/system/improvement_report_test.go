@@ -213,8 +213,23 @@ func TestBuildComparativeAndPrioritizeWorkItems(t *testing.T) {
 			t.Fatalf("work items not sorted by priority: %+v", workItems)
 		}
 	}
+}
 
-	// Summary and formatting
+func TestImprovementReportFormattingAndMetadata(t *testing.T) {
+	t.Parallel()
+
+	currentSnap := ImprovementReportSnapshot{
+		GeneratedAt: "2026-10-13T11:00:00Z",
+		ObjectCount: map[string]any{"total_objects": 750},
+	}
+	comp := ImprovementReportComparative{
+		PreviousAt:       "2026-10-13T10:00:00Z",
+		ObjectCountDelta: 250,
+	}
+	workItems := []ImprovementWorkItem{
+		{Priority: "P0", Title: "Fix blocking issue", Category: "behavior"},
+	}
+
 	summary := buildSummary(currentSnap, comp, workItems)
 	if !strings.Contains(summary, "System improvement report") || !strings.Contains(summary, "Prioritized work items") {
 		t.Fatalf("unexpected summary: %s", summary)
@@ -253,11 +268,21 @@ func TestLoadPreviousImprovementReport(t *testing.T) {
 	older := ImprovementReportOutput{GeneratedAt: "2026-10-13T08:00:00Z"}
 	newer := ImprovementReportOutput{GeneratedAt: "2026-10-13T09:00:00Z"}
 
-	olderBytes, _ := json.Marshal(older)
-	newerBytes, _ := json.Marshal(newer)
+	olderBytes, err := json.Marshal(older)
+	if err != nil {
+		t.Fatal(err)
+	}
+	newerBytes, err := json.Marshal(newer)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	_ = fileutil.WriteFile(filepath.Join(tmpDir, "improvement-report-20261013-080000.json"), olderBytes, paths.FilePerm644)
-	_ = fileutil.WriteFile(filepath.Join(tmpDir, "improvement-report-20261013-090000.json"), newerBytes, paths.FilePerm644)
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "improvement-report-20261013-080000.json"), olderBytes, paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(tmpDir, "improvement-report-20261013-090000.json"), newerBytes, paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 
 	loaded := loadPreviousImprovementReport(tmpDir)
 	if loaded == nil {

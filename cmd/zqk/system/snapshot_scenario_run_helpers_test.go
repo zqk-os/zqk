@@ -229,7 +229,7 @@ func TestParseSnapshotScenarioFlags(t *testing.T) {
 	cmd.Flags().Bool("exclude-pii", false, "")
 	cmd.Flags().Bool("preserve-state", false, "")
 
-	_ = cmd.ParseFlags([]string{
+	if err := cmd.ParseFlags([]string{
 		"--target", "my-target",
 		"--object-ids", "OBJ-A,OBJ-B",
 		"--kinds", "goal",
@@ -240,7 +240,9 @@ func TestParseSnapshotScenarioFlags(t *testing.T) {
 		"--id-prefix", "TST-",
 		"--exclude-pii",
 		"--preserve-state",
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	flags := parseSnapshotScenarioFlags(cmd)
 	if flags.Target != "my-target" ||

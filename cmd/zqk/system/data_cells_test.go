@@ -223,7 +223,10 @@ func TestTestBundleHealthSummary(t *testing.T) {
 	if err := fileutil.MkdirAll(summaryDir, paths.DirPerm755); err != nil {
 		t.Fatal(err)
 	}
-	data, _ := json.Marshal(sample)
+	data, err := json.Marshal(sample)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if err := fileutil.WriteFile(filepath.Join(summaryDir, "test_bundle_health.json"), data, paths.FilePerm644); err != nil {
 		t.Fatal(err)
 	}

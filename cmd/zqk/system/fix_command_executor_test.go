@@ -9,6 +9,22 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
+func setupRunningFixExecutor(t *testing.T, queueSize int) *FixCommandExecutor {
+	t.Helper()
+	tmpDir := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	executor := NewFixCommandExecutor(tmpDir, queueSize)
+	if err := executor.Start(); err != nil {
+		t.Fatalf("failed to start executor: %v", err)
+	}
+	t.Cleanup(func() {
+		if stopErr := executor.Stop(); stopErr != nil {
+			t.Logf("cleanup stop error: %v", stopErr)
+		}
+	})
+	return executor
+}
+
 func TestFixCommandExecutor_Lifecycle(t *testing.T) {
 	t.Parallel()
 
@@ -19,11 +35,9 @@ func TestFixCommandExecutor_Lifecycle(t *testing.T) {
 		t.Fatal("NewFixCommandExecutor returned nil")
 	}
 
-	// Setting configuration before start
 	executor.SetTimeouts(1 * time.Second)
 	executor.SetRequiresApproval(false)
 
-	// Enqueue before start should fail with ErrFixExecutorNotRunning
 	task := &FixCommandTask{
 		ObjectID:   "OBJ-001",
 		ObjectKind: "backlog_item",
@@ -34,22 +48,16 @@ func TestFixCommandExecutor_Lifecycle(t *testing.T) {
 		t.Fatalf("expected ErrFixExecutorNotRunning, got %v", err)
 	}
 
-	// Start executor
 	if err := executor.Start(); err != nil {
 		t.Fatalf("unexpected error starting executor: %v", err)
 	}
-
-	// Double start should fail with ErrFixExecutorAlreadyRunning
 	if err := executor.Start(); err != ErrFixExecutorAlreadyRunning {
 		t.Fatalf("expected ErrFixExecutorAlreadyRunning, got %v", err)
 	}
 
-	// Stop executor
 	if err := executor.Stop(); err != nil {
 		t.Fatalf("unexpected error stopping executor: %v", err)
 	}
-
-	// Double stop should be a no-op and succeed
 	if err := executor.Stop(); err != nil {
 		t.Fatalf("unexpected error double stopping executor: %v", err)
 	}
@@ -58,9 +66,7 @@ func TestFixCommandExecutor_Lifecycle(t *testing.T) {
 func TestFixCommandExecutor_CallbacksAndExecution(t *testing.T) {
 	t.Parallel()
 
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-	executor := NewFixCommandExecutor(tmpDir, 1)
+	executor := setupRunningFixExecutor(t, 1)
 
 	var completedMu sync.Mutex
 	var completedTask *FixCommandTask
@@ -73,11 +79,6 @@ func TestFixCommandExecutor_CallbacksAndExecution(t *testing.T) {
 		completedMu.Unlock()
 		close(completedCh)
 	})
-
-	if err := executor.Start(); err != nil {
-		t.Fatalf("failed to start executor: %v", err)
-	}
-	defer func() { _ = executor.Stop() }()
 
 	task := &FixCommandTask{
 		ObjectID:   "BLI-123",
@@ -104,136 +105,110 @@ func TestFixCommandExecutor_CallbacksAndExecution(t *testing.T) {
 	}
 }
 
-func TestFixCommandExecutor_ApprovalFlow(t *testing.T) {
+func TestFixCommandExecutor_ApprovalGranted(t *testing.T) {
 	t.Parallel()
 
-	t.Run("approval granted", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-		executor := NewFixCommandExecutor(tmpDir, 1)
+	executor := setupRunningFixExecutor(t, 1)
 
-		approvedCh := make(chan struct{})
-		executor.SetApprovalCallback(func(task *FixCommandTask) (bool, error) {
-			return true, nil
-		})
-		executor.SetCompletionCallback(func(task *FixCommandTask) {
-			close(approvedCh)
-		})
-
-		if err := executor.Start(); err != nil {
-			t.Fatalf("failed to start executor: %v", err)
-		}
-		defer func() { _ = executor.Stop() }()
-
-		task := &FixCommandTask{
-			ObjectID:   "BLI-456",
-			ObjectKind: "backlog_item",
-			FixCommand: "approve_me",
-		}
-		if err := executor.Enqueue(task); err != nil {
-			t.Fatalf("failed to enqueue: %v", err)
-		}
-
-		select {
-		case <-approvedCh:
-			if task.Status != FixCommandStatusCompleted {
-				t.Fatalf("expected completed status, got %v", task.Status)
-			}
-		case <-time.After(5 * time.Second):
-			t.Fatal("timeout waiting for approved execution")
-		}
+	approvedCh := make(chan struct{})
+	executor.SetApprovalCallback(func(task *FixCommandTask) (bool, error) {
+		return true, nil
+	})
+	executor.SetCompletionCallback(func(task *FixCommandTask) {
+		close(approvedCh)
 	})
 
-	t.Run("approval denied", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-		executor := NewFixCommandExecutor(tmpDir, 1)
+	task := &FixCommandTask{
+		ObjectID:   "BLI-456",
+		ObjectKind: "backlog_item",
+		FixCommand: "approve_me",
+	}
+	if err := executor.Enqueue(task); err != nil {
+		t.Fatalf("failed to enqueue: %v", err)
+	}
 
-		deniedCh := make(chan struct{})
-		executor.SetApprovalCallback(func(task *FixCommandTask) (bool, error) {
-			defer close(deniedCh)
-			return false, nil
-		})
+	select {
+	case <-approvedCh:
+		if task.Status != FixCommandStatusCompleted {
+			t.Fatalf("expected completed status, got %v", task.Status)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timeout waiting for approved execution")
+	}
+}
 
-		if err := executor.Start(); err != nil {
-			t.Fatalf("failed to start executor: %v", err)
-		}
-		defer func() { _ = executor.Stop() }()
+func TestFixCommandExecutor_ApprovalDenied(t *testing.T) {
+	t.Parallel()
 
-		task := &FixCommandTask{
-			ObjectID:   "BLI-789",
-			ObjectKind: "backlog_item",
-			FixCommand: "deny_me",
-		}
-		if err := executor.Enqueue(task); err != nil {
-			t.Fatalf("failed to enqueue: %v", err)
-		}
+	executor := setupRunningFixExecutor(t, 1)
 
-		select {
-		case <-deniedCh:
-			// Give a short moment for task status update
-			time.Sleep(50 * time.Millisecond)
-			if task.Status != FixCommandStatusCancelled {
-				t.Fatalf("expected status cancelled, got %v", task.Status)
-			}
-		case <-time.After(5 * time.Second):
-			t.Fatal("timeout waiting for approval denial")
-		}
+	deniedCh := make(chan struct{})
+	executor.SetApprovalCallback(func(task *FixCommandTask) (bool, error) {
+		defer close(deniedCh)
+		return false, nil
 	})
 
-	t.Run("approval callback error", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-		executor := NewFixCommandExecutor(tmpDir, 1)
+	task := &FixCommandTask{
+		ObjectID:   "BLI-789",
+		ObjectKind: "backlog_item",
+		FixCommand: "deny_me",
+	}
+	if err := executor.Enqueue(task); err != nil {
+		t.Fatalf("failed to enqueue: %v", err)
+	}
 
-		errCh := make(chan struct{})
-		expectedErr := errfmt.Errorf("approval error")
-		executor.SetApprovalCallback(func(task *FixCommandTask) (bool, error) {
-			return false, expectedErr
-		})
-		executor.SetErrorCallback(func(task *FixCommandTask, err error) {
-			close(errCh)
-		})
+	select {
+	case <-deniedCh:
+		time.Sleep(50 * time.Millisecond)
+		if task.Status != FixCommandStatusCancelled {
+			t.Fatalf("expected status cancelled, got %v", task.Status)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timeout waiting for approval denial")
+	}
+}
 
-		if err := executor.Start(); err != nil {
-			t.Fatalf("failed to start executor: %v", err)
-		}
-		defer func() { _ = executor.Stop() }()
+func TestFixCommandExecutor_ApprovalCallbackError(t *testing.T) {
+	t.Parallel()
 
-		task := &FixCommandTask{
-			ObjectID:   "BLI-ERR",
-			ObjectKind: "backlog_item",
-			FixCommand: "err_me",
-		}
-		if err := executor.Enqueue(task); err != nil {
-			t.Fatalf("failed to enqueue: %v", err)
-		}
+	executor := setupRunningFixExecutor(t, 1)
 
-		select {
-		case <-errCh:
-			if task.Status != FixCommandStatusFailed {
-				t.Fatalf("expected status failed, got %v", task.Status)
-			}
-			if task.Error == nil {
-				t.Fatal("expected task.Error to be set")
-			}
-		case <-time.After(5 * time.Second):
-			t.Fatal("timeout waiting for error callback")
-		}
+	errCh := make(chan struct{})
+	expectedErr := errfmt.Errorf("approval error")
+	executor.SetApprovalCallback(func(task *FixCommandTask) (bool, error) {
+		return false, expectedErr
 	})
+	executor.SetErrorCallback(func(task *FixCommandTask, err error) {
+		close(errCh)
+	})
+
+	task := &FixCommandTask{
+		ObjectID:   "BLI-ERR",
+		ObjectKind: "backlog_item",
+		FixCommand: "err_me",
+	}
+	if err := executor.Enqueue(task); err != nil {
+		t.Fatalf("failed to enqueue: %v", err)
+	}
+
+	select {
+	case <-errCh:
+		if task.Status != FixCommandStatusFailed {
+			t.Fatalf("expected status failed, got %v", task.Status)
+		}
+		if task.Error == nil {
+			t.Fatal("expected task.Error to be set")
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("timeout waiting for error callback")
+	}
 }
 
 func TestFixCommandExecutor_QueueFull(t *testing.T) {
 	t.Parallel()
 
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-	executor := NewFixCommandExecutor(tmpDir, 1)
+	executor := setupRunningFixExecutor(t, 1)
 
-	_ = executor.Start()
 	var queueFullErr error
 	for i := 0; i < 20; i++ {
 		task := &FixCommandTask{
@@ -246,6 +221,7 @@ func TestFixCommandExecutor_QueueFull(t *testing.T) {
 			break
 		}
 	}
-	_ = executor.Stop()
-	_ = queueFullErr
+	if queueFullErr != nil {
+		t.Logf("received expected error: %v", queueFullErr)
+	}
 }
