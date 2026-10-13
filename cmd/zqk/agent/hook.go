@@ -60,14 +60,17 @@ type antigravityHookOutput struct {
 	Overwrite map[string]any `json:"overwrite,omitempty"`
 }
 
+// commandIO resolves standard input and output streams for a command, falling back to os.Stdin/os.Stdout.
+func commandIO(cmd *cobra.Command) (io.Reader, io.Writer) {
+	if cmd != nil {
+		return cmd.InOrStdin(), cmd.OutOrStdout()
+	}
+	return os.Stdin, os.Stdout
+}
+
 func runPreSubagentHook(cmd *cobra.Command, proc *cli.Processor, vendor string) error {
 	sec := procSecurity(proc)
-	in := io.Reader(os.Stdin)
-	out := io.Writer(os.Stdout)
-	if cmd != nil {
-		in = cmd.InOrStdin()
-		out = cmd.OutOrStdout()
-	}
+	in, out := commandIO(cmd)
 	return runPreSubagentHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, in, out)
 }
 

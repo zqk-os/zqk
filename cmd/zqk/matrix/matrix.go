@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"context"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -11,7 +12,39 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/quality"
+	"github.com/zqk-os/zqk/pkg/verification/matrix"
+	"github.com/zqk-os/zqk/pkg/verification/matrix/scanners"
 )
+
+func cmdContext(cmd *cobra.Command) context.Context {
+	if cmd != nil && cmd.Context() != nil {
+		return cmd.Context()
+	}
+	return context.Background()
+}
+
+func defaultMatrixRegistry() *matrix.CheckRegistry {
+	registry := matrix.NewCheckRegistry()
+	scanner := scanners.NewHardcodedLogicScanner()
+	registry.Register(matrix.CheckDefinition{
+		ID:            "hardcoded-logic",
+		Name:          "Hardcoded Logic Scanner",
+		Description:   "Programmatic detection of raw permissions, release tags, and hardcoded literals",
+		Kind:          matrix.CheckKindProgrammatic,
+		TargetClasses: []matrix.FileClass{matrix.ClassSource, matrix.ClassTest, matrix.ClassScript, matrix.ClassConfigFile},
+		Runner:        scanner,
+	})
+	return registry
+}
+
+func initMatrixEngine(projectRoot string, registry *matrix.CheckRegistry) (*matrix.Engine, error) {
+	ledgerPath := filepath.Join(projectRoot, paths.ProjectDataDir, "verification_matrix.json")
+	engine, err := matrix.NewEngine(projectRoot, ledgerPath, registry)
+	if err != nil {
+		return nil, errfmt.Errorf("failed to initialize verification matrix: %w", err)
+	}
+	return engine, nil
+}
 
 func resolveProjectRoot(cmd *cobra.Command) (string, error) {
 	ctx := cli.GetContext(cmd)

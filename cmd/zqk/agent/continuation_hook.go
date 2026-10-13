@@ -39,29 +39,13 @@ type continuationHookOutput struct {
 func newContinuationHookCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookContinuationCommandBuilder(), &cobra.Command{
 		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-			in := io.Reader(os.Stdin)
-			out := io.Writer(os.Stdout)
-			if cmd != nil {
-				in = cmd.InOrStdin()
-				out = cmd.OutOrStdout()
-			}
+			in, out := commandIO(cmd)
 			sec := procSecurity(proc)
-			vendor, err := cmd.Flags().GetString("vendor")
-			if err != nil {
-				return err
-			}
-			marker, err := cmd.Flags().GetString("marker")
-			if err != nil {
-				return err
-			}
-			agentID, err := cmd.Flags().GetString("agent-id")
-			if err != nil {
-				return err
-			}
-			personaRef, err := cmd.Flags().GetString("persona-ref")
-			if err != nil {
-				return err
-			}
+			flags := cmd.Flags()
+			vendor, _ := flags.GetString("vendor")
+			marker, _ := flags.GetString("marker")
+			agentID, _ := flags.GetString("agent-id")
+			personaRef, _ := flags.GetString("persona-ref")
 			markerPath := marker
 			if markerPath == "" {
 				markerPath = filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", defaultMarkerFilename)

@@ -1,9 +1,6 @@
 package matrix
 
 import (
-	"context"
-	"path/filepath"
-
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -43,29 +40,26 @@ func runMatrixStamp(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	targetFile, _ := cmd.Flags().GetString("file")
-	dimStr, _ := cmd.Flags().GetString("dimension")
-	checkID, _ := cmd.Flags().GetString("check")
-	statusStr, _ := cmd.Flags().GetString("status")
-	expectedHash, _ := cmd.Flags().GetString("hash")
-	scoreVal, _ := cmd.Flags().GetInt("score")
-	evaluator, _ := cmd.Flags().GetString("evaluator")
-	feedback, _ := cmd.Flags().GetString("feedback")
+	f := cmd.Flags()
+	targetFile, _ := f.GetString("file")
+	dimStr, _ := f.GetString("dimension")
+	checkID, _ := f.GetString("check")
+	statusStr, _ := f.GetString("status")
+	expectedHash, _ := f.GetString("hash")
+	scoreVal, _ := f.GetInt("score")
+	evaluator, _ := f.GetString("evaluator")
+	feedback, _ := f.GetString("feedback")
 
 	if dimStr == "" && checkID == "" {
 		return errfmt.Errorf("either --dimension or --check must be specified")
 	}
 
-	ledgerPath := filepath.Join(projectRoot, paths.ProjectDataDir, "verification_matrix.json")
-	engine, err := matrix.NewEngine(projectRoot, ledgerPath, nil)
+	engine, err := initMatrixEngine(projectRoot, nil)
 	if err != nil {
-		return errfmt.Errorf("failed to initialize verification matrix: %w", err)
+		return err
 	}
 
-	ctx := cmd.Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
+	ctx := cmdContext(cmd)
 
 	req := matrix.StampRequest{
 		Path:         targetFile,
