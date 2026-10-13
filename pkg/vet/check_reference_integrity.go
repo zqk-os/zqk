@@ -28,7 +28,7 @@ func CheckReferenceIntegrity(root string, cfg *GatesConfig) ([]Finding, error) {
 			continue
 		}
 
-		_ = filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if walkErr := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil || d.IsDir() || !strings.HasSuffix(d.Name(), ".yaml") {
 				return nil
 			}
@@ -69,7 +69,10 @@ func CheckReferenceIntegrity(root string, cfg *GatesConfig) ([]Finding, error) {
 			}
 
 			if !hasRef {
-				rel, _ := filepath.Rel(root, path)
+				rel, relErr := filepath.Rel(root, path)
+				if relErr != nil {
+					rel = path
+				}
 				findings = append(findings, Finding{
 					CheckID:  "reference/missing-goal-req-ref",
 					Suite:    "hygiene",
@@ -79,7 +82,9 @@ func CheckReferenceIntegrity(root string, cfg *GatesConfig) ([]Finding, error) {
 				})
 			}
 			return nil
-		})
+		}); walkErr != nil {
+			return nil, walkErr
+		}
 	}
 
 	return findings, nil
