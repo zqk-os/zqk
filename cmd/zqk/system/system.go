@@ -56,6 +56,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewQuarantineReportCmd())
 	systemCmd.AddCommand(NewCleanupQuarantineCmd())
 	systemCmd.AddCommand(NewHealthDataCmd())
+	systemCmd.AddCommand(NewDataCellsCmd())
 
 	systemCmd.AddCommand(NewDashboardCmd())
 	systemCmd.AddCommand(NewSnapshotScenarioCmd())
