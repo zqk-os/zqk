@@ -2,6 +2,7 @@ package callback
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -21,6 +22,10 @@ const (
 	BackpressureDropError
 	// BackpressureBlock waits up to a specified duration before shedding.
 	BackpressureBlock
+	// BackpressureDropOldest drops the oldest entry when queue capacity is reached.
+	BackpressureDropOldest
+	// BackpressureDropNewest drops the incoming entry when queue capacity is reached, returning ErrQueueFull.
+	BackpressureDropNewest
 )
 
 // ResilientSubscriberConfig configures adaptive backpressure, concurrency throttling, and circuit breaking.
@@ -31,6 +36,12 @@ type ResilientSubscriberConfig struct {
 	BackpressurePolicy BackpressureStrategy
 	Breaker            circuitbreaker.CircuitBreaker
 	Logger             logging.Logger
+
+	// Adaptive queue and watermark configuration
+	QueueCapacity int
+	HighWatermark int // Active queue threshold at which throttling activates (defaults to QueueCapacity)
+	LowWatermark  int // Active queue threshold at which throttling clears (defaults to HighWatermark / 2)
+	DropPolicy    DropStrategy
 }
 
 // DefaultResilientSubscriberConfig returns safe production defaults.
@@ -41,6 +52,10 @@ func DefaultResilientSubscriberConfig() ResilientSubscriberConfig {
 		BlockTimeout:       500 * time.Millisecond,
 		BackpressurePolicy: BackpressureDropError,
 		Breaker:            circuitbreaker.NewCircuitBreaker(),
+		QueueCapacity:      64,
+		HighWatermark:      64,
+		LowWatermark:       32,
+		DropPolicy:         DropOldest,
 	}
 }
 
@@ -51,6 +66,7 @@ type ResilientSubscriber struct {
 	cfg     ResilientSubscriberConfig
 	sem     chan struct{}
 	breaker circuitbreaker.CircuitBreaker
+	queue   *AdaptiveRingBufferQueue
 
 	// Telemetry metrics
 	inFlight atomic.Int64
@@ -73,11 +89,22 @@ func NewResilientSubscriber(inner Subscriber, cfg ResilientSubscriberConfig) *Re
 		cfg.Breaker = circuitbreaker.NewCircuitBreaker()
 	}
 
+	var q *AdaptiveRingBufferQueue
+	if cfg.QueueCapacity > 0 {
+		q = NewAdaptiveRingBufferQueue(AdaptiveQueueConfig{
+			Capacity:      cfg.QueueCapacity,
+			DropStrategy:  cfg.DropPolicy,
+			HighWatermark: cfg.HighWatermark,
+			LowWatermark:  cfg.LowWatermark,
+		})
+	}
+
 	return &ResilientSubscriber{
 		inner:   inner,
 		cfg:     cfg,
 		sem:     make(chan struct{}, cfg.MaxConcurrent),
 		breaker: cfg.Breaker,
+		queue:   q,
 	}
 }
 
@@ -94,6 +121,16 @@ func (r *ResilientSubscriber) Inner() Subscriber {
 	return r.inner
 }
 
+// CircuitBreaker returns the underlying circuit breaker instance.
+func (r *ResilientSubscriber) CircuitBreaker() circuitbreaker.CircuitBreaker {
+	return r.breaker
+}
+
+// Queue returns the underlying adaptive queue if configured, or nil.
+func (r *ResilientSubscriber) Queue() *AdaptiveRingBufferQueue {
+	return r.queue
+}
+
 // Metrics returns current in-flight, dropped, total, and failure counts.
 func (r *ResilientSubscriber) Metrics() (inFlight, dropped, total, failures int64) {
 	return r.inFlight.Load(), r.dropped.Load(), r.total.Load(), r.failures.Load()
@@ -107,7 +144,31 @@ func (r *ResilientSubscriber) Notify(ctx context.Context, entry *CallbackEntry) 
 		return nil
 	}
 
-	// 1. Fast-Path Circuit Breaker Check
+	if err := r.checkCircuitBreaker(); err != nil {
+		return err
+	}
+
+	targetEntry, err := r.enqueueAndThrottle(entry)
+	if err != nil {
+		return err
+	}
+	if targetEntry == nil {
+		return nil // Dropped silently by policy
+	}
+
+	releaseSlot, err := r.acquireConcurrencySlot(ctx)
+	if err != nil {
+		return err
+	}
+	if releaseSlot == nil {
+		return nil // Dropped silently by policy
+	}
+	defer releaseSlot()
+
+	return r.dispatchGuarded(ctx, targetEntry)
+}
+
+func (r *ResilientSubscriber) checkCircuitBreaker() error {
 	if err := r.breaker.AllowRequest(); err != nil {
 		r.dropped.Add(1)
 		if r.cfg.Logger != nil {
@@ -118,20 +179,55 @@ func (r *ResilientSubscriber) Notify(ctx context.Context, entry *CallbackEntry) 
 		}
 		return errfmt.Newf("circuit breaker open for subscriber %s", r.Name()).Wrap(err)
 	}
+	return nil
+}
 
-	// 2. Concurrency Throttling & Adaptive Backpressure
+func (r *ResilientSubscriber) enqueueAndThrottle(entry *CallbackEntry) (*CallbackEntry, error) {
+	if r.queue == nil {
+		return entry, nil
+	}
+
+	if r.queue.IsThrottled() {
+		r.dropped.Add(1)
+		if r.cfg.BackpressurePolicy == BackpressureDropSilent {
+			return nil, nil
+		}
+		return nil, ErrWatermarkThrottled
+	}
+
+	evicted, pushErr := r.queue.Push(entry)
+	if pushErr != nil {
+		r.dropped.Add(1)
+		if r.cfg.BackpressurePolicy == BackpressureDropSilent {
+			return nil, nil
+		}
+		return nil, pushErr
+	}
+	if evicted != nil {
+		r.dropped.Add(1)
+	}
+
+	targetEntry := entry
+	popped, ok := r.queue.Pop()
+	if ok && popped != nil {
+		targetEntry = popped
+	}
+	return targetEntry, nil
+}
+
+func (r *ResilientSubscriber) acquireConcurrencySlot(ctx context.Context) (func(), error) {
 	acquired := false
 	switch r.cfg.BackpressurePolicy {
-	case BackpressureDropSilent, BackpressureDropError:
+	case BackpressureDropSilent, BackpressureDropError, BackpressureDropOldest, BackpressureDropNewest:
 		select {
 		case r.sem <- struct{}{}:
 			acquired = true
 		default:
 			r.dropped.Add(1)
 			if r.cfg.BackpressurePolicy == BackpressureDropSilent {
-				return nil
+				return nil, nil
 			}
-			return errfmt.Errorf("backpressure: subscriber %s concurrency limit reached (%d)", r.Name(), r.cfg.MaxConcurrent)
+			return nil, errfmt.Errorf("backpressure: subscriber %s concurrency limit reached (%d)", r.Name(), r.cfg.MaxConcurrent)
 		}
 	case BackpressureBlock:
 		blockTimeout := r.cfg.BlockTimeout
@@ -143,24 +239,25 @@ func (r *ResilientSubscriber) Notify(ctx context.Context, entry *CallbackEntry) 
 			acquired = true
 		case <-time.After(blockTimeout):
 			r.dropped.Add(1)
-			return errfmt.Errorf("backpressure: subscriber %s timed out waiting for concurrency slot", r.Name())
+			return nil, errfmt.Errorf("backpressure: subscriber %s timed out waiting for concurrency slot", r.Name())
 		case <-ctx.Done():
 			r.dropped.Add(1)
-			return ctx.Err()
+			return nil, ctx.Err()
 		}
 	}
 
 	if !acquired {
-		return errfmt.Errorf("backpressure: failed to acquire concurrency token")
+		return nil, errfmt.Errorf("backpressure: failed to acquire concurrency token")
 	}
 
 	r.inFlight.Add(1)
-	defer func() {
+	return func() {
 		<-r.sem
 		r.inFlight.Add(-1)
-	}()
+	}, nil
+}
 
-	// 3. Execution Timeout Boundary
+func (r *ResilientSubscriber) dispatchGuarded(ctx context.Context, entry *CallbackEntry) error {
 	execCtx := ctx
 	var cancel context.CancelFunc
 	if r.cfg.ExecutionTimeout > 0 {
@@ -168,7 +265,6 @@ func (r *ResilientSubscriber) Notify(ctx context.Context, entry *CallbackEntry) 
 		defer cancel()
 	}
 
-	// 4. Invariant Guarded Dispatch
 	err := r.inner.Notify(execCtx, entry)
 	if err != nil {
 		r.failures.Add(1)
@@ -178,4 +274,12 @@ func (r *ResilientSubscriber) Notify(ctx context.Context, entry *CallbackEntry) 
 
 	r.breaker.RecordSuccess()
 	return nil
+}
+
+// IsCircuitBreakerOpen checks if an error was caused by a tripped circuit breaker.
+func IsCircuitBreakerOpen(err error) bool {
+	if err == nil {
+		return false
+	}
+	return errors.Is(err, ErrCircuitBreakerOpen) || errors.Is(err, ErrCircuitHalfOpenProbing)
 }
