@@ -5,7 +5,6 @@ package object
 import (
 	"context"
 	"errors"
-	"os/exec"
 	"strings"
 	"testing"
 	"time"
@@ -22,7 +21,7 @@ func TestFieldsCommand(t *testing.T) {
 		// Use object list without kind to see available kinds; timeout so interrupted tests don't leave orphan processes
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
-		cmd := exec.CommandContext(ctx, cliBinary, "object", "list")
+		cmd := testkit.ManagedCommand(t, ctx, cliBinary, "object", "list")
 		// Set ZQK_TEST_ROOT to ensure test isolation
 		wireExecForTest(cmd, env.TestRoot)
 		output, err := cmd.CombinedOutput()

@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -151,7 +152,7 @@ func TestExtended_CapOrchestrator_DeepCoverage(t *testing.T) {
 	ctx := context.Background()
 
 	// 1. prepareCmd
-	cmd := exec.CommandContext(ctx, "echo", "hello")
+	cmd := testkit.ManagedCommand(t, ctx, "echo", "hello")
 	cmd = handler.prepareCmd(cmd)
 	foundSysAccount := false
 	for _, env := range cmd.Env {
@@ -173,7 +174,7 @@ func TestExtended_CapOrchestrator_DeepCoverage(t *testing.T) {
 		"human_args":    []string{"--human"},
 	}
 	rawEsc, _ := json.Marshal(escConfig)
-	_ = os.WriteFile(filepath.Join(agentRuntimeDir, "escalation.json"), rawEsc, 0644)
+	_ = fileutil.WriteFile(filepath.Join(agentRuntimeDir, "escalation.json"), rawEsc, 0644)
 
 	ap := buildAgentProvider(tmpDir)
 	if ap == nil {

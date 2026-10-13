@@ -27,7 +27,7 @@ passed results, skipping re-evaluation unless file content changes.`)
 }
 
 func runMatrixVerify(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolveProjectRoot(cmd)
+	ctx, _, engine, err := setupMatrixCmd(cmd, defaultMatrixRegistry())
 	if err != nil {
 		return err
 	}
@@ -35,21 +35,12 @@ func runMatrixVerify(cmd *cobra.Command, _ []string) error {
 	targetFile, _ := cmd.Flags().GetString("file")
 	force, _ := cmd.Flags().GetBool("force")
 
-	engine, err := initMatrixEngine(projectRoot, defaultMatrixRegistry())
-	if err != nil {
-		return err
-	}
-
-	ctx := cmdContext(cmd)
-
 	if targetFile != "" {
 		entry, cacheHit, err := engine.EvaluateFile(ctx, targetFile, force)
 		if err != nil {
 			return errfmt.Errorf("verification failed for %s: %w", targetFile, err)
 		}
-		if err := engine.SaveLedger(); err != nil {
-			cmd.PrintErrf("Warning: failed to persist matrix ledger: %v\n", err)
-		}
+		_ = persistLedger(cmd, engine)
 
 		statusStr := "PASSED"
 		hitStr := "evaluated"
@@ -80,9 +71,7 @@ func runMatrixVerify(cmd *cobra.Command, _ []string) error {
 		return errfmt.Errorf("matrix evaluation failed: %w", err)
 	}
 
-	if err := engine.SaveLedger(); err != nil {
-		cmd.PrintErrf("Warning: failed to persist matrix ledger: %v\n", err)
-	}
+	_ = persistLedger(cmd, engine)
 
 	cmd.Println("==================================================")
 	cmd.Println("  Content-Addressed File Verification Matrix")

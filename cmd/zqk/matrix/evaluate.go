@@ -36,7 +36,7 @@ assigned to the fixer persona (PER-COMMUNITY-SOFTWARE-ENGINEER).`)
 }
 
 func runMatrixEvaluate(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolveProjectRoot(cmd)
+	ctx, projectRoot, engine, err := setupMatrixCmd(cmd, defaultMatrixRegistry())
 	if err != nil {
 		return err
 	}
@@ -48,13 +48,7 @@ func runMatrixEvaluate(cmd *cobra.Command, _ []string) error {
 	evaluator, _ := flags.GetString("evaluator")
 	outputJSON, _ := flags.GetBool("json")
 
-	engine, err := initMatrixEngine(projectRoot, defaultMatrixRegistry())
-	if err != nil {
-		return err
-	}
 	engine.SetRemediationHook(NewZQKRemediationHook(projectRoot))
-
-	ctx := cmdContext(cmd)
 
 	// 1. Force evaluation of the file through the engine
 	_, _, err = engine.EvaluateFile(ctx, targetFile, true)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -13,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -131,7 +131,7 @@ func TestBootstrapPortableScript(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "/bin/sh", scriptPath, moduleRoot)
+	cmd := testkit.ManagedCommand(t, ctx, "/bin/sh", scriptPath, moduleRoot)
 	cmd.Dir = moduleRoot
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	out, err := cmd.CombinedOutput()
@@ -156,7 +156,7 @@ func TestProductBinaryBuildCGOZero(t *testing.T) {
 
 	const targetPkg = "./cmd/zqk"
 	tmpBin := filepath.Join(t.TempDir(), "zqk-cgo-probe")
-	cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpBin, targetPkg)
+	cmd := testkit.ManagedCommand(t, ctx, "go", "build", "-o", tmpBin, targetPkg)
 	cmd.Dir = moduleRoot
 	cmd.Env = append(os.Environ(), "CGO_ENABLED=0")
 	out, err := cmd.CombinedOutput()

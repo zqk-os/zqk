@@ -71,12 +71,104 @@ func CheckTestSubprocessHygiene(root string, cfg *GatesConfig) ([]Finding, error
 					findings = append(findings, Finding{
 						CheckID:  "hygiene/unmanaged_test_exec",
 						Suite:    "hygiene",
-						Severity: SeverityWarn,
+						Severity: SeverityError,
 						File:     rel,
 						Line:     pos.Line,
 						Message: fmt.Sprintf("unmanaged %s.%s invocation in test file; prefer testkit.ManagedCommand to guarantee process group isolation and cleanup",
 							ident.Name, sel.Sel.Name),
 					})
+				}
+				if ident.Name == "os" && sel.Sel.Name == "StartProcess" {
+					pos := fset.Position(call.Pos())
+					findings = append(findings, Finding{
+						CheckID:  "hygiene/unmanaged_test_exec",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Line:     pos.Line,
+						Message: fmt.Sprintf("unmanaged %s.%s invocation in test file; prefer testkit.ManagedCommand to guarantee process group isolation and cleanup",
+							ident.Name, sel.Sel.Name),
+					})
+				}
+				return true
+			})
+
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return findings, nil
+}
+
+// CheckTestFileutilHygiene scans Go test source files (*_test.go) for raw os.*
+// file operations that bypass pkg/utils/fileutil consistency.
+func CheckTestFileutilHygiene(root string, cfg *GatesConfig) ([]Finding, error) {
+	var findings []Finding
+	fset := token.NewFileSet()
+
+	dirs := []string{"pkg", "cmd"}
+	if cfg != nil && len(cfg.Hygiene.GoScanDirs) > 0 {
+		dirs = cfg.Hygiene.GoScanDirs
+	}
+
+	for _, dir := range dirs {
+		absDir := filepath.Join(root, dir)
+		if _, err := os.Stat(absDir); err != nil {
+			continue
+		}
+
+		err := filepath.Walk(absDir, func(path string, info os.FileInfo, walkErr error) error {
+			if walkErr != nil || info.IsDir() {
+				return walkErr
+			}
+			if !strings.HasSuffix(info.Name(), "_test.go") {
+				return nil
+			}
+
+			rel, _ := filepath.Rel(root, path)
+			src, readErr := fileutil.ReadFile(path)
+			if readErr != nil {
+				return nil
+			}
+
+			node, parseErr := parser.ParseFile(fset, rel, src, parser.ParseComments)
+			if parseErr != nil {
+				return nil
+			}
+
+			ast.Inspect(node, func(n ast.Node) bool {
+				call, ok := n.(*ast.CallExpr)
+				if !ok {
+					return true
+				}
+
+				sel, ok := call.Fun.(*ast.SelectorExpr)
+				if !ok {
+					return true
+				}
+
+				ident, ok := sel.X.(*ast.Ident)
+				if !ok {
+					return true
+				}
+
+				if ident.Name == "os" {
+					switch sel.Sel.Name {
+					case "ReadFile", "WriteFile", "Open", "OpenFile", "RemoveAll":
+						pos := fset.Position(call.Pos())
+						findings = append(findings, Finding{
+							CheckID:  "hygiene/unmanaged_test_fileutil",
+							Suite:    "hygiene",
+							Severity: SeverityError,
+							File:     rel,
+							Line:     pos.Line,
+							Message: fmt.Sprintf("raw os.%s invocation in test file; prefer pkg/utils/fileutil.%s for filesystem consistency",
+								sel.Sel.Name, sel.Sel.Name),
+						})
+					}
 				}
 				return true
 			})

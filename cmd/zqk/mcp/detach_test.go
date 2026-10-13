@@ -1,14 +1,16 @@
 package mcp
 
 import (
-	"os/exec"
 	"runtime"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // TestSetDetach ensures setDetach correctly attaches OS-specific process attributes.
 func TestSetDetach(t *testing.T) {
-	cmd := exec.CommandContext(t.Context(), "echo", "test")
+	cmd := testkit.ManagedCommand(t, t.Context(), "echo", "test")
+	cmd.SysProcAttr = nil
 
 	// Pre-condition: SysProcAttr should be nil initially
 	if cmd.SysProcAttr != nil {

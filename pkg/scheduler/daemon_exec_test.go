@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -89,7 +88,7 @@ Output:
 	}
 
 	// --- Parent process launches the child using os/exec daemonization ---
-	cmd := exec.CommandContext(t.Context(), childExePath, pidFile, logFile, "--test-id=daemon-exec-test") //nolint:gosec
+	cmd := testkit.ManagedCommand(t, t.Context(), childExePath, pidFile, logFile, "--test-id=daemon-exec-test") //nolint:gosec
 	defer func() {
 		if cmd != nil && cmd.Process != nil {
 			_ = cmd.Process.Kill()

@@ -120,6 +120,14 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 		findings = append(findings, subprocFindings...)
 	}
 
+	if r.Config.Hygiene.CheckFileutilHygiene {
+		fileutilFindings, err := CheckTestFileutilHygiene(r.Root, r.Config)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, fileutilFindings...)
+	}
+
 	if r.Config.Hygiene.CheckCommandSpecs {
 		specFindings, err := CheckCommandSpecs(r.Root, r.Config, r.RootCommand)
 		if err != nil {

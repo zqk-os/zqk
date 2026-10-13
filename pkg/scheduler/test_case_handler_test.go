@@ -94,7 +94,7 @@ func TestSchedulerTestCaseTimeoutEnforcement(t *testing.T) {
 	defer cancel()
 
 	start := time.Now()
-	cmd := exec.CommandContext(ctx, "sleep", "5")
+	cmd := testkit.ManagedCommand(t, ctx, "sleep", "5")
 	err := cmd.Run()
 	elapsed := time.Since(start)
 

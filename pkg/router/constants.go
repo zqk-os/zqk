@@ -1,10 +1,16 @@
 package router
 
 import (
+	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
+
+// normalizeKey normalizes a tool or model identifier by trimming and lowercasing.
+func normalizeKey(s string) string {
+	return strings.ToLower(strings.TrimSpace(s))
+}
 
 // ModelTier identifies the performance, latency, and capability envelope of an LLM.
 type ModelTier string

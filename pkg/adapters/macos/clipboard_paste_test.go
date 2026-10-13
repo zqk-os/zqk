@@ -6,10 +6,12 @@ import (
 	"os/exec"
 	"runtime"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
 func stubCmd(ctx context.Context, _ string, _ ...string) *exec.Cmd {
-	return exec.CommandContext(ctx, os.Args[0], "-test.run=^$")
+	return execwrap.CommandContext(ctx, os.Args[0], "-test.run=^$")
 }
 
 func TestClipboardPasteAdapter_Vendor(t *testing.T) {

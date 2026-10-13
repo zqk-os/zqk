@@ -46,6 +46,28 @@ func initMatrixEngine(projectRoot string, registry *matrix.CheckRegistry) (*matr
 	return engine, nil
 }
 
+func setupMatrixCmd(cmd *cobra.Command, registry *matrix.CheckRegistry) (context.Context, string, *matrix.Engine, error) {
+	projectRoot, err := resolveProjectRoot(cmd)
+	if err != nil {
+		return nil, "", nil, err
+	}
+	engine, err := initMatrixEngine(projectRoot, registry)
+	if err != nil {
+		return nil, "", nil, err
+	}
+	return cmdContext(cmd), projectRoot, engine, nil
+}
+
+func persistLedger(cmd *cobra.Command, engine *matrix.Engine) error {
+	if err := engine.SaveLedger(); err != nil {
+		if cmd != nil {
+			cmd.PrintErrf("Warning: failed to persist matrix ledger: %v\n", err)
+		}
+		return errfmt.Errorf("failed to persist matrix ledger: %w", err)
+	}
+	return nil
+}
+
 func resolveProjectRoot(cmd *cobra.Command) (string, error) {
 	ctx := cli.GetContext(cmd)
 	projectRoot := ""

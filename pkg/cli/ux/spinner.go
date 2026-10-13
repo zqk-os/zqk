@@ -69,6 +69,16 @@ func SetInteractive(interactive bool) {
 	}
 }
 
+func logSpinnerFallback(msg string) {
+	if msg != "" {
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Info(msg).Log()
+	}
+}
+
+func formatElapsed(d time.Duration) string {
+	return d.Round(time.Millisecond).String()
+}
+
 // StartSpinner starts a terminal spinner with the given message.
 // It falls back to printing the message if not interactive.
 func StartSpinner(message string) {
@@ -76,7 +86,7 @@ func StartSpinner(message string) {
 	defer uxMu.Unlock()
 
 	if !isTTY || suppressed {
-		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Info(message).Log()
+		logSpinnerFallback(message)
 		return
 	}
 	if globalSpinner != nil {
@@ -107,9 +117,7 @@ func StopSpinner(success bool, finalMessage string) {
 	defer uxMu.Unlock()
 
 	if !isTTY || suppressed {
-		if finalMessage != "" {
-			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Info(finalMessage).Log()
-		}
+		logSpinnerFallback(finalMessage)
 		return
 	}
 
@@ -172,12 +180,12 @@ func (st *StepTracker) Elapsed() time.Duration {
 func (st *StepTracker) finish(success bool, summary string, err error) {
 	st.runIfActive(func() {
 		st.active = false
-		elapsed := time.Since(st.startTime).Round(time.Millisecond)
+		elapsedStr := formatElapsed(time.Since(st.startTime))
 		var msg string
 		if err != nil {
-			msg = fmt.Sprintf("%s: %v [%s]", summary, err, elapsed)
+			msg = fmt.Sprintf("%s: %v [%s]", summary, err, elapsedStr)
 		} else {
-			msg = fmt.Sprintf("%s [%s]", summary, elapsed)
+			msg = fmt.Sprintf("%s [%s]", summary, elapsedStr)
 		}
 		StopSpinner(success, msg)
 	})
