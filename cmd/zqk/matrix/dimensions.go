@@ -1,6 +1,8 @@
 package matrix
 
 import (
+	"encoding/json"
+
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -13,8 +15,17 @@ func NewMatrixDimensionsCmd() *cobra.Command {
 	builder.WithShort("List canonical verification matrix evaluation dimensions and bound kernel policies")
 	builder.WithLong(`Displays the authoritative evaluation dimensions (HCODE, EFFPERF, ERRHYG, CONCURR, SECOBS, DOCSIG)
 tracked in the Continuous Source Verification Matrix, along with their bound Knowledge Kernel policy IDs.`)
+	builder.AddBoolFlag("json", "", false, "Output dimensions in JSON format")
 	builder.WithRunE(func(cmd *cobra.Command, _ []string) error {
 		dims := matrix.DefaultDimensions()
+
+		isJSON, _ := cmd.Flags().GetBool("json")
+		formatVal, _ := cmd.Flags().GetString("format")
+		if isJSON || formatVal == "json" {
+			enc := json.NewEncoder(cmd.OutOrStdout())
+			enc.SetIndent("", "  ")
+			return enc.Encode(dims)
+		}
 
 		cmd.Println("================================================================================")
 		cmd.Println("  Continuous Source Verification Matrix: Canonical Evaluation Dimensions")

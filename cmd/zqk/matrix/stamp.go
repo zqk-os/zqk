@@ -28,6 +28,7 @@ match the provided or computed evidence hash, preventing manual tampering or sta
 	cmd.Flags().String("hash", "", "Expected SHA-256 hash to verify against file content")
 	cmd.Flags().Int("score", 0, "Diamond score (1 to 5 diamonds; 0 for automatic)")
 	cmd.Flags().String("evaluator", "PER-HARDCODING-ERADICATION-CZAR", "Evaluator identity or persona ID")
+	cmd.Flags().String("agent", "PER-HARDCODING-ERADICATION-CZAR", "Evaluating agent or persona identifier (alias for --evaluator)")
 	cmd.Flags().String("feedback", "", "Evaluation notes or rationale")
 	_ = cmd.MarkFlagRequired("file")
 
@@ -48,6 +49,9 @@ func runMatrixStamp(cmd *cobra.Command, _ []string) error {
 	expectedHash, _ := f.GetString("hash")
 	scoreVal, _ := f.GetInt("score")
 	evaluator, _ := f.GetString("evaluator")
+	if f.Changed("agent") && !f.Changed("evaluator") {
+		evaluator, _ = f.GetString("agent")
+	}
 	feedback, _ := f.GetString("feedback")
 
 	if dimStr == "" && checkID == "" {
