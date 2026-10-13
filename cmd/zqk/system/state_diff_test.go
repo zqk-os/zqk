@@ -16,6 +16,14 @@ import (
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+func setupDiffTest(t *testing.T) string {
+	t.Helper()
+	t.Parallel()
+	tmpDir := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	return tmpDir
+}
+
 func writeTestCSnap(t *testing.T, dir, filename string, objs []map[string]any) string {
 	t.Helper()
 	logger := logging.GetLoggerFromProfile("debug")
@@ -29,6 +37,21 @@ func writeTestCSnap(t *testing.T, dir, filename string, objs []map[string]any) s
 	return targetPath
 }
 
+func executeDiffCmd(projectRoot string, args ...string) (string, error) {
+	cmd := NewStateDiffCmd()
+	cmd.SilenceErrors = true
+	cmd.SilenceUsage = true
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	if projectRoot != "" {
+		cli.SetContext(cmd, cli.ContextForProjectRoot(projectRoot))
+	}
+	cmd.SetArgs(args)
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
 func TestNewStateDiffCmd_StaticFloorInvariant(t *testing.T) {
 	t.Parallel()
 
@@ -40,20 +63,10 @@ func TestNewStateDiffCmd_StaticFloorInvariant(t *testing.T) {
 }
 
 func TestStateDiff_NegativeAdversarialBoundary_InvalidSnapshots(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupDiffTest(t)
 
 	// Case 1: Non-existent snapshot A
-	cmd := NewStateDiffCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetArgs([]string{filepath.Join(tmpDir, "non_existent_a.csnap")})
-
-	err := cmd.Execute()
+	_, err := executeDiffCmd("", filepath.Join(tmpDir, "non_existent_a.csnap"))
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to read snapshot A")
 
@@ -61,40 +74,20 @@ func TestStateDiff_NegativeAdversarialBoundary_InvalidSnapshots(t *testing.T) {
 	validA := writeTestCSnap(t, tmpDir, "valid_a.csnap", []map[string]any{
 		{"id": "GOAL-1", "kind": "goal", "title": "Goal 1"},
 	})
-
-	cmd2 := NewStateDiffCmd()
-	cmd2.SilenceErrors = true
-	cmd2.SilenceUsage = true
-	var buf2 bytes.Buffer
-	cmd2.SetOut(&buf2)
-	cmd2.SetErr(&buf2)
-	cmd2.SetArgs([]string{validA, filepath.Join(tmpDir, "non_existent_b.csnap")})
-
-	err2 := cmd2.Execute()
+	_, err2 := executeDiffCmd("", validA, filepath.Join(tmpDir, "non_existent_b.csnap"))
 	require.Error(t, err2)
 	assert.Contains(t, err2.Error(), "failed to read snapshot B")
 
 	// Case 3: Corrupted snapshot file
 	corruptFile := filepath.Join(tmpDir, "corrupted.csnap")
 	require.NoError(t, fileutil.WriteFile(corruptFile, []byte("NOT_A_VALID_GZIP_OR_CSNAP"), paths.FilePerm644))
-
-	cmd3 := NewStateDiffCmd()
-	cmd3.SilenceErrors = true
-	cmd3.SilenceUsage = true
-	var buf3 bytes.Buffer
-	cmd3.SetOut(&buf3)
-	cmd3.SetErr(&buf3)
-	cmd3.SetArgs([]string{corruptFile})
-
-	err3 := cmd3.Execute()
+	_, err3 := executeDiffCmd("", corruptFile)
 	require.Error(t, err3)
 	assert.Contains(t, err3.Error(), "failed to read snapshot A")
 }
 
 func TestStateDiff_OperationalDynamicProof_TwoSnapshots(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupDiffTest(t)
 
 	objsA := []map[string]any{
 		{"id": "GOAL-101", "kind": "goal", "title": "Goal A", "status": "open"},
@@ -103,24 +96,14 @@ func TestStateDiff_OperationalDynamicProof_TwoSnapshots(t *testing.T) {
 	objsB := []map[string]any{
 		{"id": "REQ-201", "kind": "requirement", "title": "Requirement B", "status": "complete"}, // Modified
 		{"id": "BLI-301", "kind": "backlog_item", "title": "BLI C", "status": "planned"},         // Added
-		// GOAL-101 is Removed
 	}
 
 	snapA := writeTestCSnap(t, tmpDir, "snapshot_a.csnap", objsA)
 	snapB := writeTestCSnap(t, tmpDir, "snapshot_b.csnap", objsB)
 
-	cmd := NewStateDiffCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetArgs([]string{snapA, snapB})
-
-	err := cmd.Execute()
+	output, err := executeDiffCmd("", snapA, snapB)
 	require.NoError(t, err)
 
-	output := buf.String()
 	assert.Contains(t, output, "Summary: 1 added, 1 removed, 1 modified")
 	assert.Contains(t, output, "[Added Objects]")
 	assert.Contains(t, output, "+ BLI-301 (backlog_item)")
@@ -131,9 +114,7 @@ func TestStateDiff_OperationalDynamicProof_TwoSnapshots(t *testing.T) {
 }
 
 func TestStateDiff_OperationalDynamicProof_BriefFlag(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupDiffTest(t)
 
 	objsA := []map[string]any{
 		{"id": "GOAL-101", "kind": "goal", "title": "Goal A"},
@@ -145,27 +126,16 @@ func TestStateDiff_OperationalDynamicProof_BriefFlag(t *testing.T) {
 	snapA := writeTestCSnap(t, tmpDir, "snap_a.csnap", objsA)
 	snapB := writeTestCSnap(t, tmpDir, "snap_b.csnap", objsB)
 
-	cmd := NewStateDiffCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetArgs([]string{"--brief", snapA, snapB})
-
-	err := cmd.Execute()
+	output, err := executeDiffCmd("", "--brief", snapA, snapB)
 	require.NoError(t, err)
 
-	output := buf.String()
 	assert.Contains(t, output, "Summary: 1 added, 1 removed, 0 modified")
 	assert.NotContains(t, output, "[Added Objects]")
 	assert.NotContains(t, output, "[Removed Objects]")
 }
 
 func TestStateDiff_OperationalDynamicProof_IdenticalSnapshots(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupDiffTest(t)
 
 	objs := []map[string]any{
 		{"id": "GOAL-101", "kind": "goal", "title": "Goal A", "status": "active"},
@@ -174,18 +144,9 @@ func TestStateDiff_OperationalDynamicProof_IdenticalSnapshots(t *testing.T) {
 
 	snap := writeTestCSnap(t, tmpDir, "identical.csnap", objs)
 
-	cmd := NewStateDiffCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetArgs([]string{snap, snap})
-
-	err := cmd.Execute()
+	output, err := executeDiffCmd("", snap, snap)
 	require.NoError(t, err)
 
-	output := buf.String()
 	assert.Contains(t, output, "Summary: 0 added, 0 removed, 0 modified")
 	assert.NotContains(t, output, "[Added Objects]")
 	assert.NotContains(t, output, "[Removed Objects]")
@@ -193,9 +154,7 @@ func TestStateDiff_OperationalDynamicProof_IdenticalSnapshots(t *testing.T) {
 }
 
 func TestStateDiff_OperationalDynamicProof_LiveSystemState(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupDiffTest(t)
 
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), paths.DirPerm755))
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755))
@@ -205,19 +164,9 @@ func TestStateDiff_OperationalDynamicProof_LiveSystemState(t *testing.T) {
 	}
 	snapA := writeTestCSnap(t, tmpDir, "snapshot_live_cmp.csnap", objsA)
 
-	cmd := NewStateDiffCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cli.SetContext(cmd, cli.ContextForProjectRoot(tmpDir))
-	cmd.SetArgs([]string{snapA})
-
-	err := cmd.Execute()
+	output, err := executeDiffCmd(tmpDir, snapA)
 	require.NoError(t, err)
 
-	output := buf.String()
 	assert.Contains(t, output, "Extracting live system state for comparison...")
 	assert.Contains(t, output, "=== Diff Results ===")
 	assert.Contains(t, output, "Summary:")

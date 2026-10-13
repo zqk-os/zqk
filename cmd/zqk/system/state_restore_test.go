@@ -2,7 +2,6 @@ package system
 
 import (
 	"bytes"
-	"context"
 	"path/filepath"
 	"testing"
 	"time"
@@ -18,29 +17,50 @@ import (
 )
 
 func TestStateRestoreStorageUnwrap(t *testing.T) {
-	tmpDir := t.TempDir()
-	if err := fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), paths.DirPerm755); err != nil {
-		t.Fatal(err)
-	}
-	factory, err := storage.NewStorageFactory(t.Context(), tmpDir)
-	if err != nil {
-		t.Fatalf("failed to create StorageFactory: %v", err)
-	}
-	t.Cleanup(func() {
-		if err := factory.Shutdown(context.Background()); err != nil {
-			t.Logf("factory shutdown: %v", err)
-		}
-	})
-
-	provider := factory.GetStorage()
-	fileStorage := storage.UnwrapToFileObjectStorage(provider)
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	fileStorage := storage.UnwrapToFileObjectStorage(proj.FileStorage)
 	if fileStorage == nil {
-		t.Fatalf("UnwrapToFileObjectStorage returned nil for factory default storage")
+		t.Fatalf("UnwrapToFileObjectStorage returned nil for isolated temp project storage")
 	}
 
-	if fileStorage.GetProjectRoot() != tmpDir {
-		t.Errorf("expected project root %s, got %s", tmpDir, fileStorage.GetProjectRoot())
+	if fileStorage.GetProjectRoot() != proj.Root {
+		t.Errorf("expected project root %s, got %s", proj.Root, fileStorage.GetProjectRoot())
 	}
+}
+
+func setupRestoreTest(t *testing.T) string {
+	t.Helper()
+	t.Parallel()
+	tmpDir := t.TempDir()
+	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), paths.DirPerm755))
+	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755))
+	return tmpDir
+}
+
+func executeRestoreCmd(projectRoot string, args ...string) (string, error) {
+	cmd := NewStateRestoreCmd()
+	cmd.SilenceErrors = true
+	cmd.SilenceUsage = true
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cli.SetContext(cmd, cli.ContextForProjectRoot(projectRoot))
+	cmd.SetArgs(args)
+	err := cmd.Execute()
+	return buf.String(), err
+}
+
+func createTestRestoreCSnap(t *testing.T, dir, filename string, objs []map[string]any) string {
+	t.Helper()
+	logger := logging.GetLoggerFromProfile("debug")
+	now := time.Now().UTC()
+	cs, err := storage.CreateCompressedSnapshot(objs, now, logger)
+	require.NoError(t, err)
+
+	snapshotPath := filepath.Join(dir, filename)
+	require.NoError(t, storage.WriteCompressedSnapshot(cs, snapshotPath))
+	return snapshotPath
 }
 
 func TestNewStateRestoreCmd_StaticFloorInvariant(t *testing.T) {
@@ -56,30 +76,14 @@ func TestNewStateRestoreCmd_StaticFloorInvariant(t *testing.T) {
 }
 
 func TestStateRestore_NegativeAdversarialBoundary_MissingInput(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupRestoreTest(t)
 
-	cmd := NewStateRestoreCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cli.SetContext(cmd, cli.ContextForProjectRoot(tmpDir))
-	cmd.SetArgs([]string{"--input", filepath.Join(tmpDir, "missing_snapshot.csnap")})
-
-	err := cmd.Execute()
+	_, err := executeRestoreCmd(tmpDir, "--input", filepath.Join(tmpDir, "missing_snapshot.csnap"))
 	require.Error(t, err)
 }
 
 func TestStateRestore_OperationalDynamicProof_RestoreSnapshot(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-
-	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), paths.DirPerm755))
-	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755))
+	tmpDir := setupRestoreTest(t)
 
 	objs := []map[string]any{
 		{
@@ -91,73 +95,33 @@ func TestStateRestore_OperationalDynamicProof_RestoreSnapshot(t *testing.T) {
 		},
 	}
 
-	logger := logging.GetLoggerFromProfile("debug")
-	now := time.Now().UTC()
-	cs, err := storage.CreateCompressedSnapshot(objs, now, logger)
+	snapshotPath := createTestRestoreCSnap(t, tmpDir, "restore_test.csnap", objs)
+
+	output, err := executeRestoreCmd(tmpDir, "--input", snapshotPath)
 	require.NoError(t, err)
 
-	snapshotPath := filepath.Join(tmpDir, "restore_test.csnap")
-	require.NoError(t, storage.WriteCompressedSnapshot(cs, snapshotPath))
-
-	cmd := NewStateRestoreCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cli.SetContext(cmd, cli.ContextForProjectRoot(tmpDir))
-	cmd.SetArgs([]string{"--input", snapshotPath})
-
-	err = cmd.Execute()
-	require.NoError(t, err)
-
-	output := buf.String()
 	assert.Contains(t, output, "Restore complete")
 	assert.Contains(t, output, "1 objects written")
 }
 
 func TestStateRestore_NegativeAdversarialBoundary_PruneWithoutConfirmPrune(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
-
-	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProcessDir), paths.DirPerm755))
-	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755))
+	tmpDir := setupRestoreTest(t)
 
 	objs := []map[string]any{
 		{"id": "GOAL-RESTORE-2", "kind": "goal", "title": "Goal 2"},
 	}
-	logger := logging.GetLoggerFromProfile("debug")
-	cs, err := storage.CreateCompressedSnapshot(objs, time.Now().UTC(), logger)
-	require.NoError(t, err)
 
-	snapshotPath := filepath.Join(tmpDir, "restore_prune_test.csnap")
-	require.NoError(t, storage.WriteCompressedSnapshot(cs, snapshotPath))
+	snapshotPath := createTestRestoreCSnap(t, tmpDir, "restore_prune_test.csnap", objs)
 
-	cmd := NewStateRestoreCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cli.SetContext(cmd, cli.ContextForProjectRoot(tmpDir))
-	cmd.SetArgs([]string{"--input", snapshotPath, "--prune"})
-
-	err = cmd.Execute()
+	_, err := executeRestoreCmd(tmpDir, "--input", snapshotPath, "--prune")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "--prune requires --confirm-prune")
 }
 
 func TestStateRestore_OperationalDynamicProof_PruneWithConfirmPrune(t *testing.T) {
-	t.Parallel()
-	tmpDir := t.TempDir()
-	testkit.RegisterTempProjectTeardown(t, tmpDir, nil)
+	tmpDir := setupRestoreTest(t)
 
-	processDir := filepath.Join(tmpDir, paths.ProcessDir)
-	require.NoError(t, fileutil.MkdirAll(processDir, paths.DirPerm755))
-	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), paths.DirPerm755))
-
-	orphanDir := filepath.Join(processDir, "custom")
+	orphanDir := filepath.Join(tmpDir, paths.ProcessDir, "custom")
 	require.NoError(t, fileutil.MkdirAll(orphanDir, paths.DirPerm755))
 	orphanFile := filepath.Join(orphanDir, "orphan.yaml")
 	require.NoError(t, fileutil.WriteFile(orphanFile, []byte("title: orphan"), paths.FilePerm644))
@@ -165,27 +129,12 @@ func TestStateRestore_OperationalDynamicProof_PruneWithConfirmPrune(t *testing.T
 	objs := []map[string]any{
 		{"id": "GOAL-RESTORE-3", "kind": "goal", "title": "Goal 3"},
 	}
-	logger := logging.GetLoggerFromProfile("debug")
-	cs, err := storage.CreateCompressedSnapshot(objs, time.Now().UTC(), logger)
+
+	snapshotPath := createTestRestoreCSnap(t, tmpDir, "restore_prune_confirm_test.csnap", objs)
+
+	output, err := executeRestoreCmd(tmpDir, "--input", snapshotPath, "--prune", "--confirm-prune")
 	require.NoError(t, err)
 
-	snapshotPath := filepath.Join(tmpDir, "restore_prune_confirm_test.csnap")
-	require.NoError(t, storage.WriteCompressedSnapshot(cs, snapshotPath))
-
-	cmd := NewStateRestoreCmd()
-	cmd.SilenceErrors = true
-	cmd.SilenceUsage = true
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cli.SetContext(cmd, cli.ContextForProjectRoot(tmpDir))
-	cmd.SetArgs([]string{"--input", snapshotPath, "--prune", "--confirm-prune"})
-
-	err = cmd.Execute()
-	require.NoError(t, err)
-
-	output := buf.String()
 	assert.Contains(t, output, "Restore complete")
 	assert.False(t, fileutil.Exists(orphanFile))
 }
-
