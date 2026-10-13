@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/zqk-os/zqk/pkg/config"
@@ -264,14 +265,26 @@ func CloseJobLogWriter(projectRoot, jobID string) {
 	jobLogRegistry.mu.Unlock()
 }
 
-// CloseAllJobLogWriters flushes and closes all registered job log writers (e.g. on scheduler shutdown).
+// CloseAllJobLogWriters flushes and closes registered job log writers.
+// When projectRoot is provided, only writers matching that project root are closed and evicted,
+// preventing concurrent test runs from closing or evicting each other's active writers.
 func CloseAllJobLogWriters(projectRoot string) {
 	jobLogRegistry.mu.Lock()
-	snapshot := make(map[string]*jobLogWriter, len(jobLogRegistry.m))
-	for k, v := range jobLogRegistry.m {
-		snapshot[k] = v
+	snapshot := make(map[string]*jobLogWriter)
+	if projectRoot == emptyValue {
+		for k, v := range jobLogRegistry.m {
+			snapshot[k] = v
+		}
+		jobLogRegistry.m = make(map[string]*jobLogWriter)
+	} else {
+		prefix := projectRoot + "\x00"
+		for k, v := range jobLogRegistry.m {
+			if strings.HasPrefix(k, prefix) {
+				snapshot[k] = v
+				delete(jobLogRegistry.m, k)
+			}
+		}
 	}
-	jobLogRegistry.m = make(map[string]*jobLogWriter)
 	jobLogRegistry.mu.Unlock()
 	for _, w := range snapshot {
 		w.Close(projectRoot)

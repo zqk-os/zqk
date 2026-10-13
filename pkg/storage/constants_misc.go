@@ -277,6 +277,7 @@ const (
 	ConstMiscOrphanCleanupQueueShutdown               = "ORPHAN_CLEANUP_QUEUE_SHUTDOWN"
 	ConstMiscFlushAuditBuffer                         = "FLUSH_AUDIT_BUFFER"
 	ConstMiscTeardownGlobalAuditBuffer                = "TEARDOWN_GLOBAL_AUDIT_BUFFER"
+	ConstMiscDrainAsyncStorageComponents              = "DRAIN_ASYNC_STORAGE_COMPONENTS"
 	ConstMiscStripProcessArtifacts                    = "STRIP_PROCESS_ARTIFACTS"
 	ConstMiscScrubProjectRoot                         = "SCRUB_PROJECT_ROOT"
 	ConstMiscInitiateError                            = "initiate_error"

@@ -85,14 +85,28 @@ return sched, env.TestRoot, teardown
 ### 2.3 Teardown Execution Order
 Regardless of whether a test explicitly invokes `defer cleanup()`, registers `t.Cleanup(cleanup)`, or omits calling cleanup, the teardown executes exactly once in deterministic sequence:
 1. **`sched.Stop()`:** Halts all scheduler cron engines, job dispatcher queues, and worker goroutines.
-2. **`CloseAllJobLogWriters(env.TestRoot)`:** Closes and flushes all active file handles in the test root.
+2. **`CloseAllJobLogWriters(env.TestRoot)` (Scoped by `projectRoot`):** Closes, flushes, and evicts only active file handles for `env.TestRoot`. Writers for concurrent tests sharing the process are preserved, preventing cross-test writer eviction and race conditions during parallel execution.
 3. **Queue Draining:** Flushes global CAS listing index queues and local storage listing index queues.
-4. **`env.Cleanup()`:** Calls `storageProvider.Shutdown()` and `RunProjectTestTeardown()` to terminate all storage write-behind workers.
-5. **Directory Cleanup:** Empties `.zqk/process` and `.zqk/` before the Go test framework executes `os.RemoveAll(t.TempDir())`.
+4. **Idempotent Storage Shutdown (`FileObjectStorage.Shutdown`):** Protected by `shutdownOnce sync.Once`. Subsequent or duplicate cleanup calls (from test teardown and `t.Cleanup`) are safely ignored, preventing re-entrant CAS directory re-creation.
+5. **Pre-Pipeline Async Draining (`RunProjectTestTeardown`):** Drains Darwin CAS sync queues (`DrainDarwinSyncQueue`), stops reverse reference indexing, and shuts down hash registries *before* running project root scrubbing and process artifact stripping.
+6. **LIFO StripRoot Cleanup:** Empties `.zqk/process` and `.zqk/` after all storage components have completely terminated, guaranteeing clean `os.RemoveAll(t.TempDir())` execution without `unlinkat ...: directory not empty` flakes.
 
 ---
 
-## 3. Zero-Flake Compliance & Verification
+## 3. Storage Provider & Writer Invariants
+
+### 3.1 Scoped Log Writer Eviction Invariant
+In `pkg/scheduler/job_log_writer.go`, `CloseAllJobLogWriters(projectRoot string)` restricts eviction to entries whose key starts with `projectRoot + "\x00"`. When `projectRoot` is provided, active writers belonging to other running tests remain untouched in the global registry.
+
+### 3.2 Idempotent Storage Shutdown Invariant
+In `pkg/storage/object_storage_file.go`, `FileObjectStorage.Shutdown` wraps execution in `f.shutdownOnce.Do(...)`. Calling `Shutdown` repeatedly will neither re-enter pending cache dumps nor re-create `.zqk` directory structures after teardown has completed.
+
+### 3.3 Pre-Scrub Component Drain Invariant
+In `pkg/storage/project_test_teardown.go`, `drainStorageAsyncComponents` is invoked prior to executing the standard teardown pipeline. Background Darwin fsync goroutines and hash registry workers complete all disk I/O before any directory scrubbing begins.
+
+---
+
+## 4. Zero-Flake Compliance & Verification
 
 - **Automated Verification Suite:** `pkg/scheduler/scheduler_test.go` and `pkg/scheduler/job_lock_integration_test.go`.
 - **Concurrency Safety:** Race detector (`go test -race`) and parallel execution suites run cleanly without goroutine leaks, `unlinkat` failures, or lock acquisition timeouts.
