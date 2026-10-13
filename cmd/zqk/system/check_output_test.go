@@ -14,6 +14,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 func TestPreliminaryCASIssue(t *testing.T) {
@@ -478,5 +479,57 @@ func TestIsCompletedSystemCheckError(t *testing.T) {
 	sc := &SystemCheckError{ExitCodeVal: 2, Message: "system check failed with exit code 2: 1 Layer 0 CAS & integrity blocker(s) found"}
 	if !isCompletedSystemCheckError(sc) {
 		t.Fatal("SystemCheckError must return to Cobra, not os.Exit")
+	}
+}
+
+func TestUnanchoredBacklogItemLayer0IntegrityBlocker(t *testing.T) {
+	t.Parallel()
+
+	// 1. Convert validation error for unanchored backlog item
+	valResult := &validation.ValidationResult{
+		Errors: []validation.ValidationError{
+			{
+				Field:   "goal_refs/requirement_refs",
+				Message: "backlog_item must have at least one goal_ref or requirement_ref to maintain the Hierarchical Chain of Integrity",
+				Rule:    "composed_integrity",
+			},
+		},
+	}
+	issues := convertValidationResultsToIssues(valResult, nil, "BLI-UNANCHORED", objects.KindBacklogItem, nil, "", nil)
+	if len(issues) != 1 {
+		t.Fatalf("expected 1 issue, got %d", len(issues))
+	}
+	if issues[0].Tier != 1 {
+		t.Fatalf("expected Tier 1 for unanchored backlog item, got %d", issues[0].Tier)
+	}
+	if issues[0].Category != categoryIntegrity {
+		t.Fatalf("expected Category %q for unanchored backlog item, got %q", categoryIntegrity, issues[0].Category)
+	}
+
+	// 2. Evaluate system check pristine: must fail closed with exit code 2 (Layer 0)
+	checkRes := []CheckResult{
+		{
+			ObjectID:   "BLI-UNANCHORED",
+			ObjectKind: objects.KindBacklogItem,
+			Status:     objects.ObjectStatusPlanned,
+			Issues:     issues,
+		},
+	}
+	err := evaluateSystemCheckPristine(checkRes, nil, "")
+	if err == nil {
+		t.Fatal("expected system check error for unanchored backlog item, got nil")
+	}
+	sc, ok := err.(*SystemCheckError)
+	if !ok {
+		t.Fatalf("expected *SystemCheckError, got %T: %v", err, err)
+	}
+	if sc.ExitCodeVal != 2 {
+		t.Fatalf("expected exit code 2 (Layer 0 CAS & integrity blocker), got %d", sc.ExitCodeVal)
+	}
+
+	// 3. Layer filter: must appear in Layer 0
+	l0 := filterResultsByLayer(checkRes, 0)
+	if len(l0) != 1 || l0[0].ObjectID != "BLI-UNANCHORED" {
+		t.Fatalf("expected unanchored item in Layer 0, got %+v", l0)
 	}
 }

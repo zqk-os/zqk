@@ -29,6 +29,7 @@ type HygieneConfig struct {
 	CheckCommandSpecs      bool     `yaml:"check_command_specs"`
 	CheckCLIBuilders       bool     `yaml:"check_cli_builders"`
 	CheckRawGoroutines     bool     `yaml:"check_raw_goroutines"`
+	CheckReferenceIntegrity bool    `yaml:"check_reference_integrity"`
 	GoroutineExemptions    []string `yaml:"goroutine_exemptions"`
 	ForbiddenPathLiterals  []string `yaml:"forbidden_path_literals"`
 	GoScanDirs             []string `yaml:"go_scan_dirs"`
@@ -102,6 +103,7 @@ func DefaultConfig() *GatesConfig {
 			CheckCommandSpecs:      true,
 			CheckCLIBuilders:       true,
 			CheckRawGoroutines:     true,
+			CheckReferenceIntegrity: true,
 			GoroutineExemptions:    []string{"*_test.go", "vendor/*", "pkg/goroutinelabels/*", "*/testdata/*"},
 			ForbiddenPathLiterals:  []string{".zqk", ".zqk/"},
 			GoScanDirs:             []string{"pkg/", "cmd/", "internal/", "scripts/", "packs/", "ext/"},
