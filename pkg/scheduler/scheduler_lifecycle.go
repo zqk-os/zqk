@@ -30,59 +30,89 @@ func (s *Scheduler) Stop() {
 		return
 	}
 
-	var isRunning bool
+	var wasRunning bool
+	var alreadyStopped bool
 	_ = concurrency.RunInLockWithLogger(
 		&s.runningMu,
 		LockNameSchedulerStopCheck,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			isRunning = s.running
-			if s.running {
-				s.running = false
+			if s.stopped {
+				alreadyStopped = true
+				return nil
 			}
+			s.stopped = true
+			wasRunning = s.running
+			s.running = false
 			return nil
 		},
 	)
 
-	if !isRunning {
+	if alreadyStopped {
 		return
 	}
 
-	SchedulerDaemonLog(s.logger).Info(LogEventSchedulerDaemonStopping).Log()
+	if wasRunning {
+		SchedulerDaemonLog(s.logger).Info(LogEventSchedulerDaemonStopping).Log()
 
-	SchedulerDaemonLog(s.logger).Debug("Stop: stopping anticipatory engine").Log()
-	if s.anticipatoryEngine != nil {
-		if err := s.anticipatoryEngine.Stop(); err != nil {
-			SchedulerDaemonLog(s.logger).Warn("Failed to stop anticipatory engine").
-				WithError(err).
-				Log()
-		} else {
-			SchedulerDaemonLog(s.logger).Info("Anticipatory engine stopped successfully").Log()
+		SchedulerDaemonLog(s.logger).Debug("Stop: stopping anticipatory engine").Log()
+		if s.anticipatoryEngine != nil {
+			if err := s.anticipatoryEngine.Stop(); err != nil {
+				SchedulerDaemonLog(s.logger).Warn("Failed to stop anticipatory engine").
+					WithError(err).
+					Log()
+			} else {
+				SchedulerDaemonLog(s.logger).Info("Anticipatory engine stopped successfully").Log()
+			}
+		}
+
+		// Mark any currently running job as abandoned so events files have a final outcome (not just "started").
+		// Collect IDs under lock (no I/O); write log entries outside lock to avoid holding mutex during I/O.
+		SchedulerDaemonLog(s.logger).Debug("Stop: abandoning running jobs").Log()
+		var runningJobIDs []string
+		s.jobsMu.RLock()
+		for _, job := range s.jobs {
+			job.RunningMu.RLock()
+			running := job.Running
+			job.RunningMu.RUnlock()
+			if running {
+				runningJobIDs = append(runningJobIDs, job.ID)
+			}
+		}
+		s.jobsMu.RUnlock()
+		stopTimeStr := zqktime.FormatRFC3339UTC(stopTime)
+		for _, jobID := range runningJobIDs {
+			writeJobLogEntry(s.projectRoot, jobID, map[string]any{
+				KeyEventType: JobLogEventAbandoned,
+				KeyJobID:     jobID,
+				KeyTimestamp: stopTimeStr,
+			})
+		}
+
+		// Remove keep-alive file FIRST (before stopping cron) to ensure cleanup happens
+		// even if process is killed during shutdown
+		if s.projectRoot != emptyValue {
+			if err := removeKeepAlive(s.projectRoot); err != nil {
+				SchedulerDaemonLog(s.logger).Warn(LogEventSchedulerDaemonKeepAliveRemoveFailed).
+					ProjectRoot(s.projectRoot).
+					WithError(err).
+					Log()
+				// Don't fail shutdown - keep-alive cleanup is best effort
+			}
+		}
+
+		// Stop cron scheduler with timeout to prevent hanging
+		SchedulerDaemonLog(s.logger).Debug("Stop: stopping cron").Log()
+		stopCtx := s.cron.Stop()
+		select {
+		case <-stopCtx.Done():
+			// Cron stopped successfully
+		case <-time.After(schedulerCronStopTimeout):
+			// Timeout - log warning but continue shutdown
+			SchedulerDaemonLog(s.logger).Warn(LogEventSchedulerDaemonCronStopTimedOut).Log()
 		}
 	}
 
-	// Mark any currently running job as abandoned so events files have a final outcome (not just "started").
-	// Collect IDs under lock (no I/O); write log entries outside lock to avoid holding mutex during I/O.
-	SchedulerDaemonLog(s.logger).Debug("Stop: abandoning running jobs").Log()
-	var runningJobIDs []string
-	s.jobsMu.RLock()
-	for _, job := range s.jobs {
-		job.RunningMu.RLock()
-		running := job.Running
-		job.RunningMu.RUnlock()
-		if running {
-			runningJobIDs = append(runningJobIDs, job.ID)
-		}
-	}
-	s.jobsMu.RUnlock()
-	stopTimeStr := zqktime.FormatRFC3339UTC(stopTime)
-	for _, jobID := range runningJobIDs {
-		writeJobLogEntry(s.projectRoot, jobID, map[string]any{
-			KeyEventType: JobLogEventAbandoned,
-			KeyJobID:     jobID,
-			KeyTimestamp: stopTimeStr,
-		})
-	}
 	SchedulerDaemonLog(s.logger).Debug("Stop: closing job log writers").Log()
 	if s.projectRoot != emptyValue {
 		CloseAllJobLogWriters(s.projectRoot)
@@ -108,29 +138,6 @@ func (s *Scheduler) Stop() {
 					Log()
 			}
 		}
-	}
-
-	// Remove keep-alive file FIRST (before stopping cron) to ensure cleanup happens
-	// even if process is killed during shutdown
-	if s.projectRoot != emptyValue {
-		if err := removeKeepAlive(s.projectRoot); err != nil {
-			SchedulerDaemonLog(s.logger).Warn(LogEventSchedulerDaemonKeepAliveRemoveFailed).
-				ProjectRoot(s.projectRoot).
-				WithError(err).
-				Log()
-			// Don't fail shutdown - keep-alive cleanup is best effort
-		}
-	}
-
-	// Stop cron scheduler with timeout to prevent hanging
-	SchedulerDaemonLog(s.logger).Debug("Stop: stopping cron").Log()
-	stopCtx := s.cron.Stop()
-	select {
-	case <-stopCtx.Done():
-		// Cron stopped successfully
-	case <-time.After(schedulerCronStopTimeout):
-		// Timeout - log warning but continue shutdown
-		SchedulerDaemonLog(s.logger).Warn(LogEventSchedulerDaemonCronStopTimedOut).Log()
 	}
 
 	// Stop priority pool first so critical jobs can finish, then general triggered-job pool (releases budget slots).

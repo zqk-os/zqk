@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sync"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -127,6 +128,7 @@ func StandardProjectTestTeardownPipeline(opts ProjectTestTeardownOptions) *pipel
 		AddStage(ConstMiscOrphanCleanupQueueShutdown, projectTeardownStageOrphanCleanupQueueShutdown(opts)).
 		AddStage(ConstMiscFlushAuditBuffer, projectTeardownStageFlushAuditBuffer(opts)).
 		AddStage(ConstMiscTeardownGlobalAuditBuffer, projectTeardownStageTearDownGlobalAuditBuffer(opts)).
+		AddStage(ConstMiscDrainAsyncStorageComponents, projectTeardownStageDrainAsyncStorageComponents(opts)).
 		AddStage(ConstMiscStripProcessArtifacts, projectTeardownStageStripProcessArtifacts(opts)).
 		AddStage(ConstMiscScrubProjectRoot, projectTeardownStageScrubProjectRoot(opts)).
 		Build()
@@ -146,18 +148,55 @@ func TempProjectTeardown(projectRoot string, fileStorage *FileObjectStorage) Pro
 	}
 }
 
+var (
+	projectTestTeardownHooksMu sync.RWMutex
+	projectTestTeardownHooks   []func(projectRoot string)
+)
+
+// RegisterProjectTestTeardownHook registers a callback to be executed during project test teardown before filesystem stripping and scrubbing.
+func RegisterProjectTestTeardownHook(hook func(projectRoot string)) {
+	if hook == nil {
+		return
+	}
+	projectTestTeardownHooksMu.Lock()
+	defer projectTestTeardownHooksMu.Unlock()
+	projectTestTeardownHooks = append(projectTestTeardownHooks, hook)
+}
+
+func runProjectTestTeardownHooks(projectRoot string) {
+	projectTestTeardownHooksMu.RLock()
+	hooks := make([]func(string), len(projectTestTeardownHooks))
+	copy(hooks, projectTestTeardownHooks)
+	projectTestTeardownHooksMu.RUnlock()
+	for _, hook := range hooks {
+		hook(projectRoot)
+	}
+}
+
+func drainStorageAsyncComponents(projectRoot string) {
+	ShutdownAsyncValidationStrategies()
+	ShutdownHashRegistriesForProjectTesting(projectRoot)
+	ShutdownAllAuditBuffersForTesting()
+	_ = filecas.DrainDarwinSyncQueue(2 * time.Second)
+	runProjectTestTeardownHooks(projectRoot)
+}
+
+func projectTeardownStageDrainAsyncStorageComponents(opts ProjectTestTeardownOptions) pipeline.StageFunc {
+	return func(pctx *pipeline.Context, payload any) (any, error) {
+		drainStorageAsyncComponents(opts.ProjectRoot)
+		return payload, nil
+	}
+}
+
 // RunProjectTestTeardown runs the standard pipeline once.
 func RunProjectTestTeardown(opts ProjectTestTeardownOptions) error {
 	opts = applyGitWorktreeTeardownGuard(opts.WithDefaults())
 	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
 	StopHighVolumeEventCachePersistForTest(opts.ProjectRoot)
+	drainStorageAsyncComponents(opts.ProjectRoot)
 	pl := StandardProjectTestTeardownPipeline(opts)
 	pctx := &pipeline.Context{Ctx: pkgctx.NewSystemContext(), Outcome: make(map[string]any)}
 	_, err := pl.Run(pctx, opts)
-	ShutdownAsyncValidationStrategies()
-	ShutdownHashRegistriesForProjectTesting(opts.ProjectRoot)
-	ShutdownAllAuditBuffersForTesting()
-	_ = filecas.DrainDarwinSyncQueue(2 * time.Second)
 	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
 	StopHighVolumeEventCachePersistForTest(opts.ProjectRoot)
 	// Reset global singletons to prevent cross-test contamination when ZQK_TEST_ROOT changes
@@ -182,6 +221,7 @@ func AppendProjectTestTeardownStages(b *pipeline.Builder, opts ProjectTestTeardo
 		AddStage(ConstMiscOrphanCleanupQueueShutdown, projectTeardownStageOrphanCleanupQueueShutdown(opts)).
 		AddStage(ConstMiscFlushAuditBuffer, projectTeardownStageFlushAuditBuffer(opts)).
 		AddStage(ConstMiscTeardownGlobalAuditBuffer, projectTeardownStageTearDownGlobalAuditBuffer(opts)).
+		AddStage(ConstMiscDrainAsyncStorageComponents, projectTeardownStageDrainAsyncStorageComponents(opts)).
 		AddStage(ConstMiscStripProcessArtifacts, projectTeardownStageStripProcessArtifacts(opts)).
 		AddStage(ConstMiscScrubProjectRoot, projectTeardownStageScrubProjectRoot(opts))
 }

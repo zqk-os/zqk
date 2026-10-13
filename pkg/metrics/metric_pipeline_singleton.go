@@ -65,3 +65,9 @@ func ResetMetricPipelineSingletonsForTest() {
 	}
 	metricPipelineByRoot = nil
 }
+
+func init() {
+	storage.RegisterProjectTestTeardownHook(func(projectRoot string) {
+		ResetMetricPipelineSingletonsForTest()
+	})
+}

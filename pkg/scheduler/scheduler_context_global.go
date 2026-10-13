@@ -328,6 +328,7 @@ type Scheduler struct {
 	jobsMu          sync.RWMutex
 	executionMu     sync.Mutex // Added for scheduler thread safety
 	running         bool
+	stopped         bool
 	runningMu       sync.RWMutex
 	storage         storagepkg.ObjectStorageProvider
 	projectRoot     string // Store project root for handlers (needed for graph backends)

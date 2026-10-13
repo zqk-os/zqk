@@ -198,6 +198,10 @@ type FileObjectStorage struct {
 	// traitNormOnce / traitNormRegistry: lazy trait registry for BLI-210 redundant top-level traits strip before YAML persist.
 	traitNormOnce     sync.Once
 	traitNormRegistry *objects.TraitRegistry
+
+	// shutdownOnce ensures Shutdown runs idempotently at most once per storage instance.
+	shutdownOnce      sync.Once
+	cachedShutdownErr error
 }
 
 var fileObjectStorageForTestOnce sync.Once
@@ -307,6 +311,13 @@ func (f *FileObjectStorage) GetLifecycleLoader() *objects.LifecycleLoader {
 // Ordered CAS pending visibility (CRIT-CAS-PENDING-003 / ADR-CAS-PENDING-VISIBILITY-LAYER):
 // reject new pending publishes → dump pending id→hash into durable indexes → then drain queues/WAL.
 func (f *FileObjectStorage) Shutdown(ctx context.Context) error {
+	f.shutdownOnce.Do(func() {
+		f.cachedShutdownErr = f.shutdownInternal(ctx)
+	})
+	return f.cachedShutdownErr
+}
+
+func (f *FileObjectStorage) shutdownInternal(ctx context.Context) error {
 	if f.projectRoot != emptyValue {
 		pending := caspkg.GetCASPendingVisibilityCache(f.projectRoot)
 		pending.BeginOrderedShutdown()

@@ -4,7 +4,9 @@ import (
 	"errors"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/metrics"
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
@@ -82,8 +84,23 @@ func setupTestScheduler(t *testing.T) (sched *Scheduler, testRoot string, cleanu
 	restoreGlobal := WithGlobalSchedulerRollback()
 	t.Cleanup(restoreGlobal)
 
+	// Registered first so it runs after storage shutdown (t.Cleanup is LIFO): empties .zqk/process
+	// and .zqk so t.TempDir cleanup does not fail with "directory not empty" under bundle parallelism.
+	var stripRoot string
+	t.Cleanup(func() {
+		if stripRoot == emptyValue {
+			return
+		}
+		_ = filecas.DrainDarwinSyncQueue(1 * time.Second)
+		storagepkg.ShutdownHashRegistriesForProjectTesting(stripRoot)
+		metrics.ResetMetricPipelineSingletonsForTest()
+		_ = fileutil.RemoveAll(datacell.ProcessPrimaryDir(stripRoot))          //nolint:errcheck // test cleanup
+		_ = fileutil.RemoveAll(filepath.Join(stripRoot, paths.ProjectDataDir)) //nolint:errcheck // test cleanup
+	})
+
 	// Use unified test environment setup
 	env := setupSchedulerCompleteTestEnvironment(t, nil)
+	stripRoot = env.TestRoot
 
 	// Ensure path alias cache is built for the test project so stream-backed storage
 	// (including scheduler_job create/update paths) can resolve paths without errors.
@@ -113,6 +130,10 @@ func setupTestScheduler(t *testing.T) (sched *Scheduler, testRoot string, cleanu
 			if env.Cleanup != nil {
 				env.Cleanup()
 			}
+			_ = storagepkg.RunProjectTestTeardown(storagepkg.TempProjectTeardown(env.TestRoot, nil))
+			_ = filecas.DrainDarwinSyncQueue(2 * time.Second)
+			storagepkg.ShutdownHashRegistriesForProjectTesting(env.TestRoot)
+			metrics.ResetMetricPipelineSingletonsForTest()
 			_ = fileutil.RemoveAll(datacell.ProcessPrimaryDir(env.TestRoot))          //nolint:errcheck // test cleanup
 			_ = fileutil.RemoveAll(filepath.Join(env.TestRoot, paths.ProjectDataDir)) //nolint:errcheck // test cleanup
 		})
