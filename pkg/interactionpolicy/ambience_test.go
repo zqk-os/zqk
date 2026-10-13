@@ -19,6 +19,8 @@ func TestClassifyAmbience(t *testing.T) {
 		{"push-ahead beats planned idle", Ambience{Planned: 3, BranchAhead: 2}, EventPushAhead},
 		{"inbox beats push-ahead", Ambience{Planned: 3, InboxUnacked: 1, BranchAhead: 4}, EventInboxUnacked},
 		{"push-ahead beats stratplan", Ambience{Planned: 0, InProgress: 1, BranchAhead: 1}, EventPushAhead},
+		{"stale base beats inbox and push-ahead", Ambience{Planned: 3, InboxUnacked: 1, BranchAhead: 2, BranchBehind: 1}, EventStaleBaseBlocked},
+		{"stale base beats stratplan", Ambience{Planned: 0, InProgress: 1, BranchBehind: 3}, EventStaleBaseBlocked},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

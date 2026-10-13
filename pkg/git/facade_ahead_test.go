@@ -67,6 +67,84 @@ func TestCountAheadUpstream(t *testing.T) {
 	}
 }
 
+func TestCountBehindOriginMainAndUpstream(t *testing.T) {
+	t.Parallel()
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not on PATH")
+	}
+
+	remote := filepath.Join(t.TempDir(), "remote.git")
+	if err := execwrap.Command("git", "init", "--bare", remote).Run(); err != nil {
+		t.Fatalf("bare: %v", err)
+	}
+
+	work := t.TempDir()
+	run := func(args ...string) {
+		t.Helper()
+		cmd := execwrap.Command("git", args...)
+		cmd.Dir = work
+		cmd.Env = append(os.Environ(),
+			"GIT_AUTHOR_NAME=test",
+			"GIT_AUTHOR_EMAIL=test@example.com",
+			"GIT_COMMITTER_NAME=test",
+			"GIT_COMMITTER_EMAIL=test@example.com",
+		)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v: %v\n%s", args, err, out)
+		}
+	}
+	run("init")
+	if err := fileutil.WriteFile(filepath.Join(work, "a"), []byte("1"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	run("add", "a")
+	run("commit", "-m", "base")
+	run("branch", "-M", "main")
+	run("remote", "add", "origin", remote)
+	run("push", "-u", "origin", "HEAD")
+
+	// Branch out feature branch
+	run("checkout", "-b", "feature")
+
+	// Commit on main and push to remote
+	run("checkout", "main")
+	if err := fileutil.WriteFile(filepath.Join(work, "b"), []byte("2"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	run("add", "b")
+	run("commit", "-m", "advance main")
+	run("push", "origin", "main")
+
+	// Switch back to feature branch: it is now behind origin/main by 1
+	run("checkout", "feature")
+
+	f := NewFacade(work)
+	if n := f.CountBehindOriginMain(); n != 1 {
+		t.Fatalf("behind origin/main=%d want 1", n)
+	}
+
+	// Track origin/main as upstream
+	run("branch", "-u", "origin/main")
+	if n := f.CountBehindUpstream(); n != 1 {
+		t.Fatalf("behind upstream=%d want 1", n)
+	}
+
+	// Non-repo and nil facade must return 0 safely
+	if n := NewFacade(t.TempDir()).CountBehindOriginMain(); n != 0 {
+		t.Fatalf("non-repo must be 0, got %d", n)
+	}
+	if n := NewFacade(t.TempDir()).CountBehindUpstream(); n != 0 {
+		t.Fatalf("non-repo must be 0, got %d", n)
+	}
+	var nilF *Facade
+	if n := nilF.CountBehindOriginMain(); n != 0 {
+		t.Fatalf("nil facade must be 0, got %d", n)
+	}
+	if n := nilF.CountBehindUpstream(); n != 0 {
+		t.Fatalf("nil facade must be 0, got %d", n)
+	}
+}
+
 func TestFindCommitHashesByGrep(t *testing.T) {
 	t.Parallel()
 	if _, err := exec.LookPath("git"); err != nil {

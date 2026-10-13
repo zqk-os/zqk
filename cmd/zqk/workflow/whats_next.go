@@ -1111,8 +1111,10 @@ func compileWhatsNextDrive(out *whatsNextOut, ctx context.Context, sp workflowSt
 		planStatus = out.PriorityPlan.Status
 	}
 	branchAhead := 0
+	branchBehind := 0
 	if out.KernelAmbience != nil {
 		branchAhead = out.KernelAmbience.BranchAhead
+		branchBehind = out.KernelAmbience.BranchBehind
 	}
 	event := interactionpolicy.ClassifyAmbience(interactionpolicy.Ambience{
 		Planned:        planned,
@@ -1123,6 +1125,7 @@ func compileWhatsNextDrive(out *whatsNextOut, ctx context.Context, sp workflowSt
 		InboxUnacked:   inbox,
 		OutboxAwaiting: outbox,
 		BranchAhead:    branchAhead,
+		BranchBehind:   branchBehind,
 	})
 	if event == "" {
 		return

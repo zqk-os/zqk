@@ -78,7 +78,7 @@ func runContinuationHookWithDeps(
 
 	// 3. Inspect active marker existence
 	if !markerExists(markerPath) {
-		return emitContinuationDecision(out, "allow", "")
+		return emitContinuationDecision(out, vendor, "allow", "")
 	}
 
 	// 4. Query active in-progress priority plan if storage is available
@@ -131,17 +131,46 @@ func runContinuationHookWithDeps(
 
 	promptMsg := fmt.Sprintf(capPromptTemplate, activePlanInfo, steeringNudge, paths.CLIInvocation(workflowWhatsNextCmd))
 	reason := paths.RewriteCanonicalCLIInvocations(promptMsg)
-	return emitContinuationDecision(out, "continue", reason)
+	return emitContinuationDecision(out, vendor, "continue", reason)
 }
 
-func emitContinuationDecision(out io.Writer, decision string, reason string) error {
-	output := continuationHookOutput{
-		Decision: decision,
-		Reason:   reason,
+func emitContinuationDecision(out io.Writer, vendor string, decision string, reason string) error {
+	v := strings.ToLower(strings.TrimSpace(vendor))
+	switch v {
+	case "claude":
+		d := decision
+		if d == "continue" {
+			d = "block"
+		}
+		output := map[string]any{
+			"decision": d,
+		}
+		if reason != "" {
+			output["reason"] = reason
+		}
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(output)
+	case "cursor":
+		output := map[string]any{
+			"decision": decision,
+		}
+		if reason != "" {
+			output["reason"] = reason
+			output["message"] = reason
+		}
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(output)
+	default:
+		output := continuationHookOutput{
+			Decision: decision,
+			Reason:   reason,
+		}
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(output)
 	}
-	enc := json.NewEncoder(out)
-	enc.SetIndent("", "  ")
-	return enc.Encode(output)
 }
 
 func markerExists(path string) bool {
