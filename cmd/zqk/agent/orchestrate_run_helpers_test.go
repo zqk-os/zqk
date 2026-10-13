@@ -18,8 +18,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockHelperStore struct {
