@@ -1,0 +1,13 @@
+Generated spec for data-cells
+
+Usage:
+  zqk system data-cells [flags]
+
+Flags:
+      --envelope-policy-dry-run   Dry run envelope policies for known storage profiles
+      --json                      Output in JSON format
+      --json-envelope             Output JSON envelope with operational details
+      --kind string               Filter data cells by kind
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -72,6 +72,8 @@ common_flags: true
 func TestRunValidateCommandSpecs_InvalidSpecsDir(t *testing.T) {
 	dir := t.TempDir()
 	cmd := NewValidateCommandSpecsCmd()
+	cmd.SilenceErrors = true
+	cmd.SilenceUsage = true
 	cmd.SetArgs([]string{
 		"--specs-dir", filepath.Join(dir, "nonexistent"),
 	})
