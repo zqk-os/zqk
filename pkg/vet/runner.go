@@ -152,6 +152,14 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 		findings = append(findings, goroutineFindings...)
 	}
 
+	if r.Config.Hygiene.CheckReferenceIntegrity {
+		refFindings, err := CheckReferenceIntegrity(r.Root, r.Config)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, refFindings...)
+	}
+
 	if r.Config.Hygiene.CheckDups {
 		dupFindings, err := CheckDuplication(r.Root, files, r.Config)
 		if err != nil {

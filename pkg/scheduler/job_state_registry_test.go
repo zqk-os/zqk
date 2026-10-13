@@ -593,3 +593,110 @@ func TestJobStateRegistry_WriteThroughCacheAndKnownIdleTracking(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+func TestJobStateRegistry_InvalidateJobCache(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
+
+	const jobID = "SCH-invalidate-job"
+	const execID = "exec-inv-1"
+
+	if err := reg.RegisterExecution(jobID, execID, 1234); err != nil {
+		t.Fatalf("RegisterExecution failed: %v", err)
+	}
+
+	st, err := reg.GetExecutionState(jobID)
+	if err != nil || st == nil {
+		t.Fatalf("expected state, got %v (err: %v)", st, err)
+	}
+
+	reg.mu.RLock()
+	_, inMem := reg.jobExecutionStateCache[jobID]
+	reg.mu.RUnlock()
+	if !inMem {
+		t.Fatalf("expected job %q in memory cache", jobID)
+	}
+
+	// Invalidate cache
+	reg.InvalidateJobCache(jobID)
+
+	reg.mu.RLock()
+	_, inMemAfter := reg.jobExecutionStateCache[jobID]
+	reg.mu.RUnlock()
+	if inMemAfter {
+		t.Fatalf("expected job %q evicted from memory cache after InvalidateJobCache", jobID)
+	}
+
+	// Read again: must seamlessly reload from disk into cache
+	stAfter, err := reg.GetExecutionState(jobID)
+	if err != nil || stAfter == nil {
+		t.Fatalf("expected reload from disk, got %v (err: %v)", stAfter, err)
+	}
+	if stAfter.ExecutionID != execID {
+		t.Fatalf("expected execution ID %q, got %q", execID, stAfter.ExecutionID)
+	}
+}
+
+func TestJobStateRegistry_StorageFaultRecoveryAndCacheEvictionRace(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
+
+	const jobID = "SCH-fault-race-job"
+	const execID = "exec-fault-1"
+
+	if err := reg.RegisterExecution(jobID, execID, 5678); err != nil {
+		t.Fatalf("RegisterExecution failed: %v", err)
+	}
+
+	// 1. Storage fault simulation: corrupt the state file on disk
+	diskPath := reg.stateFilePathForJobExecution(jobID, execID)
+	corrupted := []byte("INVALID_YAML: [unclosed")
+	if err := fileutil.WriteFile(diskPath, corrupted, paths.FilePerm600); err != nil {
+		t.Fatalf("failed to write corrupted file: %v", err)
+	}
+
+	// Evict from file state cache to force disk re-read
+	reg.evictCachedFileState(diskPath)
+
+	// In-memory active execution cache must still serve reads smoothly even when disk was corrupted
+	st, err := reg.GetExecutionState(jobID)
+	if err != nil {
+		t.Fatalf("GetExecutionState failed during storage fault: %v", err)
+	}
+	if st == nil || st.ExecutionID != execID {
+		t.Fatalf("expected in-memory state to survive disk fault, got %+v", st)
+	}
+
+	// 2. Storage recovery: update state writes valid data back to disk cleanly
+	st.PolicyDecision = "recovered"
+	if err := reg.UpdateState(jobID, st); err != nil {
+		t.Fatalf("UpdateState recovery failed: %v", err)
+	}
+
+	// 3. Concurrent cache eviction and read/write stress race
+	var wg sync.WaitGroup
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+		workerID := i
+		goroutinelabels.NewGoroutine("test.job_state_registry_race", "concurrent eviction race").StartSimple(func() {
+			defer wg.Done()
+			wJobID := fmt.Sprintf("SCH-race-worker-%d", workerID)
+			wExecID := fmt.Sprintf("exec-race-%d", workerID)
+
+			_ = reg.RegisterExecution(wJobID, wExecID, workerID)
+			for j := 0; j < 5; j++ {
+				_, _ = reg.GetExecutionState(wJobID)
+				reg.InvalidateJobCache(wJobID)
+				_, _ = reg.GetExecutionState(wJobID)
+			}
+			_ = reg.CompleteExecution(wJobID, wExecID, "completed")
+			reg.InvalidateJobCache(wJobID)
+			_, _ = reg.GetExecutionState(wJobID)
+		})
+	}
+	wg.Wait()
+}

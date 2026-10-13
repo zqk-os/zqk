@@ -44,6 +44,7 @@ hygiene:
   check_command_specs: true
   check_cli_builders: true
   check_raw_goroutines: true
+  check_reference_integrity: true
   goroutine_exemptions:
     - "*_test.go"
     - "vendor/*"

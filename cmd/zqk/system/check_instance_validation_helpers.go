@@ -208,13 +208,19 @@ func convertValidationResultsToIssues(result *validation.ValidationResult, err e
 	loader := GetAutoFixRuleLoader()
 	for _, validationError := range result.Errors {
 		tier := 2 // Default to warning
+		category := "instance_validation"
 		if validationError.Rule == "required" || validationError.Rule == objects.KindLifecycle || validationError.Rule == "no_draft_plane_refs_from_cas" {
 			tier = 1 // Blocking for required fields, lifecycle violations, and cross-plane references
+		}
+		// Elevate unanchored backlog_item goal/req references to Layer 0 fail-closed validation blocker
+		if kind == objects.KindBacklogItem && (validationError.Field == "goal_refs/requirement_refs" || validationError.Rule == "bli_hierarchical_chain" || (strings.Contains(validationError.Field, "goal_refs") && strings.Contains(validationError.Field, "requirement_refs"))) {
+			tier = 1
+			category = categoryIntegrity
 		}
 
 		issue := Issue{
 			Tier:     tier,
-			Category: "instance_validation",
+			Category: category,
 			Message:  fmt.Sprintf("%s: %s", validationError.Field, validationError.Message),
 		}
 

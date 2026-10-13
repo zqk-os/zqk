@@ -17,24 +17,25 @@ type GatesConfig struct {
 }
 
 type HygieneConfig struct {
-	CheckPaths             bool     `yaml:"check_paths"`
-	CheckPerms             bool     `yaml:"check_perms"`
-	CheckDups              bool     `yaml:"check_dups"`
-	DupMinStatements       int      `yaml:"dup_min_statements"`
-	DupMinLines            int      `yaml:"dup_min_lines"`
-	DupExemptions          []string `yaml:"dup_exemptions"`
-	CheckCLINames          bool     `yaml:"check_cli_names"`
-	CheckSubprocessHygiene bool     `yaml:"check_subprocess_hygiene"`
-	CheckFileutilHygiene   bool     `yaml:"check_fileutil_hygiene"`
-	CheckCommandSpecs      bool     `yaml:"check_command_specs"`
-	CheckCLIBuilders       bool     `yaml:"check_cli_builders"`
-	CheckRawGoroutines     bool     `yaml:"check_raw_goroutines"`
-	GoroutineExemptions    []string `yaml:"goroutine_exemptions"`
-	ForbiddenPathLiterals  []string `yaml:"forbidden_path_literals"`
-	GoScanDirs             []string `yaml:"go_scan_dirs"`
-	Exemptions             []string `yaml:"exemptions"`
-	CLIExemptFunctions     []string `yaml:"cli_exempt_functions"`
-	CLIExemptFiles         []string `yaml:"cli_exempt_files"`
+	CheckPaths              bool     `yaml:"check_paths"`
+	CheckPerms              bool     `yaml:"check_perms"`
+	CheckDups               bool     `yaml:"check_dups"`
+	DupMinStatements        int      `yaml:"dup_min_statements"`
+	DupMinLines             int      `yaml:"dup_min_lines"`
+	DupExemptions           []string `yaml:"dup_exemptions"`
+	CheckCLINames           bool     `yaml:"check_cli_names"`
+	CheckSubprocessHygiene  bool     `yaml:"check_subprocess_hygiene"`
+	CheckFileutilHygiene    bool     `yaml:"check_fileutil_hygiene"`
+	CheckCommandSpecs       bool     `yaml:"check_command_specs"`
+	CheckCLIBuilders        bool     `yaml:"check_cli_builders"`
+	CheckRawGoroutines      bool     `yaml:"check_raw_goroutines"`
+	CheckReferenceIntegrity bool     `yaml:"check_reference_integrity"`
+	GoroutineExemptions     []string `yaml:"goroutine_exemptions"`
+	ForbiddenPathLiterals   []string `yaml:"forbidden_path_literals"`
+	GoScanDirs              []string `yaml:"go_scan_dirs"`
+	Exemptions              []string `yaml:"exemptions"`
+	CLIExemptFunctions      []string `yaml:"cli_exempt_functions"`
+	CLIExemptFiles          []string `yaml:"cli_exempt_files"`
 }
 
 type TreePoliceConfig struct {
@@ -90,24 +91,25 @@ func DefaultConfig() *GatesConfig {
 	return &GatesConfig{
 		Version: "1.0.0",
 		Hygiene: HygieneConfig{
-			CheckPaths:             true,
-			CheckPerms:             true,
-			CheckDups:              true,
-			DupMinStatements:       5,
-			DupMinLines:            8,
-			DupExemptions:          []string{"*_test.go", "vendor/*", "*/testdata/*", "*/mock/*"},
-			CheckCLINames:          true,
-			CheckSubprocessHygiene: true,
-			CheckFileutilHygiene:   true,
-			CheckCommandSpecs:      true,
-			CheckCLIBuilders:       true,
-			CheckRawGoroutines:     true,
-			GoroutineExemptions:    []string{"*_test.go", "vendor/*", "pkg/goroutinelabels/*", "*/testdata/*"},
-			ForbiddenPathLiterals:  []string{".zqk", ".zqk/"},
-			GoScanDirs:             []string{"pkg/", "cmd/", "internal/", "scripts/", "packs/", "ext/"},
-			Exemptions:             []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},
-			CLIExemptFunctions:     []string{"CLIUsage", "CLIInvocation", "RewriteCanonicalCLIInvocations"},
-			CLIExemptFiles:         []string{"*_test.go", "pkg/paths/cli_command_name.go", "pkg/vet/*"},
+			CheckPaths:              true,
+			CheckPerms:              true,
+			CheckDups:               true,
+			DupMinStatements:        5,
+			DupMinLines:             8,
+			DupExemptions:           []string{"*_test.go", "vendor/*", "*/testdata/*", "*/mock/*"},
+			CheckCLINames:           true,
+			CheckSubprocessHygiene:  true,
+			CheckFileutilHygiene:    true,
+			CheckCommandSpecs:       true,
+			CheckCLIBuilders:        true,
+			CheckRawGoroutines:      true,
+			CheckReferenceIntegrity: true,
+			GoroutineExemptions:     []string{"*_test.go", "vendor/*", "pkg/goroutinelabels/*", "*/testdata/*"},
+			ForbiddenPathLiterals:   []string{".zqk", ".zqk/"},
+			GoScanDirs:              []string{"pkg/", "cmd/", "internal/", "scripts/", "packs/", "ext/"},
+			Exemptions:              []string{"*_test.go", "vendor/*", ".git/*", "pkg/paths/*", "pkg/brand/*", "pkg/vet/*"},
+			CLIExemptFunctions:      []string{"CLIUsage", "CLIInvocation", "RewriteCanonicalCLIInvocations"},
+			CLIExemptFiles:          []string{"*_test.go", "pkg/paths/cli_command_name.go", "pkg/vet/*"},
 		},
 		TreePolice: TreePoliceConfig{
 			ForbiddenPaths: []string{

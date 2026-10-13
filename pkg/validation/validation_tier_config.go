@@ -38,6 +38,7 @@ func DefaultValidationTierConfig() *ValidationTierConfig {
 			// pristine glances that only read blocking_issues / error_status_objects.
 			"execution_facing_membership": 1,
 			"scope_creep_protection":      1,
+			"bli_hierarchical_chain":      1,
 
 			// Tier 2: Warnings that should block saves
 			"pattern":         2, // Pattern mismatch

@@ -208,6 +208,32 @@ func (r *JobStateRegistry) markIdleLocked(jobID string) {
 	r.knownIdleJobs[jobID] = struct{}{}
 }
 
+// InvalidateJobCache evicts both the in-memory execution state cache and any file-level cached states for the given job.
+func (r *JobStateRegistry) InvalidateJobCache(jobID string) {
+	if r == nil || strings.TrimSpace(jobID) == emptyValue {
+		return
+	}
+	r.mu.Lock()
+	if r.jobExecutionStateCache != nil {
+		delete(r.jobExecutionStateCache, jobID)
+	}
+	if r.knownIdleJobs != nil {
+		delete(r.knownIdleJobs, jobID)
+	}
+	r.mu.Unlock()
+
+	seg := sanitizeJobIDForPathSegment(jobID)
+	r.fileCacheMu.Lock()
+	if r.fileStateCache != nil {
+		for p := range r.fileStateCache {
+			if strings.Contains(p, seg) {
+				delete(r.fileStateCache, p)
+			}
+		}
+	}
+	r.fileCacheMu.Unlock()
+}
+
 // GetState returns the execution state for a job
 func (r *JobStateRegistry) GetState(jobID string) (*JobExecutionState, error) {
 	return r.GetExecutionState(jobID)
