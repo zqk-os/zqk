@@ -29,8 +29,10 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 		return findings, nil
 	}
 
-	knownSpecs := make(map[string]string)       // canonical ID -> relative path
-	knownSpecsByName := make(map[string]string) // spec "name" -> relative path
+	knownSpecs := make(map[string]string)                // canonical ID -> relative path
+	knownSpecsByName := make(map[string]string)          // spec "name" -> relative path
+	specMapsByCanonID := make(map[string]map[string]any) // canonical ID -> parsed spec map
+	specMapsByName := make(map[string]map[string]any)    // spec "name" -> parsed spec map
 
 	// 1. Walk and validate specs in .zqk/cli/specs
 	err := filepath.WalkDir(specsDir, func(path string, d fileutil.DirEntry, walkErr error) error {
@@ -79,36 +81,31 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 			return nil
 		}
 
-		name, _ := specMap["name"].(string)
-		short, _ := specMap["short"].(string)
-		desc, _ := specMap["description"].(string)
-
-		if strings.TrimSpace(name) == "" {
-			findings = append(findings, Finding{
-				CheckID:  "command_spec/schema",
-				Suite:    "hygiene",
-				Severity: SeverityError,
-				File:     rel,
-				Message:  "command spec missing required 'name' field",
-			})
-		}
-		if strings.TrimSpace(short) == "" && strings.TrimSpace(desc) == "" {
-			findings = append(findings, Finding{
-				CheckID:  "command_spec/schema",
-				Suite:    "hygiene",
-				Severity: SeverityError,
-				File:     rel,
-				Message:  fmt.Sprintf("command spec %q missing required 'short' or 'description' field", name),
-			})
-		}
+		schemaFindings := validateCommandSpecMap(rel, specMap)
+		findings = append(findings, schemaFindings...)
 
 		relToSpecs, _ := filepath.Rel(specsDir, path)
 		canonicalID := canonicalCommandSpecID(relToSpecs)
 		knownSpecs[canonicalID] = rel
+		specMapsByCanonID[canonicalID] = specMap
+		name, _ := specMap["name"].(string)
 		if name != "" {
+			dir := filepath.Dir(relToSpecs)
 			firstWord := strings.Fields(name)[0]
-			knownSpecsByName[firstWord] = rel
-			knownSpecsByName[canonicalCommandIDString(name)] = rel
+			if dir == "." || dir == "" {
+				knownSpecsByName[firstWord] = rel
+				specMapsByName[firstWord] = specMap
+				canonName := canonicalCommandIDString(name)
+				knownSpecsByName[canonName] = rel
+				specMapsByName[canonName] = specMap
+			} else {
+				scopedWord := canonicalCommandIDString(filepath.ToSlash(dir) + " " + firstWord)
+				knownSpecsByName[scopedWord] = rel
+				specMapsByName[scopedWord] = specMap
+				canonScoped := canonicalCommandIDString(filepath.ToSlash(dir) + " " + name)
+				knownSpecsByName[canonScoped] = rel
+				specMapsByName[canonScoped] = specMap
+			}
 		}
 
 		return nil
@@ -148,6 +145,11 @@ func CheckCommandSpecs(projectRoot string, cfg *GatesConfig, rootCmd any) ([]Fin
 					Message:  fmt.Sprintf("command spec %q has no matching active CLI command (un-baselined spec drift)", missingSpec),
 				})
 			}
+
+			// Validate flag and annotation parity for loaded commands against specs
+			parityFindings := verifyCommandTreeParity(cmd, specMapsByCanonID, specMapsByName, knownSpecs)
+			findings = append(findings, parityFindings...)
+
 			return findings, nil
 		}
 	}
@@ -369,4 +371,225 @@ func canonicalCommandIDString(s string) string {
 		}
 	}
 	return strings.Join(dedup, "_")
+}
+
+func validateCommandSpecMap(rel string, specMap map[string]any) []Finding {
+	var findings []Finding
+
+	name, _ := specMap["name"].(string)
+	short, _ := specMap["short"].(string)
+	desc, _ := specMap["description"].(string)
+
+	if strings.TrimSpace(name) == "" {
+		findings = append(findings, Finding{
+			CheckID:  "command_spec/schema",
+			Suite:    "hygiene",
+			Severity: SeverityError,
+			File:     rel,
+			Message:  "command spec missing required 'name' field",
+		})
+	}
+	if strings.TrimSpace(short) == "" && strings.TrimSpace(desc) == "" {
+		findings = append(findings, Finding{
+			CheckID:  "command_spec/schema",
+			Suite:    "hygiene",
+			Severity: SeverityError,
+			File:     rel,
+			Message:  fmt.Sprintf("command spec %q missing required 'short' or 'description' field", name),
+		})
+	}
+
+	// Validate flags structure
+	if rawFlags, exists := specMap["flags"]; exists && rawFlags != nil {
+		if flagsList, ok := rawFlags.([]any); ok {
+			for i, item := range flagsList {
+				flagMap, ok := item.(map[string]any)
+				if !ok {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/flags",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q flag at index %d must be an object", name, i),
+					})
+					continue
+				}
+				flagName, _ := flagMap["name"].(string)
+				flagType, _ := flagMap["type"].(string)
+				flagDesc, _ := flagMap["description"].(string)
+
+				if strings.TrimSpace(flagName) == "" {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/flags",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q flag at index %d missing required 'name'", name, i),
+					})
+				}
+				if strings.TrimSpace(flagType) == "" {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/flags",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q flag %q missing required 'type'", name, flagName),
+					})
+				}
+				if strings.TrimSpace(flagDesc) == "" {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/flags",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q flag %q missing required 'description'", name, flagName),
+					})
+				}
+				if sh, ok := flagMap["shorthand"].(string); ok && len(sh) > 1 {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/flags",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q flag %q shorthand %q must be a single character", name, flagName, sh),
+					})
+				}
+			}
+		}
+	}
+
+	// Validate args declaration
+	if rawArgs, exists := specMap["args"]; exists && rawArgs != nil {
+		if argsMap, ok := rawArgs.(map[string]any); ok {
+			if argType, ok := argsMap["type"].(string); ok {
+				validTypes := map[string]bool{
+					"exact": true, "minimum": true, "maximum": true, "range": true, "no_args": true,
+					"none": true, "arbitrary": true, "arbitrary_args": true, "any": true,
+				}
+				if !validTypes[argType] {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/args",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q has invalid args type %q", name, argType),
+					})
+				}
+			}
+		}
+	}
+
+	// Validate required traits
+	if rawTraits, exists := specMap["required_traits"]; exists && rawTraits != nil {
+		if traitsList, ok := rawTraits.([]any); ok {
+			for i, t := range traitsList {
+				if tStr, ok := t.(string); !ok || strings.TrimSpace(tStr) == "" {
+					findings = append(findings, Finding{
+						CheckID:  "command_spec/traits",
+						Suite:    "hygiene",
+						Severity: SeverityError,
+						File:     rel,
+						Message:  fmt.Sprintf("command spec %q required_traits[%d] must be a non-empty string", name, i),
+					})
+				}
+			}
+		}
+	}
+
+	return findings
+}
+
+func verifyCommandTreeParity(
+	root *cobra.Command,
+	specMapsByCanonID map[string]map[string]any,
+	specMapsByName map[string]map[string]any,
+	knownSpecs map[string]string,
+) []Finding {
+	var findings []Finding
+
+	var walk func(cmd *cobra.Command)
+	walk = func(cmd *cobra.Command) {
+		cmdPath := cmd.CommandPath()
+		trimmed := strings.TrimPrefix(cmdPath, "zqk ")
+		canonID := canonicalCommandIDString(trimmed)
+
+		specMap := specMapsByCanonID[canonID]
+		specRel := knownSpecs[canonID]
+		if specMap == nil {
+			specMap = specMapsByName[trimmed]
+			specRel = knownSpecs[canonicalCommandIDString(trimmed)]
+		}
+
+		if specMap != nil {
+			parityFindings := checkCommandFlagAndAnnotationParity(cmd, specMap, specRel)
+			findings = append(findings, parityFindings...)
+		}
+
+		for _, sub := range cmd.Commands() {
+			walk(sub)
+		}
+	}
+
+	for _, sub := range root.Commands() {
+		walk(sub)
+	}
+
+	return findings
+}
+
+func checkCommandFlagAndAnnotationParity(cmd *cobra.Command, specMap map[string]any, relFile string) []Finding {
+	var findings []Finding
+	cmdPath := cmd.CommandPath()
+
+	// 1. Check flags defined in spec
+	if rawFlags, exists := specMap["flags"]; exists && rawFlags != nil {
+		if flagsList, ok := rawFlags.([]any); ok {
+			for _, item := range flagsList {
+				if flagMap, ok := item.(map[string]any); ok {
+					flagName, _ := flagMap["name"].(string)
+					if flagName != "" {
+						if cmd.Flags().Lookup(flagName) == nil && cmd.PersistentFlags().Lookup(flagName) == nil {
+							findings = append(findings, Finding{
+								CheckID:  "command_spec/flag_missing",
+								Suite:    "hygiene",
+								Severity: SeverityWarn,
+								File:     relFile,
+								Message:  fmt.Sprintf("runtime command %q missing flag %q defined in specification", cmdPath, flagName),
+							})
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 2. Check orchestration requirements annotations
+	checkAnnotation := func(specKey, annKey string) {
+		if specVal, ok := specMap[specKey].(bool); ok {
+			annVal := strings.ToLower(cmd.Annotations[annKey])
+			if specVal && annVal == "false" {
+				findings = append(findings, Finding{
+					CheckID:  "command_spec/annotation_drift",
+					Suite:    "hygiene",
+					Severity: SeverityWarn,
+					File:     relFile,
+					Message:  fmt.Sprintf("runtime command %q annotation %s is false but spec specifies %s: true", cmdPath, annKey, specKey),
+				})
+			} else if !specVal && annVal == "true" {
+				findings = append(findings, Finding{
+					CheckID:  "command_spec/annotation_drift",
+					Suite:    "hygiene",
+					Severity: SeverityWarn,
+					File:     relFile,
+					Message:  fmt.Sprintf("runtime command %q annotation %s is true but spec specifies %s: false", cmdPath, annKey, specKey),
+				})
+			}
+		}
+	}
+
+	checkAnnotation("requires_storage", "zqk.requires_storage")
+	checkAnnotation("requires_session", "zqk.requires_session")
+	checkAnnotation("requires_scheduler_check", "zqk.requires_scheduler_check")
+
+	return findings
 }

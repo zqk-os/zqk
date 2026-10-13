@@ -32,7 +32,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["exact", "minimum", "maximum", "range", "no_args"]
+          "enum": ["exact", "minimum", "maximum", "range", "no_args", "none", "arbitrary", "arbitrary_args", "any"]
         },
         "count": {
           "type": "integer"

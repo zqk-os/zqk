@@ -4,12 +4,15 @@ import (
 	"bytes"
 	"go/ast"
 	"go/token"
-	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestFinding_String(t *testing.T) {
@@ -146,13 +149,13 @@ func TestRunner_FullExecution(t *testing.T) {
 			RequiredArtifacts: []string{"README.md"},
 		},
 	}
-	require.NoError(t, os.WriteFile(filepath.Join(tempDir, "README.md"), []byte("# OK"), 0644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(tempDir, "README.md"), []byte("# OK"), paths.FilePerm644))
 
 	// Create valid go file under pkg
 	pkgDir := filepath.Join(tempDir, "pkg", "sample")
-	require.NoError(t, os.MkdirAll(pkgDir, 0755))
+	require.NoError(t, fileutil.MkdirAll(pkgDir, paths.DirPerm755))
 	validGo := "package sample\n\nconst Greeting = \"hello\"\n"
-	require.NoError(t, os.WriteFile(filepath.Join(pkgDir, "sample.go"), []byte(validGo), 0644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(pkgDir, "sample.go"), []byte(validGo), paths.FilePerm644))
 
 	runner := NewRunner(tempDir, cfg)
 	report, err := runner.Run(RunOptions{
@@ -188,7 +191,7 @@ func TestCheckPayload_Extended(t *testing.T) {
 	}
 
 	// Create mismatched go.mod
-	require.NoError(t, os.WriteFile(filepath.Join(tempDir, "go.mod"), []byte("module github.com/other/pkg\n"), 0644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(tempDir, "go.mod"), []byte("module github.com/other/pkg\n"), paths.FilePerm644))
 
 	findings, err := CheckPayload(tempDir, cfg)
 	assert.NoError(t, err)
@@ -221,14 +224,14 @@ func TestCheckTreePolice_ArchivedDocsAndExtraScripts(t *testing.T) {
 
 	// 1. Create archived doc dir
 	archDir := filepath.Join(tempDir, "docs", "archive")
-	require.NoError(t, os.MkdirAll(archDir, 0755))
-	require.NoError(t, os.WriteFile(filepath.Join(archDir, "doc.md"), []byte("# Old"), 0644))
+	require.NoError(t, fileutil.MkdirAll(archDir, paths.DirPerm755))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(archDir, "doc.md"), []byte("# Old"), paths.FilePerm644))
 
 	// 2. Create unapproved script
 	scriptsDir := filepath.Join(tempDir, "scripts")
-	require.NoError(t, os.MkdirAll(scriptsDir, 0755))
-	require.NoError(t, os.WriteFile(filepath.Join(scriptsDir, "unapproved.sh"), []byte("#!/bin/bash\n"), 0755))
-	require.NoError(t, os.WriteFile(filepath.Join(scriptsDir, "allowed.sh"), []byte("#!/bin/bash\n"), 0755))
+	require.NoError(t, fileutil.MkdirAll(scriptsDir, paths.DirPerm755))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(scriptsDir, "unapproved.sh"), []byte("#!/bin/bash\n"), paths.FilePerm755))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(scriptsDir, "allowed.sh"), []byte("#!/bin/bash\n"), paths.FilePerm755))
 
 	findings, err := CheckTreePolice(tempDir, cfg)
 	assert.NoError(t, err)
@@ -246,4 +249,133 @@ func TestCheckTreePolice_ArchivedDocsAndExtraScripts(t *testing.T) {
 	}
 	assert.True(t, hasArchived)
 	assert.True(t, hasExtraScript)
+}
+
+func TestCheckCommandSpecs_ParityAndGovernance(t *testing.T) {
+	// 1. Schema Validation (validateCommandSpecMap)
+	// Empty name
+	f1 := validateCommandSpecMap("spec1.yaml", map[string]any{"short": "foo"})
+	assert.NotEmpty(t, f1)
+	assert.Equal(t, "command_spec/schema", f1[0].CheckID)
+
+	// Missing short and desc
+	f2 := validateCommandSpecMap("spec2.yaml", map[string]any{"name": "test"})
+	assert.NotEmpty(t, f2)
+	assert.Equal(t, "command_spec/schema", f2[0].CheckID)
+
+	// Invalid flags
+	specWithBadFlags := map[string]any{
+		"name":  "test",
+		"short": "test cmd",
+		"flags": []any{
+			"not-a-map",
+			map[string]any{"name": ""},
+			map[string]any{"name": "valid", "type": "", "description": ""},
+			map[string]any{"name": "opt", "type": "bool", "description": "desc", "shorthand": "too-long"},
+		},
+	}
+	fFlags := validateCommandSpecMap("bad_flags.yaml", specWithBadFlags)
+	assert.True(t, len(fFlags) >= 4)
+	for _, f := range fFlags {
+		assert.Equal(t, "command_spec/flags", f.CheckID)
+	}
+
+	// Invalid args
+	specWithBadArgs := map[string]any{
+		"name":  "test",
+		"short": "test cmd",
+		"args": map[string]any{
+			"type": "unsupported_type",
+		},
+	}
+	fArgs := validateCommandSpecMap("bad_args.yaml", specWithBadArgs)
+	assert.NotEmpty(t, fArgs)
+	assert.Equal(t, "command_spec/args", fArgs[0].CheckID)
+
+	// Invalid traits
+	specWithBadTraits := map[string]any{
+		"name":            "test",
+		"short":           "test cmd",
+		"required_traits": []any{123},
+	}
+	fTraits := validateCommandSpecMap("bad_traits.yaml", specWithBadTraits)
+	assert.NotEmpty(t, fTraits)
+	assert.Equal(t, "command_spec/traits", fTraits[0].CheckID)
+
+	// 2. Flag and Annotation Parity
+	cmd := &cobra.Command{
+		Use: "mycmd",
+		Annotations: map[string]string{
+			"zqk.requires_storage":         "false",
+			"zqk.requires_session":         "false",
+			"zqk.requires_scheduler_check": "false",
+		},
+	}
+	cmd.Flags().String("existing-flag", "", "existing flag")
+
+	specForCmd := map[string]any{
+		"name":                     "mycmd",
+		"short":                    "mycmd short",
+		"requires_storage":         true, // drift: spec true vs cmd false
+		"requires_session":         true, // drift: spec true vs cmd false
+		"requires_scheduler_check": true, // drift: spec true vs cmd false
+		"flags": []any{
+			map[string]any{"name": "missing-flag", "type": "string", "description": "missing"},
+			map[string]any{"name": "existing-flag", "type": "string", "description": "present"},
+		},
+	}
+
+	driftFindings := checkCommandFlagAndAnnotationParity(cmd, specForCmd, "mycmd.yaml")
+	assert.NotEmpty(t, driftFindings)
+
+	var hasMissingFlag, hasStorageDrift, hasSessionDrift, hasSchedDrift bool
+	for _, f := range driftFindings {
+		if f.CheckID == "command_spec/flag_missing" {
+			hasMissingFlag = true
+		}
+		if f.CheckID == "command_spec/annotation_drift" {
+			if f.Message != "" {
+				if f.Message == "runtime command \"mycmd\" annotation zqk.requires_storage is false but spec specifies requires_storage: true" {
+					hasStorageDrift = true
+				}
+				if f.Message == "runtime command \"mycmd\" annotation zqk.requires_session is false but spec specifies requires_session: true" {
+					hasSessionDrift = true
+				}
+				if f.Message == "runtime command \"mycmd\" annotation zqk.requires_scheduler_check is false but spec specifies requires_scheduler_check: true" {
+					hasSchedDrift = true
+				}
+			}
+		}
+	}
+	assert.True(t, hasMissingFlag)
+	assert.True(t, hasStorageDrift)
+	assert.True(t, hasSessionDrift)
+	assert.True(t, hasSchedDrift)
+
+	// 3. Tree Parity with clean match
+	root := &cobra.Command{Use: "zqk"}
+	sub := &cobra.Command{
+		Use: "status",
+		Annotations: map[string]string{
+			"zqk.requires_storage": "false",
+		},
+	}
+	sub.Flags().Bool("verbose", false, "verbose mode")
+	root.AddCommand(sub)
+
+	specClean := map[string]any{
+		"name":             "status",
+		"short":            "show status",
+		"requires_storage": false,
+		"flags": []any{
+			map[string]any{"name": "verbose", "type": "bool", "description": "verbose mode"},
+		},
+	}
+
+	canonSpecs := map[string]map[string]any{"status": specClean}
+	nameSpecs := map[string]map[string]any{"status": specClean}
+	known := map[string]string{"status": "specs/status_command.yaml"}
+
+	cleanFindings := verifyCommandTreeParity(root, canonSpecs, nameSpecs, known)
+	assert.Empty(t, cleanFindings)
 }
