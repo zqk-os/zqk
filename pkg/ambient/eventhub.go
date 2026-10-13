@@ -55,12 +55,14 @@ type EventHub interface {
 	Publish(ctx context.Context, event Event) error
 	Status() string
 	EnableEventSourcing(projectRoot string, secCtx *pkgctx.SecurityContext)
+	WaitForAudits()
 }
 
 // eventHubImpl implements EventHub.
 type eventHubImpl struct {
 	mu       sync.RWMutex
 	handlers map[EventType][]EventHandler
+	auditWg  sync.WaitGroup
 
 	projectRoot string
 	secCtx      *pkgctx.SecurityContext
@@ -107,7 +109,9 @@ func (h *eventHubImpl) Publish(ctx context.Context, event Event) error {
 	h.mu.RUnlock()
 
 	if root != "" && sCtx != nil {
+		h.auditWg.Add(1)
 		goroutinelabels.NewGoroutine("ambient_audit", "emit audit for ambient event").StartSimple(func() {
+			defer h.auditWg.Done()
 			targetKind := objects.KindAuditEvent
 			targetURI := ""
 
@@ -146,6 +150,11 @@ func (h *eventHubImpl) Publish(ctx context.Context, event Event) error {
 	}
 
 	return nil
+}
+
+// WaitForAudits blocks until all asynchronous audit event emissions complete.
+func (h *eventHubImpl) WaitForAudits() {
+	h.auditWg.Wait()
 }
 
 // Status returns the current activity status of the EventHub.

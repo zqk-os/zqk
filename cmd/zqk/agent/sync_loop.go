@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -239,8 +240,14 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 
 	// Start background hourglass refresher
 	ctxHourglass, cancelHourglass := context.WithCancel(ctx)
-	defer cancelHourglass()
+	var hourglassWg sync.WaitGroup
+	hourglassWg.Add(1)
+	defer func() {
+		cancelHourglass()
+		hourglassWg.Wait()
+	}()
 	goroutinelabels.NewGoroutine("agent_sync_hourglass", "refresh agent_task hourglass while sync-loop runs").StartSimple(func() {
+		defer hourglassWg.Done()
 		ticker := time.NewTicker(1 * time.Minute)
 		defer ticker.Stop()
 		for {
