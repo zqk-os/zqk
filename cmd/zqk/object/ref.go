@@ -380,20 +380,17 @@ func runRefRemove(cmd *cobra.Command, args []string) error {
 					}
 				} else if k == objects.FieldKeyRelatedObjectRefs {
 					// In related_object_refs, inspect target objects and filter matching kind
-					if slice, ok := v.([]any); ok {
-						var kept []string
-						for _, item := range slice {
-							if itemID, ok := item.(string); ok {
-								if obj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), itemID); err == nil {
-									if knd, _ := obj[objects.FieldKeyKind].(string); strings.EqualFold(knd, targetKindCanonical) {
-										continue
-									}
-								}
-								kept = append(kept, itemID)
+					slice := getRefSlice(sourceObj, nil, k)
+					var kept []string
+					for _, itemID := range slice {
+						if obj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), itemID); err == nil {
+							if knd, _ := obj[objects.FieldKeyKind].(string); strings.EqualFold(knd, targetKindCanonical) {
+								continue
 							}
 						}
-						updates[k] = stringSliceToAny(kept)
+						kept = append(kept, itemID)
 					}
+					updates[k] = stringSliceToAny(kept)
 				}
 			}
 		} else if explicitField != "" && len(targetRawIDs) == 0 {
@@ -513,21 +510,18 @@ func runRefRemove(cmd *cobra.Command, args []string) error {
 				}
 
 				if isSliceVal(v) {
-					if slice, ok := v.([]any); ok {
-						var kept []string
-						for _, item := range slice {
-							if itemID, ok := item.(string); ok {
-								if !targetSet[itemID] {
-									kept = append(kept, itemID)
-								}
-							}
+					slice := getRefSlice(sourceObj, nil, k)
+					var kept []string
+					for _, itemID := range slice {
+						if !targetSet[itemID] {
+							kept = append(kept, itemID)
 						}
-						if len(kept) != len(slice) {
-							if len(kept) == 0 {
-								updates[k] = storage.FieldUnset
-							} else {
-								updates[k] = stringSliceToAny(kept)
-							}
+					}
+					if len(kept) != len(slice) {
+						if len(kept) == 0 {
+							updates[k] = storage.FieldUnset
+						} else {
+							updates[k] = stringSliceToAny(kept)
 						}
 					}
 				} else {
