@@ -285,6 +285,7 @@ type JobStateRegistryInterface interface {
 	MigrateUnbucketedJobStateDirsBestEffort() (int, error)
 	Summarize(staleAfter time.Duration) (*JobStateSummary, error)
 	CleanStaleLocks(staleAge time.Duration) (int, error)
+	WaitForRetentionCleanup()
 }
 
 // HandlerFactoryInterface defines the handler factory operations.

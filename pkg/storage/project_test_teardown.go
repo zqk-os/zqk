@@ -9,6 +9,7 @@ import (
 
 	"context"
 	"io"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -241,7 +242,14 @@ func ScrubProjectRootForTempCleanup(projectRoot string, maxAttempts int, backoff
 			return
 		}
 		for _, e := range entries {
-			logging.LogSwallowedError(fileutil.RemoveAll(filepath.Join(projectRoot, e.Name())))
+			childPath := filepath.Join(projectRoot, e.Name())
+			_ = filepath.Walk(childPath, func(path string, info os.FileInfo, err error) error {
+				if err == nil {
+					_ = os.Chmod(path, 0700) //nolint:gosec // #nosec G302 - test teardown permission reset before removal
+				}
+				return nil
+			})
+			logging.LogSwallowedError(fileutil.RemoveAll(childPath))
 		}
 		time.Sleep(backoff)
 	}

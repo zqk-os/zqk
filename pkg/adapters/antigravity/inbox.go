@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"path/filepath"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -18,7 +19,7 @@ type InboxAdapter struct {
 func (a *InboxAdapter) Vendor() string { return VendorID }
 
 // Deliver implements adapters.MessageDelivery using Antigravity's inbox JSON
-// schema (ID/Recipient/Sender/Priority/Message/renderDetails).
+// schema (id/recipient/sender/priority/timestamp/content/renderDetails).
 func (a *InboxAdapter) Deliver(_ context.Context, message string, msgID string, renderDetails map[string]string) error {
 	convRoot, err := ConversationRootFromTranscript(a.TranscriptPath)
 	if err != nil {
@@ -27,11 +28,12 @@ func (a *InboxAdapter) Deliver(_ context.Context, message string, msgID string, 
 
 	// Field names and MESSAGE_PRIORITY_HIGH are Antigravity inbox protocol, not kernel objects.
 	payload := map[string]any{
-		"ID":            msgID,
-		"Recipient":     ConversationID(convRoot),
-		"Sender":        "ZQK-Chat-Responder",
-		"Priority":      "MESSAGE_PRIORITY_HIGH",
-		"Message":       message,
+		"id":            msgID,
+		"recipient":     ConversationID(convRoot),
+		"sender":        "ZQK-Chat-Responder",
+		"priority":      "MESSAGE_PRIORITY_HIGH",
+		"timestamp":     time.Now().UTC().Format(time.RFC3339Nano),
+		"content":       message,
 		"renderDetails": renderDetails,
 	}
 	b, err := json.Marshal(payload)

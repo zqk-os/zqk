@@ -124,4 +124,9 @@ func TestPreSubagentHook_EdgeCases(t *testing.T) {
 	inputNoSubagents := []byte(`{"tool_call":{"name":"invoke_subagent","args":{}}}`)
 	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", bytes.NewReader(inputNoSubagents), &out))
 	assert.Contains(t, out.String(), `"decision": "allow"`)
+
+	// 6. Nil input reader
+	out.Reset()
+	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", nil, &out))
+	assert.Contains(t, out.String(), `"decision": "allow"`)
 }

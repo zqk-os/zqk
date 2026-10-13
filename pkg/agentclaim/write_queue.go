@@ -110,8 +110,15 @@ func (q *CheckinWriteQueue) flush() {
 	q.mu.Unlock()
 
 	for _, req := range writes {
-		_ = q.writeDirect(req.projectRoot, req.timer)
 		path := CheckinTimerPath(req.projectRoot, req.timer.TaskID)
+		q.mu.Lock()
+		if _, ok := q.flushing[path]; !ok {
+			q.mu.Unlock()
+			continue
+		}
+		q.mu.Unlock()
+
+		_ = q.writeDirect(req.projectRoot, req.timer)
 		q.mu.Lock()
 		delete(q.flushing, path)
 		q.mu.Unlock()

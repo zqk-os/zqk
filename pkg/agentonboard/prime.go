@@ -22,7 +22,7 @@ func DefaultAgentHooksJSON() string {
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -x ./bin/%s ]; then ./bin/%s agent hook pre-subagent --vendor antigravity; else %s agent hook pre-subagent --vendor antigravity; fi",
+            "command": "for p in ./bin/%s ../bin/%s \"$HOME/.gemini/antigravity-cli/bin/%s\"; do if [ -x \"$p\" ]; then exec \"$p\" agent hook pre-subagent --vendor antigravity; fi; done; exec %s agent hook pre-subagent --vendor antigravity",
             "timeout": 45
           }
         ]
@@ -33,13 +33,13 @@ func DefaultAgentHooksJSON() string {
     "Stop": [
       {
         "type": "command",
-        "command": "if [ -x ./bin/%s ]; then ./bin/%s agent hook stop --vendor antigravity; else %s agent hook stop --vendor antigravity; fi",
+        "command": "for p in ./bin/%s ../bin/%s \"$HOME/.gemini/antigravity-cli/bin/%s\"; do if [ -x \"$p\" ]; then exec \"$p\" agent hook stop --vendor antigravity; fi; done; exec %s agent hook stop --vendor antigravity",
         "timeout": 15
       }
     ]
   }
 }
-`, exe, exe, exe, exe, exe, exe)
+`, exe, exe, exe, exe, exe, exe, exe, exe)
 }
 
 func hasAgentHooksVendor(vendors []Vendor) bool {

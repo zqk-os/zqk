@@ -186,3 +186,13 @@ func TestContinuationHook_SteeringFeedIntegration(t *testing.T) {
 	assert.Contains(t, hookOut.Reason, "Focus on boundary verification and race safety")
 	assert.Contains(t, hookOut.Reason, "human-tpm")
 }
+
+func TestContinuationHook_SafeDrainInput(t *testing.T) {
+	data, err := safeDrainInput(nil)
+	assert.NoError(t, err)
+	assert.Nil(t, data)
+
+	data, err = safeDrainInput(strings.NewReader("test-payload"))
+	assert.NoError(t, err)
+	assert.Equal(t, "test-payload", string(data))
+}
