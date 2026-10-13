@@ -135,13 +135,14 @@ func TestCLITaxonomyGovernance_StandardsAndPersonas(t *testing.T) {
 	}
 
 	requiredTokens := []string{
-		"CLI Command Taxonomy Standards",
-		"Rule 1: Strict Flat Hierarchy (depth <= 2)",
-		"PER-COMMUNITY-PLATFORM-ENGINEER",
-		"PER-COMMUNITY-APPLICATION-DEVELOPER",
-		"PER-COMMUNITY-OPERATOR",
-		"PER-COMMUNITY-DATA-SCIENTIST",
-		"PER-COMMUNITY-SECURITY-AUDITOR",
+		"Canonical CLI Command Taxonomy & Architectural Standards",
+		"Rule 1: Declarative Spec Coverage & Ratcheting Baseline Parity",
+		"Rule 2: Strict Domain-Resource Grammar & Noun-Verb Hierarchy",
+		"Rule 3: Pluggable Vendor Decoupling & Adapter Isolation",
+		"Rule 4: CLI Command DNA & Behavioral Protocol",
+		"Rule 5: Deprecation & Sunsetting Protocol",
+		"PER-INFORMATION-ARCHITECT",
+		"PER-TECHNICAL-DOCUMENTARIAN",
 	}
 
 	for _, token := range requiredTokens {

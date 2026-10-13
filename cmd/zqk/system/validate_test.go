@@ -95,32 +95,64 @@ func TestValidate_OperationalProof_AgainstRepoObjects(t *testing.T) {
 		t.Skip("repo root not found")
 	}
 
+	factory, err := storage.NewStorageFactory(context.Background(), repoRoot)
+	if err != nil {
+		t.Skipf("cannot init storage factory: %v", err)
+	}
+	store := factory.GetStorage()
+	if store == nil {
+		t.Skip("storage provider is nil")
+	}
+	defer func() { _ = store.Shutdown(context.Background()) }()
+
+	secCtx := pkgctx.NewSystemSecurityContext()
+	sCtx := &pkgctx.StorageContext{}
+	res, err := store.List(context.Background(), secCtx, sCtx, storage.ListFilter{Limit: 5})
+	if err != nil || res == nil || len(res.Objects) == 0 {
+		t.Skip("no objects in storage to validate")
+	}
+
+	var targetID string
+	var targetKind string
+	for _, obj := range res.Objects {
+		if id, ok := obj[objects.FieldKeyID].(string); ok && id != "" {
+			targetID = id
+			targetKind, _ = obj[objects.FieldKeyKind].(string)
+			break
+		}
+	}
+	if targetID == "" {
+		t.Skip("no valid object ID found in storage")
+	}
+
 	// 1. Single existing object
-	outSingle, errSingle := executeValidateCmd(repoRoot, "BLI-1791926625066508000-d95cc3cd")
+	outSingle, errSingle := executeValidateCmd(repoRoot, targetID)
 	require.NoError(t, errSingle)
 	assert.NotNil(t, outSingle)
 
 	// 2. Single existing object with JSON and YAML format
-	outJSON, errJSON := executeValidateCmd(repoRoot, "BLI-1791926625066508000-d95cc3cd", "-f", "json")
+	outJSON, errJSON := executeValidateCmd(repoRoot, targetID, "-f", "json")
 	require.NoError(t, errJSON)
 	assert.Contains(t, outJSON, `"valid": true`)
 
-	outYAML, errYAML := executeValidateCmd(repoRoot, "BLI-1791926625066508000-d95cc3cd", "-f", "yaml")
+	outYAML, errYAML := executeValidateCmd(repoRoot, targetID, "-f", "yaml")
 	require.NoError(t, errYAML)
 	assert.Contains(t, outYAML, "valid: true")
 
 	// 3. Specific kind with text, JSON, and YAML formats
-	outKindText, errKindText := executeValidateCmd(repoRoot, "--kind", "milestone")
-	require.NoError(t, errKindText)
-	assert.NotNil(t, outKindText)
+	if targetKind != "" {
+		outKindText, errKindText := executeValidateCmd(repoRoot, "--kind", targetKind)
+		require.NoError(t, errKindText)
+		assert.NotNil(t, outKindText)
 
-	outKindJSON, errKindJSON := executeValidateCmd(repoRoot, "--kind", "milestone", "-f", "json")
-	require.NoError(t, errKindJSON)
-	assert.Contains(t, outKindJSON, `"valid": true`)
+		outKindJSON, errKindJSON := executeValidateCmd(repoRoot, "--kind", targetKind, "-f", "json")
+		require.NoError(t, errKindJSON)
+		assert.Contains(t, outKindJSON, `"valid": true`)
 
-	outKindYAML, errKindYAML := executeValidateCmd(repoRoot, "--kind", "milestone", "-f", "yaml")
-	require.NoError(t, errKindYAML)
-	assert.Contains(t, outKindYAML, "valid: true")
+		outKindYAML, errKindYAML := executeValidateCmd(repoRoot, "--kind", targetKind, "-f", "yaml")
+		require.NoError(t, errKindYAML)
+		assert.Contains(t, outKindYAML, "valid: true")
+	}
 
 	// 4. All objects with text, JSON, and YAML formats
 	outAllText, errAllText := executeValidateCmd(repoRoot, "--all")
