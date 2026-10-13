@@ -62,23 +62,25 @@ func (c *WireProtocolCodec) EncodeEntry(entry *CallbackEntry, buf []byte) ([]byt
 		return nil, errfmt.Newf("failed to marshal entry payload").Wrap(err)
 	}
 
-	if len(payloadBytes) > WireMaxPayloadSize {
-		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
-	}
 	payloadLen := len(payloadBytes)
-	if payloadLen > math.MaxInt-WireHeaderSize {
+	if payloadLen < 0 || payloadLen > WireMaxPayloadSize {
 		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
 	}
-	totalSize := WireHeaderSize + payloadLen
-	if totalSize > WireMaxPayloadSize+WireHeaderSize {
+	allocCap := WireHeaderSize
+	if allocCap <= math.MaxInt-payloadLen {
+		allocCap += payloadLen
+	} else {
+		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
+	}
+	if allocCap > WireMaxPayloadSize+WireHeaderSize {
 		return nil, errfmt.Errorf(ErrMsgPayloadTooLarge)
 	}
 
 	target := buf
-	if cap(target) < totalSize {
-		target = make([]byte, totalSize)
+	if cap(target) < allocCap {
+		target = make([]byte, allocCap)
 	} else {
-		target = target[:totalSize]
+		target = target[:allocCap]
 	}
 
 	c.writeHeader(target[:WireHeaderSize], entry.Seq, entry.Timestamp.UnixNano(), uint32(payloadLen))
@@ -120,14 +122,20 @@ func (c *WireProtocolCodec) DecodeEntry(data []byte) (*CallbackEntry, int, error
 	}
 
 	payloadLen := int(binary.BigEndian.Uint32(data[24:28]))
-	if payloadLen > WireMaxPayloadSize {
+	if payloadLen < 0 || payloadLen > WireMaxPayloadSize {
 		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
 	}
-	if payloadLen > math.MaxInt-WireHeaderSize {
+	allocCap := WireHeaderSize
+	if allocCap <= math.MaxInt-payloadLen {
+		allocCap += payloadLen
+	} else {
+		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
+	}
+	if allocCap > WireMaxPayloadSize+WireHeaderSize {
 		return nil, 0, errfmt.Errorf(ErrMsgPayloadLengthTooLarge)
 	}
 	expectedChecksum := binary.BigEndian.Uint32(data[28:32])
-	totalLen := WireHeaderSize + payloadLen
+	totalLen := allocCap
 
 	if len(data) < totalLen {
 		return nil, 0, errfmt.Errorf("incomplete frame data: got %d, want %d", len(data), totalLen)

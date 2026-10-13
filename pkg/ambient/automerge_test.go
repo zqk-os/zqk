@@ -6,7 +6,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestAutoMergeDaemon_Initialization(t *testing.T) {
@@ -23,17 +25,17 @@ func TestAutoMergeDaemon_CancelPropagation(t *testing.T) {
 
 	// mock execFn to output empty json array
 	daemon.execFn = func(ctx context.Context, name string, arg ...string) *exec.Cmd {
-		return exec.CommandContext(ctx, "echo", "[]")
+		return testkit.ManagedCommand(t, ctx, "echo", "[]")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel() // cancel immediately
 
 	done := make(chan struct{})
-	go func() {
+	goroutinelabels.NewGoroutine("test_automerge_daemon", "daemon shutdown test").StartSimple(func() {
 		daemon.Start(ctx)
 		close(done)
-	}()
+	})
 
 	select {
 	case <-done:
@@ -49,9 +51,9 @@ func TestAutoMergeDaemon_Poll(t *testing.T) {
 
 	daemon.execFn = func(ctx context.Context, name string, arg ...string) *exec.Cmd {
 		if name == ghCmd && len(arg) > 0 && arg[0] == "pr" && arg[1] == "list" {
-			return exec.CommandContext(ctx, "echo", `[{"number": 123, "title": "Test PR", "headRefName": "feat/test", "mergeable": "MERGEABLE"}]`)
+			return testkit.ManagedCommand(t, ctx, "echo", `[{"number": 123, "title": "Test PR", "headRefName": "feat/test", "mergeable": "MERGEABLE"}]`)
 		}
-		return exec.CommandContext(ctx, "echo", "success")
+		return testkit.ManagedCommand(t, ctx, "echo", "success")
 	}
 
 	// poll should not panic or error out
@@ -63,7 +65,7 @@ func TestAutoMergeDaemon_VerifyAndMerge(t *testing.T) {
 	daemon := NewAutoMergeDaemon(logger.Logger())
 
 	daemon.execFn = func(ctx context.Context, name string, arg ...string) *exec.Cmd {
-		return exec.CommandContext(ctx, "echo", "success")
+		return testkit.ManagedCommand(t, ctx, "echo", "success")
 	}
 
 	err := daemon.verifyAndMerge(context.Background(), PR{

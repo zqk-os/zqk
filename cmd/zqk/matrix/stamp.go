@@ -35,7 +35,7 @@ match the provided or computed evidence hash, preventing manual tampering or sta
 }
 
 func runMatrixStamp(cmd *cobra.Command, _ []string) error {
-	projectRoot, err := resolveProjectRoot(cmd)
+	ctx, _, engine, err := setupMatrixCmd(cmd, nil)
 	if err != nil {
 		return err
 	}
@@ -54,13 +54,6 @@ func runMatrixStamp(cmd *cobra.Command, _ []string) error {
 		return errfmt.Errorf("either --dimension or --check must be specified")
 	}
 
-	engine, err := initMatrixEngine(projectRoot, nil)
-	if err != nil {
-		return err
-	}
-
-	ctx := cmdContext(cmd)
-
 	req := matrix.StampRequest{
 		Path:         targetFile,
 		CheckID:      checkID,
@@ -77,8 +70,8 @@ func runMatrixStamp(cmd *cobra.Command, _ []string) error {
 		return errfmt.Errorf("programmatic matrix stamp failed: %w", err)
 	}
 
-	if err := engine.SaveLedger(); err != nil {
-		return errfmt.Errorf("failed to persist matrix ledger: %w", err)
+	if err := persistLedger(cmd, engine); err != nil {
+		return err
 	}
 
 	cmd.Printf("✓ Stamped %s [%s] -> %s (%s)\n", targetFile, result.CheckID, result.Status, result.DiamondScore)

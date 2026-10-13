@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -24,6 +25,7 @@ type HygieneConfig struct {
 	DupExemptions          []string `yaml:"dup_exemptions"`
 	CheckCLINames          bool     `yaml:"check_cli_names"`
 	CheckSubprocessHygiene bool     `yaml:"check_subprocess_hygiene"`
+	CheckFileutilHygiene   bool     `yaml:"check_fileutil_hygiene"`
 	CheckCommandSpecs      bool     `yaml:"check_command_specs"`
 	CheckCLIBuilders       bool     `yaml:"check_cli_builders"`
 	CheckRawGoroutines     bool     `yaml:"check_raw_goroutines"`
@@ -69,7 +71,7 @@ func LoadConfig(projectRoot, configPath string) (*GatesConfig, error) {
 	if configPath == "" {
 		configPath = filepath.Join(projectRoot, "config", "gates.yaml")
 	}
-	data, err := os.ReadFile(configPath)
+	data, err := fileutil.ReadFile(configPath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return DefaultConfig(), nil
@@ -96,6 +98,7 @@ func DefaultConfig() *GatesConfig {
 			DupExemptions:          []string{"*_test.go", "vendor/*", "*/testdata/*", "*/mock/*"},
 			CheckCLINames:          true,
 			CheckSubprocessHygiene: true,
+			CheckFileutilHygiene:   true,
 			CheckCommandSpecs:      true,
 			CheckCLIBuilders:       true,
 			CheckRawGoroutines:     true,

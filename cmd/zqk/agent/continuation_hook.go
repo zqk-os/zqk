@@ -38,9 +38,7 @@ type continuationHookOutput struct {
 
 func newContinuationHookCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookContinuationCommandBuilder(), &cobra.Command{
-		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-			in, out := commandIO(cmd)
-			sec := procSecurity(proc)
+		RunE: withHookProcessor(func(cmd *cobra.Command, proc *cli.Processor, in io.Reader, out io.Writer, sec *pkgctx.SecurityContext) error {
 			flags := cmd.Flags()
 			vendor, _ := flags.GetString("vendor")
 			marker, _ := flags.GetString("marker")

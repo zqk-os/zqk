@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"sort"
@@ -21,6 +20,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testkit/managedcmd"
 )
 
 // ensureObjectDeleted deterministically waits for an object to be deleted by polling
@@ -705,7 +705,7 @@ func TestFileObjectStorage_List_BudgetExhaustionDoesNotDeadlock(t *testing.T) {
 	if os.Getenv(childMarker) != "1" {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
-		cmd := exec.CommandContext(ctx, os.Args[0], "-test.run=^TestFileObjectStorage_List_BudgetExhaustionDoesNotDeadlock$") //nolint:gosec
+		cmd := managedcmd.ManagedCommand(t, ctx, os.Args[0], "-test.run=^TestFileObjectStorage_List_BudgetExhaustionDoesNotDeadlock$") //nolint:gosec
 		cmd.Env = append(os.Environ(), childMarker+"=1")
 		if output, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("budget-exhaustion child failed or deadlocked: %v\n%s", err, output)

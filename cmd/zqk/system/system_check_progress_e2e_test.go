@@ -11,7 +11,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -106,7 +105,7 @@ func testDiscoveryPhaseProgress(t *testing.T, binaryPath, projectRoot string) {
 	defer cancel()
 
 	// Run system check (default waits for completion) with verbose output
-	cmd := exec.CommandContext(ctx, binaryPath, "system", "check", "--verbose", "--timeout", "20s")
+	cmd := testkit.ManagedCommand(t, ctx, binaryPath, "system", "check", "--verbose", "--timeout", "20s")
 	zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 
 	// Capture stderr separately (where progress messages should appear)
@@ -248,7 +247,7 @@ func testValidationPhaseProgress(t *testing.T, binaryPath, projectRoot string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, binaryPath, "system", "check", "--verbose", "--timeout", "30s")
+	cmd := testkit.ManagedCommand(t, ctx, binaryPath, "system", "check", "--verbose", "--timeout", "30s")
 	zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 
 	stderrPipe, err := cmd.StderrPipe()
@@ -359,7 +358,7 @@ func testFullCheckWithFollow(t *testing.T, binaryPath, projectRoot string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, binaryPath, "system", "check", "--verbose", "--timeout", "30s")
+	cmd := testkit.ManagedCommand(t, ctx, binaryPath, "system", "check", "--verbose", "--timeout", "30s")
 	zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 
 	stderrPipe, err := cmd.StderrPipe()

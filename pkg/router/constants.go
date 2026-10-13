@@ -1,10 +1,27 @@
 package router
 
 import (
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
+
+// normalizeKey normalizes a tool or model identifier by trimming and lowercasing.
+func normalizeKey(s string) string {
+	return strings.ToLower(strings.TrimSpace(s))
+}
+
+// bindHandler registers a handler into a map guarded by a mutex.
+func bindHandler[K comparable, V any](mu *sync.RWMutex, m map[K]V, key K, handler V) {
+	if any(handler) == nil {
+		return
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	m[key] = handler
+}
 
 // ModelTier identifies the performance, latency, and capability envelope of an LLM.
 type ModelTier string

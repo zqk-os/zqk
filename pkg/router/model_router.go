@@ -56,22 +56,12 @@ func NewModelRouter(env *TimeoutEnvelope) *ModelRouter {
 
 // RegisterModel associates a specific model identifier with a handler.
 func (r *ModelRouter) RegisterModel(model string, handler ModelHandler) {
-	if handler == nil {
-		return
-	}
-	key := strings.ToLower(strings.TrimSpace(model))
-	r.mu.Lock()
-	r.modelHandlers[key] = handler
-	r.mu.Unlock()
+	bindHandler(&r.mu, r.modelHandlers, normalizeKey(model), handler)
 }
 
 // RegisterTier associates a default handler for an entire model tier.
 func (r *ModelRouter) RegisterTier(tier ModelTier, handler ModelHandler) {
-	if handler != nil {
-		r.mu.Lock()
-		r.tierHandlers[tier] = handler
-		r.mu.Unlock()
-	}
+	bindHandler(&r.mu, r.tierHandlers, tier, handler)
 }
 
 // SetDefaultHandler specifies a universal catch-all handler for unmapped models and tiers.

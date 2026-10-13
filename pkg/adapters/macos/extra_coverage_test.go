@@ -5,10 +5,12 @@ import (
 	"context"
 	"os/exec"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/execwrap"
 )
 
 func failCmd(ctx context.Context, _ string, _ ...string) *exec.Cmd {
-	return exec.CommandContext(ctx, "false")
+	return execwrap.CommandContext(ctx, "false")
 }
 
 func TestClipboardPasteAdapter_PbcopyFailure(t *testing.T) {
@@ -26,9 +28,9 @@ func TestClipboardPasteAdapter_OsascriptFailure(t *testing.T) {
 		NewCommand: func(ctx context.Context, name string, arg ...string) *exec.Cmd {
 			n++
 			if name == pbcopyBin {
-				return exec.CommandContext(ctx, "true")
+				return execwrap.CommandContext(ctx, "true")
 			}
-			return exec.CommandContext(ctx, "false")
+			return execwrap.CommandContext(ctx, "false")
 		},
 	}
 	if err := a.Deliver(context.Background(), "hi", "id", nil); err == nil {
@@ -60,7 +62,7 @@ func TestClipboardPasteAdapter_commandUsesFactory(t *testing.T) {
 	a := &ClipboardPasteAdapter{
 		NewCommand: func(ctx context.Context, name string, arg ...string) *exec.Cmd {
 			called = true
-			return exec.CommandContext(ctx, "true")
+			return execwrap.CommandContext(ctx, "true")
 		},
 	}
 	cmd := a.command(context.Background(), "true")

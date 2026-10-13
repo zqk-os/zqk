@@ -148,12 +148,7 @@ func NewToolRouter(scope *ToolScope) *ToolRouter {
 
 // RegisterTool binds a specific tool name to an execution handler.
 func (r *ToolRouter) RegisterTool(toolName string, handler ToolHandler) {
-	if handler != nil {
-		key := strings.ToLower(strings.TrimSpace(toolName))
-		r.mu.Lock()
-		r.handlers[key] = handler
-		r.mu.Unlock()
-	}
+	bindHandler(&r.mu, r.handlers, normalizeKey(toolName), handler)
 }
 
 // AddInterceptor appends a custom interceptor to the execution pipeline.

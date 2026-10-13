@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -16,6 +15,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -39,7 +39,7 @@ func TestMCPServerGraphTraversal(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), stdioTestTimeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkBin, "mcp", "serve")
+	cmd := testkit.ManagedCommand(t, ctx, zqkBin, "mcp", "serve")
 	cmd.Dir = repoRoot
 	cmd.Env = append(os.Environ(), "ZQK_GRAPH_ENABLED=true", "ZQK_MOCK_GRAPH=true", "MOCK_GRAPH=true")
 	var stderrBuf strings.Builder

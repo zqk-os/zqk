@@ -19,6 +19,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -91,7 +92,7 @@ func TestMCPServerStdioGetCurrentBacklogItem(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), stdioTestTimeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkBin, "mcp", "serve")
+	cmd := testkit.ManagedCommand(t, ctx, zqkBin, "mcp", "serve")
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -236,7 +237,7 @@ func TestConfiguredMCPServerStdio(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 45*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -370,7 +371,7 @@ func TestConfiguredMCPServerStdioDiagnostics(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 60*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -476,7 +477,7 @@ func TestConfiguredMCPServerStdioObjectList(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 35*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -594,7 +595,7 @@ func TestConfiguredMCPServerStdioObjectListCache(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 50*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -714,7 +715,7 @@ func TestConfiguredMCPServerStdioPrompts(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 60*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -908,7 +909,7 @@ func TestConfiguredMCPServerStdioResourcesAndTools(t *testing.T) {
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 30*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -1059,7 +1060,7 @@ func TestMCPServerStdioHelpPrompt(t *testing.T) {
 	}
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 15*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -1154,7 +1155,7 @@ func TestMCPServerStdioWelcomePrompt(t *testing.T) {
 	}
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 15*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf
@@ -1249,7 +1250,7 @@ func TestConfiguredMCPServerStdioUsefulAsClient(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(stdioTestBaseCtx(), 60*time.Second)
 	defer cancel()
-	cmd := exec.CommandContext(ctx, zqkMcp)
+	cmd := testkit.ManagedCommand(t, ctx, zqkMcp)
 	cmd.Dir = repoRoot
 	var stderrBuf strings.Builder
 	cmd.Stderr = &stderrBuf

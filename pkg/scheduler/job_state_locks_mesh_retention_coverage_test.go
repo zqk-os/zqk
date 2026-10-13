@@ -2,7 +2,6 @@ package scheduler
 
 import (
 	"context"
-	"os/exec"
 	"path/filepath"
 	"testing"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	goyaml "gopkg.in/yaml.v3"
 )
@@ -148,7 +148,7 @@ func TestExtended_MeshLeaseSupervision_Acquisition(t *testing.T) {
 
 	// 2. reapStaleSubprocesses with dummy cmd
 	activeLeases := map[string]bool{"LEASE-active": true}
-	cmd := exec.CommandContext(t.Context(), "true")
+	cmd := testkit.ManagedCommand(t, t.Context(), "true")
 	_ = cmd.Start()
 	leaseSupervisionMutex.Lock()
 	activeLeaseSubprocesses["LEASE-stale"] = cmd

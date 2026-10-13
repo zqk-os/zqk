@@ -1,6 +1,6 @@
 //go:build !windows && !plan9
 
-package testkit
+package managedcmd
 
 import (
 	"os/exec"

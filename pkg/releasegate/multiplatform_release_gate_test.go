@@ -3,12 +3,12 @@ package releasegate
 import (
 	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -56,7 +56,7 @@ func TestMultiPlatformCompilation(t *testing.T) {
 			defer cancel()
 
 			tmpOut := filepath.Join(t.TempDir(), "zqk-"+p.goos+"-"+p.goarch)
-			cmd := exec.CommandContext(ctx, "go", "build", "-o", tmpOut, "./cmd/zqk")
+			cmd := testkit.ManagedCommand(t, ctx, "go", "build", "-o", tmpOut, "./cmd/zqk")
 			cmd.Dir = root
 			cmd.Env = append(os.Environ(),
 				"CGO_ENABLED=0",
@@ -91,7 +91,7 @@ func TestCommandSpecBaselineCoverage(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "/bin/sh", script)
+	cmd := testkit.ManagedCommand(t, ctx, "/bin/sh", script)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -114,7 +114,7 @@ func TestZeroGhostRefs(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(root, "bin", "zqk-stable")); err != nil {
 		bin = "./bin/zqk"
 	}
-	cmd := exec.CommandContext(ctx, bin, "workflow", "whats-next", "--format", "json", "--skip-measure")
+	cmd := testkit.ManagedCommand(t, ctx, bin, "workflow", "whats-next", "--format", "json", "--skip-measure")
 	cmd.Dir = root
 	var cleanEnv []string
 	for _, env := range os.Environ() {

@@ -2,7 +2,6 @@ package system
 
 import (
 	"context"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -52,7 +51,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 
 	t.Run("NoStartupWarnings", func(t *testing.T) {
 		// Run a simple command like 'system check' or 'mcp serve' and ensure no missing spec warnings
-		cmd := exec.CommandContext(ctx, binaryPath, "system", "check", "--timeout", "5s")
+		cmd := testkit.ManagedCommand(t, ctx, binaryPath, "system", "check", "--timeout", "5s")
 		zqkenv.WireExecForIsolatedProject(cmd, projectRoot)
 		out, err := cmd.CombinedOutput()
 		if err != nil && !strings.Contains(err.Error(), "killed") {
@@ -69,7 +68,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 	})
 
 	t.Run("MCPConfigRoundTrip", func(t *testing.T) {
-		cmd := exec.CommandContext(ctx, "go", "test", "github.com/zqk-os/zqk/pkg/mcp", "-run", "TestMCPSpecConfigurationSurvivesSnapshotAndRecycle")
+		cmd := testkit.ManagedCommand(t, ctx, "go", "test", "github.com/zqk-os/zqk/pkg/mcp", "-run", "TestMCPSpecConfigurationSurvivesSnapshotAndRecycle")
 		cmd.Dir = moduleRoot
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("MCPConfigRoundTrip failed: %v\nOutput: %s", err, string(out))
@@ -77,7 +76,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 	})
 
 	t.Run("DualSeatSameNonce", func(t *testing.T) {
-		cmd := exec.CommandContext(ctx, "go", "test", "github.com/zqk-os/zqk/pkg/agentfeed", "-run", "TestProcessSeatInbox_commsLifeAndWork")
+		cmd := testkit.ManagedCommand(t, ctx, "go", "test", "github.com/zqk-os/zqk/pkg/agentfeed", "-run", "TestProcessSeatInbox_commsLifeAndWork")
 		cmd.Dir = moduleRoot
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("DualSeatSameNonce failed: %v\nOutput: %s", err, string(out))
@@ -85,7 +84,7 @@ func TestMCPCommsE2EClosure(t *testing.T) {
 	})
 
 	t.Run("WorkerDownFailClosed", func(t *testing.T) {
-		cmd := exec.CommandContext(ctx, "go", "test", "github.com/zqk-os/zqk/pkg/agentfeed", "-run", "TestSeatWorkerAlive_failClosedWhenMissing")
+		cmd := testkit.ManagedCommand(t, ctx, "go", "test", "github.com/zqk-os/zqk/pkg/agentfeed", "-run", "TestSeatWorkerAlive_failClosedWhenMissing")
 		cmd.Dir = moduleRoot
 		if out, err := cmd.CombinedOutput(); err != nil {
 			t.Fatalf("WorkerDownFailClosed failed: %v\nOutput: %s", err, string(out))

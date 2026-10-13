@@ -35,14 +35,24 @@ func NewAgentHookCmd() *cobra.Command {
 func newPreSubagentHookCmd() *cobra.Command {
 	var vendor string
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookPreSubagentCommandBuilder(), &cobra.Command{
-		RunE: cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-			return runPreSubagentHook(cmd, proc, vendor)
+		RunE: withHookProcessor(func(cmd *cobra.Command, proc *cli.Processor, in io.Reader, out io.Writer, sec *pkgctx.SecurityContext) error {
+			return runPreSubagentHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, in, out)
 		}),
 	})
 	if cmd.Flags().Lookup("vendor") == nil {
 		cmd.Flags().StringVar(&vendor, "vendor", "antigravity", "Target agent host vendor format (antigravity, generic)")
 	}
 	return cmd
+}
+
+type hookHandler func(cmd *cobra.Command, proc *cli.Processor, in io.Reader, out io.Writer, sec *pkgctx.SecurityContext) error
+
+func withHookProcessor(handler hookHandler) func(*cobra.Command, []string) error {
+	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
+		in, out := commandIO(cmd)
+		sec := procSecurity(proc)
+		return handler(cmd, proc, in, out, sec)
+	})
 }
 
 type antigravityHookInput struct {
@@ -69,9 +79,8 @@ func commandIO(cmd *cobra.Command) (io.Reader, io.Writer) {
 }
 
 func runPreSubagentHook(cmd *cobra.Command, proc *cli.Processor, vendor string) error {
-	sec := procSecurity(proc)
 	in, out := commandIO(cmd)
-	return runPreSubagentHookWithDeps(proc.OperationContext(), sec, proc.Storage(), proc.ProjectRoot(), vendor, in, out)
+	return runPreSubagentHookWithDeps(proc.OperationContext(), procSecurity(proc), proc.Storage(), proc.ProjectRoot(), vendor, in, out)
 }
 
 func runPreSubagentHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, vendor string, in io.Reader, out io.Writer) error {
