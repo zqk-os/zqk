@@ -11,7 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/testkit/managedcmd"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -32,7 +32,7 @@ func TestWorktreeKernelResolution_Integration(t *testing.T) {
 	}
 
 	runGit := func(dir string, args ...string) {
-		cmd := testkit.ManagedCommand(t, t.Context(), "git", args...)
+		cmd := managedcmd.ManagedCommand(t, t.Context(), "git", args...)
 		cmd.Dir = dir
 		cmd.Env = append(os.Environ(),
 			"GIT_AUTHOR_NAME=Test",

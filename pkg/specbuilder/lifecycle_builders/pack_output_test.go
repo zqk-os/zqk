@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/testkit/managedcmd"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -21,7 +21,7 @@ func TestGeneratedGoalLifecycleCompiles(t *testing.T) {
 	if err := GenerateBuilderFromYAML(yamlPath, toolDir); err != nil {
 		t.Fatal(err)
 	}
-	cmd := testkit.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_lifecycle/bldr_lifecycle_v1")
+	cmd := managedcmd.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_lifecycle/bldr_lifecycle_v1")
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {

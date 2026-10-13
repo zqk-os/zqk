@@ -8,7 +8,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/testkit/managedcmd"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -162,7 +162,7 @@ func TestGeneratedSiblingCompiles(t *testing.T) {
 	if err := GenerateInstanceBuilderFromSpec(specPath, toolDir, "1.0.0"); err != nil {
 		t.Fatal(err)
 	}
-	cmd := testkit.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_sibling/"+generatedInstancePackage)
+	cmd := managedcmd.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_sibling/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -193,7 +193,7 @@ func TestGeneratedGoalPackCompiles(t *testing.T) {
 	if strings.Contains(src, "github.com/zqk-os/zqk/packs/workgen_goal/bldr_enum_v1/base_object") {
 		t.Fatal("goal enums imported a pack copy of base_object that was not generated")
 	}
-	cmd := testkit.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_goal/"+generatedInstancePackage)
+	cmd := managedcmd.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_goal/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -217,7 +217,7 @@ func TestGeneratedWorkPackKindsCompile(t *testing.T) {
 			t.Fatalf("%s: %v", specPath, err)
 		}
 	}
-	cmd := testkit.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_kinds/"+generatedInstancePackage)
+	cmd := managedcmd.ManagedCommand(t, t.Context(), "go", "build", "./packs/workgen_kinds/"+generatedInstancePackage)
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
