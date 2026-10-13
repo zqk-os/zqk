@@ -158,6 +158,29 @@ func TestContinuationHook_BoundaryValidationAndErrorRecovery(t *testing.T) {
 		assert.NotEmpty(t, rawMap["reason"])
 		assert.Equal(t, rawMap["reason"], rawMap["message"])
 	}
+
+	// Subtest 7: Windsurf / Cascade vendor format (decision is "continue" with explanation & reason)
+	{
+		var outBuf bytes.Buffer
+		err := runContinuationHookWithDeps(context.Background(), secCtx, fs, root, "windsurf", markerPath, "", "", strings.NewReader("{}"), &outBuf)
+		require.NoError(t, err)
+		var rawMap map[string]any
+		require.NoError(t, json.Unmarshal(outBuf.Bytes(), &rawMap))
+		assert.Equal(t, "continue", rawMap["decision"])
+		assert.NotEmpty(t, rawMap["reason"])
+		assert.Equal(t, rawMap["reason"], rawMap["explanation"])
+	}
+
+	// Subtest 8: Cline / Roo vendor format (decision is "continue" with reason)
+	{
+		var outBuf bytes.Buffer
+		err := runContinuationHookWithDeps(context.Background(), secCtx, fs, root, "cline", markerPath, "", "", strings.NewReader("{}"), &outBuf)
+		require.NoError(t, err)
+		var rawMap map[string]any
+		require.NoError(t, json.Unmarshal(outBuf.Bytes(), &rawMap))
+		assert.Equal(t, "continue", rawMap["decision"])
+		assert.NotEmpty(t, rawMap["reason"])
+	}
 }
 
 func TestContinuationHook_SteeringFeedIntegration(t *testing.T) {
