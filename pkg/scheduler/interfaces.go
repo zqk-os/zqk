@@ -286,6 +286,7 @@ type JobStateRegistryInterface interface {
 	Summarize(staleAfter time.Duration) (*JobStateSummary, error)
 	CleanStaleLocks(staleAge time.Duration) (int, error)
 	WaitForRetentionCleanup()
+	InvalidateJobCache(jobID string)
 }
 
 // HandlerFactoryInterface defines the handler factory operations.
