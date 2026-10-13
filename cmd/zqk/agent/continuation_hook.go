@@ -177,6 +177,27 @@ func emitContinuationDecision(out io.Writer, vendor string, decision string, rea
 		enc := json.NewEncoder(out)
 		enc.SetIndent("", "  ")
 		return enc.Encode(output)
+	case "windsurf", "cascade":
+		output := map[string]any{
+			"decision": decision,
+		}
+		if reason != "" {
+			output["reason"] = reason
+			output["explanation"] = reason
+		}
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(output)
+	case "cline", "roo":
+		output := map[string]any{
+			"decision": decision,
+		}
+		if reason != "" {
+			output["reason"] = reason
+		}
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(output)
 	default:
 		output := continuationHookOutput{
 			Decision: decision,
