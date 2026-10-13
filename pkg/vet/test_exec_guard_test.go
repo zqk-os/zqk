@@ -137,6 +137,37 @@ func TestStart(t *testing.T) {
 		assert.Equal(t, "hygiene/unmanaged_test_exec", findings[0].CheckID)
 		assert.Equal(t, SeverityError, findings[0].Severity)
 	})
+
+	t.Run("CommandContextDetected", func(t *testing.T) {
+		tempDir := t.TempDir()
+		pkgDir := filepath.Join(tempDir, "pkg", "sample")
+		require.NoError(t, fileutil.MkdirAll(pkgDir, 0o755))
+		cmdContextSrc := `package sample
+
+import (
+	"context"
+	"os/exec"
+	"testing"
+)
+
+func TestCmdContext(t *testing.T) {
+	_ = exec.CommandContext(context.Background(), "/bin/ls")
+}
+`
+		require.NoError(t, fileutil.WriteFile(filepath.Join(pkgDir, "cmd_context_test.go"), []byte(cmdContextSrc), 0o644))
+
+		cfg := &GatesConfig{
+			Hygiene: HygieneConfig{
+				GoScanDirs: []string{"pkg"},
+			},
+		}
+		findings, err := CheckTestSubprocessHygiene(tempDir, cfg)
+		require.NoError(t, err)
+		require.Len(t, findings, 1)
+		assert.Equal(t, "hygiene/unmanaged_test_exec", findings[0].CheckID)
+		assert.Equal(t, SeverityError, findings[0].Severity)
+		assert.Contains(t, findings[0].Message, "CommandContext")
+	})
 }
 
 func TestCheckTestFileutilHygiene(t *testing.T) {

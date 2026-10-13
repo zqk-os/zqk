@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -223,6 +224,8 @@ type FSWatcher struct {
 	eventHub     EventHub
 	watcher      *fsnotify.Watcher
 	done         chan struct{}
+	stopOnce     sync.Once
+	stopErr      error
 	config       WatcherConfig
 	ignoredDirs  map[string]bool
 	ignoredPaths []string
@@ -399,10 +402,13 @@ func (fw *FSWatcher) Start(ctx context.Context) error {
 	return nil
 }
 
-// Stop halts the watcher.
+// Stop halts the watcher idempotently without double-close panics.
 func (fw *FSWatcher) Stop() error {
-	close(fw.done)
-	return fw.watcher.Close()
+	fw.stopOnce.Do(func() {
+		close(fw.done)
+		fw.stopErr = fw.watcher.Close()
+	})
+	return fw.stopErr
 }
 
 // BindProcessYAMLInvalidator subscribes to filesystem events on hub and invalidates/updates the object ID cache for process YAML files.

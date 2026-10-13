@@ -16,6 +16,18 @@ func Command(name string, arg ...string) *exec.Cmd {
 	return exec.Command(name, arg...) //nolint:gosec
 }
 
+// CommandContextWithGroup creates an *exec.Cmd configured in an isolated process group.
+// When ctx cancels or times out, cmd.Cancel is triggered to terminate the entire process group.
+func CommandContextWithGroup(ctx context.Context, name string, arg ...string) *exec.Cmd {
+	cmd := CommandContext(ctx, name, arg...)
+	SetProcessGroup(cmd)
+	cmd.Cancel = func() error {
+		return KillProcessGroup(cmd)
+	}
+	cmd.WaitDelay = 2 * time.Second
+	return cmd
+}
+
 // CommandWithTimeout returns an *exec.Cmd bound to a timeout context,
 // along with a cancel function that must be deferred or called by the caller.
 func CommandWithTimeout(ctx context.Context, timeout time.Duration, name string, arg ...string) (*exec.Cmd, context.CancelFunc) {
@@ -38,12 +50,31 @@ func RunWithTimeout(ctx context.Context, timeout time.Duration, name string, arg
 	defer cancel()
 
 	cmd := CommandContext(timeoutCtx, name, arg...)
-	stdout, stderr, runErr := RunWithBuffers(cmd)
+	return executeWithTimeoutContext(timeoutCtx, cmd)
+}
 
+// RunWithTimeoutGroup executes a command within an isolated process group and a bounded timeout duration.
+// If the command exceeds the timeout, the entire process group is terminated, returning
+// accumulated stdout/stderr buffers, and sets timedOut to true with context.DeadlineExceeded.
+func RunWithTimeoutGroup(ctx context.Context, timeout time.Duration, name string, arg ...string) (stdout, stderr string, timedOut bool, err error) {
+	if timeout <= 0 {
+		cmd := CommandContextWithGroup(ctx, name, arg...)
+		stdout, stderr, err = RunWithBuffers(cmd)
+		return stdout, stderr, false, err
+	}
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	cmd := CommandContextWithGroup(timeoutCtx, name, arg...)
+	return executeWithTimeoutContext(timeoutCtx, cmd)
+}
+
+func executeWithTimeoutContext(timeoutCtx context.Context, cmd *exec.Cmd) (stdout, stderr string, timedOut bool, err error) {
+	stdout, stderr, runErr := RunWithBuffers(cmd)
 	if timeoutCtx.Err() == context.DeadlineExceeded {
 		return stdout, stderr, true, context.DeadlineExceeded
 	}
-
 	return stdout, stderr, false, runErr
 }
 

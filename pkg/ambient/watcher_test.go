@@ -283,3 +283,26 @@ build_output
 		}
 	}
 }
+
+func TestFSWatcher_IdempotentStopAndChannelLeakSafety(t *testing.T) {
+	tmpDir := t.TempDir()
+	hub := NewEventHub()
+	watcher, err := NewFSWatcher(tmpDir, hub)
+	if err != nil {
+		t.Fatalf("failed to create watcher: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := watcher.Start(ctx); err != nil {
+		t.Fatalf("failed to start watcher: %v", err)
+	}
+
+	// Verify Stop can be called multiple times without panic
+	for i := 0; i < 5; i++ {
+		if err := watcher.Stop(); err != nil {
+			t.Fatalf("iteration %d: expected nil or clean stop, got error: %v", i, err)
+		}
+	}
+}

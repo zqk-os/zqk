@@ -86,7 +86,7 @@ func walkTestFileCallExprs(root string, cfg *GatesConfig, visitor func(fset *tok
 // (TDE-F-TST-ORPHANED-PROCESS-LEAK / CRIT-TST-SUBPROCESS-STATIC-GUARD).
 func CheckTestSubprocessHygiene(root string, cfg *GatesConfig) ([]Finding, error) {
 	return walkTestFileCallExprs(root, cfg, func(fset *token.FileSet, rel string, call *ast.CallExpr, ident *ast.Ident, sel *ast.SelectorExpr) []Finding {
-		if (ident.Name == "exec" || ident.Name == "__exec") && sel.Sel.Name == "Command" {
+		if (ident.Name == "exec" || ident.Name == "__exec") && (sel.Sel.Name == "Command" || sel.Sel.Name == "CommandContext") {
 			pos := fset.Position(call.Pos())
 			return []Finding{{
 				CheckID:  "hygiene/unmanaged_test_exec",
