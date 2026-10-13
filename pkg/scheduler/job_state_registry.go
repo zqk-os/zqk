@@ -127,8 +127,8 @@ type JobStateRegistry struct {
 	// called cleanupCompletedBestEffort on every finish, which ReadFile'd every state YAML under
 	// .zqk/scheduler/state (thousands of files) while concurrent job completions ran in parallel.
 	// That drove OS thread growth (blocked opens) and multi-GB RSS — showstopper under bulk test-job create.
-	//
 	cleanupMu           sync.Mutex
+	cleanupWg           sync.WaitGroup
 	lastFullCleanupAt   time.Time
 	fullCleanupInFlight bool
 	fullCleanupTestHook func() // optional; tests count scheduled full cleanups
@@ -994,7 +994,9 @@ func (r *JobStateRegistry) scheduleFullRetentionCleanup() {
 	if hook != nil {
 		hook()
 	}
+	r.cleanupWg.Add(1)
 	goroutinelabels.StartNamedGoroutine("job-state-registry", "manage job states asynchronously", func() {
+		defer r.cleanupWg.Done()
 		func() {
 			defer func() {
 				r.cleanupMu.Lock()
@@ -1005,6 +1007,14 @@ func (r *JobStateRegistry) scheduleFullRetentionCleanup() {
 			_ = r.cleanupCompletedBestEffort()
 		}()
 	})
+}
+
+// WaitForRetentionCleanup blocks until any active background retention cleanup completes.
+func (r *JobStateRegistry) WaitForRetentionCleanup() {
+	if r == nil {
+		return
+	}
+	r.cleanupWg.Wait()
 }
 
 // cleanupCompletedInDirBestEffort removes expired terminal state files in a single job directory.
