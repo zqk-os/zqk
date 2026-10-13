@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -212,7 +211,7 @@ func TestStopDaemon_RunningProcess(t *testing.T) {
 	root := t.TempDir()
 
 	// Spawn a real short-lived process so findRunningAmbientPIDs finds an active PID
-	proc := exec.Command("sleep", "10")
+	proc := testkit.ManagedCommand(t, t.Context(), "sleep", "10")
 	require.NoError(t, proc.Start())
 	defer func() {
 		if proc.Process != nil {

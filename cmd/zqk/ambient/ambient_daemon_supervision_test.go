@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -60,7 +59,7 @@ func TestAmbientDaemon_LifecycleAndSignals(t *testing.T) {
 	assert.Contains(t, buf.String(), "already running")
 
 	// 2. Stop daemon sends SIGTERM to running process and clears PID/lock
-	proc := exec.Command("sleep", "15")
+	proc := testkit.ManagedCommand(t, t.Context(), "sleep", "15")
 	require.NoError(t, proc.Start())
 	t.Cleanup(func() {
 		if proc.Process != nil {
@@ -98,7 +97,7 @@ func TestAmbientDaemon_SupervisionAndOrphanReaping(t *testing.T) {
 	assert.False(t, fileutil.Exists(pidPath), "stale PID file must be cleaned up")
 
 	// 2. PID file discovery and validation
-	proc := exec.Command("sleep", "10")
+	proc := testkit.ManagedCommand(t, t.Context(), "sleep", "10")
 	require.NoError(t, proc.Start())
 	t.Cleanup(func() {
 		if proc.Process != nil {

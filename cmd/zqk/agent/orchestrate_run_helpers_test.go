@@ -3,7 +3,6 @@ package agent
 import (
 	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 type mockHelperStore struct {
@@ -592,7 +592,7 @@ func TestOrchestrate_HelperFunctions(t *testing.T) {
 	assert.NotEmpty(t, childEnv)
 
 	// configureOrchestrationExecutorProcess
-	cmd := exec.Command("true")
+	cmd := testkit.ManagedCommand(t, t.Context(), "true")
 	configureOrchestrationExecutorProcess(cmd)
 	assert.NotNil(t, cmd.SysProcAttr)
 	assert.NotNil(t, cmd.Cancel)
