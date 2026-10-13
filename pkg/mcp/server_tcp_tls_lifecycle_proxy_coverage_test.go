@@ -12,9 +12,11 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type mockEventCoordinatorDeep7 struct {
@@ -80,9 +82,9 @@ func TestDeep7_ServerTCP_ServeTLS_Lifecycle(t *testing.T) {
 	_ = ln.Close()
 
 	done := make(chan error, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.serve_tls", "run ServeTLS in lifecycle test").StartSimple(func() {
 		done <- s.ServeTLS(addr, serverCertFile, serverKeyFile)
-	}()
+	})
 
 	time.Sleep(50 * time.Millisecond)
 
@@ -119,10 +121,10 @@ func TestDeep7_ProxyDaemon_ReadFromDaemon(t *testing.T) {
 	p.ensureTransports()
 
 	done := make(chan struct{})
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.read_from_daemon", "run readFromDaemon in deep7 test").StartSimple(func() {
 		p.readFromDaemon(clientConn)
 		close(done)
-	}()
+	})
 
 	// 1. Send heartbeat ID response
 	hbResp := fmt.Sprintf(`{"jsonrpc":"2.0","id":%s}`+"\n", proxyHeartbeatID)
@@ -281,7 +283,7 @@ func TestDeep7_ServerInitHelpers_AuthenticationFlows(t *testing.T) {
 func TestDeep7_Resources_CriticalResourcesFromSpec(t *testing.T) {
 	tmpDir := t.TempDir()
 	docFile := filepath.Join(tmpDir, "test-doc.md")
-	_ = os.WriteFile(docFile, []byte("# Test Doc\nContent"), paths.FilePerm644)
+	_ = fileutil.WriteFile(docFile, []byte("# Test Doc\nContent"), paths.FilePerm644)
 
 	s := NewServer()
 	s.SetProjectRoot(tmpDir)

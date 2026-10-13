@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
@@ -46,7 +47,7 @@ func TestProxyDaemon(t *testing.T) {
 
 	// Accept one dial from the proxy (readFromDaemon owns the conn afterward).
 	accepted := make(chan struct{}, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.proxy_accept", "accept single dial from proxy").StartSimple(func() {
 		c, err := listener.Accept()
 		if err != nil {
 			return
@@ -55,9 +56,11 @@ func TestProxyDaemon(t *testing.T) {
 		// Keep conn open until test ends so proxy does not spin-reconnect.
 		<-ctx.Done()
 		_ = c.Close()
-	}()
+	})
 
-	go proxy.Start(ctx)
+	goroutinelabels.NewGoroutine("test.mcp.proxy_start", "run proxy daemon in test").StartSimple(func() {
+		_ = proxy.Start(ctx)
+	})
 
 	select {
 	case <-accepted:
@@ -119,7 +122,7 @@ func TestProxyDaemon_ensureIDEEventSubscription(t *testing.T) {
 		raw    string
 	}
 	got := make(chan result, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.ide_subscribe_mock", "mock listener for ensureIDEEventSubscription").StartSimple(func() {
 		c, err := listener.Accept()
 		if err != nil {
 			return
@@ -143,7 +146,7 @@ func TestProxyDaemon_ensureIDEEventSubscription(t *testing.T) {
 			// ack so proxy swallow path can be exercised by a fuller test later
 			_, _ = c.Write([]byte(`{"jsonrpc":"2.0","id":` + proxyEventsSubscribeID + `,"result":{"subscriptionId":"t"}}` + "\n"))
 		}
-	}()
+	})
 
 	proxy := NewProxyDaemon(listener.Addr().String(), logging.GetLoggerFromProfile(""))
 	conn, err := net.Dial("tcp", listener.Addr().String())
@@ -209,10 +212,10 @@ func TestProxyDaemon_forwardFailsWhenDaemonDown(t *testing.T) {
 
 	start := time.Now()
 	done := make(chan struct{})
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forward_to_daemon", "forwardToDaemon failfast execution").StartSimple(func() {
 		proxy.forwardToDaemon(ctx, []byte(`{"jsonrpc":"2.0","id":7,"method":"initialize","params":{}}`), &MessageFormat{IsRawJSON: true})
 		close(done)
-	}()
+	})
 
 	select {
 	case <-done:
@@ -321,7 +324,7 @@ func TestProxyDaemon_PublishDaemonEvent(t *testing.T) {
 
 	errCh := make(chan error, 1)
 	msgCh := make(chan []byte, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.publish_daemon_listener", "accept connection and read published daemon event").StartSimple(func() {
 		conn, err := listener.Accept()
 		if err != nil {
 			errCh <- err
@@ -335,7 +338,7 @@ func TestProxyDaemon_PublishDaemonEvent(t *testing.T) {
 			return
 		}
 		msgCh <- msg
-	}()
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
@@ -390,14 +393,16 @@ func TestProxyDaemon_IndestructibleConnection(t *testing.T) {
 
 	// Accept one dial from the proxy
 	connChan := make(chan net.Conn, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.indestructible_accept1", "initial daemon connection accept").StartSimple(func() {
 		c, err := listener.Accept()
 		if err == nil {
 			connChan <- c
 		}
-	}()
+	})
 
-	go proxy.Start(ctx)
+	goroutinelabels.NewGoroutine("test.mcp.indestructible_proxy_start", "start proxy daemon in indestructible test").StartSimple(func() {
+		_ = proxy.Start(ctx)
+	})
 
 	var firstConn net.Conn
 	select {
@@ -410,12 +415,12 @@ func TestProxyDaemon_IndestructibleConnection(t *testing.T) {
 	_ = firstConn.Close()
 
 	// Proxy should attempt to reconnect. Start a new accept loop.
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.indestructible_accept2", "reconnected daemon connection accept").StartSimple(func() {
 		c, err := listener.Accept()
 		if err == nil {
 			connChan <- c
 		}
-	}()
+	})
 
 	// Verify the proxy reconnects (is indestructible)
 	select {

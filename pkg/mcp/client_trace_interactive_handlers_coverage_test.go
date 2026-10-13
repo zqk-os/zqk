@@ -14,6 +14,7 @@ import (
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/interactive"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -131,7 +132,7 @@ func TestMCPClient_Comprehensive(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.client_trace_mock_server", "mock MCP server handling initialize and tools").StartSimple(func() {
 		bufReader := bufio.NewReader(serverReader)
 		transport := NewDefaultTransport()
 		format := &MessageFormat{IsRawJSON: false}
@@ -185,7 +186,7 @@ func TestMCPClient_Comprehensive(t *testing.T) {
 				_ = transport.WriteMessage(bufio.NewWriter(serverWriter), respBytes, format)
 			}
 		}
-	}()
+	})
 
 	initRes, err := client.Initialize(ctx, InitializeParams{
 		ProtocolVersion: "2025-06-18",

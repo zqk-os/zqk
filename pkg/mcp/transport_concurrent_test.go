@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"sync"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // Regression: proxy used one DefaultTransport for stdin + TCP; concurrent
@@ -16,17 +18,17 @@ func TestDefaultTransport_concurrentReadersDoNotPanic(t *testing.T) {
 	payload := []byte(`{"jsonrpc":"2.0","id":1,"method":"ping"}` + "\n")
 	var wg sync.WaitGroup
 	for i := 0; i < 8; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < 40; j++ {
-				r := bufio.NewReader(bytes.NewReader(payload))
-				if _, _, err := shared.ReadMessage(r); err != nil {
-					t.Errorf("ReadMessage: %v", err)
-					return
+		goroutinelabels.NewGoroutine("test.mcp.concurrent_reader", "concurrent transport read loop").
+			WithWaitGroup(&wg).
+			StartSimple(func() {
+				for j := 0; j < 40; j++ {
+					r := bufio.NewReader(bytes.NewReader(payload))
+					if _, _, err := shared.ReadMessage(r); err != nil {
+						t.Errorf("ReadMessage: %v", err)
+						return
+					}
 				}
-			}
-		}()
+			})
 	}
 	wg.Wait()
 }
