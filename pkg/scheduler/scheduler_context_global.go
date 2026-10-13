@@ -270,7 +270,7 @@ func TriggerOriginFromContext(ctx context.Context) string {
 // when done (see WithGlobalSchedulerRollback); otherwise later code in the same process
 // may observe a test scheduler or call Stop() on the wrong logical instance.
 func RegisterGlobalScheduler(s *Scheduler) {
-	_ = concurrency.RunInLockWithLogger(
+	logging.LogSwallowedError(concurrency.RunInLockWithLogger(
 		&globalSchedulerMu,
 		LockNameSchedulerRegisterGlobal,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -278,7 +278,7 @@ func RegisterGlobalScheduler(s *Scheduler) {
 			globalSchedulerRegistry = s
 			return nil
 		},
-	)
+	))
 }
 
 // WithGlobalSchedulerRollback returns a cleanup function that restores the global
@@ -298,7 +298,7 @@ func WithGlobalSchedulerRollback() (cleanup func()) {
 // It may block if the daemon holds globalSchedulerMu (e.g. during job dispatch).
 func GetGlobalScheduler() *Scheduler {
 	var s *Scheduler
-	_ = concurrency.RunInRLockWithLogger(
+	logging.LogSwallowedError(concurrency.RunInRLockWithLogger(
 		&globalSchedulerMu,
 		LockNameSchedulerGetGlobal,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -306,7 +306,7 @@ func GetGlobalScheduler() *Scheduler {
 			s = globalSchedulerRegistry
 			return nil
 		},
-	)
+	))
 	return s
 }
 

@@ -9,6 +9,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
@@ -32,7 +33,7 @@ func (s *Scheduler) Stop() {
 
 	var wasRunning bool
 	var alreadyStopped bool
-	_ = concurrency.RunInLockWithLogger(
+	logging.LogSwallowedError(concurrency.RunInLockWithLogger(
 		&s.runningMu,
 		LockNameSchedulerStopCheck,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -46,7 +47,7 @@ func (s *Scheduler) Stop() {
 			s.running = false
 			return nil
 		},
-	)
+	))
 
 	if alreadyStopped {
 		return
@@ -60,7 +61,7 @@ func (s *Scheduler) Stop() {
 	s.drainAndShutdownStorage(stopTime, wasRunning)
 
 	// Update state via callback (not defer) for predictable execution order
-	_ = concurrency.RunInLockWithLogger(
+	logging.LogSwallowedError(concurrency.RunInLockWithLogger(
 		&s.runningMu,
 		LockNameSchedulerStopCheck,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -68,7 +69,7 @@ func (s *Scheduler) Stop() {
 			s.running = false
 			return nil
 		},
-	)
+	))
 	SchedulerDaemonLog(s.logger).Debug("Stop: finished teardown").Log()
 	SchedulerDaemonLog(s.logger).Info(LogEventSchedulerDaemonStopped).Log()
 }
@@ -251,7 +252,7 @@ func (s *Scheduler) drainAndShutdownStorage(stopTime time.Time, wasRunning bool)
 // IsRunning returns whether the scheduler is running
 func (s *Scheduler) IsRunning() bool {
 	var isRunning bool
-	_ = concurrency.RunInRLockWithLogger(
+	logging.LogSwallowedError(concurrency.RunInRLockWithLogger(
 		&s.runningMu,
 		LockNameSchedulerIsRunning,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
@@ -259,7 +260,7 @@ func (s *Scheduler) IsRunning() bool {
 			isRunning = s.running
 			return nil
 		},
-	)
+	))
 	return isRunning
 }
 
@@ -317,7 +318,7 @@ func (s *Scheduler) handleCoordinationEvents(ctx context.Context) {
 						}
 
 						// Enqueue trigger request for respawn
-						_ = s.TriggerJob(ctx, job.ID)
+						logging.LogSwallowedError(s.TriggerJob(ctx, job.ID))
 					}
 				}
 			case "process_started":
@@ -337,7 +338,7 @@ func (s *Scheduler) handleCoordinationEvents(ctx context.Context) {
 			case "process_errored":
 				if s.notificationContext != nil {
 					var execErr error
-					if errMsg, ok := ev.Metadata["error"].(string); ok && errMsg != "" {
+					if errMsg := objects.GetString(ev.Metadata, "error"); errMsg != "" {
 						execErr = fmt.Errorf("%s", errMsg)
 					}
 					notif := CreateJobNotification(ev.JobID, "subagent", "swarm", notificationEventFailed, PriorityHigh, 0, execErr, ev.Metadata)
