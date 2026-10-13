@@ -6,6 +6,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 type dummyHandler struct {
@@ -43,11 +45,11 @@ func TestAsyncHandler_LifetimeCounters(t *testing.T) {
 	}
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		_, _ = ah.Handle(context.Background(), "test.method", nil)
-	}()
+	goroutinelabels.NewGoroutine("test.async_handler.lifetime", "lifetime counters test execution").
+		WithWaitGroup(&wg).
+		StartSimple(func() {
+			_, _ = ah.Handle(context.Background(), "test.method", nil)
+		})
 
 	// Wait for handler to start
 	time.Sleep(10 * time.Millisecond)
@@ -73,11 +75,11 @@ func TestAsyncHandler_CapacityLimit(t *testing.T) {
 	})
 
 	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		_, _ = ah.Handle(context.Background(), "slow.method", nil)
-	}()
+	goroutinelabels.NewGoroutine("test.async_handler.capacity", "capacity limit test execution").
+		WithWaitGroup(&wg).
+		StartSimple(func() {
+			_, _ = ah.Handle(context.Background(), "slow.method", nil)
+		})
 
 	time.Sleep(10 * time.Millisecond)
 

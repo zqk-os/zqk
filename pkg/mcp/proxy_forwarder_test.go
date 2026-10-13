@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
@@ -20,7 +21,7 @@ func TestProxyForwarder_Basic(t *testing.T) {
 	}
 	defer l.Close()
 
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_server", "mock echo server for TestProxyForwarder_Basic").StartSimple(func() {
 		conn, err := l.Accept()
 		if err != nil {
 			return
@@ -41,7 +42,7 @@ func TestProxyForwarder_Basic(t *testing.T) {
 				return
 			}
 		}
-	}()
+	})
 
 	clientIn, clientWriter := io.Pipe()
 	clientReader, clientOut := io.Pipe()
@@ -56,9 +57,9 @@ func TestProxyForwarder_Basic(t *testing.T) {
 	defer cancel()
 
 	proxyDone := make(chan error, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_start", "start proxy forwarder for TestProxyForwarder_Basic").StartSimple(func() {
 		proxyDone <- proxy.Start(ctx)
-	}()
+	})
 
 	time.Sleep(50 * time.Millisecond)
 
@@ -97,14 +98,14 @@ func TestProxyForwarder_ReconnectForwardsToolsCall(t *testing.T) {
 	}
 	addr := l.Addr().String()
 
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_reconnect_l1", "first listener accept in reconnect test").StartSimple(func() {
 		conn, err := l.Accept()
 		if err != nil {
 			return
 		}
 		_ = conn.Close()
 		_ = l.Close()
-	}()
+	})
 
 	clientIn, clientWriter := io.Pipe()
 	clientReader, clientOut := io.Pipe()
@@ -122,7 +123,9 @@ func TestProxyForwarder_ReconnectForwardsToolsCall(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go func() { _ = proxy.Start(ctx) }()
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_reconnect_start", "start proxy forwarder in reconnect test").StartSimple(func() {
+		_ = proxy.Start(ctx)
+	})
 	time.Sleep(40 * time.Millisecond)
 
 	l2, err := net.Listen("tcp", "127.0.0.1:0")
@@ -133,7 +136,7 @@ func TestProxyForwarder_ReconnectForwardsToolsCall(t *testing.T) {
 	setAddr(l2.Addr().String())
 
 	got := make(chan []byte, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_reconnect_l2", "second listener accept in reconnect test").StartSimple(func() {
 		conn, err := l2.Accept()
 		if err != nil {
 			return
@@ -148,7 +151,7 @@ func TestProxyForwarder_ReconnectForwardsToolsCall(t *testing.T) {
 		}
 		got <- data
 		_ = transport.WriteMessage(writer, []byte(`{"jsonrpc":"2.0","id":9,"result":{"ok":true}}`), format)
-	}()
+	})
 
 	time.Sleep(40 * time.Millisecond)
 
@@ -180,14 +183,14 @@ func TestProxyForwarder_Reconnect(t *testing.T) {
 	}
 	addr := l.Addr().String()
 
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_reconnect_l1_b", "first listener accept in TestProxyForwarder_Reconnect").StartSimple(func() {
 		conn, err := l.Accept()
 		if err != nil {
 			return
 		}
 		_ = conn.Close()
 		_ = l.Close()
-	}()
+	})
 
 	clientIn, clientWriter := io.Pipe()
 	clientReader, clientOut := io.Pipe()
@@ -207,9 +210,9 @@ func TestProxyForwarder_Reconnect(t *testing.T) {
 	defer cancel()
 
 	proxyDone := make(chan error, 1)
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_reconnect_start_b", "start proxy forwarder in TestProxyForwarder_Reconnect").StartSimple(func() {
 		proxyDone <- proxy.Start(ctx)
-	}()
+	})
 
 	time.Sleep(50 * time.Millisecond)
 
@@ -221,7 +224,7 @@ func TestProxyForwarder_Reconnect(t *testing.T) {
 
 	setAddr(l2.Addr().String())
 
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.forwarder_reconnect_l2_b", "second listener accept in TestProxyForwarder_Reconnect").StartSimple(func() {
 		conn, err := l2.Accept()
 		if err != nil {
 			return
@@ -238,7 +241,7 @@ func TestProxyForwarder_Reconnect(t *testing.T) {
 			resp := bytes.ReplaceAll(data, []byte("request"), []byte("response"))
 			_ = transport.WriteMessage(writer, resp, format)
 		}
-	}()
+	})
 
 	time.Sleep(50 * time.Millisecond)
 

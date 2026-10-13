@@ -14,8 +14,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // 1. MCPSpec Validate and GetName tests
@@ -305,7 +307,7 @@ func TestDeep13_MCPServerAdapter_AsyncAndBatch(t *testing.T) {
 	s := NewServer()
 	s.initialized.Store(true)
 	resFile := filepath.Join(t.TempDir(), "info.txt")
-	_ = os.WriteFile(resFile, []byte("hello resource"), paths.FilePerm644)
+	_ = fileutil.WriteFile(resFile, []byte("hello resource"), paths.FilePerm644)
 	fileURI := "file://" + filepath.ToSlash(resFile)
 
 	s.RegisterResource(fileURI, "File Info", "Info", "text/plain")
@@ -609,9 +611,9 @@ func TestDeep13_InstallToIDE_Branches(t *testing.T) {
 
 	// 2. Directory exists, but file has invalid json and is not foreign
 	validDir := filepath.Join(tmpDir, "valid_dir")
-	_ = os.MkdirAll(validDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(validDir, paths.DirPerm755)
 	badJSONFile := filepath.Join(validDir, "mcp.json")
-	_ = os.WriteFile(badJSONFile, []byte("{invalid-json"), paths.FilePerm644)
+	_ = fileutil.WriteFile(badJSONFile, []byte("{invalid-json"), paths.FilePerm644)
 	errBadJSON := InstallToIDE("Claude Desktop", badJSONFile, "/bin/zqk", tmpDir, logger)
 	if errBadJSON == nil {
 		t.Error("expected error for invalid json")
@@ -627,7 +629,7 @@ func TestDeep13_InstallToIDE_Branches(t *testing.T) {
 	}
 	data, _ := json.Marshal(prevConfig)
 	prevFile := filepath.Join(validDir, "prev_mcp.json")
-	_ = os.WriteFile(prevFile, data, paths.FilePerm644)
+	_ = fileutil.WriteFile(prevFile, data, paths.FilePerm644)
 	errPrev := InstallToIDE("Claude Desktop", prevFile, "/bin/zqk", tmpDir, logger)
 	if errPrev != nil {
 		t.Errorf("InstallToIDE failed with previous config: %v", errPrev)
@@ -840,10 +842,10 @@ func TestDeep13_ObjectsSpecLoaderAdapter(t *testing.T) {
 // 19. Server Serve Lifecycle
 func TestDeep13_Server_ServeLifecycle(t *testing.T) {
 	s := NewServer()
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.server_lifecycle_shutdown", "trigger server shutdown cancel").StartSimple(func() {
 		time.Sleep(10 * time.Millisecond)
 		s.shutdownCancel()
-	}()
+	})
 	_ = s.Serve()
 	_ = s.IsShutdownRequested()
 	_ = s.GetMCPMetrics()

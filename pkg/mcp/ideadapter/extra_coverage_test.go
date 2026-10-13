@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -81,7 +82,9 @@ func TestExtraRunPingEOFAndSessionHelpers(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error, 1)
-	go func() { done <- a.Run(ctx) }()
+	goroutinelabels.NewGoroutine("test.ideadapter.extra_run", "adapter Run in TestExtraConfigMergeLoadAndWriteHelpers").StartSimple(func() {
+		done <- a.Run(ctx)
+	})
 	_, _ = pw.Write([]byte("not-json\n"))
 	_, _ = pw.Write([]byte(`{"jsonrpc":"2.0","id":1,"result":{}}` + "\n"))
 	_, _ = pw.Write([]byte(`{"jsonrpc":"2.0","method":"notifications/foo"}` + "\n"))
@@ -149,7 +152,9 @@ func TestExtraFakeDaemonInitializeForwardAndHeartbeat(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	errCh := make(chan error, 1)
-	go func() { errCh <- adapter.Run(ctx) }()
+	goroutinelabels.NewGoroutine("test.ideadapter.fake_daemon_run", "adapter Run in TestExtraFakeDaemonInitializeForwardAndHeartbeat").StartSimple(func() {
+		errCh <- adapter.Run(ctx)
+	})
 
 	writeLine(t, stdinW, `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"ide","version":"1"}}}`)
 	_ = readLine(t, stdoutR, 5*time.Second)
@@ -188,7 +193,9 @@ func TestExtraFakeDaemonInitializeForwardAndHeartbeat(t *testing.T) {
 	sess.mu.Unlock()
 	_, _ = sess.Call(context.Background(), methodPing, map[string]any{})
 	hbCtx, hbCancel := context.WithCancel(context.Background())
-	go sess.HeartbeatLoop(hbCtx)
+	goroutinelabels.NewGoroutine("test.ideadapter.session_heartbeat", "heartbeat loop in test").StartSimple(func() {
+		sess.HeartbeatLoop(hbCtx)
+	})
 	time.Sleep(20 * time.Millisecond)
 	hbCancel()
 	ch := make(chan json.RawMessage, 1)
@@ -201,12 +208,12 @@ func TestExtraFakeDaemonInitializeForwardAndHeartbeat(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	go func() {
+	goroutinelabels.NewGoroutine("test.ideadapter.ln_accept_close", "accept and close connection in broken session test").StartSimple(func() {
 		c, aerr := ln.Accept()
 		if aerr == nil {
 			_ = c.Close()
 		}
-	}()
+	})
 	broken := newDaemonSession(Config{DaemonTCP: ln.Addr().String(), RequestTimeout: 200 * time.Millisecond}, logger)
 	_ = broken.EnsureConnected(context.Background())
 	_ = ln.Close()
@@ -214,7 +221,9 @@ func TestExtraFakeDaemonInitializeForwardAndHeartbeat(t *testing.T) {
 
 	dead := newDaemonSession(Config{DaemonTCP: "127.0.0.1:1", HeartbeatInterval: time.Millisecond, RequestTimeout: 50 * time.Millisecond}, logger)
 	deadCtx, deadCancel := context.WithCancel(context.Background())
-	go dead.HeartbeatLoop(deadCtx)
+	goroutinelabels.NewGoroutine("test.ideadapter.dead_heartbeat", "dead heartbeat loop in test").StartSimple(func() {
+		dead.HeartbeatLoop(deadCtx)
+	})
 	time.Sleep(30 * time.Millisecond)
 	deadCancel()
 	dead.Close()

@@ -17,6 +17,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
 
@@ -141,13 +142,14 @@ func TestDeep6_ProxyDaemon_Queries(t *testing.T) {
 
 	addr := listener.Addr().String()
 
-	go func() {
+	goroutinelabels.NewGoroutine("test.mcp.cli_bridge_accept_loop", "mock daemon accept loop").StartSimple(func() {
 		for {
 			conn, err := listener.Accept()
 			if err != nil {
 				return
 			}
-			go func(c net.Conn) {
+			c := conn
+			goroutinelabels.NewGoroutine("test.mcp.cli_bridge_conn_worker", "mock daemon conn worker").StartSimple(func() {
 				defer c.Close()
 				reader := bufio.NewReader(c)
 				writer := bufio.NewWriter(c)
@@ -210,9 +212,9 @@ func TestDeep6_ProxyDaemon_Queries(t *testing.T) {
 					writer.Write(append(b, '\n'))
 					writer.Flush()
 				}
-			}(conn)
+			})
 		}
-	}()
+	})
 
 	proxy := &ProxyDaemon{
 		tcpAddr: addr,
