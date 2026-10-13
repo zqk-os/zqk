@@ -177,7 +177,7 @@ func drainStorageAsyncComponents(projectRoot string) {
 	ShutdownAsyncValidationStrategies()
 	ShutdownHashRegistriesForProjectTesting(projectRoot)
 	ShutdownAllAuditBuffersForTesting()
-	_ = filecas.DrainDarwinSyncQueue(2 * time.Second)
+	logging.LogSwallowedError(filecas.DrainDarwinSyncQueue(2 * time.Second))
 	runProjectTestTeardownHooks(projectRoot)
 }
 
@@ -283,12 +283,12 @@ func ScrubProjectRootForTempCleanup(projectRoot string, maxAttempts int, backoff
 		}
 		for _, e := range entries {
 			childPath := filepath.Join(projectRoot, e.Name())
-			_ = filepath.Walk(childPath, func(path string, info os.FileInfo, err error) error {
+			logging.LogSwallowedError(filepath.Walk(childPath, func(path string, info os.FileInfo, err error) error {
 				if err == nil {
-					_ = os.Chmod(path, 0700) //nolint:gosec // #nosec G302 - test teardown permission reset before removal
+					logging.LogSwallowedError(os.Chmod(path, 0700)) //nolint:gosec // #nosec G302 - test teardown permission reset before removal
 				}
 				return nil
-			})
+			}))
 			logging.LogSwallowedError(fileutil.RemoveAll(childPath))
 		}
 		time.Sleep(backoff)

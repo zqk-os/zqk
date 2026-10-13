@@ -60,7 +60,7 @@ func ResetMetricPipelineSingletonsForTest() {
 			continue
 		}
 		if reg := p.GetSamplerRegistry(); reg != nil {
-			_ = reg.StopAll() //nolint:errcheck // best-effort test hygiene
+			logging.LogSwallowedError(reg.StopAll())
 		}
 	}
 	metricPipelineByRoot = nil
