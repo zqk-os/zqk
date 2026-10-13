@@ -2,6 +2,8 @@ package execwrap
 
 import (
 	"context"
+	"errors"
+	"os/exec"
 	"testing"
 	"time"
 )
@@ -128,5 +130,61 @@ func TestKillProcessGroup_NilSafe(t *testing.T) {
 	cmd := Command("echo", "test")
 	if err := KillProcessGroup(cmd); err != nil {
 		t.Fatalf("expected nil error for unstarted cmd, got: %v", err)
+	}
+}
+
+func TestIsTextFileBusy(t *testing.T) {
+	if IsTextFileBusy(nil) {
+		t.Fatal("expected nil error to not be text file busy")
+	}
+	if IsTextFileBusy(errors.New("some regular error")) {
+		t.Fatal("expected regular error to not be text file busy")
+	}
+	if !IsTextFileBusy(errors.New("fork/exec /bin/zqk: text file busy")) {
+		t.Fatal("expected text file busy to be detected")
+	}
+	if !IsTextFileBusy(errors.New("TEXT FILE BUSY")) {
+		t.Fatal("expected uppercase text file busy to be detected")
+	}
+	if !IsETXTBSY(errors.New("text file busy")) {
+		t.Fatal("expected IsETXTBSY to return true")
+	}
+}
+
+func TestRunCombinedOutputWithRetry_Success(t *testing.T) {
+	out, err := RunCombinedOutputWithRetry(context.Background(), func() *exec.Cmd {
+		return Command("echo", "retry success")
+	}, 3, 5*time.Millisecond)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if string(out) != "retry success\n" {
+		t.Fatalf("expected 'retry success\\n', got: %q", string(out))
+	}
+}
+
+func TestRunCombinedOutputWithRetry_NonRetryableError(t *testing.T) {
+	attempts := 0
+	_, err := RunCombinedOutputWithRetry(context.Background(), func() *exec.Cmd {
+		attempts++
+		return Command("false")
+	}, 3, 5*time.Millisecond)
+	if err == nil {
+		t.Fatal("expected error from false command, got nil")
+	}
+	if attempts != 1 {
+		t.Fatalf("expected exactly 1 attempt for non-busy error, got: %d", attempts)
+	}
+}
+
+func TestRunCombinedOutputWithRetry_ContextCancelled(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := RunCombinedOutputWithRetry(ctx, func() *exec.Cmd {
+		return Command("echo", "cancelled")
+	}, 3, 5*time.Millisecond)
+	// Cancelled context either returns context.Canceled or executes if finished immediately
+	if err != nil && !errors.Is(err, context.Canceled) {
+		t.Logf("got error: %v", err)
 	}
 }

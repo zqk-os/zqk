@@ -301,11 +301,17 @@ func seatMatchesPersona(seat Seat, personaRef string) bool {
 }
 
 func addressedToSeat(seat Seat, ev map[string]any, msg string) bool {
-	to := objects.StringField(ev, JSONFieldToAgentID)
+	to := strings.TrimSpace(objects.StringField(ev, JSONFieldToAgentID))
 	if to != "" {
+		if strings.EqualFold(to, "all") || strings.EqualFold(to, "*") || strings.EqualFold(to, "broadcast") {
+			return true
+		}
 		return seatMatchesAgent(seat, to)
 	}
 	upper := strings.ToUpper(msg)
+	if !strings.Contains(upper, "ATTN ") {
+		return true
+	}
 	hints := seat.RoleHints
 	if len(hints) == 0 {
 		hints = inferRoleHints(seat.AgentID)

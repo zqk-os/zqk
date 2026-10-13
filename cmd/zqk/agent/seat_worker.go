@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -793,16 +794,18 @@ func triggerPlanOrchestration(ctx context.Context, sp storage.ObjectStorageProvi
 	}
 	cb := filepath.Join(logDir, "orch-"+safePlanFileName(planID)+".callback.json")
 	hourglass := schedulerCallbackNotify(cli, cb)
-	cmd := execwrap.CommandContext(ctx, cli,
-		"scheduler", "submit", orchCmd,
-		"--title", "ORCHESTRATE "+planID,
-		"--max-runtime", "7200",
-		"--workdir", root,
-		"--callback-completion", hourglass,
-		"--callback-failure", hourglass,
-	)
-	cmd.Dir = root
-	output, err := cmd.CombinedOutput()
+	output, err := execwrap.RunCombinedOutputWithRetry(ctx, func() *exec.Cmd {
+		c := execwrap.CommandContext(ctx, cli,
+			"scheduler", "submit", orchCmd,
+			"--title", "ORCHESTRATE "+planID,
+			"--max-runtime", "7200",
+			"--workdir", root,
+			"--callback-completion", hourglass,
+			"--callback-failure", hourglass,
+		)
+		c.Dir = root
+		return c
+	}, 5, 10*time.Millisecond)
 	if err != nil {
 		return string(output), errfmt.Errorf("submit agent orchestrate for %s: %w", planID, err)
 	}

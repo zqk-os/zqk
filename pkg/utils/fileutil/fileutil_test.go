@@ -60,6 +60,17 @@ func TestFileUtil_IOPS(t *testing.T) {
 	if err := WriteExecutableFile(exePath, []byte("#!/bin/sh\n")); err != nil {
 		t.Fatalf("WriteExecutableFile: %v", err)
 	}
+	durableExePath := filepath.Join(subDir, "run_durable.sh")
+	if err := WriteDurableExecutableFile(durableExePath, []byte("#!/bin/sh\n")); err != nil {
+		t.Fatalf("WriteDurableExecutableFile: %v", err)
+	}
+	stDurable, err := Stat(durableExePath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if perm := stDurable.Mode().Perm(); perm != executableFilePerm {
+		t.Fatalf("durable executable perm got %o, want %o", perm, executableFilePerm)
+	}
 	st, err := Stat(exePath)
 	if err != nil {
 		t.Fatal(err)

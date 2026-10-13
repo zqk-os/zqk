@@ -40,10 +40,22 @@ func newContinuationHookCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookContinuationCommandBuilder(), &cobra.Command{
 		RunE: withHookProcessor(func(cmd *cobra.Command, proc *cli.Processor, in io.Reader, out io.Writer, sec *pkgctx.SecurityContext) error {
 			flags := cmd.Flags()
-			vendor, _ := flags.GetString("vendor")
-			marker, _ := flags.GetString("marker")
-			agentID, _ := flags.GetString("agent-id")
-			personaRef, _ := flags.GetString("persona-ref")
+			vendor, err := flags.GetString("vendor")
+			if err != nil {
+				return err
+			}
+			marker, err := flags.GetString("marker")
+			if err != nil {
+				return err
+			}
+			agentID, err := flags.GetString("agent-id")
+			if err != nil {
+				return err
+			}
+			personaRef, err := flags.GetString("persona-ref")
+			if err != nil {
+				return err
+			}
 			markerPath := marker
 			if markerPath == "" {
 				markerPath = filepath.Join(proc.ProjectRoot(), paths.ProjectDataDir, "state", defaultMarkerFilename)
@@ -92,9 +104,9 @@ func runContinuationHookWithDeps(
 		}
 		if res, err := sp.List(ctx, sec, nil, filter); err == nil && len(res.Objects) > 0 {
 			first := res.Objects[0]
-			pID, _ := first[objects.FieldKeyID].(string)
-			title, _ := first[objects.FieldKeyTitle].(string)
-			if pID != "" {
+			pID, okID := first[objects.FieldKeyID].(string)
+			title, okTitle := first[objects.FieldKeyTitle].(string)
+			if okID && pID != "" && okTitle {
 				activePlanInfo = fmt.Sprintf(activePlanInfoFmt, title, pID)
 			}
 		}
@@ -112,6 +124,9 @@ func runContinuationHookWithDeps(
 			if targetAgentID == "" {
 				targetAgentID = strings.TrimSpace(agentfeed.WorkerSeatID(projectRoot))
 			}
+		}
+		if targetAgentID == "" {
+			targetAgentID = "coordinator"
 		}
 	}
 	var steeringNudge string

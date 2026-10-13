@@ -113,7 +113,7 @@ func TestTriggerPlanOrchestrationSubmitsAgentOrchestrate(t *testing.T) {
 	}
 	zqkPath := filepath.Join(binDir, "zqk")
 	script := "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$0.args\"\n"
-	if err := fileutil.WriteFile(zqkPath, []byte(script), paths.DirPerm700); err != nil {
+	if err := fileutil.WriteDurableExecutableFile(zqkPath, []byte(script)); err != nil {
 		t.Fatal(err)
 	}
 

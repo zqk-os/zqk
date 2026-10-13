@@ -219,3 +219,41 @@ func TestContinuationHook_SafeDrainInput(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "test-payload", string(data))
 }
+
+func TestContinuationHook_BroadcastSteeringInboxFallback(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind:            "hook_test",
+		SeedSchemaPlane: true,
+	})
+	root, fs := proj.Root, proj.FileStorage
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	// 1. Touch cap_loop_active marker
+	stateDir := filepath.Join(root, paths.ProjectDataDir, "state")
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+	markerPath := filepath.Join(stateDir, "cap_loop_active")
+	require.NoError(t, fileutil.WriteFile(markerPath, []byte("active"), 0644))
+
+	// 2. Append broadcast steering message (no ToAgentID)
+	steerRes, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
+		ProjectRoot:      root,
+		Message:          "General broadcast steering for active cycle",
+		AgentID:          "human-tpm",
+		EventType:        agentfeed.FeedEventTypeSteering,
+		SkipEnabledCheck: true,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, steerRes.EventID)
+
+	// 3. Run hook with empty agent ID (trigger fallback to coordinator)
+	var outBuf bytes.Buffer
+	err = runContinuationHookWithDeps(context.Background(), secCtx, fs, root, "antigravity", markerPath, "", "", strings.NewReader("{}"), &outBuf)
+	require.NoError(t, err)
+
+	var hookOut continuationHookOutput
+	require.NoError(t, json.Unmarshal(outBuf.Bytes(), &hookOut))
+
+	assert.Equal(t, "continue", hookOut.Decision)
+	assert.Contains(t, hookOut.Reason, "Pending steering inbox (1 unacked message(s))")
+	assert.Contains(t, hookOut.Reason, "General broadcast steering for active cycle")
+}
