@@ -40,6 +40,7 @@ type syncPrefixDetail struct {
 func NewSyncIDPrefixesFromSpecsCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemSyncIdPrefixesFromSpecsCommandBuilder()
 	cli.RequireSession(cmd, false)
+	cli.AddCommonFlags(cmd)
 	cmd.Args = cobra.NoArgs
 	cmd.RunE = runSyncIDPrefixesFromSpecs
 	return cmd
