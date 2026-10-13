@@ -276,8 +276,8 @@ func TestRunVerifyCompletion_TestCase_DirectUnitProofs(t *testing.T) {
 	noRootStore := &testStubStorage{
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			return map[string]any{
-				objects.FieldKeyKind:                "test_case",
-				objects.FieldKeyVerificationHash:    "dummy-hash",
+				objects.FieldKeyKind:                 "test_case",
+				objects.FieldKeyVerificationHash:     "dummy-hash",
 				objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
 			}, nil
 		},
@@ -292,7 +292,7 @@ func TestRunVerifyCompletion_TestCase_DirectUnitProofs(t *testing.T) {
 	noHashStore := &testStubStorage{
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			return map[string]any{
-				objects.FieldKeyKind:                "test_case",
+				objects.FieldKeyKind:                 "test_case",
 				objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
 			}, nil
 		},
@@ -320,8 +320,8 @@ func TestRunVerifyCompletion_TestCase_DirectUnitProofs(t *testing.T) {
 	mismatchStore := &testStubStorage{
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			return map[string]any{
-				objects.FieldKeyKind:                "test_case",
-				objects.FieldKeyVerificationHash:    "mismatched-test-hash",
+				objects.FieldKeyKind:                 "test_case",
+				objects.FieldKeyVerificationHash:     "mismatched-test-hash",
 				objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
 			}, nil
 		},
@@ -335,8 +335,8 @@ func TestRunVerifyCompletion_TestCase_DirectUnitProofs(t *testing.T) {
 	validStore := &testStubStorage{
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			return map[string]any{
-				objects.FieldKeyKind:                "test_case",
-				objects.FieldKeyVerificationHash:    tcHash,
+				objects.FieldKeyKind:                 "test_case",
+				objects.FieldKeyVerificationHash:     tcHash,
 				objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
 			}, nil
 		},
@@ -355,10 +355,10 @@ func TestRunVerifyCompletion_TestCase_WithOrganizer(t *testing.T) {
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			if id == "TST-ORG" {
 				return map[string]any{
-					objects.FieldKeyKind:                "test_case",
-					objects.FieldKeyVerificationHash:    tcHash,
+					objects.FieldKeyKind:                 "test_case",
+					objects.FieldKeyVerificationHash:     tcHash,
 					objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
-					objects.FieldKeyCriteriaRefs:        []any{"CRIT-1", "CRIT-2"},
+					objects.FieldKeyCriteriaRefs:         []any{"CRIT-1", "CRIT-2"},
 				}, nil
 			}
 			return map[string]any{objects.FieldKeyKind: "criteria"}, nil
@@ -381,10 +381,10 @@ func TestRunVerifyCompletion_TestCase_WithOrganizer(t *testing.T) {
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			if id == "TST-ORG" {
 				return map[string]any{
-					objects.FieldKeyKind:                "test_case",
-					objects.FieldKeyVerificationHash:    tcHash,
+					objects.FieldKeyKind:                 "test_case",
+					objects.FieldKeyVerificationHash:     tcHash,
 					objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
-					objects.FieldKeyCriteriaRefs:        []string{"CRIT-FAIL", "CRIT-SAFE"},
+					objects.FieldKeyCriteriaRefs:         []string{"CRIT-FAIL", "CRIT-SAFE"},
 				}, nil
 			}
 			if id == "CRIT-FAIL" {
@@ -404,10 +404,10 @@ func TestRunVerifyCompletion_TestCase_WithOrganizer(t *testing.T) {
 		readFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, id string) (map[string]any, error) {
 			if id == "TST-ORG" {
 				return map[string]any{
-					objects.FieldKeyKind:                "test_case",
-					objects.FieldKeyVerificationHash:    tcHash,
+					objects.FieldKeyKind:                 "test_case",
+					objects.FieldKeyVerificationHash:     tcHash,
 					objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
-					objects.FieldKeyCriteriaRefs:        []any{"CRIT-PANIC", "CRIT-SAFE"},
+					objects.FieldKeyCriteriaRefs:         []any{"CRIT-PANIC", "CRIT-SAFE"},
 				}, nil
 			}
 			if id == "CRIT-PANIC" {
@@ -494,7 +494,7 @@ func TestRunVerifyCompletion_BacklogItem_DirectUnitProofs(t *testing.T) {
 			return &storage.QueryResult{
 				Objects: []map[string]any{
 					{
-						objects.FieldKeyID:                  "TST-1",
+						objects.FieldKeyID:                   "TST-1",
 						objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
 					},
 				},
@@ -518,7 +518,7 @@ func TestRunVerifyCompletion_BacklogItem_DirectUnitProofs(t *testing.T) {
 			return &storage.QueryResult{
 				Objects: []map[string]any{
 					{
-						objects.FieldKeyID:                  "TST-1",
+						objects.FieldKeyID:                   "TST-1",
 						objects.FieldKeyVerifiedArtifactRefs: []any{artifactRel},
 					},
 				},
