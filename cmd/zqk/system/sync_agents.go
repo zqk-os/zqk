@@ -12,6 +12,8 @@ import (
 
 func NewSyncAgentsCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemSyncAgentsCommandBuilder(), &cobra.Command{Use: "sync-agents"})
+	cmd.Flags().String("dir", "", "Directory containing agent definitions")
+	cli.AddCommonFlags(cmd)
 	cli.BindAsyncProgress(cmd, func(c *cobra.Command, args []string) error {
 		dir, err := c.Flags().GetString("dir")
 		if err != nil {

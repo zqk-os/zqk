@@ -1,0 +1,4 @@
+$schema: ../_schemas/command_spec.schema.json
+name: data-cells
+short: Generated spec for data-cells
+description: Generated spec for data-cells

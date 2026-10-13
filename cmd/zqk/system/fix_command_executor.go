@@ -345,8 +345,6 @@ func (fce *FixCommandExecutor) Enqueue(task *FixCommandTask) error {
 
 // worker processes fix command tasks from the queue
 func (fce *FixCommandExecutor) worker(id int) {
-	defer fce.wg.Done()
-
 	for {
 		select {
 		case <-fce.ctx.Done():

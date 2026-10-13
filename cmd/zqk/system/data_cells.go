@@ -32,6 +32,10 @@ func NewDataCellsCmd() *cobra.Command {
 	cli.EnsureCmdAnnotations(cmd)
 	cmd.Annotations[cli.AnnotationKeySystemKindValidate] = cli.KindValidateFlagKind
 	cmd.Args = cobra.NoArgs
+	cmd.Flags().Bool("json", false, "Output in JSON format")
+	cmd.Flags().Bool("json-envelope", false, "Output JSON envelope with operational details")
+	cmd.Flags().Bool("envelope-policy-dry-run", false, "Dry run envelope policies for known storage profiles")
+	cmd.Flags().String("kind", "", "Filter data cells by kind")
 	cmd.RunE = runDataCells
 	return cmd
 }
