@@ -63,7 +63,7 @@ func TestInboxAdapter_DeliverWritesVendorInbox(t *testing.T) {
 	if err := json.Unmarshal(raw, &got); err != nil {
 		t.Fatal(err)
 	}
-	if got["Recipient"] != "conv-xyz" || got["Message"] != "hello" {
+	if got["recipient"] != "conv-xyz" || got["content"] != "hello" {
 		t.Fatalf("payload=%v", got)
 	}
 	if !fileutil.Exists(filepath.Join(conv, systemGeneratedDir, messagesDir, undeliveredDir, "msg-1")) {

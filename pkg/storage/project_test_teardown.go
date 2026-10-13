@@ -245,7 +245,7 @@ func ScrubProjectRootForTempCleanup(projectRoot string, maxAttempts int, backoff
 			childPath := filepath.Join(projectRoot, e.Name())
 			_ = filepath.Walk(childPath, func(path string, info os.FileInfo, err error) error {
 				if err == nil {
-					_ = os.Chmod(path, 0777)
+					_ = os.Chmod(path, 0700) //nolint:gosec // #nosec G302 - test teardown permission reset before removal
 				}
 				return nil
 			})
