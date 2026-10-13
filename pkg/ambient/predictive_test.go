@@ -39,6 +39,8 @@ func (h *dummyHub) Status() string { return "dummy" }
 
 func (h *dummyHub) EnableEventSourcing(projectRoot string, secCtx *pkgctx.SecurityContext) {}
 
+func (h *dummyHub) WaitForAudits() {}
+
 func TestPredictiveTaskSpawner_CreatesTestStub(t *testing.T) {
 	hub := &dummyHub{}
 	NewPredictiveTaskSpawner(hub)

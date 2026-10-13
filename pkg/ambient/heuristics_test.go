@@ -43,6 +43,8 @@ func (h *mockEventHub) Status() string {
 func (h *mockEventHub) EnableEventSourcing(projectRoot string, secCtx *pkgctx.SecurityContext) {
 }
 
+func (h *mockEventHub) WaitForAudits() {}
+
 func TestCoachHeuristics_ManualEdit(t *testing.T) {
 	hub := newMockEventHub()
 	NewCoachHeuristics(hub)

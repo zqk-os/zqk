@@ -44,6 +44,8 @@ func (m *mockFailingEventHub) Status() string {
 func (m *mockFailingEventHub) EnableEventSourcing(projectRoot string, secCtx *pkgctx.SecurityContext) {
 }
 
+func (m *mockFailingEventHub) WaitForAudits() {}
+
 func TestAmbientDaemon_LifecycleAndSignals(t *testing.T) {
 	root := t.TempDir()
 	t.Setenv("ZQK_PROJECT_ROOT", root)

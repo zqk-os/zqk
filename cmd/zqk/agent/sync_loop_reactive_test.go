@@ -111,7 +111,7 @@ func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
 	afterDispatch := dispatchTestCallbackEvent(taskID, time.Time{})
 	require.Equal(t, 0, afterDispatch, "expected waker channel to be unregistered after sync loop exits")
 
-	storage.ScrubProjectRootForTempCleanup(filepath.Join(root, paths.ProjectDataDir), 20, 25*time.Millisecond)
+	_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, nil))
 }
 
 func TestSyncLoop_WakerChannelDeliveryLatency(t *testing.T) {
@@ -170,6 +170,7 @@ func TestSyncLoop_ContextCancellationCleanExit(t *testing.T) {
 	writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
 	if writeQueue != nil {
 		_ = writeQueue.FlushAll(1 * time.Second)
+		_ = writeQueue.Shutdown()
 	}
-	storage.ScrubProjectRootForTempCleanup(filepath.Join(root, paths.ProjectDataDir), 20, 25*time.Millisecond)
+	_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, nil))
 }

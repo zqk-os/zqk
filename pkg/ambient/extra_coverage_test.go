@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestMapToSystemObject(t *testing.T) {
@@ -127,9 +128,10 @@ func TestEventHub_EnableEventSourcingAndPublish(t *testing.T) {
 		t.Fatalf("Publish ev3 failed: %v", err)
 	}
 
-	// Allow asynchronous ambient_audit goroutines to finish disk emission
-	// before t.TempDir() executes directory cleanup.
-	time.Sleep(1 * time.Second)
+	// Deterministically wait for asynchronous ambient_audit goroutines to finish disk emission
+	// and scrub project root before t.TempDir() executes directory cleanup.
+	hub.WaitForAudits()
+	storage.ScrubProjectRootForTempCleanup(tempDir, 20, 25*time.Millisecond)
 }
 
 func TestCoachHeuristics_AppendTip(t *testing.T) {

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"hash/crc32"
 	"sync"
+
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 // Wire protocol framing constants.
@@ -43,8 +45,7 @@ const (
 
 // Standard wire framing error values.
 var (
-	ErrInvalidMagic     = errors.New(ErrTextInvalidMagic)
-	ErrInvalidWireMagic = ErrInvalidMagic
+	ErrInvalidWireMagic = errfmt.Errorf("%w: %s", ErrInvalidMagic, ErrTextInvalidMagic)
 	ErrHeaderTruncated  = errors.New(ErrTextHeaderTruncated)
 	ErrPayloadTruncated = errors.New(ErrTextPayloadTruncated)
 	ErrChecksumMismatch = errors.New(ErrTextChecksumMismatch)
@@ -128,7 +129,7 @@ func DecodeHeader(src []byte) (FrameHeader, error) {
 		return FrameHeader{}, ErrHeaderTruncated
 	}
 	if src[0] != WireMagicByte0 || src[1] != WireMagicByte1 || src[2] != WireMagicByte2 || src[3] != WireMagicByte3 {
-		return FrameHeader{}, ErrInvalidMagic
+		return FrameHeader{}, ErrInvalidWireMagic
 	}
 	expectedChecksum := binary.BigEndian.Uint32(src[HeaderChecksumFieldOffset:HeaderSize])
 	actualChecksum := crc32.ChecksumIEEE(src[0:HeaderChecksumFieldOffset])
