@@ -3,7 +3,7 @@
 > **Technical Specification:** `TSP-FAIL-CLOSED-AST-TEST-ISOLATION-001`  
 > **Status:** Implemented & Verified  
 > **Target Release:** Zen Quantum Kernel v0.1.0  
-> **Governing Requirements:** `REQ-1791858094693724000-c6588fb0`, `CRIT-1791858095119988000-cb0ac8fe`, `CRIT-1791858095119989000-2bf5638f`, `CRIT-1791858095119990000-7ad8eeaa`
+> **Architecture Domain:** Static Analysis & Verification Governance
 
 ---
 
