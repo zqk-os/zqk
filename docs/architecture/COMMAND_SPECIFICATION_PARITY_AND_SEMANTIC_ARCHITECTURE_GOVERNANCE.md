@@ -97,7 +97,7 @@ Engineers and agents verify command specification parity and governance through 
    ```
 4. **Trigger VDS Test Verification:**
    ```bash
-   ./bin/zqk test run TST-1791859568043010001-df80b189
+   ./bin/zqk test run <tst-id>
    ```
 
 ---
