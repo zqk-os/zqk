@@ -16,6 +16,7 @@ const (
 	EventCommsFail        = "comms_fail"
 	EventLifecycleBlocked = "lifecycle_blocked"
 	EventChatIssueIntake  = "chat_issue_intake"
+	EventStaleBaseBlocked = "stale_base_blocked"
 )
 
 // Known interaction policy IDs (kernel objects). Catalog text is the fast pong;

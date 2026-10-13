@@ -13,7 +13,7 @@ const maxDriveRunes = 600
 // with empty-column or "ack then hourglass" prose. TRACK
 func SkipCASOverlay(event string) bool {
 	switch event {
-	case EventIdle, EventPushAhead, EventInboxUnacked:
+	case EventIdle, EventPushAhead, EventInboxUnacked, EventStaleBaseBlocked:
 		return true
 	default:
 		return false

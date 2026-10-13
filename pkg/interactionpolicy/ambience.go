@@ -175,7 +175,9 @@ type Ambience struct {
 	InboxUnacked   int
 	OutboxAwaiting int
 	// BranchAhead is local commits not on the tracked upstream (0 if unknown).
-	BranchAhead     int
+	BranchAhead int
+	// BranchBehind is commits on origin/main not in HEAD (0 if unknown).
+	BranchBehind    int
 	StaleInProgress []StaleInProgressItem
 }
 
@@ -192,7 +194,7 @@ func planExecutionLocked(s Ambience) bool {
 }
 
 // ClassifyAmbience picks one event from compiled signals.
-// Preemption (POL-AGENT-INTERACTION-POLICY-001): inbox > push-ahead >
+// Preemption (POL-AGENT-INTERACTION-POLICY-001): stale-base-blocked > inbox > push-ahead >
 // planned execution (idle) > kernel fill (compiled onto idle, not a
 // separate event) > groom-ahead > align. Never silence.
 // TRACK: follow-up in kernel backlog
@@ -212,6 +214,9 @@ func planExecutionLocked(s Ambience) bool {
 //
 // Outbox awaiting peer_ack with planned>0 is keep-working idle, not a hole.
 func ClassifyAmbience(s Ambience) string {
+	if s.BranchBehind > 0 {
+		return EventStaleBaseBlocked
+	}
 	if s.InboxUnacked > 0 {
 		return EventInboxUnacked
 	}

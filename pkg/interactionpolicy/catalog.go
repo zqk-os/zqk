@@ -126,6 +126,14 @@ var catalog = []catalogEntry{
 			CommandHint: "object promote <id>",
 		},
 	},
+	{
+		events: []string{EventStaleBaseBlocked},
+		step: Step{
+			PolicyID:    "POL-WORKFLOW-003",
+			GuidingStep: "Fail-closed upstream sync violation: active branch is behind origin/main. Pushing or building on a stale base causes PR merge conflicts and redundant CI cycles. Sync local main and rebase before executing: git fetch origin && git rebase origin/main.",
+			CommandHint: "git fetch origin && git rebase origin/main",
+		},
+	},
 }
 
 func stepsForEvent(event string) []Step {

@@ -63,7 +63,9 @@ type KernelAmbience struct {
 	SeatMode           string                      `json:"seat_mode,omitempty"`
 	StewardFocus       string                      `json:"steward_focus,omitempty"`
 	// BranchAhead is local commits not on the tracked upstream (TPM push-ahead gland).
-	BranchAhead       int                    `json:"branch_ahead,omitempty"`
+	BranchAhead int `json:"branch_ahead,omitempty"`
+	// BranchBehind is upstream commits on origin/main not in HEAD (Gate 0b POL-WORKFLOW-003).
+	BranchBehind      int                    `json:"branch_behind,omitempty"`
 	Note              string                 `json:"note,omitempty"`
 	TopIssueClusters  []IssueCluster         `json:"top_issue_clusters,omitempty"`
 	MetricsRollup     *MetricsRollupSnapshot `json:"metrics_rollup,omitempty"`
@@ -245,8 +247,12 @@ func LoadKernelAmbience(projectRoot string) KernelAmbience {
 	EnrichStrategicAlignment(&amb, projectRoot)
 	EnrichMetricsRollup(&amb, projectRoot)
 	EnrichAutoRemedy(&amb, projectRoot)
-	if n := git.NewFacade(projectRoot).CountAheadUpstream(); n > 0 {
+	facade := git.NewFacade(projectRoot)
+	if n := facade.CountAheadUpstream(); n > 0 {
 		amb.BranchAhead = n
+	}
+	if n := facade.CountBehindOriginMain(); n > 0 {
+		amb.BranchBehind = n
 	}
 	amb.StewardFocus = ProjectStewardFocus(amb, "")
 	return amb
@@ -751,6 +757,12 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 	}
 	if !amb.Available {
 		parts = append(parts, paths.RewriteCanonicalCLIInvocations("no system-check cache — run zqk system check --format json -o .zqk/logs/system-check.json before claiming kernel healthy"))
+	}
+	if amb.BranchBehind > 0 {
+		parts = append(parts, fmt.Sprintf(
+			"❌ STALE BRANCH BASE (POL-WORKFLOW-003): behind origin/main by %d commit(s) — run git fetch origin && git rebase origin/main before executing or pushing",
+			amb.BranchBehind,
+		))
 	}
 	switch strings.TrimSpace(correspondenceHint) {
 	case "ack_then_continue":

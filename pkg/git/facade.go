@@ -119,15 +119,15 @@ func (f *Facade) CommitsAheadOneline(branch string) ([]byte, error) {
 	return f.output("log", "origin/"+branch+"..HEAD", "--oneline")
 }
 
-// CountAheadUpstream returns how many local commits are not on the tracked
-// upstream. 0 if no upstream, not a repo, or the probe times out.
-func (f *Facade) CountAheadUpstream() int {
+// countRevs returns the revision count for the specified rev-list argument.
+// Returns 0 if not a repo, invalid rev, or the probe times out.
+func (f *Facade) countRevs(revSpec string) int {
 	if f == nil || strings.TrimSpace(f.repoPath) == "" {
 		return 0
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), AheadProbeTimeout)
 	defer cancel()
-	cmd := execwrap.CommandContext(ctx, gitCommandName, "rev-list", "--count", "@{upstream}..HEAD")
+	cmd := execwrap.CommandContext(ctx, gitCommandName, "rev-list", "--count", revSpec)
 	cmd.Dir = f.repoPath
 	out, err := cmd.Output()
 	if err != nil {
@@ -138,6 +138,24 @@ func (f *Facade) CountAheadUpstream() int {
 		return 0
 	}
 	return n
+}
+
+// CountAheadUpstream returns how many local commits are not on the tracked
+// upstream. 0 if no upstream, not a repo, or the probe times out.
+func (f *Facade) CountAheadUpstream() int {
+	return f.countRevs("@{upstream}..HEAD")
+}
+
+// CountBehindOriginMain returns how many commits HEAD is behind origin/main.
+// Returns 0 if origin/main does not exist, not a repo, or the probe times out.
+func (f *Facade) CountBehindOriginMain() int {
+	return f.countRevs("HEAD..origin/main")
+}
+
+// CountBehindUpstream returns how many commits HEAD is behind its tracked upstream branch.
+// Returns 0 if no upstream is set, not a repo, or the probe times out.
+func (f *Facade) CountBehindUpstream() int {
+	return f.countRevs("HEAD..@{upstream}")
 }
 
 func (f *Facade) Push(verify bool) ([]byte, error) {

@@ -135,6 +135,29 @@ func TestContinuationHook_BoundaryValidationAndErrorRecovery(t *testing.T) {
 		require.NoError(t, json.Unmarshal(outBuf.Bytes(), &hookOut))
 		assert.Equal(t, "continue", hookOut.Decision)
 	}
+
+	// Subtest 5: Claude vendor format (decision is "block")
+	{
+		var outBuf bytes.Buffer
+		err := runContinuationHookWithDeps(context.Background(), secCtx, fs, root, "claude", markerPath, "", "", strings.NewReader("{}"), &outBuf)
+		require.NoError(t, err)
+		var rawMap map[string]any
+		require.NoError(t, json.Unmarshal(outBuf.Bytes(), &rawMap))
+		assert.Equal(t, "block", rawMap["decision"])
+		assert.NotEmpty(t, rawMap["reason"])
+	}
+
+	// Subtest 6: Cursor vendor format (decision is "continue" with message & reason)
+	{
+		var outBuf bytes.Buffer
+		err := runContinuationHookWithDeps(context.Background(), secCtx, fs, root, "cursor", markerPath, "", "", strings.NewReader("{}"), &outBuf)
+		require.NoError(t, err)
+		var rawMap map[string]any
+		require.NoError(t, json.Unmarshal(outBuf.Bytes(), &rawMap))
+		assert.Equal(t, "continue", rawMap["decision"])
+		assert.NotEmpty(t, rawMap["reason"])
+		assert.Equal(t, rawMap["reason"], rawMap["message"])
+	}
 }
 
 func TestContinuationHook_SteeringFeedIntegration(t *testing.T) {

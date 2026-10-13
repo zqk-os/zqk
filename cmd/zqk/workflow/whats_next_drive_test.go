@@ -259,3 +259,29 @@ func TestPriorityPlanLooksShaped_UsesInheritedTitleAndWorkstream(t *testing.T) {
 		t.Fatal("inherited title plus workstream plus personas must be shaped")
 	}
 }
+
+func TestCompileWhatsNextDrive_staleBaseBlocks(t *testing.T) {
+	t.Parallel()
+	out := whatsNextOut{
+		PriorityPlan: &whatsNextPriorityPlan{
+			ID:     "PRI-LOCKED",
+			Status: objects.ObjectStatusInProgress,
+		},
+		KernelAmbience: &whatsnext.KernelAmbience{
+			BranchBehind: 2,
+		},
+	}
+	compileWhatsNextDrive(&out, context.Background(), nil, "", nil)
+	if out.GuidingStep == nil {
+		t.Fatal("stale base must compile guiding step")
+	}
+	if out.GuidingStep.Event != interactionpolicy.EventStaleBaseBlocked {
+		t.Fatalf("event=%q want %q", out.GuidingStep.Event, interactionpolicy.EventStaleBaseBlocked)
+	}
+	if !strings.Contains(out.GuidingStep.GuidingStep, "behind origin/main") {
+		t.Fatalf("must explain stale base: %q", out.GuidingStep.GuidingStep)
+	}
+	if out.GuidingStep.PolicyID != "POL-WORKFLOW-003" {
+		t.Fatalf("policy=%q want POL-WORKFLOW-003", out.GuidingStep.PolicyID)
+	}
+}
