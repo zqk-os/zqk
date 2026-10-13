@@ -1,9 +1,8 @@
 # Flake-Resilient Subprocess Execution and Test Script Concurrency Invariants
 
-**Document Version:** 1.0.0  
-**Context:** Cycle 55 Engineering Architecture (`PRI-1791885450402106000-46ac8203`)  
-**Requirement Reference:** `REQ-1791885437023127000-e9ab6514`  
-**Technical Debt Reference:** `TDE-1791761155035714000-2f822060`  
+> **Technical Specification:** `TSP-FLAKE-RESILIENT-SUBPROCESS-001`  
+> **Status:** Implemented & Verified  
+> **Target Release:** Zen Quantum Kernel v0.1.0  
 
 ---
 
