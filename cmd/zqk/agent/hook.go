@@ -80,7 +80,7 @@ func runPreSubagentHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext
 		return emitHookDecision(out, "allow", nil)
 	}
 
-	inputBytes, err := io.ReadAll(in)
+	inputBytes, err := safeDrainInput(in)
 	if err != nil || len(strings.TrimSpace(string(inputBytes))) == 0 {
 		return emitHookDecision(out, "allow", nil)
 	}

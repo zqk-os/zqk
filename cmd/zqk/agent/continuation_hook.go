@@ -69,18 +69,8 @@ func runContinuationHookWithDeps(
 	out io.Writer,
 ) error {
 	// 1. Drain stdin safely (tolerate empty, non-JSON payloads, or interactive terminal)
-	if in != nil {
-		shouldRead := true
-		if f, ok := in.(*os.File); ok {
-			if stat, err := f.Stat(); err == nil && (stat.Mode()&os.ModeCharDevice) != 0 {
-				shouldRead = false
-			}
-		}
-		if shouldRead {
-			if _, readErr := io.ReadAll(in); readErr != nil {
-				return readErr
-			}
-		}
+	if _, err := safeDrainInput(in); err != nil {
+		return err
 	}
 
 	// 2. Resolve default marker if empty

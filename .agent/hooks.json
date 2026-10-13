@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook pre-subagent --vendor antigravity; else zqk agent hook pre-subagent --vendor antigravity; fi",
+            "command": "for p in ./bin/zqk ../bin/zqk \"$HOME/.gemini/antigravity-cli/bin/zqk\"; do if [ -x \"$p\" ]; then exec \"$p\" agent hook pre-subagent --vendor antigravity; fi; done; exec zqk agent hook pre-subagent --vendor antigravity",
             "timeout": 45
           }
         ]
@@ -17,7 +17,7 @@
     "Stop": [
       {
         "type": "command",
-        "command": "if [ -x ./bin/zqk ]; then ./bin/zqk agent hook stop --vendor antigravity; else zqk agent hook stop --vendor antigravity; fi",
+        "command": "for p in ./bin/zqk ../bin/zqk \"$HOME/.gemini/antigravity-cli/bin/zqk\"; do if [ -x \"$p\" ]; then exec \"$p\" agent hook stop --vendor antigravity; fi; done; exec zqk agent hook stop --vendor antigravity",
         "timeout": 15
       }
     ]
