@@ -3,8 +3,11 @@ package execwrap
 import (
 	"bytes"
 	"context"
+	"errors"
 	"os"
 	"os/exec"
+	"strings"
+	"syscall"
 	"time"
 )
 
@@ -92,4 +95,53 @@ func RunWithStandardStreams(cmd *exec.Cmd) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+// IsTextFileBusy reports whether err represents an ETXTBSY (text file busy) execution error.
+func IsTextFileBusy(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, syscall.ETXTBSY) {
+		return true
+	}
+	return strings.Contains(strings.ToLower(err.Error()), "text file busy")
+}
+
+// IsETXTBSY is an alias for IsTextFileBusy.
+func IsETXTBSY(err error) bool {
+	return IsTextFileBusy(err)
+}
+
+// RunCombinedOutputWithRetry executes a command, retrying with exponential backoff
+// if the OS returns ETXTBSY (text file busy). This eliminates transient flakes on Linux
+// when executing freshly written binaries or test mock scripts.
+func RunCombinedOutputWithRetry(ctx context.Context, cmdFactory func() *exec.Cmd, maxRetries int, initialBackoff time.Duration) ([]byte, error) {
+	if maxRetries <= 0 {
+		maxRetries = 5
+	}
+	if initialBackoff <= 0 {
+		initialBackoff = 10 * time.Millisecond
+	}
+	backoff := initialBackoff
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		cmd := cmdFactory()
+		out, err := cmd.CombinedOutput()
+		if err == nil {
+			return out, nil
+		}
+		if !IsTextFileBusy(err) || attempt == maxRetries {
+			return out, err
+		}
+		select {
+		case <-ctx.Done():
+			return out, ctx.Err()
+		case <-time.After(backoff):
+		}
+		backoff *= 2
+		if backoff > 200*time.Millisecond {
+			backoff = 200 * time.Millisecond
+		}
+	}
+	return nil, nil
 }

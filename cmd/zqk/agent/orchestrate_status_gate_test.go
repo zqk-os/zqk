@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -10,6 +11,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -38,7 +40,7 @@ func TestTriggerPlanOrchestration_RefusesGroomingAndComplete(t *testing.T) {
 	}
 	zqkPath := filepath.Join(binDir, "zqk")
 	script := "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$0.args\"\n"
-	if err := fileutil.WriteFile(zqkPath, []byte(script), paths.DirPerm700); err != nil {
+	if err := fileutil.WriteDurableExecutableFile(zqkPath, []byte(script)); err != nil {
 		t.Fatal(err)
 	}
 
@@ -165,5 +167,55 @@ func TestHandleNonCommsWithAgentX_AcksRefusedStatusCleanly(t *testing.T) {
 	)
 	if err != nil {
 		t.Fatalf("handleNonCommsWithAgentX must ack skip cleanly without returning error, got: %v", err)
+	}
+}
+
+func TestTriggerPlanOrchestration_ETXTBSY_ConcurrencyStress(t *testing.T) {
+	t.Parallel()
+
+	// Concurrently invoke triggerPlanOrchestration across 20 distinct temp dirs
+	// to stress Linux VFS dirty page flush and prove zero ETXTBSY flakes.
+	const workers = 20
+	errCh := make(chan error, workers)
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	for i := 0; i < workers; i++ {
+		workerID := i
+		goroutinelabels.NewGoroutine("orchestrate_status_gate_test", fmt.Sprintf("concurrency stress worker %d", workerID)).StartSimple(func() {
+			root := t.TempDir()
+			binDir := filepath.Join(root, "bin")
+			if err := fileutil.MkdirAll(binDir, paths.DirPerm750); err != nil {
+				errCh <- err
+				return
+			}
+			zqkPath := filepath.Join(binDir, "zqk")
+			script := fmt.Sprintf("#!/bin/sh\nprintf '%%s\\n' \"$@\" > \"$0.args.%d\"\n", workerID)
+			if err := fileutil.WriteDurableExecutableFile(zqkPath, []byte(script)); err != nil {
+				errCh <- err
+				return
+			}
+
+			planID := fmt.Sprintf("PRI-STRESS-%d", workerID)
+			mockStore := &mockStatusGateStorage{
+				objs: map[string]map[string]any{
+					planID: {
+						objects.FieldKeyKind:   objects.KindPriorityPlan,
+						objects.FieldKeyStatus: objects.ObjectStatusInProgress,
+						objects.FieldKeyTitle:  fmt.Sprintf("Stress Plan %d", workerID),
+					},
+				},
+			}
+
+			_, err := triggerPlanOrchestration(ctx, mockStore, secCtx, root, planID)
+			errCh <- err
+		})
+	}
+
+	for i := 0; i < workers; i++ {
+		if err := <-errCh; err != nil {
+			t.Fatalf("concurrency stress worker failed with error: %v", err)
+		}
 	}
 }

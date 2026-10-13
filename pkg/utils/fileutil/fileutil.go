@@ -105,6 +105,11 @@ func WriteExecutableFile(path string, data []byte) error {
 	return writeFileWithMode(path, data, executableFilePerm)
 }
 
+// WriteDurableExecutableFile writes data to a file with executable permissions (0755) and synchronous fsync.
+func WriteDurableExecutableFile(path string, data []byte) error {
+	return WriteDurableFile(path, data, executableFilePerm)
+}
+
 // CopyExecutableFile copies source to target and makes the target executable.
 func CopyExecutableFile(source, target string) error {
 	data, err := ReadFile(source)
