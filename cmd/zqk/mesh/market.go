@@ -5,6 +5,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -21,10 +22,14 @@ func NewMarketCmd() *cobra.Command {
 
 func runMarket(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		resourceType, _ := cmd.Flags().GetString("type")
+		var flags clipkg.FlagBag
+		resourceType := flags.String(cmd, "type")
+		if err := flags.Err(); err != nil {
+			return err
+		}
 
 		// Query advertisements
-		filter := storage.ListFilter{Kind: "capacity_advertisement", Limit: 0}
+		filter := storage.ListFilter{Kind: objects.KindCapacityAdvertisement, Limit: 0}
 		if resourceType != "" {
 			filter.Filters = map[string]any{objects.FieldKeyResourceType: resourceType}
 		}
@@ -35,8 +40,7 @@ func runMarket(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(result.Objects) == 0 {
-			_ = cli.WriteOutput(cmd, []byte("No resources currently advertised in the mesh market.\n"))
-			return nil
+			return cli.WriteOutput(cmd, []byte("No resources currently advertised in the mesh market.\n"))
 		}
 
 		cyan := color.New(color.FgCyan).SprintFunc()
