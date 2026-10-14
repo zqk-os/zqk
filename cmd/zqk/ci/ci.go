@@ -152,7 +152,6 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	return cli.WriteOutput(cmd, []byte(b.String()))
 }
 
-
 func runDemote(cmd *cobra.Command, args []string) error {
 	studio, err := resolveStudioRoot()
 	if err != nil {
