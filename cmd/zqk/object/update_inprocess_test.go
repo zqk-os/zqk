@@ -266,14 +266,15 @@ func TestInProcess_Update_Guards(t *testing.T) {
 		t.Errorf("expected error for short reason code (<30 chars)")
 	}
 
-	// 5. Override in non-TTY agent session is correctly blocked
+	// 5. Override in non-TTY agent session is correctly blocked (or blocked by CI guard in CI)
 	_, errProvNonTTY := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-GUARD",
 		"--field", "created_at=2020-01-01T00:00:00Z",
 		"--override",
 		"--reason-code=Authorized administrative provenance timestamp correction per audit log",
 	)
-	if errProvNonTTY == nil || !strings.Contains(errProvNonTTY.Error(), "lifecycle --override is blocked without an interactive TTY") {
-		t.Errorf("expected non-TTY override block error, got: %v", errProvNonTTY)
+	if errProvNonTTY == nil || (!strings.Contains(errProvNonTTY.Error(), "lifecycle --override is blocked without an interactive TTY") &&
+		!strings.Contains(errProvNonTTY.Error(), "manual overrides are completely blocked in CI environments")) {
+		t.Errorf("expected non-TTY or CI override block error, got: %v", errProvNonTTY)
 	}
 
 	// 6. No updates provided error
