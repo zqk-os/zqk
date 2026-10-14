@@ -246,6 +246,8 @@ kind_to_prefixes:
         - SCH-
     shockwave_router:
         - SWR-
+    skill_lease:
+        - SKL-
     stakeholder_profile:
         - STK-
     status_history_metric_sampler:
