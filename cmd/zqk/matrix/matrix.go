@@ -91,10 +91,14 @@ func resolveMatrixFromCmd(cmd *cobra.Command) (string, quality.MatrixResolution,
 	if err != nil {
 		return "", quality.MatrixResolution{}, err
 	}
-	name, _ := cmd.Flags().GetString("name")
-	registryFlag, _ := cmd.Flags().GetString("registry")
-	matrixPath, _ := cmd.Flags().GetString("matrix")
-	profilePath, _ := cmd.Flags().GetString("profile")
+	var flags clipkg.FlagBag
+	name := flags.String(cmd, "name")
+	registryFlag := flags.String(cmd, "registry")
+	matrixPath := flags.String(cmd, "matrix")
+	profilePath := flags.String(cmd, "profile")
+	if err := flags.Err(); err != nil {
+		return projectRoot, quality.MatrixResolution{}, err
+	}
 	resolved, err := quality.ResolveMatrixForCLI(projectRoot, name, registryFlag, matrixPath, profilePath)
 	if err != nil {
 		return projectRoot, quality.MatrixResolution{}, err
@@ -137,6 +141,12 @@ func NewMatrixCmd() *cobra.Command {
 // NewMatrixReportCmd wires the generated spec builder to RunE.
 func NewMatrixReportCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixReportCommandBuilder()
+	c.Flags().String("name", "", "Matrix alias from matrix_registry.yaml")
+	c.Flags().String("registry", "", "Path to matrix_registry.yaml")
+	c.Flags().String("matrix", "", "Direct path to matrix CSV")
+	c.Flags().String("profile", "", "Direct path to profile YAML")
+	c.Flags().Bool("go-only", false, "Only rows whose file_path ends with .go")
+	cli.AddCommonFlags(c)
 	c.RunE = runMatrixReport
 	return c
 }
@@ -144,6 +154,8 @@ func NewMatrixReportCmd() *cobra.Command {
 // NewMatrixListCmd wires the generated list spec builder to RunE.
 func NewMatrixListCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixListCommandBuilder()
+	c.Flags().String("registry", "", "Path to matrix_registry.yaml")
+	cli.AddCommonFlags(c)
 	c.RunE = runMatrixList
 	return c
 }

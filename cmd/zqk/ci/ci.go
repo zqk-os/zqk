@@ -70,10 +70,18 @@ func runCIRun(cmd *cobra.Command, args []string) error {
 	return runTestCasesAfterCheckout(cmd)
 }
 
-func runLocalCICheckout(cmd *cobra.Command) error {
+func resolveStudioRoot() (string, error) {
 	studio := cli.ResolveProjectRoot(".")
 	if studio == "" {
-		return errfmt.Errorf("project root not found")
+		return "", errfmt.Errorf("project root not found")
+	}
+	return studio, nil
+}
+
+func runLocalCICheckout(cmd *cobra.Command) error {
+	studio, err := resolveStudioRoot()
+	if err != nil {
+		return err
 	}
 	sha, _ := cmd.Flags().GetString("sha")
 	allowDirty, _ := cmd.Flags().GetBool("allow-dirty")
@@ -97,12 +105,21 @@ func runLocalCICheckout(cmd *cobra.Command) error {
 	return nil
 }
 
-func runTestCasesAfterCheckout(cmd *cobra.Command) error {
-	studio := cli.ResolveProjectRoot(".")
-	if studio == "" {
-		return errfmt.Errorf("project root not found")
+func resolveCIWorkdir() (base string, workdir string, err error) {
+	studio, err := resolveStudioRoot()
+	if err != nil {
+		return "", "", err
 	}
-	workdir := filepath.Join(studio, paths.ProjectDataDir, "local-ci", "workdir")
+	base = localci.BaseDir(studio, "")
+	workdir = filepath.Join(base, paths.LocalCIWorkdirName)
+	return base, workdir, nil
+}
+
+func runTestCasesAfterCheckout(cmd *cobra.Command) error {
+	_, workdir, err := resolveCIWorkdir()
+	if err != nil {
+		return err
+	}
 	if _, err := fileutil.Stat(filepath.Join(workdir, "go.mod")); err != nil {
 		return errfmt.Errorf("local-ci workdir missing go.mod at %s (run checkout first)", workdir)
 	}
@@ -115,13 +132,11 @@ func runTestCasesAfterCheckout(cmd *cobra.Command) error {
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
-	studio := cli.ResolveProjectRoot(".")
-	if studio == "" {
-		return errfmt.Errorf("project root not found")
+	base, workdir, err := resolveCIWorkdir()
+	if err != nil {
+		return err
 	}
-	base := filepath.Join(studio, paths.ProjectDataDir, "local-ci")
-	shaPath := filepath.Join(base, "SOURCE_SHA")
-	workdir := filepath.Join(base, "workdir")
+	shaPath := filepath.Join(base, paths.LocalCISourceSHAFile)
 	var b strings.Builder
 	fmt.Fprintf(&b, "Local CI status\n")
 	if raw, err := fileutil.ReadFile(shaPath); err == nil {
@@ -138,9 +153,9 @@ func runStatus(cmd *cobra.Command, args []string) error {
 }
 
 func runDemote(cmd *cobra.Command, args []string) error {
-	studio := cli.ResolveProjectRoot(".")
-	if studio == "" {
-		return errfmt.Errorf("project root not found")
+	studio, err := resolveStudioRoot()
+	if err != nil {
+		return err
 	}
 	if err := localci.Demote(cmd.Context(), localci.Options{
 		RepoRoot: studio,

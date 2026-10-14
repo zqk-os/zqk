@@ -186,6 +186,12 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			kindnames.Policy:                 {"POL-"},
 			kindnames.TechnicalDebt:          {"TDE-"},
 			objects.KindDocEntry:             {"DOC-"},
+			objects.KindOrganizationalChange: {"OCH-"},
+			objects.KindOrganization:         {"ORG-"},
+			objects.KindDivision:             {"DIV-"},
+			objects.KindDepartment:           {"DEP-"},
+			objects.KindTeam:                 {"TEA-"},
+			objects.KindPartnership:          {"PAR-"},
 		},
 		KindToSynonyms: map[string][]string{
 			// Two-word kinds

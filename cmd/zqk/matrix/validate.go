@@ -2,6 +2,7 @@ package matrix
 
 import (
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -11,6 +12,9 @@ import (
 // NewMatrixValidateCmd wires the generated validate spec builder to RunE.
 func NewMatrixValidateCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixValidateCommandBuilder()
+	c.Flags().String("name", "", "Matrix alias from matrix_registry.yaml")
+	c.Flags().String("registry", "", "Path to matrix_registry.yaml")
+	cli.AddCommonFlags(c)
 	c.RunE = runMatrixValidate
 	return c
 }
@@ -21,8 +25,12 @@ func runMatrixValidate(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	name, _ := cmd.Flags().GetString("name")
-	registryFlag, _ := cmd.Flags().GetString("registry")
+	var flags clipkg.FlagBag
+	name := flags.String(cmd, "name")
+	registryFlag := flags.String(cmd, "registry")
+	if err := flags.Err(); err != nil {
+		return err
+	}
 
 	res, err := quality.ValidateMatrixRegistry(projectRoot, name, registryFlag)
 	if err != nil {
