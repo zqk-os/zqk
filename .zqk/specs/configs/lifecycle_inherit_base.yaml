@@ -54,6 +54,7 @@ inherit_base:
   - scenario
   - scheduler_handler_binding
   - shockwave_router
+  - skill_lease
   - status_history_metric_sampler
   - team
   - team_configuration

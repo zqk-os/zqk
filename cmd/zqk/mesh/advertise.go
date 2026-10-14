@@ -2,8 +2,10 @@ package mesh
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -21,9 +23,22 @@ func NewAdvertiseCmd() *cobra.Command {
 func runAdvertise(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		resourceType := args[0]
-		amount, _ := cmd.Flags().GetFloat64("amount")
-		units, _ := cmd.Flags().GetString("units")
-		resourceID, _ := cmd.Flags().GetString("resource-id")
+		var flags clipkg.FlagBag
+		amountStr := flags.String(cmd, "amount")
+		units := flags.String(cmd, "units")
+		resourceID := flags.String(cmd, "resource-id")
+		if err := flags.Err(); err != nil {
+			return err
+		}
+
+		var amount float64
+		if amountStr != "" {
+			var err error
+			amount, err = strconv.ParseFloat(amountStr, 64)
+			if err != nil {
+				return errfmt.Newf("invalid amount %q", amountStr).Wrap(err)
+			}
+		}
 
 		// Resolve local identity
 		kernelID, err := resolveLocalKernelID(proc.ProjectRoot())
@@ -52,9 +67,6 @@ func runAdvertise(cmd *cobra.Command, args []string) error {
 			return errfmt.Newf("failed to create advertisement").Wrap(err)
 		}
 
-		if err := cli.WriteOutput(cmd, []byte(fmt.Sprintf("✅ Broadcasting %s capacity: %.1f %s\n", resourceType, amount, units))); err != nil {
-			return err
-		}
-		return nil
+		return cli.WriteOutput(cmd, []byte(fmt.Sprintf("✅ Broadcasting %s capacity: %.1f %s\n", resourceType, amount, units)))
 	})(cmd, args)
 }
