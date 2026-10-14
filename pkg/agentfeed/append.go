@@ -66,6 +66,8 @@ const (
 	JSONFieldPeerAckAwaitID  = "peer_ack_await_id"
 	JSONFieldAwaitPeerAck    = "await_peer_ack"
 	JSONFieldAwaitsCompleted = "awaits_completed"
+	JSONFieldNonInterrupting = "non_interrupting"
+	JSONFieldInFlightRePrime = "in_flight_reprime"
 )
 
 // EventEmitter interface abstracts MCP notification broadcasting.
@@ -99,18 +101,24 @@ type AppendEventInput struct {
 	SkipEnabledCheck bool
 	// EventEmitter optionally broadcasts EventTypeActionRequired to live MCP subscribers.
 	EventEmitter EventEmitter
+	// NonInterrupting marks steering guidance as non-interrupting to running processes.
+	NonInterrupting bool
+	// InFlightRePrime marks steering guidance to be incorporated into in-flight agent context.
+	InFlightRePrime bool
 }
 
 // AppendEventResult describes a successful append.
 type AppendEventResult struct {
-	EventPath    string
-	StartSize    int64
-	Event        map[string]any
-	ACK          map[string]any
-	Enabled      bool
-	DeliveryMode string
-	FeedID       string
-	EventID      string
+	EventPath       string
+	StartSize       int64
+	Event           map[string]any
+	ACK             map[string]any
+	Enabled         bool
+	DeliveryMode    string
+	FeedID          string
+	EventID         string
+	NonInterrupting bool
+	InFlightRePrime bool
 }
 
 // NewEventID returns a stable feed event id (AFE-<nano>-<hex>).
@@ -209,6 +217,12 @@ func AppendEvent(in AppendEventInput) (AppendEventResult, error) {
 	if fid := strings.TrimSpace(cfg.FeedID); fid != "" {
 		event[JSONFieldFeedID] = fid
 	}
+	if in.NonInterrupting {
+		event[JSONFieldNonInterrupting] = true
+	}
+	if in.InFlightRePrime {
+		event[JSONFieldInFlightRePrime] = true
+	}
 
 	f, err := fileutil.OpenAppend(eventPath)
 	if err != nil {
@@ -260,14 +274,16 @@ func AppendEvent(in AppendEventInput) (AppendEventResult, error) {
 	}
 
 	return AppendEventResult{
-		EventPath:    eventPath,
-		StartSize:    startSize,
-		Event:        event,
-		ACK:          ack,
-		Enabled:      cfg.Enabled,
-		DeliveryMode: cfg.DeliveryMode,
-		FeedID:       cfg.FeedID,
-		EventID:      eventID,
+		EventPath:       eventPath,
+		StartSize:       startSize,
+		Event:           event,
+		ACK:             ack,
+		Enabled:         cfg.Enabled,
+		DeliveryMode:    cfg.DeliveryMode,
+		FeedID:          cfg.FeedID,
+		EventID:         eventID,
+		NonInterrupting: in.NonInterrupting,
+		InFlightRePrime: in.InFlightRePrime,
 	}, nil
 }
 
