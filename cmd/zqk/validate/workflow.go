@@ -89,13 +89,22 @@ func runCheck(cmd *cobra.Command, args []string) error {
 				// Validate active item is in current priority plan
 				foundInPlan := false
 				var items []string
-				if refs, ok := plan[objects.FieldKeyBacklogItemRefs].([]any); ok {
+				switch refs := plan[objects.FieldKeyBacklogItemRefs].(type) {
+				case []string:
+					for _, strRef := range refs {
+						items = append(items, strRef)
+						if strings.Contains(strRef, activeItemID) {
+							foundInPlan = true
+							activeItemID = strRef
+						}
+					}
+				case []any:
 					for _, ref := range refs {
 						if strRef, ok := ref.(string); ok {
 							items = append(items, strRef)
 							if strings.Contains(strRef, activeItemID) {
 								foundInPlan = true
-								activeItemID = strRef // use full ID
+								activeItemID = strRef
 							}
 						}
 					}

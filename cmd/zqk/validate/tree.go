@@ -335,6 +335,29 @@ func filterBacklogsByPlan(objs []map[string]any, planID string) []map[string]any
 	return out
 }
 
+func toStringSlice(val any) []string {
+	if val == nil {
+		return nil
+	}
+	switch v := val.(type) {
+	case []string:
+		return v
+	case []any:
+		res := make([]string, 0, len(v))
+		for _, item := range v {
+			if s, ok := item.(string); ok && s != "" {
+				res = append(res, s)
+			}
+		}
+		return res
+	case string:
+		if v != "" {
+			return []string{v}
+		}
+	}
+	return nil
+}
+
 func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, planID string) map[string]bool {
 	set := make(map[string]bool)
 	for _, goal := range goals {
@@ -356,14 +379,9 @@ func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, pla
 		}
 	}
 	for _, item := range planBacklogs {
-		goalRefsRaw, ok := item[objects.FieldKeyGoalRefs]
-		if ok {
-			if goalRefs, ok := goalRefsRaw.([]any); ok {
-				for _, g := range goalRefs {
-					if gStr, ok := g.(string); ok && gStr != "" {
-						set[gStr] = true
-					}
-				}
+		for _, gStr := range toStringSlice(item[objects.FieldKeyGoalRefs]) {
+			if gStr != "" {
+				set[gStr] = true
 			}
 		}
 	}
@@ -373,14 +391,9 @@ func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, pla
 func mapRequirementsToGoals(reqs []map[string]any) map[string][]map[string]any {
 	m := make(map[string][]map[string]any)
 	for _, req := range reqs {
-		goalRefsRaw, ok := req[objects.FieldKeyGoalRefs]
-		if ok {
-			if goalRefs, ok := goalRefsRaw.([]any); ok {
-				for _, g := range goalRefs {
-					if gStr, ok := g.(string); ok {
-						m[gStr] = append(m[gStr], req)
-					}
-				}
+		for _, gStr := range toStringSlice(req[objects.FieldKeyGoalRefs]) {
+			if gStr != "" {
+				m[gStr] = append(m[gStr], req)
 			}
 		}
 	}
@@ -390,14 +403,9 @@ func mapRequirementsToGoals(reqs []map[string]any) map[string][]map[string]any {
 func mapBacklogsToRequirements(backlogs []map[string]any) map[string][]map[string]any {
 	m := make(map[string][]map[string]any)
 	for _, item := range backlogs {
-		reqRefsRaw, ok := item[objects.FieldKeyRequirementRefs]
-		if ok {
-			if reqRefs, ok := reqRefsRaw.([]any); ok {
-				for _, r := range reqRefs {
-					if rStr, ok := r.(string); ok {
-						m[rStr] = append(m[rStr], item)
-					}
-				}
+		for _, rStr := range toStringSlice(item[objects.FieldKeyRequirementRefs]) {
+			if rStr != "" {
+				m[rStr] = append(m[rStr], item)
 			}
 		}
 	}
@@ -407,17 +415,11 @@ func mapBacklogsToRequirements(backlogs []map[string]any) map[string][]map[strin
 func mapBacklogsToGoals(backlogs []map[string]any) map[string][]map[string]any {
 	m := make(map[string][]map[string]any)
 	for _, item := range backlogs {
-		reqRefsRaw, okR := item[objects.FieldKeyRequirementRefs]
-		hasReq := okR && reqRefsRaw != nil && len(reqRefsRaw.([]any)) > 0
-		if !hasReq {
-			goalRefsRaw, ok := item[objects.FieldKeyGoalRefs]
-			if ok {
-				if goalRefs, ok := goalRefsRaw.([]any); ok {
-					for _, g := range goalRefs {
-						if gStr, ok := g.(string); ok {
-							m[gStr] = append(m[gStr], item)
-						}
-					}
+		reqRefs := toStringSlice(item[objects.FieldKeyRequirementRefs])
+		if len(reqRefs) == 0 {
+			for _, gStr := range toStringSlice(item[objects.FieldKeyGoalRefs]) {
+				if gStr != "" {
+					m[gStr] = append(m[gStr], item)
 				}
 			}
 		}
@@ -428,11 +430,9 @@ func mapBacklogsToGoals(backlogs []map[string]any) map[string][]map[string]any {
 func findOrphanBacklogs(backlogs []map[string]any) []map[string]any {
 	var out []map[string]any
 	for _, item := range backlogs {
-		goalRefsRaw, okG := item[objects.FieldKeyGoalRefs]
-		reqRefsRaw, okR := item[objects.FieldKeyRequirementRefs]
-		hasGoal := okG && goalRefsRaw != nil && len(goalRefsRaw.([]any)) > 0
-		hasReq := okR && reqRefsRaw != nil && len(reqRefsRaw.([]any)) > 0
-		if !hasGoal && !hasReq {
+		goalRefs := toStringSlice(item[objects.FieldKeyGoalRefs])
+		reqRefs := toStringSlice(item[objects.FieldKeyRequirementRefs])
+		if len(goalRefs) == 0 && len(reqRefs) == 0 {
 			out = append(out, item)
 		}
 	}
@@ -443,31 +443,17 @@ func mapCriteriaToParents(backlogs []map[string]any, reqs []map[string]any, crit
 	m := make(map[string][]map[string]any)
 	for _, item := range backlogs {
 		id := objects.GetString(item, objects.FieldKeyID)
-		critRefsRaw, ok := item[objects.FieldKeyCriteriaRefs]
-		if ok {
-			if critRefs, ok := critRefsRaw.([]any); ok {
-				for _, c := range critRefs {
-					if cStr, ok := c.(string); ok {
-						if critObj, exists := critMap[cStr]; exists {
-							m[id] = append(m[id], critObj)
-						}
-					}
-				}
+		for _, cStr := range toStringSlice(item[objects.FieldKeyCriteriaRefs]) {
+			if critObj, exists := critMap[cStr]; exists {
+				m[id] = append(m[id], critObj)
 			}
 		}
 	}
 	for _, req := range reqs {
 		id := objects.GetString(req, objects.FieldKeyID)
-		critRefsRaw, ok := req[objects.FieldKeyCriteriaRefs]
-		if ok {
-			if critRefs, ok := critRefsRaw.([]any); ok {
-				for _, c := range critRefs {
-					if cStr, ok := c.(string); ok {
-						if critObj, exists := critMap[cStr]; exists {
-							m[id] = append(m[id], critObj)
-						}
-					}
-				}
+		for _, cStr := range toStringSlice(req[objects.FieldKeyCriteriaRefs]) {
+			if critObj, exists := critMap[cStr]; exists {
+				m[id] = append(m[id], critObj)
 			}
 		}
 	}

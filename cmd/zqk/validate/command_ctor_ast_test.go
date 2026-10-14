@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"strings"
@@ -76,5 +77,33 @@ func NewAgentCmd() *cobra.Command {
 	}
 	if err := checkCommandCtorPattern("cmd/zqk/agent/agent.go", file); err != nil {
 		t.Fatalf("group AddCommand should pass: %v", err)
+	}
+}
+
+func TestCallExprName(t *testing.T) {
+	// 1. SelectorExpr
+	callSel := &ast.CallExpr{
+		Fun: &ast.SelectorExpr{
+			Sel: &ast.Ident{Name: "SelectorFunc"},
+		},
+	}
+	if name := callExprName(callSel); name != "SelectorFunc" {
+		t.Errorf("expected SelectorFunc, got %s", name)
+	}
+
+	// 1b. Ident
+	callIdent := &ast.CallExpr{
+		Fun: &ast.Ident{Name: "IdentFunc"},
+	}
+	if name := callExprName(callIdent); name != "IdentFunc" {
+		t.Errorf("expected IdentFunc, got %s", name)
+	}
+
+	// 2. Default branch
+	callDef := &ast.CallExpr{
+		Fun: &ast.ArrayType{},
+	}
+	if name := callExprName(callDef); name != "" {
+		t.Errorf("expected empty string, got %s", name)
 	}
 }
