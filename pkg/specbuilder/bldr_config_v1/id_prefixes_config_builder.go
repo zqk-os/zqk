@@ -366,6 +366,9 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 				"shockwave_router": []any{
 					"SWR-",
 				},
+				"skill_lease": []any{
+					"SKL-",
+				},
 				"stakeholder_profile": []any{
 					"STK-",
 				},

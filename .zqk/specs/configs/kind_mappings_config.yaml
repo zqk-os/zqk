@@ -18,6 +18,7 @@ backends:
             backlog: backlog_item
             backlog_items: backlog_item
             bucketing_strategies: bucketing_strategy
+            capacity_advertisements: capacity_advertisement
             certificates: certificate
             change_journal: change_journal_entry
             change_journal_entries: change_journal_entry
@@ -78,6 +79,7 @@ backends:
             scheduler_handler_bindings: scheduler_handler_binding
             scheduler_jobs: scheduler_job
             shockwave_routers: shockwave_router
+            skill_leases: skill_lease
             stakeholder_profiles: stakeholder_profile
             strategic_contexts: strategic_context
             strategic_plans: strategic_plan
@@ -111,6 +113,7 @@ backends:
             backlog_item: backlog_items
             base_metric: metrics
             bucketing_strategy: bucketing_strategies
+            capacity_advertisement: capacity_advertisements
             certificate: certificates
             change_journal_entry: change_journal_entries
             code_reference: code_references
@@ -169,6 +172,7 @@ backends:
             scheduler_handler_binding: scheduler_handler_bindings
             scheduler_health_metric: metrics
             scheduler_job: scheduler_jobs
+            skill_lease: skill_leases
             stakeholder_profile: stakeholder_profiles
             strategic_context: strategic_contexts
             strategic_plan: strategic_plans
