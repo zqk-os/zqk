@@ -41,6 +41,15 @@ func executeGraphCmd(t *testing.T, cmd *cobra.Command, projectRoot string, args 
 	return buf.String(), err
 }
 
+func createGraphTestProcessor(t *testing.T, cmd *cobra.Command, root string) *cli.Processor {
+	t.Helper()
+	cmd.SetContext(pkgctx.NewSystemContext())
+	cli.SetContext(cmd, cli.ContextForProjectRoot(root))
+	proc, err := cli.NewProcessor(cmd)
+	require.NoError(t, err)
+	return proc
+}
+
 func TestNewGraphCmd_Structure(t *testing.T) {
 	t.Parallel()
 
@@ -120,9 +129,9 @@ func TestGraphQuery_OutputQueryResults(t *testing.T) {
 	// 3. JSON structured format
 	buf.Reset()
 	cmdJSON := NewQueryCmd()
+	cmdJSON.Flags().String("format", "json", "format")
 	cmdJSON.SetContext(pkgctx.WithCommandOutputWriter(pkgctx.NewSystemContext(), buf))
 	cli.SetContext(cmdJSON, cli.ContextForProjectRoot(testRoot))
-	_ = cmdJSON.Flags().Set("format", "json")
 	cmdJSON.SetOut(buf)
 
 	procJSON, err := cli.NewProcessor(cmdJSON)
@@ -189,12 +198,7 @@ func TestGraphDiscoverCmd_Execution(t *testing.T) {
 	assert.Contains(t, err2.Error(), "failed to read root object")
 
 	// 3. Create a valid object and discover it
-	cmdCreate := NewDiscoverCmd()
-	cmdCreate.SetContext(pkgctx.NewSystemContext())
-	cli.SetContext(cmdCreate, cli.ContextForProjectRoot(testRoot))
-	proc, err := cli.NewProcessor(cmdCreate)
-	require.NoError(t, err)
-
+	proc := createGraphTestProcessor(t, NewDiscoverCmd(), testRoot)
 	ctx := context.Background()
 	secCtx := proc.SecurityContext()
 	obj := map[string]any{
@@ -217,12 +221,7 @@ func TestGraphExportCmd_FormatsAndFileExport(t *testing.T) {
 	testRoot := setupGraphIsolatedProject(t)
 
 	// Seed an object to export
-	cmdProc := NewExportCmd()
-	cmdProc.SetContext(pkgctx.NewSystemContext())
-	cli.SetContext(cmdProc, cli.ContextForProjectRoot(testRoot))
-	proc, err := cli.NewProcessor(cmdProc)
-	require.NoError(t, err)
-
+	proc := createGraphTestProcessor(t, NewExportCmd(), testRoot)
 	ctx := context.Background()
 	secCtx := proc.SecurityContext()
 	obj := map[string]any{
@@ -230,7 +229,8 @@ func TestGraphExportCmd_FormatsAndFileExport(t *testing.T) {
 		objects.FieldKeyKind:  objects.KindGoal,
 		objects.FieldKeyTitle: "Exportable Goal Holon",
 	}
-	_ = proc.Storage().Create(ctx, secCtx, obj)
+	errStorage := proc.Storage().Create(ctx, secCtx, obj)
+	require.NoError(t, errStorage)
 
 	// 1. Export as JSON-LD / databook to stdout
 	cmd1 := NewExportCmd()
