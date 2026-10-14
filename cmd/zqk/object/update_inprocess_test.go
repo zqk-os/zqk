@@ -8,10 +8,8 @@ import (
 
 	"github.com/spf13/cobra"
 	cli "github.com/zqk-os/zqk/pkg/cliapp"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -35,18 +33,9 @@ func TestNewUpdateCmd_Structure(t *testing.T) {
 	}
 }
 
-func TestInProcess_Update_FieldModifications(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+func TestInProcess_Update_FieldModifications_Basic(t *testing.T) {
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed a backlog_item
 	bliObj := plannedBLI("BLI-UPD-001", "Initial Title", map[string]any{
@@ -96,9 +85,20 @@ func TestInProcess_Update_FieldModifications(t *testing.T) {
 	if comps, ok := readObj["components"].([]any); !ok || len(comps) != 1 || comps[0] != "Comp1" {
 		t.Errorf("expected components to have ['Comp1'], got: %v", readObj["components"])
 	}
+}
+
+func TestInProcess_Update_FieldModifications_Flags(t *testing.T) {
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	// Seed a backlog_item
+	bliObj := plannedBLI("BLI-UPD-001B", "Initial Title", map[string]any{
+		objects.FieldKeyDescription: "Initial Description",
+	})
+	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bliObj, objectStatusPlanned)
 
 	// 4. Dry-run update
-	outDry, err := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-001", "--field", "title=Dry Run Title", "--dry-run")
+	outDry, err := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-001B", "--field", "title=Dry Run Title", "--dry-run")
 	if err != nil {
 		t.Fatalf("update with --dry-run failed: %v\noutput: %s", err, outDry)
 	}
@@ -106,7 +106,7 @@ func TestInProcess_Update_FieldModifications(t *testing.T) {
 		t.Logf("dry run output: %s", outDry)
 	}
 	// Verify title was NOT changed
-	readObj, err = provider.Read(stdctx.Background(), secCtx, "BLI-UPD-001")
+	readObj, err := provider.Read(stdctx.Background(), secCtx, "BLI-UPD-001B")
 	if err != nil {
 		t.Fatalf("failed to read after dry run: %v", err)
 	}
@@ -115,7 +115,7 @@ func TestInProcess_Update_FieldModifications(t *testing.T) {
 	}
 
 	// 5. Output format json
-	outJSON, err := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-001", "--field", "title=JSON Title", "--format", "json")
+	outJSON, err := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-001B", "--field", "title=JSON Title", "--format", "json")
 	if err != nil {
 		t.Fatalf("update with --format json failed: %v\noutput: %s", err, outJSON)
 	}
@@ -124,11 +124,11 @@ func TestInProcess_Update_FieldModifications(t *testing.T) {
 	}
 
 	// 6. Unset field
-	outUnset, err := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-001", "--unset-field", "metadata")
+	outUnset, err := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-001B", "--unset-field", "metadata")
 	if err != nil {
 		t.Fatalf("update with --unset-field failed: %v\noutput: %s", err, outUnset)
 	}
-	readObj, err = provider.Read(stdctx.Background(), secCtx, "BLI-UPD-001")
+	readObj, err = provider.Read(stdctx.Background(), secCtx, "BLI-UPD-001B")
 	if err != nil {
 		t.Fatalf("failed to read after unset: %v", err)
 	}
@@ -138,17 +138,8 @@ func TestInProcess_Update_FieldModifications(t *testing.T) {
 }
 
 func TestInProcess_Update_OptimisticLocking(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	bliObj := plannedBLI("BLI-UPD-LOCK", "Lock Test Title", map[string]any{
 		objects.FieldKeyDescription: "Lock Test Description",
@@ -178,17 +169,8 @@ func TestInProcess_Update_OptimisticLocking(t *testing.T) {
 }
 
 func TestInProcess_Update_BulkUpdate(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	bli1 := plannedBLI("BLI-UPD-B1", "Bulk Item 1", map[string]any{
 		objects.FieldKeyDescription: "Initial desc 1",
@@ -218,17 +200,8 @@ func TestInProcess_Update_BulkUpdate(t *testing.T) {
 }
 
 func TestInProcess_Update_ForceCreate(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-
-	seedBulkUpdateSupportObjects(t, provider)
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Update non-existent object without force should fail
 	_, errNoForce := executeObjectCommand(t, tempDir, provider, "update", "BLI-UPD-NONEXIST", "--field", "title=Nonexist")
@@ -257,17 +230,8 @@ func TestInProcess_Update_ForceCreate(t *testing.T) {
 }
 
 func TestInProcess_Update_Guards(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-
-	seedBulkUpdateSupportObjects(t, provider)
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	bli := plannedBLI("BLI-UPD-GUARD", "Guard Test Item", map[string]any{
 		objects.FieldKeyDescription: "Guard Test Description",
@@ -326,17 +290,8 @@ func TestInProcess_Update_Guards(t *testing.T) {
 }
 
 func TestInProcess_Update_DataAndFile(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	bli := plannedBLI("BLI-UPD-DATA", "Data Update Item", map[string]any{
 		objects.FieldKeyDescription: "Initial description",
@@ -380,17 +335,8 @@ func TestInProcess_Update_DataAndFile(t *testing.T) {
 }
 
 func TestInProcess_Update_AddAndRemoveRef(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed requirement target
 	reqObj := map[string]any{
@@ -441,17 +387,8 @@ func TestInProcess_Update_AddAndRemoveRef(t *testing.T) {
 }
 
 func TestInProcess_Update_AutoStatus(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Backlog item starts at "conceptual"
 	bliObj := plannedBLI("BLI-UPD-AUTO", "Auto Status Item", map[string]any{
@@ -475,17 +412,8 @@ func TestInProcess_Update_AutoStatus(t *testing.T) {
 }
 
 func TestInProcess_Update_UpdateAll(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed 2 backlog items
 	b1 := plannedBLI("BLI-ALL-1", "All 1", map[string]any{objects.FieldKeyPriority: "low"})
@@ -544,7 +472,7 @@ func TestInProcess_Update_UpdateAll(t *testing.T) {
 	}
 }
 
-func TestUpdateHelpers_UnitUtilities(t *testing.T) {
+func TestUpdateHelpers_ParsingAndUnset(t *testing.T) {
 	// 1. parseRefFlag tests
 	field, refVal, err := parseRefFlag("milestone_refs=MIL-001")
 	if err != nil || field != "milestone_refs" || refVal != "MIL-001" {
@@ -597,7 +525,9 @@ func TestUpdateHelpers_UnitUtilities(t *testing.T) {
 	if !shouldUseBulkInvalidation(4, 10, false) {
 		t.Error("4/10 (40%) should trigger bulk invalidation")
 	}
+}
 
+func TestUpdateHelpers_BulkAndValidation(t *testing.T) {
 	// 4. formatUpdateAllResults tests
 	resSuccess := formatUpdateAllResults("backlog_item", 5, 0, nil, false)
 	if !strings.Contains(string(resSuccess), "Success: 5") {
@@ -647,7 +577,7 @@ func TestUpdateHelpers_UnitUtilities(t *testing.T) {
 	}
 }
 
-func TestTypeConversion_Comprehensive(t *testing.T) {
+func TestTypeConversion_NumbersAndFloats(t *testing.T) {
 	// 1. normalizeValueForField with nil fieldInfo
 	val, err := normalizeValueForField("test", nil)
 	if err != nil || val != "test" {
@@ -657,45 +587,71 @@ func TestTypeConversion_Comprehensive(t *testing.T) {
 	// 2. Number / Float conversions
 	fNumber := &objects.FieldInfo{Type: "number"}
 	// int -> float64
-	vNumInt, _ := normalizeValueForField(42, fNumber)
+	vNumInt, err := normalizeValueForField(42, fNumber)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing int: %v", err)
+	}
 	if f, ok := vNumInt.(float64); !ok || f != 42.0 {
 		t.Errorf("expected float64 42.0, got: %T %v", vNumInt, vNumInt)
 	}
 	// int32 -> float64
-	vNumInt32, _ := normalizeValueForField(int32(10), fNumber)
+	vNumInt32, err := normalizeValueForField(int32(10), fNumber)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing int32: %v", err)
+	}
 	if f, ok := vNumInt32.(float64); !ok || f != 10.0 {
 		t.Errorf("expected float64 10.0, got: %T %v", vNumInt32, vNumInt32)
 	}
 	// int64 -> float64
-	vNumInt64, _ := normalizeValueForField(int64(100), fNumber)
+	vNumInt64, err := normalizeValueForField(int64(100), fNumber)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing int64: %v", err)
+	}
 	if f, ok := vNumInt64.(float64); !ok || f != 100.0 {
 		t.Errorf("expected float64 100.0, got: %T %v", vNumInt64, vNumInt64)
 	}
 	// float32 -> float64
-	vNumFloat32, _ := normalizeValueForField(float32(3.14), fNumber)
+	vNumFloat32, err := normalizeValueForField(float32(3.14), fNumber)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing float32: %v", err)
+	}
 	if _, ok := vNumFloat32.(float64); !ok {
 		t.Errorf("expected float64, got: %T %v", vNumFloat32, vNumFloat32)
 	}
 	// float64 -> float64
-	vNumFloat64, _ := normalizeValueForField(float64(5.5), fNumber)
+	vNumFloat64, err := normalizeValueForField(float64(5.5), fNumber)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing float64: %v", err)
+	}
 	if f, ok := vNumFloat64.(float64); !ok || f != 5.5 {
 		t.Errorf("expected float64 5.5, got: %T %v", vNumFloat64, vNumFloat64)
 	}
 	// string -> float64
-	vNumStr, _ := normalizeValueForField("123.45", fNumber)
+	vNumStr, err := normalizeValueForField("123.45", fNumber)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing string to float64: %v", err)
+	}
 	if f, ok := vNumStr.(float64); !ok || f != 123.45 {
 		t.Errorf("expected float64 123.45, got: %T %v", vNumStr, vNumStr)
 	}
+}
 
+func TestTypeConversion_IntegersAndCollections(t *testing.T) {
 	// 3. Integer conversions
 	fInt := &objects.FieldInfo{Type: "integer"}
 	// float64 whole number -> int
-	vIntFloat, _ := normalizeValueForField(float64(99.0), fInt)
+	vIntFloat, err := normalizeValueForField(float64(99.0), fInt)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing float to int: %v", err)
+	}
 	if i, ok := vIntFloat.(int); !ok || i != 99 {
 		t.Errorf("expected int 99, got: %T %v", vIntFloat, vIntFloat)
 	}
 	// int -> int
-	vIntInt, _ := normalizeValueForField(77, fInt)
+	vIntInt, err := normalizeValueForField(77, fInt)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing int to int: %v", err)
+	}
 	if i, ok := vIntInt.(int); !ok || i != 77 {
 		t.Errorf("expected int 77, got: %T %v", vIntInt, vIntInt)
 	}
@@ -703,14 +659,20 @@ func TestTypeConversion_Comprehensive(t *testing.T) {
 	// 4. List / Array conversions
 	fList := &objects.FieldInfo{Type: "list"}
 	sliceIn := []any{"a", "b"}
-	vList, _ := normalizeValueForField(sliceIn, fList)
+	vList, err := normalizeValueForField(sliceIn, fList)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing list: %v", err)
+	}
 	if sl, ok := vList.([]any); !ok || len(sl) != 2 {
 		t.Errorf("expected []any with 2 elements, got: %T %v", vList, vList)
 	}
 
 	// 5. Other types passthrough
 	fOther := &objects.FieldInfo{Type: "string"}
-	vStr, _ := normalizeValueForField("passthrough", fOther)
+	vStr, err := normalizeValueForField("passthrough", fOther)
+	if err != nil {
+		t.Fatalf("unexpected error normalizing string: %v", err)
+	}
 	if vStr != "passthrough" {
 		t.Errorf("expected passthrough, got: %v", vStr)
 	}
@@ -721,19 +683,9 @@ func TestTypeConversion_Comprehensive(t *testing.T) {
 	}
 }
 
-func TestUpdate_EnforceActivePlanMembershipAndHelpers(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+func TestUpdate_LifecycleAndHashHelpers(t *testing.T) {
+	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
-	cliCtx := stdctx.Background()
 
 	// 1. deriveNextLifecycleStatus
 	stBli, err := deriveNextLifecycleStatus(map[string]any{
@@ -774,7 +726,7 @@ func TestUpdate_EnforceActivePlanMembershipAndHelpers(t *testing.T) {
 	// 3. buildUpdateCacheContext with ID change and normal update
 	testCmd := &cobra.Command{}
 	setTestCLIContext(t, testCmd, tempDir, provider)
-	_ = cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+	errProc := cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		ctxWithChange := buildUpdateCacheContext(proc, "OLD-ID", map[string]any{objects.FieldKeyID: "NEW-ID"}, "goal")
 		if ctxWithChange == nil {
 			t.Error("expected non-nil context for ID change")
@@ -785,6 +737,16 @@ func TestUpdate_EnforceActivePlanMembershipAndHelpers(t *testing.T) {
 		}
 		return nil
 	})(testCmd, nil)
+	if errProc != nil {
+		t.Fatalf("processor failed: %v", errProc)
+	}
+}
+
+func TestUpdate_EnforceActivePlanMembership(t *testing.T) {
+	_, provider, secCtx, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	cliCtx := stdctx.Background()
 
 	// 4. enforceActivePlanMembership - BLI not found
 	errNotFound := enforceActivePlanMembership(cliCtx, secCtx, provider, "NON-EXISTENT")

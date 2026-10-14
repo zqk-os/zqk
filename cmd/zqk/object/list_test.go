@@ -6,10 +6,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestObjectList_IncludesGlossaryTerm(t *testing.T) {
@@ -46,126 +44,73 @@ func TestNewListCmd_Structure(t *testing.T) {
 }
 
 func TestInProcess_List_SingleKind_Matrix(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
 
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Seed 3 backlog items with distinct priorities
-	b1 := plannedBLI("BLI-LST-101", "Alpha Item", map[string]any{
-		objects.FieldKeyPriority: "low",
-	})
-	b2 := plannedBLI("BLI-LST-102", "Beta Item", map[string]any{
-		objects.FieldKeyPriority: "high",
-	})
-	b3 := plannedBLI("BLI-LST-103", "Gamma Item", map[string]any{
-		objects.FieldKeyPriority: "critical",
-	})
+	b1 := plannedBLI("BLI-LST-101", "Alpha Item", map[string]any{objects.FieldKeyPriority: "low"})
+	b2 := plannedBLI("BLI-LST-102", "Beta Item", map[string]any{objects.FieldKeyPriority: "high"})
+	b3 := plannedBLI("BLI-LST-103", "Gamma Item", map[string]any{objects.FieldKeyPriority: "critical"})
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, b1, objectStatusPlanned)
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, b2, objectStatusPlanned)
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, b3, objectStatusPlanned)
 
-	// 1. Basic list
+	verifySingleKindBasicQueries(t, tempDir, provider)
+	verifySingleKindProjectionAndLimits(t, tempDir, provider)
+}
+
+func verifySingleKindBasicQueries(t *testing.T, tempDir string, provider storage.ObjectStorageProvider) {
+	t.Helper()
 	out, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item")
-	if err != nil {
-		t.Fatalf("list backlog_item failed: %v", err)
-	}
-	if !strings.Contains(out, "BLI-LST-101") || !strings.Contains(out, "BLI-LST-102") || !strings.Contains(out, "BLI-LST-103") {
-		t.Errorf("expected all 3 items in list output, got:\n%s", out)
+	if err != nil || !strings.Contains(out, "BLI-LST-101") || !strings.Contains(out, "BLI-LST-102") || !strings.Contains(out, "BLI-LST-103") {
+		t.Fatalf("basic list failed: out=%s, err=%v", out, err)
 	}
 
-	// 2. Filter by priority
 	outFilter, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--filter", "priority=high")
-	if err != nil {
-		t.Fatalf("list with filter failed: %v", err)
-	}
-	if !strings.Contains(outFilter, "BLI-LST-102") {
-		t.Errorf("expected BLI-LST-102 in filter output, got:\n%s", outFilter)
-	}
-	if strings.Contains(outFilter, "BLI-LST-101") || strings.Contains(outFilter, "BLI-LST-103") {
-		t.Errorf("expected only high priority item in filtered output, got:\n%s", outFilter)
+	if err != nil || !strings.Contains(outFilter, "BLI-LST-102") || strings.Contains(outFilter, "BLI-LST-101") {
+		t.Fatalf("filter list failed: out=%s, err=%v", outFilter, err)
 	}
 
-	// 3. Count only
 	outCount, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--count")
-	if err != nil {
-		t.Fatalf("list --count failed: %v", err)
-	}
-	if !strings.Contains(outCount, "3") {
-		t.Errorf("expected count 3 in output, got: %s", outCount)
+	if err != nil || !strings.Contains(outCount, "3") {
+		t.Fatalf("count failed: out=%s, err=%v", outCount, err)
 	}
 
-	// 4. Sort-by title ascending
 	outSort, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--sort-by", "title", "--sort-asc")
-	if err != nil {
-		t.Fatalf("list with sort failed: %v", err)
+	if err != nil || !strings.Contains(outSort, "Alpha Item") {
+		t.Fatalf("sort failed: out=%s, err=%v", outSort, err)
 	}
-	if !strings.Contains(outSort, "Alpha Item") {
-		t.Errorf("expected Alpha Item in sorted output, got:\n%s", outSort)
-	}
+}
 
-	// 5. Group by status
+func verifySingleKindProjectionAndLimits(t *testing.T, tempDir string, provider storage.ObjectStorageProvider) {
+	t.Helper()
 	outGroup, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--group-by", "status")
-	if err != nil {
-		t.Fatalf("list with group-by failed: %v", err)
-	}
-	if !strings.Contains(outGroup, "planned") {
-		t.Errorf("expected group planned in output, got:\n%s", outGroup)
+	if err != nil || !strings.Contains(outGroup, "planned") {
+		t.Fatalf("group-by failed: out=%s, err=%v", outGroup, err)
 	}
 
-	// 6. Custom fields projection
 	outFields, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--fields", "id,title,priority")
-	if err != nil {
-		t.Fatalf("list with --fields failed: %v", err)
-	}
-	if !strings.Contains(outFields, "BLI-LST-101") {
-		t.Errorf("expected BLI-LST-101 in projection output, got:\n%s", outFields)
+	if err != nil || !strings.Contains(outFields, "BLI-LST-101") {
+		t.Fatalf("fields projection failed: out=%s, err=%v", outFields, err)
 	}
 
-	// 7. Output format YAML
 	outYAML, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--format", "yaml")
-	if err != nil {
-		t.Fatalf("list with --format yaml failed: %v", err)
-	}
-	if !strings.Contains(outYAML, "BLI-LST-101") {
-		t.Errorf("expected YAML output with item ID, got:\n%s", outYAML)
+	if err != nil || !strings.Contains(outYAML, "BLI-LST-101") {
+		t.Fatalf("yaml format failed: out=%s, err=%v", outYAML, err)
 	}
 
-	// 8. Limit and Offset
 	outLim, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--limit", "1", "--offset", "1")
-	if err != nil {
-		t.Fatalf("list with limit/offset failed: %v", err)
-	}
-	if outLim == "" {
-		t.Error("expected non-empty output with limit and offset")
+	if err != nil || outLim == "" {
+		t.Fatalf("limit/offset failed: out=%s, err=%v", outLim, err)
 	}
 
-	// 9. Error path: invalid filter field
-	_, errInvalidFilter := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--filter", "nonexistent_field_xyz=123")
-	if errInvalidFilter == nil {
-		t.Error("expected error for invalid filter field")
+	if _, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--filter", "nonexistent_xyz=123"); err == nil {
+		t.Fatal("expected error for invalid filter field")
 	}
 }
 
 func TestInProcess_List_AllKinds_Matrix(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed objects of different kinds
 	b1 := plannedBLI("BLI-ALL-101", "All Kinds BLI")

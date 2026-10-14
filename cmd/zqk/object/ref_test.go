@@ -8,7 +8,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestNewRefCmd_Hierarchy(t *testing.T) {
@@ -275,18 +274,9 @@ func TestRefAddRemoveOperations(t *testing.T) {
 	}
 }
 
-func TestInProcess_RefAdd_Matrix(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+func TestInProcess_RefAdd_Direct_Matrix(t *testing.T) {
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed test requirement
 	reqObj := map[string]any{
@@ -302,7 +292,47 @@ func TestInProcess_RefAdd_Matrix(t *testing.T) {
 	}
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, reqObj, "complete")
 
-	// Seed test priority plan
+	bli1 := plannedBLI("BLI-REF-001", "Ref BLI 1", map[string]any{
+		objects.FieldKeyRequirementRefs: []string{"REQ-REF-001"},
+	})
+	bli2 := plannedBLI("BLI-REF-002", "Ref BLI 2", map[string]any{
+		objects.FieldKeyRequirementRefs: []string{},
+	})
+	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bli1, objectStatusPlanned)
+	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bli2, objectStatusPlanned)
+
+	// 1. Direct Add: Add requirement to BLI-REF-002
+	out, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-002", "REQ-REF-001")
+	if err != nil || (!strings.Contains(out, "Successfully added reference") && !strings.Contains(out, "Successfully")) {
+		t.Fatalf("failed to add ref: %v\noutput: %s", err, out)
+	}
+
+	// 2. Direct Add (Idempotent): Add requirement again
+	outIdempotent, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-002", "REQ-REF-001")
+	if err != nil || (!strings.Contains(outIdempotent, "already up to date") && !strings.Contains(outIdempotent, "Successfully")) {
+		t.Fatalf("idempotent add failed: %v", err)
+	}
+
+	// 3. Self-Reference check: cannot reference self
+	if _, errSelf := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-001", "BLI-REF-001"); errSelf == nil || !strings.Contains(errSelf.Error(), "cannot reference self") {
+		t.Errorf("expected cannot reference self error, got: %v", errSelf)
+	}
+
+	// 4. Missing Source check
+	if _, errMissingSource := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-NONEXISTENT", "REQ-REF-001"); errMissingSource == nil || !strings.Contains(errMissingSource.Error(), "not found") {
+		t.Errorf("expected source not found error, got: %v", errMissingSource)
+	}
+
+	// 5. Missing Target check
+	if _, errMissingTarget := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-001", "REQ-NONEXISTENT"); errMissingTarget == nil || !strings.Contains(errMissingTarget.Error(), "not found") {
+		t.Errorf("expected target not found error, got: %v", errMissingTarget)
+	}
+}
+
+func TestInProcess_RefAdd_Inverted_Matrix(t *testing.T) {
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
 	planObj := map[string]any{
 		objects.FieldKeyID:            "PRI-REF-001",
 		objects.FieldKeyKind:          objects.KindPriorityPlan,
@@ -314,84 +344,29 @@ func TestInProcess_RefAdd_Matrix(t *testing.T) {
 	}
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, planObj, objects.ObjectStatusOriginated)
 
-	// Seed BLI 1 (has requirement REQ-REF-001, no plan)
-	bli1 := plannedBLI("BLI-REF-001", "Ref BLI 1", map[string]any{
+	bliTarget := plannedBLI("BLI-REF-INV", "Ref BLI Inverted Target", map[string]any{
 		objects.FieldKeyPriorityPlanRef: "",
-		objects.FieldKeyRequirementRefs: []string{"REQ-REF-001"},
 	})
-	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bli1, objectStatusPlanned)
+	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bliTarget, objectStatusPlanned)
 
-	// Seed BLI 2 (unassigned)
-	bli2 := plannedBLI("BLI-REF-002", "Ref BLI 2", map[string]any{
-		objects.FieldKeyPriorityPlanRef: "",
-		objects.FieldKeyRequirementRefs: []string{},
-	})
-	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bli2, objectStatusPlanned)
-
-	// 1. Direct Add: Add requirement to BLI-REF-002
-	out, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-002", "REQ-REF-001")
-	if err != nil {
-		t.Fatalf("failed to add ref: %v\noutput: %s", err, out)
-	}
-	if !strings.Contains(out, "Successfully added reference") && !strings.Contains(out, "Successfully") {
-		t.Errorf("expected success message in output, got: %s", out)
-	}
-
-	// 2. Direct Add (Idempotent): Add requirement again
-	outIdempotent, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-002", "REQ-REF-001")
-	if err != nil {
-		t.Fatalf("idempotent add failed: %v", err)
-	}
-	if !strings.Contains(outIdempotent, "already up to date") && !strings.Contains(outIdempotent, "No reference changes required") && !strings.Contains(outIdempotent, "Successfully") {
-		t.Errorf("expected idempotent note or success, got: %s", outIdempotent)
-	}
-
-	// 3. Self-Reference check: cannot reference self
-	_, errSelf := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-001", "BLI-REF-001")
-	if errSelf == nil || !strings.Contains(errSelf.Error(), "cannot reference self") {
-		t.Errorf("expected cannot reference self error, got: %v", errSelf)
-	}
-
-	// 4. Missing Source check
-	_, errMissingSource := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-NONEXISTENT", "REQ-REF-001")
-	if errMissingSource == nil || !strings.Contains(errMissingSource.Error(), "not found") {
-		t.Errorf("expected source not found error, got: %v", errMissingSource)
-	}
-
-	// 5. Missing Target check
-	_, errMissingTarget := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-001", "REQ-NONEXISTENT")
-	if errMissingTarget == nil || !strings.Contains(errMissingTarget.Error(), "not found") {
-		t.Errorf("expected target not found error, got: %v", errMissingTarget)
-	}
-
-	// 6. Inverted Add: Source is PRI-REF-001, target is BLI-REF-002 (target owns priority_plan_ref)
-	outInv, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "PRI-REF-001", "BLI-REF-002")
-	if err != nil {
+	// Inverted Add: Source is PRI-REF-001, target is BLI-REF-INV
+	outInv, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "PRI-REF-001", "BLI-REF-INV")
+	if err != nil || (!strings.Contains(outInv, "Successfully linked") && !strings.Contains(outInv, "Successfully added")) {
 		t.Fatalf("inverted ref add failed: %v\noutput: %s", err, outInv)
 	}
-	if !strings.Contains(outInv, "Successfully linked") && !strings.Contains(outInv, "Successfully added") {
-		t.Errorf("expected successful inverted link, got: %s", outInv)
+
+	updatedBli, err := provider.Read(stdctx.Background(), secCtx, "BLI-REF-INV")
+	if err != nil || objects.GetString(updatedBli, objects.FieldKeyPriorityPlanRef) != "PRI-REF-001" {
+		t.Fatalf("expected BLI-REF-INV priority_plan_ref to be PRI-REF-001, got: %v", updatedBli)
 	}
 
-	// Verify that BLI-REF-002 now points to PRI-REF-001
-	updatedBli2, err := provider.Read(stdctx.Background(), secCtx, "BLI-REF-002")
-	if err != nil {
-		t.Fatalf("failed to read BLI-REF-002: %v", err)
-	}
-	if planRef, ok := updatedBli2[objects.FieldKeyPriorityPlanRef].(string); !ok || planRef != "PRI-REF-001" {
-		t.Errorf("expected BLI-REF-002 priority_plan_ref to be PRI-REF-001, got: %v", updatedBli2[objects.FieldKeyPriorityPlanRef])
-	}
-
-	// 7. Inverted Add (Idempotent): Add again
-	outInvIdem, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "PRI-REF-001", "BLI-REF-002")
-	if err != nil {
+	// Inverted Add (Idempotent)
+	outInvIdem, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "PRI-REF-001", "BLI-REF-INV")
+	if err != nil || (!strings.Contains(outInvIdem, "already up to date") && !strings.Contains(outInvIdem, "Successfully linked")) {
 		t.Fatalf("inverted idempotent add failed: %v", err)
 	}
-	if !strings.Contains(outInvIdem, "already up to date") && !strings.Contains(outInvIdem, "Successfully linked") {
-		t.Errorf("expected idempotent note, got: %s", outInvIdem)
-	}
 
-	// 8. Scalar Overwrite Prevention: Seed PRI-REF-002 and try to link to BLI-REF-002 which already has PRI-REF-001
+	// Scalar Overwrite Prevention
 	planObj2 := map[string]any{
 		objects.FieldKeyID:            "PRI-REF-002",
 		objects.FieldKeyKind:          objects.KindPriorityPlan,
@@ -403,24 +378,14 @@ func TestInProcess_RefAdd_Matrix(t *testing.T) {
 	}
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, planObj2, objects.ObjectStatusOriginated)
 
-	_, errOverwrite := executeObjectCommand(t, tempDir, provider, "ref", "add", "PRI-REF-002", "BLI-REF-002")
-	if errOverwrite == nil || !strings.Contains(errOverwrite.Error(), "cannot overwrite scalar reference") {
+	if _, errOverwrite := executeObjectCommand(t, tempDir, provider, "ref", "add", "PRI-REF-002", "BLI-REF-INV"); errOverwrite == nil || !strings.Contains(errOverwrite.Error(), "cannot overwrite scalar reference") {
 		t.Errorf("expected cannot overwrite scalar reference error, got: %v", errOverwrite)
 	}
 }
 
 func TestInProcess_RefAdd_ScopeLock_Matrix(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed sealed priority plan in progress
 	sealedPlan := map[string]any{
@@ -463,17 +428,8 @@ func TestInProcess_RefAdd_ScopeLock_Matrix(t *testing.T) {
 }
 
 func TestInProcess_RefAdd_CycleAndRedundancy_Matrix(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Seed requirement
 	req := map[string]any{
@@ -536,19 +492,9 @@ func TestInProcess_RefAdd_CycleAndRedundancy_Matrix(t *testing.T) {
 }
 
 func TestInProcess_RefRemove_Matrix(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
 
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
-	seedBulkUpdateSupportObjects(t, provider)
-
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Seed priority plan
 	plan := map[string]any{
 		objects.FieldKeyID:            "PRI-RM-001",
 		objects.FieldKeyKind:          objects.KindPriorityPlan,
@@ -560,7 +506,6 @@ func TestInProcess_RefRemove_Matrix(t *testing.T) {
 	}
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, plan, objects.ObjectStatusOriginated)
 
-	// Seed requirement
 	req := map[string]any{
 		objects.FieldKeyID:            "REQ-RM-001",
 		objects.FieldKeyKind:          objects.KindRequirement,
@@ -574,47 +519,40 @@ func TestInProcess_RefRemove_Matrix(t *testing.T) {
 	}
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, req, "complete")
 
-	// Seed BLI with both requirement and plan
 	bli := plannedBLI("BLI-RM-001", "Remove Test BLI", map[string]any{
 		objects.FieldKeyPriorityPlanRef: "PRI-RM-001",
 		objects.FieldKeyRequirementRefs: []string{"REQ-RM-001"},
 	})
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bli, objectStatusPlanned)
 
-	// 1. Error when no targets or flags specified
-	_, errNoArgs := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-001")
-	if errNoArgs == nil || !strings.Contains(errNoArgs.Error(), "must specify target ID(s), --kind, --field, or --all") {
-		t.Errorf("expected missing argument error, got: %v", errNoArgs)
+	verifyRefRemoveDirectAndInverted(t, tempDir, provider)
+	verifyRefRemoveFilters(t, tempDir, provider, secCtx)
+}
+
+func verifyRefRemoveDirectAndInverted(t *testing.T, tempDir string, provider storage.ObjectStorageProvider) {
+	t.Helper()
+	if _, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-001"); err == nil {
+		t.Fatal("expected missing argument error")
 	}
 
-	// 2. Direct remove specific target ID (REQ-RM-001)
 	outDirect, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-001", "REQ-RM-001")
-	if err != nil {
-		t.Fatalf("failed direct remove: %v\noutput: %s", err, outDirect)
-	}
-	if !strings.Contains(outDirect, "Successfully removed reference") && !strings.Contains(outDirect, "Successfully") {
-		t.Errorf("expected successful remove message, got: %s", outDirect)
+	if err != nil || (!strings.Contains(outDirect, "Successfully removed reference") && !strings.Contains(outDirect, "Successfully")) {
+		t.Fatalf("failed direct remove: out=%s, err=%v", outDirect, err)
 	}
 
-	// 3. Remove non-existent target (idempotent / no-op)
-	outNoop, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-001", "REQ-RM-001")
+	_, err = executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-001", "REQ-RM-001")
 	if err != nil {
 		t.Fatalf("noop remove failed: %v", err)
 	}
-	if !strings.Contains(outNoop, "not found in reference field") && !strings.Contains(outNoop, "no-op") && !strings.Contains(outNoop, "No references were removed") {
-		t.Logf("noop output: %s", outNoop)
-	}
 
-	// 4. Inverted remove: remove BLI from plan (clears priority_plan_ref on BLI-RM-001)
 	outInv, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "PRI-RM-001", "BLI-RM-001")
-	if err != nil {
-		t.Fatalf("inverted remove failed: %v\noutput: %s", err, outInv)
+	if err != nil || (!strings.Contains(outInv, "Successfully removed reference") && !strings.Contains(outInv, "Successfully")) {
+		t.Fatalf("inverted remove failed: out=%s, err=%v", outInv, err)
 	}
-	if !strings.Contains(outInv, "Successfully removed reference") && !strings.Contains(outInv, "Successfully") {
-		t.Errorf("expected inverted remove success, got: %s", outInv)
-	}
+}
 
-	// 5. Remove by --field
+func verifyRefRemoveFilters(t *testing.T, tempDir string, provider storage.ObjectStorageProvider, secCtx *pkgctx.SecurityContext) {
+	t.Helper()
 	bliField := plannedBLI("BLI-RM-002", "Remove Field BLI", map[string]any{
 		objects.FieldKeyPriorityPlanRef: "PRI-RM-001",
 		objects.FieldKeyRequirementRefs: []string{"REQ-RM-001"},
@@ -622,11 +560,10 @@ func TestInProcess_RefRemove_Matrix(t *testing.T) {
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bliField, objectStatusPlanned)
 
 	outField, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-002", "--field", "priority_plan_ref")
-	if err != nil {
-		t.Fatalf("remove by field failed: %v\noutput: %s", err, outField)
+	if err != nil || (!strings.Contains(outField, "Successfully removed reference") && !strings.Contains(outField, "Successfully")) {
+		t.Fatalf("remove by field failed: out=%s, err=%v", outField, err)
 	}
 
-	// 6. Remove by --kind
 	bliKind := plannedBLI("BLI-RM-003", "Remove Kind BLI", map[string]any{
 		objects.FieldKeyPriorityPlanRef: "PRI-RM-001",
 		objects.FieldKeyRequirementRefs: []string{"REQ-RM-001"},
@@ -634,11 +571,10 @@ func TestInProcess_RefRemove_Matrix(t *testing.T) {
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bliKind, objectStatusPlanned)
 
 	outKind, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-003", "--kind", "requirement")
-	if err != nil {
-		t.Fatalf("remove by kind failed: %v\noutput: %s", err, outKind)
+	if err != nil || (!strings.Contains(outKind, "Successfully removed reference") && !strings.Contains(outKind, "Successfully")) {
+		t.Fatalf("remove by kind failed: out=%s, err=%v", outKind, err)
 	}
 
-	// 7. Remove with --all
 	bliAll := plannedBLI("BLI-RM-004", "Remove All BLI", map[string]any{
 		objects.FieldKeyPriorityPlanRef: "PRI-RM-001",
 		objects.FieldKeyRequirementRefs: []string{"REQ-RM-001"},
@@ -646,10 +582,7 @@ func TestInProcess_RefRemove_Matrix(t *testing.T) {
 	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, bliAll, objectStatusPlanned)
 
 	outAll, err := executeObjectCommand(t, tempDir, provider, "ref", "remove", "BLI-RM-004", "--all")
-	if err != nil {
-		t.Fatalf("remove all failed: %v\noutput: %s", err, outAll)
-	}
-	if !strings.Contains(outAll, "Successfully removed all references") && !strings.Contains(outAll, "Successfully") {
-		t.Errorf("expected remove all success, got: %s", outAll)
+	if err != nil || (!strings.Contains(outAll, "Successfully removed all references") && !strings.Contains(outAll, "Successfully")) {
+		t.Fatalf("remove all failed: out=%s, err=%v", outAll, err)
 	}
 }

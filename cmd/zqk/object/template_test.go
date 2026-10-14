@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -25,14 +23,8 @@ func TestNewTemplateCmd_Structure(t *testing.T) {
 }
 
 func TestInProcess_Template_StdoutAndFile(t *testing.T) {
-	tempDir, cleanup := setupTestProject(t)
+	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
-
-	provider, err := storage.NewFileObjectStorageForTest(tempDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
-	testkit.RegisterStorageTestCleanup(t, tempDir, provider)
 
 	// 1. Generate template to stdout for backlog_item
 	out, err := executeObjectCommand(t, tempDir, provider, "template", "backlog_item")
