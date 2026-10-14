@@ -2,6 +2,7 @@ package fileutil
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -73,6 +74,9 @@ func WriteFile(name string, data []byte, perm FileMode) error {
 	if err := ValidateSafePath(name); err != nil {
 		return err
 	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	guardRepoMutation(name)
 	t0 := nowIfMetricsEnabled()
 	err := os.WriteFile(name, data, perm)
@@ -88,6 +92,9 @@ func Mkdir(path string, perm FileMode) error {
 	if err := ValidateSafePath(path); err != nil {
 		return err
 	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
 	err := os.Mkdir(path, perm)
@@ -98,6 +105,9 @@ func Mkdir(path string, perm FileMode) error {
 func MkdirAll(path string, perm FileMode) error {
 	if err := ValidateSafePath(path); err != nil {
 		return err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
 	}
 	info, err := os.Stat(path)
 	if err == nil && info.IsDir() {
@@ -115,6 +125,7 @@ func MkdirTemp(dir, pattern string) (string, error) {
 		if err := ValidateSafePath(dir); err != nil {
 			return "", err
 		}
+		dir = filepath.Clean(dir)
 		guardRepoMutation(dir)
 	}
 	return os.MkdirTemp(dir, pattern)
@@ -125,6 +136,7 @@ func CreateTemp(dir, pattern string) (*File, error) {
 		if err := ValidateSafePath(dir); err != nil {
 			return nil, err
 		}
+		dir = filepath.Clean(dir)
 		guardRepoMutation(dir)
 	}
 	return os.CreateTemp(dir, pattern)
@@ -134,28 +146,58 @@ func Create(name string) (*File, error) {
 	if err := ValidateSafePath(name); err != nil {
 		return nil, err
 	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	guardRepoMutation(name)
 	return os.Create(name) //nolint:gosec
 }
 
 func Chmod(name string, mode FileMode) error {
+	if err := ValidateSafePath(name); err != nil {
+		return err
+	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	guardRepoMutation(name)
 	return os.Chmod(name, mode)
 }
 
 func Chtimes(name string, atime, mtime time.Time) error {
+	if err := ValidateSafePath(name); err != nil {
+		return err
+	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	guardRepoMutation(name)
 	return os.Chtimes(name, atime, mtime)
 }
 
 func Truncate(name string, size int64) error {
+	if err := ValidateSafePath(name); err != nil {
+		return err
+	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	guardRepoMutation(name)
 	return os.Truncate(name, size)
 }
 
 func Link(oldname, newname string) error {
+	if err := ValidateSafePath(oldname); err != nil {
+		return err
+	}
 	if err := ValidateSafePath(newname); err != nil {
 		return err
+	}
+	if oldname != "" {
+		oldname = filepath.Clean(oldname)
+	}
+	if newname != "" {
+		newname = filepath.Clean(newname)
 	}
 	guardRepoMutation(newname)
 	return os.Link(oldname, newname)
@@ -165,29 +207,53 @@ func Symlink(oldname, newname string) error {
 	if err := ValidateSafePath(newname); err != nil {
 		return err
 	}
+	if newname != "" {
+		newname = filepath.Clean(newname)
+	}
 	guardRepoMutation(newname)
 	return os.Symlink(oldname, newname)
 }
 
 func Readlink(name string) (string, error) {
+	if err := ValidateSafePath(name); err != nil {
+		return "", err
+	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	return os.Readlink(name)
 }
 
 func Open(name string) (*File, error) {
+	if err := ValidateSafePath(name); err != nil {
+		return nil, err
+	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	return os.Open(name) //nolint:gosec
 }
 
 func OpenFile(name string, flag int, perm FileMode) (*File, error) {
+	if err := ValidateSafePath(name); err != nil {
+		return nil, err
+	}
+	if name != "" {
+		name = filepath.Clean(name)
+	}
 	if flag&writeOpenFlags() != 0 {
-		if err := ValidateSafePath(name); err != nil {
-			return nil, err
-		}
 		guardRepoMutation(name)
 	}
 	return os.OpenFile(name, flag, perm) //nolint:gosec
 }
 
 func Remove(path string) error {
+	if err := ValidateSafePath(path); err != nil {
+		return err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
 	err := os.Remove(path)
@@ -196,6 +262,12 @@ func Remove(path string) error {
 }
 
 func RemoveAll(path string) error {
+	if err := ValidateSafePath(path); err != nil {
+		return err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
 	err := os.RemoveAll(path)
@@ -212,8 +284,17 @@ func RemoveFileIfExists(path string) error {
 }
 
 func Rename(oldPath, newPath string) error {
+	if err := ValidateSafePath(oldPath); err != nil {
+		return err
+	}
 	if err := ValidateSafePath(newPath); err != nil {
 		return err
+	}
+	if oldPath != "" {
+		oldPath = filepath.Clean(oldPath)
+	}
+	if newPath != "" {
+		newPath = filepath.Clean(newPath)
 	}
 	guardRepoMutation(oldPath)
 	guardRepoMutation(newPath)
@@ -224,6 +305,12 @@ func Rename(oldPath, newPath string) error {
 }
 
 func Lstat(path string) (FileInfo, error) {
+	if err := ValidateSafePath(path); err != nil {
+		return nil, err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	t0 := nowIfMetricsEnabled()
 	fi, err := os.Lstat(path)
 	recordIOOp(OpStat, path, 0, t0, err)
@@ -231,6 +318,12 @@ func Lstat(path string) (FileInfo, error) {
 }
 
 func Stat(path string) (FileInfo, error) {
+	if err := ValidateSafePath(path); err != nil {
+		return nil, err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	t0 := nowIfMetricsEnabled()
 	fi, err := os.Stat(path)
 	recordIOOp(OpStat, path, 0, t0, err)
@@ -238,6 +331,12 @@ func Stat(path string) (FileInfo, error) {
 }
 
 func ReadFile(path string) ([]byte, error) {
+	if err := ValidateSafePath(path); err != nil {
+		return nil, err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	t0 := nowIfMetricsEnabled()
 	data, err := os.ReadFile(path) //nolint:gosec
 	var n int64
@@ -249,6 +348,12 @@ func ReadFile(path string) ([]byte, error) {
 }
 
 func ReadDir(path string) ([]DirEntry, error) {
+	if err := ValidateSafePath(path); err != nil {
+		return nil, err
+	}
+	if path != "" {
+		path = filepath.Clean(path)
+	}
 	t0 := nowIfMetricsEnabled()
 	entries, err := os.ReadDir(path)
 	recordIOOp(OpReadDir, path, 0, t0, err)
