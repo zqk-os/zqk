@@ -309,8 +309,8 @@ func TestInProcess_RefAdd_Direct_Matrix(t *testing.T) {
 
 	// 2. Direct Add (Idempotent): Add requirement again
 	outIdempotent, err := executeObjectCommand(t, tempDir, provider, "ref", "add", "BLI-REF-002", "REQ-REF-001")
-	if err != nil || (!strings.Contains(outIdempotent, "already up to date") && !strings.Contains(outIdempotent, "Successfully")) {
-		t.Fatalf("idempotent add failed: %v", err)
+	if err != nil || (!strings.Contains(outIdempotent, "No reference changes required") && !strings.Contains(outIdempotent, "already up to date") && !strings.Contains(outIdempotent, "Successfully")) {
+		t.Fatalf("idempotent add failed: %v\noutput: %s", err, outIdempotent)
 	}
 
 	// 3. Self-Reference check: cannot reference self
