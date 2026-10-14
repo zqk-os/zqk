@@ -372,41 +372,54 @@ func TestAutoTracePipeline_BLI1789335658105469000_Discipline(t *testing.T) {
 		t.Fatal("object subcommand not found")
 	}
 
-	// 1. Qualifying kind (requirement only) triggers trace pipeline in non-test mode (Issue #504)
-	if !shouldAutoTracePipelineConfigured(leaf, objects.KindRequirement, false, false) {
-		t.Errorf("kind requirement should auto-run trace pipeline in standard production mode")
+	// 1. Qualifying kind (requirement) does NOT auto-run trace pipeline by default (DEF-ZQK-TPM-TRACE-001)
+	if shouldAutoTracePipelineConfigured(leaf, objects.KindRequirement, false, false) {
+		t.Errorf("kind requirement must NOT auto-run trace pipeline by default (must be opt-in)")
 	}
 
-	// 2. Non-qualifying kinds (including strategic goals, milestones, BLIs, criteria) never trigger trace pipeline
-	for _, kind := range []string{objects.KindGoal, objects.KindMilestone, objects.KindBacklogItem, objects.KindCriteria, objects.KindTestCase, objects.KindAgentTask} {
-		if shouldAutoTracePipelineConfigured(leaf, kind, false, false) {
-			t.Errorf("kind %s must never auto-run trace pipeline", kind)
-		}
-	}
-
-	// 3. In-test mode or test root suppress auto trace pipeline
-	if shouldAutoTracePipelineConfigured(leaf, objects.KindRequirement, true, false) {
-		t.Error("inTest=true must suppress auto trace pipeline")
-	}
-	if shouldAutoTracePipelineConfigured(leaf, objects.KindRequirement, false, true) {
-		t.Error("hasTestRoot=true must suppress auto trace pipeline")
-	}
-
-	// 4. --skip-trace-pipeline flag suppresses auto trace pipeline
-	skipCmd := NewNewCmd()
-	var skipLeaf *cobra.Command
-	for _, c := range skipCmd.Commands() {
+	// 2. Qualifying kind triggers trace pipeline when --trace-pipeline flag is opted in
+	optInCmd := NewNewCmd()
+	var optInLeaf *cobra.Command
+	for _, c := range optInCmd.Commands() {
 		if c.Name() == "object" {
-			skipLeaf = c
+			optInLeaf = c
 			break
 		}
 	}
-	if skipLeaf != nil && skipLeaf.Flags().Lookup("skip-trace-pipeline") != nil {
-		if err := skipLeaf.Flags().Set("skip-trace-pipeline", "true"); err != nil {
-			t.Fatalf("failed to set skip-trace-pipeline flag: %v", err)
+	if optInLeaf != nil {
+		if optInLeaf.Flags().Lookup("trace-pipeline") == nil {
+			optInLeaf.Flags().Bool("trace-pipeline", false, "")
 		}
-		if shouldAutoTracePipelineConfigured(skipLeaf, objects.KindRequirement, false, false) {
-			t.Error("--skip-trace-pipeline must suppress auto trace pipeline")
+		if err := optInLeaf.Flags().Set("trace-pipeline", "true"); err != nil {
+			t.Fatalf("failed to set trace-pipeline flag: %v", err)
+		}
+		if !shouldAutoTracePipelineConfigured(optInLeaf, objects.KindRequirement, false, false) {
+			t.Errorf("kind requirement must run trace pipeline when --trace-pipeline is set")
+		}
+
+		// 3. Non-qualifying kinds (strategic goals, milestones, BLIs) never trigger trace pipeline even with --trace-pipeline
+		for _, kind := range []string{objects.KindGoal, objects.KindMilestone, objects.KindBacklogItem, objects.KindCriteria, objects.KindTestCase, objects.KindAgentTask} {
+			if shouldAutoTracePipelineConfigured(optInLeaf, kind, false, false) {
+				t.Errorf("kind %s must never auto-run trace pipeline", kind)
+			}
+		}
+
+		// 4. In-test mode or test root suppress auto trace pipeline
+		if shouldAutoTracePipelineConfigured(optInLeaf, objects.KindRequirement, true, false) {
+			t.Error("inTest=true must suppress auto trace pipeline")
+		}
+		if shouldAutoTracePipelineConfigured(optInLeaf, objects.KindRequirement, false, true) {
+			t.Error("hasTestRoot=true must suppress auto trace pipeline")
+		}
+
+		// 5. --skip-trace-pipeline flag suppresses auto trace pipeline even if --trace-pipeline is set
+		if optInLeaf.Flags().Lookup("skip-trace-pipeline") != nil {
+			if err := optInLeaf.Flags().Set("skip-trace-pipeline", "true"); err != nil {
+				t.Fatalf("failed to set skip-trace-pipeline flag: %v", err)
+			}
+			if shouldAutoTracePipelineConfigured(optInLeaf, objects.KindRequirement, false, false) {
+				t.Error("--skip-trace-pipeline must suppress auto trace pipeline")
+			}
 		}
 	}
 }
@@ -632,9 +645,9 @@ func TestNewEpicConvenienceCmd(t *testing.T) {
 }
 
 func TestShouldAutoTracePipeline_Issue504_OnlyRequirements(t *testing.T) {
-	// Requirements trigger auto-trace outside test environments
-	if !shouldAutoTracePipelineConfigured(nil, objects.KindRequirement, false, false) {
-		t.Errorf("expected KindRequirement to trigger auto-trace when not in test")
+	// Requirements do not auto-trace by default (opt-in via --trace-pipeline)
+	if shouldAutoTracePipelineConfigured(nil, objects.KindRequirement, false, false) {
+		t.Errorf("expected KindRequirement NOT to auto-trace without opt-in")
 	}
 
 	// Goals must NOT trigger auto-trace (Issue #504)

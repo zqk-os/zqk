@@ -101,7 +101,8 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().String("file", "", "File to read title/description from")
 	cmd.Flags().Bool("promote", false, "Enqueue background object promote after mint")
 	cmd.Flags().Bool("cas", false, "Directly materialize the object into CAS storage")
-	cmd.Flags().Bool("skip-trace-pipeline", false, "Do not auto-run workflow gen-trace-pipeline")
+	cmd.Flags().Bool("trace-pipeline", false, "Auto-run workflow gen-trace-pipeline after mint (opt-in)")
+	cmd.Flags().Bool("skip-trace-pipeline", false, "Deprecated: auto-run is disabled by default; trace pipeline is opt-in via --trace-pipeline")
 	return cmd
 }
 
@@ -243,19 +244,26 @@ func shouldAutoTracePipeline(cmd *cobra.Command, kind string) bool {
 }
 
 func shouldAutoTracePipelineConfigured(cmd *cobra.Command, kind string, inTest bool, hasTestRoot bool) bool {
+	// Auto-trace pipeline is disabled by default to prevent ghost test/criteria clutter and graph pollution (DEF-ZQK-TPM-TRACE-001).
+	// Trace pipeline is opt-in via --trace-pipeline on requirements, or via `zqk workflow gen-trace-pipeline <REQ-id>`.
+	if inTest || hasTestRoot {
+		return false
+	}
 	switch kind {
 	case objects.KindRequirement:
 	default:
 		return false
 	}
-	if inTest || hasTestRoot {
+	if cmd == nil || cmd.Flags() == nil {
 		return false
 	}
-	if cmd != nil && cmd.Flags() != nil {
-		skip, _ := cmd.Flags().GetBool("skip-trace-pipeline")
-		if skip {
-			return false
-		}
+	optIn, _ := cmd.Flags().GetBool("trace-pipeline")
+	if !optIn {
+		return false
+	}
+	skip, _ := cmd.Flags().GetBool("skip-trace-pipeline")
+	if skip {
+		return false
 	}
 	return true
 }
