@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -248,8 +249,13 @@ func TestDaemonServiceCommands(t *testing.T) {
 
 	// 3. Service Uninstall
 	out, err = executeDaemonCmd(t, projectRoot, "service", "uninstall")
-	require.NoError(t, err)
-	assert.Contains(t, out, "uninstalled")
+	if runtime.GOOS != "darwin" {
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "LaunchAgent service management is only supported on macOS (darwin)")
+	} else {
+		require.NoError(t, err)
+		assert.Contains(t, out, "uninstalled")
+	}
 }
 
 func TestDaemonInternalHelpers(t *testing.T) {
