@@ -543,7 +543,7 @@ func NewAutoFixBatchCmd() *cobra.Command {
 	})
 
 	cmd.Flags().String("batch-file", "", "Path to batch JSON file (required)")
-	cmd.Flags().String("project-root", "", "Project root directory")
+	// cmd.Flags().String("project-root", "", "Project root directory (required)")
 	cmd.Flags().Int("chunk-size", 0, fmt.Sprintf("Number of issues per transactional chunk (0 = use default or %s env; default 20)", zqkenv.AutofixBatchChunkSize()))
 
 	return cmd
@@ -554,13 +554,12 @@ func NewAutoFixBatchCmd() *cobra.Command {
 func runAutoFixBatch(cmd *cobra.Command, args []string) error {
 	batchFile, _ := cmd.Flags().GetString("batch-file")
 	projectRoot, _ := cmd.Flags().GetString("project-root")
-	projectRoot = ProjectRootOrResolve(projectRoot)
 
 	if batchFile == emptyValue {
 		return errfmt.Errorf("--batch-file is required")
 	}
 	if projectRoot == emptyValue {
-		return errfmt.Errorf("--project-root is required when not run from a project directory")
+		return errfmt.Errorf("--project-root is required")
 	}
 
 	ctx, err := getAutofixCLIContext(cmd, projectRoot)

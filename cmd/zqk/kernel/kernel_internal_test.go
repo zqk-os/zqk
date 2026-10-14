@@ -129,7 +129,6 @@ func TestLogSweepSummary(t *testing.T) {
 	})
 }
 
-
 func TestStewardDaemonCmdLifecycle(t *testing.T) {
 	tmpDir := t.TempDir()
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, ".zqk", "state"), 0755))

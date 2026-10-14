@@ -356,4 +356,3 @@ func TestMatrixUpdateDetailedBranches(t *testing.T) {
 	_, err = executeMatrixCmd(t, []string{"update", "--name", "t", "--file-path", "pkg/a.go", "--bundle-label", "bundle1", "--set", "fully_vetted=yes"})
 	assert.Error(t, err)
 }
-
