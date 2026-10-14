@@ -30,6 +30,10 @@ type PeerWakeResult struct {
 	Live bool `json:"live"`
 	// IdeBridgeQueued is true when a zqk.wake.attn control event was appended for the IDE bridge.
 	IdeBridgeQueued bool `json:"ide_bridge_queued,omitempty"`
+	// NonInterrupting is true when steering is delivered without process disruption.
+	NonInterrupting bool `json:"non_interrupting,omitempty"`
+	// InFlightRePrime is true when steering guidance is queued for in-flight context re-priming.
+	InFlightRePrime bool `json:"in_flight_reprime,omitempty"`
 }
 
 // Wake transport names (stable for CLI JSON + unrepaired classification).
@@ -40,6 +44,7 @@ const (
 	TransportAGYNotify         = "agy_notify" // deprecated alias of TransportAgentAPINotify
 	TransportMCPActionRequired = "mcp_action_required"
 	TransportMCPNoSubscriber   = "mcp_no_subscriber"
+	TransportNonInterrupting   = "non_interrupting"
 )
 
 // WakePeerOptions configures peer wake + optional delivery_receipt stamp.
@@ -65,6 +70,10 @@ type WakePeerOptions struct {
 	MCPSubscribersProbed bool
 	// MCPSubscriberCount is events/subscribe count from the daemon (meaningful only when probed).
 	MCPSubscriberCount int
+	// NonInterrupting instructs wake transport to deliver in-flight without interrupting processes.
+	NonInterrupting bool
+	// InFlightRePrime marks steering guidance for in-flight agent context re-priming.
+	InFlightRePrime bool
 }
 
 // ShouldWakePeer reports whether lite delivery_mode requires a peer wake transport.
@@ -163,6 +172,39 @@ func WakePeerOpts(ctx context.Context, opts WakePeerOptions) PeerWakeResult {
 	root := strings.TrimSpace(opts.ProjectRoot)
 	if root == "" {
 		return PeerWakeResult{Skipped: "empty_project_root"}
+	}
+	if opts.NonInterrupting {
+		res := PeerWakeResult{
+			Attempted:       true,
+			InReplyTo:       strings.TrimSpace(opts.InReplyTo),
+			Transport:       TransportNonInterrupting,
+			Live:            true,
+			NonInterrupting: true,
+			InFlightRePrime: opts.InFlightRePrime,
+		}
+		if ir := strings.TrimSpace(opts.InReplyTo); ir != "" {
+			author := strings.TrimSpace(opts.FromAgentID)
+			if author == "" {
+				author = from
+			}
+			summary := "DELIVERY_RECEIPT — non-interrupting in-flight steering delivered for " + ir
+			dr, derr := AppendDeliveryReceipt(root, author, ir, summary)
+			if derr == nil {
+				res.DeliveryReceipt = true
+				res.DeliveryEventID = dr.EventID
+			}
+		}
+		if to := strings.TrimSpace(opts.ToAgentID); to != "" {
+			_ = RecordInFlightSteering(root, to, InFlightSteering{
+				EventID:         res.InReplyTo,
+				FromAgentID:     from,
+				ToAgentID:       to,
+				Message:         msg,
+				NonInterrupting: true,
+				InFlightRePrime: opts.InFlightRePrime,
+			})
+		}
+		return res
 	}
 	if ctx == nil {
 		var cancel context.CancelFunc
