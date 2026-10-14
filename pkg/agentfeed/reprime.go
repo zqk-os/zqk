@@ -217,7 +217,15 @@ func RePrimeAgentContext(input RePrimeInput) (RePrimeResult, error) {
 		return RePrimeResult{}, errfmt.Errorf("list in-flight steering: %w", err)
 	}
 
-	state, _ := LoadAgentInFlightState(root, agentID)
+	state, stateErr := LoadAgentInFlightState(root, agentID)
+	if stateErr != nil {
+		state = AgentInFlightState{
+			Schema:         InFlightStateSchema,
+			AgentID:        agentID,
+			Status:         InFlightStatusAligned,
+			ActiveGuidance: []InFlightSteering{},
+		}
+	}
 	if len(steeringItems) == 0 && len(state.ActiveGuidance) > 0 && state.Status == InFlightStatusPending {
 		steeringItems = state.ActiveGuidance
 	}
@@ -264,7 +272,9 @@ func RePrimeAgentContext(input RePrimeInput) (RePrimeResult, error) {
 	if len(steeringItems) > 0 {
 		state.LastEventID = steeringItems[len(steeringItems)-1].EventID
 	}
-	_ = SaveAgentInFlightState(root, state)
+	if saveErr := SaveAgentInFlightState(root, state); saveErr != nil {
+		return RePrimeResult{}, errfmt.Errorf("save in-flight state: %w", saveErr)
+	}
 
 	return RePrimeResult{
 		RePrimedContext: reprimed,

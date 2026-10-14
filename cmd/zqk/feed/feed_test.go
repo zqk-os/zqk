@@ -8,7 +8,15 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
+
+func initFeedTestHarness(t *testing.T) (string, storage.ObjectStorageProvider, func()) {
+	t.Helper()
+	tempDir, provider, cleanup := setupFeedTestProjectWithStorage(t)
+	seedFeedSupportObjects(t, provider)
+	return tempDir, provider, cleanup
+}
 
 func TestNewFeedCmd_wiresSteerAndEmitStatus(t *testing.T) {
 	cmd := NewFeedCmd()
@@ -104,9 +112,8 @@ func TestNewFeedCmd_wiresSteerAndEmitStatus(t *testing.T) {
 }
 
 func TestFeedSteer_NonInterruptingAndReprime(t *testing.T) {
-	tempDir, provider, cleanup := setupFeedTestProjectWithStorage(t)
+	tempDir, provider, cleanup := initFeedTestHarness(t)
 	defer cleanup()
-	seedFeedSupportObjects(t, provider)
 
 	out, err := executeFeedCommand(
 		t,
@@ -193,9 +200,8 @@ func TestFeedSteer_NonInterruptingAndReprime(t *testing.T) {
 }
 
 func TestFeedSteer_NonInterrupting_Boundary(t *testing.T) {
-	tempDir, provider, cleanup := setupFeedTestProjectWithStorage(t)
+	tempDir, provider, cleanup := initFeedTestHarness(t)
 	defer cleanup()
-	seedFeedSupportObjects(t, provider)
 
 	// Explicitly configure chat channel with known feed_id
 	cfg := datacell.AgentChatChannelConfig{
