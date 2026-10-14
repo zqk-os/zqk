@@ -93,7 +93,11 @@ func handleDaemonStateToggle(cmd *cobra.Command, name string, desired overseer.D
 	projectRoot, client := getDaemonClient(cmd)
 	stateStr := string(desired)
 	if client.IsRunning() {
-		if _, err := sendOverseerAction(cmd.Context(), client, stateStr, name); err != nil {
+		action := "enable"
+		if desired == overseer.DesiredStateDisabled {
+			action = "disable"
+		}
+		if _, err := sendOverseerAction(cmd.Context(), client, action, name); err != nil {
 			return err
 		}
 		return cli.FormatOutput(cmd, map[string]any{
