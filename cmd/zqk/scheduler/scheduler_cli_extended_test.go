@@ -3,6 +3,7 @@ package scheduler
 import (
 	"bytes"
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -134,7 +135,9 @@ func TestSchedulerServiceCmd_ControlAccess(t *testing.T) {
 	assert.Contains(t, err.Error(), "scheduler service control requires")
 
 	// 2. Service list command
-	_, _ = executeSchedulerCmd(t, NewServiceCmd(), []string{"list"}, proj.Root) // Host dependent
+	outList, errList := executeSchedulerCmd(t, NewServiceCmd(), []string{"list"}, proj.Root) // Host dependent
+	_ = outList
+	_ = errList
 }
 
 func TestAuditEventExtractor_Methods(t *testing.T) {
@@ -232,11 +235,216 @@ func TestTestFailuresCommands_Execution(t *testing.T) {
 	require.NotNil(t, cmd)
 
 	// 2. Health command
-	_, _ = executeSchedulerCmd(t, NewTestFailuresHealthCmd(), []string{}, proj.Root)
+	outHealth, errHealth := executeSchedulerCmd(t, NewTestFailuresHealthCmd(), []string{}, proj.Root)
+	_ = outHealth
+	_ = errHealth
 
 	// 3. Criteria evidence command
-	_, _ = executeSchedulerCmd(t, NewTestFailuresCriteriaEvidenceCmd(), []string{}, proj.Root)
+	outCrit, errCrit := executeSchedulerCmd(t, NewTestFailuresCriteriaEvidenceCmd(), []string{}, proj.Root)
+	_ = outCrit
+	_ = errCrit
 
 	// 4. List command
-	_, _ = executeSchedulerCmd(t, NewTestFailuresListCmd(), []string{}, proj.Root)
+	outFailuresList, errFailuresList := executeSchedulerCmd(t, NewTestFailuresListCmd(), []string{}, proj.Root)
+	_ = outFailuresList
+	_ = errFailuresList
+
+	// 5. Rerun command
+	outRerun, errRerun := executeSchedulerCmd(t, NewTestFailuresRerunCmd(), []string{"--dry-run"}, proj.Root)
+	_ = outRerun
+	_ = errRerun
+
+	// 6. Analyze command
+	outAnalyze, errAnalyze := executeSchedulerCmd(t, NewTestFailuresAnalyzeCmd(), []string{}, proj.Root)
+	_ = outAnalyze
+	_ = errAnalyze
+}
+
+func TestSchedulerStatusCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// Text mode
+	out, err := executeSchedulerCmd(t, NewStatusCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, out, "Scheduler daemon: Not running")
+
+	// JSON mode
+	out, err = executeSchedulerCmd(t, NewStatusCmd(), []string{"--format", "json"}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, out, `"status": "not running"`)
+}
+
+func TestSchedulerIssuesAndClearIssuesCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// 1. Initial issues (empty/ok)
+	out, err := executeSchedulerCmd(t, NewIssuesCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, out, "Status: ok")
+
+	// 2. Clear issues
+	out, err = executeSchedulerCmd(t, NewClearIssuesCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, strings.ToLower(out), "cleared")
+}
+
+func TestSchedulerEventsHealthCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	cmd := NewEventsCmd()
+	require.NotNil(t, cmd)
+
+	out, err := executeSchedulerCmd(t, cmd, []string{"health"}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, out, "No summary found")
+}
+
+func TestSchedulerHistoryCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	out, err := executeSchedulerCmd(t, NewHistoryCmd(), []string{"--limit", "10"}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
+}
+
+func TestSchedulerActivityCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	out, err := executeSchedulerCmd(t, NewActivityCmd(), []string{"--limit", "10"}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
+}
+
+func TestSchedulerHealthCheckCmd_Structure(t *testing.T) {
+	cmd := NewHealthCheckCmd()
+	require.NotNil(t, cmd)
+	assert.Equal(t, "health-check", cmd.Name())
+}
+
+func TestSchedulerListCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	_, err := executeSchedulerCmd(t, NewListCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+}
+
+func TestSchedulerStopAndRestartCmd_NotRunning(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// Stop when not running
+	out, err := executeSchedulerCmd(t, NewStopCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, out, "not running")
+
+	// Restart with force flag when not running
+	outRestart, errRestart := executeSchedulerCmd(t, NewRestartCmd(), []string{"--force"}, proj.Root)
+	_ = outRestart
+	_ = errRestart
+}
+
+func TestSchedulerTriggerCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	_, err := executeSchedulerCmd(t, NewTriggerCmd(), []string{"NONEXISTENT_JOB"}, proj.Root)
+	require.Error(t, err)
+}
+
+func TestSchedulerCoordinationCommands(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	ctx := context.Background()
+	emitSchedulerStartEventViaCoordinator(ctx, proj.Root, nil, "start event", "test", map[string]any{"k": "v"})
+	emitSchedulerStopEventViaCoordinator(ctx, proj.Root, nil, "stop event", 12345, "test", map[string]any{"k": "v"})
+	emitSchedulerTriggerEventViaCoordinator(ctx, proj.Root, nil, "trigger event", "JOB-1", "test", map[string]any{"k": "v"})
+	emitSchedulerWarningEventViaCoordinator(ctx, proj.Root, nil, "warning event", nil, "test")
+	emitSchedulerDumpEventViaCoordinator(ctx, proj.Root, nil, "complete", nil, "test", map[string]any{"dir": proj.Root})
+}
+
+func TestSchedulerCmd_Root(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	cmd := NewSchedulerCmd()
+	require.NotNil(t, cmd)
+	assert.Equal(t, "scheduler", cmd.Name())
+	assert.NotEmpty(t, cmd.Commands())
+}
+
+func TestSchedulerBundleProgressCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	out, err := executeSchedulerCmd(t, NewSchedulerBundleProgressCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.Contains(t, out, "Bundle Progress Matrix")
+}
+
+func TestIssuesBundleHealthCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	out, err := executeSchedulerCmd(t, NewIssuesBundleHealthCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
+}
+
+func TestPrintIDEPasteApplescriptCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	out, err := executeSchedulerCmd(t, NewPrintIDEPasteApplescriptCmd(), []string{}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
+}
+
+func TestSchedulerEscalateCmd_Execution(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	out, err := executeSchedulerCmd(t, NewEscalateCmd(), []string{"--dry-run", "--test"}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
+}
+
+func TestSchedulerSubmitCmd_Structure(t *testing.T) {
+	cmd := NewSubmitCmd()
+	require.NotNil(t, cmd)
+	assert.Equal(t, "submit <command> [args...]", cmd.Use)
+}
+
+func TestSchedulerWaitCmd_Timeout(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	_, err := executeSchedulerCmd(t, NewWaitCmd(), []string{"NONEXISTENT_JOB", "--timeout", "10ms", "--poll-interval", "5ms"}, proj.Root)
+	require.Error(t, err)
+}
+
+func TestSchedulerActivity_StructuredJSONAndFilters(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// JSON format
+	out, err := executeSchedulerCmd(t, NewActivityCmd(), []string{"--format", "json", "--since", "1h", "--bypass-cache"}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
+}
+
+func TestSchedulerHistory_FiltersAndJSON(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// JSON format with since
+	out, err := executeSchedulerCmd(t, NewHistoryCmd(), []string{"--format", "json", "--since", "1h", "--bypass-cache"}, proj.Root)
+	require.NoError(t, err)
+	assert.NotEmpty(t, out)
 }
