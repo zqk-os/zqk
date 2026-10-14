@@ -141,7 +141,9 @@ func newInitCmd() *cobra.Command {
 			tplContent := `prompt: |
   Evaluate the system against defined requirements and record findings.
 `
-			_ = fileutil.WriteFile(sampleTpl, []byte(tplContent), paths.FilePerm644)
+			if err := fileutil.WriteFile(sampleTpl, []byte(tplContent), paths.FilePerm644); err != nil {
+				return fmt.Errorf("failed to write sample template: %w", err)
+			}
 
 			cmd.Printf("✓ Successfully scaffolded holonic swarm package %q in %s\n", name, targetDir)
 			return nil

@@ -28,13 +28,22 @@ func NewRegisterCmd() *cobra.Command {
 
 func runRegister(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		domainID, _ := cmd.Flags().GetString("domain-id")
-		namespace, _ := cmd.Flags().GetString(objects.KindNamespace)
-		specFile, _ := cmd.Flags().GetString("spec-file")
-		dryRun, _ := cmd.Flags().GetBool("dry-run")
-
-		var err error
-		_ = err
+		domainID, err := cmd.Flags().GetString("domain-id")
+		if err != nil {
+			return errfmt.Newf("failed to get domain-id flag").Wrap(err)
+		}
+		namespace, err := cmd.Flags().GetString(objects.KindNamespace)
+		if err != nil {
+			return errfmt.Newf("failed to get namespace flag").Wrap(err)
+		}
+		specFile, err := cmd.Flags().GetString("spec-file")
+		if err != nil {
+			return errfmt.Newf("failed to get spec-file flag").Wrap(err)
+		}
+		dryRun, err := cmd.Flags().GetBool("dry-run")
+		if err != nil {
+			return errfmt.Newf("failed to get dry-run flag").Wrap(err)
+		}
 
 		if domainID == emptyValue {
 			return errfmt.Errorf("%s", errfmt.Newf("--domain-id is required").Build())
