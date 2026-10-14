@@ -13,7 +13,7 @@ import (
 func runMatrixValidate(cmd *cobra.Command, _ []string) error {
 	ctx := cli.GetContext(cmd)
 	projectRoot := ""
-	if ctx != nil {
+	if ctx != nil && ctx.Context != nil {
 		projectRoot = ctx.ProjectRoot
 	}
 	if projectRoot == "" {
@@ -47,6 +47,8 @@ func runMatrixValidate(cmd *cobra.Command, _ []string) error {
 func NewMatrixValidateCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixValidateCommandBuilder()
 	c.Use = "matrix"
+	c.Flags().String("name", "", "Validate a single matrix alias")
+	c.Flags().String("registry", "", "Path to matrix registry YAML")
 	c.RunE = runMatrixValidate
 	return c
 }

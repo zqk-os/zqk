@@ -85,19 +85,32 @@ func runTree(cmd *cobra.Command, args []string) error {
 	})(cmd, args)
 }
 
+type treeEntities struct {
+	backlogs []map[string]any
+	goals    []map[string]any
+	reqs     []map[string]any
+	crits    []map[string]any
+}
+
 // Resolve fetches all related items and constructs the dependency tree.
 func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*TreeNode, error) {
+	planObj, entities, err := r.fetchTreeEntities(ctx, planID)
+	if err != nil {
+		return nil, err
+	}
+	return assembleTree(planID, planObj, entities), nil
+}
+
+func (r *DependencyTreeResolver) fetchTreeEntities(ctx context.Context, planID string) (map[string]any, *treeEntities, error) {
 	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
 
 	// Read the priority plan
 	planObj, err := r.sp.Read(ctx, secCtx, planID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read priority plan %s: %w", planID, err)
+		return nil, nil, fmt.Errorf("failed to read priority plan %s: %w", planID, err)
 	}
 
-	// Fetch backlog_items (scoped to plan and non-archived), goals, requirements, criteria (non-archived)
-	backlogRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	backlogRes, err := r.sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind: objects.KindBacklogItem,
 		Filters: map[string]any{
 			objects.FieldKeyPriorityPlanRef: planID,
@@ -108,10 +121,10 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, "requirement_ref", objects.FieldKeyRequirementRefs, "goal_ref", objects.FieldKeyGoalRefs},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list backlog items: %w", err)
+		return nil, nil, fmt.Errorf("failed to list backlog items: %w", err)
 	}
 
-	goalRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	goalRes, err := r.sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind: objects.KindGoal,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: map[string]any{
@@ -121,10 +134,10 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list goals: %w", err)
+		return nil, nil, fmt.Errorf("failed to list goals: %w", err)
 	}
 
-	reqRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	reqRes, err := r.sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind: objects.KindRequirement,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: map[string]any{
@@ -134,10 +147,10 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list requirements: %w", err)
+		return nil, nil, fmt.Errorf("failed to list requirements: %w", err)
 	}
 
-	critRes, err := r.sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	critRes, err := r.sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind: objects.KindCriteria,
 		Filters: map[string]any{
 			objects.FieldKeyStatus: map[string]any{
@@ -147,23 +160,32 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		Fields: []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyBacklogItemRef, "requirement_ref", objects.FieldKeyRequirementRefs, "goal_ref", objects.FieldKeyGoalRefs},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to list criteria: %w", err)
+		return nil, nil, fmt.Errorf("failed to list criteria: %w", err)
 	}
 
+	return planObj, &treeEntities{
+		backlogs: backlogRes.Objects,
+		goals:    goalRes.Objects,
+		reqs:     reqRes.Objects,
+		crits:    critRes.Objects,
+	}, nil
+}
+
+func assembleTree(planID string, planObj map[string]any, entities *treeEntities) *TreeNode {
 	// Build index maps
-	goalMap := indexObjectsByID(goalRes.Objects)
-	critMap := indexObjectsByID(critRes.Objects)
+	goalMap := indexObjectsByID(entities.goals)
+	critMap := indexObjectsByID(entities.crits)
 
 	// Filter backlog items and goals belonging to this plan
-	planBacklogs := filterBacklogsByPlan(backlogRes.Objects, planID)
-	planGoalsSet := resolvePlanGoals(goalRes.Objects, planBacklogs, planID)
+	planBacklogs := filterBacklogsByPlan(entities.backlogs, planID)
+	planGoalsSet := resolvePlanGoals(entities.goals, planBacklogs, planID)
 
 	// Map relationships
-	reqsByGoal := mapRequirementsToGoals(reqRes.Objects)
+	reqsByGoal := mapRequirementsToGoals(entities.reqs)
 	backlogsByReq := mapBacklogsToRequirements(planBacklogs)
 	backlogsByGoal := mapBacklogsToGoals(planBacklogs)
 	orphanBacklogs := findOrphanBacklogs(planBacklogs)
-	criteriaByParent := mapCriteriaToParents(planBacklogs, reqRes.Objects, critMap)
+	criteriaByParent := mapCriteriaToParents(planBacklogs, entities.reqs, critMap)
 
 	// Construct tree starting from Priority Plan
 	rootNode := &TreeNode{
@@ -244,19 +266,18 @@ func (r *DependencyTreeResolver) Resolve(ctx context.Context, planID string) (*T
 		rootNode.Children = append(rootNode.Children, bliNode)
 	}
 
-	return rootNode, nil
+	return rootNode
 }
 
 func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit string) (string, error) {
 	secCtx := pkgctx.NewSystemSecurityContext()
-	storageCtx := pkgctx.NewStorageContext()
 
 	if explicit != "" {
 		obj, err := sp.Read(ctx, secCtx, explicit)
 		if err == nil && obj != nil {
 			return explicit, nil
 		}
-		res, lerr := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+		res, lerr := sp.List(ctx, secCtx, nil, storage.ListFilter{
 			Kind:    objects.KindPriorityPlan,
 			Filters: map[string]any{objects.FieldKeyID: explicit},
 			Limit:   1,
@@ -269,7 +290,7 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	}
 
 	// Try in_progress
-	res, err := sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	res, err := sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusInProgress},
 		Limit:   1,
@@ -280,7 +301,7 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	}
 
 	// Try active
-	res, err = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	res, err = sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusActive},
 		Limit:   1,
@@ -291,7 +312,7 @@ func resolvePriorityPlan(ctx context.Context, sp workflowStorage, explicit strin
 	}
 
 	// Try paused
-	res, err = sp.List(ctx, secCtx, storageCtx, storage.ListFilter{
+	res, err = sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind:    objects.KindPriorityPlan,
 		Filters: map[string]any{objects.FieldKeyStatus: objects.ObjectStatusPaused},
 		Limit:   1,
@@ -335,6 +356,29 @@ func filterBacklogsByPlan(objs []map[string]any, planID string) []map[string]any
 	return out
 }
 
+func toStringSlice(val any) []string {
+	if val == nil {
+		return nil
+	}
+	switch v := val.(type) {
+	case []string:
+		return v
+	case []any:
+		res := make([]string, 0, len(v))
+		for _, item := range v {
+			if s, ok := item.(string); ok && s != "" {
+				res = append(res, s)
+			}
+		}
+		return res
+	case string:
+		if v != "" {
+			return []string{v}
+		}
+	}
+	return nil
+}
+
 func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, planID string) map[string]bool {
 	set := make(map[string]bool)
 	for _, goal := range goals {
@@ -356,14 +400,9 @@ func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, pla
 		}
 	}
 	for _, item := range planBacklogs {
-		goalRefsRaw, ok := item[objects.FieldKeyGoalRefs]
-		if ok {
-			if goalRefs, ok := goalRefsRaw.([]any); ok {
-				for _, g := range goalRefs {
-					if gStr, ok := g.(string); ok && gStr != "" {
-						set[gStr] = true
-					}
-				}
+		for _, gStr := range toStringSlice(item[objects.FieldKeyGoalRefs]) {
+			if gStr != "" {
+				set[gStr] = true
 			}
 		}
 	}
@@ -373,14 +412,9 @@ func resolvePlanGoals(goals []map[string]any, planBacklogs []map[string]any, pla
 func mapRequirementsToGoals(reqs []map[string]any) map[string][]map[string]any {
 	m := make(map[string][]map[string]any)
 	for _, req := range reqs {
-		goalRefsRaw, ok := req[objects.FieldKeyGoalRefs]
-		if ok {
-			if goalRefs, ok := goalRefsRaw.([]any); ok {
-				for _, g := range goalRefs {
-					if gStr, ok := g.(string); ok {
-						m[gStr] = append(m[gStr], req)
-					}
-				}
+		for _, gStr := range toStringSlice(req[objects.FieldKeyGoalRefs]) {
+			if gStr != "" {
+				m[gStr] = append(m[gStr], req)
 			}
 		}
 	}
@@ -390,14 +424,9 @@ func mapRequirementsToGoals(reqs []map[string]any) map[string][]map[string]any {
 func mapBacklogsToRequirements(backlogs []map[string]any) map[string][]map[string]any {
 	m := make(map[string][]map[string]any)
 	for _, item := range backlogs {
-		reqRefsRaw, ok := item[objects.FieldKeyRequirementRefs]
-		if ok {
-			if reqRefs, ok := reqRefsRaw.([]any); ok {
-				for _, r := range reqRefs {
-					if rStr, ok := r.(string); ok {
-						m[rStr] = append(m[rStr], item)
-					}
-				}
+		for _, rStr := range toStringSlice(item[objects.FieldKeyRequirementRefs]) {
+			if rStr != "" {
+				m[rStr] = append(m[rStr], item)
 			}
 		}
 	}
@@ -407,17 +436,11 @@ func mapBacklogsToRequirements(backlogs []map[string]any) map[string][]map[strin
 func mapBacklogsToGoals(backlogs []map[string]any) map[string][]map[string]any {
 	m := make(map[string][]map[string]any)
 	for _, item := range backlogs {
-		reqRefsRaw, okR := item[objects.FieldKeyRequirementRefs]
-		hasReq := okR && reqRefsRaw != nil && len(reqRefsRaw.([]any)) > 0
-		if !hasReq {
-			goalRefsRaw, ok := item[objects.FieldKeyGoalRefs]
-			if ok {
-				if goalRefs, ok := goalRefsRaw.([]any); ok {
-					for _, g := range goalRefs {
-						if gStr, ok := g.(string); ok {
-							m[gStr] = append(m[gStr], item)
-						}
-					}
+		reqRefs := toStringSlice(item[objects.FieldKeyRequirementRefs])
+		if len(reqRefs) == 0 {
+			for _, gStr := range toStringSlice(item[objects.FieldKeyGoalRefs]) {
+				if gStr != "" {
+					m[gStr] = append(m[gStr], item)
 				}
 			}
 		}
@@ -428,11 +451,9 @@ func mapBacklogsToGoals(backlogs []map[string]any) map[string][]map[string]any {
 func findOrphanBacklogs(backlogs []map[string]any) []map[string]any {
 	var out []map[string]any
 	for _, item := range backlogs {
-		goalRefsRaw, okG := item[objects.FieldKeyGoalRefs]
-		reqRefsRaw, okR := item[objects.FieldKeyRequirementRefs]
-		hasGoal := okG && goalRefsRaw != nil && len(goalRefsRaw.([]any)) > 0
-		hasReq := okR && reqRefsRaw != nil && len(reqRefsRaw.([]any)) > 0
-		if !hasGoal && !hasReq {
+		goalRefs := toStringSlice(item[objects.FieldKeyGoalRefs])
+		reqRefs := toStringSlice(item[objects.FieldKeyRequirementRefs])
+		if len(goalRefs) == 0 && len(reqRefs) == 0 {
 			out = append(out, item)
 		}
 	}
@@ -443,31 +464,17 @@ func mapCriteriaToParents(backlogs []map[string]any, reqs []map[string]any, crit
 	m := make(map[string][]map[string]any)
 	for _, item := range backlogs {
 		id := objects.GetString(item, objects.FieldKeyID)
-		critRefsRaw, ok := item[objects.FieldKeyCriteriaRefs]
-		if ok {
-			if critRefs, ok := critRefsRaw.([]any); ok {
-				for _, c := range critRefs {
-					if cStr, ok := c.(string); ok {
-						if critObj, exists := critMap[cStr]; exists {
-							m[id] = append(m[id], critObj)
-						}
-					}
-				}
+		for _, cStr := range toStringSlice(item[objects.FieldKeyCriteriaRefs]) {
+			if critObj, exists := critMap[cStr]; exists {
+				m[id] = append(m[id], critObj)
 			}
 		}
 	}
 	for _, req := range reqs {
 		id := objects.GetString(req, objects.FieldKeyID)
-		critRefsRaw, ok := req[objects.FieldKeyCriteriaRefs]
-		if ok {
-			if critRefs, ok := critRefsRaw.([]any); ok {
-				for _, c := range critRefs {
-					if cStr, ok := c.(string); ok {
-						if critObj, exists := critMap[cStr]; exists {
-							m[id] = append(m[id], critObj)
-						}
-					}
-				}
+		for _, cStr := range toStringSlice(req[objects.FieldKeyCriteriaRefs]) {
+			if critObj, exists := critMap[cStr]; exists {
+				m[id] = append(m[id], critObj)
 			}
 		}
 	}

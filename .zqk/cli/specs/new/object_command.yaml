@@ -9,15 +9,15 @@ description: |-
     Default: stay on the draft plane (title-only is rarely promote-ready). Pass
     --promote to enqueue background promote.
 
-    Requirement, goal, and milestone mints auto-run workflow gen-trace-pipeline
-    unless --skip-trace-pipeline.
+    Automated scaffold synthesis (gen-trace-pipeline) is disabled by default. Pass
+    --trace-pipeline to auto-scaffold criteria, tests, and backlog items upon minting.
 
     For printable YAML scaffolds (edit offline), use: zqk object template <kind>
 
       Mint a backlog item onto the draft plane
       zqk new object backlog_item --title "Explore draft plane"
       Mint a requirement and scaffold CRIT/TST/BLI
-      zqk new object requirement --title "Description required at CAS"
+      zqk new object requirement --title "Description required at CAS" --trace-pipeline
       Mint and enqueue background promote
       zqk new object agent_task --title "Ready spike" --promote
 args:
@@ -50,7 +50,11 @@ flags:
     - name: skip-trace-pipeline
       type: bool
       default: false
-      description: Do not auto-run workflow gen-trace-pipeline after minting requirement, goal, or milestone
+      description: 'Deprecated: auto-run is disabled by default; trace pipeline is opt-in via --trace-pipeline'
+    - name: trace-pipeline
+      type: bool
+      default: false
+      description: Auto-run workflow gen-trace-pipeline after minting requirement, goal, or milestone (opt-in)
 help:
     examples:
         - comment: Mint a backlog item onto the draft plane

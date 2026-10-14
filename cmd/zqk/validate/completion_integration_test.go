@@ -1,12 +1,14 @@
 package validate
 
 import (
+	"bytes"
 	"context"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/scheduler"
@@ -140,4 +142,69 @@ func TestVerifyCompletionIntegration(t *testing.T) {
 	require.NoError(t, err)
 	reqHash, _ := reqRead[objects.FieldKeyVerificationHash].(string)
 	assert.NotEmpty(t, reqHash, "requirement should have verification_hash")
+
+	// Execute NewVerifyCompletionCmd on backlog_item
+	cmdBli := NewVerifyCompletionCmd()
+	var bufBli bytes.Buffer
+	cmdBli.SetOut(&bufBli)
+	cmdBli.SetErr(&bufBli)
+	baseCtxBli := pkgctx.WithCommandOutputWriter(context.Background(), &bufBli)
+	baseCtxBli = pkgctx.WithSecurityContext(baseCtxBli, secCtx)
+	cmdBli.SetContext(cli.WithStorageProvider(baseCtxBli, fs))
+	initCtx := pkgctx.NewCliInitializationContext(cli.ResolveProjectRoot, ".")
+	cctxBli, err := cli.GetContextFromCommand(cmdBli, initCtx)
+	require.NoError(t, err)
+	cctxBli.ProjectRoot = proj.Root
+	cli.SetContext(cmdBli, cctxBli)
+	cmdBli.SetArgs([]string{bliID})
+	err = cmdBli.Execute()
+	assert.NoError(t, err)
+
+	// Execute NewVerifyCompletionCmd on test_case
+	cmdTc := NewVerifyCompletionCmd()
+	var bufTc bytes.Buffer
+	cmdTc.SetOut(&bufTc)
+	cmdTc.SetErr(&bufTc)
+	baseCtxTc := pkgctx.WithCommandOutputWriter(context.Background(), &bufTc)
+	baseCtxTc = pkgctx.WithSecurityContext(baseCtxTc, secCtx)
+	cmdTc.SetContext(cli.WithStorageProvider(baseCtxTc, fs))
+	cctxTc, err := cli.GetContextFromCommand(cmdTc, initCtx)
+	require.NoError(t, err)
+	cctxTc.ProjectRoot = proj.Root
+	cli.SetContext(cmdTc, cctxTc)
+	cmdTc.SetArgs([]string{tcID})
+	err = cmdTc.Execute()
+	assert.NoError(t, err)
+
+	// Execute NewVerifyCompletionCmd on non-existent object
+	cmdErr := NewVerifyCompletionCmd()
+	var bufErr bytes.Buffer
+	cmdErr.SetOut(&bufErr)
+	cmdErr.SetErr(&bufErr)
+	baseCtxErr := pkgctx.WithCommandOutputWriter(context.Background(), &bufErr)
+	baseCtxErr = pkgctx.WithSecurityContext(baseCtxErr, secCtx)
+	cmdErr.SetContext(cli.WithStorageProvider(baseCtxErr, fs))
+	cctxErr, err := cli.GetContextFromCommand(cmdErr, initCtx)
+	require.NoError(t, err)
+	cctxErr.ProjectRoot = proj.Root
+	cli.SetContext(cmdErr, cctxErr)
+	cmdErr.SetArgs([]string{"DOES-NOT-EXIST"})
+	err = cmdErr.Execute()
+	assert.Error(t, err)
+
+	// Execute NewVerifyCompletionCmd on unsupported kind (goal)
+	cmdGoal := NewVerifyCompletionCmd()
+	var bufGoal bytes.Buffer
+	cmdGoal.SetOut(&bufGoal)
+	cmdGoal.SetErr(&bufGoal)
+	baseCtxGoal := pkgctx.WithCommandOutputWriter(context.Background(), &bufGoal)
+	baseCtxGoal = pkgctx.WithSecurityContext(baseCtxGoal, secCtx)
+	cmdGoal.SetContext(cli.WithStorageProvider(baseCtxGoal, fs))
+	cctxGoal, err := cli.GetContextFromCommand(cmdGoal, initCtx)
+	require.NoError(t, err)
+	cctxGoal.ProjectRoot = proj.Root
+	cli.SetContext(cmdGoal, cctxGoal)
+	cmdGoal.SetArgs([]string{goalID})
+	err = cmdGoal.Execute()
+	assert.Error(t, err)
 }
