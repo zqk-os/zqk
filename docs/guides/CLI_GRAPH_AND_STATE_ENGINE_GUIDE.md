@@ -66,9 +66,9 @@ Renders the complete 5-layer cascade of the active workspace:
 │   └── Mission: Core Mission [MIS-001]
 │       └── Vision: System Vision [VIS-001]
 │           └── Goal: System Quality [GOAL-001]
-│               └── Priority Plan: Cycle 78 [PRI-001] (in_progress)
+│               └── Plan: Cycle 78 [PLAN-001] (in_progress)
 │                   └── Requirement: Conformance [REQ-001]
-│                       └── BLI: Implement Tests [BLI-001] (in_progress)
+│                       └── Work Item: Implement Tests [ITEM-001] (in_progress)
 ```
 - Available in human-readable tree text or structured JSON (`--format json`).
 
