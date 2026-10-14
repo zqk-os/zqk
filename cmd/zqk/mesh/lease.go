@@ -3,14 +3,15 @@ package mesh
 import (
 	"crypto/rand"
 	"fmt"
-	"time"
 
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"time"
 )
 
 // NewLeaseCmd creates the mesh lease command
@@ -23,9 +24,12 @@ func NewLeaseCmd() *cobra.Command {
 func runLease(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		resourceID := args[0]
-		providerRef, _ := cmd.Flags().GetString("from")
-		durationStr, _ := cmd.Flags().GetString("duration")
-		duration, _ := time.ParseDuration(durationStr)
+		var flags clipkg.FlagBag
+		providerRef := flags.String(cmd, "from")
+		duration := flags.Duration(cmd, "duration")
+		if err := flags.Err(); err != nil {
+			return err
+		}
 
 		// Resolve local identity
 		kernelID, err := resolveLocalKernelID(proc.ProjectRoot())
@@ -57,8 +61,7 @@ func runLease(cmd *cobra.Command, args []string) error {
 			return errfmt.Newf("failed to create lease").Wrap(err)
 		}
 
-		_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("✅ Lease established for %s.\nAuthorization Token: %s\n", resourceID, token)))
-		return nil
+		return cli.WriteOutput(cmd, []byte(fmt.Sprintf("✅ Lease established for %s.\nAuthorization Token: %s\n", resourceID, token)))
 	})(cmd, args)
 }
 

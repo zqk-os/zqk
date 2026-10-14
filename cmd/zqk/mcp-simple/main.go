@@ -13,13 +13,42 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-func main() {
-	mtlsAddr := flag.String("mtls-addr", "", "Address to listen on for mTLS (e.g. :8443)")
-	certFile := flag.String("cert", "", "Path to TLS certificate file")
-	keyFile := flag.String("key", "", "Path to TLS key file")
-	caFile := flag.String("ca", "", "Path to CA certificate file")
-	flag.Parse()
+// ServerConfig holds command-line configuration for mcp-simple.
+type ServerConfig struct {
+	MTLSAddr string
+	CertFile string
+	KeyFile  string
+	CAFile   string
+}
 
+// parseServerConfig parses flags from argument slice.
+func parseServerConfig(args []string) (ServerConfig, error) {
+	fs := flag.NewFlagSet("mcp-simple", flag.ContinueOnError)
+	mtlsAddr := fs.String("mtls-addr", "", "Address to listen on for mTLS (e.g. :8443)")
+	certFile := fs.String("cert", "", "Path to TLS certificate file")
+	keyFile := fs.String("key", "", "Path to TLS key file")
+	caFile := fs.String("ca", "", "Path to CA certificate file")
+	if err := fs.Parse(args); err != nil {
+		return ServerConfig{}, err
+	}
+
+	cfg := ServerConfig{
+		MTLSAddr: *mtlsAddr,
+		CertFile: *certFile,
+		KeyFile:  *keyFile,
+		CAFile:   *caFile,
+	}
+
+	if cfg.MTLSAddr != "" {
+		if cfg.CertFile == "" || cfg.KeyFile == "" || cfg.CAFile == "" {
+			return cfg, errors.New("mTLS requires -cert, -key, and -ca flags")
+		}
+	}
+	return cfg, nil
+}
+
+// buildServer constructs and configures a minimal MCP server instance.
+func buildServer(projectRoot string) *mcp.Server {
 	brand.SetExecutableName("zqk")
 	// Create minimal MCP server - no timeout hooks, no CLI tool registration, no complex initialization
 	server := mcp.NewServer()
@@ -42,38 +71,56 @@ func main() {
 	server.SetSecurityContext(secCtx)
 
 	// Set minimal initialization context
-	// Try to find project root by looking for .zqk directory
-	projectRoot := cli.ResolveProjectRoot(".")
 	initCtx := &pkgctx.CliInitializationContext{
 		ProjectRoot: projectRoot,
 	}
 	server.SetCliInitializationContext(initCtx)
+	return server
+}
 
-	if *mtlsAddr != "" {
-		if *certFile == "" || *keyFile == "" || *caFile == "" {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			logging.Fluent(logger).Error("mTLS requires -cert, -key, and -ca flags", errors.New("missing flags")).Log()
-			os.Exit(1)
-		}
-		if err := server.ServeMTLS(*mtlsAddr, *certFile, *keyFile, *caFile); err != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			logging.Fluent(logger).Error("MCP mTLS server error", err).Log()
-			os.Exit(1)
-		}
-	} else {
-		// Start serving - reads from stdin, writes to stdout
-		if err := server.Serve(); err != nil {
-			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-			logging.Fluent(logger).Error("MCP server error", err).Log()
-			os.Exit(1)
-		}
+// serverRunner abstracts the serving interface of mcp.Server for testing.
+type serverRunner interface {
+	Serve() error
+	ServeMTLS(addr, cert, key, ca string) error
+}
+
+// runWithServer runs the server with the given configuration.
+func runWithServer(cfg ServerConfig, server serverRunner) error {
+	if cfg.MTLSAddr != "" {
+		return server.ServeMTLS(cfg.MTLSAddr, cfg.CertFile, cfg.KeyFile, cfg.CAFile)
+	}
+	return server.Serve()
+}
+
+func run(args []string) error {
+	cfg, err := parseServerConfig(args)
+	if err != nil {
+		return err
+	}
+
+	projectRoot := cli.ResolveProjectRoot(".")
+	server := buildServer(projectRoot)
+	return runWithServer(cfg, server)
+}
+
+func main() {
+	if err := run(os.Args[1:]); err != nil {
+		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+		logging.Fluent(logger).Error("MCP server error", err).Log()
+		os.Exit(1)
 	}
 }
 
-// registerMinimalTools registers 1 tool of each type for minimal testing
-// These tools are already handled in server.go's handleToolCallWithContext switch statement
+// registerMinimalTools registers 1 tool of each type for minimal testing.
 func registerMinimalTools(server *mcp.Server) {
-	// 1. Echo tool (test tool)
+	registerEchoTool(server)
+	registerGraphTraversalTool(server)
+	registerObjectListTool(server)
+	registerPriorityPlanTool(server)
+	registerInteractiveCreationTool(server)
+}
+
+func registerEchoTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_test_echo",
 		"Test tool that echoes a message back",
@@ -89,8 +136,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 2. Graph tool (1 of 3 - graph_traversal)
+func registerGraphTraversalTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_graph_traversal",
 		"Perform multi-hop graph traversal starting from a node",
@@ -111,8 +159,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 3. Common tool (1 of 5 - object_list)
+func registerObjectListTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_object_list",
 		"List objects with filtering and pagination",
@@ -133,8 +182,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 4. Workflow tool (1 of 4 - get_current_priority_plan)
+func registerPriorityPlanTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_get_current_priority_plan",
 		"Get the current active priority plan",
@@ -151,8 +201,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 5. Interactive tool (create_object_interactive)
+func registerInteractiveCreationTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_create_object_interactive",
 		"Interactively create an object with guided field collection",
