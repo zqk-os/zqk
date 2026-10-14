@@ -653,4 +653,3 @@ func TestInProcess_RefRemove_Matrix(t *testing.T) {
 		t.Errorf("expected remove all success, got: %s", outAll)
 	}
 }
-
