@@ -236,11 +236,12 @@ Valid kinds usually include: requirement, workstream, goal, technical_spec, stra
 					return fmt.Errorf("failed to resolve kind '%s': %w", obj.Kind, resolveErr)
 				}
 
+				initialStatus := resolveInitialStatusForKind(proc.ProjectRoot(), kind)
 				payload := map[string]any{
 					objects.FieldKeyKind:        kind,
 					objects.FieldKeyTitle:       obj.Title,
 					objects.FieldKeyDescription: obj.Description,
-					objects.FieldKeyStatus:      objects.ObjectStatusPlanned, // Create in planned state to avoid immediate bzzzt
+					objects.FieldKeyStatus:      initialStatus,
 				}
 
 				if err := proc.Storage().Create(ctx, proc.SecurityContext(), payload); err != nil {
@@ -316,4 +317,15 @@ func ValidateAllIntakeObjects(objs []IntakeObject) error {
 	}
 	return fmt.Errorf("fail-closed CAS intake gate rejected %d of %d object(s): %s",
 		len(rejected), len(objs), strings.Join(rejected, "; "))
+}
+
+func resolveInitialStatusForKind(projectRoot, kind string) string {
+	loader := objects.NewLifecycleLoader(projectRoot)
+	if origin, err := loader.GetOriginStatus(kind); err == nil && origin != "" {
+		return origin
+	}
+	if kind == objects.KindBacklogItem {
+		return objects.ObjectStatusPlanned
+	}
+	return "conceptual"
 }
