@@ -124,6 +124,26 @@ func dispatchPeerWake(
 	mcpSubscribersProbed := false
 	mcpIPCDelivered := false
 
+	if res.NonInterrupting {
+		wake = agentfeed.WakePeerOpts(ctx, agentfeed.WakePeerOptions{
+			ProjectRoot:     root,
+			Message:         message,
+			InReplyTo:       res.EventID,
+			FromAgentID:     agentID,
+			DeliveryMode:    res.DeliveryMode,
+			ToAgentID:       toAgentID,
+			NonInterrupting: true,
+			InFlightRePrime: res.InFlightRePrime,
+		})
+		wakePtr = &wake
+		logging.Fluent(logger).Info("feed "+opName+" non-interrupting steering delivered in-flight").
+			String("event_id", res.EventID).
+			String("transport", wake.Transport).
+			Bool("delivery_receipt", wake.DeliveryReceipt).
+			Log()
+		return wakePtr, mcpSubscribers
+	}
+
 	if !zqkenv.IsCommunityEdition && !noWake && agentfeed.ShouldWakePeer(res.DeliveryMode) {
 		if res.DeliveryMode == datacell.DeliveryModeNotify {
 			probe := mcp.ProbeFeedSteerMCPWake(ctx, "", message, agentID, res.EventID, logger)
@@ -160,6 +180,8 @@ func dispatchPeerWake(
 			MCPIPCDelivered:      mcpIPCDelivered,
 			MCPSubscribersProbed: mcpSubscribersProbed,
 			MCPSubscriberCount:   mcpSubscribers,
+			NonInterrupting:      res.NonInterrupting,
+			InFlightRePrime:      res.InFlightRePrime,
 		})
 		wakePtr = &wake
 		if unrepaired, reason, detail := agentfeed.IsUnrepairedWake(wake); unrepaired {
@@ -206,17 +228,25 @@ func formatPeerWakeOutput(
 	if wakePtr != nil && wakePtr.Transport != "" {
 		out["peer_wake_transport"] = wakePtr.Transport
 	}
+	if wakePtr != nil && wakePtr.NonInterrupting {
+		out["non_interrupting"] = true
+	}
+	if res.InFlightRePrime {
+		out["in_flight_reprime"] = true
+	}
 	return cli.FormatOutput(cmd, out)
 }
 
 type peerEventFlags struct {
-	message      string
-	agentID      string
-	feedID       string
-	noAck        bool
-	noWake       bool
-	toAgentID    string
-	awaitPeerAck bool
+	message         string
+	agentID         string
+	feedID          string
+	noAck           bool
+	noWake          bool
+	toAgentID       string
+	awaitPeerAck    bool
+	nonInterrupting bool
+	reprime         bool
 }
 
 func parsePeerEventFlags(cmd *cobra.Command, flags *clipkg.FlagBag) (peerEventFlags, error) {
@@ -228,6 +258,12 @@ func parsePeerEventFlags(cmd *cobra.Command, flags *clipkg.FlagBag) (peerEventFl
 		noWake:       flags.Bool(cmd, "no-wake"),
 		toAgentID:    flags.String(cmd, "to-agent-id"),
 		awaitPeerAck: flags.Bool(cmd, "await-peer-ack"),
+	}
+	if cmd.Flags().Lookup("non-interrupting") != nil {
+		p.nonInterrupting = flags.Bool(cmd, "non-interrupting")
+	}
+	if cmd.Flags().Lookup("reprime") != nil {
+		p.reprime = flags.Bool(cmd, "reprime")
 	}
 	if err := flags.Err(); err != nil {
 		return p, err
