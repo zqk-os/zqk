@@ -18,6 +18,10 @@ import (
 // NewPropagateCmd creates the propagate command from the generated builder.
 func NewPropagateCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewOrganizationalPropagateCommandBuilder()
+	cmd.Flags().String("change", "", "Organizational change object ID")
+	cmd.Flags().String("impact-analysis", "", "Impact analysis object ID (optional, defaults to latest)")
+	cmd.Flags().Bool("confirm", false, "Confirm and apply propagation updates")
+	cmd.Flags().Bool("dry-run", false, "Preview propagation without updating objects")
 	cli.BindAsyncProgress(cmd, runPropagate)
 	return cmd
 }
@@ -25,6 +29,7 @@ func NewPropagateCmd() *cobra.Command {
 func runPropagate(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		changeID, _ := cmd.Flags().GetString("change")
+		impactFlag, _ := cmd.Flags().GetString("impact-analysis")
 		confirm, _ := cmd.Flags().GetBool("confirm")
 		dryRun, _ := cmd.Flags().GetBool("dry-run")
 
@@ -48,7 +53,10 @@ func runPropagate(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("object %s is not an %s (got %s)", changeID, objects.KindOrganizationalChange, kind)
 		}
 
-		impactAnalysisID := getOrCreateImpactAnalysis(ctx, store, secCtx, changeObj, changeID, domainLogger)
+		impactAnalysisID := impactFlag
+		if impactAnalysisID == emptyValue {
+			impactAnalysisID = getOrCreateImpactAnalysis(ctx, store, secCtx, changeObj, changeID, domainLogger)
+		}
 		if impactAnalysisID == emptyValue {
 			return errfmt.Errorf("no impact analysis for change %s; run 'organizational analyze-impact --change %s' first", changeID, changeID)
 		}
@@ -120,6 +128,33 @@ func getOrCreateImpactAnalysis(ctx context.Context, store storage.ObjectStorageP
 			return last
 		}
 	}
+
+	// Since occupancy is child-owned (impact_analysis.change_ref), check for existing impact_analysis by change_ref
+	if res, err := store.List(ctx, secCtx, nil, storage.ListFilter{
+		Kind: objects.KindImpactAnalysis,
+		Filters: map[string]any{
+			objects.FieldKeyChangeRef: changeID,
+		},
+	}); err == nil && res != nil && len(res.Objects) > 0 {
+		if id, ok := res.Objects[len(res.Objects)-1][objects.FieldKeyID].(string); ok && id != emptyValue {
+			return id
+		}
+	}
+
+	// Also check draft plane for impact_analysis objects
+	if fos, ok := store.(interface{ GetProjectRoot() string }); ok {
+		if draftIDs, err := storage.ListObjectDraftPlaneIDs(fos.GetProjectRoot(), objects.KindImpactAnalysis); err == nil {
+			for i := len(draftIDs) - 1; i >= 0; i-- {
+				dID := draftIDs[i]
+				if obj, readErr := store.Read(ctx, secCtx, dID); readErr == nil && obj != nil {
+					if ref, _ := obj[objects.FieldKeyChangeRef].(string); ref == changeID {
+						return dID
+					}
+				}
+			}
+		}
+	}
+
 	domainLogger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	analyzer := orgdomain.NewImpactAnalyzer(storage.NewOrganizationalStorageAdapter(store), domainLogger, secCtx)
 	impactID, err := analyzer.AnalyzeChange(ctx, changeID)

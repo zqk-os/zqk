@@ -61,6 +61,8 @@ func (v *IDValidator) inferPrefixesFromKind(kind string) []string {
 		return []string{"CVS-"}
 	case "agent_feed":
 		return []string{"AGF-"}
+	case "organizational_change":
+		return []string{"OCH-"}
 	}
 
 	// Fallback: try to infer from kind name (backward compatibility)

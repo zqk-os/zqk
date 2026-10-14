@@ -105,3 +105,33 @@ func TestAllowedKindsList_nonEmpty(t *testing.T) {
 		t.Errorf("allowedKindsList should contain organization, got %q", list)
 	}
 }
+
+func TestMarshalUnmarshalOrgSync_JSON(t *testing.T) {
+	t.Parallel()
+	sampleJSON := `[{"id":"ORG-001","kind":"organization","title":"Org 1"},{"id":"DIV-001","kind":"division","title":"Div 1"}]`
+	objs, err := unmarshalOrgSync([]byte(sampleJSON), storage.ExportFormatJSON)
+	if err != nil {
+		t.Fatalf("unmarshalOrgSync JSON failed: %v", err)
+	}
+	if len(objs) != 2 {
+		t.Fatalf("expected 2 objects, got %d", len(objs))
+	}
+
+	data, err := marshalOrgSync(objs, storage.ExportFormatJSON)
+	if err != nil {
+		t.Fatalf("marshalOrgSync JSON failed: %v", err)
+	}
+	if len(data) == 0 {
+		t.Fatal("expected non-empty JSON data")
+	}
+
+	// Single YAML object
+	singleYAML := "id: ORG-003\nkind: organization\ntitle: Single YAML Org\n"
+	singleYAMLObjs, err := unmarshalOrgSync([]byte(singleYAML), storage.ExportFormatYAML)
+	if err != nil {
+		t.Fatalf("unmarshalOrgSync single YAML failed: %v", err)
+	}
+	if len(singleYAMLObjs) != 1 {
+		t.Fatalf("expected 1 object, got %d", len(singleYAMLObjs))
+	}
+}

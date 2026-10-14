@@ -14,6 +14,7 @@ import (
 
 	clctx "github.com/zqk-os/zqk/pkg/cliapp/context"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 type testSettingsYAMLShapeOrg struct {
@@ -152,6 +153,7 @@ func setupIntegrationTestWithSpecsOrganizational(t *testing.T, scenarioName stri
 		t.Fatalf("Setenv TestRoot: %v", err)
 	}
 	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
 		if orig != emptyValue {
 			_ = zqkenv.TestRoot().Set(orig)
 		} else {
