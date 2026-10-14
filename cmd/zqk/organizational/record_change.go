@@ -21,6 +21,13 @@ import (
 // NewRecordChangeCmd creates the record-change command from the generated builder.
 func NewRecordChangeCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewOrganizationalRecordChangeCommandBuilder()
+	cmd.Flags().String("id", "", "ID of the organizational change (OCHG-*)")
+	cmd.Flags().String("change-type", "", "Type of change (restructure, split, merge, etc.)")
+	cmd.Flags().String("title", "", "Title of the change")
+	cmd.Flags().String("description", "", "Description of the change")
+	cmd.Flags().String("affected-objects", "", "Path to YAML/JSON file defining affected objects")
+	cmd.Flags().String("change-date", "", "Date/time of the change (RFC3339)")
+	cmd.Flags().Bool("dry-run", false, "Simulate recording without writing to storage")
 	cli.BindAsyncProgress(cmd, runRecordChange)
 	return cmd
 }
@@ -42,17 +49,20 @@ func runRecordChange(cmd *cobra.Command, args []string) error {
 		if title == emptyValue {
 			title = changeType
 		}
+		if description == emptyValue {
+			description = title
+		}
 
 		obj := map[string]any{
-			objects.FieldKeyID:                 id,
-			objects.FieldKeyKind:               objects.KindOrganizationalChange,
-			objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
-			objects.FieldKeyTitle:              title,
-			objects.FieldKeyStatus:             objects.ObjectStatusProposed,
-			objects.FieldKeyChangeType:         changeType,
-			objects.FieldKeyChangeDescription:  description,
-			objects.FieldKeyAffectedObjects:    map[string]any{},
-			objects.FieldKeyImpactAnalysisRefs: []string{},
+			objects.FieldKeyID:                id,
+			objects.FieldKeyKind:              objects.KindOrganizationalChange,
+			objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
+			objects.FieldKeyTitle:             title,
+			objects.FieldKeyDescription:       description,
+			objects.FieldKeyStatus:            objects.ObjectStatusProposed,
+			objects.FieldKeyChangeType:        changeType,
+			objects.FieldKeyChangeDescription: description,
+			objects.FieldKeyAffectedObjects:   map[string]any{},
 		}
 
 		if changeDateStr != emptyValue {

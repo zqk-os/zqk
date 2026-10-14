@@ -29,6 +29,11 @@ var orgSyncAllowedKinds = map[string]bool{
 // NewSyncCmd creates the organizational sync command from the generated builder.
 func NewSyncCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewOrganizationalSyncCommandBuilder()
+	cmd.Flags().String("file", "", "Path to YAML or JSON file containing organizational structure")
+	cmd.Flags().String("input-format", "yaml", "Input format (yaml or json)")
+	cmd.Flags().String("mode", "upsert", "Sync mode: upsert or create_only")
+	cmd.Flags().Bool("dry-run", false, "Validate file only without writing to storage")
+	cmd.Flags().Bool("continue-on-error", false, "Continue on individual object errors")
 	cli.BindAsyncProgress(cmd, runSync)
 	return cmd
 }
@@ -164,10 +169,18 @@ func unmarshalOrgSync(data []byte, format storage.ExportFormat) ([]map[string]an
 	switch strings.ToLower(string(format)) {
 	case string(storage.ExportFormatYAML), "":
 		if err := yaml.Unmarshal(data, &objects); err != nil {
+			var single map[string]any
+			if singleErr := yaml.Unmarshal(data, &single); singleErr == nil && len(single) > 0 {
+				return []map[string]any{single}, nil
+			}
 			return nil, err
 		}
 	case string(storage.ExportFormatJSON):
 		if err := json.Unmarshal(data, &objects); err != nil {
+			var single map[string]any
+			if singleErr := json.Unmarshal(data, &single); singleErr == nil && len(single) > 0 {
+				return []map[string]any{single}, nil
+			}
 			return nil, err
 		}
 	default:

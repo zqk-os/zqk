@@ -19,6 +19,7 @@ const emptyValue = ""
 // NewAnalyzeImpactCmd creates the analyze-impact command from the generated builder.
 func NewAnalyzeImpactCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewOrganizationalAnalyzeImpactCommandBuilder()
+	cmd.Flags().String("change", "", "Organizational change object ID")
 	cli.BindAsyncProgress(cmd, runAnalyzeImpact)
 	return cmd
 }
