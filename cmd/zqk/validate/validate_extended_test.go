@@ -314,6 +314,14 @@ func TestValidate_Workflow(t *testing.T) {
 
 func TestValidate_Agent(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	t.Cleanup(func() {
+		_ = filepath.Walk(proj.Root, func(path string, info os.FileInfo, err error) error {
+			if err == nil {
+				_ = os.Chmod(path, 0777)
+			}
+			return nil
+		})
+	})
 
 	// Initialize git in proj.Root so git status/diff works cleanly
 	gitInit := execwrap.Command("git", "init")
@@ -730,6 +738,14 @@ pkg/foo/bar.go,yes,yes
 
 func TestValidate_Workflow_FullAdherence(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	t.Cleanup(func() {
+		_ = filepath.Walk(proj.Root, func(path string, info os.FileInfo, err error) error {
+			if err == nil {
+				_ = os.Chmod(path, 0777)
+			}
+			return nil
+		})
+	})
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
