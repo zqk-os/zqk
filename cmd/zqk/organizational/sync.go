@@ -29,7 +29,7 @@ var orgSyncAllowedKinds = map[string]bool{
 // NewSyncCmd creates the organizational sync command from the generated builder.
 func NewSyncCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewOrganizationalSyncCommandBuilder()
-	cmd.Flags().StringP("file", "f", "", "Path to YAML or JSON file containing organizational structure")
+	cmd.Flags().String("file", "", "Path to YAML or JSON file containing organizational structure")
 	cmd.Flags().String("input-format", "yaml", "Input format (yaml or json)")
 	cmd.Flags().String("mode", "upsert", "Sync mode: upsert or create_only")
 	cmd.Flags().Bool("dry-run", false, "Validate file only without writing to storage")
