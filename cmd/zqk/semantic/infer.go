@@ -15,6 +15,8 @@ import (
 // NewInferCmd creates the semantic infer command
 func NewInferCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSemanticInferCommandBuilder()
+	cmd.Flags().Bool("apply", false, "Apply discovered inferences to the knowledge kernel")
+	cmd.Flags().String("session-id", "", "Filter inferences by convergence session ID")
 	cmd.Args = cobra.NoArgs
 	cmd.RunE = runInfer
 	return cmd
@@ -22,16 +24,19 @@ func NewInferCmd() *cobra.Command {
 
 func runInfer(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-
 		projectRoot := proc.ProjectRoot()
 		if projectRoot == emptyValue {
 			return errfmt.Errorf("project root not found")
 		}
 
-		apply, _ := cmd.Flags().GetBool("apply")
-		sessionID, _ := cmd.Flags().GetString("session-id")
+		apply, err := cmd.Flags().GetBool("apply")
+		if err != nil {
+			return errfmt.Newf("failed to get apply flag").Wrap(err)
+		}
+		sessionID, err := cmd.Flags().GetString("session-id")
+		if err != nil {
+			return errfmt.Newf("failed to get session-id flag").Wrap(err)
+		}
 
 		// 1. Maturity Assessment
 		assessment, err := runMaturityAssessment(projectRoot)
@@ -106,13 +111,13 @@ func outputInferences(cmd *cobra.Command, inferences []map[string]any) error {
 		return cli.FormatOutput(cmd, inferences)
 	default:
 		var out strings.Builder
-		_, _ = fmt.Fprintln(&out, "Strategic Inferences & Proposed Backlog Items")
-		_, _ = fmt.Fprintln(&out, "=============================================")
+		out.WriteString("Strategic Inferences & Proposed Backlog Items\n")
+		out.WriteString("=============================================\n")
 		for _, inf := range inferences {
-			_, _ = fmt.Fprintf(&out, "- [%s] %s\n", inf[objects.FieldKeyPriorityTier], inf[objects.FieldKeyTitle])
-			_, _ = fmt.Fprintf(&out, "  Description: %s\n\n", inf[objects.FieldKeyDescription])
+			out.WriteString(fmt.Sprintf("- [%s] %s\n", inf[objects.FieldKeyPriorityTier], inf[objects.FieldKeyTitle]))
+			out.WriteString(fmt.Sprintf("  Description: %s\n\n", inf[objects.FieldKeyDescription]))
 		}
-		_, _ = fmt.Fprintln(&out, "Use --apply to create these items in the Knowledge Kernel.")
+		out.WriteString("Use --apply to create these items in the Knowledge Kernel.\n")
 		return cli.WriteOutput(cmd, []byte(out.String()))
 	}
 }
