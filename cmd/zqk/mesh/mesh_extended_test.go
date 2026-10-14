@@ -153,13 +153,18 @@ func TestLeaseCmd_ZeroDuration(t *testing.T) {
 	assert.Contains(t, out, "Lease established for sandbox-01")
 }
 
+func executeMarketQuery(t *testing.T, proj testkit.IsolatedTempProject, args []string) string {
+	t.Helper()
+	cmd := NewMarketCmd()
+	out, err := executeMeshCmd(t, proj, cmd, args)
+	require.NoError(t, err)
+	return out
+}
+
 func TestMarketCmd_Empty(t *testing.T) {
 	proj := setupMeshTestProject(t)
 
-	cmd := NewMarketCmd()
-	out, err := executeMeshCmd(t, proj, cmd, []string{})
-
-	require.NoError(t, err)
+	out := executeMarketQuery(t, proj, []string{})
 	assert.Contains(t, out, "No resources currently advertised in the mesh market")
 }
 
@@ -208,10 +213,7 @@ func TestMarketCmd_WithAdvertisements(t *testing.T) {
 	require.NoError(t, proj.FileStorage.Create(ctx, secCtx, item3))
 
 	// Run market query without filter
-	cmd := NewMarketCmd()
-	out, err := executeMeshCmd(t, proj, cmd, []string{})
-
-	require.NoError(t, err)
+	out := executeMarketQuery(t, proj, []string{})
 	assert.Contains(t, out, "SOVEREIGN MESH MARKETPLACE")
 	assert.Contains(t, out, "compute")
 	assert.Contains(t, out, "4.5 cores")
@@ -223,10 +225,7 @@ func TestMarketCmd_WithAdvertisements(t *testing.T) {
 	assert.Contains(t, out, "vol-nvme-01")
 
 	// Run market query with --type compute filter
-	cmdFiltered := NewMarketCmd()
-	outFiltered, err := executeMeshCmd(t, proj, cmdFiltered, []string{"--type", "compute"})
-
-	require.NoError(t, err)
+	outFiltered := executeMarketQuery(t, proj, []string{"--type", "compute"})
 	assert.Contains(t, outFiltered, "compute")
 	assert.NotContains(t, outFiltered, "agent_seat")
 	assert.NotContains(t, outFiltered, "vol-nvme-01")

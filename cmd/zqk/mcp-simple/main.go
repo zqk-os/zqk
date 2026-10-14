@@ -111,10 +111,16 @@ func main() {
 	}
 }
 
-// registerMinimalTools registers 1 tool of each type for minimal testing
-// These tools are already handled in server.go's handleToolCallWithContext switch statement
+// registerMinimalTools registers 1 tool of each type for minimal testing.
 func registerMinimalTools(server *mcp.Server) {
-	// 1. Echo tool (test tool)
+	registerEchoTool(server)
+	registerGraphTraversalTool(server)
+	registerObjectListTool(server)
+	registerPriorityPlanTool(server)
+	registerInteractiveCreationTool(server)
+}
+
+func registerEchoTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_test_echo",
 		"Test tool that echoes a message back",
@@ -130,8 +136,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 2. Graph tool (1 of 3 - graph_traversal)
+func registerGraphTraversalTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_graph_traversal",
 		"Perform multi-hop graph traversal starting from a node",
@@ -152,8 +159,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 3. Common tool (1 of 5 - object_list)
+func registerObjectListTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_object_list",
 		"List objects with filtering and pagination",
@@ -174,8 +182,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 4. Workflow tool (1 of 4 - get_current_priority_plan)
+func registerPriorityPlanTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_get_current_priority_plan",
 		"Get the current active priority plan",
@@ -192,8 +201,9 @@ func registerMinimalTools(server *mcp.Server) {
 		},
 		nil,
 	)
+}
 
-	// 5. Interactive tool (create_object_interactive)
+func registerInteractiveCreationTool(server *mcp.Server) {
 	server.RegisterTool(
 		"zqk_create_object_interactive",
 		"Interactively create an object with guided field collection",
