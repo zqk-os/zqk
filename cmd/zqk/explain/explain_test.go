@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/zqk-os/zqk/pkg/acronyms"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/testkit"
@@ -106,7 +107,8 @@ func TestExplainCmd_DynamicGlossaryTermDiscovery(t *testing.T) {
 
 // TestExplainCmd_NegativeBoundary proves CRIT-1790814939731526000-641cda96 (Boundary & Error Handling).
 func TestExplainCmd_NegativeBoundary(t *testing.T) {
-	_ = testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	assert.NotNil(t, proj)
 
 	cmd := NewExplainCmd()
 	cmd.SetArgs([]string{"NONEXISTENT"})
