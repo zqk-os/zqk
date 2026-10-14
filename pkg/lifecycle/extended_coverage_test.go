@@ -159,6 +159,7 @@ func TestLifecycleEventWAL_Full(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewLifecycleEventWAL failed: %v", err)
 	}
+	defer wal.Close()
 
 	if wal.Path() == "" || wal.CheckpointPath() == "" {
 		t.Errorf("expected non-empty paths from wal")
@@ -710,6 +711,10 @@ func TestListenerUpdaterRegistry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewLifecycleEventWAL failed: %v", err)
 	}
+	defer func() {
+		_ = wal.Close()
+		_ = CloseLifecycleWAL(dir)
+	}()
 
 	mock := newMockStorageProvider()
 	getStorage := func(string) (storage.ObjectStorageProvider, bool) {
@@ -952,6 +957,9 @@ func TestDependencyPropagation_FullShockwaveAndSubscriber(t *testing.T) {
 	ch := make(chan TransitionRequest)
 	close(ch)
 	wal, _ := NewLifecycleEventWAL(dir)
+	if wal != nil {
+		defer wal.Close()
+	}
 	l := NewListener(dir, wal, DefaultTransitionRules(), ch, getStorage)
 	_ = l.Run(canceledCtx)
 
@@ -1044,6 +1052,7 @@ func TestLifecycle_PushOver80Percent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewLifecycleEventWAL failed: %v", err)
 	}
+	defer wal.Close()
 	_ = wal.Append(&LifecycleEvent{
 		EventType:   EventTypeCriterionSatisfied,
 		CriterionID: criterionAllBacklogComplete,
