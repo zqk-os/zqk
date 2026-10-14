@@ -41,6 +41,6 @@ func TestStartSupervisedAccumulators(t *testing.T) {
 	}
 
 	cancel()
-	time.Sleep(30 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 	_ = lifecycle.CloseLifecycleWAL(tempDir)
 }
