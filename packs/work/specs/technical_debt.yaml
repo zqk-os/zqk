@@ -79,7 +79,7 @@ fields:
       default: null
       dependencies: none
       observability: "yes"
-      origin_lifecycle: immutable
+      origin_lifecycle: mutable
       purpose: Type of technical debt (complexity, performance, maintainability, infrastructure, tooling, process, documentation, testing, security, observability)
       security: non-sensitive
       system_usage:
@@ -89,7 +89,7 @@ fields:
         - reporting
       validation: Must be one of defined debt types
     field_profile_code: TDE-001
-    permissions: r-x
+    permissions: rwx
     semantic_type: statement
     traits:
       - filterable

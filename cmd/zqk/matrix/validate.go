@@ -11,6 +11,9 @@ import (
 // NewMatrixValidateCmd wires the generated validate spec builder to RunE.
 func NewMatrixValidateCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixValidateCommandBuilder()
+	c.Flags().String("name", "", "Matrix alias from matrix_registry.yaml")
+	c.Flags().String("registry", "", "Path to matrix_registry.yaml")
+	cli.AddCommonFlags(c)
 	c.RunE = runMatrixValidate
 	return c
 }

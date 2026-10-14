@@ -137,6 +137,12 @@ func NewMatrixCmd() *cobra.Command {
 // NewMatrixReportCmd wires the generated spec builder to RunE.
 func NewMatrixReportCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixReportCommandBuilder()
+	c.Flags().String("name", "", "Matrix alias from matrix_registry.yaml")
+	c.Flags().String("registry", "", "Path to matrix_registry.yaml")
+	c.Flags().String("matrix", "", "Direct path to matrix CSV")
+	c.Flags().String("profile", "", "Direct path to profile YAML")
+	c.Flags().Bool("go-only", false, "Only rows whose file_path ends with .go")
+	cli.AddCommonFlags(c)
 	c.RunE = runMatrixReport
 	return c
 }
@@ -144,6 +150,8 @@ func NewMatrixReportCmd() *cobra.Command {
 // NewMatrixListCmd wires the generated list spec builder to RunE.
 func NewMatrixListCmd() *cobra.Command {
 	c := bldr_cli_cmd_v1.NewMatrixListCommandBuilder()
+	c.Flags().String("registry", "", "Path to matrix_registry.yaml")
+	cli.AddCommonFlags(c)
 	c.RunE = runMatrixList
 	return c
 }
