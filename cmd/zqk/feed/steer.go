@@ -31,13 +31,15 @@ func runFeedSteer(cmd *cobra.Command, _ []string) error {
 		}
 
 		res, err := agentfeed.AppendEvent(agentfeed.AppendEventInput{
-			ProjectRoot: root,
-			Message:     p.message,
-			AgentID:     p.agentID,
-			ToAgentID:   p.toAgentID,
-			Sender:      agentfeed.FeedSenderHumanSteer,
-			EventType:   agentfeed.FeedEventTypeSteering,
-			SelfACK:     !p.noAck,
+			ProjectRoot:     root,
+			Message:         p.message,
+			AgentID:         p.agentID,
+			ToAgentID:       p.toAgentID,
+			Sender:          agentfeed.FeedSenderHumanSteer,
+			EventType:       agentfeed.FeedEventTypeSteering,
+			SelfACK:         !p.noAck,
+			NonInterrupting: p.nonInterrupting,
+			InFlightRePrime: p.reprime,
 		})
 		if err != nil {
 			return errfmt.Newf("feed steer").Wrap(err)
