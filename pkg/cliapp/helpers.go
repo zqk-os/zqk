@@ -23,7 +23,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/outputtypes"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // contextRegistry stores context for commands using command pointer as key
@@ -442,12 +441,7 @@ func formatOutputWithPermissionChecker(cmd *cobra.Command, format OutputFormat, 
 			ctx = pkgctx.NewSystemContext()
 		}
 
-		// Get writer (stdout or stderr based on MCP mode)
-		var writer io.Writer = os.Stdout
-		if zqkenv.MCPAccountID().Get() != emptyValue {
-			writer = os.Stderr
-		}
-
+		writer := CommandOutputWriter(cmd, ctx)
 		return handler.Stream(ctx, data, writer)
 	}
 

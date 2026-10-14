@@ -38,20 +38,16 @@ func NewUICmd() *cobra.Command {
 				server := studio.NewServer(projectRoot)
 
 				if cmd.Flags().Changed("port") {
-					// User explicitly requested this port: fail with helpful guidance if bound
-					addr := fmt.Sprintf("127.0.0.1:%d", port)
-					err = server.Start(addr)
-					if err != nil {
+					if err := server.Start(fmt.Sprintf("127.0.0.1:%d", port)); err != nil {
 						return fmt.Errorf("port %d is already in use. Specify a different port with: %s ui -w --port <port> (or -p <port>): %w", port, brand.ExecutableName(), err)
 					}
 				} else {
-					// Default port: try 8080, and if in use, auto-fallback to next available ports (8081-8095)
 					for p := port; p <= port+15; p++ {
-						addr := fmt.Sprintf("127.0.0.1:%d", p)
-						err = server.Start(addr)
-						if err == nil {
+						if err = server.Start(fmt.Sprintf("127.0.0.1:%d", p)); err == nil {
 							if p != port {
-								_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, p)))
+								if err := cli.WriteOutput(cmd, []byte(fmt.Sprintf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, p))); err != nil {
+									return err
+								}
 							}
 							break
 						}
@@ -61,10 +57,12 @@ func NewUICmd() *cobra.Command {
 					}
 				}
 
-				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("⚡ ZQK Knowledge Kernel Visual Studio running at http://%s (Press Ctrl+C to stop)\n", server.Addr())))
-				sigCh := make(chan os.Signal, 1)
-				signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-				<-sigCh
+				if err := cli.WriteOutput(cmd, []byte(fmt.Sprintf("⚡ ZQK Knowledge Kernel Visual Studio running at http://%s (Press Ctrl+C to stop)\n", server.Addr()))); err != nil {
+					return err
+				}
+				sigCtx, sigCancel := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
+				defer sigCancel()
+				<-sigCtx.Done()
 				return server.Shutdown(proc.OperationContext())
 			}
 
@@ -75,7 +73,10 @@ func NewUICmd() *cobra.Command {
 			sec := pkgctx.NewSystemSecurityContext()
 			sp := proc.Storage()
 
-			format := proc.Format()
+			format := cli.GetFormat(cmd)
+			if format == cli.FormatTable && proc != nil && proc.Format() != "" && proc.Format() != cli.FormatTable {
+				format = proc.Format()
+			}
 			if format == cli.FormatJSON || format == cli.FormatJSONL || format == cli.FormatYAML {
 				m := tui.NewUIModel(projectRoot, tab)
 				m.RefreshMutations()
