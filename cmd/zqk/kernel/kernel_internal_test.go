@@ -39,13 +39,15 @@ func TestSystemHygieneProvider(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+type planContext = storage.StorageContext
+
 type mockPlanStorage struct {
 	storage.ObjectStorageProvider
 	res *storage.QueryResult
 	err error
 }
 
-func (m *mockPlanStorage) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *storage.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+func (m *mockPlanStorage) List(ctx context.Context, secCtx *pkgctx.SecurityContext, sCtx *planContext, filter storage.ListFilter) (*storage.QueryResult, error) {
 	if m.err != nil {
 		return nil, m.err
 	}

@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	clitool "github.com/zqk-os/zqk/pkg/cli"
@@ -79,7 +80,7 @@ func TestMatrixValidateFailure(t *testing.T) {
 
 	// Delete profile to cause validation failure
 	profilePath := filepath.Join(projRoot, "docs", "quality", "profile.yaml")
-	_ = fileutil.Remove(profilePath)
+	require.NoError(t, fileutil.Remove(profilePath))
 
 	_, err := executeMatrixCmd(t, []string{"validate"})
 	assert.Error(t, err)
@@ -261,11 +262,17 @@ func TestMatrixUpdateExecution(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestValidateCvsIDsReadable(t *testing.T) {
+func prepareIsolatedMatrixUpdateCmd(t *testing.T) *cobra.Command {
+	t.Helper()
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	cmd := NewMatrixUpdateCmd()
 	cmd.SetContext(context.Background())
 	cli.SetContext(cmd, cli.ContextForProjectRoot(proj.Root))
+	return cmd
+}
+
+func TestValidateCvsIDsReadable(t *testing.T) {
+	cmd := prepareIsolatedMatrixUpdateCmd(t)
 
 	// Empty IDs returns nil
 	err := validateCvsIDsReadable(cmd, nil)
@@ -277,10 +284,7 @@ func TestValidateCvsIDsReadable(t *testing.T) {
 }
 
 func TestAppendMatrixCvsActivityErrors(t *testing.T) {
-	proj := testkit.PrepareIsolatedTempProject(t, nil)
-	cmd := NewMatrixUpdateCmd()
-	cmd.SetContext(context.Background())
-	cli.SetContext(cmd, cli.ContextForProjectRoot(proj.Root))
+	cmd := prepareIsolatedMatrixUpdateCmd(t)
 
 	// Empty session IDs
 	_, err := appendMatrixCvsActivity(cmd, "t", "m.csv", false, 0, nil, nil, "", nil, nil)

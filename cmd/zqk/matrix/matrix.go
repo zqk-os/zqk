@@ -91,10 +91,14 @@ func resolveMatrixFromCmd(cmd *cobra.Command) (string, quality.MatrixResolution,
 	if err != nil {
 		return "", quality.MatrixResolution{}, err
 	}
-	name, _ := cmd.Flags().GetString("name")
-	registryFlag, _ := cmd.Flags().GetString("registry")
-	matrixPath, _ := cmd.Flags().GetString("matrix")
-	profilePath, _ := cmd.Flags().GetString("profile")
+	var flags clipkg.FlagBag
+	name := flags.String(cmd, "name")
+	registryFlag := flags.String(cmd, "registry")
+	matrixPath := flags.String(cmd, "matrix")
+	profilePath := flags.String(cmd, "profile")
+	if err := flags.Err(); err != nil {
+		return projectRoot, quality.MatrixResolution{}, err
+	}
 	resolved, err := quality.ResolveMatrixForCLI(projectRoot, name, registryFlag, matrixPath, profilePath)
 	if err != nil {
 		return projectRoot, quality.MatrixResolution{}, err
