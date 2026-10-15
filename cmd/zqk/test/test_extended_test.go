@@ -3,9 +3,6 @@ package test
 import (
 	"bytes"
 	"context"
-	"path/filepath"
-	"strings"
-	"testing"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -13,6 +10,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
+	"path/filepath"
+	"strings"
+	"testing"
 )
 
 func findModuleRootForTestPkg() (string, error) {
@@ -928,8 +928,3 @@ func TestBindCmd_ErrorsAndValidation(t *testing.T) {
 		t.Fatalf("expected binding assistant execution, got err: %v", err)
 	}
 }
-
-
-
-
-
