@@ -18,7 +18,7 @@ const (
 	testCreatePlan  = "BEGIN; UPSERT priority_plan { id: 'PRI-DELETE-001', title: 'To Delete', priority_tier: 'P1', status: 'originated' }; COMMIT;"
 )
 
-func setupMutateTestProject(t *testing.T) (string, string) {
+func initMutateTestEnv(t *testing.T) string {
 	t.Helper()
 	tmpDir := t.TempDir()
 	t.Cleanup(func() {
@@ -28,6 +28,12 @@ func setupMutateTestProject(t *testing.T) (string, string) {
 		}
 	})
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+	return tmpDir
+}
+
+func setupMutateTestProject(t *testing.T) string {
+	t.Helper()
+	tmpDir := initMutateTestEnv(t)
 
 	repoRoot, err := findModuleRoot()
 	require.NoError(t, err)
@@ -38,7 +44,7 @@ func setupMutateTestProject(t *testing.T) (string, string) {
 	copySpecErr := testenvroot.CopyObjectSpecsFromProject(tmpDir, repoRoot)
 	require.NoError(t, copySpecErr)
 
-	return tmpDir, repoRoot
+	return tmpDir
 }
 
 func executeMutateScript(t *testing.T, stdinContent string, args ...string) (string, error) {
@@ -56,14 +62,7 @@ func executeMutateScript(t *testing.T, stdinContent string, args ...string) (str
 }
 
 func TestMutateCmd_StdinInput(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Cleanup(func() {
-		cleanupErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil))
-		if cleanupErr != nil {
-			t.Logf("cleanup teardown notice: %v", cleanupErr)
-		}
-	})
-	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+	initMutateTestEnv(t)
 
 	t.Run("stdin_via_file_dash", func(t *testing.T) {
 		out, err := executeMutateScript(t, testValidScript, "-f", "-", "--dry-run", "--format", "json")
@@ -79,14 +78,7 @@ func TestMutateCmd_StdinInput(t *testing.T) {
 }
 
 func TestMutateCmd_MissingAndInvalidScripts(t *testing.T) {
-	tmpDir := t.TempDir()
-	t.Cleanup(func() {
-		cleanupErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(tmpDir, nil))
-		if cleanupErr != nil {
-			t.Logf("cleanup teardown notice: %v", cleanupErr)
-		}
-	})
-	t.Setenv("ZQK_TEST_ROOT", tmpDir)
+	initMutateTestEnv(t)
 
 	t.Run("no_script_provided", func(t *testing.T) {
 		_, err := executeMutateScript(t, "")
@@ -108,7 +100,8 @@ func TestMutateCmd_MissingAndInvalidScripts(t *testing.T) {
 }
 
 func TestMutateCmd_DeletePersistenceAndTableFormat(t *testing.T) {
-	_, _ = setupMutateTestProject(t)
+	testRoot := setupMutateTestProject(t)
+	require.NotEmpty(t, testRoot)
 
 	// Step 1: Create object
 	createOut, createErr := executeMutateScript(t, "", testCreatePlan, "--format", "table")
