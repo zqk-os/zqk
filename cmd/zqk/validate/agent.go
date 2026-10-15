@@ -153,7 +153,7 @@ func RunValidateAgent(cmd *cobra.Command, args []string, proc *cli.Processor) er
 	cmd.Println("✅ Validation analysis complete.")
 	cmd.Println(paths.RewriteCanonicalCLIInvocations("⏳ Queueing zqk test discover for kernel test_case refresh..."))
 	exe, err := fileutil.Executable()
-	if err == nil {
+	if err == nil && !zqkenv.IsInTest() {
 		disc := execwrap.Command(exe, "test", "discover")
 		disc.Dir = projectRoot
 		if err := disc.Start(); err == nil {

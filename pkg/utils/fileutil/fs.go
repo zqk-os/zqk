@@ -70,208 +70,190 @@ func IsExist(err error) bool { return os.IsExist(err) }
 
 func IsPermission(err error) bool { return os.IsPermission(err) }
 
+// prepareSafePath validates that path does not contain unsafe flag injections,
+// and returns the cleaned path if non-empty, preserving empty paths for stdlib error semantics.
+func prepareSafePath(path string) (string, error) {
+	if err := ValidateSafePath(path); err != nil {
+		return "", err
+	}
+	if path != "" {
+		return filepath.Clean(path), nil
+	}
+	return "", nil
+}
+
+// prepareSafeMutationPath validates safety, cleans the path, and verifies test-time repo mutation safety.
+func prepareSafeMutationPath(path string) (string, error) {
+	cleanPath, err := prepareSafePath(path)
+	if err != nil {
+		return "", err
+	}
+	guardRepoMutation(cleanPath)
+	return cleanPath, nil
+}
+
 func WriteFile(name string, data []byte, perm FileMode) error {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafeMutationPath(name)
+	if err != nil {
 		return err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	guardRepoMutation(name)
 	t0 := nowIfMetricsEnabled()
-	err := os.WriteFile(name, data, perm)
+	err = os.WriteFile(safePath, data, perm)
 	var n int64
 	if err == nil {
 		n = int64(len(data))
 	}
-	recordIOOp(OpWrite, name, n, t0, err)
+	recordIOOp(OpWrite, safePath, n, t0, err)
 	return err
 }
 
 func Mkdir(path string, perm FileMode) error {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafeMutationPath(path)
+	if err != nil {
 		return err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
-	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
-	err := os.Mkdir(path, perm)
-	recordIOOp(OpMkdir, path, 0, t0, err)
+	err = os.Mkdir(safePath, perm)
+	recordIOOp(OpMkdir, safePath, 0, t0, err)
 	return err
 }
 
 func MkdirAll(path string, perm FileMode) error {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafePath(path)
+	if err != nil {
 		return err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
-	info, err := os.Stat(path)
+	info, err := os.Stat(safePath)
 	if err == nil && info.IsDir() {
 		return nil
 	}
-	guardRepoMutation(path)
+	guardRepoMutation(safePath)
 	t0 := nowIfMetricsEnabled()
-	err = os.MkdirAll(path, perm)
-	recordIOOp(OpMkdir, path, 0, t0, err)
+	err = os.MkdirAll(safePath, perm)
+	recordIOOp(OpMkdir, safePath, 0, t0, err)
 	return err
 }
 
 func MkdirTemp(dir, pattern string) (string, error) {
 	if dir != "" {
-		if err := ValidateSafePath(dir); err != nil {
+		var err error
+		dir, err = prepareSafeMutationPath(dir)
+		if err != nil {
 			return "", err
 		}
-		dir = filepath.Clean(dir)
-		guardRepoMutation(dir)
 	}
 	return os.MkdirTemp(dir, pattern)
 }
 
 func CreateTemp(dir, pattern string) (*File, error) {
 	if dir != "" {
-		if err := ValidateSafePath(dir); err != nil {
+		var err error
+		dir, err = prepareSafeMutationPath(dir)
+		if err != nil {
 			return nil, err
 		}
-		dir = filepath.Clean(dir)
-		guardRepoMutation(dir)
 	}
 	return os.CreateTemp(dir, pattern)
 }
 
 func Create(name string) (*File, error) {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafeMutationPath(name)
+	if err != nil {
 		return nil, err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	guardRepoMutation(name)
-	return os.Create(name) //nolint:gosec
+	return os.Create(safePath) //nolint:gosec
 }
 
 func Chmod(name string, mode FileMode) error {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafeMutationPath(name)
+	if err != nil {
 		return err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	guardRepoMutation(name)
-	return os.Chmod(name, mode)
+	return os.Chmod(safePath, mode)
 }
 
 func Chtimes(name string, atime, mtime time.Time) error {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafeMutationPath(name)
+	if err != nil {
 		return err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	guardRepoMutation(name)
-	return os.Chtimes(name, atime, mtime)
+	return os.Chtimes(safePath, atime, mtime)
 }
 
 func Truncate(name string, size int64) error {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafeMutationPath(name)
+	if err != nil {
 		return err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	guardRepoMutation(name)
-	return os.Truncate(name, size)
+	return os.Truncate(safePath, size)
 }
 
 func Link(oldname, newname string) error {
-	if err := ValidateSafePath(oldname); err != nil {
+	safeOld, err := prepareSafePath(oldname)
+	if err != nil {
 		return err
 	}
-	if err := ValidateSafePath(newname); err != nil {
+	safeNew, err := prepareSafeMutationPath(newname)
+	if err != nil {
 		return err
 	}
-	if oldname != "" {
-		oldname = filepath.Clean(oldname)
-	}
-	if newname != "" {
-		newname = filepath.Clean(newname)
-	}
-	guardRepoMutation(newname)
-	return os.Link(oldname, newname)
+	return os.Link(safeOld, safeNew)
 }
 
 func Symlink(oldname, newname string) error {
-	if err := ValidateSafePath(newname); err != nil {
+	safeNew, err := prepareSafeMutationPath(newname)
+	if err != nil {
 		return err
 	}
-	if newname != "" {
-		newname = filepath.Clean(newname)
-	}
-	guardRepoMutation(newname)
-	return os.Symlink(oldname, newname)
+	return os.Symlink(oldname, safeNew)
 }
 
 func Readlink(name string) (string, error) {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafePath(name)
+	if err != nil {
 		return "", err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	return os.Readlink(name)
+	return os.Readlink(safePath)
 }
 
 func Open(name string) (*File, error) {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafePath(name)
+	if err != nil {
 		return nil, err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
-	return os.Open(name) //nolint:gosec
+	return os.Open(safePath) //nolint:gosec
 }
 
 func OpenFile(name string, flag int, perm FileMode) (*File, error) {
-	if err := ValidateSafePath(name); err != nil {
+	safePath, err := prepareSafePath(name)
+	if err != nil {
 		return nil, err
 	}
-	if name != "" {
-		name = filepath.Clean(name)
-	}
 	if flag&writeOpenFlags() != 0 {
-		guardRepoMutation(name)
+		guardRepoMutation(safePath)
 	}
-	return os.OpenFile(name, flag, perm) //nolint:gosec
+	return os.OpenFile(safePath, flag, perm) //nolint:gosec
 }
 
 func Remove(path string) error {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafeMutationPath(path)
+	if err != nil {
 		return err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
-	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
-	err := os.Remove(path)
-	recordIOOp(OpRemove, path, 0, t0, err)
+	err = os.Remove(safePath)
+	recordIOOp(OpRemove, safePath, 0, t0, err)
 	return err
 }
 
 func RemoveAll(path string) error {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafeMutationPath(path)
+	if err != nil {
 		return err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
-	guardRepoMutation(path)
 	t0 := nowIfMetricsEnabled()
-	err := os.RemoveAll(path)
-	recordIOOp(OpRemove, path, 0, t0, err)
+	err = os.RemoveAll(safePath)
+	recordIOOp(OpRemove, safePath, 0, t0, err)
 	return err
 }
 
@@ -284,79 +266,65 @@ func RemoveFileIfExists(path string) error {
 }
 
 func Rename(oldPath, newPath string) error {
-	if err := ValidateSafePath(oldPath); err != nil {
+	safeOld, err := prepareSafeMutationPath(oldPath)
+	if err != nil {
 		return err
 	}
-	if err := ValidateSafePath(newPath); err != nil {
+	safeNew, err := prepareSafeMutationPath(newPath)
+	if err != nil {
 		return err
 	}
-	if oldPath != "" {
-		oldPath = filepath.Clean(oldPath)
-	}
-	if newPath != "" {
-		newPath = filepath.Clean(newPath)
-	}
-	guardRepoMutation(oldPath)
-	guardRepoMutation(newPath)
 	t0 := nowIfMetricsEnabled()
-	err := os.Rename(oldPath, newPath)
-	recordIOOp(OpRename, newPath, 0, t0, err)
+	err = os.Rename(safeOld, safeNew)
+	recordIOOp(OpRename, safeNew, 0, t0, err)
 	return err
 }
 
 func Lstat(path string) (FileInfo, error) {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafePath(path)
+	if err != nil {
 		return nil, err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
 	t0 := nowIfMetricsEnabled()
-	fi, err := os.Lstat(path)
-	recordIOOp(OpStat, path, 0, t0, err)
+	fi, err := os.Lstat(safePath)
+	recordIOOp(OpStat, safePath, 0, t0, err)
 	return fi, err
 }
 
 func Stat(path string) (FileInfo, error) {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafePath(path)
+	if err != nil {
 		return nil, err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
 	t0 := nowIfMetricsEnabled()
-	fi, err := os.Stat(path)
-	recordIOOp(OpStat, path, 0, t0, err)
+	fi, err := os.Stat(safePath)
+	recordIOOp(OpStat, safePath, 0, t0, err)
 	return fi, err
 }
 
 func ReadFile(path string) ([]byte, error) {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafePath(path)
+	if err != nil {
 		return nil, err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
 	t0 := nowIfMetricsEnabled()
-	data, err := os.ReadFile(path) //nolint:gosec
+	data, err := os.ReadFile(safePath) //nolint:gosec
 	var n int64
 	if err == nil {
 		n = int64(len(data))
 	}
-	recordIOOp(OpRead, path, n, t0, err)
+	recordIOOp(OpRead, safePath, n, t0, err)
 	return data, err
 }
 
 func ReadDir(path string) ([]DirEntry, error) {
-	if err := ValidateSafePath(path); err != nil {
+	safePath, err := prepareSafePath(path)
+	if err != nil {
 		return nil, err
 	}
-	if path != "" {
-		path = filepath.Clean(path)
-	}
 	t0 := nowIfMetricsEnabled()
-	entries, err := os.ReadDir(path)
-	recordIOOp(OpReadDir, path, 0, t0, err)
+	entries, err := os.ReadDir(safePath)
+	recordIOOp(OpReadDir, safePath, 0, t0, err)
 	return entries, err
 }
 
