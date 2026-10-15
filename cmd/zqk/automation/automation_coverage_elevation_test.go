@@ -421,5 +421,3 @@ func TestLintBypassCoordination_Helpers(t *testing.T) {
 	assert.Equal(t, 5, minInt(20, 5))
 	assert.Equal(t, 7, minInt(7, 7))
 }
-
-
