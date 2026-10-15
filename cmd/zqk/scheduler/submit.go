@@ -109,6 +109,9 @@ func ensureSubmitFlags(cmd *cobra.Command) {
 }
 
 func runSubmit(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		return errfmt.Errorf("requires at least 1 command argument")
+	}
 	submitCtx, cancel := context.WithTimeout(pkgctx.NewSystemContext(), 30*time.Second)
 	defer cancel()
 
@@ -133,9 +136,13 @@ func runSubmit(cmd *cobra.Command, args []string) error {
 	case <-submitCtx.Done():
 		diagnosticsDir := zqkenv.DiagnosticsDir().Get()
 		if diagnosticsDir == emptyValue {
-			projectRoot := cli.ResolveProjectRoot(".")
-			if projectRoot == emptyValue && cliCtx != nil {
+			projectRoot := emptyValue
+			if cliCtx != nil && cliCtx.ProjectRoot != emptyValue {
 				projectRoot = cliCtx.ProjectRoot
+			} else if cmd != nil {
+				if r, err := cli.ResolveCommandProjectRoot(cmd); err == nil && r != emptyValue {
+					projectRoot = r
+				}
 			}
 			if projectRoot != emptyValue {
 				diagnosticsDir = filepath.Join(projectRoot, paths.ProjectDataDir, "diagnostics")
@@ -166,6 +173,9 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	// Parse command and arguments
+	if len(args) == 0 {
+		return errfmt.Errorf("requires at least 1 command argument")
+	}
 	command := args[0]
 	commandArgs := args[1:]
 

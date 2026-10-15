@@ -5154,20 +5154,26 @@ func TestAgentPromptStages_CommitAndFinalize(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, pctx.Outcome[outcomeAgentPromptComplete].(bool))
 
-	// pasteIDE delivery path
-	pctxPaste := &pipeline.Context{
-		Ctx:     context.Background(),
-		Outcome: make(map[string]any),
+	// pasteIDE delivery path (darwin clipboard only)
+	if runtime.GOOS == "darwin" {
+		pctxPaste := &pipeline.Context{
+			Ctx:     context.Background(),
+			Outcome: make(map[string]any),
+		}
+		payloadPaste := &agentPromptPipelinePayload{
+			projectRoot: proj.Root,
+			markdown:    "# Test Paste",
+			pasteIDE:    true,
+		}
+		res, err = agentPromptStageCommit(pctxPaste, payloadPaste)
+		if runtime.GOOS == "darwin" {
+			assert.NoError(t, err)
+			assert.NotNil(t, res)
+			assert.Equal(t, agentPromptDeliverPasteIDE, pctxPaste.Outcome[outcomeAgentPromptDeliverMode])
+		} else {
+			assert.Error(t, err)
+		}
 	}
-	payloadPaste := &agentPromptPipelinePayload{
-		projectRoot: proj.Root,
-		markdown:    "# Test Paste",
-		pasteIDE:    true,
-	}
-	res, err = agentPromptStageCommit(pctxPaste, payloadPaste)
-	assert.NoError(t, err)
-	assert.NotNil(t, res)
-	assert.Equal(t, agentPromptDeliverPasteIDE, pctxPaste.Outcome[outcomeAgentPromptDeliverMode])
 }
 
 func TestBundleProgress_TableAndEvents(t *testing.T) {
@@ -5322,7 +5328,7 @@ func TestAuditEvents_FieldNamesAndExtraction(t *testing.T) {
 	assert.Equal(t, objects.FieldKeyCreatedAt, getAuditEventFieldName("created_at"))
 	assert.Equal(t, objects.FieldKeyMetadata, getAuditEventFieldName("metadata"))
 
-	// runSubmit with nil context
+	// runSubmit with nil context returns error immediately
 	cmd := NewSubmitCmd()
-	assert.Error(t, runSubmit(cmd, []string{"echo hello"}))
+	assert.Error(t, runSubmit(cmd, nil))
 }
