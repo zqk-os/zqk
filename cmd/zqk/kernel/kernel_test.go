@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/kernel"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestKernelCommandStructure(t *testing.T) {
@@ -33,7 +34,11 @@ func TestKernelCommandStructure(t *testing.T) {
 
 func TestKernelStewardSweepExecution(t *testing.T) {
 	cmd := kernel.NewKernelCmd()
-	cli.SetContext(cmd, cli.ContextForProjectRoot(t.TempDir()))
+	testRoot := t.TempDir()
+	t.Cleanup(func() {
+		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
+	})
+	cli.SetContext(cmd, cli.ContextForProjectRoot(testRoot))
 	cmd.SetArgs([]string{"steward", "sweep"})
 	err := cmd.ExecuteContext(context.Background())
 	assert.NoError(t, err)
