@@ -10,7 +10,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
@@ -70,23 +69,28 @@ func formatLinkedBacklogAcceptanceSection(p *cli.Processor, cvs map[string]any) 
 		fmt.Fprintf(&b, "- **Backlog id:** `%s`\n", refID)
 
 		rawAC, ok := obj[objects.FieldKeyCriteriaRefs]
-		if !ok {
+		if !ok || rawAC == nil {
 			b.WriteString("- **Criteria:** *(none)*\n\n")
 			continue
 		}
-		rawAC, ok = nildecode.DecodeNonNilPayload[any](rawAC)
-		if !ok {
-			b.WriteString("- **Criteria:** *(none)*\n\n")
-			continue
+		var items []string
+		switch v := rawAC.(type) {
+		case []string:
+			items = v
+		case []any:
+			for _, it := range v {
+				if s, ok := it.(string); ok {
+					items = append(items, s)
+				}
+			}
 		}
-		list, ok := rawAC.([]any)
-		if !ok || len(list) == 0 {
+		if len(items) == 0 {
 			b.WriteString("- **Criteria:** *(none)*\n\n")
 			continue
 		}
 
 		b.WriteString("- **Criteria:**\n")
-		for _, item := range list {
+		for _, item := range items {
 			line := acceptanceCriteriaMarkdownLine(p, item, log, globalHints)
 			if line != "" {
 				b.WriteString(line)
@@ -197,24 +201,29 @@ func backlogItemRefsFromCVS(cvs map[string]any) []string {
 	if !ok || raw == nil {
 		return nil
 	}
-	raw, ok = nildecode.DecodeNonNilPayload[any](raw)
-	if !ok {
-		return nil
-	}
-	list, ok := raw.([]any)
-	if !ok {
-		return nil
-	}
-	var out []string
-	for _, it := range list {
-		if s, ok := it.(string); ok {
+	switch v := raw.(type) {
+	case []string:
+		var out []string
+		for _, s := range v {
 			s = strings.TrimSpace(s)
 			if s != emptyValue {
 				out = append(out, s)
 			}
 		}
+		return out
+	case []any:
+		var out []string
+		for _, it := range v {
+			if s, ok := it.(string); ok {
+				s = strings.TrimSpace(s)
+				if s != emptyValue {
+					out = append(out, s)
+				}
+			}
+		}
+		return out
 	}
-	return out
+	return nil
 }
 
 func isCriteriaRefToken(s string) bool {

@@ -46,9 +46,11 @@ func NewServiceCmd() *cobra.Command {
 
 func requireSchedulerServiceControl(cmd *cobra.Command) error {
 	// Privilege: host unit install/enable/start/stop require the system account or admin.
-	if sec := pkgctx.GetSecurityContext(cmd.Context()); sec != nil {
-		if sec.AccountID == pkgctx.SystemAccountID || slices.Contains(sec.Roles, "admin") {
-			return nil
+	if cmd != nil && cmd.Context() != nil {
+		if sec := pkgctx.GetSecurityContext(cmd.Context()); sec != nil {
+			if sec.AccountID == pkgctx.SystemAccountID || slices.Contains(sec.Roles, "admin") {
+				return nil
+			}
 		}
 	}
 	if zqkenv.APIKey().Get() == pkgctx.SystemAccountID {

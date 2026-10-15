@@ -100,6 +100,12 @@ func ensureSubmitFlags(cmd *cobra.Command) {
 	if f.Lookup("description") == nil {
 		f.String("description", "", "Job description (default: auto-generated)")
 	}
+	if f.Lookup("id") == nil {
+		f.String("id", "", "Job ID (default: auto-generated)")
+	}
+	if f.Lookup("execution-mode") == nil {
+		f.String("execution-mode", submitExecutionModeOneTime, "Execution mode (one_time, recurrent)")
+	}
 }
 
 func runSubmit(cmd *cobra.Command, args []string) error {
@@ -190,7 +196,14 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 	// Use nanosecond resolution so concurrent CLI processes cannot overwrite a
 	// submission merely because they started within the same wall-clock second.
 	now := time.Now().UTC()
-	jobID := newSubmitJobID(now)
+	jobID, _ := cmd.Flags().GetString("id")
+	if jobID == emptyValue {
+		jobID = newSubmitJobID(now)
+	}
+	executionMode, _ := cmd.Flags().GetString("execution-mode")
+	if executionMode == emptyValue {
+		executionMode = submitExecutionModeOneTime
+	}
 
 	// Generate title and description if not provided
 	if title == emptyValue {
@@ -224,7 +237,7 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 		objects.FieldKeyTriggerType:       schedulerTriggerImmediate,
 		objects.FieldKeyCategory:          schedulerpkg.CategoryManual,
 		objects.FieldKeyPriority:          schedulerpkg.JobPriorityHigh,
-		objects.FieldKeyExecutionMode:     submitExecutionModeOneTime,
+		objects.FieldKeyExecutionMode:     executionMode,
 		objects.FieldKeyMaxRuntimeSeconds: timeout,
 		objects.FieldKeyEnabled:           true,
 		objects.FieldKeyTitle:             title,
@@ -271,11 +284,9 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 		if executionMode == submitExecutionModeOneTime {
 			// Update the existing job: reset enabled, revive archived→active, update timestamps/command
 			updates := map[string]any{
-				objects.FieldKeyEnabled:   true,
-				objects.FieldKeyStatus:    submitStatusActive,
-				objects.FieldKeyPriority:  schedulerpkg.JobPriorityHigh,
-				objects.FieldKeyUpdatedAt: now.Format(time.RFC3339),
-				objects.FieldKeyUpdatedBy: submitSystemAccountID,
+				objects.FieldKeyEnabled:  true,
+				objects.FieldKeyStatus:   submitStatusActive,
+				objects.FieldKeyPriority: schedulerpkg.JobPriorityHigh,
 			}
 
 			// Update command/args if provided (allows re-running with different commands)

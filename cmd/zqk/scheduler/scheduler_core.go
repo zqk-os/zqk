@@ -607,7 +607,7 @@ func startScheduler(ctx *cli.Context, cmd *cobra.Command) error {
 		interruptCtx = pkgctx.NewSystemContext()
 	}
 	if runtime.GOOS != schedulerGOOSWindows {
-		sigCtx, stopSignal := signal.NotifyContext(pkgctx.NewSystemContext(), os.Interrupt, syscall.SIGTERM)
+		sigCtx, stopSignal := signal.NotifyContext(interruptCtx, os.Interrupt, syscall.SIGTERM)
 		defer stopSignal()
 		interruptCtx = sigCtx
 	}

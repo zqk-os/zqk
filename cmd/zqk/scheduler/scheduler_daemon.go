@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -63,8 +64,12 @@ func startDetachedSchedulerDaemonProcess(execCmd *exec.Cmd) error {
 // attachSchedulerDaemonStdioToDevNull sets stdout/stderr to os.DevNull copies so the child never inherits
 // the parent's terminal or pipe fds. Inheriting a blocked pipe/socket can strand new zqk processes in
 // _dyld_start (vm_object lock cascade on macOS); see cmd/zqk/app/root.go watchdog comments.
-func attachSchedulerDaemonStdioToDevNull(execCmd *exec.Cmd) (func(), error) {
-	dupOut, err := fileutil.OpenAppend(filepath.Join(paths.ProjectDataDir, "daemon_crash.log"))
+func attachSchedulerDaemonStdioToDevNull(execCmd *exec.Cmd, projectRoot string) (func(), error) {
+	crashLogPath := filepath.Join(paths.ProjectDataDir, "daemon_crash.log")
+	if projectRoot != emptyValue {
+		crashLogPath = filepath.Join(projectRoot, paths.ProjectDataDir, "daemon_crash.log")
+	}
+	dupOut, err := fileutil.OpenAppend(crashLogPath)
 	if err != nil {
 		return nil, errfmt.Errorf("open daemon_crash.log for scheduler daemon stdout/stderr: %w", err)
 	}
@@ -156,9 +161,13 @@ func startSchedulerInBackground(ctx *cli.Context, cmd *cobra.Command) error {
 
 	// Give child time to start and write PID file.
 	// 2 seconds allows for slow initialization under memory pressure or heavy CPU load.
+	cmdCtx := context.Background()
+	if cmd != nil && cmd.Context() != nil {
+		cmdCtx = cmd.Context()
+	}
 	select {
-	case <-cmd.Context().Done():
-		return cmd.Context().Err()
+	case <-cmdCtx.Done():
+		return cmdCtx.Err()
 	case <-time.After(2 * time.Second):
 	}
 	running, pid, errRunningCheck := schedulerpkg.IsSchedulerRunning(projectRoot)
@@ -285,7 +294,7 @@ func configureSchedulerDaemonExec(execCmd *exec.Cmd, projectRoot, contextLabel s
 		return nil, errfmt.Errorf(schedulerErrOpenFmt, fileutil.DevNull, err)
 	}
 	execCmd.Stdin = devNull
-	closeDup, err := attachSchedulerDaemonStdioToDevNull(execCmd)
+	closeDup, err := attachSchedulerDaemonStdioToDevNull(execCmd, projectRoot)
 	if err != nil {
 		_ = devNull.Close() //nolint:errcheck // best-effort cleanup on error path
 		return nil, err
