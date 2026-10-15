@@ -97,6 +97,9 @@ func WriteFile(name string, data []byte, perm FileMode) error {
 	if err != nil {
 		return err
 	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
+	}
 	t0 := nowIfMetricsEnabled()
 	err = os.WriteFile(safePath, data, perm)
 	var n int64
@@ -111,6 +114,9 @@ func Mkdir(path string, perm FileMode) error {
 	safePath, err := prepareSafeMutationPath(path)
 	if err != nil {
 		return err
+	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
 	}
 	t0 := nowIfMetricsEnabled()
 	err = os.Mkdir(safePath, perm)
@@ -141,6 +147,7 @@ func MkdirTemp(dir, pattern string) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		dir = filepath.Clean(dir)
 	}
 	return os.MkdirTemp(dir, pattern)
 }
@@ -152,6 +159,7 @@ func CreateTemp(dir, pattern string) (*File, error) {
 		if err != nil {
 			return nil, err
 		}
+		dir = filepath.Clean(dir)
 	}
 	return os.CreateTemp(dir, pattern)
 }
@@ -160,6 +168,9 @@ func Create(name string) (*File, error) {
 	safePath, err := prepareSafeMutationPath(name)
 	if err != nil {
 		return nil, err
+	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
 	}
 	return os.Create(safePath) //nolint:gosec
 }
@@ -221,6 +232,9 @@ func Open(name string) (*File, error) {
 	if err != nil {
 		return nil, err
 	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
+	}
 	return os.Open(safePath) //nolint:gosec
 }
 
@@ -228,6 +242,9 @@ func OpenFile(name string, flag int, perm FileMode) (*File, error) {
 	safePath, err := prepareSafePath(name)
 	if err != nil {
 		return nil, err
+	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
 	}
 	if flag&writeOpenFlags() != 0 {
 		guardRepoMutation(safePath)
@@ -306,6 +323,9 @@ func ReadFile(path string) ([]byte, error) {
 	safePath, err := prepareSafePath(path)
 	if err != nil {
 		return nil, err
+	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
 	}
 	t0 := nowIfMetricsEnabled()
 	data, err := os.ReadFile(safePath) //nolint:gosec
