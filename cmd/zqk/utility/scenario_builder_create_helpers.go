@@ -131,14 +131,11 @@ func (sb *ScenarioBuilder) createNewScenario(ctx context.Context, scenarioName, 
 
 // updateScenarioOnConflict updates scenario when create fails due to conflict
 func (sb *ScenarioBuilder) updateScenarioOnConflict(ctx context.Context, scenarioName, scenarioID string) error {
-	now := zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ)
 	updates := map[string]any{
 		objects.FieldKeyTitle:                fmt.Sprintf("Test Scenario: %s", scenarioName),
 		objects.FieldKeyDescription:          fmt.Sprintf("Test scenario for %s", scenarioName),
 		objects.FieldKeyObjective:            fmt.Sprintf("Automated test scenario for %s", scenarioName),
 		objects.FieldKeyDataGenerationConfig: sb.buildDataGenerationConfig(),
-		objects.FieldKeyUpdatedAt:            now,
-		objects.FieldKeyUpdatedBy:            scenarioBuilderAccountSystem,
 	}
 	if err := sb.storage.Update(ctx, sb.secCtx, scenarioID, updates); err != nil {
 		return errfmt.Newf("failed to update scenario object").Wrap(err)
@@ -151,11 +148,8 @@ func (sb *ScenarioBuilder) updateScenarioOnConflict(ctx context.Context, scenari
 
 // updateExistingScenario updates an existing scenario object
 func (sb *ScenarioBuilder) updateExistingScenario(ctx context.Context, existingScenario map[string]any) error {
-	now := zqktime.NowLayoutUTC(zqktime.LayoutObjectDateTimeZ)
 	updates := map[string]any{
 		objects.FieldKeyDataGenerationConfig: sb.buildDataGenerationConfig(),
-		objects.FieldKeyUpdatedAt:            now,
-		objects.FieldKeyUpdatedBy:            scenarioBuilderAccountSystem,
 	}
 	scenarioID := existingScenario[objects.FieldKeyID].(string)
 	if err := sb.storage.Update(ctx, sb.secCtx, scenarioID, updates); err != nil {

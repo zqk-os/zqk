@@ -284,6 +284,7 @@ func (sb *ScenarioBuilder) updateReferences(ctx context.Context, idMapping map[s
 		}
 
 		updated := false
+		updates := make(map[string]any)
 		// Update reference fields
 		for key, value := range obj {
 			keyLower := strings.ToLower(key)
@@ -293,23 +294,25 @@ func (sb *ScenarioBuilder) updateReferences(ctx context.Context, idMapping map[s
 					switch val := value.(type) {
 					case string:
 						if mappedID, exists := idMapping[val]; exists {
-							obj[key] = mappedID
+							updates[key] = mappedID
 							updated = true
 						}
 					case []any:
 						listValue := val
 						// Handle list of references
 						updatedList := false
-						for i, item := range listValue {
+						newList := make([]any, len(listValue))
+						copy(newList, listValue)
+						for i, item := range newList {
 							if strItem, ok := item.(string); ok {
 								if mappedID, exists := idMapping[strItem]; exists {
-									listValue[i] = mappedID
+									newList[i] = mappedID
 									updatedList = true
 								}
 							}
 						}
 						if updatedList {
-							obj[key] = listValue
+							updates[key] = newList
 							updated = true
 						}
 					}
@@ -320,7 +323,7 @@ func (sb *ScenarioBuilder) updateReferences(ctx context.Context, idMapping map[s
 
 		// Update object if references were changed
 		if updated {
-			if err := sb.storage.Update(ctx, sb.secCtx, newID, obj); err != nil {
+			if err := sb.storage.Update(ctx, sb.secCtx, newID, updates); err != nil {
 				logging.FluentEvent(sb.logger).Warn("Failed to update references in object").
 					String("object_id", newID).
 					WithError(err).

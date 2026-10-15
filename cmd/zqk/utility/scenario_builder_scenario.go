@@ -64,14 +64,18 @@ func (sb *ScenarioBuilder) LoadFromScenarioObject(ctx context.Context, scenarioI
 
 // findScenarioByName finds a scenario object by name (title or ID)
 func (sb *ScenarioBuilder) findScenarioByName(ctx context.Context, scenarioName string) (string, error) {
+	// Check by ID directly first
+	if existing, err := sb.storage.Read(ctx, sb.secCtx, scenarioName); err == nil && existing != nil {
+		if id, ok := existing[objects.FieldKeyID].(string); ok && id != emptyValue {
+			return id, nil
+		}
+	}
+
 	// Try to list scenarios and find by title
 	storageCtx := pkgctx.NewStorageContext()
 	filter := storage.ListFilter{
-		Kind: objects.KindScenario,
-		Filters: map[string]any{
-			objects.FieldKeyTitle: map[string]any{"$contains": scenarioName},
-		},
-		Limit: 10,
+		Kind:  objects.KindScenario,
+		Limit: 50,
 	}
 
 	result, err := sb.storage.List(ctx, sb.secCtx, storageCtx, filter)

@@ -658,7 +658,6 @@ func TestReferenceExistsMemoized(t *testing.T) {
 
 // TestVerifyReferencedObjectsExistMemoized tests reference validation with memoized cache
 func TestVerifyReferencedObjectsExistMemoized(t *testing.T) {
-	t.Parallel()
 	tmpDir := t.TempDir()
 	processDir := datacell.ProcessPrimaryDir(tmpDir)
 	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
