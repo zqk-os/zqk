@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -13,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/spf13/cobra"
 )
 
 func findModuleRootForTestPkg() (string, error) {
@@ -53,15 +56,26 @@ func setupTestProject(t *testing.T) (string, func()) {
 	return testRoot, cleanup
 }
 
+func newTestCommandBuffer(cmd *cobra.Command) *bytes.Buffer {
+	var buf bytes.Buffer
+	prepareTestCmd(cmd, &buf)
+	return &buf
+}
+
+func prepareTestCmd(cmd *cobra.Command, buf *bytes.Buffer) {
+	buf.Reset()
+	cmd.SetOut(buf)
+	cmd.SetErr(buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), buf))
+}
+
 func TestCheckContaminationCmd_Execution(t *testing.T) {
 	testRoot, cleanup := setupTestProject(t)
 	defer cleanup()
 
 	// 1. Missing command error
 	cmd := NewCheckContaminationCmd()
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	buf := newTestCommandBuffer(cmd)
 	cmd.SetArgs([]string{})
 	err := cmd.Execute()
 	if err == nil || !strings.Contains(err.Error(), "specify command to run") {
@@ -69,19 +83,15 @@ func TestCheckContaminationCmd_Execution(t *testing.T) {
 	}
 
 	// 2. Successful contamination check with --command flag
-	buf.Reset()
 	cmd = NewCheckContaminationCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--command", "echo test-run", "--plane", filepath.Join(testRoot, paths.ProcessDir)})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("expected successful contamination check, got err: %v", err)
 	}
 	// 3. Command execution failure
-	buf.Reset()
 	cmd = NewCheckContaminationCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--command", "sh -c 'exit 1'", "--plane", filepath.Join(testRoot, paths.ProcessDir)})
 	err = cmd.Execute()
 	if err == nil || !strings.Contains(err.Error(), "command failed with exit code 1") {
@@ -89,10 +99,8 @@ func TestCheckContaminationCmd_Execution(t *testing.T) {
 	}
 
 	// 4. Schema contamination detected
-	buf.Reset()
 	cmd = NewCheckContaminationCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	planeDir := filepath.Join(testRoot, "schema_plane_test")
 	if err := fileutil.EnsureDir(planeDir); err != nil {
 		t.Fatalf("ensure dir: %v", err)
@@ -105,6 +113,14 @@ func TestCheckContaminationCmd_Execution(t *testing.T) {
 	if !strings.Contains(buf.String(), "TEST CONTAMINATION") {
 		t.Errorf("expected TEST CONTAMINATION in output, got: %s", buf.String())
 	}
+
+	// 5. Positional arguments command
+	cmd = NewCheckContaminationCmd()
+	prepareTestCmd(cmd, buf)
+	cmd.SetArgs([]string{"--plane", filepath.Join(testRoot, paths.ProcessDir), "echo", "zero-contamination"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("expected success with positional command, got: %v", err)
+	}
 }
 
 func TestIdentifyParallelCmd_Execution(t *testing.T) {
@@ -113,39 +129,31 @@ func TestIdentifyParallelCmd_Execution(t *testing.T) {
 
 	// 1. Basic scan with safe-only
 	cmd := NewIdentifyParallelCmd()
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	buf := newTestCommandBuffer(cmd)
 	cmd.SetArgs([]string{"--path", ".", "--safe-only"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel safe-only failed: %v", err)
 	}
 
 	// 2. Scan with unsafe-only
-	buf.Reset()
 	cmd = NewIdentifyParallelCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--path", ".", "--unsafe-only"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel unsafe-only failed: %v", err)
 	}
 
 	// 3. Scan with json format
-	buf.Reset()
 	cmd = NewIdentifyParallelCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--path", ".", "--format", "json"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel json format failed: %v", err)
 	}
 
 	// 4. Scan with default text format (summary reporting)
-	buf.Reset()
 	cmd = NewIdentifyParallelCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{".", "--safe-only=false", "--unsafe-only=false"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel default format failed: %v", err)
@@ -155,8 +163,8 @@ func TestIdentifyParallelCmd_Execution(t *testing.T) {
 	}
 }
 
-func TestRunCmd_EdgeCases(t *testing.T) {
-	testRoot, cleanup := setupTestProject(t)
+func TestRunCmd_ValidationErrors(t *testing.T) {
+	_, cleanup := setupTestProject(t)
 	defer cleanup()
 
 	// 1. No IDs and not --all
@@ -194,8 +202,12 @@ func TestRunCmd_EdgeCases(t *testing.T) {
 	if !strings.Contains(buf.String(), "No active test cases found to run") {
 		t.Errorf("expected 'No active test cases found to run', got: %s", buf.String())
 	}
+}
 
-	// 4. --dry-run with a test case
+func TestRunCmd_DryRunAndExecution(t *testing.T) {
+	testRoot, cleanup := setupTestProject(t)
+	defer cleanup()
+
 	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
 	factory, err := storage.NewStorageFactory(stdctx, testRoot)
 	if err != nil {
@@ -235,8 +247,8 @@ func TestRunCmd_EdgeCases(t *testing.T) {
 		t.Fatalf("update test case with criterion: %v", err)
 	}
 
-	buf.Reset()
-	cmd = NewRunCmd()
+	var buf bytes.Buffer
+	cmd := NewRunCmd()
 	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
@@ -248,7 +260,6 @@ func TestRunCmd_EdgeCases(t *testing.T) {
 		t.Errorf("expected Executing Test Case in output, got: %s", buf.String())
 	}
 
-	// 5. --all --dry-run with active test cases
 	buf.Reset()
 	cmd = NewRunCmd()
 	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
@@ -303,7 +314,7 @@ func TestBindCmd_HelpersAndEdgeCases(t *testing.T) {
 	}
 }
 
-func TestBindCmd_Execution(t *testing.T) {
+func TestBindCmd_ExplicitBinding(t *testing.T) {
 	testRoot, cleanup := setupTestProject(t)
 	defer cleanup()
 
@@ -315,7 +326,6 @@ func TestBindCmd_Execution(t *testing.T) {
 	sp := factory.GetStorage()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
-	// Seed a test case, requirement, and goal
 	tcID := "TST-TEST-BIND-001"
 	reqID := "REQ-TEST-BIND-001"
 	goalID := "GOAL-TEST-BIND-001"
@@ -381,8 +391,21 @@ func TestBindCmd_Execution(t *testing.T) {
 	if !strings.Contains(buf.String(), "Lineage updated successfully") {
 		t.Errorf("expected Lineage updated successfully, got: %s", buf.String())
 	}
+}
 
-	// 3. Display binding assistant with broken test cases
+func TestBindCmd_AssistantAndAutoBinding(t *testing.T) {
+	testRoot, cleanup := setupTestProject(t)
+	defer cleanup()
+
+	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
+	factory, err := storage.NewStorageFactory(stdctx, testRoot)
+	if err != nil {
+		t.Fatalf("NewStorageFactory: %v", err)
+	}
+	sp := factory.GetStorage()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	// Display binding assistant with broken test cases
 	tcBrokenID := "TST-BROKEN-001"
 	tcBrokenObj := map[string]any{
 		objects.FieldKeyID:            tcBrokenID,
@@ -396,8 +419,30 @@ func TestBindCmd_Execution(t *testing.T) {
 		t.Fatalf("create broken test case: %v", err)
 	}
 
-	buf.Reset()
-	cmd = NewBindCmd()
+	reqAutoID := "REQ-AUTO-001"
+	reqAutoObj := map[string]any{
+		objects.FieldKeyID:            reqAutoID,
+		objects.FieldKeyKind:          objects.KindRequirement,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeyTitle:         "Broken Test Case Requirement",
+		objects.FieldKeyDescription:   "Requirement for broken test case auto binding",
+	}
+	_ = sp.Create(stdctx, secCtx, reqAutoObj)
+
+	goalAutoID := "GOAL-AUTO-001"
+	goalAutoObj := map[string]any{
+		objects.FieldKeyID:            goalAutoID,
+		objects.FieldKeyKind:          objects.KindGoal,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeyTitle:         "Broken Test Case Goal",
+		objects.FieldKeyDescription:   "Goal for broken test case auto binding",
+	}
+	_ = sp.Create(stdctx, secCtx, goalAutoObj)
+
+	cmd := NewBindCmd()
+	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
 	cmd.SetArgs([]string{})
@@ -405,7 +450,7 @@ func TestBindCmd_Execution(t *testing.T) {
 		t.Fatalf("assistant display failed: %v", err)
 	}
 
-	// 4. Auto binding dry run
+	// Auto binding dry run
 	buf.Reset()
 	cmd = NewBindCmd()
 	cmd.SetOut(&buf)
@@ -415,7 +460,7 @@ func TestBindCmd_Execution(t *testing.T) {
 		t.Fatalf("auto dry run failed: %v", err)
 	}
 
-	// 5. Auto binding real execution
+	// Auto binding real execution
 	buf.Reset()
 	cmd = NewBindCmd()
 	cmd.SetOut(&buf)
@@ -528,6 +573,9 @@ func TestDashboardState_InternalHelpers(t *testing.T) {
 	if err == nil {
 		_ = WarmLiteFile(stdctx, testRoot, factory.GetStorage())
 	}
+	_ = state.Name()
+	_ = state.ApplyEvent(&lifecycle.LifecycleEvent{EventType: lifecycle.EventTypeCriterionSatisfied, CriterionID: "CRIT-1"})
+	_ = state.BuildPayload()
 }
 
 func TestStreamCmd_Properties(t *testing.T) {
@@ -553,11 +601,33 @@ func TestStreamCmd_Execution(t *testing.T) {
 	_, cleanup := setupTestProject(t)
 	defer cleanup()
 
+	// 1. With flags
 	cmd := NewStreamCmd()
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
 	cmd.SetArgs([]string{"--pkg", "./pkg/errfmt/...", "--parallel", "1", "--test-timeout", "10s"})
+	_ = cmd.Execute()
+
+	// 2. With positional arg
+	buf.Reset()
+	cmd = NewStreamCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{"./pkg/errfmt/..."})
+	_ = cmd.Execute()
+
+	// 3. Nonexistent package error path
+	buf.Reset()
+	cmd = NewStreamCmd()
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{"./pkg/nonexistent_xyz/..."})
+	_ = cmd.Execute()
+
+	// 4. Invalid timeout flag error
+	cmd = NewStreamCmd()
+	cmd.SetArgs([]string{"--test-timeout", "invalid_dur"})
 	_ = cmd.Execute()
 }
 
@@ -625,20 +695,8 @@ func TestRunCmd_Extended(t *testing.T) {
 	_ = cmd.Execute()
 }
 
-func TestDashboardState_HydrationAndEnrichment(t *testing.T) {
-	testRoot, cleanup := setupTestProject(t)
-	defer cleanup()
-
-	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
-	factory, err := storage.NewStorageFactory(stdctx, testRoot)
-	if err != nil {
-		t.Fatalf("StorageFactory error: %v", err)
-	}
-	sp := factory.GetStorage()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	ctx := context.Background()
-
-	// Seed objects in storage
+func seedDashboardTestObjects(t *testing.T, sp storage.ObjectStorageProvider, stdctx context.Context, secCtx *pkgctx.SecurityContext) (string, string) {
+	t.Helper()
 	goalID := "GOAL-1792024710618118000-TEST001"
 	reqID := "REQ-1792024710618118000-TEST001"
 	critID := "CRIT-1792024710618118000-TEST001"
@@ -716,6 +774,23 @@ func TestDashboardState_HydrationAndEnrichment(t *testing.T) {
 	if err := sp.Create(stdctx, secCtx, tcObj); err != nil {
 		t.Fatalf("create tc failed: %v", err)
 	}
+	return tcID, critID
+}
+
+func TestDashboardState_HydrationAndEnrichment(t *testing.T) {
+	testRoot, cleanup := setupTestProject(t)
+	defer cleanup()
+
+	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
+	factory, err := storage.NewStorageFactory(stdctx, testRoot)
+	if err != nil {
+		t.Fatalf("StorageFactory error: %v", err)
+	}
+	sp := factory.GetStorage()
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := context.Background()
+
+	tcID, _ := seedDashboardTestObjects(t, sp, stdctx, secCtx)
 
 	state := NewDashboardState()
 	state.projectRoot = testRoot
@@ -745,7 +820,6 @@ func TestDashboardState_HydrationAndEnrichment(t *testing.T) {
 		t.Errorf("expected non-nil lineage after refresh")
 	}
 
-	// Test displayBindingAssistant
 	cmd := NewBindCmd()
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
@@ -761,47 +835,41 @@ func TestIdentifyParallelCmd_FlagsAndFormats(t *testing.T) {
 
 	// 1. JSON format
 	cmd := NewIdentifyParallelCmd()
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	buf := newTestCommandBuffer(cmd)
 	cmd.SetArgs([]string{"--format", "json", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel --format json failed: %v", err)
 	}
 
 	// 2. YAML format
-	buf.Reset()
 	cmd = NewIdentifyParallelCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--format", "yaml", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel --format yaml failed: %v", err)
 	}
 
 	// 3. Safe-only flag
-	buf.Reset()
 	cmd = NewIdentifyParallelCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--safe-only", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel --safe-only failed: %v", err)
 	}
 
 	// 4. Unsafe-only flag
-	buf.Reset()
 	cmd = NewIdentifyParallelCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
-	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--unsafe-only", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("identify-parallel --unsafe-only failed: %v", err)
 	}
+
+	// 5. Audit cmd/zqk/test to exercise formatted safety printer
+	cmd = NewIdentifyParallelCmd()
+	prepareTestCmd(cmd, buf)
+	cmd.SetArgs([]string{"cmd/zqk/test"})
+	_ = cmd.Execute()
 }
 
 func TestDiscoverCmd_FlagsAndFormats(t *testing.T) {
@@ -810,39 +878,31 @@ func TestDiscoverCmd_FlagsAndFormats(t *testing.T) {
 
 	// 1. Format JSON
 	cmd := NewDiscoverCmd()
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	buf := newTestCommandBuffer(cmd)
 	cmd.SetArgs([]string{"--format", "json", "--lang", "go", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("discover --format json failed: %v", err)
 	}
 
 	// 2. Format YAML
-	buf.Reset()
 	cmd = NewDiscoverCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--format", "yaml", "--lang", "go", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("discover --format yaml failed: %v", err)
 	}
 
 	// 3. Verbose and dry-run
-	buf.Reset()
 	cmd = NewDiscoverCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--verbose", "--dry-run", "--sync", "."})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("discover --verbose --dry-run failed: %v", err)
 	}
 
 	// 4. Absolute path handling
-	buf.Reset()
 	cmd = NewDiscoverCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{testRoot})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("discover with absolute path failed: %v", err)
@@ -855,9 +915,7 @@ func TestDashboardCmd_WatchAndDoDModes(t *testing.T) {
 
 	// 1. Check DoD (should satisfy when empty or clean)
 	cmd := NewDashboardCmd()
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	buf := newTestCommandBuffer(cmd)
 	cmd.SetArgs([]string{"--check-dod"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("dashboard --check-dod failed: %v", err)
@@ -871,9 +929,7 @@ func TestDashboardCmd_WatchAndDoDModes(t *testing.T) {
 	cancel() // cancel immediately
 	cmd = NewDashboardCmd()
 	cmd.SetContext(ctx)
-	buf.Reset()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--watch", "10ms"})
 	if err := cmd.ExecuteContext(ctx); err != nil {
 		t.Fatalf("dashboard --watch failed: %v", err)
@@ -881,10 +937,8 @@ func TestDashboardCmd_WatchAndDoDModes(t *testing.T) {
 
 	// 3. Filtering and view modes
 	for _, view := range []string{"active", "regression", "all"} {
-		buf.Reset()
 		cmd = NewDashboardCmd()
-		cmd.SetOut(&buf)
-		cmd.SetErr(&buf)
+		prepareTestCmd(cmd, buf)
 		cmd.SetArgs([]string{"--view", view, "--refresh"})
 		if err := cmd.Execute(); err != nil {
 			t.Errorf("dashboard --view %s --refresh failed: %v", view, err)
@@ -892,10 +946,8 @@ func TestDashboardCmd_WatchAndDoDModes(t *testing.T) {
 	}
 
 	// 4. Status filter and test case filter
-	buf.Reset()
 	cmd = NewDashboardCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"--status", "in_progress", "--test-case", "non_existent"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("dashboard --status failed: %v", err)
@@ -908,9 +960,7 @@ func TestBindCmd_ErrorsAndValidation(t *testing.T) {
 
 	// 1. Non-existent test case
 	cmd := NewBindCmd()
-	var buf bytes.Buffer
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	buf := newTestCommandBuffer(cmd)
 	cmd.SetArgs([]string{"TST-NONEXISTENT-999", "--req", "REQ-TEST-123"})
 	err := cmd.Execute()
 	if err == nil || !strings.Contains(err.Error(), "not found") {
@@ -918,10 +968,8 @@ func TestBindCmd_ErrorsAndValidation(t *testing.T) {
 	}
 
 	// 2. Target test case with no parent bindings runs binding assistant
-	buf.Reset()
 	cmd = NewBindCmd()
-	cmd.SetOut(&buf)
-	cmd.SetErr(&buf)
+	prepareTestCmd(cmd, buf)
 	cmd.SetArgs([]string{"TST-TEST-123"})
 	err = cmd.Execute()
 	if err != nil {
