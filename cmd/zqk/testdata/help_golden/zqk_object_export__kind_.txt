@@ -22,6 +22,7 @@ Flags:
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
       --limit int               Pagination limit (0 = no limit)
       --offset int              Pagination offset
+      --out string              Output file path (default stdout, use - for stdout)
   -o, --output string           Write output to file
   -q, --quiet                   Suppress non-essential output
       --sort-asc                Sort ascending (default: true) (default true)
