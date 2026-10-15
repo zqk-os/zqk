@@ -17,6 +17,7 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,30 +43,40 @@ func shimLogger() logging.Logger {
 }
 
 func main() {
-	if len(os.Args) < 1 {
-		os.Exit(1)
+	os.Exit(runShim(os.Args, os.Getenv, os.Stdout, os.Stderr))
+}
+
+func runShim(rawArgs []string, getenv func(string) string, out io.Writer, errOut io.Writer) int {
+	if len(rawArgs) < 1 {
+		return 1
+	}
+	if getenv == nil {
+		getenv = os.Getenv
+	}
+	if out == nil {
+		out = os.Stdout
+	}
+	if errOut == nil {
+		errOut = os.Stderr
 	}
 
-	cmdName := filepath.Base(os.Args[0])
-	args := os.Args[1:]
+	cmdName := filepath.Base(rawArgs[0])
+	args := rawArgs[1:]
 
-	// 1. Path Resolution Bypass
-	// We need to find the real binary, skipping our own shim.
-	// Since the shim is likely placed in ~/.zqk/shims, we can look up the binary
-	// using the PATH env var, but omitting the shim directory.
 	logger := shimLogger()
 
 	realPath := findRealBinary(cmdName)
 	if realPath == "" {
 		logger.Error("zqk-shim: could not find original executable for "+cmdName, nil)
-		os.Exit(1)
+		return 1
 	}
 
 	// 2. Commit/PR traceability gate
 	if isMutatingOperation(cmdName, args) {
-		if err := validateCommitTraceability(); err != nil {
+		projectRoot := cli.ResolveProjectRoot(".")
+		if err := validateCommitTraceabilityWithEnv(projectRoot, getenv); err != nil {
 			logger.Error("commit traceability violation", err)
-			os.Exit(1)
+			return 1
 		}
 	}
 
@@ -73,11 +84,14 @@ func main() {
 	ctx := pkgctx.NewSystemContext()
 
 	// Emit telemetry directly if in e2e test because full logging framework isn't initialized
-	val := zqkenv.ZqkShimBypassTraceability().Get()
+	val := getenv(zqkenv.ZqkShimBypassTraceability().Name())
+	if val == "" {
+		val = getenv(zqkenv.DefaultBrandKey("SHIM_BYPASS_TRACEABILITY"))
+	}
 	if val == "1" {
-		if ok, _ := hasBreakGlassOverride(os.Getenv); ok {
-			_, _ = os.Stderr.WriteString("cli_exec_start\n")
-			_, _ = os.Stderr.WriteString("cli_exec_success\n")
+		if ok, _ := hasBreakGlassOverride(getenv); ok {
+			_, _ = io.WriteString(errOut, "cli_exec_start\n")
+			_, _ = io.WriteString(errOut, "cli_exec_success\n")
 		}
 	}
 	spec := cli_builders.CLISpec{
@@ -88,26 +102,22 @@ func main() {
 
 	// 3.5. Inject Cryptographic Stamp for PR creation
 	if cmdName == "gh" && len(args) > 1 && args[0] == "pr" && args[1] == "create" {
-		stamp := generateCryptographicStamp()
+		projectRoot := cli.ResolveProjectRoot(".")
+		stamp := generateCryptographicStampWithEnv(projectRoot, getenv)
 		args = injectPRBodyStamp(args, stamp)
 	}
 
 	builder := cli_builders.NewCLIBuilder(spec, nil).WithArgs(args...).WithEnv(os.Environ())
 
-	// Execute the command. The output is wired to the execution context stdout/stderr.
-	// Since we are a shim, we should just run the command and attach our os.Stdout/os.Stderr.
-	// Wait, cli_builders executes and returns stdout, but we need streaming.
-	// cli_builders.CLIBuilder buffers stdout. But for now, we will use it as is and print output.
 	output, err := builder.Execute(ctx)
 	if len(output) > 0 {
-		_, _ = logging.GetCommandOutputWriter(ctx).Write(output)
+		_, _ = out.Write(output)
 	}
 	if err != nil {
-		// Output is already printed or captured in err message by cli_builders
-		// Actually builder.Execute wraps the stderr in the error message.
 		logger.Error("command execution failed", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func isMutatingOperation(cmdName string, args []string) bool {
@@ -204,7 +214,7 @@ func validateCommitTraceabilityWithEnv(projectRoot string, getenv func(string) s
 		if status == "active" {
 			// Check if branch contains workstream ID or title/name mapping
 			wsID, _ := ws[objects.FieldKeyID].(string)
-			if wsID != "" && strings.Contains(branch, wsID) {
+			if wsID != "" && (strings.Contains(branch, wsID) || strings.Contains(strings.ToLower(branch), strings.ToLower(wsID))) {
 				hasTraceability = true
 				break
 			}
