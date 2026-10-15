@@ -121,6 +121,9 @@ func BuildSwarmStatus(ctx context.Context, sp storage.ObjectStorageProvider, sec
 }
 
 func countByStatus(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, kind string) (map[string]int, int, error) {
+	if sp == nil {
+		return nil, 0, errfmt.Errorf("storage provider is nil")
+	}
 	res, err := sp.List(ctx, sec, pkgctx.NewStorageContext(), storage.ListFilter{
 		Kind:    kind,
 		GroupBy: objects.FieldKeyStatus,
@@ -161,18 +164,23 @@ func countByStatus(ctx context.Context, sp storage.ObjectStorageProvider, sec *p
 }
 
 func countWithFilter(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, kind string, filters map[string]any) (int, error) {
+	if sp == nil {
+		return 0, errfmt.Errorf("storage provider is nil")
+	}
 	return sp.Count(ctx, sec, storage.ListFilter{Kind: kind, Filters: filters})
 }
 
 func summarizePersonaSkillBound(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext) map[string]any {
-	// Structural dual-read (agent_skill_refs + related ASK-*). Full resolve gate lands with
-	// CRI-PERSONA-SKILL-BOUND enforce PR; status still surfaces bind rate for throughput ops.
-	res, err := sp.List(ctx, sec, pkgctx.NewStorageContext(), storage.ListFilter{Kind: objects.KindPersona, Limit: 0})
 	out := map[string]any{
 		"total":   0,
 		"bound":   0,
 		"unbound": 0,
 	}
+	if sp == nil {
+		out["error"] = "storage_nil"
+		return out
+	}
+	res, err := sp.List(ctx, sec, pkgctx.NewStorageContext(), storage.ListFilter{Kind: objects.KindPersona, Limit: 0})
 	if err != nil || res == nil {
 		out["error"] = "list_failed"
 		return out
