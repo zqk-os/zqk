@@ -49,6 +49,15 @@ func NewLintBypassAuditCmd() *cobra.Command {
 		RunE: runLintBypassAudit,
 	})
 
+	cmd.Flags().String("git-user", "", "Git committer/author name (auto-detected if omitted)")
+	cmd.Flags().String("git-email", "", "Git committer/author email (auto-detected if omitted)")
+	cmd.Flags().String("commit-message", "", "Commit message associated with the bypass (auto-detected if omitted)")
+	cmd.Flags().StringArray("files", nil, "Files affected by the bypass (auto-detected from staged files if omitted)")
+	cmd.Flags().Bool("auto-detect", true, "Auto-detect git context (user, email, commit message, staged files)")
+
+	// Add common flags
+	cli.AddCommonFlags(cmd)
+
 	// Apply help builder to command
 	helpBuilder.ApplyToCommand(cmd)
 

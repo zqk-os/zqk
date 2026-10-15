@@ -3,7 +3,6 @@ package automation
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -28,12 +27,11 @@ func parseDocmanSyncFlags(cmd *cobra.Command) (*DocmanSyncFlags, error) {
 	flags := &DocmanSyncFlags{}
 
 	// Get profile from command flags or default
-	profile, err := cmd.Flags().GetString("context")
-	if err != nil {
-		return nil, errfmt.Newf("failed to get context flag").Wrap(err)
-	}
-	if profile == emptyValue {
-		profile = automationProfileAIAgent // Default profile for automation
+	profile := automationProfileAIAgent
+	if f := cmd.Flags().Lookup("context"); f != nil {
+		if val, err := cmd.Flags().GetString("context"); err == nil && val != emptyValue {
+			profile = val
+		}
 	}
 	flags.Profile = profile
 
@@ -166,7 +164,7 @@ func handleCheckOnlyMode(cmd *cobra.Command, created int) error {
 			//nolint:errcheck // Output errors are non-critical
 			_ = cli.WriteOutput(cmd, []byte(msg))
 		}
-		os.Exit(1)
+		return errfmt.Errorf("documentation registration needed: %d files need registration", created)
 	}
 
 	if !cli.IsQuiet(cmd) {
