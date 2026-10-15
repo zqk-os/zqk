@@ -129,6 +129,9 @@ func MkdirAll(path string, perm FileMode) error {
 	if err != nil {
 		return err
 	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
+	}
 	info, err := os.Stat(safePath)
 	if err == nil && info.IsDir() {
 		return nil
@@ -302,6 +305,9 @@ func Lstat(path string) (FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
+	}
 	t0 := nowIfMetricsEnabled()
 	fi, err := os.Lstat(safePath)
 	recordIOOp(OpStat, safePath, 0, t0, err)
@@ -312,6 +318,9 @@ func Stat(path string) (FileInfo, error) {
 	safePath, err := prepareSafePath(path)
 	if err != nil {
 		return nil, err
+	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
 	}
 	t0 := nowIfMetricsEnabled()
 	fi, err := os.Stat(safePath)
@@ -341,6 +350,9 @@ func ReadDir(path string) ([]DirEntry, error) {
 	safePath, err := prepareSafePath(path)
 	if err != nil {
 		return nil, err
+	}
+	if safePath != "" {
+		safePath = filepath.Clean(safePath)
 	}
 	t0 := nowIfMetricsEnabled()
 	entries, err := os.ReadDir(safePath)
