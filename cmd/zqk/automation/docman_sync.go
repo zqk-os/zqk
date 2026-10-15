@@ -53,6 +53,7 @@ func NewDocmanSyncCmd() *cobra.Command {
 	cmd.Flags().Bool("git-aware", false, "Only run if markdown files are staged/changed (for git hooks)")
 	cmd.Flags().Bool("update-existing", false, "Update existing doc_entries to include missing reference fields per spec")
 	cmd.Flags().Bool("dry-run", false, "Show what would be registered without actually creating objects")
+	cmd.Flags().String("context", "", "Execution context or profile")
 
 	// Add common flags
 	cli.AddCommonFlags(cmd)
