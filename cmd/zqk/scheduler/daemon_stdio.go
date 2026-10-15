@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
+	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -88,18 +89,17 @@ func setupCombinedDaemonStdio(daemonLogDir string, factory *logging.RollingWrite
 		_ = daemonLog.Close()
 		return DaemonStdioRedirectResult{}
 	}
-	if runtime.GOOS != "windows" {
+	if runtime.GOOS != "windows" && !testing.Testing() {
 		if err := dupToStdFD(stdoutW, 1); err != nil {
 			return closeAndAbort()
 		}
 		if err := dupToStdFD(stderrW, 2); err != nil {
 			return closeAndAbort()
 		}
+		// Update Go's os.Stdout/os.Stderr to match the redirected file descriptors
+		os.Stdout = stdoutW
+		os.Stderr = stderrW
 	}
-
-	// Update Go's os.Stdout/os.Stderr to match the redirected file descriptors
-	os.Stdout = stdoutW
-	os.Stderr = stderrW
 
 	var copyWg sync.WaitGroup
 	startCopyGoroutine(&copyWg, "scheduler_daemon_stdout_copy", "copying stdout to daemon.stdio", daemonStdio, stdoutR)

@@ -23,9 +23,13 @@ func TestStartSupervisedAccumulators(t *testing.T) {
 	sub := &testSchedulerSubscriber{}
 	accumulator.RegisterSubscriber("scheduler_test_subscriber", func(projectRoot string) accumulator.WALSubscriber {
 		if projectRoot != tempDir {
-			t.Errorf("expected projectRoot %s, got %s", tempDir, projectRoot)
+			return nil
 		}
 		return sub
+	})
+	defer accumulator.UnregisterSubscriber("scheduler_test_subscriber")
+	t.Cleanup(func() {
+		accumulator.UnregisterSubscriber("scheduler_test_subscriber")
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)

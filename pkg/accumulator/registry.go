@@ -25,6 +25,13 @@ func RegisterSubscriber(name string, factory SubscriberFactory) {
 	registry[name] = factory
 }
 
+// UnregisterSubscriber removes a subscriber factory by name (used in tests for clean rollback).
+func UnregisterSubscriber(name string) {
+	registryMu.Lock()
+	defer registryMu.Unlock()
+	delete(registry, name)
+}
+
 // RegisteredSubscribers returns the names of all registered accumulator subscriber factories.
 func RegisteredSubscribers() []string {
 	registryMu.RLock()
