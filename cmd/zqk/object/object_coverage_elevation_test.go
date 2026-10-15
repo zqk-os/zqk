@@ -27,17 +27,17 @@ func TestInProcess_SubcommandCoverageElevation(t *testing.T) {
 
 	// 1. Seed a backlog_item in 'planned' status with required fields for demote testing
 	bliObj := map[string]any{
-		objects.FieldKeyID:                        "BLI-COV-001",
-		objects.FieldKeyKind:                      objects.KindBacklogItem,
-		objects.FieldKeyStatus:                    "planned",
-		objects.FieldKeyProblemStatement:          "Valid problem statement of sufficient length for elevation testing.",
-		objects.FieldKeyDescription:               "Valid problem statement/description of sufficient length for elevation testing.",
+		objects.FieldKeyID:                       "BLI-COV-001",
+		objects.FieldKeyKind:                     objects.KindBacklogItem,
+		objects.FieldKeyStatus:                   "planned",
+		objects.FieldKeyProblemStatement:         "Valid problem statement of sufficient length for elevation testing.",
+		objects.FieldKeyDescription:              "Valid problem statement/description of sufficient length for elevation testing.",
 		objects.FieldKeyAcceptanceConsiderations: "Acceptance considerations for demote validation.",
-		objects.FieldKeyPriority:                  "high",
-		objects.FieldKeyPriorityTier:              "P1",
-		objects.FieldKeyPriorityPlanRef:           "PRI-COV-PLAN",
-		objects.FieldKeyMilestoneRefs:             []any{"MIL-COV-001"},
-		objects.FieldKeyTitle:                     "Coverage Elevation Backlog Item",
+		objects.FieldKeyPriority:                 "high",
+		objects.FieldKeyPriorityTier:             "P1",
+		objects.FieldKeyPriorityPlanRef:          "PRI-COV-PLAN",
+		objects.FieldKeyMilestoneRefs:            []any{"MIL-COV-001"},
+		objects.FieldKeyTitle:                    "Coverage Elevation Backlog Item",
 	}
 	err = provider.Create(ctx, secCtx, bliObj)
 	require.NoError(t, err)
@@ -63,7 +63,7 @@ func TestInProcess_SubcommandCoverageElevation(t *testing.T) {
 		objects.FieldKeyTitle:       "Strategic Plan Coverage Test",
 		objects.FieldKeyDescription: "Strategic plan object for elevation test suite.",
 		objects.FieldKeyStatus:      "active",
-		objects.FieldKeyVision:       "Strategic vision statement with sufficient length.",
+		objects.FieldKeyVision:      "Strategic vision statement with sufficient length.",
 	}
 	err = provider.Create(ctx, secCtx, splanObj)
 	require.NoError(t, err)
