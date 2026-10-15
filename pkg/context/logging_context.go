@@ -189,8 +189,11 @@ func WithLoggingContext(ctx context.Context, loggingCtx *LoggingContext) context
 }
 
 // GetLoggingContext retrieves LoggingContext from the Go context
-// Returns nil if no LoggingContext is present
+// Returns nil if no LoggingContext is present or ctx is nil
 func GetLoggingContext(ctx context.Context) *LoggingContext {
+	if ctx == nil {
+		return nil
+	}
 	if loggingCtx, ok := ctx.Value(loggingContextKey{}).(*LoggingContext); ok {
 		return loggingCtx
 	}

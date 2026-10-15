@@ -144,7 +144,8 @@ func (sb *ScenarioBuilder) createObjectInLayer(
 				// If we have an ID, update the object
 				if updateID != emptyValue {
 					updateCtx := pkgctx.WithCacheUpdate(ctx, updateID, objKind, "")
-					if updateErr := sb.storage.Update(updateCtx, sb.secCtx, updateID, obj); updateErr != nil {
+					cleanUpdates := cleanObjectForUpdate(obj)
+					if updateErr := sb.storage.Update(updateCtx, sb.secCtx, updateID, cleanUpdates); updateErr != nil {
 						sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
 							"Failed to update existing object with --force",
 							map[string]any{
@@ -409,7 +410,8 @@ func (sb *ScenarioBuilder) processObjectsSequentially(ctx context.Context, state
 					// If we have an ID, update the object
 					if updateID != emptyValue {
 						updateCtx := pkgctx.WithCacheUpdate(ctx, updateID, objKind, "")
-						if updateErr := sb.storage.Update(updateCtx, sb.secCtx, updateID, obj); updateErr != nil {
+						cleanUpdates := cleanObjectForUpdate(obj)
+						if updateErr := sb.storage.Update(updateCtx, sb.secCtx, updateID, cleanUpdates); updateErr != nil {
 							sb.emitCoordinatorEvent(ctx, ScenarioBuilderProfileName, scenarioBuilderStatusWarning,
 								"Failed to update existing object with --force",
 								map[string]any{
@@ -569,4 +571,20 @@ func (sb *ScenarioBuilder) trackValidationScope(ctx context.Context, state *laye
 			*state.validationCounter--
 		})
 	}
+}
+
+// cleanObjectForUpdate strips system provenance and immutable identity fields from an update payload
+func cleanObjectForUpdate(obj map[string]any) map[string]any {
+	cleaned := make(map[string]any, len(obj))
+	for k, v := range obj {
+		switch k {
+		case objects.FieldKeyID, objects.FieldKeyKind,
+			objects.FieldKeyCreatedAt, objects.FieldKeyCreatedBy,
+			objects.FieldKeyUpdatedAt, objects.FieldKeyUpdatedBy:
+			continue
+		default:
+			cleaned[k] = v
+		}
+	}
+	return cleaned
 }

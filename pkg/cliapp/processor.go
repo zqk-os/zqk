@@ -140,8 +140,14 @@ func NewProcessor(cmd *cobra.Command) (*Processor, error) {
 		}
 	}
 
+	cmdCtx := cmd.Context()
+	if cmdCtx == nil {
+		cmdCtx = pkgctx.NewSystemContext()
+		cmd.SetContext(cmdCtx)
+	}
+
 	// Create security context (use context from AuthMiddleware if present, otherwise fail-closed guest context)
-	secCtx := pkgctx.GetSecurityContext(cmd.Context())
+	secCtx := pkgctx.GetSecurityContext(cmdCtx)
 	if secCtx == nil {
 		if testing.Testing() || strings.HasSuffix(os.Args[0], ".test") {
 			secCtx = pkgctx.NewTestSecurityContext()
@@ -150,7 +156,7 @@ func NewProcessor(cmd *cobra.Command) (*Processor, error) {
 		}
 	}
 	// Get logger from command context
-	logger := logging.GetLoggerFromContext(cmd.Context())
+	logger := logging.GetLoggerFromContext(cmdCtx)
 
 	// Create storage context from CLI context (respects precedence for storage settings)
 	storageCtx := cliCtx.GetStorageContext()

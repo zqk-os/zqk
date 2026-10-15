@@ -298,8 +298,11 @@ func WithSecurityContext(ctx stdcontext.Context, securityCtx *SecurityContext) s
 }
 
 // GetSecurityContext retrieves SecurityContext from the Go context
-// Returns nil if no SecurityContext is present
+// Returns nil if no SecurityContext is present or ctx is nil
 func GetSecurityContext(ctx stdcontext.Context) *SecurityContext {
+	if ctx == nil {
+		return nil
+	}
 	if securityCtx, ok := ctx.Value(securityContextKey{}).(*SecurityContext); ok {
 		return securityCtx
 	}

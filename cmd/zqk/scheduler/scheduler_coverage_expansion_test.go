@@ -5174,6 +5174,23 @@ func TestAgentPromptStages_CommitAndFinalize(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 	assert.Equal(t, agentPromptDeliverPasteIDE, pctxPaste.Outcome[outcomeAgentPromptDeliverMode])
+
+	_, err = agentPromptStageFinalize(pctxPaste, payloadPaste)
+	assert.NoError(t, err)
+	assert.True(t, pctxPaste.Outcome[outcomeAgentPromptComplete].(bool))
+
+	// On non-Darwin platforms, attempting pasteIDE delivery without an Antigravity transcript
+	// falls back to the Darwin-only clipboard-paste adapter, which fails closed.
+	if runtime.GOOS != "darwin" {
+		t.Setenv(zqkenv.AGTranscriptPath().Name(), "")
+		pctxPasteNonDarwin := &pipeline.Context{
+			Ctx:     context.Background(),
+			Outcome: make(map[string]any),
+		}
+		_, errPasteNonDarwin := agentPromptStageCommit(pctxPasteNonDarwin, payloadPaste)
+		assert.Error(t, errPasteNonDarwin)
+		assert.Contains(t, errPasteNonDarwin.Error(), "requires darwin")
+	}
 }
 
 func TestBundleProgress_TableAndEvents(t *testing.T) {
@@ -5318,6 +5335,11 @@ func TestShowActivity_CompactHelpersAndLastRunTime(t *testing.T) {
 }
 
 func TestAuditEvents_FieldNamesAndExtraction(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+	t.Setenv(zqkenv.TestRoot().Name(), proj.Root)
+	t.Setenv(zqkenv.DiagnosticsDir().Name(), filepath.Join(proj.Root, paths.ProjectDataDir, "diagnostics"))
+
 	// Unknown field should return fallback
 	assert.Equal(t, "unknown_field", getAuditEventFieldName("unknown_field"))
 
@@ -5328,8 +5350,10 @@ func TestAuditEvents_FieldNamesAndExtraction(t *testing.T) {
 	assert.Equal(t, objects.FieldKeyCreatedAt, getAuditEventFieldName("created_at"))
 	assert.Equal(t, objects.FieldKeyMetadata, getAuditEventFieldName("metadata"))
 
-	// runSubmit with nil context returns error immediately
+	// runSubmit with nil context or empty args returns error immediately
 	cmd := NewSubmitCmd()
+	cliCtx := cli.ContextForProjectRoot(proj.Root)
+	cli.SetContext(cmd, cliCtx)
 	assert.Error(t, runSubmit(cmd, nil))
 }
 
