@@ -13,10 +13,6 @@ import (
 // TestDomainDiscover_Integration runs domain discover with a test project root and asserts output.
 // Not parallel: redirects os.Stdout; run sequentially with other integration tests in this package.
 func TestDomainDiscover_Integration(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test in short mode")
-	}
-
 	testRoot, _ := setupIntegrationTestWithSpecsDomain(t, "domain-discover-integration")
 	t.Cleanup(func() {
 		_ = storagepkg.RunProjectTestTeardown(storagepkg.TempProjectTeardown(testRoot, nil))
@@ -41,10 +37,6 @@ func TestDomainDiscover_Integration(t *testing.T) {
 // Not parallel: redirects os.Stdout; run sequentially with other integration tests in this package.
 // Uses test-owned storage so cleanup can shut it down and release file handles before t.TempDir() cleanup.
 func TestDomainRegister_Integration(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test in short mode")
-	}
-
 	testRoot, _ := setupIntegrationTestWithSpecsDomain(t, "domain-register-integration")
 
 	// Create storage we control so we can shut it down in cleanup (releases WAL and .zqk/process handles).
@@ -106,10 +98,6 @@ func TestDomainCmd_Hierarchy(t *testing.T) {
 }
 
 func TestDomainRegister_ValidationAndDryRun(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test in short mode")
-	}
-
 	testRoot, _ := setupIntegrationTestWithSpecsDomain(t, "domain-val-dryrun")
 	t.Cleanup(func() {
 		_ = storagepkg.RunProjectTestTeardown(storagepkg.TempProjectTeardown(testRoot, nil))
@@ -142,10 +130,6 @@ func TestDomainRegister_ValidationAndDryRun(t *testing.T) {
 }
 
 func TestDomainRegister_UpdateExistingAndDiscover(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test in short mode")
-	}
-
 	testRoot, _ := setupIntegrationTestWithSpecsDomain(t, "domain-update-discover")
 
 	storage, err := storagepkg.NewFileObjectStorageForTest(testRoot)
