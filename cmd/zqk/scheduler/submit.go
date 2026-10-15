@@ -106,6 +106,12 @@ func ensureSubmitFlags(cmd *cobra.Command) {
 	if f.Lookup("execution-mode") == nil {
 		f.String("execution-mode", submitExecutionModeOneTime, "Execution mode (one_time, recurrent)")
 	}
+	if f.Lookup("project-root") == nil {
+		f.String("project-root", "", "Project root directory")
+	}
+	if f.Lookup("repo-root") == nil {
+		f.String("repo-root", "", "Repository root directory (alias for --project-root)")
+	}
 }
 
 func runSubmit(cmd *cobra.Command, args []string) error {
@@ -137,11 +143,26 @@ func runSubmit(cmd *cobra.Command, args []string) error {
 		diagnosticsDir := zqkenv.DiagnosticsDir().Get()
 		if diagnosticsDir == emptyValue {
 			projectRoot := emptyValue
-			if cliCtx != nil && cliCtx.ProjectRoot != emptyValue {
+			if cmd != nil {
+				if pr, _ := cmd.Flags().GetString("project-root"); pr != emptyValue {
+					projectRoot = pr
+				} else if rr, _ := cmd.Flags().GetString("repo-root"); rr != emptyValue {
+					projectRoot = rr
+				}
+			}
+			if projectRoot == emptyValue && cliCtx != nil && cliCtx.ProjectRoot != emptyValue {
 				projectRoot = cliCtx.ProjectRoot
-			} else if cmd != nil {
+			}
+			if projectRoot == emptyValue && cmd != nil {
 				if r, err := cli.ResolveCommandProjectRoot(cmd); err == nil && r != emptyValue {
 					projectRoot = r
+				}
+			}
+			if projectRoot == emptyValue {
+				if envRoot := zqkenv.ProjectRoot().Get(); envRoot != emptyValue {
+					projectRoot = envRoot
+				} else if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
+					projectRoot = testRoot
 				}
 			}
 			if projectRoot != emptyValue {
@@ -161,8 +182,24 @@ func submitJob(cliCtx *cli.Context, cmd *cobra.Command, args []string) error {
 	ctx := pkgctx.NewSystemContext()
 
 	projectRoot, err := cli.ResolveCommandProjectRoot(cmd)
-	if err != nil {
-		return err
+	if err != nil || projectRoot == emptyValue {
+		if cliCtx != nil && cliCtx.ProjectRoot != emptyValue {
+			projectRoot = cliCtx.ProjectRoot
+		} else if envRoot := zqkenv.ProjectRoot().Get(); envRoot != emptyValue {
+			projectRoot = envRoot
+		} else if testRoot := zqkenv.TestRoot().Get(); testRoot != emptyValue {
+			projectRoot = testRoot
+		}
+	}
+	if cmd != nil {
+		if pr, _ := cmd.Flags().GetString("project-root"); pr != emptyValue {
+			projectRoot = pr
+		} else if rr, _ := cmd.Flags().GetString("repo-root"); rr != emptyValue {
+			projectRoot = rr
+		}
+	}
+	if projectRoot == emptyValue {
+		return errfmt.Errorf("project root not found")
 	}
 
 	storageProvider, err := cli.NewStorageProviderFromFactory(ctx, projectRoot)

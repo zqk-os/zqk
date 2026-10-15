@@ -5136,6 +5136,9 @@ func TestRunDump_WithRunningDaemonProcess(t *testing.T) {
 
 func TestAgentPromptStages_CommitAndFinalize(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+	t.Setenv(zqkenv.TestRoot().Name(), proj.Root)
+	t.Setenv(zqkenv.DiagnosticsDir().Name(), filepath.Join(proj.Root, paths.ProjectDataDir, "diagnostics"))
 	pctx := &pipeline.Context{
 		Ctx:     context.Background(),
 		Outcome: make(map[string]any),
@@ -5352,9 +5355,17 @@ func TestAuditEvents_FieldNamesAndExtraction(t *testing.T) {
 
 	// runSubmit with nil context or empty args returns error immediately
 	cmd := NewSubmitCmd()
+	_ = cmd.Flags().Set("project-root", proj.Root)
+	_ = cmd.Flags().Set("repo-root", proj.Root)
 	cliCtx := cli.ContextForProjectRoot(proj.Root)
 	cli.SetContext(cmd, cliCtx)
 	assert.Error(t, runSubmit(cmd, nil))
+	assert.Error(t, runSubmit(cmd, []string{}))
+
+	// verify runSubmit without context returns error fail-closed
+	cmdNoCtx := NewSubmitCmd()
+	_ = cmdNoCtx.Flags().Set("project-root", proj.Root)
+	assert.Error(t, runSubmit(cmdNoCtx, nil))
 }
 
 func TestServiceCmd_AllOperations(t *testing.T) {
