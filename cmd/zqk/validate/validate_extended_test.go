@@ -313,7 +313,11 @@ func TestValidate_Workflow(t *testing.T) {
 }
 
 func TestValidate_Agent(t *testing.T) {
-	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind:                     "validate.agent.unit",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
+	})
 	t.Cleanup(func() {
 		_ = filepath.Walk(proj.Root, func(path string, info os.FileInfo, err error) error {
 			if err == nil {
@@ -321,6 +325,7 @@ func TestValidate_Agent(t *testing.T) {
 			}
 			return nil
 		})
+		_ = fileutil.RemoveAll(proj.Root)
 	})
 
 	// Initialize git in proj.Root so git status/diff works cleanly
@@ -737,7 +742,11 @@ pkg/foo/bar.go,yes,yes
 }
 
 func TestValidate_Workflow_FullAdherence(t *testing.T) {
-	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind:                     "validate.workflow.unit",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
+	})
 	t.Cleanup(func() {
 		_ = filepath.Walk(proj.Root, func(path string, info os.FileInfo, err error) error {
 			if err == nil {
@@ -745,6 +754,7 @@ func TestValidate_Workflow_FullAdherence(t *testing.T) {
 			}
 			return nil
 		})
+		_ = fileutil.RemoveAll(proj.Root)
 	})
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()

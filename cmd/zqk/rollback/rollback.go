@@ -30,6 +30,7 @@ func NewRollbackCmd() *cobra.Command {
 		Short: "List and apply rollback points (lifecycle/maintenance snapshots)",
 		Long:  "List rollback points, apply a stored point (quick path), reconstruct state at a timestamp (beyond-threshold path), or trim the store (retain).",
 	})
+	cmd.PersistentFlags().String("format", "", "Output format (json, yaml, table)")
 	cmd.AddCommand(newListCmd())
 	cmd.AddCommand(newApplyCmd())
 	cmd.AddCommand(newReconstructCmd())
@@ -40,6 +41,8 @@ func NewRollbackCmd() *cobra.Command {
 // newListCmd returns the list subcommand from the generated builder (spec: rollback/list_command.yaml).
 func newListCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewRollbackListCommandBuilder()
+	cmd.Flags().Int("last", 0, "Limit the number of rollback points")
+	cmd.Flags().String("within", "", "Filter points within duration (e.g. 24h)")
 	cmd.RunE = runList
 	return cmd
 }
@@ -95,6 +98,9 @@ func runApply(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	if len(args) == 0 {
+		return errfmt.Errorf("point id is required")
+	}
 	pointID := args[0]
 	if err := rollback.Apply(ctx, projectRoot, pointID, provider); err != nil {
 		if strings.Contains(err.Error(), "not found") {
@@ -109,6 +115,9 @@ func runApply(cmd *cobra.Command, args []string) error {
 // newReconstructCmd returns the reconstruct subcommand from the generated builder (spec: rollback/reconstruct_command.yaml).
 func newReconstructCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewRollbackReconstructCommandBuilder()
+	cmd.Flags().String("scope-type", "", "Scope type")
+	cmd.Flags().String("scope-id", "", "Scope ID")
+	cmd.Flags().String("timestamp", "", "Target timestamp (RFC3339)")
 	_ = cmd.MarkFlagRequired("scope-id")
 	_ = cmd.MarkFlagRequired("timestamp")
 	cmd.RunE = runReconstruct
