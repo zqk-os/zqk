@@ -37,6 +37,7 @@ Examples:
 	})
 	cli.AddCommonFlags(cmd)
 	clipkg.AddQueryFlags(cmd)
+	cmd.Flags().String("out", "", "Output file path (default stdout, use - for stdout)")
 
 	ensureCmdAnnotations(cmd)
 	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0Opt
@@ -93,6 +94,9 @@ func runExport(cmd *cobra.Command, args []string) error {
 		}
 
 		outputPath, _ := cmd.Flags().GetString("out")
+		if outputPath == emptyValue {
+			outputPath, _ = cmd.Flags().GetString("output")
+		}
 		if outputPath == emptyValue || outputPath == "-" {
 			return cli.WriteOutput(cmd, data)
 		}
