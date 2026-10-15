@@ -5154,26 +5154,26 @@ func TestAgentPromptStages_CommitAndFinalize(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, pctx.Outcome[outcomeAgentPromptComplete].(bool))
 
-	// pasteIDE delivery path (darwin clipboard only)
-	if runtime.GOOS == "darwin" {
-		pctxPaste := &pipeline.Context{
-			Ctx:     context.Background(),
-			Outcome: make(map[string]any),
-		}
-		payloadPaste := &agentPromptPipelinePayload{
-			projectRoot: proj.Root,
-			markdown:    "# Test Paste",
-			pasteIDE:    true,
-		}
-		res, err = agentPromptStageCommit(pctxPaste, payloadPaste)
-		if runtime.GOOS == "darwin" {
-			assert.NoError(t, err)
-			assert.NotNil(t, res)
-			assert.Equal(t, agentPromptDeliverPasteIDE, pctxPaste.Outcome[outcomeAgentPromptDeliverMode])
-		} else {
-			assert.Error(t, err)
-		}
+	// pasteIDE delivery path using mock antigravity transcript (cross-platform compatible on all OSes)
+	brainDir := t.TempDir()
+	mockTranscript := filepath.Join(brainDir, "conv-cross-os", ".system_generated", "logs", "transcript.jsonl")
+	require.NoError(t, fileutil.MkdirAll(filepath.Dir(mockTranscript), 0755))
+	require.NoError(t, fileutil.WriteFile(mockTranscript, []byte("{}\n"), 0644))
+	t.Setenv(zqkenv.AGTranscriptPath().Name(), mockTranscript)
+
+	pctxPaste := &pipeline.Context{
+		Ctx:     context.Background(),
+		Outcome: make(map[string]any),
 	}
+	payloadPaste := &agentPromptPipelinePayload{
+		projectRoot: proj.Root,
+		markdown:    "# Test Paste",
+		pasteIDE:    true,
+	}
+	res, err = agentPromptStageCommit(pctxPaste, payloadPaste)
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+	assert.Equal(t, agentPromptDeliverPasteIDE, pctxPaste.Outcome[outcomeAgentPromptDeliverMode])
 }
 
 func TestBundleProgress_TableAndEvents(t *testing.T) {
@@ -5331,4 +5331,198 @@ func TestAuditEvents_FieldNamesAndExtraction(t *testing.T) {
 	// runSubmit with nil context returns error immediately
 	cmd := NewSubmitCmd()
 	assert.Error(t, runSubmit(cmd, nil))
+}
+
+func TestServiceCmd_AllOperations(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "true")
+
+	cmd := NewServiceCmd()
+	cliCtx := cli.ContextForProjectRoot(proj.Root)
+	cli.SetContext(cmd, cliCtx)
+
+	// Subcommands with uninstalled/non-existent root
+	_ = runSchedulerServiceInstall(cmd, nil)
+	_ = runSchedulerServiceStart(cmd, nil)
+	_ = runSchedulerServiceStop(cmd, nil)
+	_ = runSchedulerServiceRestart(cmd, nil)
+	_ = runSchedulerServiceUninstall(cmd, nil)
+	_ = runSchedulerServiceGC(cmd, nil)
+	_ = runSchedulerServiceRebind(cmd, nil)
+	_ = runSchedulerServiceStatus(cmd, nil)
+}
+
+func TestRestart_EdgeCases(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	cmd := NewRestartCmd()
+	cliCtx := cli.ContextForProjectRoot(proj.Root)
+	cli.SetContext(cmd, cliCtx)
+
+	// Missing context
+	cmdNoCtx := NewRestartCmd()
+	assert.Error(t, runRestart(cmdNoCtx, nil))
+
+	// Force flag set
+	_ = cmd.Flags().Set("force", "true")
+	_ = runRestart(cmd, nil)
+}
+
+func TestSkipWindow_Helpers(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	cmd := NewSkipWindowCmd()
+	cliCtx := cli.ContextForProjectRoot(proj.Root)
+	cli.SetContext(cmd, cliCtx)
+
+	dir, err := resolveSchedulerSkipWindowDir(cmd)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, dir)
+
+	cmdNoCtx := &cobra.Command{}
+	_, _ = resolveSchedulerSkipWindowDir(cmdNoCtx)
+
+	_ = runSkipWindowClear(cmd, nil)
+}
+
+func TestWaitResult_Outputs(t *testing.T) {
+	cmd := NewWaitCmd()
+
+	resWithScope := &WaitResult{
+		JobID:       "JOB-TEST-WAIT-01",
+		Status:      "completed",
+		Duration:    "120ms",
+		DurationMs:  120,
+		CompletedAt: time.Date(2026, 10, 15, 7, 0, 0, 0, time.UTC),
+		Scope: map[string]string{
+			"env": "prod",
+			"app": "backend",
+		},
+	}
+
+	assert.NoError(t, outputWaitResultTable(cmd, resWithScope))
+
+	// Empty scope and zero completed at
+	resMinimal := &WaitResult{
+		JobID:    "JOB-TEST-WAIT-02",
+		Status:   "running",
+		Duration: "10ms",
+	}
+	assert.NoError(t, outputWaitResultTable(cmd, resMinimal))
+
+	// JSON format
+	_ = cmd.Flags().Set("format", "json")
+	assert.NoError(t, outputWaitResult(cmd, resWithScope))
+
+	// YAML format
+	_ = cmd.Flags().Set("format", "yaml")
+	assert.NoError(t, outputWaitResult(cmd, resWithScope))
+
+	// Table format
+	_ = cmd.Flags().Set("format", "table")
+	assert.NoError(t, outputWaitResult(cmd, resWithScope))
+
+	// runWait with empty args
+	assert.Equal(t, ErrJobNotFound, runWait(cmd, nil))
+	assert.Equal(t, ErrJobNotFound, runWait(cmd, []string{""}))
+}
+
+func TestSchedulerStatus_TableFormats(t *testing.T) {
+	cmd := NewStatusCmd()
+
+	// Missing running key
+	dataInvalid := map[string]any{"invalid": 123}
+	assert.NoError(t, outputSchedulerStatusTable(cmd, dataInvalid))
+
+	// Not running without project root
+	dataNotRunningNoRoot := map[string]any{
+		schedulerStatusRunning: false,
+	}
+	assert.NoError(t, outputSchedulerStatusTable(cmd, dataNotRunningNoRoot))
+
+	// Not running with project root
+	dataNotRunningRoot := map[string]any{
+		schedulerStatusRunning:    false,
+		schedulerFieldProjectRoot: "/tmp/sample-project",
+	}
+	assert.NoError(t, outputSchedulerStatusTable(cmd, dataNotRunningRoot))
+
+	// Running in process
+	dataRunningInProcess := map[string]any{
+		schedulerStatusRunning:  true,
+		schedulerFieldInProcess: true,
+	}
+	assert.NoError(t, outputSchedulerStatusTable(cmd, dataRunningInProcess))
+
+	// Running with PID
+	dataRunningPID := map[string]any{
+		schedulerStatusRunning: true,
+		schedulerFieldPID:      4242,
+	}
+	assert.NoError(t, outputSchedulerStatusTable(cmd, dataRunningPID))
+
+	// Running with no PID or in-process info
+	dataRunningPlain := map[string]any{
+		schedulerStatusRunning: true,
+	}
+	assert.NoError(t, outputSchedulerStatusTable(cmd, dataRunningPlain))
+
+	// outputSchedulerStatus formats
+	_ = cmd.Flags().Set("format", "json")
+	assert.NoError(t, outputSchedulerStatus(cmd, dataRunningPID))
+
+	_ = cmd.Flags().Set("format", "yaml")
+	assert.NoError(t, outputSchedulerStatus(cmd, dataRunningPID))
+
+	_ = cmd.Flags().Set("format", "table")
+	assert.NoError(t, outputSchedulerStatus(cmd, dataRunningPID))
+}
+
+func TestSchedulerConfig_MutuallyExclusiveFlags(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	cmd := NewConfigCmd()
+	cliCtx := cli.ContextForProjectRoot(proj.Root)
+	cli.SetContext(cmd, cliCtx)
+
+	_ = cmd.Flags().Set("jobs-paused", "true")
+	_ = cmd.Flags().Set("no-jobs-paused", "true")
+
+	err := runConfig(cmd, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "cannot set both")
+}
+
+func TestFlagDuration_Comprehensive(t *testing.T) {
+	cmd := &cobra.Command{}
+	cmd.Flags().Duration("duration-flag", 5*time.Second, "")
+	cmd.Flags().String("string-flag", "10m", "")
+	cmd.Flags().String("invalid-flag", "invalid-duration", "")
+	cmd.Flags().String("empty-flag", "", "")
+
+	// Fallback when flag missing
+	assert.Equal(t, 2*time.Second, flagDuration(cmd, "non-existent", 2*time.Second))
+
+	// Duration flag
+	assert.Equal(t, 5*time.Second, flagDuration(cmd, "duration-flag", 1*time.Second))
+
+	// Valid string flag
+	assert.Equal(t, 10*time.Minute, flagDuration(cmd, "string-flag", 1*time.Second))
+
+	// Invalid string flag
+	assert.Equal(t, 3*time.Second, flagDuration(cmd, "invalid-flag", 3*time.Second))
+
+	// Empty string flag
+	assert.Equal(t, 4*time.Second, flagDuration(cmd, "empty-flag", 4*time.Second))
+}
+
+func TestDumpCmd_NotRunningDaemon(t *testing.T) {
+	cmd := NewDumpCmd()
+	err := cmd.RunE(cmd, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "scheduler daemon is not running")
 }

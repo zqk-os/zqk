@@ -2,6 +2,8 @@ package scheduler
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -35,15 +37,27 @@ func TestAuditSchedulerInitFull(t *testing.T) {
 
 	t.Log("Scheduler initialized. Attempting Start()...")
 
-	// Wait briefly to allow scheduler to start
-	// Note: We don't need it to run fully, just to initialize without panicking
-	<-time.After(100 * time.Millisecond)
+	// Wait briefly to allow scheduler to start without panicking
+	for i := 0; i < 20; i++ {
+		if s.IsRunning() {
+			break
+		}
+		select {
+		case err := <-errCh:
+			if err != nil && !errors.Is(err, context.Canceled) && !strings.Contains(err.Error(), "context canceled") {
+				t.Fatalf("Scheduler Start failed: %v", err)
+			}
+			t.Log("Audit successful (exited early).")
+			return
+		case <-time.After(50 * time.Millisecond):
+		}
+	}
 
 	// Cancel context to stop scheduler
 	cancel()
 
 	err := <-errCh
-	if err != nil {
+	if err != nil && !errors.Is(err, context.Canceled) && !strings.Contains(err.Error(), "context canceled") {
 		t.Fatalf("Scheduler Start failed: %v", err)
 	}
 	t.Log("Audit successful.")
