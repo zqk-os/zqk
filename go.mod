@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/jedib0t/go-pretty/v6 v6.8.3
 	github.com/joho/godotenv v1.5.1
-	github.com/mattn/go-runewidth v0.0.30
+	github.com/mattn/go-runewidth v0.0.31
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/neo4j/neo4j-go-driver/v5 v5.28.5
 	github.com/robfig/cron/v3 v3.0.1
