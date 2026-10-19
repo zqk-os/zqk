@@ -1382,4 +1382,3 @@ func TestElevation_Cycle92_SyncLoop_Worktree_Terminal_Transition(t *testing.T) {
 	cli.SetContext(cmd, cli.ContextForProjectRoot(wtRoot))
 	_ = cmd.ExecuteContext(context.Background())
 }
-
