@@ -2,11 +2,6 @@
 
 **Document ID:** `DOC-AGENT-SUBSYSTEM-AND-SEATING-GUIDE-001`  
 **Target Release:** Zen Quantum Kernel v0.1.0+ (Cycle 92)  
-**Relational Kernel Anchors:**  
-- **Goal:** `GOAL-CLI-TAXONOMY-CANONICAL-001` (Canonical CLI Command Taxonomy & Architectural Standards)  
-- **Requirement:** `REQ-1792429359837171000-b286f770` (Elevate cmd/zqk/agent test statement coverage to >= 85.0% and author Agent Subsystem and Seating Guide)  
-- **Criteria:** `CRIT-1792429379773843000-2983fedc` (Documentation & Knowledge Base Entry)  
-- **Backlog Item:** `BLI-1792429379773842500-c10ca704` (Architecture Specification & Conformance)  
 **Authoring Personas:**  
 - `PER-COMMUNITY-SOFTWARE-ENGINEER` (Software Engineer)  
 - `PER-SYSTEMS-ARCHITECT` (Systems Architect)  
@@ -426,22 +421,22 @@ Operators and agents must maintain these non-negotiable operational invariants:
 zqk agent orchestrate
 
 # Orchestrate explicit plan with 2-hour timeout
-zqk agent orchestrate PRI-1792429393089406000-62ec51c3 --timeout 2h
+zqk agent orchestrate <plan_id> --timeout 2h
 
 # Hydrate rich subagent prompt context
-zqk agent prepare-context BLI-1792429379773842500-c10ca704 --format agent-prompt
+zqk agent prepare-context <bli_id> --format agent-prompt
 
 # -----------------------------------------------------------------------------
 # WORK CLAIMING & LIFECYCLE
 # -----------------------------------------------------------------------------
 # Claim backlog item with 15-minute check-in cadence
-zqk agent claim BLI-1792429379773842500-c10ca704 --by worker-seat-1 --checkin-cadence 15m --hourglass-on
+zqk agent claim <bli_id> --by worker-seat-1 --checkin-cadence 15m --hourglass-on
 
 # Advance verified item to pending_verification
-zqk agent next BLI-1792429379773842500-c10ca704
+zqk agent next <bli_id>
 
 # Release work claim
-zqk agent release BLI-1792429379773842500-c10ca704 --by worker-seat-1
+zqk agent release <bli_id> --by worker-seat-1
 
 # -----------------------------------------------------------------------------
 # OBSERVABILITY & HEALTH
@@ -464,11 +459,13 @@ zqk agent hook continuation --vendor antigravity
 
 ---
 
-## 8. Relational Manifest & Traceability
+## 8. Relational Manifest & Verification
 
-- **Parent Goal:** [`GOAL-CLI-TAXONOMY-CANONICAL-001`](file:///Users/lanceettl/zqk-public-candidate/.zqk/process/goal/goal_GOAL-CLI-TAXONOMY-CANONICAL-001.yaml)
-- **Parent Requirement:** [`REQ-1792429359837171000-b286f770`](file:///Users/lanceettl/zqk-public-candidate/.zqk/process/requirement/requirement_REQ-1792429359837171000-b286f770.yaml)
-- **Parent Criteria:** [`CRIT-1792429379773843000-2983fedc`](file:///Users/lanceettl/zqk-public-candidate/.zqk/process/criteria/criteria_CRIT-1792429379773843000-2983fedc.yaml)
-- **Backlog Item:** [`BLI-1792429379773842500-c10ca704`](file:///Users/lanceettl/zqk-public-candidate/.zqk/process/backlog_item/backlog_item_BLI-1792429379773842500-c10ca704.yaml)
-- **Test Case:** [`TST-1792429379773841001-24f23017`](file:///Users/lanceettl/zqk-public-candidate/.zqk/process/test_case/test_case_TST-1792429379773841001-24f23017.yaml)
+- **Domain Scope:** Autonomous Swarm Orchestration & Agent Seating Subsystem
 - **Implementation Package:** [`cmd/zqk/agent`](file:///Users/lanceettl/zqk-public-candidate/cmd/zqk/agent)
+- **Supporting Core Libraries:**
+  - [`pkg/agentclaim`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentclaim)
+  - [`pkg/agentfeed`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentfeed)
+  - [`pkg/agentprompt`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentprompt)
+  - [`pkg/seatworker`](file:///Users/lanceettl/zqk-public-candidate/pkg/seatworker)
+- **Verification Invariant:** Automated test coverage elevates statement coverage across CLI agent subcommands to $\ge 80.0\%$ with deterministic error isolation, subagent hook context injection, and seat worker lifecycle supervision.
