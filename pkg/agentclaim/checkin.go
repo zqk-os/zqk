@@ -218,10 +218,7 @@ func ClearCheckin(projectRoot, taskID string) error {
 		_ = RemoveSeatClaim(projectRoot, "", taskID)
 	}
 	if q := globalQueue; q != nil {
-		q.mu.Lock()
-		delete(q.items, path)
-		delete(q.flushing, path)
-		q.mu.Unlock()
+		q.Tombstone(path)
 	}
 
 	walCache.Delete(taskID)

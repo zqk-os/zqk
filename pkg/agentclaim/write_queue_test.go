@@ -76,3 +76,41 @@ func TestCheckinWriteQueue_Reducer(t *testing.T) {
 		t.Errorf("Expected 1 item in queue due to reducer, got %d", count)
 	}
 }
+
+func TestCheckinWriteQueue_Tombstone(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	queue := &CheckinWriteQueue{
+		items:      make(map[string]checkinWriteRequest),
+		flushing:   make(map[string]checkinWriteRequest),
+		tombstones: make(map[string]struct{}),
+		shutdownCh: make(chan chan struct{}),
+		doneCh:     make(chan struct{}),
+	}
+	go queue.worker()
+	defer queue.Stop()
+
+	timer := &CheckinTimer{
+		TaskID:    "ATK-789",
+		ClaimedBy: "AGENT-1",
+		ExpiresAt: "2026-01-01T00:00:00Z",
+	}
+
+	queue.Enqueue(tmpDir, timer)
+	path := CheckinTimerPath(tmpDir, "ATK-789")
+	queue.Tombstone(path)
+
+	if !queue.IsTombstoned(path) {
+		t.Errorf("Expected path %s to be tombstoned", path)
+	}
+
+	if val, ok := queue.Get(path); ok || val != nil {
+		t.Errorf("Expected Get on tombstoned path to return nil, false, got %v", val)
+	}
+
+	time.Sleep(100 * time.Millisecond)
+
+	if fileutil.Exists(path) {
+		t.Errorf("Expected timer NOT to be written to %s after tombstone, but it exists", path)
+	}
+}
