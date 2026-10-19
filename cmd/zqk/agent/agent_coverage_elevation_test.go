@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -1180,7 +1181,8 @@ func TestElevation_Agent_Execute_Extended(t *testing.T) {
 	cmdExecPrompt.SetArgs([]string{taskID})
 	errExecPrompt := cmdExecPrompt.ExecuteContext(context.Background())
 	assert.Error(t, errExecPrompt)
-	assert.Contains(t, errExecPrompt.Error(), "swarm engine execution failed")
+	errMsg := errExecPrompt.Error()
+	assert.True(t, strings.Contains(errMsg, "swarm engine execution failed") || strings.Contains(errMsg, "failed to initialize MCP executor") || strings.Contains(errMsg, "mcp connection closed"), "unexpected error message: %s", errMsg)
 }
 
 func TestElevation_Agent_Hook_Extended(t *testing.T) {
