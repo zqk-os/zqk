@@ -42,7 +42,7 @@ func seedStateTreeEntities(t *testing.T, sp storage.ObjectStorageProvider, sCtx 
 
 func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 	t.Helper()
-	sCtx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
+	sCtx := storage.WithSkipWriteBehind(storage.WithCLIOperation(pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())))
 	factory, err := storage.NewStorageFactory(sCtx, testRoot)
 	if err != nil {
 		t.Fatalf("factory init failed: %v", err)
@@ -91,6 +91,8 @@ func TestStateTree_WithPopulatedHierarchy(t *testing.T) {
 	require.NoError(t, errJSON)
 	assert.Contains(t, outJSON, "ORG-STATE-001")
 	assert.Contains(t, outJSON, "active_plans")
+	assert.Contains(t, outJSON, "BLI-STATE-001")
+	assert.Contains(t, outJSON, "BLI-STATE-002")
 }
 
 func seedRawStreamFile(t *testing.T, path string) {
