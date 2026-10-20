@@ -825,7 +825,6 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 	// and prevent the daemon from ever exiting (SCHEDULER_HUNG_SAMPLE_ANALYSIS, shutdown hang).
 	// Critical shutdown path: do not gate on DefaultBudget (parallel CI can saturate it and
 	// leave startCtx uncanceled — TestStartSchedulerBackgroundWatchers_SignalHandling flake).
-	// TRACK: BLI-1790209618294719000-90cdbe5f (studio alias campaign; Core CLI flake while pinning).
 	interruptBuilder := goroutinelabels.NewGoroutine("scheduler_interrupt_handler", "handling scheduler interrupt signal")
 	interruptBuilder.StartWithContext(interruptCtx, func(ctx context.Context) error {
 		<-ctx.Done()
