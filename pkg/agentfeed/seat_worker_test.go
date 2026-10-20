@@ -403,6 +403,29 @@ func TestSeatEventAttemptLedger_requiresEventID(t *testing.T) {
 	}
 }
 
+func TestSanitizeSafePathSegment(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"agent-1", "agent-1"},
+		{"../../etc/passwd", "passwd"},
+		{"foo/bar/baz", "baz"},
+		{"foo\\bar\\baz", "baz"},
+		{"..", "unknown"},
+		{"", "unknown"},
+		{"   ", "unknown"},
+		{"/...", "unknown"},
+	}
+	for _, tc := range tests {
+		got := sanitizeSafePathSegment(tc.input)
+		if got != tc.want {
+			t.Errorf("sanitizeSafePathSegment(%q) = %q, want %q", tc.input, got, tc.want)
+		}
+	}
+}
+
 func mustWriteLiteFeed(t *testing.T, root string) {
 	t.Helper()
 	if err := datacell.WriteAgentChatChannelConfig(root, datacell.AgentChatChannelConfig{

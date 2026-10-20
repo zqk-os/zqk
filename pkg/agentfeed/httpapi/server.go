@@ -202,6 +202,32 @@ type steerRequest struct {
 	AwaitPeerAck bool   `json:"await_peer_ack"`
 }
 
+func validateSafeField(name, val string) error {
+	trimmed := strings.TrimSpace(val)
+	if trimmed == "" {
+		return nil
+	}
+	if strings.Contains(trimmed, "..") || strings.Contains(trimmed, "/") || strings.Contains(trimmed, "\\") {
+		return errfmt.Errorf("invalid %s: path traversal sequences and separators are prohibited", name)
+	}
+	if strings.HasPrefix(trimmed, "-") {
+		return errfmt.Errorf("invalid %s: flag-like prefix is prohibited", name)
+	}
+	return nil
+}
+
+func validateAgentPair(w http.ResponseWriter, agentID, toAgentID string) bool {
+	if err := validateSafeField("agent_id", agentID); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return false
+	}
+	if err := validateSafeField("to_agent_id", toAgentID); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return false
+	}
+	return true
+}
+
 func (s *Server) handleSteer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeErr(w, http.StatusMethodNotAllowed, "POST required")
@@ -209,6 +235,13 @@ func (s *Server) handleSteer(w http.ResponseWriter, r *http.Request) {
 	}
 	var req steerRequest
 	if err := decodeJSON(r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if !validateAgentPair(w, req.AgentID, req.ToAgentID) {
+		return
+	}
+	if err := validateSafeField("feed_id", req.FeedID); err != nil {
 		writeErr(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -290,6 +323,18 @@ func (s *Server) handleAck(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	if err := validateSafeField("in_reply_to", req.InReplyTo); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := validateSafeField("agent_id", req.AgentID); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := validateSafeField("persona_ref", req.PersonaRef); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
 	inReplyTo := strings.TrimSpace(req.InReplyTo)
 	agentID := strings.TrimSpace(req.AgentID)
 	personaRef := strings.TrimSpace(req.PersonaRef)
@@ -333,6 +378,16 @@ func (s *Server) handlePending(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "agent_id query param is required")
 		return
 	}
+	if err := validateSafeField("agent_id", agentID); err != nil {
+		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if persona := strings.TrimSpace(q.Get(objects.FieldKeyPersonaRef)); persona != "" {
+		if err := validateSafeField("persona_ref", persona); err != nil {
+			writeErr(w, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 	limit := 50
 	if raw := strings.TrimSpace(q.Get("limit")); raw != "" {
 		n, err := strconv.Atoi(raw)
@@ -375,6 +430,9 @@ func (s *Server) handleWake(w http.ResponseWriter, r *http.Request) {
 	var req wakeRequest
 	if err := decodeJSON(r, &req); err != nil {
 		writeErr(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if !validateAgentPair(w, req.AgentID, req.ToAgentID) {
 		return
 	}
 	msg := strings.TrimSpace(req.Message)
