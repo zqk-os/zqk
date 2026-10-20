@@ -823,11 +823,10 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 	// Cancel startCtx immediately so sched.Start() unblocks and shutdown begins; then best-effort
 	// emit and RemoveKeepAlive. Doing I/O before cancel() could block (coordinator/storage under load)
 	// and prevent the daemon from ever exiting (SCHEDULER_HUNG_SAMPLE_ANALYSIS, shutdown hang).
-	interruptBud := goroutinelabels.DefaultBudget()
+	// Critical shutdown path: do not gate on DefaultBudget (parallel CI can saturate it and
+	// leave startCtx uncanceled — TestStartSchedulerBackgroundWatchers_SignalHandling flake).
+	// TRACK: BLI-1790209618294719000-90cdbe5f (studio alias campaign; Core CLI flake while pinning).
 	interruptBuilder := goroutinelabels.NewGoroutine("scheduler_interrupt_handler", "handling scheduler interrupt signal")
-	if interruptBud != nil {
-		interruptBuilder = interruptBuilder.WithBudget(interruptBud)
-	}
 	interruptBuilder.StartWithContext(interruptCtx, func(ctx context.Context) error {
 		<-ctx.Done()
 		cancel() // First: unblock sched.Start() so shutdown runs; do not block on I/O below
