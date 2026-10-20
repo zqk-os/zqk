@@ -258,6 +258,8 @@ func (s *WakerEventStreamer) handleLifecycleEvent(ev *lifecycle.LifecycleEvent) 
 		Priority:  "high",
 	}
 
+	s.streamedTotal.Add(1)
+
 	// 1. Emit to EventEmitter subscribers (e.g. notifications/event)
 	if s.server != nil && s.server.eventEmitter != nil {
 		s.server.eventEmitter.Emit(mcpEvent)
@@ -267,8 +269,6 @@ func (s *WakerEventStreamer) handleLifecycleEvent(ev *lifecycle.LifecycleEvent) 
 	if s.server != nil {
 		s.server.BroadcastMessage(message, string(eventType), "high")
 	}
-
-	s.streamedTotal.Add(1)
 }
 
 // formatWakerMessage creates human-readable descriptions of waker and lifecycle updates.

@@ -92,8 +92,8 @@ Examples:
 			if len(args) > 0 {
 				inputContext = strings.Join(args, " ")
 			} else {
-				stat, _ := os.Stdin.Stat()
-				if (stat.Mode() & fileutil.ModeCharDevice) == 0 {
+				stat, statErr := os.Stdin.Stat()
+				if statErr == nil && stat != nil && (stat.Mode()&fileutil.ModeCharDevice) == 0 {
 					bytes, err := io.ReadAll(os.Stdin)
 					if err != nil {
 						return errfmt.Newf(errFailedToReadStdin).Wrap(err)

@@ -193,7 +193,15 @@ func TestZeroIdleWakerStream_Functional(t *testing.T) {
 	verifyFastPathDispatch(t, registry, receivedCh)
 	verifyWALReplayDispatch(t, wal, receivedCh)
 
-	streamed, dropped := streamer.Stats()
+	var streamed, dropped int64
+	deadline := time.Now().Add(1 * time.Second)
+	for {
+		streamed, dropped = streamer.Stats()
+		if streamed >= 2 || time.Now().After(deadline) {
+			break
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
 	if dropped < 0 {
 		t.Errorf("unexpected negative dropped count: %d", dropped)
 	}
