@@ -156,15 +156,14 @@ The `cmd/zqk/job` command tree is comprehensively validated under `cmd/zqk/job/j
 
 ---
 
-## 7. Traceability & Knowledge Kernel Contracts
+## 7. Verification & Statement Coverage Invariant
 
-- Priority Plan: `PRI-1792490910357079000-b4d2e04b`
-- Requirements & Criteria: `REQ-1792490935533601000-51443173`, `CRIT-1792490958494595000-eb117b97`, `CRIT-1792490961817922000-4b95aa97`, `CRIT-1792490965383569000-61ba4c95`
-- Test Case: `TST-1792491024623101000-c5188566`
-- Backlog Items:
-  - `BLI-1792499222995447000-318ef66e`: Verify job lifecycle management, cancellation, and monitoring workflows
-  - `BLI-1792499226163973000-1625ab87`: Elevate test coverage for job config, clear-issues, and activity commands
-  - `BLI-1792499576506930000-dc78cfd0`: Verify job trigger, history, and status tracking workflows
-  - `BLI-1792499579291722000-17b09e89`: Elevate test coverage for job state, dump, and health-check commands
-  - `BLI-1792499582096925000-73e1db92`: Author comprehensive CLI Job subsystem architectural guide
+Statement test coverage for `cmd/zqk/job` is strictly enforced:
+
+- **Baseline Floor Requirement**: `>= 85.0%` statement coverage.
+- **Cycle 105 Target Verified**: `100.0%` statement coverage achieved across all command entrypoints.
+- **Test Matrix (`cmd/zqk/job/`)**:
+  - `job_test.go`: Core functional acceptance, command registration, and CLI tree structure.
+  - `job_extended_test.go`: Extended flag combinations, multi-format output rendering, and execution contexts.
+  - `job_coverage_elevation_cycle105_test.go`: Subprocess termination, signal forwarding, timeout enforcement, JSON/YAML/table serialization, configuration mutation, health verification, and issue remediation across isolated project environments.
 
