@@ -32,6 +32,12 @@ func TestSharedValidationCache_Helpers(t *testing.T) {
 	if SharedValidationStateCache(tempDir) != shared {
 		t.Fatal("SharedValidationStateCache must return the same singleton")
 	}
+	if aged := ApplySharedValidationCacheMaxAge(tempDir, time.Hour); aged != shared {
+		t.Fatal("ApplySharedValidationCacheMaxAge must return the same singleton")
+	}
+	if ApplySharedValidationCacheMaxAge("", time.Hour) != nil {
+		t.Error("expected nil ApplySharedValidationCacheMaxAge on empty projectRoot")
+	}
 
 	// Test with CacheModeTestSync
 	ctx := pkgctx.WithCacheMode(context.Background(), pkgctx.CacheModeTestSync)

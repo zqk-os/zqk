@@ -45,6 +45,19 @@ func SharedValidationStateCache(projectRoot string) *ValidationStateCache {
 	return sc.cache
 }
 
+// ApplySharedValidationCacheMaxAge sets maxAge on the shared singleton and
+// returns it. Cross-module facades cannot assign the unexported maxAge field;
+// use this (or SharedValidationStateCache when age is irrelevant) so
+// Ensure*/Invalidate* and AsyncValidator stay on one pointer.
+func ApplySharedValidationCacheMaxAge(projectRoot string, maxAge time.Duration) *ValidationStateCache {
+	cache := SharedValidationStateCache(projectRoot)
+	if cache == nil {
+		return nil
+	}
+	cache.maxAge = maxAge
+	return cache
+}
+
 // EnsureValidationCacheReady ensures the validation state cache file exists on disk.
 // It gets or creates the per-project shared cache (loading from disk if present),
 // then saves so that .zqk/cache/validation_cache.json is created if it did not exist.
