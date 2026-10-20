@@ -35,9 +35,9 @@ func NewAsyncValidator(ctx context.Context, projectRoot string, workers int, max
 	// entries) to overwrite a full check Save on disk and permanently starve
 	// the warm path (cache_hits≈0).
 	stateCache := NewValidationStateCache(projectRoot, maxCacheAge)
-	if sc := getSharedValidationCache(projectRoot); sc != nil && sc.cache != nil {
-		sc.cache.maxAge = maxCacheAge
-		stateCache = sc.cache
+	if shared := SharedValidationStateCache(projectRoot); shared != nil {
+		shared.maxAge = maxCacheAge
+		stateCache = shared
 	}
 
 	return &AsyncValidator{

@@ -19,11 +19,11 @@ func TestNewAsyncValidatorUsesSharedValidationCache(t *testing.T) {
 	root := t.TempDir()
 
 	av := NewAsyncValidator(pkgctx.NewSystemContext(), root, 2, time.Hour)
-	sc := getSharedValidationCache(root)
-	if sc == nil || sc.cache == nil {
+	shared := SharedValidationStateCache(root)
+	if shared == nil {
 		t.Fatal("expected shared validation cache for non-empty project root")
 	}
-	if av.stateCache != sc.cache {
+	if av.stateCache != shared {
 		t.Fatal("AsyncValidator.stateCache must be the shared singleton, not a private cache")
 	}
 
@@ -35,7 +35,7 @@ func TestNewAsyncValidatorUsesSharedValidationCache(t *testing.T) {
 	}
 	av.stateCache.Set(state)
 
-	got, ok := sc.cache.Get(state.ObjectID)
+	got, ok := shared.Get(state.ObjectID)
 	if !ok || got == nil || got.ObjectID != state.ObjectID {
 		t.Fatalf("shared cache missing Set from AsyncValidator: ok=%v got=%v", ok, got)
 	}

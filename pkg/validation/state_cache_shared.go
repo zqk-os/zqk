@@ -30,6 +30,21 @@ var (
 	sharedCaches   = make(map[string]*sharedValidationCache)
 )
 
+// SharedValidationStateCache returns the per-project shared ValidationStateCache
+// singleton used by Ensure*/Invalidate*/Update* and AsyncValidator. Empty
+// projectRoot returns nil. Callers that need Get/Set/Save/Load on the same
+// in-memory map (studio facades, system check) must use this accessor rather
+// than NewValidationStateCache, which would fork a second cache.
+// Pattern matches GetGlobalFeatureFlags: one process-lifetime singleton keyed
+// by project root.
+func SharedValidationStateCache(projectRoot string) *ValidationStateCache {
+	sc := getSharedValidationCache(projectRoot)
+	if sc == nil {
+		return nil
+	}
+	return sc.cache
+}
+
 // EnsureValidationCacheReady ensures the validation state cache file exists on disk.
 // It gets or creates the per-project shared cache (loading from disk if present),
 // then saves so that .zqk/cache/validation_cache.json is created if it did not exist.
@@ -38,11 +53,11 @@ func EnsureValidationCacheReady(projectRoot string) error {
 	if projectRoot == emptyValue {
 		return nil
 	}
-	sc := getSharedValidationCache(projectRoot)
-	if sc == nil {
+	cache := SharedValidationStateCache(projectRoot)
+	if cache == nil {
 		return nil
 	}
-	return sc.cache.Save()
+	return cache.Save()
 }
 
 // getSharedValidationCache returns a per-project shared cache instance.
