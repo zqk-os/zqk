@@ -33,5 +33,10 @@ zqk system auto-fix-process-pending --project-root /path/to/project
 Usage:
   zqk system auto-fix-process-pending [flags]
 
+Flags:
+      --project-root string   Project root directory
+      --sync-glossary         Scan for missing glossary terms after processing
+      --sync-glossary-apply   Create missing glossary terms inferred from specs
+
 Global Flags:
       --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

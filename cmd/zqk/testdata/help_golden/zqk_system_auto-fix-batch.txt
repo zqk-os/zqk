@@ -34,8 +34,9 @@ Usage:
   zqk system auto-fix-batch [flags]
 
 Flags:
-      --batch-file string   Path to batch JSON file (required)
-      --chunk-size int      Number of issues per transactional chunk (0 = use default or AUTOFIX_BATCH_CHUNK_SIZE env; default 20)
+      --batch-file string     Path to batch JSON file (required)
+      --chunk-size int        Number of issues per transactional chunk (0 = use default or AUTOFIX_BATCH_CHUNK_SIZE env; default 20)
+      --project-root string   Project root directory (required)
 
 Global Flags:
       --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
