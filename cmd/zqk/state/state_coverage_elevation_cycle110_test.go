@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -389,4 +390,81 @@ func TestFormatTSDBTelemetryText_StatusAndTruncation(t *testing.T) {
 	assert.Contains(t, outCrit, "CRITICAL")
 	assert.Contains(t, outCrit, "Last 1h")
 	assert.Contains(t, outCrit, "--:--:--")
+}
+
+func TestStreamJournalMutations_LiveEventDebounce(t *testing.T) {
+	testRoot := setupStateIsolatedProject(t)
+	sDir := filepath.Join(testRoot, paths.ProjectDataDir, paths.StreamsDir, "change_journal_entry")
+	if err := fileutil.MkdirAll(sDir, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir stream failed: %v", err)
+	}
+
+	buf := new(bytes.Buffer)
+	ctx, cancel := context.WithCancel(context.Background())
+	cmd := newStreamCmd()
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(ctx, buf))
+
+	doneCh := make(chan error, 1)
+	goroutinelabels.NewGoroutine("test_stream_debounce", "run live stream mutations for debounce test").StartSimple(func() {
+		doneCh <- StreamJournalMutations(cmd, testRoot, true, 10, "text", false)
+	})
+
+	time.Sleep(80 * time.Millisecond)
+	newFile := filepath.Join(sDir, "dynamic_entry.json")
+	entry := `{"id":"MUT-DYN-01","change_type":"create","object_ref":"BLI-DYN","created_at":1700000010}` + "\n"
+	if err := fileutil.WriteFile(newFile, []byte(entry), paths.FilePerm644); err != nil {
+		t.Fatalf("write dynamic stream file failed: %v", err)
+	}
+
+	time.Sleep(150 * time.Millisecond)
+	cancel()
+
+	select {
+	case err := <-doneCh:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for StreamJournalMutations to exit")
+	}
+}
+
+func TestFormatMutationLine_SummaryFallback(t *testing.T) {
+	m := JournalMutation{
+		ID:         "MUT-FALLBACK",
+		ChangeType: "patch",
+		ObjectRef:  "REQ-FALLBACK",
+		CreatedAt:  time.Now().Unix(),
+	}
+	line := FormatMutationLine(m)
+	assert.Contains(t, line, "patch")
+	assert.Contains(t, line, "MUT-FALLBACK")
+}
+
+func TestFormatStateTreeText_EmptyDiff(t *testing.T) {
+	payload := &StateTreePayload{
+		RecentMutations: []JournalMutation{
+			{ID: "MUT-TREE-DIFF", ChangeType: "merge", ObjectRef: "PRI-TREE", DiffSummary: ""},
+		},
+	}
+	out := FormatStateTreeText(payload)
+	assert.Contains(t, out, "merge")
+	assert.Contains(t, out, "MUT-TREE-DIFF")
+}
+
+func TestGenerateDurationSparkline_Flat(t *testing.T) {
+	spark := generateDurationSparkline([]float64{15.0, 15.0, 15.0})
+	assert.Equal(t, "→ STABLE", spark)
+}
+
+func TestReadCommandMetricsStats_InvalidJSON(t *testing.T) {
+	testRoot := setupStateIsolatedProject(t)
+	mDir := filepath.Join(testRoot, paths.ProjectDataDir, "metrics")
+	if err := fileutil.MkdirAll(mDir, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir metrics failed: %v", err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(mDir, "command_metrics.json"), []byte("invalid_json_payload"), paths.FilePerm644); err != nil {
+		t.Fatalf("write invalid metrics failed: %v", err)
+	}
+	telem := &TSDBTelemetry{}
+	readCommandMetricsStats(testRoot, telem)
+	assert.Empty(t, telem.TopCommands)
 }
