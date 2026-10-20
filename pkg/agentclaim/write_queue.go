@@ -20,6 +20,7 @@ type CheckinWriteQueue struct {
 	mu         sync.Mutex
 	items      map[string]checkinWriteRequest
 	flushing   map[string]checkinWriteRequest
+	tombstones map[string]struct{}
 	shutdownCh chan chan struct{}
 	doneCh     chan struct{}
 }
@@ -34,6 +35,7 @@ func GetGlobalCheckinWriteQueue() *CheckinWriteQueue {
 		globalQueue = &CheckinWriteQueue{
 			items:      make(map[string]checkinWriteRequest),
 			flushing:   make(map[string]checkinWriteRequest),
+			tombstones: make(map[string]struct{}),
 			shutdownCh: make(chan chan struct{}),
 			doneCh:     make(chan struct{}),
 		}
@@ -45,6 +47,11 @@ func GetGlobalCheckinWriteQueue() *CheckinWriteQueue {
 func (q *CheckinWriteQueue) Get(path string) (*CheckinTimer, bool) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
+	if q.tombstones != nil {
+		if _, ok := q.tombstones[path]; ok {
+			return nil, false
+		}
+	}
 	if req, ok := q.items[path]; ok {
 		cp := *req.timer
 		return &cp, true
@@ -59,9 +66,32 @@ func (q *CheckinWriteQueue) Get(path string) (*CheckinTimer, bool) {
 func (q *CheckinWriteQueue) Enqueue(projectRoot string, timer *CheckinTimer) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
-	// Reducer: deduplicate by path. Only the latest state is written.
 	path := CheckinTimerPath(projectRoot, timer.TaskID)
+	if q.tombstones != nil {
+		delete(q.tombstones, path)
+	}
 	q.items[path] = checkinWriteRequest{projectRoot: projectRoot, timer: timer}
+}
+
+func (q *CheckinWriteQueue) Tombstone(path string) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	delete(q.items, path)
+	delete(q.flushing, path)
+	if q.tombstones == nil {
+		q.tombstones = make(map[string]struct{})
+	}
+	q.tombstones[path] = struct{}{}
+}
+
+func (q *CheckinWriteQueue) IsTombstoned(path string) bool {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+	if q.tombstones == nil {
+		return false
+	}
+	_, ok := q.tombstones[path]
+	return ok
 }
 
 func (q *CheckinWriteQueue) FlushWait() {
@@ -116,10 +146,26 @@ func (q *CheckinWriteQueue) flush() {
 			q.mu.Unlock()
 			continue
 		}
+		if q.tombstones != nil {
+			if _, ok := q.tombstones[path]; ok {
+				delete(q.flushing, path)
+				q.mu.Unlock()
+				_ = fileutil.Remove(path)
+				continue
+			}
+		}
 		q.mu.Unlock()
 
 		_ = q.writeDirect(req.projectRoot, req.timer)
 		q.mu.Lock()
+		if q.tombstones != nil {
+			if _, ok := q.tombstones[path]; ok {
+				delete(q.flushing, path)
+				q.mu.Unlock()
+				_ = fileutil.Remove(path)
+				continue
+			}
+		}
 		delete(q.flushing, path)
 		q.mu.Unlock()
 	}

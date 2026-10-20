@@ -233,11 +233,23 @@ func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 	if q := GetGlobalCheckinWriteQueue(); q != nil {
 		q.mu.Lock()
 		for _, req := range q.items {
+			path := CheckinTimerPath(req.projectRoot, req.timer.TaskID)
+			if q.tombstones != nil {
+				if _, ok := q.tombstones[path]; ok {
+					continue
+				}
+			}
 			if filepath.Clean(req.projectRoot) == filepath.Clean(projectRoot) && req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
 				acc.Add(req.timer.TaskID)
 			}
 		}
 		for _, req := range q.flushing {
+			path := CheckinTimerPath(req.projectRoot, req.timer.TaskID)
+			if q.tombstones != nil {
+				if _, ok := q.tombstones[path]; ok {
+					continue
+				}
+			}
 			if filepath.Clean(req.projectRoot) == filepath.Clean(projectRoot) && req.timer != nil && strings.EqualFold(req.timer.ClaimedBy, claimant) && req.timer.EvictedAt == "" {
 				acc.Add(req.timer.TaskID)
 			}
@@ -254,7 +266,11 @@ func LiveClaimIDs(projectRoot, claimant string) ([]string, error) {
 		if ent.IsDir() || !strings.HasSuffix(ent.Name(), checkinFileSuffix) {
 			continue
 		}
-		timer, err := LoadCheckinFile(filepath.Join(dir, ent.Name()))
+		timerPath := filepath.Join(dir, ent.Name())
+		if q := GetGlobalCheckinWriteQueue(); q != nil && q.IsTombstoned(timerPath) {
+			continue
+		}
+		timer, err := LoadCheckinFile(timerPath)
 		if err != nil || timer == nil || timer.EvictedAt != "" {
 			continue
 		}
