@@ -3,15 +3,12 @@ package job
 import (
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/scheduler"
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 )
 
 // NewJobCmd creates the Job Management parent command group.
 func NewJobCmd() *cobra.Command {
-	jobCmd := clipkg.NewCommandBuilder("job").
-		WithShort("Background scheduler job triggers, queues, history, and status").
-		WithLong("Inspect and manage background scheduler jobs, queues, execution history, activity, and configuration.").
-		Build()
+	jobCmd := bldr_cli_cmd_v1.NewJobCommandBuilder()
 
 	jobCmd.AddCommand(scheduler.NewListCmd())
 	jobCmd.AddCommand(scheduler.NewTriggerCmd())
