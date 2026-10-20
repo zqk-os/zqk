@@ -121,3 +121,73 @@ func TestServer_ListenAndServeCancel(t *testing.T) {
 		t.Fatalf("ListenAndServe: %v", err)
 	}
 }
+
+func TestServer_PathTraversalAndInjectionRejected(t *testing.T) {
+	t.Parallel()
+	srv, err := New(Config{ProjectRoot: t.TempDir(), SkipMCPProbe: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	h := srv.Handler()
+
+	traversalPayloads := []string{
+		`{"message":"test", "agent_id":"../../etc/passwd"}`,
+		`{"message":"test", "agent_id":"foo/bar"}`,
+		`{"message":"test", "agent_id":"foo\\bar"}`,
+		`{"message":"test", "agent_id":"-rf"}`,
+		`{"message":"test", "to_agent_id":"../evil", "await_peer_ack":true}`,
+		`{"message":"test", "feed_id":"../evil"}`,
+	}
+
+	for _, payload := range traversalPayloads {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, httptest.NewRequest(http.MethodPost, pathFeedSteer, bytes.NewBufferString(payload)))
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400 for steer payload %s, got %d", payload, rr.Code)
+		}
+	}
+
+	// Ack traversal rejection
+	ackPayloads := []string{
+		`{"in_reply_to":"../../etc/passwd", "agent_id":"agent1", "persona_ref":"per1"}`,
+		`{"in_reply_to":"AFE-1", "agent_id":"../evil", "persona_ref":"per1"}`,
+		`{"in_reply_to":"AFE-1", "agent_id":"agent1", "persona_ref":"../../evil"}`,
+		`{"in_reply_to":"AFE-1", "agent_id":"-rf", "persona_ref":"per1"}`,
+	}
+
+	for _, payload := range ackPayloads {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, httptest.NewRequest(http.MethodPost, pathFeedAck, bytes.NewBufferString(payload)))
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400 for ack payload %s, got %d", payload, rr.Code)
+		}
+	}
+
+	// Wake traversal rejection
+	wakePayloads := []string{
+		`{"message":"test", "agent_id":"../../evil"}`,
+		`{"message":"test", "to_agent_id":"../evil"}`,
+		`{"message":"test", "agent_id":"-rf"}`,
+	}
+
+	for _, payload := range wakePayloads {
+		rr := httptest.NewRecorder()
+		h.ServeHTTP(rr, httptest.NewRequest(http.MethodPost, pathFeedWake, bytes.NewBufferString(payload)))
+		if rr.Code != http.StatusBadRequest {
+			t.Fatalf("expected 400 for wake payload %s, got %d", payload, rr.Code)
+		}
+	}
+
+	// Pending traversal rejection
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, httptest.NewRequest(http.MethodGet, pathFeedPending+"?agent_id=../bad", nil))
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for pending bad agent_id, got %d", rr.Code)
+	}
+
+	rr = httptest.NewRecorder()
+	h.ServeHTTP(rr, httptest.NewRequest(http.MethodGet, pathFeedPending+"?agent_id=valid&persona_ref=../bad", nil))
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for pending bad persona_ref, got %d", rr.Code)
+	}
+}

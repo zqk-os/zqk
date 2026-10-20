@@ -69,6 +69,11 @@ func TestValidateSafePath(t *testing.T) {
 			path:        "/tmp/--version/test",
 			expectError: true,
 		},
+		{
+			name:        "path with null byte is rejected",
+			path:        "/tmp/bad\x00file.txt",
+			expectError: true,
+		},
 	}
 
 	for _, tc := range testCases {

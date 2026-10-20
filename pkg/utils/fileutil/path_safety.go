@@ -22,6 +22,9 @@ func ValidateSafePath(path string) error {
 		return nil
 	}
 	clean := filepath.Clean(trimmed)
+	if strings.Contains(clean, "\x00") {
+		return errfmt.Errorf("%w: null byte prohibited", ErrUnsafeFlagPath)
+	}
 	if strings.HasPrefix(clean, "-") {
 		return errfmt.Errorf("%w: path %q begins with flag-like prefix", ErrUnsafeFlagPath, path)
 	}

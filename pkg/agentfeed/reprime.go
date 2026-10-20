@@ -62,7 +62,7 @@ type RePrimeResult struct {
 
 // AgentInFlightStatePath returns the disk path for a seat's persistent in-flight state file.
 func AgentInFlightStatePath(projectRoot, agentID string) string {
-	safe := strings.ReplaceAll(strings.TrimSpace(agentID), "/", "_")
+	safe := sanitizeSafePathSegment(agentID)
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "mesh", "in_flight", safe+".json")
 }
 

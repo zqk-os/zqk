@@ -235,7 +235,7 @@ type orchestrateDuty struct {
 }
 
 func orchestrateDutyPath(projectRoot, fromAgentID string) string {
-	safe := strings.ReplaceAll(strings.TrimSpace(fromAgentID), "/", "_")
+	safe := sanitizeSafePathSegment(fromAgentID)
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "mesh", "seat_workers", safe+".orchestrate-duty.json")
 }
 

@@ -61,9 +61,32 @@ type SeatWorkerResult struct {
 // Return nil to leave the item unacked for a human or later pass.
 type NonCommsHandler func(ctx context.Context, item CorrespondenceItem, body string) error
 
+// sanitizeSafePathSegment cleans and sanitizes an identifier for safe filesystem usage,
+// preventing path traversal, separator injection, and flag injection.
+func sanitizeSafePathSegment(raw string) string {
+	s := strings.TrimSpace(raw)
+	if s == "" {
+		return "unknown"
+	}
+	// Normalize separators before finding base component
+	s = strings.ReplaceAll(s, "\\", "/")
+	clean := filepath.Clean(s)
+	base := filepath.Base(clean)
+	if base == "." || base == "/" || base == ".." || base == "" {
+		return "unknown"
+	}
+	base = strings.ReplaceAll(base, "..", "_")
+	base = strings.ReplaceAll(base, "/", "_")
+	base = strings.TrimLeft(base, "._- ")
+	if base == "" {
+		return "unknown"
+	}
+	return base
+}
+
 // SeatWorkerAlivePath returns the heartbeat file for a seat.
 func SeatWorkerAlivePath(projectRoot, agentID string) string {
-	safe := strings.ReplaceAll(strings.TrimSpace(agentID), "/", "_")
+	safe := sanitizeSafePathSegment(agentID)
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "mesh", "seat_workers", safe+".alive.json")
 }
 
@@ -101,7 +124,7 @@ func WriteSeatWorkerAlive(projectRoot, agentID, sessionID string, now time.Time)
 
 // SeatWorkerAttemptsPath returns the per-seat ledger of failed AgentX attempts.
 func SeatWorkerAttemptsPath(projectRoot, agentID string) string {
-	safe := strings.ReplaceAll(strings.TrimSpace(agentID), "/", "_")
+	safe := sanitizeSafePathSegment(agentID)
 	return filepath.Join(projectRoot, paths.ProjectDataDir, paths.StateDir, "mesh", "seat_workers", safe+".attempts.json")
 }
 
