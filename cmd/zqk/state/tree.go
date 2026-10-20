@@ -393,7 +393,9 @@ func readStreamFileMutations(fileRef streamFileRef) []JournalMutation {
 		return nil
 	}
 	defer func() {
-		_ = file.Close()
+		if cErr := file.Close(); cErr != nil {
+			return
+		}
 	}()
 
 	scanner := bufio.NewScanner(file)
