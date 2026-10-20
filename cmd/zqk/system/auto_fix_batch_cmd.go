@@ -109,6 +109,11 @@ func NewAutoFixProcessPendingCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemAutoFixProcessPendingCommandBuilder()
 	cmd.Hidden = true
 	cmd.RunE = runAutoFixProcessPending
+
+	cmd.Flags().String("project-root", "", "Project root directory")
+	cmd.Flags().Bool("sync-glossary", false, "Scan for missing glossary terms after processing")
+	cmd.Flags().Bool("sync-glossary-apply", false, "Create missing glossary terms inferred from specs")
+
 	return cmd
 }
 
@@ -543,7 +548,7 @@ func NewAutoFixBatchCmd() *cobra.Command {
 	})
 
 	cmd.Flags().String("batch-file", "", "Path to batch JSON file (required)")
-	// cmd.Flags().String("project-root", "", "Project root directory (required)")
+	cmd.Flags().String("project-root", "", "Project root directory (required)")
 	cmd.Flags().Int("chunk-size", 0, fmt.Sprintf("Number of issues per transactional chunk (0 = use default or %s env; default 20)", zqkenv.AutofixBatchChunkSize()))
 
 	return cmd

@@ -18,3 +18,16 @@ description: |-
       zqk system auto-fix-process-pending
       With explicit project root
       zqk system auto-fix-process-pending --project-root /path/to/project
+
+flags:
+  - name: project-root
+    type: string
+    description: Project root directory
+  - name: sync-glossary
+    type: bool
+    description: Scan for missing glossary terms after processing
+  - name: sync-glossary-apply
+    type: bool
+    description: Create missing glossary terms inferred from specs
+
+common_flags: true

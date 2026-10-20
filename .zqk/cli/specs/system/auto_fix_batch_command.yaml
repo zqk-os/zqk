@@ -18,3 +18,17 @@ description: |-
       zqk system auto-fix-process-pending
       With explicit project root
       zqk system auto-fix-process-pending --project-root /path/to/project
+
+flags:
+  - name: batch-file
+    type: string
+    required: true
+    description: Path to batch JSON file (required)
+  - name: project-root
+    type: string
+    description: Project root directory
+  - name: chunk-size
+    type: int
+    description: Number of issues per transactional chunk
+
+common_flags: true

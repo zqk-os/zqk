@@ -241,3 +241,45 @@ func TestAutoFixBatchProcessor_ProcessBatch_NilProvider_FailsGracefully(t *testi
 		t.Errorf("expected Failed > 0 when storage factory cannot be created, got %+v", result)
 	}
 }
+
+func TestAutoFixCommands_FlagsRegistered(t *testing.T) {
+	t.Parallel()
+
+	t.Run("auto-fix-batch flags", func(t *testing.T) {
+		cmd := NewAutoFixBatchCmd()
+		for _, flagName := range []string{"batch-file", "project-root", "chunk-size"} {
+			f := cmd.Flags().Lookup(flagName)
+			if f == nil {
+				t.Fatalf("auto-fix-batch missing expected flag: --%s", flagName)
+			}
+		}
+		if err := cmd.Flags().Set("project-root", "/test/dir"); err != nil {
+			t.Fatalf("failed setting --project-root: %v", err)
+		}
+		if err := cmd.Flags().Set("batch-file", "test.json"); err != nil {
+			t.Fatalf("failed setting --batch-file: %v", err)
+		}
+		if err := cmd.Flags().Set("chunk-size", "10"); err != nil {
+			t.Fatalf("failed setting --chunk-size: %v", err)
+		}
+	})
+
+	t.Run("auto-fix-process-pending flags", func(t *testing.T) {
+		cmd := NewAutoFixProcessPendingCmd()
+		for _, flagName := range []string{"project-root", "sync-glossary", "sync-glossary-apply"} {
+			f := cmd.Flags().Lookup(flagName)
+			if f == nil {
+				t.Fatalf("auto-fix-process-pending missing expected flag: --%s", flagName)
+			}
+		}
+		if err := cmd.Flags().Set("project-root", "/test/dir"); err != nil {
+			t.Fatalf("failed setting --project-root: %v", err)
+		}
+		if err := cmd.Flags().Set("sync-glossary", "true"); err != nil {
+			t.Fatalf("failed setting --sync-glossary: %v", err)
+		}
+		if err := cmd.Flags().Set("sync-glossary-apply", "true"); err != nil {
+			t.Fatalf("failed setting --sync-glossary-apply: %v", err)
+		}
+	})
+}

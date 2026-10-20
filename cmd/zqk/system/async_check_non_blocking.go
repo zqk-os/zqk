@@ -52,7 +52,6 @@ func runCheckAsyncNonBlocking(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	defer setup.cleanup()
 
 	// Emit start event immediately
 	if setup.projectRoot != emptyValue && setup.storageProvider != nil {
@@ -78,6 +77,7 @@ func runCheckAsyncNonBlocking(cmd *cobra.Command, args []string) error {
 		nonBlockBuilder = nonBlockBuilder.WithBudget(nonBlockBud)
 	}
 	nonBlockBuilder.StartWithContext(backgroundCtx, func(bgCtx context.Context) error {
+		defer setup.cleanup()
 		started := time.Now()
 		checkErr := runCheckAsyncWithContext(cmd, setup.cliCtx, args)
 		emitSystemCheckOperationResult(setup.projectRoot, setup.storageProvider, setup.operationID, setup.profile, checkErr, time.Since(started))
