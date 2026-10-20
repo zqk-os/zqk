@@ -49,123 +49,111 @@ func TestRunQuick_UnknownPreset(t *testing.T) {
 	}
 }
 
-func TestRunQuickQuestions_Empty(t *testing.T) {
-	// Not t.Parallel(): setupTestProject uses t.Setenv(ZQK_TEST_ROOT).
-	projectRoot, storageProvider := setupTestProject(t)
-	cmd := createQuickTestCommand(t, projectRoot, storageProvider)
-	_ = cmd.Flags().Set("preset", presetQuestions)
-	_ = cmd.Flags().Set("format", quickFormatJSON)
-
-	err := runQuick(cmd, nil)
-	if err != nil {
-		t.Fatalf("runQuick questions (empty): %v", err)
-	}
-}
-
-func TestRunQuickQuestions_WithData(t *testing.T) {
+func TestRunQuick_LifecyclePresets(t *testing.T) {
 	// Not t.Parallel(): setupTestProject uses t.Setenv(ZQK_TEST_ROOT).
 	projectRoot, storageProvider := setupTestProject(t)
 	ctx := pkgctx.NewSystemContext()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
-	// Create open question (unanswered)
-	q := map[string]any{
-		objects.FieldKeyID:            "QUE-TEST-1",
-		objects.FieldKeyKind:          quickKindQuestion,
-		objects.FieldKeySchemaVersion: quickSchemaV2,
-		objects.FieldKeyStatus:        quickStatusOpen,
-		objects.FieldKeyTitle:         "Test question",
-		objects.FieldKeyQuestionText:  "What is the answer?",
-		objects.FieldKeyUpdatedBy:     "ACC-TEST",
-	}
-	storage.CreateCASVisible(t, storageProvider, ctx, secCtx, q, "answered")
+	t.Run("Questions_Empty", func(t *testing.T) {
+		cmd := createQuickTestCommand(t, projectRoot, storageProvider)
+		_ = cmd.Flags().Set("preset", presetQuestions)
+		_ = cmd.Flags().Set("format", quickFormatJSON)
 
-	cmd := createQuickTestCommand(t, projectRoot, storageProvider)
-	_ = cmd.Flags().Set("preset", presetQuestions)
-	_ = cmd.Flags().Set("format", quickFormatJSON)
+		err := runQuick(cmd, nil)
+		if err != nil {
+			t.Fatalf("runQuick questions (empty): %v", err)
+		}
+	})
 
-	err := runQuick(cmd, nil)
-	if err != nil {
-		t.Fatalf("runQuick questions: %v", err)
-	}
-}
+	t.Run("MilestonesOverdue_Empty", func(t *testing.T) {
+		cmd := createQuickTestCommand(t, projectRoot, storageProvider)
+		_ = cmd.Flags().Set("preset", presetMilestonesOverdue)
+		_ = cmd.Flags().Set("format", quickFormatJSON)
 
-func TestRunQuickQuestions_StrictWithP0_ReturnsError(t *testing.T) {
-	// Not t.Parallel(): setupTestProject uses t.Setenv(ZQK_TEST_ROOT).
-	projectRoot, storageProvider := setupTestProject(t)
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
+		err := runQuick(cmd, nil)
+		if err != nil {
+			t.Fatalf("runQuick milestones-overdue (empty): %v", err)
+		}
+	})
 
-	q := map[string]any{
-		objects.FieldKeyID:            "QUE-P0-1",
-		objects.FieldKeyKind:          quickKindQuestion,
-		objects.FieldKeySchemaVersion: quickSchemaV2,
-		objects.FieldKeyStatus:        quickStatusOpen,
-		objects.FieldKeyTitle:         "P0 question",
-		objects.FieldKeyQuestionText:  "Critical?",
-		objects.FieldKeyPriorityTier:  quickPriorityP0,
-		objects.FieldKeyUpdatedBy:     "ACC-TEST",
-	}
-	storage.CreateCASVisible(t, storageProvider, ctx, secCtx, q, "answered")
+	t.Run("Questions_WithData", func(t *testing.T) {
+		// Create open question (unanswered)
+		q := map[string]any{
+			objects.FieldKeyID:            "QUE-TEST-1",
+			objects.FieldKeyKind:          quickKindQuestion,
+			objects.FieldKeySchemaVersion: quickSchemaV2,
+			objects.FieldKeyStatus:        quickStatusOpen,
+			objects.FieldKeyTitle:         "Test question",
+			objects.FieldKeyQuestionText:  "What is the answer?",
+			objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		}
+		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, q, "answered")
 
-	cmd := createQuickTestCommand(t, projectRoot, storageProvider)
-	_ = cmd.Flags().Set("preset", presetQuestions)
-	_ = cmd.Flags().Set("strict", "true")
-	_ = cmd.Flags().Set("format", quickFormatJSON)
+		cmd := createQuickTestCommand(t, projectRoot, storageProvider)
+		_ = cmd.Flags().Set("preset", presetQuestions)
+		_ = cmd.Flags().Set("format", quickFormatJSON)
 
-	err := runQuick(cmd, nil)
-	if err == nil {
-		t.Fatal("expected non-nil error when --strict and P0 question present")
-	}
-	var exitErr errExitCode
-	if !errors.As(err, &exitErr) {
-		t.Errorf("expected errExitCode, got %T: %v", err, err)
-	}
-}
+		err := runQuick(cmd, nil)
+		if err != nil {
+			t.Fatalf("runQuick questions: %v", err)
+		}
+	})
 
-func TestRunQuickMilestonesOverdue_Empty(t *testing.T) {
-	// Not t.Parallel(): setupTestProject uses t.Setenv(ZQK_TEST_ROOT).
-	projectRoot, storageProvider := setupTestProject(t)
-	cmd := createQuickTestCommand(t, projectRoot, storageProvider)
-	_ = cmd.Flags().Set("preset", presetMilestonesOverdue)
-	_ = cmd.Flags().Set("format", quickFormatJSON)
+	t.Run("Questions_StrictWithP0_ReturnsError", func(t *testing.T) {
+		q := map[string]any{
+			objects.FieldKeyID:            "QUE-P0-1",
+			objects.FieldKeyKind:          quickKindQuestion,
+			objects.FieldKeySchemaVersion: quickSchemaV2,
+			objects.FieldKeyStatus:        quickStatusOpen,
+			objects.FieldKeyTitle:         "P0 question",
+			objects.FieldKeyQuestionText:  "Critical?",
+			objects.FieldKeyPriorityTier:  quickPriorityP0,
+			objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		}
+		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, q, "answered")
 
-	err := runQuick(cmd, nil)
-	if err != nil {
-		t.Fatalf("runQuick milestones-overdue (empty): %v", err)
-	}
-}
+		cmd := createQuickTestCommand(t, projectRoot, storageProvider)
+		_ = cmd.Flags().Set("preset", presetQuestions)
+		_ = cmd.Flags().Set("strict", "true")
+		_ = cmd.Flags().Set("format", quickFormatJSON)
 
-func TestRunQuickMilestonesOverdue_WithData(t *testing.T) {
-	// Not t.Parallel(): setupTestProject uses t.Setenv(ZQK_TEST_ROOT).
-	projectRoot, storageProvider := setupTestProject(t)
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
+		err := runQuick(cmd, nil)
+		if err == nil {
+			t.Fatal("expected non-nil error when --strict and P0 question present")
+		}
+		var exitErr errExitCode
+		if !errors.As(err, &exitErr) {
+			t.Errorf("expected errExitCode, got %T: %v", err, err)
+		}
+	})
 
-	// Milestone with target_date in the past (not complete)
-	past := time.Now().UTC().AddDate(0, 0, -14).Format("2006-01-02")
-	m := map[string]any{
-		objects.FieldKeyID:            "MIL-TEST-1",
-		objects.FieldKeyKind:          quickKindMilestone,
-		objects.FieldKeySchemaVersion: quickSchemaV2,
-		objects.FieldKeyStatus:        quickStatusInProgress,
-		objects.FieldKeyTitle:         "Overdue milestone",
-		objects.FieldKeyTargetDate:    past,
-		objects.FieldKeyUpdatedBy:     "ACC-TEST",
-		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
-		objects.FieldKeyCreatedBy:     "ACC-TEST",
-	}
-	storage.CreateCASVisible(t, storageProvider, ctx, secCtx, m, quickStatusInProgress)
+	t.Run("MilestonesOverdue_WithData", func(t *testing.T) {
+		// Milestone with target_date in the past (not complete)
+		past := time.Now().UTC().AddDate(0, 0, -14).Format("2006-01-02")
+		m := map[string]any{
+			objects.FieldKeyID:            "MIL-TEST-1",
+			objects.FieldKeyKind:          quickKindMilestone,
+			objects.FieldKeySchemaVersion: quickSchemaV2,
+			objects.FieldKeyStatus:        quickStatusInProgress,
+			objects.FieldKeyTitle:         "Overdue milestone",
+			objects.FieldKeyTargetDate:    past,
+			objects.FieldKeyUpdatedBy:     "ACC-TEST",
+			objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
+			objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
+			objects.FieldKeyCreatedBy:     "ACC-TEST",
+		}
+		storage.CreateCASVisible(t, storageProvider, ctx, secCtx, m, quickStatusInProgress)
 
-	cmd := createQuickTestCommand(t, projectRoot, storageProvider)
-	_ = cmd.Flags().Set("preset", presetMilestonesOverdue)
-	_ = cmd.Flags().Set("format", quickFormatJSON)
+		cmd := createQuickTestCommand(t, projectRoot, storageProvider)
+		_ = cmd.Flags().Set("preset", presetMilestonesOverdue)
+		_ = cmd.Flags().Set("format", quickFormatJSON)
 
-	err := runQuick(cmd, nil)
-	if err != nil {
-		t.Fatalf("runQuick milestones-overdue: %v", err)
-	}
+		err := runQuick(cmd, nil)
+		if err != nil {
+			t.Fatalf("runQuick milestones-overdue: %v", err)
+		}
+	})
 }
 
 func TestErrExitCode_Error(t *testing.T) {
