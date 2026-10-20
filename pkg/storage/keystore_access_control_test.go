@@ -61,8 +61,8 @@ func setupKeystoreTest(t *testing.T) (string, *FileObjectStorage, *pkgctx.Securi
 		t.Fatalf("Failed to create storage: %v", err)
 	}
 
-	defer func() { _ = storage.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
+		_ = storage.Shutdown(context.Background())
 		opts := TempProjectTeardown(tmpDir, storage)
 		if err := RunProjectTestTeardown(opts); err != nil {
 			t.Logf("project test teardown: %v", err)
