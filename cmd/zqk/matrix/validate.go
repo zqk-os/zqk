@@ -2,7 +2,6 @@ package matrix
 
 import (
 	"github.com/spf13/cobra"
-	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -25,10 +24,8 @@ func runMatrixValidate(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	var flags clipkg.FlagBag
-	name := flags.String(cmd, "name")
-	registryFlag := flags.String(cmd, "registry")
-	if err := flags.Err(); err != nil {
+	name, registryFlag, err := resolveMatrixTargetFlags(cmd)
+	if err != nil {
 		return err
 	}
 
