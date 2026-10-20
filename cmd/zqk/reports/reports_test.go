@@ -368,161 +368,131 @@ func createMockCommand(t *testing.T, projectRoot string) *cobra.Command {
 	return cmd
 }
 
-func TestReportsPCS_BaseMetrics(t *testing.T) {
+func TestReports_Calculations(t *testing.T) {
 	_, storageProvider := setupTestProject(t)
 	createTestData(t, storageProvider)
 
-	// Calculate expected PCS manually
-	// The filter only includes: "complete", "in_progress", "validated", "planned"
-	// So "exploring" items are excluded from the calculation
-	// We have: 2 complete (1.0), 2 validated (0.5) = 4 items in the filter
-	// Score: (2*1.0 + 2*0.5) / 4 * 100 = 3.0 / 4 * 100 = 75.0
-	// However, commit data may be auto-detected, which could enhance the score
-	// So we'll check that it's in a reasonable range
-	expectedBasePCS := (2.0*1.0 + 2.0*0.5) / 4.0 * 100.0
+	t.Run("PCS_BaseMetrics", func(t *testing.T) {
+		// Calculate expected PCS manually
+		// The filter only includes: "complete", "in_progress", "validated", "planned"
+		// So "exploring" items are excluded from the calculation
+		// We have: 2 complete (1.0), 2 validated (0.5) = 4 items in the filter
+		// Score: (2*1.0 + 2*0.5) / 4 * 100 = 3.0 / 4 * 100 = 75.0
+		// However, commit data may be auto-detected, which could enhance the score
+		// So we'll check that it's in a reasonable range
+		expectedBasePCS := (2.0*1.0 + 2.0*0.5) / 4.0 * 100.0
 
-	// Verify calculation
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", false)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
-	}
-
-	// Allow for commit data auto-detection (if commit data exists, it may enhance PCS)
-	// Base PCS should be around 75.0, but with commit data it could be enhanced
-	// So we check it's in a reasonable range (base to base + enhancements)
-	minExpected := expectedBasePCS - 5.0  // Allow some variance
-	maxExpected := expectedBasePCS + 20.0 // Allow for commit enhancements
-	if projectMetrics.PCS < minExpected || projectMetrics.PCS > maxExpected {
-		t.Errorf("expected PCS in range [%.2f, %.2f], got %.2f (base: %.2f)", minExpected, maxExpected, projectMetrics.PCS, expectedBasePCS)
-	}
-
-	// Verify PCS is in valid range
-	if projectMetrics.PCS < 0 || projectMetrics.PCS > 100 {
-		t.Errorf("PCS should be in range [0, 100], got %.2f", projectMetrics.PCS)
-	}
-}
-
-func TestReportsPCS_WithCommitData(t *testing.T) {
-	_, storageProvider := setupTestProject(t)
-	createTestData(t, storageProvider)
-
-	// Calculate metrics with commit data
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
-	}
-
-	// With commit data, PCS should be enhanced
-	// We have 5 unique commits in last 30 days
-	// 5 commits / 30 days = ~0.167 commits/day (low frequency, but recent activity)
-	// 4 commits in last 7 days
-	// Pattern should be "increasing" or "stable"
-
-	// Verify PCS is enhanced (should be different from base)
-	if projectMetrics.PCS <= 0 || projectMetrics.PCS > 100 {
-		t.Errorf("PCS should be in range [0, 100], got %.2f", projectMetrics.PCS)
-	}
-
-	// Verify commit data is being used (PCS should be enhanced)
-	// Base PCS is ~65, with commit enhancements it should be different
-	baseMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", false)
-	if err != nil {
-		t.Logf("Note: Could not calculate base metrics for comparison: %v", err)
-	} else if projectMetrics.PCS == baseMetrics.PCS {
-		t.Logf("Note: PCS with commit data (%.2f) equals base PCS (%.2f) - commit data may not be enhancing", projectMetrics.PCS, baseMetrics.PCS)
-	}
-}
-
-func TestReportsEDD_Calculation(t *testing.T) {
-	_, storageProvider := setupTestProject(t)
-	createTestData(t, storageProvider)
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Calculate EDD
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
-	}
-
-	// EDD can be negative or positive
-	// With commit data: we have ~5 unique commits and 5 backlog items
-	// Work item ratio = 5 / 5 = 1.0 (optimal range is 2-5)
-	// This should indicate underestimation (low ratio)
-	// So EDD should be adjusted upward
-
-	// Verify EDD is calculated
-	if projectMetrics.EDD < -100 || projectMetrics.EDD > 100 {
-		t.Errorf("EDD should be in reasonable range, got %.2f", projectMetrics.EDD)
-	}
-}
-
-func TestReportsBlockers_DependencyDetection(t *testing.T) {
-	_, storageProvider := setupTestProject(t)
-	createTestData(t, storageProvider)
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Calculate D&B
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
-	}
-
-	// Verify dependencies are detected
-	// We created co-change pattern: cochange-a.go and cochange-b.go changed together 3 times
-	// This should trigger dependency detection
-	foundCoChangeDep := false
-	for _, dep := range projectMetrics.DB.Dependencies {
-		if strings.Contains(dep.Description, "cochange-a.go") && strings.Contains(dep.Description, "cochange-b.go") {
-			foundCoChangeDep = true
-			if dep.Type != "code" {
-				t.Errorf("expected dependency type 'code', got %s", dep.Type)
-			}
-			if dep.Severity != "medium" {
-				t.Errorf("expected dependency severity 'medium', got %s", dep.Severity)
-			}
-			break
+		// Verify calculation
+		ctx := pkgctx.NewSystemContext()
+		secCtx := pkgctx.NewSystemSecurityContext()
+		projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", false)
+		if err != nil {
+			t.Fatalf("failed to calculate metrics: %v", err)
 		}
-	}
-	if !foundCoChangeDep {
-		t.Error("expected to detect co-change dependency between cochange-a.go and cochange-b.go")
-	}
 
-	// Verify blockers are detected
-	// We created stale file pattern: stale.go has 5 commits but all > 30 days ago
-	// This should trigger stale file blocker detection
-	foundStaleBlocker := false
-	for _, blocker := range projectMetrics.DB.Blockers {
-		if strings.Contains(blocker.Description, "stale.go") && strings.Contains(blocker.Description, "no recent activity") {
-			foundStaleBlocker = true
-			if blocker.Type != "code" {
-				t.Errorf("expected blocker type 'code', got %s", blocker.Type)
-			}
-			break
+		// Allow for commit data auto-detection (if commit data exists, it may enhance PCS)
+		// Base PCS should be around 75.0, but with commit data it could be enhanced
+		// So we check it's in a reasonable range (base to base + enhancements)
+		minExpected := expectedBasePCS - 5.0  // Allow some variance
+		maxExpected := expectedBasePCS + 20.0 // Allow for commit enhancements
+		if projectMetrics.PCS < minExpected || projectMetrics.PCS > maxExpected {
+			t.Errorf("expected PCS in range [%.2f, %.2f], got %.2f (base: %.2f)", minExpected, maxExpected, projectMetrics.PCS, expectedBasePCS)
 		}
-	}
-	if !foundStaleBlocker {
-		t.Error("expected to detect stale file blocker for stale.go")
-	}
+
+		// Verify PCS is in valid range
+		if projectMetrics.PCS < 0 || projectMetrics.PCS > 100 {
+			t.Errorf("PCS should be in range [0, 100], got %.2f", projectMetrics.PCS)
+		}
+	})
+
+	t.Run("PCS_WithCommitData", func(t *testing.T) {
+		// Calculate metrics with commit data
+		ctx := pkgctx.NewSystemContext()
+		secCtx := pkgctx.NewSystemSecurityContext()
+		projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
+		if err != nil {
+			t.Fatalf("failed to calculate metrics: %v", err)
+		}
+
+		// Verify PCS is enhanced (should be different from base)
+		if projectMetrics.PCS <= 0 || projectMetrics.PCS > 100 {
+			t.Errorf("PCS should be in range [0, 100], got %.2f", projectMetrics.PCS)
+		}
+
+		// Verify commit data is being used (PCS should be enhanced)
+		// Base PCS is ~65, with commit enhancements it should be different
+		baseMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", false)
+		if err != nil {
+			t.Logf("Note: Could not calculate base metrics for comparison: %v", err)
+		} else if projectMetrics.PCS == baseMetrics.PCS {
+			t.Logf("Note: PCS with commit data (%.2f) equals base PCS (%.2f) - commit data may not be enhancing", projectMetrics.PCS, baseMetrics.PCS)
+		}
+	})
+
+	t.Run("EDD_Calculation", func(t *testing.T) {
+		ctx := pkgctx.NewSystemContext()
+		secCtx := pkgctx.NewSystemSecurityContext()
+
+		// Calculate EDD
+		projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
+		if err != nil {
+			t.Fatalf("failed to calculate metrics: %v", err)
+		}
+
+		// Verify EDD is calculated
+		if projectMetrics.EDD < -100 || projectMetrics.EDD > 100 {
+			t.Errorf("EDD should be in reasonable range, got %.2f", projectMetrics.EDD)
+		}
+	})
+
+	t.Run("Blockers_DependencyDetection", func(t *testing.T) {
+		ctx := pkgctx.NewSystemContext()
+		secCtx := pkgctx.NewSystemSecurityContext()
+
+		// Calculate D&B
+		projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
+		if err != nil {
+			t.Fatalf("failed to calculate metrics: %v", err)
+		}
+
+		// Verify dependencies are detected
+		foundCoChangeDep := false
+		for _, dep := range projectMetrics.DB.Dependencies {
+			if strings.Contains(dep.Description, "cochange-a.go") && strings.Contains(dep.Description, "cochange-b.go") {
+				foundCoChangeDep = true
+				if dep.Type != "code" {
+					t.Errorf("expected dependency type 'code', got %s", dep.Type)
+				}
+				if dep.Severity != "medium" {
+					t.Errorf("expected dependency severity 'medium', got %s", dep.Severity)
+				}
+				break
+			}
+		}
+		if !foundCoChangeDep {
+			t.Error("expected to detect co-change dependency between cochange-a.go and cochange-b.go")
+		}
+
+		// Verify blockers are detected
+		foundStaleBlocker := false
+		for _, blocker := range projectMetrics.DB.Blockers {
+			if strings.Contains(blocker.Description, "stale.go") && strings.Contains(blocker.Description, "no recent activity") {
+				foundStaleBlocker = true
+				if blocker.Type != "code" {
+					t.Errorf("expected blocker type 'code', got %s", blocker.Type)
+				}
+				break
+			}
+		}
+		if !foundStaleBlocker {
+			t.Error("expected to detect stale file blocker for stale.go")
+		}
+	})
 }
 
 func TestReportsPCS_JSONOutput(t *testing.T) {
-	_, storageProvider := setupTestProject(t)
-	createTestData(t, storageProvider)
-
-	// Test JSON output format
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", false)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
+	projectMetrics := &metrics.ProjectMetrics{
+		PCS: 75.0,
 	}
 
 	// Verify JSON can be marshaled
@@ -550,14 +520,8 @@ func TestReportsPCS_JSONOutput(t *testing.T) {
 }
 
 func TestReportsEDD_JSONOutput(t *testing.T) {
-	_, storageProvider := setupTestProject(t)
-	createTestData(t, storageProvider)
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
+	projectMetrics := &metrics.ProjectMetrics{
+		EDD: 10.0,
 	}
 
 	// Verify JSON can be marshaled
@@ -585,14 +549,19 @@ func TestReportsEDD_JSONOutput(t *testing.T) {
 }
 
 func TestReportsBlockers_JSONOutput(t *testing.T) {
-	_, storageProvider := setupTestProject(t)
-	createTestData(t, storageProvider)
-
-	ctx := pkgctx.NewSystemContext()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	projectMetrics, err := metrics.CalculateProjectMetrics(ctx, storageProvider, secCtx, "test-project", true)
-	if err != nil {
-		t.Fatalf("failed to calculate metrics: %v", err)
+	projectMetrics := &metrics.ProjectMetrics{
+		DB: &metrics.DependenciesBlockers{
+			Summary: "Test summary",
+			Dependencies: []metrics.DependencyItem{
+				{Severity: "medium", Type: "code", Description: "Dependency found"},
+			},
+			Blockers: []metrics.BlockerItem{
+				{Severity: "high", Type: "code", Description: "Blocker found"},
+			},
+			ActionItems: []metrics.ActionItem{
+				{Priority: "high", Description: "Resolve blocker"},
+			},
+		},
 	}
 
 	// Verify JSON can be marshaled
