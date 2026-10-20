@@ -88,8 +88,6 @@ func enqueueMintPromoteJob(projectRoot, objectID string) (string, error) {
 		updates := map[string]any{
 			objects.FieldKeyEnabled:          true,
 			objects.FieldKeyStatus:           mintPromoteStatusActive,
-			objects.FieldKeyUpdatedAt:        nowStr,
-			objects.FieldKeyUpdatedBy:        pkgctx.SystemAccountID,
 			objects.FieldKeyCommand:          exe,
 			objects.FieldKeyCommandArgs:      commandArgs,
 			objects.FieldKeyWorkingDirectory: projectRoot,
