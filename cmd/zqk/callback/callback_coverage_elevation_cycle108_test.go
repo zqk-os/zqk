@@ -916,14 +916,9 @@ func TestCycle108_ProcessorAndCallbackCmd_Comprehensive(t *testing.T) {
 	cmdBadSort.SetContext(ctxSort)
 	assert.Error(t, handleCallback(cliCtx, cmdBadSort))
 
-	// Queue size > 0 enqueue path
-	cmdQueue := NewNotifyCmd()
-	require.NoError(t, cmdQueue.Flags().Set("queue-size", "5"))
-	require.NoError(t, cmdQueue.Flags().Set("log-file", filepath.Join(tmpDir, "queue.log")))
-	ctxQueue := pkgctx.WithStdinReader(context.Background(), bytes.NewBufferString(`{"job_id":"SCH-QUEUED","status":"ok"}`))
-	cmdQueue.SetContext(ctxQueue)
-	assert.NoError(t, handleCallback(cliCtx, cmdQueue))
-
+	// Test enqueue path directly on local processor to preserve global singleton isolation
+	require.NoError(t, proc.Initialize(tmpDir, filepath.Join(tmpDir, "queue.log"), true, 5, &TimestampSorter{}, outputtypes.IDText))
+	assert.NoError(t, proc.Enqueue(map[string]any{"job_id": "SCH-QUEUED", "status": "ok"}))
 	proc.Shutdown()
 }
 
