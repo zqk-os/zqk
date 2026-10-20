@@ -153,3 +153,17 @@ The `cmd/zqk/job` command tree is comprehensively validated under `cmd/zqk/job/j
 - Statement test coverage: **100.0%**.
 - Verified commands: `list`, `trigger`, `activity`, `history`, `state`, `config`, `clear-issues`, `health-check`, `dump`.
 - Invariant tests: Subprocess termination, signal forwarding, timeout enforcement, JSON/YAML/table serialization, and isolated project root execution.
+
+---
+
+## 7. Verification & Statement Coverage Invariant
+
+Statement test coverage for `cmd/zqk/job` is strictly enforced:
+
+- **Baseline Floor Requirement**: `>= 85.0%` statement coverage.
+- **Cycle 105 Target Verified**: `100.0%` statement coverage achieved across all command entrypoints.
+- **Test Matrix (`cmd/zqk/job/`)**:
+  - `job_test.go`: Core functional acceptance, command registration, and CLI tree structure.
+  - `job_extended_test.go`: Extended flag combinations, multi-format output rendering, and execution contexts.
+  - `job_coverage_elevation_cycle105_test.go`: Subprocess termination, signal forwarding, timeout enforcement, JSON/YAML/table serialization, configuration mutation, health verification, and issue remediation across isolated project environments.
+
