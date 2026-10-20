@@ -106,13 +106,13 @@ The State Tree command synthesizes an integrated perspective across the Knowledg
 
 ```mermaid
 graph TD
-    ORG["Organization: ORG-DEMO-001"] --> MIS["Mission: MIS-DEMO-001"]
-    MIS --> VIS["Vision: VIS-DEMO-001"]
-    MIS --> GOAL["Goal: GOAL-DEMO-001"]
-    GOAL --> PLAN["Priority Plan: PRI-DEMO-001"]
-    PLAN --> REQ["Requirement: REQ-DEMO-001"]
-    REQ --> BLI1["BLI: BLI-DEMO-001 (Claimed: AGENT-LEADER)"]
-    REQ --> BLI2["BLI: BLI-DEMO-002 (Unclaimed)"]
+    ORG["Organization (Core)"] --> MIS["Mission (Strategic)"]
+    MIS --> VIS["Vision (Horizon)"]
+    MIS --> GOAL["Goal (Compass)"]
+    GOAL --> PLAN["Priority Plan (Execution Cycle)"]
+    PLAN --> REQ["Requirement (Feature Contract)"]
+    REQ --> BLI1["Backlog Item 1 (Claimed: Leader)"]
+    REQ --> BLI2["Backlog Item 2 (Unclaimed)"]
 ```
 
 #### Key Projection Behaviors:
