@@ -86,14 +86,26 @@ func resolveProjectRoot(cmd *cobra.Command) (string, error) {
 	return projectRoot, nil
 }
 
+func resolveMatrixTargetFlags(cmd *cobra.Command) (string, string, error) {
+	var flags clipkg.FlagBag
+	name := flags.String(cmd, "name")
+	registryFlag := flags.String(cmd, "registry")
+	if err := flags.Err(); err != nil {
+		return "", "", err
+	}
+	return name, registryFlag, nil
+}
+
 func resolveMatrixFromCmd(cmd *cobra.Command) (string, quality.MatrixResolution, error) {
 	projectRoot, err := resolveProjectRoot(cmd)
 	if err != nil {
 		return "", quality.MatrixResolution{}, err
 	}
+	name, registryFlag, err := resolveMatrixTargetFlags(cmd)
+	if err != nil {
+		return projectRoot, quality.MatrixResolution{}, err
+	}
 	var flags clipkg.FlagBag
-	name := flags.String(cmd, "name")
-	registryFlag := flags.String(cmd, "registry")
 	matrixPath := flags.String(cmd, "matrix")
 	profilePath := flags.String(cmd, "profile")
 	if err := flags.Err(); err != nil {
