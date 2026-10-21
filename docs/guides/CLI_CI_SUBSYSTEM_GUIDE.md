@@ -1,319 +1,289 @@
-# CLI CI Subsystem & Local Sandboxing Architecture Guide
+# CLI Local CI Subsystem & Ephemeral Worktree Execution Guide
 
 ## Overview
 
-The ZQK CLI CI subsystem (`cmd/zqk/ci` and `pkg/localci`) provides deterministic, hermetic, and offline-capable Continuous Integration sandboxing within the local developer environment. Rather than relying on fragile shell scripts or external remote CI pipelines for initial verification, ZQK uses pure-Go isolated git worktrees, pointer files, and archive caching to guarantee that tests execute against clean, pinned commit snapshots.
+The ZQK CLI Local CI subsystem (`cmd/zqk/ci` and `pkg/localci`) provides isolated, reproducible, and deterministic test execution in ephemeral git worktrees. By decoupling test execution from the operator's active working directory, Local CI eliminates test contamination from unstaged modifications, untracked artifacts, or dirty state.
+
+Local CI is implemented in pure Go (`pkg/localci`), completely eliminating legacy shell script dependencies (`scripts/local-ci-*.sh`) and providing cross-platform parity across macOS and Linux environments.
 
 ```mermaid
 flowchart TD
-    subgraph Operator["Operator / AI Agent Harness"]
-        CLI["zqk ci {checkout, run, status, demote}"]
+    subgraph Host["Developer Host / Workspace"]
+        Repo["Git Repository Root"]
+        Dirty["Working Directory (Uncommitted Changes)"]
     end
 
-    subgraph Subsystem["CLI CI Subsystem (cmd/zqk/ci)"]
+    subgraph CLI["CLI Local CI Subsystem (cmd/zqk/ci)"]
+        CmdCI["zqk ci"]
         CmdCheckout["zqk ci checkout"]
         CmdRun["zqk ci run"]
         CmdStatus["zqk ci status"]
         CmdDemote["zqk ci demote"]
     end
 
-    subgraph Core["Local CI Core Engine (pkg/localci)"]
-        WorktreeMgr["Worktree Sandboxing & Swinger"]
-        DirtyCheck["Tracked Dirty Boundary Check"]
-        ArchiveEngine["Tar Archive & SHA256 Engine"]
-        DemoteEngine["Demotion & Disk Reclamation"]
+    subgraph Engine["Local CI Engine (pkg/localci)"]
+        WorktreeMgr["Worktree & Swing Manager"]
+        ArchiveMgr["Archive & Retention Engine"]
+        StateTracker["Pointer & State Tracker"]
     end
 
-    subgraph Sandbox[".zqk/local-ci/ Sandbox Hierarchy"]
-        Trees[".zqk/local-ci/trees/<short-sha> (Detached Worktree)"]
-        WorkdirSymlink[".zqk/local-ci/workdir -> trees/<short-sha>"]
-        PointerSHA[".zqk/local-ci/SOURCE_SHA"]
-        PointerEnv[".zqk/local-ci/CURRENT.env"]
-        Archives[".zqk/local-ci/archives/drop-<short-sha>.tar"]
+    subgraph Storage[".zqk/local-ci Ephemeral Store"]
+        Trees[".zqk/local-ci/trees/<short_sha>"]
+        Workdir[".zqk/local-ci/workdir (Symlink)"]
+        Archives[".zqk/local-ci/archives/ (Tars + Hashes)"]
+        Pointers["SOURCE_SHA / PROMOTED_AT / CURRENT.env"]
     end
 
-    subgraph Verification["Test Execution Plane (cmd/zqk/test)"]
-        TestRun["zqk test run --all"]
+    subgraph TestRunner["Kernel Test Runner (cmd/zqk/test)"]
+        TestCmd["zqk test run --all"]
     end
 
-    CLI --> CmdCheckout
-    CLI --> CmdRun
-    CLI --> CmdStatus
-    CLI --> CmdDemote
+    CmdCI --> CmdCheckout
+    CmdCI --> CmdRun
+    CmdCI --> CmdStatus
+    CmdCI --> CmdDemote
 
-    CmdCheckout --> DirtyCheck
-    DirtyCheck --> WorktreeMgr
-    WorktreeMgr --> Trees
-    WorktreeMgr --> WorkdirSymlink
-    WorktreeMgr --> PointerSHA
-    WorktreeMgr --> PointerEnv
-    WorktreeMgr --> ArchiveEngine
-    ArchiveEngine --> Archives
+    CmdCheckout --> WorktreeMgr
+    CmdRun --> WorktreeMgr
+    CmdRun --> TestCmd
 
-    CmdRun --> CmdCheckout
-    CmdRun --> TestRun
-    TestRun --> WorkdirSymlink
+    WorktreeMgr -->|"git worktree add --detach"| Trees
+    WorktreeMgr -->|"atomic symlink swing"| Workdir
+    WorktreeMgr --> StateTracker
+    StateTracker --> Pointers
 
-    CmdStatus --> PointerSHA
-    CmdStatus --> WorkdirSymlink
+    CmdCheckout --> ArchiveMgr
+    ArchiveMgr -->|"git archive + sha256"| Archives
 
-    CmdDemote --> DemoteEngine
-    DemoteEngine --> Trees
-    DemoteEngine --> WorkdirSymlink
-    DemoteEngine --> PointerSHA
-    DemoteEngine --> PointerEnv
+    CmdStatus --> StateTracker
+    CmdDemote -->|"cleanup worktrees & pointers"| Storage
 ```
 
 ---
 
-## Architectural Taxonomy & Core File Layout
-
-The CLI CI subsystem is decomposed into command line entry points and core engine packages:
+## Architectural Taxonomy & Core Components
 
 ```
 cmd/zqk/ci/
-├── ci.go                                      # Cobra CLI command registration, flag binding, and dispatch
-├── ci_test.go                                 # Base command hierarchy, lifecycle, and unset status tests
-└── ci_coverage_elevation_cycle113_test.go     # Skip detection, full pipeline, directory edge-case, and context tests
+├── ci.go                                      # Cobra CLI command builders, flag definitions, and execution dispatch
+├── ci_test.go                                 # Core lifecycle, hierarchy, and unset status verification tests
+└── ci_coverage_elevation_cycle113_test.go     # Cycle 113: Full pipeline run, skipped re-checkout, context cancellation tests
 
 pkg/localci/
-├── localci.go                                 # Configuration options, base directory resolution, GitRun signatures
-├── checkout.go                                # Detached worktree allocation, symlink swinging, dirty validation, archives
-├── demote.go                                  # Worktree unlinking, tree removal, and pointer cleanup
-├── git.go                                     # Managed git subprocess execution with context awareness
-├── localci_test.go                            # Git execution and core lifecycle unit tests
-└── extra_coverage_test.go                     # Archive retention, legacy workdir migration, and helper tests
+├── localci.go                                 # Local CI directory resolution, options, and archive retention logic
+├── checkout.go                                # Pure-Go worktree creation, symlink swing, archive generation, and skip check
+├── demote.go                                  # Worktree removal, symlink removal, and pointer file cleanup
+├── git.go                                     # Managed git command execution with context cancellation
+├── localci_test.go                            # Git worktree lifecycle and dirty tree rejection tests
+└── extra_coverage_test.go                     # Environment variable overrides, archive pruning, and edge case coverage
 ```
 
 ---
 
 ## Command Taxonomy & Ergonomics
 
-The `zqk ci` command group exposes four core operational commands:
+The Local CI interface exposes four primary subcommands under `zqk ci`:
 
 ### 1. `zqk ci checkout`
 
-Pins and extracts a specific commit snapshot into an isolated, detached git worktree:
+Checks out a specific commit or `HEAD` into an isolated git worktree under `.zqk/local-ci/trees/<short_sha>` and atomically points `.zqk/local-ci/workdir` to it:
 
 ```bash
 zqk ci checkout [flags]
 ```
 
 **Supported Flags:**
-- `--sha <string>`: Specific commit SHA, branch, or tag to check out (defaults to `HEAD`). When specified, pins the commit and bypasses tracked dirty checks.
-- `--allow-dirty`: Permits checking out `HEAD` even when tracked uncommitted changes exist in the working tree.
-- `--no-archive`: Disables creating tar archives and checksums in `.zqk/local-ci/archives/` (accelerates checkout).
+- `--sha <sha>`: Specific git commit SHA to check out (defaults to `HEAD`). When specified, skips the dirty working directory check.
+- `--allow-dirty`: Permits checking out `HEAD` even when the active working directory contains tracked uncommitted changes.
+- `--no-archive`: Skips generating a `.tar` archive and SHA-256 checksum in `.zqk/local-ci/archives/` for faster turnaround.
 
-**Behavior & Idempotency:**
-If the requested commit SHA is already checked out at `.zqk/local-ci/workdir` and verified via `.zqk/local-ci/SOURCE_SHA`, the checkout is skipped idempotently without redundant disk operations:
-```
-local-ci checkout skipped: 4a3b2c1d00000000000000000000000000000000 already checked out at /path/to/.zqk/local-ci/workdir
+**Idempotent Execution Guarantee:**
+If the target SHA is already checked out and `.zqk/local-ci/workdir` is valid, `zqk ci checkout` skips redundant worktree recreation and outputs:
+```text
+local-ci checkout skipped: <sha> already checked out at <workdir>
 ```
 
 ### 2. `zqk ci run`
 
-Executes the complete CI verification pipeline—promoting the checkout, validating prerequisites, and executing tests:
+Performs an isolated checkout (identical to `zqk ci checkout`) and immediately executes the test suite in the isolated worktree:
 
 ```bash
 zqk ci run [flags]
 ```
 
 **Supported Flags:**
-- Inherits all `checkout` flags (`--sha`, `--allow-dirty`, `--no-archive`).
-- `--checkout-only`: Prepares the sandbox worktree and pointer files without launching test execution.
+- `--sha <sha>`: Target git commit SHA to verify.
+- `--allow-dirty`: Allows running from `HEAD` with uncommitted changes in the host tree.
+- `--no-archive`: Bypasses archive generation.
+- `--checkout-only`: Prepares the isolated worktree without executing test cases.
 
 **Execution Flow:**
-1. Calls `runLocalCICheckout`: ensures the target tree is extracted and pointer files are updated.
-2. Checks for `--checkout-only`: returns immediately if true.
-3. Invokes `runTestCasesAfterCheckout`: verifies `go.mod` exists inside `.zqk/local-ci/workdir`, then orchestrates `zqk test run --all`.
+1. Resolves repository root and options.
+2. Checks out the target commit into `.zqk/local-ci/trees/<short_sha>`.
+3. Swings the `.zqk/local-ci/workdir` symlink to the new tree.
+4. Verifies `go.mod` exists at the root of the isolated worktree.
+5. Invokes `zqk test run --all` against the isolated tree, verifying all test cases.
 
 ### 3. `zqk ci status`
 
-Inspects the current sandbox status, showing the active pinned `SOURCE_SHA` and workdir validity:
+Displays the current state of the Local CI subsystem, including active commit pointer and workdir link:
 
 ```bash
 zqk ci status
 ```
 
-**Sample Output (Configured Sandbox):**
-```
-Local CI status
-  SOURCE_SHA=4a3b2c1d00000000000000000000000000000000
-  workdir=/workspace/.zqk/local-ci/workdir
-```
+**Output Formats:**
 
-**Sample Output (Unset or Demoted Sandbox):**
-```
+*Unconfigured / Pre-checkout State:*
+```text
 Local CI status
   SOURCE_SHA=(not set — run: zqk ci checkout)
   workdir=(missing)
 ```
 
+*Populated / Active State:*
+```text
+Local CI status
+  SOURCE_SHA=a1b2c3d4e5f60718293a4b5c6d7e8f9012345678
+  workdir=/path/to/repo/.zqk/local-ci/workdir
+```
+
 ### 4. `zqk ci demote`
 
-Tears down ephemeral worktrees, unlinks symlinks, deletes pointer files, and reclaims disk space:
+Removes all ephemeral git worktrees, symlinks, and pointer files created by Local CI without modifying repository branches or git history:
 
 ```bash
 zqk ci demote
 ```
 
-**Action Output:**
-```
+**Console Output:**
+```text
 local-ci demote: worktrees and pointer files removed
 ```
 
 ---
 
-## Local CI Sandboxing Architecture
-
-### Directory Structure & Pointer Files
-
-All Local CI operations occur under `.zqk/local-ci` (or the directory pointed to by `LOCAL_CI_DIR`):
-
-```
-.zqk/local-ci/
-├── CURRENT.env                                # Sourcable environment variables for subshells
-├── PROMOTED_AT                                # ISO 8601 UTC timestamp of active checkout
-├── SOURCE_SHA                                 # 40-character commit SHA currently pinned
-├── archive-git/                               # Offline git bundle cache for rapid local diffs
-├── archives/                                  # Rolling tarball drops and sha256 manifests
-│   ├── drop-4a3b2c1.tar
-│   └── drop-4a3b2c1.tar.sha256
-├── trees/                                     # Detached git worktrees keyed by short commit SHA
-│   └── 4a3b2c1/
-└── workdir -> trees/4a3b2c1                   # Symlink pointing to the currently active tree
-```
-
-### Pointer File Specifications
-
-1. **`SOURCE_SHA`**: Contains the full 40-character hexadecimal git commit SHA. Serves as the primary idempotency key for `status` and `checkout` skip evaluation.
-2. **`PROMOTED_AT`**: Stores the RFC 3339 UTC timestamp recording when the snapshot was extracted into the sandbox.
-3. **`CURRENT.env`**: Key-value environment declaration formatted for direct POSIX sourcing:
-   ```bash
-   workdir=/path/to/.zqk/local-ci/workdir
-   sha=4a3b2c1d00000000000000000000000000000000
-   short=4a3b2c1
-   tree=/path/to/.zqk/local-ci/trees/4a3b2c1
-   ```
-
----
-
-## Checkout Mechanics & Validation Gates
+## Workflow Semantics & Invariants
 
 ```mermaid
-flowchart TD
-    Start["zqk ci checkout"] --> ResolveRoot["Resolve Studio Project Root"]
-    ResolveRoot --> ResolveSHA["Resolve commit via git rev-parse"]
-    ResolveSHA --> CheckDirty{"SHAPinned OR AllowDirty?"}
-    
-    CheckDirty -- No --> InspectPorcelain["git status --porcelain --untracked-files=no"]
-    InspectPorcelain --> HasDirty{"Tracked Changes Exist?"}
-    HasDirty -- Yes --> FailDirty["Error: studio has tracked changes; commit first"]
-    HasDirty -- No --> CheckSkip
-    CheckDirty -- Yes --> CheckSkip{"SOURCE_SHA == Target SHA AND dirExists(workdir)?"}
+sequenceDiagram
+    autonumber
+    participant Dev as Operator / Agent
+    participant CLI as cmd/zqk/ci
+    participant Engine as pkg/localci
+    participant Git as Git Engine
+    participant FS as Local Filesystem (.zqk/local-ci)
+    participant Test as cmd/zqk/test
 
-    CheckSkip -- Yes --> EmitSkip["Emit: local-ci checkout skipped (Idempotent)"]
-    CheckSkip -- No --> MkdirTrees["Ensure .zqk/local-ci/trees exists"]
-    MkdirTrees --> WorktreeAdd["git worktree add --detach trees/<short> <sha>"]
-    WorktreeAdd --> Swing["Swing workdir Symlink to trees/<short>"]
-    Swing --> PruneOld["Prune other trees under trees/"]
-    PruneOld --> WritePointers["Write SOURCE_SHA, PROMOTED_AT, CURRENT.env"]
-    WritePointers --> ArchiveOpt{"Archive Flag Enabled?"}
-    ArchiveOpt -- Yes --> CreateTar["git archive --format=tar + sha256File"]
-    ArchiveOpt -- No --> Complete["Emit: local-ci checkout: <sha> checked out"]
-    CreateTar --> Complete
+    Dev->>CLI: zqk ci run --sha <sha>
+    CLI->>Engine: Checkout(ctx, opts)
+    Engine->>FS: Read SOURCE_SHA
+    alt SHA matches and workdir exists
+        Engine-->>CLI: Result{Skipped: true}
+        CLI-->>Dev: local-ci checkout skipped (already active)
+    else New SHA or uninitialized
+        Engine->>Git: rev-parse & verify clean state
+        Engine->>Git: worktree add --detach trees/<short> <sha>
+        Engine->>FS: swing workdir symlink -> trees/<short>
+        Engine->>Git: prune stale worktrees
+        Engine->>FS: write SOURCE_SHA, PROMOTED_AT, CURRENT.env
+        opt Archive enabled (!no-archive)
+            Engine->>Git: archive --format=tar
+            Engine->>FS: write drop-<short>.tar & checksum
+        end
+        Engine-->>CLI: Result{Skipped: false}
+        CLI-->>Dev: local-ci checkout: <sha> checked out
+    end
+
+    CLI->>FS: Verify workdir/go.mod exists
+    CLI->>Test: NewRunCmd().Execute(--all)
+    Test-->>CLI: Test execution outcome
+    CLI-->>Dev: Complete CI run receipt
 ```
 
-### 1. SHA Pinning & Resolution
-The target revision is verified using `git rev-parse --verify <sha>^{commit}` to guarantee that only valid commit objects (and not dangling tree or blob references) are admitted to the sandbox.
+### 1. SHA Checkout vs. Dirty Checkout
+- **Strict Cleanliness Floor:** By default, if the developer's working directory has tracked modifications (`git status --porcelain --untracked-files=no`), `zqk ci checkout` and `zqk ci run` fail closed:
+  ```text
+  studio has tracked changes; commit first or pass --allow-dirty / --sha <committed>
+  ```
+- **Explicit Bypass Modes:**
+  - Passing `--sha <committed>` indicates intent to test a specific committed point in history, ignoring host working directory dirty state.
+  - Passing `--allow-dirty` allows testing `HEAD` without committing in-progress work.
 
-### 2. Dirty Tree Detection Gate
-Unless `--allow-dirty` or an explicit `--sha <committed>` is supplied, the engine runs `git status --porcelain --untracked-files=no`. If any tracked files are modified, staged, or deleted, checkout aborts immediately. This invariant protects operators and autonomous agents from testing against uncommitted state that cannot be reproduced.
+### 2. Symlink Swing & Worktree Pruning
+- Each checked-out commit resides in its own sub-worktree: `.zqk/local-ci/trees/<short_sha>`.
+- The canonical execution path `.zqk/local-ci/workdir` is an atomic symlink pointing to the active short-SHA tree.
+- When swinging to a new SHA, any older worktrees under `.zqk/local-ci/trees/` are automatically pruned via `git worktree remove --force`, preventing unbounded disk consumption.
 
-### 3. Symlink Swinging (`swingWorkdir`)
-The `workdir` reference is maintained as a relative symbolic link pointing to `trees/<short_sha>`. When switching between commits, `swingWorkdir` atomically updates the link. If a legacy non-symlink directory is detected from earlier versions, the engine safely renames the legacy directory to `workdir.legacy.<pid>`, creates the symlink, and force-removes the old worktree.
+### 3. State & Pointer Tracking
+The `.zqk/local-ci` directory maintains three deterministic state files:
+| File | Format | Purpose |
+| :--- | :--- | :--- |
+| `SOURCE_SHA` | 40-character hex + `\n` | Identity of the currently active commit |
+| `PROMOTED_AT` | RFC3339 UTC timestamp + `\n` | Timestamp of last checkout / promotion |
+| `CURRENT.env` | Key-value pairs (`workdir`, `sha`, `short`, `tree`) | Machine-readable environment for build and test tools |
 
-### 4. Archive Caching & Retention
-When archiving is enabled, `git archive --format=tar` writes a compressed snapshot to `.zqk/local-ci/archives/drop-<short_sha>.tar` accompanied by a SHA256 checksum file. Rolling retention prunes older archives to `ArchiveKeep` (default: 5 or `LOCAL_CI_ARCHIVE_KEEP`).
+### 4. Archive Dropping & Retention
+- When `--no-archive` is false, Local CI creates a `.tar` snapshot of the committed tree in `.zqk/local-ci/archives/drop-<short>.tar`.
+- A SHA-256 digest is calculated and recorded in `.zqk/local-ci/archive-git/`.
+- Archives are automatically pruned to retain the latest drops (default: 5 archives, configurable via `LOCAL_CI_ARCHIVE_KEEP`).
 
----
-
-## Test Execution Lifecycle
-
-When `zqk ci run` is executed without `--checkout-only`:
-
-1. **Sandbox Root Assertion**: Resolves `.zqk/local-ci/workdir`.
-2. **Go Module Verification**: Inspects `filepath.Join(workdir, "go.mod")`. If missing or invalid, fails with an actionable diagnostic instructing the operator to run `zqk ci checkout`.
-3. **Execution Delegate**: Instantiates `testcmd.NewRunCmd()` configured with `--all` and passes output/context streams.
-4. **Knowledge Kernel Test Runner**: Dispatches through `pkg/testrunner`, executing all registered `test_case` objects (e.g. `TST-CI-001`, `TST-AUTH-001`) with AST and criterion assertion tracking.
-
----
-
-## Demotion Lifecycle & Disk Reclamation
-
-Running `zqk ci demote` executes complete sandbox teardown:
+### 5. Demote Teardown Lifecycle
+`zqk ci demote` provides clean-slate teardown:
+1. Inspects `.zqk/local-ci/workdir`: if it is a symlink or directory, removes the underlying worktree via `git worktree remove --force` and unlinks the path.
+2. Iterates over all remaining entries in `.zqk/local-ci/trees/` and removes each worktree.
+3. Unlinks `SOURCE_SHA`, `PROMOTED_AT`, and `CURRENT.env`.
+4. Guarantees that subsequent `zqk ci status` calls return `SOURCE_SHA=(not set)`.
 
 ```mermaid
-flowchart TD
-    DemoteStart["zqk ci demote"] --> StatWorkdir["Inspect .zqk/local-ci/workdir"]
-    StatWorkdir --> IsSymlink{"Is Symlink?"}
-    IsSymlink -- Yes --> ReadTarget["Readlink target"]
-    ReadTarget --> RemoveWorktree1["git worktree remove --force <target>"]
-    RemoveWorktree1 --> DeleteTarget["Remove target directory"]
-    DeleteTarget --> UnlinkWorkdir["Unlink workdir"]
-    IsSymlink -- No --> IsDir{"Is Directory?"}
-    IsDir -- Yes --> RemoveWorktree2["git worktree remove --force <workdir>"]
-    RemoveWorktree2 --> DeleteWorkdir["fileutil.RemoveAll(workdir)"]
-    IsDir -- No --> ScanTrees
-    UnlinkWorkdir --> ScanTrees["Scan .zqk/local-ci/trees/"]
+sequenceDiagram
+    autonumber
+    participant Dev as Operator / Agent
+    participant CLI as cmd/zqk/ci
+    participant Engine as pkg/localci
+    participant Git as Git Engine
+    participant FS as Local Filesystem
 
-    ScanTrees --> RemoveEachTree["For each tree: git worktree remove --force + RemoveAll"]
-    RemoveEachTree --> DeletePointers["Delete SOURCE_SHA, PROMOTED_AT, CURRENT.env"]
-    DeletePointers --> DemoteDone["Emit: local-ci demote: worktrees and pointer files removed"]
+    Dev->>CLI: zqk ci demote
+    CLI->>Engine: Demote(ctx, opts)
+    Engine->>FS: Check workdir symlink / dir
+    opt Worktree exists
+        Engine->>Git: worktree remove --force <worktree>
+        Engine->>FS: unlink workdir
+    end
+    Engine->>FS: List trees/
+    loop For each tree in trees/
+        Engine->>Git: worktree remove --force <tree>
+        Engine->>FS: remove <tree>
+    end
+    Engine->>FS: unlink SOURCE_SHA, PROMOTED_AT, CURRENT.env
+    Engine-->>CLI: Demote complete
+    CLI-->>Dev: local-ci demote: worktrees and pointer files removed
 ```
-
-Demotion is fully idempotent: running it against an already clean or uninitialized repository succeeds without error.
 
 ---
 
-## Error Handling, Exit Codes & Boundary Conditions
+## Verification & Statement Coverage Invariant
 
-| Scenario | Condition / Error Trigger | Diagnostic / Behavior |
-|:---|:---|:---|
-| **Missing Project Root** | Directory not inside a valid ZQK workspace | `Error: project root not found` |
-| **Tracked Changes Present** | Uncommitted modifications without `--allow-dirty` | `Error: studio has tracked changes; commit first or pass --allow-dirty / --sha <committed>` |
-| **Invalid Revision** | Target commit SHA does not resolve | `Error: local-ci checkout failed: exit status 128` |
-| **Missing Module File** | `go.mod` missing inside checkout workdir | `Error: local-ci workdir missing go.mod at <workdir> (run checkout first)` |
-| **Corrupted Workdir** | Workdir exists as unexpected special file | `Error: local-ci: refusing to clobber unexpected workdir at <workdir>` |
-| **Context Abort** | Execution cancelled via SIGINT or context timeout | Aborts git operations cleanly, returns wrapped context error |
-| **Unknown CLI Flags** | Unsupported argument supplied to subcommand | Cobra returns exit code 1 with usage hints |
+The Local CI subsystem is governed by automated verification gates across three proof tiers, requiring statement test coverage of `cmd/zqk/ci` to meet or exceed `>= 90.0%` (achieving `100.0%` statement coverage in Cycle 113):
 
----
+1. **Static Floor Invariant (`CRIT-STATIC-001`):**
+   - Statement test coverage for `cmd/zqk/ci` is maintained at `>= 90.0%` (achieved `100.0%`).
+   - Zero swallowed errors (`_ = ...` strictly prohibited in all test and implementation code).
+   - AST complexity constraints: all functions strictly capped under 100 lines.
+   - Clean tree hygiene: passes `./bin/zqk-vet -suite hygiene,tree` with 0 findings.
 
-## Verification & Exemplar Objects
+2. **Operational Dynamic Proof (`CRIT-OPERATIONAL-001`):**
+   - Subcommand hierarchy verification (`checkout`, `run`, `status`, `demote`).
+   - Complete lifecycle validation: `checkout` &rarr; `status` populated &rarr; `demote` &rarr; `status` unset.
+   - Full test pipeline execution via `run` (without `--checkout-only`) dispatching `zqk test run --all`.
+   - Idempotent re-checkout branch verification (`res.Skipped == true`) displaying skipped status telemetry.
+   - Status output verification under missing `go.mod` vs. directory `go.mod` anomalies.
 
-The CLI CI subsystem anchors into the Knowledge Kernel verification plane via timeless requirements, criteria, and test cases:
-
-```yaml
-kind: requirement
-id: REQ-CI-001
-title: Deterministic Offline Local CI Subsystem
-goal_refs:
-  - GOAL-STABILITY-001
-criteria_refs:
-  - CRIT-CI-001   # Static Floor Invariant: cmd/zqk/ci statement coverage >= 90.0%
-  - CRIT-CI-002   # Operational Dynamic Proof: Full checkout, run, status, demote cycle
-  - CRIT-CI-003   # Negative Adversarial Boundary: Refuse dirty checkout without explicit override
-```
-
-```yaml
-kind: test_case
-id: TST-CI-001
-title: Verify Local CI Command Lifecycle and Sandboxing Invariants
-requirement_ref: REQ-CI-001
-criteria_refs:
-  - CRIT-CI-001
-  - CRIT-CI-002
-  - CRIT-CI-003
-command: "go test -v -cover ./cmd/zqk/ci/..."
-```
+3. **Negative Adversarial Boundaries (`CRIT-BOUNDARY-001`):**
+   - Context cancellation handling in both `checkout` and `demote` operations returning fail-closed errors.
+   - Unknown CLI flag rejection across all subcommands (`checkout`, `run`, `status`, `demote`).
+   - Missing project root resolution failure propagation.
+   - Invalid SHA format rejection during checkout stage.
+   - Missing `go.mod` fail-closed detection before test runner dispatch.
+   - Strict open-core compliance: zero studio nanosecond-hex identifiers across documentation and test fixtures.
