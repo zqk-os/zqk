@@ -28,6 +28,9 @@ type Result struct {
 
 // Checkout promotes a committed SHA into a detached git worktree under BaseDir.
 func Checkout(ctx context.Context, opt Options) (Result, error) {
+	if err := ctx.Err(); err != nil {
+		return Result{}, err
+	}
 	root := strings.TrimSpace(opt.RepoRoot)
 	if root == "" {
 		return Result{}, errfmt.Errorf("project root not found")
@@ -60,6 +63,13 @@ func Checkout(ctx context.Context, opt Options) (Result, error) {
 	workdir := workdirPath(base)
 	trees := treesDir(base)
 	tree := filepath.Join(trees, short)
+
+	if currentSHA, err := fileutil.ReadFile(sourceSHAPath(base)); err == nil {
+		if strings.TrimSpace(string(currentSHA)) == sha && dirExists(workdir) {
+			return Result{SHA: sha, Short: short, Workdir: workdir, Tree: tree, Skipped: true}, nil
+		}
+	}
+
 	if err := fileutil.MkdirAll(trees, paths.DirPerm755); err != nil {
 		return Result{}, errfmt.Newf("local-ci trees").Wrap(err)
 	}
