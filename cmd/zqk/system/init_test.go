@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -129,6 +130,7 @@ func requireFieldRegistryReloaded(t *testing.T) {
 func registerInitTestCleanup(t *testing.T, dir string) {
 	t.Cleanup(func() {
 		_ = WaitProjectCacheBackgroundWork(context.Background(), dir)
+		validation.StopSharedValidationCacheForTest(dir)
 		if provider, ok := storage.GetGlobalStorageProviderCache().Get(dir); ok {
 			_ = provider.Shutdown(context.Background())
 			storage.GetGlobalStorageProviderCache().Delete(dir)
@@ -583,6 +585,9 @@ func TestInit_GreenfieldAnchorsToCWD(t *testing.T) {
 		t.Fatalf("Init in child dir failed: %v", err)
 	}
 	_ = WaitProjectCacheBackgroundWork(context.Background(), childDir)
+	// Shared validation-cache flusher may still write under .zqk/cache; stop it
+	// before t.TempDir cleanup (ENOTEMPTY on unlinkat).
+	validation.StopSharedValidationCacheForTest(childDir)
 	if provider, ok := storage.GetGlobalStorageProviderCache().Get(childDir); ok {
 		if err := provider.Shutdown(context.Background()); err != nil {
 			t.Fatalf("shutdown child storage: %v", err)

@@ -23,12 +23,42 @@ type sharedValidationCache struct {
 	cache       *ValidationStateCache
 	projectRoot string
 	dirtyCh     chan struct{} // buffered; signals that cache should be saved
+	cancel      context.CancelFunc
+	done        chan struct{} // closed when runFlusher returns
 }
 
 var (
 	sharedCachesMu sync.Mutex
 	sharedCaches   = make(map[string]*sharedValidationCache)
 )
+
+// SharedValidationStateCache returns the per-project shared ValidationStateCache
+// singleton used by Ensure*/Invalidate*/Update* and AsyncValidator. Empty
+// projectRoot returns nil. Callers that need Get/Set/Save/Load on the same
+// in-memory map (studio facades, system check) must use this accessor rather
+// than NewValidationStateCache, which would fork a second cache.
+// Pattern matches GetGlobalFeatureFlags: one process-lifetime singleton keyed
+// by project root.
+func SharedValidationStateCache(projectRoot string) *ValidationStateCache {
+	sc := getSharedValidationCache(projectRoot)
+	if sc == nil {
+		return nil
+	}
+	return sc.cache
+}
+
+// ApplySharedValidationCacheMaxAge sets maxAge on the shared singleton and
+// returns it. Cross-module facades cannot assign the unexported maxAge field;
+// use this (or SharedValidationStateCache when age is irrelevant) so
+// Ensure*/Invalidate* and AsyncValidator stay on one pointer.
+func ApplySharedValidationCacheMaxAge(projectRoot string, maxAge time.Duration) *ValidationStateCache {
+	cache := SharedValidationStateCache(projectRoot)
+	if cache == nil {
+		return nil
+	}
+	cache.maxAge = maxAge
+	return cache
+}
 
 // EnsureValidationCacheReady ensures the validation state cache file exists on disk.
 // It gets or creates the per-project shared cache (loading from disk if present),
@@ -38,11 +68,11 @@ func EnsureValidationCacheReady(projectRoot string) error {
 	if projectRoot == emptyValue {
 		return nil
 	}
-	sc := getSharedValidationCache(projectRoot)
-	if sc == nil {
+	cache := SharedValidationStateCache(projectRoot)
+	if cache == nil {
 		return nil
 	}
-	return sc.cache.Save()
+	return cache.Save()
 }
 
 // getSharedValidationCache returns a per-project shared cache instance.
@@ -71,20 +101,55 @@ func getSharedValidationCache(projectRoot string) *sharedValidationCache {
 		// Proceed with empty in-memory cache; save path will create a fresh file.
 	}
 
+	flushCtx, flushCancel := context.WithCancel(context.Background())
 	sc := &sharedValidationCache{
 		cache:       cache,
 		projectRoot: projectRoot,
 		dirtyCh:     make(chan struct{}, 1),
+		cancel:      flushCancel,
+		done:        make(chan struct{}),
 	}
 	sharedCaches[projectRoot] = sc
 
 	// Use managed goroutine for flusher
 	builder := goroutinelabels.NewGoroutine("shared_validation_cache_flusher", "background flusher for shared validation state cache")
 	builder.StartSimple(func() {
-		sc.runFlusher(context.Background()) // System-wide shared instance uses background context
+		defer close(sc.done)
+		sc.runFlusher(flushCtx)
 	})
 
 	return sc
+}
+
+// StopSharedValidationCacheForTest cancels the per-project shared cache flusher,
+// waits for it to exit, and drops the singleton. Tests that use t.TempDir must
+// call this (or project teardown that does) before cleanup so Save() cannot
+// recreate files under .zqk/cache (ENOTEMPTY on unlinkat).
+func StopSharedValidationCacheForTest(projectRoot string) {
+	if projectRoot == emptyValue {
+		return
+	}
+	sharedCachesMu.Lock()
+	sc := sharedCaches[projectRoot]
+	delete(sharedCaches, projectRoot)
+	sharedCachesMu.Unlock()
+	if sc == nil {
+		return
+	}
+	if sc.cancel != nil {
+		sc.cancel()
+	}
+	if sc.done == nil {
+		return
+	}
+	select {
+	case <-sc.done:
+	case <-time.After(5 * time.Second):
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Warn(
+			"Timed out waiting for shared validation cache flusher to stop").
+			ProjectRoot(projectRoot).
+			Log()
+	}
 }
 
 // markDirty signals that the cache has changed and should be persisted.

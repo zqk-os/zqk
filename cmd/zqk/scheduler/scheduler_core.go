@@ -823,13 +823,12 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 	// Cancel startCtx immediately so sched.Start() unblocks and shutdown begins; then best-effort
 	// emit and RemoveKeepAlive. Doing I/O before cancel() could block (coordinator/storage under load)
 	// and prevent the daemon from ever exiting (SCHEDULER_HUNG_SAMPLE_ANALYSIS, shutdown hang).
-	interruptBud := goroutinelabels.DefaultBudget()
-	interruptBuilder := goroutinelabels.NewGoroutine("scheduler_interrupt_handler", "handling scheduler interrupt signal")
-	if interruptBud != nil {
-		interruptBuilder = interruptBuilder.WithBudget(interruptBud)
-	}
-	interruptBuilder.StartWithContext(interruptCtx, func(ctx context.Context) error {
-		<-ctx.Done()
+	// Critical path: StartSimple without DefaultBudget / StartWithContext(interruptCtx).
+	// StartWithContext sets builder.ctx=interruptCtx; Start() then exits early when that ctx
+	// is already Done — without running fn — so cancel() never fired (SignalHandling flake).
+	// cancel is idempotent: call it from the waiter and immediately if interrupt already fired.
+	goroutinelabels.NewGoroutine("scheduler_interrupt_handler", "handling scheduler interrupt signal").StartSimple(func() {
+		<-interruptCtx.Done()
 		cancel() // First: unblock sched.Start() so shutdown runs; do not block on I/O below
 		emitSchedulerStartEventViaCoordinator(
 			pkgctx.NewSystemContext(),
@@ -844,8 +843,10 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 				schedulerpkg.SLog(logging.GetLoggerFromProfile(profile)).Debug("Failed to remove keep-alive file").WithError(errKeepAlive).Log()
 			}
 		}
-		return ctx.Err()
 	})
+	if interruptCtx.Err() != nil {
+		cancel()
+	}
 
 	// Optional wall-clock limit (e.g. CI/E2E): detached daemons use argv[0]=zqk-scheduler and skip the idle
 	// watchdog below, so this is the only in-process backstop if the parent test dies without teardown.

@@ -11,8 +11,14 @@ import (
 
 func TestSharedValidationCache_Helpers(t *testing.T) {
 	tempDir := t.TempDir()
+	t.Cleanup(func() {
+		StopSharedValidationCacheForTest(tempDir)
+	})
 
 	// Empty projectRoot
+	if SharedValidationStateCache("") != nil {
+		t.Error("expected nil SharedValidationStateCache on empty projectRoot")
+	}
 	if err := EnsureValidationCacheReady(""); err != nil {
 		t.Errorf("expected nil on empty projectRoot, got %v", err)
 	}
@@ -20,6 +26,20 @@ func TestSharedValidationCache_Helpers(t *testing.T) {
 	// EnsureValidationCacheReady on temp project
 	if err := EnsureValidationCacheReady(tempDir); err != nil {
 		t.Fatalf("EnsureValidationCacheReady failed: %v", err)
+	}
+
+	shared := SharedValidationStateCache(tempDir)
+	if shared == nil {
+		t.Fatal("expected SharedValidationStateCache for non-empty projectRoot")
+	}
+	if SharedValidationStateCache(tempDir) != shared {
+		t.Fatal("SharedValidationStateCache must return the same singleton")
+	}
+	if aged := ApplySharedValidationCacheMaxAge(tempDir, time.Hour); aged != shared {
+		t.Fatal("ApplySharedValidationCacheMaxAge must return the same singleton")
+	}
+	if ApplySharedValidationCacheMaxAge("", time.Hour) != nil {
+		t.Error("expected nil ApplySharedValidationCacheMaxAge on empty projectRoot")
 	}
 
 	// Test with CacheModeTestSync
@@ -34,7 +54,11 @@ func TestSharedValidationCache_Helpers(t *testing.T) {
 	}
 	UpdateObjectInGlobalValidationCacheWithContext(ctx, tempDir, state)
 
-	// Retrieve
+	// Retrieve via exported accessor and test helper (same singleton)
+	direct, ok := shared.Get("BLI-TEST-1")
+	if !ok || direct == nil || direct.ObjectID != "BLI-TEST-1" {
+		t.Fatalf("expected state via SharedValidationStateCache Get: ok=%v got=%v", ok, direct)
+	}
 	got, ok := GetValidationStateForTest(ctx, tempDir, "BLI-TEST-1")
 	if !ok || got == nil {
 		t.Fatalf("expected state to be found in cache")
@@ -50,6 +74,9 @@ func TestSharedValidationCache_Helpers(t *testing.T) {
 	_, ok = GetValidationStateForTest(ctx, tempDir, "BLI-TEST-1")
 	if ok {
 		t.Errorf("expected object to be invalidated from cache")
+	}
+	if _, ok = shared.Get("BLI-TEST-1"); ok {
+		t.Error("SharedValidationStateCache must observe InvalidateObjects*")
 	}
 
 	// InvalidateObjectsInGlobalValidationCacheWithContext with empty IDs
