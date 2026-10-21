@@ -12,6 +12,9 @@ import (
 
 // Demote removes Local CI worktrees and pointer files.
 func Demote(ctx context.Context, opt Options) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	root := strings.TrimSpace(opt.RepoRoot)
 	if root == "" {
 		return errfmt.Errorf("project root not found")
