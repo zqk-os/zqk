@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/projecttemp"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // ProjectTestTeardownPipelineKind is the pipeline "kind" for metrics/logs.
@@ -175,6 +176,7 @@ func runProjectTestTeardownHooks(projectRoot string) {
 
 func drainStorageAsyncComponents(projectRoot string) {
 	ShutdownAsyncValidationStrategies()
+	validation.StopSharedValidationCacheForTest(projectRoot)
 	ShutdownHashRegistriesForProjectTesting(projectRoot)
 	ShutdownAllAuditBuffersForTesting()
 	logging.LogSwallowedError(filecas.DrainDarwinSyncQueue(2 * time.Second))

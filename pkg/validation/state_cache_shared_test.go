@@ -11,6 +11,9 @@ import (
 
 func TestSharedValidationCache_Helpers(t *testing.T) {
 	tempDir := t.TempDir()
+	t.Cleanup(func() {
+		StopSharedValidationCacheForTest(tempDir)
+	})
 
 	// Empty projectRoot
 	if SharedValidationStateCache("") != nil {

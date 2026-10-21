@@ -823,9 +823,10 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 	// Cancel startCtx immediately so sched.Start() unblocks and shutdown begins; then best-effort
 	// emit and RemoveKeepAlive. Doing I/O before cancel() could block (coordinator/storage under load)
 	// and prevent the daemon from ever exiting (SCHEDULER_HUNG_SAMPLE_ANALYSIS, shutdown hang).
-	// Critical path: StartSimple without DefaultBudget / StartWithContext(interruptCtx). Budget
-	// saturation or StartWithContext racing a canceled interruptCtx left startCtx uncanceled
-	// (TestStartSchedulerBackgroundWatchers_SignalHandling flake under parallel CI).
+	// Critical path: StartSimple without DefaultBudget / StartWithContext(interruptCtx).
+	// StartWithContext sets builder.ctx=interruptCtx; Start() then exits early when that ctx
+	// is already Done — without running fn — so cancel() never fired (SignalHandling flake).
+	// cancel is idempotent: call it from the waiter and immediately if interrupt already fired.
 	goroutinelabels.NewGoroutine("scheduler_interrupt_handler", "handling scheduler interrupt signal").StartSimple(func() {
 		<-interruptCtx.Done()
 		cancel() // First: unblock sched.Start() so shutdown runs; do not block on I/O below
@@ -843,6 +844,9 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 			}
 		}
 	})
+	if interruptCtx.Err() != nil {
+		cancel()
+	}
 
 	// Optional wall-clock limit (e.g. CI/E2E): detached daemons use argv[0]=zqk-scheduler and skip the idle
 	// watchdog below, so this is the only in-process backstop if the parent test dies without teardown.

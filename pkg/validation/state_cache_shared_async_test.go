@@ -17,6 +17,9 @@ import (
 func TestNewAsyncValidatorUsesSharedValidationCache(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
+	t.Cleanup(func() {
+		StopSharedValidationCacheForTest(root)
+	})
 
 	av := NewAsyncValidator(pkgctx.NewSystemContext(), root, 2, time.Hour)
 	shared := SharedValidationStateCache(root)
