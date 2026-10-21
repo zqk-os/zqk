@@ -110,9 +110,15 @@ func NewAutoFixProcessPendingCmd() *cobra.Command {
 	cmd.Hidden = true
 	cmd.RunE = runAutoFixProcessPending
 
-	cmd.Flags().String("project-root", "", "Project root directory")
-	cmd.Flags().Bool("sync-glossary", false, "Scan for missing glossary terms after processing")
-	cmd.Flags().Bool("sync-glossary-apply", false, "Create missing glossary terms inferred from specs")
+	if cmd.Flags().Lookup("project-root") == nil {
+		cmd.Flags().String("project-root", "", "Project root directory")
+	}
+	if cmd.Flags().Lookup("sync-glossary") == nil {
+		cmd.Flags().Bool("sync-glossary", false, "Scan for missing glossary terms after processing")
+	}
+	if cmd.Flags().Lookup("sync-glossary-apply") == nil {
+		cmd.Flags().Bool("sync-glossary-apply", false, "Create missing glossary terms inferred from specs")
+	}
 
 	return cmd
 }
@@ -540,16 +546,22 @@ func decodeAutoFixBatch(raw []byte) (AutoFixBatch, bool, error) {
 // NewAutoFixBatchCmd creates the auto-fix-batch command
 // This command processes a batch of auto-fixable issues submitted by the scheduler
 func NewAutoFixBatchCmd() *cobra.Command {
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemAutoFixProcessPendingCommandBuilder(), &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemAutoFixBatchCommandBuilder(), &cobra.Command{
 		Use:    "auto-fix-batch",
 		Short:  "Process a batch of auto-fixable issues (internal command, called by scheduler)",
 		Hidden: true, // Hide from help - this is an internal command
 		RunE:   runAutoFixBatch,
 	})
 
-	cmd.Flags().String("batch-file", "", "Path to batch JSON file (required)")
-	cmd.Flags().String("project-root", "", "Project root directory (required)")
-	cmd.Flags().Int("chunk-size", 0, fmt.Sprintf("Number of issues per transactional chunk (0 = use default or %s env; default 20)", zqkenv.AutofixBatchChunkSize()))
+	if cmd.Flags().Lookup("batch-file") == nil {
+		cmd.Flags().String("batch-file", "", "Path to batch JSON file (required)")
+	}
+	if cmd.Flags().Lookup("project-root") == nil {
+		cmd.Flags().String("project-root", "", "Project root directory (required)")
+	}
+	if cmd.Flags().Lookup("chunk-size") == nil {
+		cmd.Flags().Int("chunk-size", 0, fmt.Sprintf("Number of issues per transactional chunk (0 = use default or %s env; default 20)", zqkenv.AutofixBatchChunkSize()))
+	}
 
 	return cmd
 }

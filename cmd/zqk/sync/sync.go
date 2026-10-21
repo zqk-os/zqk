@@ -113,6 +113,9 @@ func newSyncStatusCmd() *cobra.Command {
 }
 
 func resolveKernelSyncStore(proc *cli.Processor) (*syncpkg.KernelSyncStore, error) {
+	if proc == nil {
+		return nil, errors.New(ErrStorageUnavailable)
+	}
 	secCtx := proc.SecurityContext()
 	if secCtx == nil {
 		secCtx = pkgctx.NewSystemSecurityContext()
