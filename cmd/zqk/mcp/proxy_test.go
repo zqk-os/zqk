@@ -2,6 +2,8 @@ package mcp
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -23,7 +25,7 @@ func TestProxyCmd_RunProxy(t *testing.T) {
 
 	select {
 	case err := <-errCh:
-		if err != nil && err != context.DeadlineExceeded && err != context.Canceled {
+		if err != nil && !errors.Is(err, context.DeadlineExceeded) && !errors.Is(err, context.Canceled) && !strings.Contains(err.Error(), "context canceled") && !strings.Contains(err.Error(), "context deadline exceeded") {
 			t.Fatalf("runProxy failed: %v", err)
 		}
 	case <-time.After(500 * time.Millisecond):

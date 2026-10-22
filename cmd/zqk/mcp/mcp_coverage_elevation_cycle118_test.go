@@ -3,11 +3,13 @@ package mcp
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"testing"
@@ -448,9 +450,7 @@ func TestCycle118_ProxyCmd_StartWithCancel(t *testing.T) {
 	cmd.SetContext(ctx)
 
 	err := cmd.Execute()
-	if err != nil {
-		assert.Contains(t, err.Error(), "context canceled")
-	}
+	assert.True(t, err == nil || errors.Is(err, context.Canceled) || strings.Contains(err.Error(), "context canceled"))
 }
 
 type failingStorageProvider struct {
