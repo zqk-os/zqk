@@ -125,9 +125,11 @@ func TestEnqueueMintPromoteJob(t *testing.T) {
 	if err := testenvroot.BootstrapRoot(testRoot, repoRoot); err != nil {
 		t.Fatalf("BootstrapRoot: %v", err)
 	}
-	defer func() {
-		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
-	}()
+	t.Cleanup(func() {
+		if teardownErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil)); teardownErr != nil {
+			t.Logf("teardown error: %v", teardownErr)
+		}
+	})
 
 	jobID, err := enqueueMintPromoteJob(testRoot, "BLI-TEST-MINT-001")
 	if err != nil {
@@ -150,9 +152,11 @@ func TestNewObject_EdgeCases(t *testing.T) {
 	if err := testenvroot.BootstrapRoot(testRoot, repoRoot); err != nil {
 		t.Fatalf("BootstrapRoot: %v", err)
 	}
-	defer func() {
-		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
-	}()
+	t.Cleanup(func() {
+		if teardownErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil)); teardownErr != nil {
+			t.Logf("teardown error: %v", teardownErr)
+		}
+	})
 
 	// Test object command with --file
 	tmpFile := filepath.Join(testRoot, "spec.md")

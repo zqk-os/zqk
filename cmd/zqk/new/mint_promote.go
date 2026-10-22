@@ -1,6 +1,7 @@
 package newcmd
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -37,33 +38,7 @@ func enqueueMintPromoteJob(projectRoot, objectID string) (string, error) {
 		exe = "zqk"
 	}
 	commandArgs := []string{"object", "promote", objectID}
-	jobID := fmt.Sprintf("%s%s", mintPromoteJobPrefix, objectID)
-	now := time.Now().UTC()
-	nowStr := zqktime.FormatLayoutUTC(now, zqktime.LayoutObjectDateTimeZ)
-
-	jobData := map[string]any{
-		objects.FieldKeyID:                jobID,
-		objects.FieldKeyKind:              objects.KindSchedulerJob,
-		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
-		objects.FieldKeyStatus:            mintPromoteStatusActive,
-		objects.FieldKeyJobType:           mintPromoteJobType,
-		objects.FieldKeyTriggerType:       mintPromoteTriggerManual,
-		objects.FieldKeyCategory:          mintPromoteJobCategory,
-		objects.FieldKeyExecutionMode:     mintPromoteExecutionOnce,
-		objects.FieldKeyMaxRuntimeSeconds: mintPromoteMaxRuntimeSec,
-		objects.FieldKeyEnabled:           true,
-		objects.FieldKeyTitle:             fmt.Sprintf("Mint promote: %s", objectID),
-		objects.FieldKeyDescription:       fmt.Sprintf("Background promote for newly minted draft-plane object %s", objectID),
-		objects.FieldKeyCommand:           exe,
-		objects.FieldKeyCommandArgs:       commandArgs,
-		objects.FieldKeyRetryCount:        mintPromoteRetryCount,
-		objects.FieldKeyRetryDelaySeconds: mintPromoteRetryDelaySec,
-		objects.FieldKeyCreatedAt:         nowStr,
-		objects.FieldKeyCreatedBy:         pkgctx.SystemAccountID,
-		objects.FieldKeyUpdatedAt:         nowStr,
-		objects.FieldKeyUpdatedBy:         pkgctx.SystemAccountID,
-		objects.FieldKeyWorkingDirectory:  projectRoot,
-	}
+	jobID, jobData := buildMintPromoteJobData(projectRoot, objectID, exe, commandArgs)
 
 	stdctx := pkgctx.NewSystemContext()
 	stdctx = pkgctx.WithPromoteOnCreate(stdctx)
@@ -77,6 +52,11 @@ func enqueueMintPromoteJob(projectRoot, objectID string) (string, error) {
 	if provider == nil {
 		return "", errfmt.Errorf("mint promote: nil storage")
 	}
+	defer func() {
+		if shutdownErr := provider.Shutdown(context.Background()); shutdownErr != nil {
+			logging.LogSwallowedError(shutdownErr)
+		}
+	}()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
 	existing, listErr := provider.List(stdctx, secCtx, pkgctx.NewStorageContext(), storage.ListFilter{
@@ -113,4 +93,35 @@ func enqueueMintPromoteJob(projectRoot, objectID string) (string, error) {
 			Log()
 	}
 	return jobID, nil
+}
+
+func buildMintPromoteJobData(projectRoot, objectID, exe string, commandArgs []string) (string, map[string]any) {
+	jobID := fmt.Sprintf("%s%s", mintPromoteJobPrefix, objectID)
+	now := time.Now().UTC()
+	nowStr := zqktime.FormatLayoutUTC(now, zqktime.LayoutObjectDateTimeZ)
+
+	jobData := map[string]any{
+		objects.FieldKeyID:                jobID,
+		objects.FieldKeyKind:              objects.KindSchedulerJob,
+		objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
+		objects.FieldKeyStatus:            mintPromoteStatusActive,
+		objects.FieldKeyJobType:           mintPromoteJobType,
+		objects.FieldKeyTriggerType:       mintPromoteTriggerManual,
+		objects.FieldKeyCategory:          mintPromoteJobCategory,
+		objects.FieldKeyExecutionMode:     mintPromoteExecutionOnce,
+		objects.FieldKeyMaxRuntimeSeconds: mintPromoteMaxRuntimeSec,
+		objects.FieldKeyEnabled:           true,
+		objects.FieldKeyTitle:             fmt.Sprintf("Mint promote: %s", objectID),
+		objects.FieldKeyDescription:       fmt.Sprintf("Background promote for newly minted draft-plane object %s", objectID),
+		objects.FieldKeyCommand:           exe,
+		objects.FieldKeyCommandArgs:       commandArgs,
+		objects.FieldKeyRetryCount:        mintPromoteRetryCount,
+		objects.FieldKeyRetryDelaySeconds: mintPromoteRetryDelaySec,
+		objects.FieldKeyCreatedAt:         nowStr,
+		objects.FieldKeyCreatedBy:         pkgctx.SystemAccountID,
+		objects.FieldKeyUpdatedAt:         nowStr,
+		objects.FieldKeyUpdatedBy:         pkgctx.SystemAccountID,
+		objects.FieldKeyWorkingDirectory:  projectRoot,
+	}
+	return jobID, jobData
 }
