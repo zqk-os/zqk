@@ -68,7 +68,6 @@ func binaryBuildIdentifier(exe string) string {
 	return "static"
 }
 
-
 var fileContentHashes stampmemo.Table[[]byte] // keyed by checker/lifecycle path (closed glob set)
 
 // computeValidationCodeChecksum fingerprints the running executable plus

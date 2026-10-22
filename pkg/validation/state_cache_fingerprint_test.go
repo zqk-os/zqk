@@ -124,8 +124,6 @@ func TestRunningExecutableFingerprint_BinZqkAndStableParity(t *testing.T) {
 	}
 }
 
-
-
 func TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
