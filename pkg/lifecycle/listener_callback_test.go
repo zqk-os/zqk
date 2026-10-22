@@ -3,6 +3,7 @@ package lifecycle
 import (
 	"context"
 	"errors"
+	"fmt"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -219,4 +220,39 @@ func TestListenerEndToEndWALReplaySchedulerCallback(t *testing.T) {
 	// Verify checkpoint file exists
 	checkpointPath := filepath.Join(tempDir, ".zqk", "wal", "lifecycle_events.wal.checkpoint")
 	assert.FileExists(t, checkpointPath)
+}
+
+func TestListener_DedupMapsBounded(t *testing.T) {
+	tempDir := t.TempDir()
+	wal, err := NewLifecycleEventWAL(tempDir)
+	require.NoError(t, err)
+	defer wal.Close()
+
+	ch := make(chan TransitionRequest, 2000)
+	rule := TransitionRule{
+		CriterionID: "CRIT-test",
+		Kind:        "milestone",
+		ToStatus:    "completed",
+		ScopeKey:    "milestone_id",
+	}
+	listener := NewListener(tempDir, wal, []TransitionRule{rule}, ch, nil)
+
+	// Populate satisfied map past maxDedupEntries
+	for i := 0; i < maxDedupEntries+200; i++ {
+		ev := &LifecycleEvent{
+			EventType:   EventTypeCriterionSatisfied,
+			CriterionID: "CRIT-test",
+			Scope:       map[string]string{"milestone_id": fmt.Sprintf("MIL-%d", i)},
+		}
+		err := listener.processEvent(ev)
+		require.NoError(t, err)
+	}
+
+	listener.mu.Lock()
+	satisfiedLen := len(listener.satisfied)
+	firedLen := len(listener.fired)
+	listener.mu.Unlock()
+
+	assert.LessOrEqual(t, satisfiedLen, maxDedupEntries)
+	assert.LessOrEqual(t, firedLen, maxDedupEntries)
 }

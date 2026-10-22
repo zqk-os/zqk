@@ -404,6 +404,23 @@ func (r *JobStateRegistry) getCachedFileState(path string, modTime time.Time, si
 	return c.state
 }
 
+// maxCachedFileStates is the upper bound on fileStateCache entries to prevent unbounded memory growth.
+const maxCachedFileStates = 500
+
+func (r *JobStateRegistry) evictExcessCachedFileStatesLocked() {
+	if len(r.fileStateCache) < maxCachedFileStates {
+		return
+	}
+	toRemove := 50
+	for k := range r.fileStateCache {
+		delete(r.fileStateCache, k)
+		toRemove--
+		if toRemove <= 0 {
+			break
+		}
+	}
+}
+
 func (r *JobStateRegistry) setCachedFileState(path string, modTime time.Time, size int64, state *JobExecutionState) {
 	if r == nil || state == nil {
 		return
@@ -412,6 +429,9 @@ func (r *JobStateRegistry) setCachedFileState(path string, modTime time.Time, si
 	defer r.fileCacheMu.Unlock()
 	if r.fileStateCache == nil {
 		r.fileStateCache = make(map[string]cachedFileState)
+	}
+	if _, exists := r.fileStateCache[path]; !exists && len(r.fileStateCache) >= maxCachedFileStates {
+		r.evictExcessCachedFileStatesLocked()
 	}
 	r.fileStateCache[path] = cachedFileState{
 		modTime: modTime,

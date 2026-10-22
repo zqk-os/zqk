@@ -175,3 +175,44 @@ func TestJobLogFileStem_ChurnNestedSchedulerJobShort(t *testing.T) {
 		t.Fatal("stem must be deterministic")
 	}
 }
+
+func TestIsTestBundleJob_Prefix(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		id   string
+		want bool
+	}{
+		{"", false},
+		{"SCH-run-bundle-test", true},
+		{"SCH-run-bundle-my-bundle", true},
+		{"SCH-run-pkg-foo", true},
+		{"SCH-run-cmd-zqk", true},
+		{"SCH-run-12345", true},
+		{"SCH-run-shell", true},
+		{"SCH-other", false},
+		{"SCH-12345-task", false},
+	}
+	for _, tc := range cases {
+		if got := IsTestBundleJob(tc.id); got != tc.want {
+			t.Errorf("IsTestBundleJob(%q) = %v; want %v", tc.id, got, tc.want)
+		}
+	}
+}
+
+func TestJobLogDir_RegularRunWrapperJob(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	id := "SCH-run-pkg-storage-1"
+	got := JobLogDir(root, id)
+	want := JobLogsTestBundlesDir(root)
+	if got != want {
+		t.Fatalf("JobLogDir(%q) = %q; want %q", id, got, want)
+	}
+
+	nonBundleID := "SCH-other-1"
+	gotNonBundle := JobLogDir(root, nonBundleID)
+	wantNonBundle := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, paths.SchedulerJobLogsSubdir, nonBundleID)
+	if gotNonBundle != wantNonBundle {
+		t.Fatalf("JobLogDir(%q) = %q; want %q", nonBundleID, gotNonBundle, wantNonBundle)
+	}
+}

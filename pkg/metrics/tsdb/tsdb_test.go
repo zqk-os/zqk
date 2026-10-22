@@ -54,3 +54,36 @@ func TestMemoryTSDB_ReadNotFound(t *testing.T) {
 		t.Error("Expected error for non-existent metric, got nil")
 	}
 }
+
+func TestMemoryTSDB_MaxPointsPerMetric(t *testing.T) {
+	db := NewMemoryTSDB()
+	ctx := context.Background()
+	metric := "bounded_metric"
+	now := time.Now()
+
+	for i := 0; i < DefaultMaxPointsPerMetric+100; i++ {
+		pt := DataPoint{
+			Timestamp: now.Add(time.Duration(i) * time.Second),
+			Value:     float64(i),
+		}
+		if err := db.Write(ctx, metric, pt); err != nil {
+			t.Fatalf("unexpected write error at %d: %v", i, err)
+		}
+	}
+
+	db.mu.RLock()
+	pts := db.data[metric]
+	db.mu.RUnlock()
+
+	if len(pts) != DefaultMaxPointsPerMetric {
+		t.Fatalf("expected exactly %d points, got %d", DefaultMaxPointsPerMetric, len(pts))
+	}
+
+	// Verify sliding window retained newest points
+	if pts[0].Value != 100.0 {
+		t.Fatalf("expected first point value to be 100.0, got %v", pts[0].Value)
+	}
+	if pts[len(pts)-1].Value != float64(DefaultMaxPointsPerMetric+99) {
+		t.Fatalf("expected last point value to be %v, got %v", DefaultMaxPointsPerMetric+99, pts[len(pts)-1].Value)
+	}
+}

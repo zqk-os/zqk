@@ -185,12 +185,29 @@ func (l *Listener) Run(ctx context.Context) error {
 	}
 }
 
+// maxDedupEntries is the upper bound on satisfied and fired dedup maps to prevent unbounded memory growth.
+const maxDedupEntries = 1000
+
+func pruneDedupMap(m map[string]struct{}, targetCap int) {
+	toDelete := len(m) - targetCap
+	for k := range m {
+		if toDelete <= 0 {
+			break
+		}
+		delete(m, k)
+		toDelete--
+	}
+}
+
 func (l *Listener) processEvent(ev *LifecycleEvent) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	switch ev.EventType {
 	case EventTypeCriterionSatisfied:
 		key := ev.CriterionID + ":" + ev.scopeKey()
+		if len(l.satisfied) >= maxDedupEntries {
+			pruneDedupMap(l.satisfied, maxDedupEntries/2)
+		}
 		l.satisfied[key] = struct{}{}
 		l.tryFireRulesLocked(ev.CriterionID, ev.scopeKey(), ev.Scope)
 	case EventTypeStatusTransition:
@@ -250,6 +267,9 @@ func (l *Listener) tryFireRulesLocked(criterionID, scopeKey string, scope map[st
 		select {
 		case l.transitionCh <- TransitionRequest{Kind: rule.Kind, ID: objID, ToStatus: rule.ToStatus}:
 			// Mark fired only after enqueue so a full channel can retry on the next WAL poll.
+			if len(l.fired) >= maxDedupEntries {
+				pruneDedupMap(l.fired, maxDedupEntries/2)
+			}
 			l.fired[fireKey] = struct{}{}
 		default:
 			// channel full; don't block listener (retry on later events / polls)
