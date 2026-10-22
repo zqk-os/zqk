@@ -16,12 +16,12 @@ import (
 // (e.g. NAME_MAX) and stay manageable in UIs.
 const maxSchedulerJobLogFilenameBytes = 200
 
-// TestBundleJobIDPrefix is the prefix for leftover run_wrapper job IDs (SCH-run-bundle-).
+// TestBundleJobIDPrefix is the prefix for leftover run_wrapper job IDs (SCH-run-).
 // Jobs with this prefix use a single shared folder to avoid one directory per job and reduce lock contention.
-const TestBundleJobIDPrefix = "SCH-run-bundle-"
+const TestBundleJobIDPrefix = "SCH-run-"
 
-// IsTestBundleJob returns true when jobID is a test-bundle job (e.g. legacy SCH-run-bundle-* jobs).
-// Regular SCH-run-* jobs (such as SCH-run-pkg-*, SCH-run-cmd-*, etc.) are not routed into test-bundle logging paths.
+// IsTestBundleJob returns true when jobID is a test-bundle job (e.g. leftover SCH-run-* jobs).
+// Such jobs use JobLogsTestBundlesDir so all test bundle logs live in one folder.
 func IsTestBundleJob(jobID string) bool {
 	return strings.HasPrefix(jobID, TestBundleJobIDPrefix)
 }
