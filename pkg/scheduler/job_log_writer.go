@@ -2,16 +2,12 @@ package scheduler
 
 import (
 	"bufio"
-	"encoding/json"
-	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/zqk-os/zqk/pkg/config"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
-	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
 // testBundlesEventsMu serializes appends to the single test-bundles events.jsonl so multiple jobs don't interleave.
@@ -57,115 +53,8 @@ func AppendTestBundleProgressEvent(projectRoot, jobID string, entry map[string]a
 }
 
 // TrackAndAppendTestBundleProgress tracks the progress of the test bundles and writes tallies to progress.jsonl.
+// Deprecated: test bundles are deprecated. This function is a safe no-op to eliminate full-file scans and GC thrashing.
 func TrackAndAppendTestBundleProgress(projectRoot, jobID string, eventType string) {
-	if projectRoot == emptyValue || jobID == emptyValue {
-		return
-	}
-
-	if !IsTestBundleJob(jobID) {
-		return
-	}
-
-	// Load all saved test bundles to identify the known IDs dynamically
-	knownIDs := make(map[string]bool)
-	bundleStorageDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.TestBundlesDir)
-	if entries, err := fileutil.ReadDir(bundleStorageDir); err == nil {
-		for _, entry := range entries {
-			if !entry.IsDir() && filepath.Ext(entry.Name()) == ".json" {
-				name := entry.Name()[:len(entry.Name())-5] // Remove .json extension
-				knownIDs["SCH-run-bundle-"+name] = true
-			}
-		}
-	}
-
-	// Fallback to treating the current job ID as the only known ID if the directory is empty/missing
-	if len(knownIDs) == 0 {
-		knownIDs[jobID] = true
-	}
-
-	// Load existing progress from progress.jsonl
-	path := TestBundlesProgressFilePath(projectRoot)
-
-	// Read all previous progress events to reconstruct current state of all jobs
-	states := make(map[string]string)
-	for k := range knownIDs {
-		states[k] = "pending"
-	}
-
-	f, err := fileutil.Open(path)
-	if err == nil {
-		sc := bufio.NewScanner(f)
-		for sc.Scan() {
-			var m map[string]any
-			if err := json.Unmarshal(sc.Bytes(), &m); err == nil {
-				jID, _ := m["job_id"].(string)
-				eType, _ := m[objects.FieldKeyEventType].(string)
-				if jID != "" && eType != "" {
-					states[jID] = eType
-				}
-			}
-		}
-		_ = f.Close()
-	}
-
-	// Update current job state
-	newState := "pending"
-	if eventType == "started" {
-		newState = "running"
-	} else if eventType == "passed" || eventType == "pass" || eventType == "completed" {
-		newState = "pass"
-	} else if eventType == "failed" || eventType == "fail" || eventType == "test_fail" {
-		newState = "fail"
-	} else if eventType == "skipped" {
-		newState = "skipped"
-	}
-	states[jobID] = newState
-
-	tallies := computeStateTallies(states, len(knownIDs))
-
-	// Emit bundle_progress event
-	entry := map[string]any{
-		KeyTimestamp:      zqktime.NowRFC3339UTC(),
-		KeyEventType:      newState,
-		"completed_count": tallies.completedCount,
-		"total_count":     tallies.totalCount,
-		"pass_count":      tallies.passCount,
-		"fail_count":      tallies.failCount,
-		"running_count":   tallies.runningCount,
-		"pending_count":   tallies.pendingCount,
-	}
-
-	AppendTestBundleProgressEvent(projectRoot, jobID, entry)
-}
-
-type bundleProgressTallies struct {
-	totalCount     int
-	completedCount int
-	passCount      int
-	failCount      int
-	runningCount   int
-	pendingCount   int
-}
-
-func computeStateTallies(states map[string]string, totalCount int) bundleProgressTallies {
-	t := bundleProgressTallies{totalCount: totalCount}
-	for _, s := range states {
-		switch s {
-		case "pass":
-			t.completedCount++
-			t.passCount++
-		case "fail":
-			t.completedCount++
-			t.failCount++
-		case "skipped":
-			t.completedCount++
-		case "running":
-			t.runningCount++
-		case "pending":
-			t.pendingCount++
-		}
-	}
-	return t
 }
 
 // jobLogBufferSize is the size of the in-memory buffer per job (balance I/O efficiency vs memory).
@@ -189,7 +78,7 @@ func jobLogKey(projectRoot, jobID string) string {
 }
 
 // GetOrCreateJobLogWriter returns a buffered writer for the job's events file, creating it if needed.
-// Do not use for test-bundle jobs (SCH-run-*); they write to the shared test-bundles/events.jsonl via AppendTestBundleEvent.
+// Do not use for test-bundle jobs (SCH-run-bundle-*); they write to the shared test-bundles/events.jsonl via AppendTestBundleEvent.
 // Callers must use WriteJobLogLine and then CloseJobLogWriter when the job ends.
 // Safe for concurrent use; each job has one writer.
 func GetOrCreateJobLogWriter(projectRoot, jobID string) (*jobLogWriter, error) {

@@ -700,3 +700,24 @@ func TestJobStateRegistry_StorageFaultRecoveryAndCacheEvictionRace(t *testing.T)
 	}
 	wg.Wait()
 }
+
+func TestJobStateRegistry_FileStateCacheBounded(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
+
+	// Insert more than maxCachedFileStates items into fileStateCache
+	for i := 0; i < maxCachedFileStates+100; i++ {
+		path := fmt.Sprintf("/fake/path/%d.yaml", i)
+		st := &JobExecutionState{JobID: fmt.Sprintf("SCH-job-%d", i), ExecutionID: fmt.Sprintf("exec-%d", i)}
+		reg.setCachedFileState(path, time.Now(), 100, st)
+	}
+
+	reg.fileCacheMu.RLock()
+	cacheLen := len(reg.fileStateCache)
+	reg.fileCacheMu.RUnlock()
+
+	if cacheLen > maxCachedFileStates {
+		t.Fatalf("fileStateCache exceeded bound: got %d, max %d", cacheLen, maxCachedFileStates)
+	}
+}

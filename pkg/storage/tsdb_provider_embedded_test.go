@@ -153,12 +153,72 @@ func TestEmbeddedTSDBProvider_IsClosed(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	_ = provider.Initialize(ctx)
-	_ = provider.Close(ctx)
+	if err := provider.Initialize(ctx); err != nil {
+		t.Fatalf("failed to initialize: %v", err)
+	}
+	if err := provider.Close(ctx); err != nil {
+		t.Fatalf("failed to close: %v", err)
+	}
 
 	if !provider.IsClosed() {
 		t.Errorf("expected provider IsClosed to be true after Close")
 	}
 }
 
-// tdd refresh
+func TestEmbeddedTSDBProvider_TimeRangeWindowing(t *testing.T) {
+	tempDir, err := fileutil.MkdirTemp("", "zqk-tsdb-window-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer fileutil.RemoveAll(tempDir)
+
+	provider := NewEmbeddedTSDBProvider(tempDir)
+	ctx := context.Background()
+
+	// Write points to historical files for different days
+	pastDate := time.Date(2025, 1, 15, 12, 0, 0, 0, time.UTC)
+	pastFile := filepath.Join(tempDir, "metrics-2025-01-15.tsdb")
+	pastPt := TSDBPoint{
+		Measurement: "cpu_usage",
+		Fields:      map[string]any{"value": 10.0},
+		Timestamp:   pastDate,
+	}
+	encoded, err := encodePoint(pastPt)
+	if err != nil {
+		t.Fatalf("failed to encode point: %v", err)
+	}
+	if err := fileutil.WriteFile(pastFile, []byte(encoded+"\n"), 0o644); err != nil {
+		t.Fatalf("failed to write past file: %v", err)
+	}
+
+	recentDate := time.Date(2025, 2, 20, 12, 0, 0, 0, time.UTC)
+	recentFile := filepath.Join(tempDir, "metrics-2025-02-20.tsdb")
+	recentPt := TSDBPoint{
+		Measurement: "cpu_usage",
+		Fields:      map[string]any{"value": 20.0},
+		Timestamp:   recentDate,
+	}
+	encodedRecent, err := encodePoint(recentPt)
+	if err != nil {
+		t.Fatalf("failed to encode recent point: %v", err)
+	}
+	if err := fileutil.WriteFile(recentFile, []byte(encodedRecent+"\n"), 0o644); err != nil {
+		t.Fatalf("failed to write recent file: %v", err)
+	}
+
+	// Query only for Feb 2025: should skip Jan 2025 file
+	res, err := provider.Query(ctx, TSDBQuery{
+		Measurement: "cpu_usage",
+		StartTime:   time.Date(2025, 2, 1, 0, 0, 0, 0, time.UTC),
+		EndTime:     time.Date(2025, 2, 28, 23, 59, 59, 0, time.UTC),
+	})
+	if err != nil {
+		t.Fatalf("query failed: %v", err)
+	}
+	if len(res.Points) != 1 {
+		t.Fatalf("expected 1 point, got %d", len(res.Points))
+	}
+	if res.Points[0].Fields["value"].(float64) != 20.0 {
+		t.Fatalf("expected value 20.0, got %v", res.Points[0].Fields["value"])
+	}
+}

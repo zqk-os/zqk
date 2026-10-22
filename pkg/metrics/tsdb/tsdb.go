@@ -22,6 +22,9 @@ type TSDB interface {
 	Close() error
 }
 
+// DefaultMaxPointsPerMetric is the maximum number of data points retained per metric in MemoryTSDB.
+const DefaultMaxPointsPerMetric = 1000
+
 // MemoryTSDB provides a simple in-memory implementation of TSDB.
 type MemoryTSDB struct {
 	mu   sync.RWMutex
@@ -42,7 +45,11 @@ func (db *MemoryTSDB) Write(ctx context.Context, metric string, point DataPoint)
 	}
 	db.mu.Lock()
 	defer db.mu.Unlock()
-	db.data[metric] = append(db.data[metric], point)
+	pts := append(db.data[metric], point)
+	if len(pts) > DefaultMaxPointsPerMetric {
+		pts = pts[len(pts)-DefaultMaxPointsPerMetric:]
+	}
+	db.data[metric] = pts
 	return nil
 }
 
