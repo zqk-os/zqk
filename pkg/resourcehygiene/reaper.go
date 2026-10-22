@@ -1,6 +1,7 @@
 package resourcehygiene
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
@@ -342,6 +343,26 @@ func ExecuteHygiene(projectRoot string, opts HygieneOptions) (*HygieneExecutionR
 		}
 	}
 
+	if opts.ReapScorecards {
+		cnt, bytes, paths, err := ReapOrphanedScorecards(projectRoot, opts.DryRun)
+		report.ScorecardsReaped += cnt
+		report.BytesReclaimed += bytes
+		report.ReapedPaths = append(report.ReapedPaths, paths...)
+		if err != nil {
+			report.Errors = append(report.Errors, err.Error())
+		}
+	}
+
+	if opts.ReapMetrics {
+		cnt, bytes, paths, err := ReapAgedMetrics(projectRoot, opts.MetricsMaxAge, opts.DryRun)
+		report.MetricsReaped += cnt
+		report.BytesReclaimed += bytes
+		report.ReapedPaths = append(report.ReapedPaths, paths...)
+		if err != nil {
+			report.Errors = append(report.Errors, err.Error())
+		}
+	}
+
 	if opts.ReapProcesses {
 		cnt, paths, err := ReapOrphanedProcesses(projectRoot, opts.DryRun)
 		report.ProcessesReaped += cnt
@@ -352,6 +373,140 @@ func ExecuteHygiene(projectRoot string, opts HygieneOptions) (*HygieneExecutionR
 	}
 
 	return report, nil
+}
+
+// ReapOrphanedScorecards scans .zqk/scorecards looking for scorecards whose
+// target source file no longer exists in projectRoot, safely removing them.
+func ReapOrphanedScorecards(projectRoot string, dryRun bool) (int, int64, []string, error) {
+	if strings.TrimSpace(projectRoot) == "" {
+		return 0, 0, nil, nil
+	}
+	cleanRoot := filepath.Clean(projectRoot)
+	scorecardsDir := filepath.Join(cleanRoot, paths.ProjectDataDir, "scorecards")
+
+	entries, err := fileutil.ReadDir(scorecardsDir)
+	if err != nil {
+		if fileutil.IsNotExist(err) {
+			return 0, 0, nil, nil
+		}
+		return 0, 0, nil, err
+	}
+
+	var stats reaperStats
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		if !strings.HasSuffix(name, ".json") {
+			continue
+		}
+
+		scPath := filepath.Join(scorecardsDir, name)
+		info, errStat := fileutil.Stat(scPath)
+		if errStat != nil {
+			continue
+		}
+
+		// Fast path: decode relative path from encoded name
+		encoded := strings.TrimSuffix(name, ".json")
+		relPath := strings.ReplaceAll(encoded, "__", "/")
+		fullSourcePath := filepath.Join(cleanRoot, relPath)
+
+		if _, err := fileutil.Stat(fullSourcePath); err == nil {
+			// Source file exists
+			continue
+		}
+
+		// Verify with sc.FilePath in JSON to avoid false positives on filenames with "__"
+		data, errRead := fileutil.ReadFile(scPath)
+		if errRead == nil {
+			var sc struct {
+				FilePath string `json:"file_path"`
+			}
+			if errJSON := json.Unmarshal(data, &sc); errJSON == nil && sc.FilePath != "" {
+				if _, errSrc := fileutil.Stat(filepath.Join(cleanRoot, sc.FilePath)); errSrc == nil {
+					// Actual source exists!
+					continue
+				}
+			}
+		}
+
+		// Confirmed orphaned scorecard!
+		stats.count++
+		stats.reclaimedBytes += info.Size()
+		rel, relErr := filepath.Rel(cleanRoot, scPath)
+		if relErr == nil {
+			stats.reaped = append(stats.reaped, rel)
+		} else {
+			stats.reaped = append(stats.reaped, scPath)
+		}
+
+		if !dryRun {
+			_ = fileutil.Remove(scPath)
+		}
+	}
+
+	return stats.count, stats.reclaimedBytes, stats.reaped, nil
+}
+
+// ReapAgedMetrics scans .zqk/metrics subdirectories (command_metrics, object_volume, filesystem_snapshot, stream_volume)
+// for chunk and metric files older than maxAge, safely removing them.
+func ReapAgedMetrics(projectRoot string, maxAge time.Duration, dryRun bool) (int, int64, []string, error) {
+	if strings.TrimSpace(projectRoot) == "" {
+		return 0, 0, nil, nil
+	}
+	if maxAge <= 0 {
+		maxAge = 14 * 24 * time.Hour
+	}
+	cleanRoot := filepath.Clean(projectRoot)
+	cutoff := time.Now().UTC().Add(-maxAge)
+
+	metricsDir := filepath.Join(cleanRoot, paths.ProjectDataDir, paths.MetricsDir)
+	subdirs := []string{
+		paths.MetricsCommandMetricsSubdir,
+		paths.MetricsObjectVolumeSubdir,
+		paths.MetricsFilesystemSnapshotSubdir,
+		paths.MetricsStreamVolumeSubdir,
+	}
+
+	var stats reaperStats
+	for _, sub := range subdirs {
+		dir := filepath.Join(metricsDir, sub)
+		entries, err := fileutil.ReadDir(dir)
+		if err != nil {
+			continue
+		}
+		for _, e := range entries {
+			if e.IsDir() {
+				continue
+			}
+			name := e.Name()
+			if !strings.HasSuffix(name, ".chunk") && !strings.HasSuffix(name, ".json") && !strings.HasSuffix(name, ".tmp") {
+				continue
+			}
+			filePath := filepath.Join(dir, name)
+			info, errStat := fileutil.Stat(filePath)
+			if errStat != nil {
+				continue
+			}
+			if info.ModTime().Before(cutoff) {
+				stats.count++
+				stats.reclaimedBytes += info.Size()
+				rel, relErr := filepath.Rel(cleanRoot, filePath)
+				if relErr == nil {
+					stats.reaped = append(stats.reaped, rel)
+				} else {
+					stats.reaped = append(stats.reaped, filePath)
+				}
+				if !dryRun {
+					_ = fileutil.Remove(filePath)
+				}
+			}
+		}
+	}
+
+	return stats.count, stats.reclaimedBytes, stats.reaped, nil
 }
 
 // ReapOrphanedProcesses detects and terminates orphaned zqk processes whose parent has died (PPID == 1)
