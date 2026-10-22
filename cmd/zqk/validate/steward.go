@@ -6,10 +6,13 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
+
+var stewardTickerInterval = 10 * time.Second
 
 // NewStewardCmd creates the agent steward command
 func NewStewardCmd() *cobra.Command {
@@ -39,7 +42,7 @@ func runStewardLoop(cmd *cobra.Command) error {
 
 	_ = cli.WriteOutput(cmd, []byte("🛡️ Roadmap Steward agent loop started. Monitoring 'grooming' and 'planned' objects...\n"))
 
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(stewardTickerInterval)
 	defer ticker.Stop()
 
 	for {
@@ -65,8 +68,28 @@ func runStewardLoop(cmd *cobra.Command) error {
 
 				// Steward Preflight Check
 				// A priority plan must have at least one valid backlog item linked to go active.
-				blis, hasBlis := obj[objects.FieldKeyBacklogItemRefs].([]any)
-				if !hasBlis || len(blis) == 0 {
+				var hasBlis bool
+				switch blis := obj[objects.FieldKeyBacklogItemRefs].(type) {
+				case []any:
+					hasBlis = len(blis) > 0
+				case []string:
+					hasBlis = len(blis) > 0
+				}
+				if !hasBlis {
+					// Child->Parent: query for backlog_items referencing this plan via priority_plan_ref
+					bliFilter := storage.ListFilter{
+						Kind: objects.KindBacklogItem,
+						Filters: map[string]any{
+							objects.FieldKeyPriorityPlanRef: planID,
+						},
+						Limit: 1,
+					}
+					bliRes, bliErr := sp.List(ctx, secCtx, nil, bliFilter)
+					if bliErr == nil && bliRes != nil && len(bliRes.Objects) > 0 {
+						hasBlis = true
+					}
+				}
+				if !hasBlis {
 					_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("⏳ Steward: Plan %s is grooming but lacks backlog items. Waiting...\n", planID)))
 					continue
 				}
@@ -74,7 +97,8 @@ func runStewardLoop(cmd *cobra.Command) error {
 				_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("🛡️ Steward: Plan %s has backlog items. Preflight passed. Promoting to active...\n", planID)))
 
 				// Promote to active
-				err = sp.Update(ctx, secCtx, planID, map[string]any{
+				promoteCtx := pkgctx.WithLifecycleBreakGlass(ctx, "steward roadmap auto-promotion")
+				err = sp.Update(promoteCtx, secCtx, planID, map[string]any{
 					objects.FieldKeyStatus: objects.ObjectStatusActive,
 				})
 				if err != nil {
