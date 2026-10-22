@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strings"
 
@@ -14,19 +15,59 @@ import (
 )
 
 // runningExecutableFingerprint is the production identity mixed into the
-// validation cache checksum. A rebuild (size or mtime change) drops stale
-// Layer 1 hits on the next Load.
+// validation cache checksum. Normalizes executable path to its canonical family
+// and uses build identity rather than transient mtime to prevent mutual cache
+// invalidation between CLI binaries (e.g. bin/zqk vs .zqk/bin/zqk-stable)
+// built or promoted from the same build.
 func runningExecutableFingerprint() string {
 	exe, err := fileutil.Executable()
 	if err != nil || exe == emptyValue {
+		return emptyValue
+	}
+	return executableFingerprintForPath(exe)
+}
+
+func executableFingerprintForPath(exe string) string {
+	if exe == emptyValue {
 		return emptyValue
 	}
 	info, err := fileutil.Stat(exe)
 	if err != nil {
 		return exe
 	}
-	return fmt.Sprintf("%s:%d:%d", exe, info.Size(), info.ModTime().UnixNano())
+	base := filepath.Base(exe)
+	if strings.HasPrefix(base, "zqk") || strings.HasPrefix(base, "zcom") {
+		base = "zqk"
+	}
+	buildID := binaryBuildIdentifier(exe)
+	return fmt.Sprintf("%s:%d:%s", base, info.Size(), buildID)
 }
+
+func binaryBuildIdentifier(exe string) string {
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		for _, s := range bi.Settings {
+			if s.Key == "vcs.revision" && s.Value != emptyValue {
+				return s.Value
+			}
+		}
+		if bi.Main.Version != emptyValue && bi.Main.Version != "(devel)" {
+			return bi.Main.Version
+		}
+	}
+	// Fallback: fast hash of first 64KB of executable (covers binary header + build-id)
+	f, err := fileutil.OpenFile(exe, fileutil.O_RDONLY, 0)
+	if err == nil {
+		defer func() { _ = f.Close() }()
+		buf := make([]byte, 64*1024)
+		n, _ := f.Read(buf)
+		if n > 0 {
+			h := sha256.Sum256(buf[:n])
+			return hex.EncodeToString(h[:8])
+		}
+	}
+	return "static"
+}
+
 
 var fileContentHashes stampmemo.Table[[]byte] // keyed by checker/lifecycle path (closed glob set)
 

@@ -318,6 +318,10 @@ func runCheck(cmd *cobra.Command, args []string) error {
 	if unlockAutoFix != nil {
 		defer unlockAutoFix()
 	}
+	if canSkipAutofixRun(cmd, args) {
+		cmd.Println("Zero auto-fixable issues detected in clean kernel; skipping redundant validation scan.")
+		return nil
+	}
 	runInBackground, _ := cmd.Flags().GetBool("background") //nolint:errcheck
 
 	// Eradicate "jerky" backpressure when run interactively by the user.

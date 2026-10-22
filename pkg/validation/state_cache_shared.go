@@ -72,6 +72,10 @@ func EnsureValidationCacheReady(projectRoot string) error {
 	if cache == nil {
 		return nil
 	}
+	total, _, _ := cache.Count()
+	if total == 0 {
+		return nil
+	}
 	return cache.Save()
 }
 
