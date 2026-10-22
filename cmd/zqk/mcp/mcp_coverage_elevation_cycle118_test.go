@@ -471,7 +471,13 @@ func TestCycle118_StorageProviderAdapter_ListError(t *testing.T) {
 }
 
 func TestCycle118_Subcommand_FlagErrors_Direct(t *testing.T) {
+	tempDir, provider, cleanup := setupMCPTestProjectWithStorage(t)
+	defer cleanup()
+	t.Setenv(zqkenv.ProjectRoot().Name(), tempDir)
+	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
+
 	bareCmd := &cobra.Command{Use: "bare"}
+	setMCPCLIContext(t, bareCmd, tempDir, provider)
 
 	err := runProxy(bareCmd, nil)
 	require.Error(t, err)
