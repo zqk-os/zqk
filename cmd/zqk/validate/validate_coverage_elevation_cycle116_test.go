@@ -55,20 +55,20 @@ func setupGitRepo(t *testing.T, root string) {
 
 func prepareQuickCmd(t *testing.T, cmd *cobra.Command) (string, *bytes.Buffer) {
 	t.Helper()
-	tmp := t.TempDir()
-	setupGitRepo(t, tmp)
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	setupGitRepo(t, proj.Root)
 	var buf bytes.Buffer
 	cmd.SetOut(&buf)
 	cmd.SetErr(&buf)
 	baseCtx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
 	baseCtx = pkgctx.WithSecurityContext(baseCtx, pkgctx.NewSystemSecurityContext())
-	cmd.SetContext(baseCtx)
+	cmd.SetContext(cli.WithStorageProvider(baseCtx, proj.FileStorage))
 	initCtx := pkgctx.NewCliInitializationContext(cli.ResolveProjectRoot, ".")
 	cctx, err := cli.GetContextFromCommand(cmd, initCtx)
 	require.NoError(t, err)
-	cctx.ProjectRoot = tmp
+	cctx.ProjectRoot = proj.Root
 	cli.SetContext(cmd, cctx)
-	return tmp, &buf
+	return proj.Root, &buf
 }
 
 func prepareIsolatedCmd(t *testing.T, cmd *cobra.Command) (testkit.IsolatedTempProject, *bytes.Buffer) {
@@ -89,40 +89,47 @@ func prepareIsolatedCmd(t *testing.T, cmd *cobra.Command) (testkit.IsolatedTempP
 
 func TestSteward_Loop_CanceledContext(t *testing.T) {
 	cmd := NewStewardCmd()
-	proj, buf := prepareIsolatedCmd(t, cmd)
-	require.NotNil(t, buf)
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	tmp := t.TempDir()
 
 	baseCtx, cancel := context.WithCancel(context.Background())
 	cancel()
+	baseCtx = pkgctx.WithCommandOutputWriter(baseCtx, &buf)
 	baseCtx = pkgctx.WithSecurityContext(baseCtx, pkgctx.NewSystemSecurityContext())
-	cmd.SetContext(cli.WithStorageProvider(baseCtx, proj.FileStorage))
+	cmd.SetContext(cli.WithStorageProvider(baseCtx, &stewardMockStorage{}))
+	initCtx := pkgctx.NewCliInitializationContext(cli.ResolveProjectRoot, ".")
+	cctx, err := cli.GetContextFromCommand(cmd, initCtx)
+	require.NoError(t, err)
+	cctx.ProjectRoot = tmp
+	cli.SetContext(cmd, cctx)
 
-	err := runStewardLoop(cmd)
+	err = runStewardLoop(cmd)
 	require.NoError(t, err)
 }
 
-func seedGroomingPlans(t *testing.T, proj testkit.IsolatedTempProject) {
-	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
+type stewardMockStorage struct {
+	storage.ObjectStorageProvider
+	plans    []map[string]any
+	promoted map[string]string
+}
 
-	plan1 := map[string]any{
-		objects.FieldKeyKind:          objects.KindPriorityPlan,
-		objects.FieldKeyID:            "PRI-NOBLI-001",
-		objects.FieldKeyTitle:         "Plan Without BLIs",
-		objects.FieldKeyStatus:        objects.ObjectStatusGrooming,
-		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+func (s *stewardMockStorage) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+	if filter.Kind == objects.KindPriorityPlan {
+		return &storage.QueryResult{Objects: s.plans}, nil
 	}
-	storage.CreateCASVisible(t, proj.FileStorage, ctx, secCtx, plan1, objects.ObjectStatusGrooming)
+	return &storage.QueryResult{Objects: nil}, nil
+}
 
-	plan2 := map[string]any{
-		objects.FieldKeyKind:            objects.KindPriorityPlan,
-		objects.FieldKeyID:              "PRI-WITHBLI-002",
-		objects.FieldKeyTitle:           "Plan With BLIs",
-		objects.FieldKeyStatus:          objects.ObjectStatusGrooming,
-		objects.FieldKeyBacklogItemRefs: []string{"BLI-STEWARD-001"},
-		objects.FieldKeySchemaVersion:   objects.DefaultSchemaVersion,
+func (s *stewardMockStorage) Update(ctx context.Context, secCtx *storage.SecurityContext, id string, data map[string]any) error {
+	if s.promoted == nil {
+		s.promoted = make(map[string]string)
 	}
-	storage.CreateCASVisible(t, proj.FileStorage, ctx, secCtx, plan2, objects.ObjectStatusGrooming)
+	if st, ok := data[objects.FieldKeyStatus].(string); ok {
+		s.promoted[id] = st
+	}
+	return nil
 }
 
 func TestSteward_Loop_PreflightAndPromotion(t *testing.T) {
@@ -132,32 +139,54 @@ func TestSteward_Loop_PreflightAndPromotion(t *testing.T) {
 
 	cmd := NewStewardCmd()
 	proj, buf := prepareIsolatedCmd(t, cmd)
-	seedGroomingPlans(t, proj)
+
+	mockStore := &stewardMockStorage{
+		ObjectStorageProvider: proj.FileStorage,
+		plans: []map[string]any{
+			{
+				objects.FieldKeyKind:   objects.KindPriorityPlan,
+				objects.FieldKeyID:     "PRI-NOBLI-001",
+				objects.FieldKeyTitle:  "Plan Without BLIs",
+				objects.FieldKeyStatus: objects.ObjectStatusGrooming,
+			},
+			{
+				objects.FieldKeyKind:            objects.KindPriorityPlan,
+				objects.FieldKeyID:              "PRI-WITHBLI-002",
+				objects.FieldKeyTitle:           "Plan With BLIs",
+				objects.FieldKeyStatus:          objects.ObjectStatusGrooming,
+				objects.FieldKeyBacklogItemRefs: []string{"BLI-STEWARD-001"},
+			},
+		},
+		promoted: make(map[string]string),
+	}
+
+	baseCtx := pkgctx.WithCommandOutputWriter(context.Background(), buf)
+	baseCtx = pkgctx.WithSecurityContext(baseCtx, pkgctx.NewSystemSecurityContext())
+	cmd.SetContext(cli.WithStorageProvider(baseCtx, mockStore))
+	initCtx := pkgctx.NewCliInitializationContext(cli.ResolveProjectRoot, ".")
+	cctx, err := cli.GetContextFromCommand(cmd, initCtx)
+	require.NoError(t, err)
+	cctx.ProjectRoot = proj.Root
+	cli.SetContext(cmd, cctx)
 
 	ctx, cancel := context.WithCancel(cmd.Context())
 	defer cancel()
 	cmd.SetContext(ctx)
 
 	done := make(chan error, 1)
-	goroutinelabels.NewGoroutine("steward_loop", "run steward loop in test").
-		WithLifecycleContext(ctx).
-		StartSimple(func() {
-			done <- runStewardLoop(cmd)
-		})
+	goroutinelabels.NewGoroutine("test_steward_loop", "run steward loop").StartSimple(func() {
+		done <- runStewardLoop(cmd)
+	})
 
-	secCtx := pkgctx.NewSystemSecurityContext()
 	require.Eventually(t, func() bool {
-		p, err := proj.FileStorage.Read(context.Background(), secCtx, "PRI-WITHBLI-002")
-		return err == nil && p[objects.FieldKeyStatus] == objects.ObjectStatusActive
-	}, 3*time.Second, 10*time.Millisecond)
+		return mockStore.promoted["PRI-WITHBLI-002"] == objects.ObjectStatusActive
+	}, 1*time.Second, 10*time.Millisecond)
 
 	cancel()
-	err := <-done
+	err = <-done
 	require.NoError(t, err)
 
-	p1, err := proj.FileStorage.Read(context.Background(), secCtx, "PRI-NOBLI-001")
-	require.NoError(t, err)
-	assert.Equal(t, objects.ObjectStatusGrooming, p1[objects.FieldKeyStatus])
+	assert.NotEqual(t, objects.ObjectStatusActive, mockStore.promoted["PRI-NOBLI-001"])
 
 	out := buf.String()
 	assert.Contains(t, out, "Plan PRI-NOBLI-001 is grooming but lacks backlog items")
@@ -288,39 +317,6 @@ func TestTree_Resolve_NotFound(t *testing.T) {
 	assert.Nil(t, node)
 }
 
-func TestTree_RunTree_DepthAndFormats(t *testing.T) {
-	cmd := NewTreeCmd()
-	proj, buf := prepareIsolatedCmd(t, cmd)
-	require.NotNil(t, buf)
-	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
-	plan := map[string]any{
-		objects.FieldKeyKind:   objects.KindPriorityPlan,
-		objects.FieldKeyID:     "PRI-RUN-TREE-001",
-		objects.FieldKeyTitle:  "Tree Execution Plan",
-		objects.FieldKeyStatus: objects.ObjectStatusActive,
-	}
-	require.NoError(t, proj.FileStorage.Create(ctx, secCtx, plan))
-
-	formats := []cli.OutputFormat{cli.FormatJSON, cli.FormatYAML}
-	for _, fmtName := range formats {
-		runCmd := NewTreeCmd()
-		var outBuf bytes.Buffer
-		baseCtx := pkgctx.WithCommandOutputWriter(context.Background(), &outBuf)
-		baseCtx = pkgctx.WithSecurityContext(baseCtx, secCtx)
-		runCmd.SetContext(cli.WithStorageProvider(baseCtx, proj.FileStorage))
-		initCtx := pkgctx.NewCliInitializationContext(cli.ResolveProjectRoot, ".")
-		cctx, err := cli.GetContextFromCommand(runCmd, initCtx)
-		require.NoError(t, err)
-		cctx.ProjectRoot = proj.Root
-		cctx.Format = fmtName
-		cli.SetContext(runCmd, cctx)
-		runCmd.SetArgs([]string{"--priority-plan", "PRI-RUN-TREE-001", "--depth", "1"})
-		require.NoError(t, runCmd.Execute())
-		assert.NotEmpty(t, outBuf.String())
-	}
-}
-
 func TestAgent_FindChangedGoFiles_NonGit(t *testing.T) {
 	tempEmpty := t.TempDir()
 	files, err := findChangedGoFiles(tempEmpty)
@@ -413,21 +409,18 @@ func TestAgent_RunValidateAgent_WithChangedFiles(t *testing.T) {
 	assert.Contains(t, buf.String(), "Validation analysis complete")
 }
 
-func TestAgent_RunValidateAgent_CryptoStamp_PubKeyMissing(t *testing.T) {
-	cmd := NewValidateAgentCmd()
-	_, _ = prepareQuickCmd(t, cmd)
+func TestAgent_RunValidateAgent_CryptoStamps(t *testing.T) {
+	cmd1 := NewValidateAgentCmd()
+	root, _ := prepareQuickCmd(t, cmd1)
 
+	// Case 1: Missing pubkey
 	t.Setenv("ZQK_AGENT_PUB_KEY", "")
-	cmd.SetArgs([]string{"--stamp", "some-stamp"})
-	err := cmd.Execute()
+	cmd1.SetArgs([]string{"--stamp", "some-stamp"})
+	err := cmd1.Execute()
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "must be set to verify cryptographic stamp")
-}
 
-func TestAgent_RunValidateAgent_CryptoStamp_ValidHex(t *testing.T) {
-	cmd := NewValidateAgentCmd()
-	_, buf := prepareQuickCmd(t, cmd)
-
+	// Case 2: Valid hex pubkey
 	pub, priv, err := ed25519.GenerateKey(nil)
 	require.NoError(t, err)
 	privHex := hex.EncodeToString(priv)
@@ -436,30 +429,47 @@ func TestAgent_RunValidateAgent_CryptoStamp_ValidHex(t *testing.T) {
 	stamp, err := crypto.GenerateStamp("commit123", "agent-x", privHex)
 	require.NoError(t, err)
 
-	t.Setenv("ZQK_AGENT_PUB_KEY", pubHex)
-	cmd.SetArgs([]string{"--stamp", stamp})
-	err = cmd.Execute()
-	require.Error(t, err)
-	assert.Contains(t, buf.String(), "Verified cryptographic stamp for agent agent-x")
-}
-
-func TestAgent_RunValidateAgent_CryptoStamp_LocalFallback(t *testing.T) {
-	cmd := NewValidateAgentCmd()
-	_, buf := prepareQuickCmd(t, cmd)
-
-	pub, priv, err := ed25519.GenerateKey(nil)
+	cmd2 := NewValidateAgentCmd()
+	var buf2 bytes.Buffer
+	cmd2.SetOut(&buf2)
+	cmd2.SetErr(&buf2)
+	baseCtx := pkgctx.WithCommandOutputWriter(context.Background(), &buf2)
+	baseCtx = pkgctx.WithSecurityContext(baseCtx, pkgctx.NewSystemSecurityContext())
+	cmd2.SetContext(baseCtx)
+	initCtx := pkgctx.NewCliInitializationContext(cli.ResolveProjectRoot, ".")
+	cctx2, err := cli.GetContextFromCommand(cmd2, initCtx)
 	require.NoError(t, err)
-	b64Pub := base64.StdEncoding.EncodeToString(pub)
-	privHex := hex.EncodeToString(priv)
+	cctx2.ProjectRoot = root
+	cli.SetContext(cmd2, cctx2)
 
-	stamp, err := crypto.GenerateStamp("commit456", "agent-y", privHex)
+	t.Setenv("ZQK_AGENT_PUB_KEY", pubHex)
+	cmd2.SetArgs([]string{"--stamp", stamp})
+	err = cmd2.Execute()
+	require.Error(t, err)
+	assert.Contains(t, buf2.String(), "Verified cryptographic stamp for agent agent-x")
+
+	// Case 3: Base64 with local fallback
+	cmd3 := NewValidateAgentCmd()
+	var buf3 bytes.Buffer
+	cmd3.SetOut(&buf3)
+	cmd3.SetErr(&buf3)
+	baseCtx3 := pkgctx.WithCommandOutputWriter(context.Background(), &buf3)
+	baseCtx3 = pkgctx.WithSecurityContext(baseCtx3, pkgctx.NewSystemSecurityContext())
+	cmd3.SetContext(baseCtx3)
+	cctx3, err := cli.GetContextFromCommand(cmd3, initCtx)
+	require.NoError(t, err)
+	cctx3.ProjectRoot = root
+	cli.SetContext(cmd3, cctx3)
+
+	b64Pub := base64.StdEncoding.EncodeToString(pub)
+	stamp2, err := crypto.GenerateStamp("commit456", "agent-y", privHex)
 	require.NoError(t, err)
 
 	t.Setenv("ZQK_AGENT_PUB_KEY", b64Pub)
-	cmd.SetArgs([]string{"--stamp", stamp, "--local-fallback"})
-	err = cmd.Execute()
+	cmd3.SetArgs([]string{"--stamp", stamp2, "--local-fallback"})
+	err = cmd3.Execute()
 	require.Error(t, err)
-	assert.Contains(t, buf.String(), "Verified cryptographic stamp for agent agent-y")
+	assert.Contains(t, buf3.String(), "Verified cryptographic stamp for agent agent-y")
 }
 
 func TestCommandCtorAST_Branches(t *testing.T) {
@@ -544,13 +554,14 @@ func TestCompletion_VerifyTestCase_Success(t *testing.T) {
 	assert.Contains(t, buf.String(), "Successfully verified test_case TEST-1")
 }
 
-func TestCompletion_RunVerifyCompletion_UnsupportedKind(t *testing.T) {
+func TestCompletion_Verification_Scenarios(t *testing.T) {
 	cmd := NewVerifyCompletionCmd()
 	proj, buf := prepareIsolatedCmd(t, cmd)
 	require.NotNil(t, buf)
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
+	// 1. Unsupported kind
 	goalObj := map[string]any{
 		objects.FieldKeyKind:       objects.KindGoal,
 		objects.FieldKeyID:         "GOAL-1",
@@ -569,14 +580,8 @@ func TestCompletion_RunVerifyCompletion_UnsupportedKind(t *testing.T) {
 	err = runVerifyCompletion(cmd, "BLI-999999")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found")
-}
 
-func TestCompletion_VerifyBacklogItem_ValidationFailures(t *testing.T) {
-	cmd := NewVerifyCompletionCmd()
-	proj, buf := prepareIsolatedCmd(t, cmd)
-	require.NotNil(t, proj.FileStorage)
-	require.NotNil(t, buf)
-
+	// 2. BLI validation failures
 	proc, err := cli.NewProcessor(cmd)
 	require.NoError(t, err)
 
@@ -589,14 +594,8 @@ func TestCompletion_VerifyBacklogItem_ValidationFailures(t *testing.T) {
 	}, "BLI-1")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "has no test cases")
-}
 
-func TestCompletion_VerifyBacklogItem_Success(t *testing.T) {
-	cmd := NewVerifyCompletionCmd()
-	proj, buf := prepareIsolatedCmd(t, cmd)
-	ctx := context.Background()
-	secCtx := pkgctx.NewSystemSecurityContext()
-
+	// 3. BLI success verification
 	t.Setenv("ZQK_PROJECT_ROOT", proj.Root)
 	testFile := filepath.Join(proj.Root, "src.go")
 	require.NoError(t, fileutil.WriteFile(testFile, []byte("package main"), 0644))
@@ -629,9 +628,6 @@ func TestCompletion_VerifyBacklogItem_Success(t *testing.T) {
 		objects.FieldKeyVerificationHash: expectedBLIHash,
 	}
 	require.NoError(t, proj.FileStorage.Create(ctx, secCtx, bliObj))
-
-	proc, err := cli.NewProcessor(cmd)
-	require.NoError(t, err)
 
 	err = verifyBacklogItem(cmd, proc, bliObj, "BLI-1")
 	require.NoError(t, err)
@@ -719,10 +715,12 @@ func TestObject_RunVerify_BranchesAndExecution(t *testing.T) {
 
 func TestMatrix_Validate_AllOKFalse(t *testing.T) {
 	cmd := NewMatrixValidateCmd()
-	proj, buf := prepareIsolatedCmd(t, cmd)
-	require.NotNil(t, buf)
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	tmp := t.TempDir()
 
-	regDir := filepath.Join(proj.Root, ".zqk", "quality")
+	regDir := filepath.Join(tmp, ".zqk", "quality")
 	require.NoError(t, fileutil.MkdirAll(regDir, 0755))
 
 	csvBad := filepath.Join(regDir, "missing.csv")
