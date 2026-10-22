@@ -413,3 +413,115 @@ func TestReapOrphanedProcesses(t *testing.T) {
 		t.Fatalf("expected terminated message in live paths: %v", pathsLive)
 	}
 }
+
+func TestReapOrphanedScorecards(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Empty root returns 0
+	cnt, bytes, reaped, err := ReapOrphanedScorecards("", false)
+	if err != nil || cnt != 0 || bytes != 0 || len(reaped) != 0 {
+		t.Fatalf("expected empty results for empty root: %v, %d, %d", err, cnt, bytes)
+	}
+
+	// Missing scorecards directory returns 0
+	cnt, bytes, reaped, err = ReapOrphanedScorecards(tmpDir, false)
+	if err != nil || cnt != 0 || bytes != 0 || len(reaped) != 0 {
+		t.Fatalf("expected 0 for missing directory: %v, %d", err, cnt)
+	}
+
+	scorecardsDir := filepath.Join(tmpDir, paths.ProjectDataDir, "scorecards")
+	if err := fileutil.MkdirAll(scorecardsDir, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir failed: %v", err)
+	}
+
+	// 1. Create a live source file and its valid scorecard
+	liveSrc := filepath.Join(tmpDir, "pkg", "live.go")
+	if err := fileutil.MkdirAll(filepath.Dir(liveSrc), paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir live src dir failed: %v", err)
+	}
+	_ = fileutil.WriteFile(liveSrc, []byte("package live"), paths.FilePerm644)
+	validSC := filepath.Join(scorecardsDir, "pkg__live.go.json")
+	_ = fileutil.WriteFile(validSC, []byte(`{"file_path": "pkg/live.go"}`), paths.FilePerm644)
+
+	// 2. Create an orphaned scorecard whose source does NOT exist
+	orphanSC := filepath.Join(scorecardsDir, "pkg__deleted.go.json")
+	_ = fileutil.WriteFile(orphanSC, []byte(`{"file_path": "pkg/deleted.go"}`), paths.FilePerm644)
+
+	// 3. Dry run
+	cnt, bytes, reaped, err = ReapOrphanedScorecards(tmpDir, true)
+	if err != nil {
+		t.Fatalf("dry run failed: %v", err)
+	}
+	if cnt != 1 || len(reaped) != 1 || bytes <= 0 {
+		t.Fatalf("expected 1 orphan in dry run, got %d (bytes %d)", cnt, bytes)
+	}
+	if _, err := fileutil.Stat(orphanSC); err != nil {
+		t.Fatalf("orphanSC should still exist after dry run")
+	}
+
+	// 4. Live run
+	cnt, bytes, reaped, err = ReapOrphanedScorecards(tmpDir, false)
+	if err != nil {
+		t.Fatalf("live run failed: %v", err)
+	}
+	if cnt != 1 || len(reaped) != 1 || bytes <= 0 {
+		t.Fatalf("expected 1 orphan reaped in live run, got %d", cnt)
+	}
+	if _, err := fileutil.Stat(orphanSC); !fileutil.IsNotExist(err) {
+		t.Fatalf("orphanSC should be deleted after live run")
+	}
+	if _, err := fileutil.Stat(validSC); err != nil {
+		t.Fatalf("validSC should NOT be deleted: %v", err)
+	}
+}
+
+func TestReapAgedMetrics(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Empty root returns 0
+	cnt, bytes, reaped, err := ReapAgedMetrics("", 0, false)
+	if err != nil || cnt != 0 || bytes != 0 || len(reaped) != 0 {
+		t.Fatalf("expected empty results for empty root: %v", err)
+	}
+
+	metricsDir := filepath.Join(tmpDir, paths.ProjectDataDir, paths.MetricsDir, paths.MetricsCommandMetricsSubdir)
+	if err := fileutil.MkdirAll(metricsDir, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir failed: %v", err)
+	}
+
+	oldChunk := filepath.Join(metricsDir, "cmd_old_20261001.chunk")
+	freshChunk := filepath.Join(metricsDir, "cmd_fresh_20261022.chunk")
+	_ = fileutil.WriteFile(oldChunk, []byte("old chunk"), paths.FilePerm644)
+	_ = fileutil.WriteFile(freshChunk, []byte("fresh chunk"), paths.FilePerm644)
+
+	// Backdate oldChunk by 20 days
+	oldTime := time.Now().Add(-20 * 24 * time.Hour)
+	_ = os.Chtimes(oldChunk, oldTime, oldTime)
+
+	// Dry run with 14d max age
+	cnt, bytes, reaped, err = ReapAgedMetrics(tmpDir, 14*24*time.Hour, true)
+	if err != nil {
+		t.Fatalf("dry run failed: %v", err)
+	}
+	if cnt != 1 || len(reaped) != 1 || bytes <= 0 {
+		t.Fatalf("expected 1 aged metric in dry run, got %d", cnt)
+	}
+	if _, err := fileutil.Stat(oldChunk); err != nil {
+		t.Fatalf("oldChunk should exist after dry run")
+	}
+
+	// Live run
+	cnt, bytes, reaped, err = ReapAgedMetrics(tmpDir, 14*24*time.Hour, false)
+	if err != nil {
+		t.Fatalf("live run failed: %v", err)
+	}
+	if cnt != 1 || len(reaped) != 1 {
+		t.Fatalf("expected 1 aged metric reaped in live run, got %d", cnt)
+	}
+	if _, err := fileutil.Stat(oldChunk); !fileutil.IsNotExist(err) {
+		t.Fatalf("oldChunk should be deleted after live run")
+	}
+	if _, err := fileutil.Stat(freshChunk); err != nil {
+		t.Fatalf("freshChunk should still exist")
+	}
+}

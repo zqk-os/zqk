@@ -34,11 +34,14 @@ type HygieneOptions struct {
 	ReapTemp         bool          `json:"reap_temp"`
 	ReapProcesses    bool          `json:"reap_processes"`
 	EnforceRetention bool          `json:"enforce_retention"`
+	ReapScorecards   bool          `json:"reap_scorecards"`
+	ReapMetrics      bool          `json:"reap_metrics"`
 	DryRun           bool          `json:"dry_run"`
 	LockThreshold    time.Duration `json:"lock_threshold"`
 	TempThreshold    time.Duration `json:"temp_threshold"`
 	LogMaxAge        time.Duration `json:"log_max_age"`
 	LogMaxSize       int64         `json:"log_max_size"`
+	MetricsMaxAge    time.Duration `json:"metrics_max_age"`
 }
 
 // DefaultHygieneOptions returns sensible defaults for automated resource hygiene.
@@ -48,23 +51,28 @@ func DefaultHygieneOptions() HygieneOptions {
 		ReapTemp:         true,
 		ReapProcesses:    true,
 		EnforceRetention: true,
+		ReapScorecards:   true,
+		ReapMetrics:      true,
 		DryRun:           false,
 		LockThreshold:    15 * time.Minute,
 		TempThreshold:    30 * time.Minute,
 		LogMaxAge:        48 * time.Hour,
-		LogMaxSize:       10 * 1024 * 1024, // 10MB
+		LogMaxSize:       10 * 1024 * 1024,    // 10MB
+		MetricsMaxAge:    14 * 24 * time.Hour, // 14 days
 	}
 }
 
 // HygieneExecutionReport summarizes the results of a hygiene sweep.
 type HygieneExecutionReport struct {
-	Timestamp       string   `json:"timestamp"`
-	DryRun          bool     `json:"dry_run"`
-	LocksReaped     int      `json:"locks_reaped"`
-	TempReaped      int      `json:"temp_reaped"`
-	ProcessesReaped int      `json:"processes_reaped"`
-	LogsPruned      int      `json:"logs_pruned"`
-	BytesReclaimed  int64    `json:"bytes_reclaimed"`
-	ReapedPaths     []string `json:"reaped_paths,omitempty"`
-	Errors          []string `json:"errors,omitempty"`
+	Timestamp        string   `json:"timestamp"`
+	DryRun           bool     `json:"dry_run"`
+	LocksReaped      int      `json:"locks_reaped"`
+	TempReaped       int      `json:"temp_reaped"`
+	ProcessesReaped  int      `json:"processes_reaped"`
+	LogsPruned       int      `json:"logs_pruned"`
+	ScorecardsReaped int      `json:"scorecards_reaped"`
+	MetricsReaped    int      `json:"metrics_reaped"`
+	BytesReclaimed   int64    `json:"bytes_reclaimed"`
+	ReapedPaths      []string `json:"reaped_paths,omitempty"`
+	Errors           []string `json:"errors,omitempty"`
 }

@@ -18,6 +18,9 @@ import (
 func NewResourceHygieneCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewSystemResourceHygieneCommandBuilder()
 	cmd.Flags().Bool("reap-processes", true, "Reap orphaned background zqk processes")
+	cmd.Flags().Bool("reap-scorecards", true, "Reap orphaned matrix scorecards for deleted source files")
+	cmd.Flags().Bool("reap-metrics", true, "Reap aged metrics time-series chunks")
+	cmd.Flags().String("metrics-max-age", "14d", "Maximum age for metric time-series chunks")
 	cmd.RunE = runResourceHygiene
 	return cmd
 }
@@ -29,8 +32,11 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 		reapTemp, _ := cmd.Flags().GetBool("reap-temp")
 		reapProcesses, _ := cmd.Flags().GetBool("reap-processes")
 		enforceRetention, _ := cmd.Flags().GetBool("enforce-retention")
+		reapScorecards, _ := cmd.Flags().GetBool("reap-scorecards")
+		reapMetrics, _ := cmd.Flags().GetBool("reap-metrics")
 		lockThresholdStr, _ := cmd.Flags().GetString("lock-threshold")
 		tempThresholdStr, _ := cmd.Flags().GetString("temp-threshold")
+		metricsMaxAgeStr, _ := cmd.Flags().GetString("metrics-max-age")
 
 		lockThreshold := 15 * time.Minute
 		if lockThresholdStr != "" {
@@ -42,6 +48,13 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 		if tempThresholdStr != "" {
 			if d, err := time.ParseDuration(tempThresholdStr); err == nil {
 				tempThreshold = d
+			}
+		}
+
+		metricsMaxAge := 14 * 24 * time.Hour
+		if metricsMaxAgeStr != "" {
+			if d, err := config.ParseDuration(metricsMaxAgeStr); err == nil {
+				metricsMaxAge = d
 			}
 		}
 
@@ -75,11 +88,14 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 			ReapTemp:         reapTemp,
 			ReapProcesses:    reapProcesses,
 			EnforceRetention: enforceRetention,
+			ReapScorecards:   reapScorecards,
+			ReapMetrics:      reapMetrics,
 			DryRun:           dryRun,
 			LockThreshold:    lockThreshold,
 			TempThreshold:    tempThreshold,
 			LogMaxAge:        logMaxAge,
 			LogMaxSize:       logMaxSize,
+			MetricsMaxAge:    metricsMaxAge,
 		}
 
 		report, err := resourcehygiene.ExecuteHygiene(root, opts)
@@ -100,11 +116,13 @@ func runResourceHygiene(cmd *cobra.Command, args []string) error {
 
 		cmd.Printf("Resource Hygiene Report (dry_run: %t)\n", report.DryRun)
 		cmd.Printf("=========================================\n")
-		cmd.Printf("Locks reaped:     %d\n", report.LocksReaped)
-		cmd.Printf("Temp reaped:      %d\n", report.TempReaped)
-		cmd.Printf("Processes reaped: %d\n", report.ProcessesReaped)
-		cmd.Printf("Logs pruned:      %d\n", report.LogsPruned)
-		cmd.Printf("Bytes reclaimed:  %s (%d bytes)\n", diskusage.FormatBytes(report.BytesReclaimed), report.BytesReclaimed)
+		cmd.Printf("Locks reaped:      %d\n", report.LocksReaped)
+		cmd.Printf("Temp reaped:       %d\n", report.TempReaped)
+		cmd.Printf("Processes reaped:  %d\n", report.ProcessesReaped)
+		cmd.Printf("Logs pruned:       %d\n", report.LogsPruned)
+		cmd.Printf("Scorecards reaped: %d\n", report.ScorecardsReaped)
+		cmd.Printf("Metrics reaped:    %d\n", report.MetricsReaped)
+		cmd.Printf("Bytes reclaimed:   %s (%d bytes)\n", diskusage.FormatBytes(report.BytesReclaimed), report.BytesReclaimed)
 		if len(report.ReapedPaths) > 0 {
 			cmd.Printf("\nReaped Artifacts:\n")
 			for _, p := range report.ReapedPaths {
