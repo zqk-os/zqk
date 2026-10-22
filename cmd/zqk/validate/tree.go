@@ -109,6 +109,9 @@ func (r *DependencyTreeResolver) fetchTreeEntities(ctx context.Context, planID s
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to read priority plan %s: %w", planID, err)
 	}
+	if planObj == nil {
+		return nil, nil, fmt.Errorf("priority plan %s not found", planID)
+	}
 
 	backlogRes, err := r.sp.List(ctx, secCtx, nil, storage.ListFilter{
 		Kind: objects.KindBacklogItem,
