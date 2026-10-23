@@ -246,11 +246,8 @@ func TestCycle142_Criterion_Evaluation(t *testing.T) {
 }
 
 func TestCycle142_Criterion_EmitBacklogAndRequirement(t *testing.T) {
-	dir := t.TempDir()
-	t.Cleanup(func() { require.NoError(t, CloseLifecycleWAL(dir)) })
-	mockStore := newMockStorageProvider()
+	dir, mockStore, ctx := newTestCriterionEnvironment(t)
 	storeFn := func(r string) (storage.ObjectStorageProvider, bool) { return mockStore, true }
-	ctx := context.Background()
 
 	mockStore.add(map[string]any{
 		objects.FieldKeyID:     "REQ-1",
@@ -527,10 +524,7 @@ func TestCycle142_Criterion_More(t *testing.T) {
 	require.True(t, ok)
 	require.Len(t, refs, 2)
 
-	dir := t.TempDir()
-	t.Cleanup(func() { require.NoError(t, CloseLifecycleWAL(dir)) })
-	mockStore := newMockStorageProvider()
-	ctx := context.Background()
+	dir, mockStore, ctx := newTestCriterionEnvironment(t)
 
 	mockStore.add(map[string]any{
 		objects.FieldKeyID:                 "P-DRAIN",

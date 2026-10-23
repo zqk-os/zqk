@@ -1,152 +1,127 @@
-# Lifecycle Subsystem Operational & Architectural Guide
+# Lifecycle Subsystem Architectural Guide
 
 ## Overview
 
-The ZQK Lifecycle Subsystem (`pkg/lifecycle`) implements the reactive state machine, durable event logging, criterion evaluation, and dependency shockwave cascades powering the **Zen Quantum Knowledge Kernel**.
+The ZQK Lifecycle Subsystem (`pkg/lifecycle`) provides the core distributed state machine, write-ahead event logging, reactive trigger evaluation, and dependency shockwave propagation for the ZQK Knowledge Kernel platform. It ensures deterministic, auditable, and content-addressed lifecycle transitions across all kernel entities—from strategic goals and milestones to requirements, criteria, priority plans, and atomic backlog items.
 
-In traditional development environments, lifecycle states (e.g. task progress, requirement completion, milestone gating) are managed through disconnected tickets or transient in-memory queues that flake, race, or drift out of synchronization with reality. ZQK solves this by establishing a verifiable, write-ahead logged (WAL) event mesh where object state mutations propagate through deterministic rules, optimistic concurrency controls (CAS), and multi-hop graph cascades.
+The subsystem encapsulates eight primary architectural capabilities:
+1. **Durable Write-Ahead Logging (`LifecycleEventWAL`)**: Appends structured, immutable lifecycle event records to disk (`.zqk/wal/lifecycle_events.wal`) with checkpointing and atomic state recovery.
+2. **Global WAL Registry & Polling (`registry.go`, `event_wal.go`)**: Manages project-scoped WAL instances, deduplicated event ingestion, cache reset lifecycles, and asynchronous polling routines.
+3. **Reactive Listener & Transition Rules Engine (`Listener`, `TransitionRule`)**: Evaluates forward-looking transition conditions against incoming WAL events, executing automated state advancement and callback dispatching.
+4. **Asynchronous Job Waker Registry (`JobWakerRegistry`)**: Provides deterministic goroutine synchronization, notification channels, and wildcard event subscriptions for autonomous agent workers and scheduler daemons.
+5. **Background Updater & Storage Convergence (`Updater`)**: Continuously drains transition requests from listeners and writes CAS-compliant state changes to durable storage backends.
+6. **Shockwave Propagation & Dependency Cascades (`DependencyPropagationSubscriber`)**: Propagates hierarchical status transitions upstream and downstream (e.g. child completion unblocking parent milestones, epic shockwaves, or failure halts).
+7. **Criterion Satisfaction & Done-Gate Cascades (`criterion.go`)**: Evaluates Three-Fold Proof criteria, automatically satisfying parent requirements and backlog items upon verification.
+8. **Remaining Open Child Counting & CAS Invariants (`remaining_open_count.go`)**: Tracks uncompleted children under plans and containers using atomic compare-and-swap decrements to eliminate race conditions and avoid unbounded listing.
 
 ---
 
-## Subsystem Architecture
+## Architectural Taxonomy & Component Layout
+
+```
+pkg/lifecycle/
+├── event_wal.go                   # Write-Ahead Log implementation, replay cursors, and checkpoints
+├── registry.go                    # Global project-scoped WAL registry and event factory helpers
+├── listener.go                    # Reactive event processor, dedup maps, and rule firing loop
+├── rules.go                       # Transition rule definitions, catalysts, and pattern matchers
+├── waker.go                       # Job waker registry, wildcard subscriptions, and channel cleanup
+├── updater.go                     # Storage writer draining transition requests from listeners
+├── dependency_propagation.go      # Upstream/downstream status shockwave coordinator
+├── shockwave_resolve.go           # Shockwave policy resolution (prune, cluster, line)
+├── criterion.go                   # Acceptance criteria satisfaction and done-gate evaluation
+├── remaining_open_count.go        # Atomic CAS tracking of active child counts
+├── stage_membrane.go              # Draft plane to CAS membrane qualification rules
+├── rollback_graph.go              # Scope-bounded reference recomputation on rollback
+├── hooks.go                       # Custom lifecycle compute hook invocations
+└── constants.go                   # Canonical event types, status strings, and reason codes
+```
+
+---
+
+## 1. Durable Write-Ahead Event Logging (`LifecycleEventWAL`)
+
+Every mutation within the Knowledge Kernel produces a structured `LifecycleEvent` appended to a local WAL before storage confirmation.
+
+### Event Structure & Schema
+```go
+type LifecycleEvent struct {
+    ID           string                 `json:"id"`
+    EventType    string                 `json:"event_type"`    // status_transition, criterion_satisfied, reference_linked
+    ObjectType   string                 `json:"object_type"`   // goal, requirement, backlog_item, priority_plan
+    OldStatus    string                 `json:"old_status"`
+    NewStatus    string                 `json:"new_status"`
+    Data         map[string]interface{} `json:"data,omitempty"`
+    Ts           time.Time              `json:"ts"`
+    CheckpointID string                 `json:"checkpoint_id,omitempty"`
+}
+```
+
+### WAL Storage & Checkpointing
+- Events are appended sequentially in JSON Lines format to `.zqk/wal/lifecycle_events.wal`.
+- Checkpoints are saved periodically to `.zqk/wal/lifecycle_events.wal.checkpoint` using atomic file renaming (`fileutil.WriteFileAtomic`).
+- When a process restarts or recovers, `LifecycleEventWAL.ReplayFromCheckpoint` scans only unacknowledged entries, guaranteeing O(1) restart latency without scanning historical event logs.
+
+---
+
+## 2. Reactive Listener & Transition Rules Engine
+
+The `Listener` acts as the sensory organ of the lifecycle package, monitoring incoming events from the WAL and matching them against registered `TransitionRule` specifications.
 
 ```mermaid
 flowchart TD
-    Mutations["Object Mutations / Promotes (CLI, Agent, Coordinator)"]
-    
-    subgraph LifecycleMesh["Lifecycle Subsystem Mesh (pkg/lifecycle)"]
-        WALReg["Registry & Singleton Cache (registry.go)"]
-        EventWAL["LifecycleEventWAL (.zqk/wal/lifecycle_events.wal)"]
-        Listener["Reactive Event Listener (listener.go)"]
-        RulesEngine["Transition Rules Engine (rules.go)"]
-        WakerReg["Job Waker Registry (waker.go)"]
-        AsyncWakers["Subscribers / Wildcard Wakers (waker.go)"]
-        Updater["Background Updater & CAS Sync (updater.go)"]
-        RemainingOpen["Remaining Open Child Counter (remaining_open_count.go)"]
-        Shockwaves["Shockwave Propagation Engine (dependency_propagation.go)"]
-        Membrane["Stage Membrane & Hop Planner (stage_membrane.go)"]
-        CriteriaEval["Criterion Evaluation & Done Gates (criterion.go)"]
-    end
-    
-    StoragePlane["Authoritative CAS Storage (.zqk/process/)"]
-
-    Mutations --> WALReg
-    WALReg --> EventWAL
-    EventWAL --> Listener
-    Listener --> RulesEngine
-    Listener --> WakerReg
-    WakerReg --> AsyncWakers
-    RulesEngine --> Updater
-    Updater --> StoragePlane
-    StoragePlane --> Shockwaves
-    Shockwaves --> Membrane
-    Shockwaves --> RemainingOpen
-    Shockwaves --> CriteriaEval
-    CriteriaEval --> EventWAL
+    WAL["LifecycleEventWAL<br/>(.zqk/wal/lifecycle_events.wal)"] -->|Poll / Stream| L["Listener"]
+    L --> DEDUP{"Deduplication Filter<br/>(Pruned at 1,000 entries)"}
+    DEDUP -->|New Event| RULES["Transition Rules Evaluator"]
+    RULES -->|Criterion Satisfied| GATE["Done-Gate Accumulator"]
+    RULES -->|All Criteria Met| TRANS["TransitionRequest Channel"]
+    TRANS --> UPDATER["Updater<br/>(Background Storage Writer)"]
+    UPDATER --> STORAGE[("CAS Object Storage<br/>(.zqk/process/)")]
+    UPDATER --> SHOCK["Shockwave Propagation"]
 ```
+
+### Transition Rule Types & Triggers
+- `criterion_satisfied`: Fired when a unit test or verification pass certifies a criterion.
+- `all_criteria_complete`: Evaluated when all child criteria for a requirement or backlog item are satisfied.
+- `all_backlog_complete`: Fired when `remaining_open_count` drains to zero on a priority plan.
+- `status_transition`: Triggered when an object moves through its defined lifecycle hops (e.g. `planned` -> `in_progress`).
 
 ---
 
-## Core Components & Architectural Invariants
+## 3. Asynchronous Job Waker Registry
 
-### 1. LifecycleEventWAL & Event Persistence (`event_wal.go`, `registry.go`)
+The `JobWakerRegistry` coordinates autonomous execution agents, CLI wait loops, and scheduler daemons by waking waiting goroutines when matching lifecycle events occur.
 
-The lifecycle Write-Ahead Log records every state transition and criterion satisfaction before background listeners trigger side-effects:
-- **Append-Only JSON Lines**: Stored at `.zqk/wal/lifecycle_events.wal` with dedicated checkpoints at `.zqk/wal/lifecycle_events.wal.checkpoint`.
-- **Legacy Migration**: Automatically detects and migrates legacy filenames (`lifecycle_events` and `lifecycle_events.checkpoint`) to the canonical `.wal` suffix on startup (`migrateLifecycleWALToCanonicalNames`).
-- **Process Registry**: `GetOrCreateLifecycleWAL(projectRoot)` maintains an in-process cache protected by an RWMutex, preventing duplicate file descriptor allocation across concurrent workers.
-- **Event Types**:
-  - `status_transition`: Captures object identity, kind, previous status, and new target status.
-  - `criterion_satisfied`: Records verified proof of criteria completion along with scope bindings.
-  - `reference_linked`: Records relational edges established between graph entities.
-  - `scheduler_callback`: Notifies background subscribers of scheduled job execution cycles.
-
-```go
-// Clean illustrative event generation:
-lifecycle.AppendStatusTransition(projectRoot, "backlog_item", "BLI-DEMO-001", "in_progress", "complete")
-```
-
-### 2. Reactive Listener & Transition Rules Engine (`listener.go`, `rules.go`)
-
-The `Listener` is a single bounded goroutine per project root that consumes durable WAL events, checks criteria bindings, and queues validated transition requests:
-- **Resilient Cursor Replay**: Resumes execution from the recorded checkpoint byte offset (`loadCheckpoint`, `saveCheckpoint`).
-- **Rule Matching**: `DefaultTransitionRules` defines declarative criteria-to-status transitions without hardcoded procedural branching:
-  - `all_backlog_items_complete_for_plan` ➔ `priority_plan` marked `complete`.
-  - `all_backlog_items_complete_for_milestone` ➔ `milestone` marked `complete`.
-  - `all_criteria_complete_for_milestone` ➔ `milestone` marked `complete`.
-  - `all_acceptance_criteria_met_for_backlog_item` ➔ `backlog_item` marked `complete`.
-  - `all_criteria_complete_for_requirement` ➔ `requirement` marked `complete`.
-- **Deduplication Bounds**: To prevent unbounded memory consumption across long-running daemon sessions, internal `satisfied` and `fired` tracking sets are capped at `maxDedupEntries` (1,000 items) and pruned using `pruneDedupMap`.
-
-### 3. Job Waker Registry & Asynchronous Wakers (`waker.go`)
-
-The waker registry enables event-driven job coordination without inefficient polling loops:
-- **Targeted & Wildcard Channels**: Callers register interest in specific job IDs (`Register(jobID)`) or subscribe to all callback events (`RegisterWildcard()`).
-- **Non-Blocking Dispatch**: Event broadcast (`Dispatch`) delivers to buffered channels non-blockingly, safeguarding the core pipeline against slow or lagging consumers.
-- **Fail-Closed Registration**: When closed via `Close()`, any subsequent `Register` invocation returns an immediately closed channel (`newClosedWakerChannel()`), preventing deadlocks.
-- **Synchronous Await**: Helper `AwaitJob` and `AwaitJobWithWAL` allow synchronous command workflows to pause until asynchronous workers complete execution.
-
-### 4. Background Updater & Storage Sync (`updater.go`)
-
-The `Updater` consumes `TransitionRequest` objects from the listener and executes atomic updates against authoritative CAS storage:
-- **Break-Glass Intent Isolation**: When auto-completing core objects (`backlog_item`, `priority_plan`), updater operations inject explicit lifecycle authorization (`WithLifecycleBreakGlass`, `WithAllowCoreObjectDelete`) without granting blanket elevated permissions to callers.
-- **Rollback Snapshotting**: Automatically captures state graph snapshots prior to applying mutations when graph rollback tracking is activated.
-- **Clean Worker Teardown**: `RunListenerAndUpdater` starts the paired listener and updater with bounded goroutines and returns an idempotent `stop()` closure that flushes channels and waits for zero in-flight operations.
-
-### 5. Shockwave Propagation & Dependency Cascades (`dependency_propagation.go`, `shockwave_resolve.go`)
-
-When an entity undergoes a lifecycle transition, shockwaves propagate along ontological dependency edges:
-- **Lineage Hierarchies**: Evaluates rank transitions across `vision` (rank 0), `mission` (rank 1), `goal` (rank 2), `milestone` (rank 3), and `priority_plan` (rank 4).
-- **Shockwave Policies**: Resolves declarative policy modes (`cluster`, `shared`, `prune`, `none`) defined in lifecycle YAML specs (`ResolveShockwavePolicy`).
-- **Occupancy Execution Locks**: Automatically locks Priority Plans (`planStatusCanOccupancyLock`) when child backlog items enter active progress, ensuring scope integrity during sprint execution.
-- **Role Transitions**: Emits side effects when leaving specific operational roles (e.g. clearing `active_order` when departing shovel-ready or execution-locked states).
-
-### 6. Criterion Satisfaction & Done-Gate Cascades (`criterion.go`)
-
-ZQK guarantees that features are only marked complete when all verifying criteria and test cases have passed:
-- **Three-Fold Proof Verification**: Evaluates whether all linked criteria are in validated or complete status (`areAllLinkedCriteriaSatisfied`).
-- **Requirement Verification Gate**: `TryEmitAllCriteriaCompleteForRequirement` checks that both:
-  1. Every linked `CRIT-*` is satisfied.
-  2. Every test case pointing to the requirement (`KindTestCase` with `$has: requirementID`) is in `complete` or `archived` status.
-- **Milestone & Backlog Auto-Completion**: Automatically emits `all_acceptance_criteria_met_for_backlog_item` or `all_backlog_items_complete_for_milestone` when all child criteria/items reach terminal gates.
-
-### 7. Remaining Open Child Counting & CAS Invariants (`remaining_open_count.go`)
-
-To avoid expensive repeated graph traversal queries during high-concurrency swarms, containers track open work counts directly:
-- **Optimistic Concurrency Control (CAS)**: Updates `remaining_open_count` using expected `updated_at` timestamps (`casWriteRemainingOpenCountAt`), retrying up to 5 times on version conflicts.
-- **Floor Protection**: Counters clamp to zero when decremented below floor, preventing integer underflow from double-resolution events.
-- **Cold Seeding**: When `remaining_open_count` is unset, `SeedRemainingOpenCountFromMembers` initializes the count from authoritative storage members before applying incremental modifications.
-- **Trusted Draining**: When the remaining open child count reaches zero on an execution hop, `EmitTrustedRemainingOpenDrained` emits completion criteria without requiring a full storage re-scan.
+### Registration Topology
+- **Direct Wakers (`Register(jobID)`):** Return a buffered `chan *LifecycleEvent` and an unregister closure for a specific target identifier.
+- **Wildcard Wakers (`RegisterWildcard()`):** Subscribe to all scheduler callbacks and callback events across any job identifier.
+- **Clean Teardown:** Invoking `Close()` closes all active waker channels and unblocks listening goroutines safely, eliminating goroutine leaks.
 
 ---
 
-## Concurrency, Dedup Buffers, and Resource Safety
+## 4. Shockwave Propagation & Dependency Cascades
 
-1. **Named Goroutines**: All background threads must be instantiated using `goroutinelabels.NewGoroutine` with descriptive subsystem names (e.g. `lifecycle_listener`, `lifecycle_updater`, `lifecycle_propagation`).
-2. **Buffer Bounds**: Dedup maps (`satisfied`, `fired`) enforce hard upper caps (`maxDedupEntries = 1000`) and prune to 50% capacity upon saturation.
-3. **Channel Buffers**: Inter-thread communication channels use bounded capacities (64 for updater transitions, 16 for wildcard wakers, 1 for discrete wakers).
-4. **Context Deadlines**: Long-running loops (`PollLifecycleWAL`, `Listener.Run`, `Updater.Run`) honor context cancellation immediately, guaranteeing prompt shutdown during CLI termination.
+When an entity undergoes a status transition, the event ripples through its semantic hierarchy:
+
+### Shockwave Modes
+- **Prune Mode:** When an object transitions to `archived` or `cancelled`, dependent children are pruned or transitioned concurrently to maintain membrane consistency.
+- **Cluster Mode:** Sibling and parent objects within a priority plan cluster move together across the CAS membrane.
+- **Occupancy Lock:** When a priority plan transitions to `in_progress`, its linked backlog items lock execution scope, preventing lateral modification without administrative review.
 
 ---
 
-## Verification & Testing Patterns
+## 5. Remaining Open Child Counting & CAS Invariants
 
-The lifecycle subsystem enforces a strict statement test coverage invariant of **>= 85.0%** verified across automated test suites:
+To avoid scanning thousands of content-addressed files on disk to determine whether a priority plan or epic is finished, the lifecycle engine maintains an atomic `remaining_open_count` field:
+- **Initialization:** Set to the number of planned backlog items when the plan enters `in_progress`.
+- **Decrement:** When a child transitions to a terminal state (`complete`, `archived`), `casDecrementRemainingOpenCount` atomically decrements the counter.
+- **Drain Trigger:** When the counter hits 0, `TryEmitRemainingOpenDrained` automatically signals completion of the container.
 
-| Test Suite | File Location | Scope |
-| :--- | :--- | :--- |
-| **Coverage Elevation Suite** | `pkg/lifecycle/lifecycle_coverage_elevation_cycle142_test.go` | Coverage invariants, corner cases, error paths, and resource cleanups |
-| **Extended Coverage Suite** | `pkg/lifecycle/extended_coverage_test.go` | Comprehensive lifecycle state machine and membrane hop validation |
-| **Listener & Callback Suite** | `pkg/lifecycle/listener_callback_test.go` | Waker dispatching, thread isolation, and error handling |
-| **Shockwave Cascade Suite** | `pkg/lifecycle/shockwave_compiled_paths_test.go` | Dependency propagation, lineage rank calculation, and pruning |
-| **Stage Membrane Suite** | `pkg/lifecycle/stage_membrane_test.go` | Two-phase CAS qualification, cross-plane transitions, and fail-closed safety |
+---
 
-### Executing Lifecycle Subsystem Tests
+## 6. Verification and Testing Patterns
 
-```bash
-# Run unit tests with statement coverage profiling
-go test -v -cover ./pkg/lifecycle/...
-
-# Run specific cycle test suite
-go test -v -run TestCycle142 ./pkg/lifecycle/...
-```
+Subsystem tests in `pkg/lifecycle/lifecycle_coverage_elevation_cycle142_test.go` enforce:
+- **TDD Invariants:** Statement coverage $\ge 85.0\%$.
+- **AST Hygiene:** All test functions strictly $\le 80$ lines with zero swallowed error returns (`_ = ...`).
+- **Resource Hygiene:** WAL file descriptors, channels, and temporary test directories are cleanly closed via `t.Cleanup`.
+- **Process Isolation:** Clean state isolation per test invocation with dedicated project roots.
