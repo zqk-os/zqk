@@ -13,6 +13,11 @@ type ConvergenceStorageAdapter struct {
 	storage storagepkg.ObjectStorageProvider
 }
 
+// NewConvergenceStorageAdapter wraps storage for convergence session list/update helpers.
+func NewConvergenceStorageAdapter(storage storagepkg.ObjectStorageProvider) *ConvergenceStorageAdapter {
+	return &ConvergenceStorageAdapter{storage: storage}
+}
+
 func (a *ConvergenceStorageAdapter) ListConvergenceSessions(ctx context.Context) ([]map[string]any, error) {
 	secCtx := pkgctx.NewSystemSecurityContext()
 	res, err := a.storage.List(ctx, secCtx, nil, storagepkg.ListFilter{
