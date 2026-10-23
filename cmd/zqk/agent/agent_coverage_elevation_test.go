@@ -1098,7 +1098,7 @@ func TestElevation_Agent_SeatWorker_Extended(t *testing.T) {
 
 	// 3. schedulerCallbackNotify
 	cb := schedulerCallbackNotify("zqk", "/tmp/log.json")
-	assert.Equal(t, "zqk callback notify --log-file /tmp/log.json", cb)
+	assert.Equal(t, "zqk callback notify --stamp-mesh-status --log-file /tmp/log.json", cb)
 
 	// 4. submitKernelFill branches
 	resNil, errNil := submitKernelFill(context.Background(), tempDir, nil)

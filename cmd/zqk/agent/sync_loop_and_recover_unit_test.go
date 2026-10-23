@@ -129,7 +129,7 @@ func TestSyncLoop_QuerySubgraph(t *testing.T) {
 
 func TestSeatWorkerFill_Helpers(t *testing.T) {
 	notifyCmd := schedulerCallbackNotify("zqk", "/tmp/cb.log")
-	assert.Equal(t, "zqk callback notify --log-file /tmp/cb.log", notifyCmd)
+	assert.Equal(t, "zqk callback notify --stamp-mesh-status --log-file /tmp/cb.log", notifyCmd)
 
 	tmp := t.TempDir()
 	path := fillSubmitMarkPath(tmp, "plan")

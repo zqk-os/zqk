@@ -182,6 +182,13 @@ func LoadCorrespondence(projectRoot string, seat Seat, limit int) (Correspondenc
 		if et == FeedEventTypeMeshStatus && strings.TrimSpace(to) == "" {
 			continue
 		}
+		// Untargeted wake without ATTN is job/telemetry noise (e.g. legacy
+		// scheduler-callback feed wake). addressedToSeat would otherwise treat
+		// "no ATTN" as broadcast to every seat and flood inbox_unacked.
+		// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001 — mesh_status parity.
+		if isUntargetedNonAttnWake(et, to, msg) {
+			continue
+		}
 		if !addressedToSeat(seat, ev, msg) {
 			continue
 		}
@@ -298,6 +305,18 @@ func seatMatchesPersona(seat Seat, personaRef string) bool {
 		return false
 	}
 	return a == b
+}
+
+// isUntargetedNonAttnWake reports wake events that must not enter inbox_unacked.
+// Same fire-and-forget posture as undirected mesh_status.
+func isUntargetedNonAttnWake(eventType, toAgentID, msg string) bool {
+	if eventType != FeedEventTypeWake {
+		return false
+	}
+	if strings.TrimSpace(toAgentID) != "" {
+		return false
+	}
+	return !strings.Contains(strings.ToUpper(msg), "ATTN ")
 }
 
 func addressedToSeat(seat Seat, ev map[string]any, msg string) bool {

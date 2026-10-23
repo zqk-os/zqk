@@ -359,7 +359,7 @@ func TestCycle137_SeatWorkerFill_MarksAndSubmit(t *testing.T) {
 
 	// schedulerCallbackNotify format
 	cb := schedulerCallbackNotify("/usr/local/bin/zqk", "/tmp/log.json")
-	assert.Equal(t, "/usr/local/bin/zqk callback notify --log-file /tmp/log.json", cb)
+	assert.Equal(t, "/usr/local/bin/zqk callback notify --stamp-mesh-status --log-file /tmp/log.json", cb)
 
 	// fillSubmitMarkPath
 	markPath := fillSubmitMarkPath(tempDir, "goal")

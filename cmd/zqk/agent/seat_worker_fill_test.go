@@ -100,7 +100,7 @@ func TestSubmitKernelFill_EarlyReturns(t *testing.T) {
 func TestSchedulerCallbackNotify(t *testing.T) {
 	t.Parallel()
 	got := schedulerCallbackNotify("zqk", "/tmp/log.json")
-	want := "zqk callback notify --log-file /tmp/log.json"
+	want := "zqk callback notify --stamp-mesh-status --log-file /tmp/log.json"
 	if got != want {
 		t.Fatalf("got %q want %q", got, want)
 	}

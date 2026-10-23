@@ -118,6 +118,59 @@ func TestCorrespondence_inboxOutboxPeerAck(t *testing.T) {
 	}
 }
 
+func TestCorrespondence_untargetedSchedulerWakeDoesNotFillInbox(t *testing.T) {
+	root := t.TempDir()
+	if err := datacell.WriteAgentChatChannelConfig(root, datacell.AgentChatChannelConfig{
+		SchemaVersion: datacell.AgentChatChannelSchemaVersion,
+		Enabled:       true,
+		DeliveryMode:  datacell.DeliveryModeLog,
+		FeedID:        "AGF-sched-wake",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	worker := Seat{AgentID: "peer-agent-2", RoleHints: []string{"peer-agent-2"}}
+	if _, err := AppendEvent(AppendEventInput{
+		ProjectRoot: root,
+		Message:     "scheduler callback SCH-1 success",
+		AgentID:     "scheduler-callback",
+		Sender:      FeedSenderHumanSteer,
+		EventType:   FeedEventTypeWake,
+		SelfACK:     false,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	snap, err := LoadCorrespondence(root, worker, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(snap.InboxUnacked) != 0 {
+		t.Fatalf("untargeted non-ATTN wake must not fill inbox: %+v", snap.InboxUnacked)
+	}
+	if snap.NextActionHint != HintContinue {
+		t.Fatalf("hint=%s want continue", snap.NextActionHint)
+	}
+
+	// Directed ATTN wake still lands.
+	if _, err := AppendEvent(AppendEventInput{
+		ProjectRoot: root,
+		Message:     "ATTN peer-agent-2: real work",
+		AgentID:     "cursor-composer",
+		ToAgentID:   worker.AgentID,
+		Sender:      FeedSenderHumanSteer,
+		EventType:   FeedEventTypeWake,
+		SelfACK:     false,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	snap2, err := LoadCorrespondence(root, worker, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(snap2.InboxUnacked) != 1 {
+		t.Fatalf("directed wake should inbox: %+v", snap2.InboxUnacked)
+	}
+}
+
 func TestCorrespondence_meshStatusDoesNotBlockOutbox(t *testing.T) {
 	root := t.TempDir()
 	if err := datacell.WriteAgentChatChannelConfig(root, datacell.AgentChatChannelConfig{
