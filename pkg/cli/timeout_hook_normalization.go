@@ -1,6 +1,10 @@
 package cli
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/zqk-os/zqk/pkg/strutil"
+)
 
 // normalizeCommand normalizes a command for metrics tracking
 // This is exported via NormalizeCommand() in command_tracker.go for use outside the package
@@ -79,15 +83,7 @@ func isHexString(s string) bool {
 }
 
 func isNumericString(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	for i := 0; i < len(s); i++ {
-		if s[i] < '0' || s[i] > '9' {
-			return false
-		}
-	}
-	return true
+	return strutil.IsAllDigits(s)
 }
 
 // sanitizeArgs sanitizes command arguments for privacy

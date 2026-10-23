@@ -33,7 +33,7 @@ func (m *mockJoinTransport) ExecuteTool(ctx context.Context, endpoint string, to
 }
 
 func TestJoinCommand_Registration(t *testing.T) {
-	env := testkit.PrepareIsolatedTempProject(t, nil)
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
 	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
 	store := env.FileStorage
 	ctx := pkgctx.NewSystemContext()
@@ -77,7 +77,7 @@ func TestJoinCommand_ExecutionAttempt(t *testing.T) {
 }
 
 func TestJoinCommand_WithMockTransport_Declined(t *testing.T) {
-	env := testkit.PrepareIsolatedTempProject(t, nil)
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
 	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
 	origDir, _ := os.Getwd()
 	require.NoError(t, os.Chdir(env.Root))
@@ -100,7 +100,7 @@ func TestJoinCommand_WithMockTransport_Declined(t *testing.T) {
 }
 
 func TestJoinCommand_WithMockTransport_Accepted(t *testing.T) {
-	env := testkit.PrepareIsolatedTempProject(t, nil)
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
 	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
 	origDir, _ := os.Getwd()
 	require.NoError(t, os.Chdir(env.Root))

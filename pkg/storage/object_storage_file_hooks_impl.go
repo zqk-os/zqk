@@ -17,6 +17,11 @@ func SetChangeNotificationHandler(handler func(context.Context, string, string, 
 	changeNotificationHandler = handler
 }
 
+// GetChangeNotificationHandler returns the registered change notification handler.
+func GetChangeNotificationHandler() func(context.Context, string, string, string, map[string]any) error {
+	return changeNotificationHandler
+}
+
 // executeChangeNotification invokes the change notification handler for create/update/delete (BLI-643)
 // and dispatches the mutation shockwave across InvalidationShockwaveBus synchronously.
 func executeChangeNotification(ctx context.Context, operation, kind, id string, objectData map[string]any) {

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 // CASIDIndex lists IDs from a content-addressable index. Storage wires the
@@ -33,15 +35,7 @@ func NumericPrefixedIDs(prefix string, ids []string) []string {
 }
 
 func allDigits(s string) bool {
-	if s == "" {
-		return false
-	}
-	for i := 0; i < len(s); i++ {
-		if s[i] < '0' || s[i] > '9' {
-			return false
-		}
-	}
-	return true
+	return strutil.IsAllDigits(s)
 }
 
 // ListNumericPrefixedIDs reads idx and filters. List errors are best-effort

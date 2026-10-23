@@ -26,6 +26,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[CLI Object Subsystem Operational Guide](./CLI_OBJECT_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, CAS storage membrane, two-phase draft plane isolation, and relational query pipelines. | All Engineers & Agents | `zqk object create`, `zqk object get`, `zqk object list`, `zqk object update`, `zqk object delete`, `zqk object promote`, `zqk object demote`, `zqk object ref` |
 | **[Storage Subsystem Operational & Architectural Guide](./STORAGE_SUBSYSTEM_GUIDE.md)** | Foundational persistence engine, Content Addressable Storage (CAS), write-behind audit event buffering, transaction safety, and TSDB engine. | Storage Engineers & Agents | `pkg/storage` |
 | **[CLI Organizational Subsystem Architectural Guide](./CLI_ORGANIZATIONAL_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, domain modeling, impact analysis cascade, propagation lifecycle, and declarative structure sync. | All Engineers & Agents | `zqk organizational record-change`, `zqk organizational analyze-impact`, `zqk organizational propagate`, `zqk organizational sync` |
+| **[CLI Application Subsystem Architectural & Operational Guide](./CLI_APP_SUBSYSTEM_GUIDE.md)** | Root application bootstrap, command tree composition, execution context propagation, runtime diagnostics, and authentication middleware. | All Engineers & Agents | `zqk`, `cmd/zqk/app` |
 
 ---
 
@@ -42,6 +43,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | Guide | Focus Area | Target Audience | Primary CLI & MCP Commands |
 | :--- | :--- | :--- | :--- |
 | **[Single-Command Execution Loop (`zqk do`)](./SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.md)** | 5-phase execution engine (Intent ➔ Preflight ➔ Locks ➔ Dispatch ➔ Verification), fail-closed invariant guards, and anti-thrashing discipline. | Autonomous AI Agents | `zqk do <intent>`, `zqk workflow whats-next` |
+| **[CLI Application Subsystem Architectural & Operational Guide](./CLI_APP_SUBSYSTEM_GUIDE.md)** | Subsystem lifecycle, execution topology, session persistence, runtime diagnostics, profiling, shell completions, and failure isolation. | All Engineers & Agents | `zqk`, `cmd/zqk/app`, `zqk completion` |
 
 ---
 

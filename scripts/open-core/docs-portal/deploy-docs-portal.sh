@@ -10,7 +10,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 BUILD_DIR="/tmp/zqk-docs-build"
-DOCS_REPO="git@github.com:zqk-os/zqk-docs.git"
+DOCS_REPO="${DOCS_REPO:-git@github.com:zqk-os/zqk-docs.git}"
+if [[ -n "${DOCS_PAT:-}" ]]; then
+  DOCS_REPO="https://x-access-token:${DOCS_PAT}@github.com/zqk-os/zqk-docs.git"
+elif [[ -n "${GITHUB_TOKEN:-}" && "${DOCS_REPO}" == git@github.com:* ]]; then
+  DOCS_REPO="https://x-access-token:${GITHUB_TOKEN}@github.com/zqk-os/zqk-docs.git"
+fi
 CUSTOM_DOMAIN="docs.zqk.dev"
 
 DRY_RUN=0

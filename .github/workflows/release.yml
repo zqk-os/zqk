@@ -37,3 +37,30 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docs-portal:
+    name: Build & Verify Docs Portal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate and Verify Documentation Portal
+        run: |
+          mkdir -p dist-docs
+          python3 scripts/open-core/docs-portal/generate_docs_portal.py dist-docs
+          tar -czf dist-docs.tar.gz -C dist-docs .
+          python3 scripts/open-core/docs-portal/generate_docs_portal.py --verify dist-docs.tar.gz
+
+      - name: Upload Docs Portal Release Asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${GITHUB_REF_NAME}" dist-docs.tar.gz --clobber || echo "Release asset upload will proceed after release creation"

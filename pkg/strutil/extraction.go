@@ -29,3 +29,16 @@ func FindLineWithPrefix(lines []string, prefixes ...string) string {
 	}
 	return ""
 }
+
+// IsAllDigits reports whether s is non-empty and consists solely of ASCII decimal digits ('0'-'9').
+func IsAllDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
+}

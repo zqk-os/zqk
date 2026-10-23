@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/cmd/zqk/agent"
@@ -431,7 +432,7 @@ func registerCommands() {
 
 	// Filter out admin commands if we are not running as the zqk-admin binary (or a test binary)
 	baseArg := filepath.Base(os.Args[0])
-	if !strings.HasPrefix(baseArg, "zqk-admin") && !strings.HasSuffix(baseArg, ".test") {
+	if !testing.Testing() && !strings.HasPrefix(baseArg, "zqk-admin") && !strings.HasSuffix(baseArg, ".test") {
 		var toRemove []*cobra.Command
 		for _, cmd := range rootCmd.Commands() {
 			if cmd.GroupID == "admin" {
