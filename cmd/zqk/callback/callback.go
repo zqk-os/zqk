@@ -93,7 +93,6 @@ func NewNotifyCmd() *cobra.Command {
 	// Default off: log-only notify stays unchanged for existing public callers.
 	// Seat workers pass --stamp-mesh-status so hourglass completion is visible
 	// without undirected wake → inbox_unacked floods.
-	// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
 	notifyCmd.Flags().Bool("stamp-mesh-status", false, "After logging, stamp undirected mesh_status on the agent feed (hourglass observability; does not fill inbox_unacked)")
 	notifyCmd.Flags().String("clear-inflight", "", "Remove this inflight lock file after a successful log write (agent-commit / hourglass)")
 

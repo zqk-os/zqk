@@ -185,7 +185,7 @@ func LoadCorrespondence(projectRoot string, seat Seat, limit int) (Correspondenc
 		// Untargeted wake without ATTN is job/telemetry noise (e.g. legacy
 		// scheduler-callback feed wake). addressedToSeat would otherwise treat
 		// "no ATTN" as broadcast to every seat and flood inbox_unacked.
-		// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001 — mesh_status parity.
+		// Same fire-and-forget posture as undirected mesh_status.
 		if isUntargetedNonAttnWake(et, to, msg) {
 			continue
 		}

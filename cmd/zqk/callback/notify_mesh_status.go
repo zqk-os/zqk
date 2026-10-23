@@ -8,9 +8,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// Scheduler callback feed identity — matches studio Python wake and
-// IsAckTheatreInboxItem (ack-theatre / non-injecting status).
-// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
+// Scheduler callback feed identity — matches IsAckTheatreInboxItem
+// (ack-theatre / non-injecting status) and historical scheduler-callback wakes.
 const (
 	callbackSchedulerFeedAgentID = "scheduler-callback"
 	callbackMeshMessageMaxLen    = 240

@@ -27,7 +27,6 @@ type leadPlanDispatch struct {
 func schedulerCallbackNotify(cli, logFile string) string {
 	// --stamp-mesh-status: undirected mesh_status (not wake) so hourglass
 	// completion is visible without flooding inbox_unacked.
-	// TRACK: TDE-CEF-SCHEDULER-CALLBACK-HOURGLASS-001
 	return cli + " callback notify --stamp-mesh-status --log-file " + logFile
 }
 
