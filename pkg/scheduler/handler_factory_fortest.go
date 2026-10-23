@@ -96,13 +96,3 @@ func (f *HandlerFactory) CreateMetricsCollectionHandlerForTest(job *ScheduledJob
 func (f *HandlerFactory) GetCachedTestCommandDetectorForTest() TestCommandDetector {
 	return f.getCachedTestCommandDetector()
 }
-
-// CreateMetricsCollectionHandlerForTest exposes createMetricsCollectionHandler for facade registry.
-func (f *HandlerFactory) CreateMetricsCollectionHandlerForTest(job *ScheduledJob) JobHandler {
-	return f.createMetricsCollectionHandler(job)
-}
-
-// GetCachedTestCommandDetectorForTest exposes the shared TestCommandDetector cache.
-func (f *HandlerFactory) GetCachedTestCommandDetectorForTest() TestCommandDetector {
-	return f.getCachedTestCommandDetector()
-}
