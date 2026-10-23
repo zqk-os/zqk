@@ -17,14 +17,28 @@ var (
 	hvePersistTimer *time.Timer
 )
 
-func scheduleHighVolumeEventCachePersist(projectRoot string) {
+func resolveHighVolumeEventProjectRoot(projectRoot string) string {
+	bound := reverseReferenceBoundProjectRoot()
 	if projectRoot == emptyValue {
-		projectRoot = reverseReferenceBoundProjectRoot()
+		projectRoot = bound
 	}
 	if projectRoot == emptyValue {
+		return emptyValue
+	}
+	if isTestProjectRootUnbound(projectRoot) {
+		return emptyValue
+	}
+	if bound != emptyValue && !isProjectRootEquivalent(bound, projectRoot) {
+		return emptyValue
+	}
+	return projectRoot
+}
+
+func scheduleHighVolumeEventCachePersist(projectRoot string) {
+	root := resolveHighVolumeEventProjectRoot(projectRoot)
+	if root == emptyValue {
 		return
 	}
-	root := projectRoot
 	hvePersistMu.Lock()
 	defer hvePersistMu.Unlock()
 	if hvePersistTimer != nil {
@@ -32,18 +46,23 @@ func scheduleHighVolumeEventCachePersist(projectRoot string) {
 	}
 	hvePersistTimer = time.AfterFunc(highVolumeEventPersistDebounce, func() {
 		hvePersistMu.Lock()
-		if hvePersistTimer == nil {
-			hvePersistMu.Unlock()
-			return
-		}
+		timerActive := (hvePersistTimer != nil)
 		hvePersistTimer = nil
 		hvePersistMu.Unlock()
+		if !timerActive || resolveHighVolumeEventProjectRoot(root) == emptyValue {
+			return
+		}
 		SaveHighVolumeEventCache(root)
 	})
 }
 
 // StopHighVolumeEventCachePersistForTest cancels any pending debounce timer for tests.
 func StopHighVolumeEventCachePersistForTest(projectRoot string) {
+	if projectRoot != emptyValue {
+		markTestProjectRootUnbound(projectRoot)
+	} else if bound := reverseReferenceBoundProjectRoot(); bound != emptyValue {
+		markTestProjectRootUnbound(bound)
+	}
 	hvePersistMu.Lock()
 	defer hvePersistMu.Unlock()
 	if hvePersistTimer != nil {
@@ -123,7 +142,7 @@ func EnsureHighVolumeEventCacheReady(ctx context.Context, projectRoot string, st
 
 // SaveHighVolumeEventCache saves the global high-volume event cache to disk for the given project.
 func SaveHighVolumeEventCache(projectRoot string) {
-	if projectRoot == emptyValue {
+	if projectRoot == emptyValue || isTestProjectRootUnbound(projectRoot) {
 		return
 	}
 	cache := GetGlobalHighVolumeEventCache()

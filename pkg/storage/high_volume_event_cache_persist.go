@@ -142,6 +142,9 @@ func (c *HighVolumeEventCache) bucketsFromCache() highVolumeEventCacheV2Buckets 
 // Follows established pattern: minimize lock hold time, especially during I/O
 // Pattern: RLock to read count → I/O operations → Lock to prepare data → I/O operations
 func (c *HighVolumeEventCache) SaveCache(projectRoot string) error {
+	if projectRoot == emptyValue || isTestProjectRootUnbound(projectRoot) {
+		return nil
+	}
 	var entryCount int
 	var err_swallow_17 = c.withReadLock(
 		locknames.LockNameHighVolumeCacheSaveGetCount,
