@@ -1,7 +1,6 @@
 package scheduler
 
-// TRACK: BLI-1790209618294719000-90cdbe5f — Scheduler ForTest seams for studio facade alias
-// (unblocks JobTriggerQueue / HandlerFactory / DataCellEnvelopeTick peels).
+// Package scheduler provides whitebox testing hooks and facade accessors for storage, logger, project root, spec loader, and executor.
 
 import (
 	"github.com/zqk-os/zqk/pkg/logging"
