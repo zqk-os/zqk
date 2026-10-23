@@ -27,6 +27,11 @@ func newQASuccessID() string {
 	return fmt.Sprintf("QAS-%d-%x", time.Now().UnixNano(), suffix)
 }
 
+// BuildQASuccessObject builds a verified qa_success instance.
+func BuildQASuccessObject(itemID, signature, publicKey string) (map[string]any, error) {
+	return buildQASuccessObject(itemID, signature, publicKey)
+}
+
 func buildQASuccessObject(itemID, signature, publicKey string) (map[string]any, error) {
 	b := instance_builders.NewForKind(KindQASuccess, objects.DefaultSchemaVersion)
 	b.SetID(newQASuccessID()).

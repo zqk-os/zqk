@@ -130,3 +130,82 @@ func TestPreSubagentHook_EdgeCases(t *testing.T) {
 	require.NoError(t, runPreSubagentHookWithDeps(context.Background(), nil, newMockHelperStore(), "/tmp", "antigravity", nil, &out))
 	assert.Contains(t, out.String(), `"decision": "allow"`)
 }
+
+func TestPreSubagentHook_AntigravityDirectPrompt(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind:            "hook_test_direct",
+		SeedSchemaPlane: true,
+	})
+	root, fs := proj.Root, proj.FileStorage
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	bli := map[string]any{
+		objects.FieldKeyID:            "BLI-HOOK-TEST-002",
+		objects.FieldKeyKind:          objects.KindBacklogItem,
+		objects.FieldKeyTitle:         "Support Native Antigravity Subagent Hooks",
+		objects.FieldKeyDescription:   "Direct prompt enrichment for invoke_subagent",
+		objects.FieldKeyStatus:        objects.ObjectStatusPlanned,
+		objects.FieldKeySchemaVersion: "2.0.0",
+	}
+	require.NoError(t, fs.Create(context.Background(), secCtx, bli))
+
+	hookInput := antigravityHookInput{
+		ConversationID: "conv-456",
+		WorkspacePaths: []string{root},
+	}
+	hookInput.ToolCall.Name = "invoke_subagent"
+	hookInput.ToolCall.Args = map[string]any{
+		"TypeName": "self",
+		"Role":     "Worker",
+		"Prompt":   "Execute work on BLI-HOOK-TEST-002",
+	}
+
+	inputBytes, err := json.Marshal(hookInput)
+	require.NoError(t, err)
+
+	var outBuf bytes.Buffer
+	err = runPreSubagentHookWithDeps(context.Background(), secCtx, fs, root, "antigravity", bytes.NewReader(inputBytes), &outBuf)
+	require.NoError(t, err)
+
+	var hookOut antigravityHookOutput
+	require.NoError(t, json.Unmarshal(outBuf.Bytes(), &hookOut))
+	assert.Equal(t, "allow", hookOut.Decision)
+	require.NotNil(t, hookOut.Overwrite)
+
+	enrichedPrompt, ok := hookOut.Overwrite["Prompt"].(string)
+	require.True(t, ok, "expected Overwrite.Prompt string")
+	assert.Contains(t, enrichedPrompt, "BLI-HOOK-TEST-002")
+	assert.Contains(t, enrichedPrompt, "Subagent Specific Instructions")
+}
+
+func TestPreSubagentHook_AntigravityDirectPrompt_AlreadyHydrated(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		Kind:            "hook_test_hydrated",
+		SeedSchemaPlane: true,
+	})
+	root, fs := proj.Root, proj.FileStorage
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	hookInput := antigravityHookInput{
+		ConversationID: "conv-789",
+		WorkspacePaths: []string{root},
+	}
+	hookInput.ToolCall.Name = "invoke_subagent"
+	hookInput.ToolCall.Args = map[string]any{
+		"TypeName": "self",
+		"Role":     "Worker",
+		"Prompt":   "# Orchestration Context\nAlready fully hydrated\n",
+	}
+
+	inputBytes, err := json.Marshal(hookInput)
+	require.NoError(t, err)
+
+	var outBuf bytes.Buffer
+	err = runPreSubagentHookWithDeps(context.Background(), secCtx, fs, root, "antigravity", bytes.NewReader(inputBytes), &outBuf)
+	require.NoError(t, err)
+
+	var hookOut antigravityHookOutput
+	require.NoError(t, json.Unmarshal(outBuf.Bytes(), &hookOut))
+	assert.Equal(t, "allow", hookOut.Decision)
+	assert.Nil(t, hookOut.Overwrite)
+}
