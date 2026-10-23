@@ -178,10 +178,18 @@ func isProjectRootEquivalent(a, b string) bool {
 	if a == "" || b == "" {
 		return false
 	}
+	if filepath.Clean(a) == filepath.Clean(b) {
+		return true
+	}
 	absA, errA := filepath.Abs(a)
 	absB, errB := filepath.Abs(b)
 	if errA == nil && errB == nil && absA == absB {
 		return true
 	}
-	return filepath.Clean(a) == filepath.Clean(b)
+	evalA, errEvalA := filepath.EvalSymlinks(a)
+	evalB, errEvalB := filepath.EvalSymlinks(b)
+	if errEvalA == nil && errEvalB == nil && evalA == evalB {
+		return true
+	}
+	return false
 }

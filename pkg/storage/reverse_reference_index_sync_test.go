@@ -151,3 +151,45 @@ func TestEnsureReverseReferenceIndexLoaded_MissingCacheLeavesNotReady(t *testing
 		t.Fatal("Missing cache must leave reverse-ref index not ready (must not fail-open as ready-empty)")
 	}
 }
+
+func TestIsProjectRootEquivalent_Symlinks(t *testing.T) {
+	tmpDir := t.TempDir()
+	evalDir, err := filepath.EvalSymlinks(tmpDir)
+	if err != nil {
+		t.Fatalf("eval symlinks: %v", err)
+	}
+
+	if !isProjectRootEquivalent(tmpDir, evalDir) {
+		t.Fatalf("expected %q and %q to be equivalent", tmpDir, evalDir)
+	}
+	if !isProjectRootEquivalent(evalDir, tmpDir) {
+		t.Fatalf("expected %q and %q to be equivalent", evalDir, tmpDir)
+	}
+	if isProjectRootEquivalent(tmpDir, filepath.Join(tmpDir, "other")) {
+		t.Fatalf("expected different paths not to be equivalent")
+	}
+}
+
+func TestStopReverseReferenceIndexPersistForTest_SymlinkEquivalence(t *testing.T) {
+	resetReverseReferenceIndexSyncForTest(t)
+	t.Cleanup(func() { resetReverseReferenceIndexSyncForTest(t) })
+
+	tmpDir := t.TempDir()
+	evalDir, err := filepath.EvalSymlinks(tmpDir)
+	if err != nil {
+		t.Fatalf("eval symlinks: %v", err)
+	}
+
+	BindReverseReferenceIndexProjectRoot(evalDir)
+	StopReverseReferenceIndexPersistForTest(tmpDir)
+
+	if rev := reverseReferenceBoundProjectRoot(); rev != emptyValue {
+		t.Fatalf("expected bound root to be empty after stop with symlink, got %q", rev)
+	}
+	if !isTestProjectRootUnbound(evalDir) {
+		t.Fatalf("expected %q to be marked unbound", evalDir)
+	}
+	if !isTestProjectRootUnbound(tmpDir) {
+		t.Fatalf("expected %q to be marked unbound", tmpDir)
+	}
+}

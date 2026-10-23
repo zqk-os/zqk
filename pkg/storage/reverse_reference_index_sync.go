@@ -31,8 +31,13 @@ func forEachTestProjectRootKey(projectRoot string, fn func(key string)) {
 	}
 	clean := filepath.Clean(projectRoot)
 	fn(clean)
-	if abs, err := filepath.Abs(clean); err == nil && abs != clean {
+	var abs string
+	if a, err := filepath.Abs(clean); err == nil && a != clean {
+		abs = a
 		fn(abs)
+	}
+	if eval, err := filepath.EvalSymlinks(clean); err == nil && eval != clean && eval != abs {
+		fn(eval)
 	}
 }
 
@@ -55,8 +60,14 @@ func isTestProjectRootUnbound(projectRoot string) bool {
 		return true
 	}
 	if abs, err := filepath.Abs(clean); err == nil && abs != clean {
-		_, ok := unboundTestRoots[abs]
-		return ok
+		if _, ok := unboundTestRoots[abs]; ok {
+			return true
+		}
+	}
+	if eval, err := filepath.EvalSymlinks(clean); err == nil && eval != clean {
+		if _, ok := unboundTestRoots[eval]; ok {
+			return true
+		}
 	}
 	return false
 }
