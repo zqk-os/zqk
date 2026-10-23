@@ -55,6 +55,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[CLI Scheduler Subsystem Architectural & Operational Guide](./CLI_SCHEDULER_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, singleton daemon supervision, keep-alive heartbeat, WAL event streaming, dead-letter escalation, maintenance skip windows, and >=85.0% coverage invariant. | All Engineers & Agents | `zqk scheduler start`, `zqk scheduler stop`, `zqk scheduler status`, `zqk scheduler health-check`, `zqk scheduler submit`, `zqk scheduler dump`, `zqk scheduler escalate`, `zqk scheduler test-failures` |
 | **[Scheduler Subsystem Operational & Architectural Guide](./SCHEDULER_SUBSYSTEM_GUIDE.md)** | Embedded job queue, CAP loop orchestrator, transient retry membranes, atomic job state registry, retention cleanup, and watchdog monitoring. | Kernel Engineers & Agents | `pkg/scheduler`, `zqk scheduler` |
 | **[Concurrency Primitives Subsystem Architectural & Operational Guide](./CONCURRENCY_SUBSYSTEM_GUIDE.md)** | Synchronization primitives, deadlock prevention, TimeoutMutex invariants, adaptive GoroutineCeiling token pools, context-aware waits, named WaitGroupManager, and >=85.0% coverage invariant. | All Engineers & Agents | `pkg/concurrency` |
+| **[Runtime Subsystem Architectural & Operational Guide](./RUNTIME_SUBSYSTEM_GUIDE.md)** | Centralized supervision tree, goroutine lifecycle governance, leak detection heuristics, graceful drain coordination, and >=85.0% coverage invariant. | All Engineers & Agents | `pkg/runtime` |
 
 ---
 
