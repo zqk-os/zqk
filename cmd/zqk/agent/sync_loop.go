@@ -170,6 +170,17 @@ func buildContextBundle(task map[string]any, deps []map[string]any) ContextBundl
 	}
 }
 
+var syncLoopHeartbeat = 5 * time.Second
+
+func getSyncLoopHeartbeat() time.Duration {
+	if val := os.Getenv("ZQK_SYNC_LOOP_HEARTBEAT"); val != "" {
+		if d, err := time.ParseDuration(val); err == nil && d > 0 {
+			return d
+		}
+	}
+	return syncLoopHeartbeat
+}
+
 //nolint:gocyclo
 func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 	proc, err := newAgentProcessor(cmd)
@@ -267,7 +278,7 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		}
 	})
 
-	const fallbackHeartbeat = 5 * time.Second
+	fallbackHeartbeat := getSyncLoopHeartbeat()
 	poller := time.NewTicker(fallbackHeartbeat)
 	defer poller.Stop()
 
