@@ -38,6 +38,11 @@ func (s *Scheduler) ProjectRootForTest() string {
 	return s.projectRoot
 }
 
+// GetProjectRootForTest exposes getProjectRoot (storage-aware) for facade package tests.
+func (s *Scheduler) GetProjectRootForTest() string {
+	return s.getProjectRoot()
+}
+
 // SpecLoaderForTest exposes the spec loader for facade package tests.
 func (s *Scheduler) SpecLoaderForTest() *objects.SpecLoader {
 	return s.specLoader
