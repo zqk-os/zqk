@@ -43,12 +43,16 @@ func TestSeedSchemaPlanePopulatesEveryPlaneDir(t *testing.T) {
 // files present is not enough: the plane has to be complete enough to write an object.
 func TestSeedSchemaPlaneAllowsObjectCreate(t *testing.T) {
 	proj := PrepareIsolatedTempProject(t, &IsolatedTempProjectOptions{
-		Kind:            "seed_plane_create",
-		SeedSchemaPlane: true,
+		Kind:                     "seed_plane_create",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true,
 	})
 	if proj.FileStorage == nil {
 		t.Fatal("expected file storage")
 	}
+	t.Cleanup(func() {
+		_ = proj.FileStorage.Close()
+	})
 
 	err := proj.FileStorage.Create(pkgctx.WithPromoteOnCreate(t.Context()), pkgctx.NewSystemSecurityContext(), map[string]any{
 		objects.FieldKeyID:            "PER-seed-plane-test",
@@ -60,6 +64,10 @@ func TestSeedSchemaPlaneAllowsObjectCreate(t *testing.T) {
 	})
 	if err != nil {
 		t.Fatalf("create in seeded root: %v", err)
+	}
+
+	if err := proj.FileStorage.Close(); err != nil {
+		t.Fatalf("close file storage: %v", err)
 	}
 }
 
