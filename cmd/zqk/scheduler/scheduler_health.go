@@ -22,6 +22,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqktime"
 )
 
+var healthCheckExit = os.Exit
+
 // NewHealthCheckCmd creates the health-check command
 // This command runs externally (not inside the scheduler daemon) to check if the daemon is alive
 // It can be run via cron or other external monitoring tools
@@ -70,13 +72,13 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 	isAlive, lastKeepAlive, err := scheduler.IsSchedulerAlive(projectRoot)
 	if err != nil {
 		logging.Fluent(logger).Error("Failed to check scheduler status", err).Log()
-		os.Exit(2)
+		healthCheckExit(2)
 	}
 
 	storageProvider, err := cli.NewStorageProviderFromFactory(pkgctx.NewSystemContext(), projectRoot)
 	if err != nil {
 		logging.Fluent(logger).Error("Failed to create storage factory", err).Log()
-		os.Exit(2)
+		healthCheckExit(2)
 	}
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := pkgctx.NewStorageContext()
@@ -93,7 +95,7 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 	})
 	if err != nil {
 		logging.Fluent(logger).Error("Failed to query scheduler jobs", err).Log()
-		os.Exit(2)
+		healthCheckExit(2)
 	}
 
 	hasEnabledTimerJobs := len(jobResult.Objects) > 0
@@ -114,11 +116,11 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 					Log()
 			}
 			logging.Fluent(logger).Info(paths.RewriteCanonicalCLIInvocations("Start the daemon with: zqk scheduler start")).Log()
-			os.Exit(1)
+			healthCheckExit(1)
 		}
 		removeDaemonUnhealthyFile(projectRoot)
 		logging.Fluent(logger).Info("OK: Scheduler daemon is not running (no enabled timer jobs)").Log()
-		os.Exit(0)
+		healthCheckExit(0)
 	}
 
 	if !lastKeepAlive.IsZero() {
@@ -131,7 +133,7 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 				String("max", scheduler.DefaultKeepAliveTimeout.String()).
 				String("last_keep_alive", lastKeepAlive.Format(time.RFC3339)).
 				Log()
-			os.Exit(1)
+			healthCheckExit(1)
 		}
 	}
 
@@ -149,7 +151,7 @@ func runHealthCheck(cmd *cobra.Command, args []string) error {
 			Int("count", len(jobResult.Objects)).
 			Log()
 	}
-	os.Exit(0)
+	healthCheckExit(0)
 	return nil
 }
 

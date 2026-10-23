@@ -144,10 +144,17 @@ cli:
 	if err := fileutil.EnsureDir(filepath.Dir(binaryPath)); err != nil {
 		t.Fatalf("create workspace bin dir: %v", err)
 	}
-	buildCmd := execwrap.Command("go", "build", "-o", binaryPath, "./cmd/zqk")
-	zqkenv.WireExecForIsolatedProject(buildCmd, moduleRoot)
-	if err := buildCmd.Run(); err != nil {
-		t.Fatalf("build zqk binary: %v", err)
+	existingBin := filepath.Join(moduleRoot, "bin", "zqk")
+	if fileutil.Exists(existingBin) {
+		if err := fileutil.CopyExecutableFile(existingBin, binaryPath); err != nil {
+			t.Fatalf("copy existing zqk binary: %v", err)
+		}
+	} else {
+		buildCmd := execwrap.Command("go", "build", "-o", binaryPath, "./cmd/zqk")
+		zqkenv.WireExecForIsolatedProject(buildCmd, moduleRoot)
+		if err := buildCmd.Run(); err != nil {
+			t.Fatalf("build zqk binary: %v", err)
+		}
 	}
 
 	env := envWithoutZQKTestRoot()

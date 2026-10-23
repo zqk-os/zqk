@@ -10,6 +10,7 @@ import (
 
 	"github.com/zqk-os/zqk/cmd/zqk/object"
 	"github.com/zqk-os/zqk/pkg/agentprompt"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedpkg "github.com/zqk-os/zqk/pkg/scheduler"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -30,6 +31,16 @@ const agentPromptChatMatrixCycles = 3
 func TestCLI_AgentPromptChatMatrix_MultiCycle(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skip CLI integration in -short mode")
+	}
+
+	projRoot := cli.ResolveProjectRoot(".")
+	if projRoot == "" {
+		projRoot = "."
+	}
+	fixturePath := filepath.Join(projRoot, "integration", "fixtures", "convergence_session", "agent_prompt_chat_matrix.yaml")
+	raw, err := fileutil.ReadFile(fixturePath)
+	if err != nil {
+		t.Skipf("integration pillar fixture (see integration/README.md): %v", err)
 	}
 
 	te := object.SetupTestEnvironment(t)
@@ -55,11 +66,6 @@ func TestCLI_AgentPromptChatMatrix_MultiCycle(t *testing.T) {
 
 	const fixtureTemplateID = "CVS-ITEST-AGENT-PROMPT-CHAT-MATRIX-001"
 	cvsID := fmt.Sprintf("CVS-ITEST-AGENT-PROMPT-CHAT-%d", time.Now().UnixNano())
-	fixturePath := filepath.Join(te.ProjectRoot, "integration", "fixtures", "convergence_session", "agent_prompt_chat_matrix.yaml")
-	raw, err := fileutil.ReadFile(fixturePath)
-	if err != nil {
-		t.Skipf("integration pillar fixture (see integration/README.md): %v", err)
-	}
 	patched := strings.ReplaceAll(string(raw), fixtureTemplateID, cvsID)
 	tmpYAML := filepath.Join(t.TempDir(), "cvs-chat-matrix.yaml")
 	if err := fileutil.WriteFile(tmpYAML, []byte(patched), paths.FilePerm644); err != nil {
