@@ -55,7 +55,7 @@ func NewConvergenceSessionTickHandler(storage storagepkg.ObjectStorageProvider, 
 }
 
 // ProjectRoot returns the handler project root (health.jsonl / outcome paths).
-// TRACK: BLI-1790209618294719000-90cdbe5f — facade accessor for studio EvaluationSurfaceAdapter.
+// Facade accessor for studio EvaluationSurfaceAdapter.
 func (h *ConvergenceSessionTickHandler) ProjectRoot() string {
 	if h == nil {
 		return ""
@@ -64,7 +64,7 @@ func (h *ConvergenceSessionTickHandler) ProjectRoot() string {
 }
 
 // Logger returns the handler logger.
-// TRACK: BLI-1790209618294719000-90cdbe5f — facade accessor for studio EvaluationSurfaceAdapter.
+// Facade accessor for studio EvaluationSurfaceAdapter.
 func (h *ConvergenceSessionTickHandler) Logger() logging.Logger {
 	if h == nil {
 		return nil
@@ -73,7 +73,7 @@ func (h *ConvergenceSessionTickHandler) Logger() logging.Logger {
 }
 
 // Storage returns the handler object storage provider.
-// TRACK: BLI-1790209618294719000-90cdbe5f — facade accessor for studio EvaluationSurfaceAdapter.
+// Facade accessor for studio EvaluationSurfaceAdapter.
 func (h *ConvergenceSessionTickHandler) Storage() storagepkg.ObjectStorageProvider {
 	if h == nil {
 		return nil
