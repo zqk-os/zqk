@@ -267,3 +267,15 @@ func (h *ConvergenceSessionTickHandler) maybeSpawnTerminalFollowupDraft(
 	}
 	return id, nil
 }
+
+// MaybeSpawnTerminalFollowupDraftForTest exposes maybeSpawnTerminalFollowupDraft for facade package tests.
+func (h *ConvergenceSessionTickHandler) MaybeSpawnTerminalFollowupDraftForTest(
+	ctx context.Context,
+	secCtx *pkgctx.SecurityContext,
+	job *ScheduledJob,
+	priorSessionID string,
+	prior map[string]any,
+	snap *TestBundleConvergenceSnapshot,
+) (newSessionID string, err error) {
+	return h.maybeSpawnTerminalFollowupDraft(ctx, secCtx, job, priorSessionID, prior, snap)
+}
