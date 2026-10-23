@@ -837,7 +837,7 @@ func TestCycle139_DaemonForRoot_Scenarios(t *testing.T) {
 	// 1. When scheduler is running (pid exists and live process)
 	pidPath := paths.SchedulerPIDFilePath(proj.Root)
 	require.NoError(t, fileutil.MkdirAll(filepath.Dir(pidPath), 0755))
-	require.NoError(t, fileutil.WriteSecureFile(pidPath, []byte(fmt.Sprintf("%d\n", os.Getpid()))))
+	require.NoError(t, fileutil.WriteSecureFile(pidPath, []byte(fmt.Sprintf("%d", os.Getpid()))))
 
 	err := StartSchedulerDaemonForRoot(proj.Root)
 	assert.NoError(t, err)

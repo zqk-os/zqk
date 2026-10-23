@@ -131,7 +131,7 @@ func readPIDFile(projectRoot string) (int, error) {
 		return 0, errfmt.Newf("failed to read PID file").Wrap(err)
 	}
 
-	pidStr := string(data)
+	pidStr := strings.TrimSpace(string(data))
 	pid, err := strconv.Atoi(pidStr)
 	if err != nil {
 		return 0, errfmt.Newf("invalid PID in file").Wrap(err)
