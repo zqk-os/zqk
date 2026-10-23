@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -48,6 +49,9 @@ func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 		t.Fatalf("factory init failed: %v", err)
 	}
 	sp := factory.GetStorage()
+	if closer, ok := sp.(io.Closer); ok {
+		defer func() { _ = closer.Close() }()
+	}
 	sec := pkgctx.NewSystemSecurityContext()
 
 	seedStateTreeEntities(t, sp, sCtx, sec)
