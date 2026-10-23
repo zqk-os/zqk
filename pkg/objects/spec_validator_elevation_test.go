@@ -8,6 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func setupTestSpecValidator(t *testing.T) *SpecValidator {
+	t.Helper()
+	t.Parallel()
+	return NewSpecValidator(NewSpecLoader(findSpecsDir()), nil)
+}
+
 func TestValidateLoadedSpec_NilSpec(t *testing.T) {
 	t.Parallel()
 	errs := ValidateLoadedSpec(context.Background(), nil, nil, nil)
@@ -15,9 +21,7 @@ func TestValidateLoadedSpec_NilSpec(t *testing.T) {
 }
 
 func TestSpecValidator_FieldDefVariants(t *testing.T) {
-	t.Parallel()
-	loader := NewSpecLoader(findSpecsDir())
-	validator := NewSpecValidator(loader, nil)
+	validator := setupTestSpecValidator(t)
 
 	// 1. Non-map field definition should be skipped without panic
 	specNonMap := &Spec{
@@ -52,9 +56,7 @@ func TestSpecValidator_FieldDefVariants(t *testing.T) {
 }
 
 func TestSpecValidator_FieldTraitValidationErrors(t *testing.T) {
-	t.Parallel()
-	loader := NewSpecLoader(findSpecsDir())
-	validator := NewSpecValidator(loader, nil)
+	validator := setupTestSpecValidator(t)
 
 	// Field trait not matching known valid traits or invalid context
 	specTraitErr := &Spec{
@@ -81,3 +83,4 @@ func TestSpecValidator_FieldTraitValidationErrors(t *testing.T) {
 	}
 	assert.True(t, foundTraitErr)
 }
+
