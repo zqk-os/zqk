@@ -389,6 +389,22 @@ func (c *ValidationStateCache) Save() error {
 		byKind = make(map[string]kindBucket)
 	}
 
+	if len(byKind) == 0 {
+		var forceReplace bool
+		_ = concurrency.RunInRLockWithLogger(
+			&c.mu,
+			LockOpValidationCacheSaveCopy,
+			logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+			func() error {
+				forceReplace = c.replaceDiskOnNextSave
+				return nil
+			},
+		)
+		if !forceReplace {
+			return nil
+		}
+	}
+
 	if err := fileutil.MkdirAll(filepath.Dir(c.cacheFile), paths.DirPerm755); err != nil {
 		return errfmt.Newf(ErrMsgCreateCacheDir).Wrap(err)
 	}
@@ -494,16 +510,18 @@ func (c *ValidationStateCache) Save() error {
 	}()
 
 	if len(byKind) == 0 {
-		if stat, statErr := fileutil.Stat(c.cacheFile); statErr == nil && stat.Size() > 0 {
-			existingData, readErr := fileutil.ReadFile(c.cacheFile)
-			if readErr == nil {
-				var existing struct {
-					ByKind map[string]json.RawMessage `json:"by_kind"`
-				}
-				if json.Unmarshal(existingData, &existing) == nil && len(existing.ByKind) > 0 {
-					return nil
-				}
-			}
+		var forceReplace bool
+		_ = concurrency.RunInRLockWithLogger(
+			&c.mu,
+			LockOpValidationCacheSaveCopy,
+			logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+			func() error {
+				forceReplace = c.replaceDiskOnNextSave
+				return nil
+			},
+		)
+		if !forceReplace {
+			return nil
 		}
 	} else if shrinkGuardSkipSave(c.cacheFile, byKind) {
 		// Refuse to replace a large on-disk warm cache with a tiny in-memory
@@ -870,6 +888,32 @@ func (c *ValidationStateCache) Count() (total, stale, withIssues int) {
 	return totalCount, staleCount, withIssuesCount
 }
 
+// CountAutoFixable returns the count of cached objects with at least one unresolved auto-fixable issue.
+func (c *ValidationStateCache) CountAutoFixable() int {
+	var count int
+	if err := concurrency.RunInRLockWithLogger(
+		&c.mu,
+		LockOpValidationCacheCount,
+		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			for _, state := range c.cache {
+				if len(state.Issues) > 0 {
+					for _, issue := range state.Issues {
+						if issue.ResolvedAt == nil && issue.AutoFixable {
+							count++
+							break
+						}
+					}
+				}
+			}
+			return nil
+		},
+	); err != nil {
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgLockFailedCount, err).Log()
+	}
+	return count
+}
+
 // shrinkGuardMinDiskEntries is the floor above which we protect a warm on-disk
 // validation cache from being replaced by a drastically smaller in-memory snapshot.
 const shrinkGuardMinDiskEntries = 200
@@ -894,14 +938,22 @@ func shrinkGuardSkipSave(cacheFile string, byKind map[string]kindBucket) bool {
 		return false
 	}
 	var existing struct {
-		ByKind map[string]kindBucket `json:"by_kind"`
+		ByKind map[string]json.RawMessage `json:"by_kind"`
 	}
 	if json.Unmarshal(existingData, &existing) != nil || len(existing.ByKind) == 0 {
 		return false
 	}
 	existingCount := 0
-	for _, bucket := range existing.ByKind {
-		existingCount += len(bucket.Entries)
+	for _, raw := range existing.ByKind {
+		var bucket kindBucket
+		if err := json.Unmarshal(raw, &bucket); err == nil && len(bucket.Entries) > 0 {
+			existingCount += len(bucket.Entries)
+			continue
+		}
+		var entries []validationStateEntry
+		if err := json.Unmarshal(raw, &entries); err == nil {
+			existingCount += len(entries)
+		}
 	}
 	if existingCount < shrinkGuardMinDiskEntries {
 		return false
@@ -909,6 +961,13 @@ func shrinkGuardSkipSave(cacheFile string, byKind map[string]kindBucket) bool {
 	// Skip tiny snapshots that are less than half the warm on-disk size
 	// (e.g. ~81 CRUD flusher entries vs thousands from system check).
 	return newCount < shrinkGuardMinDiskEntries && newCount*2 < existingCount
+}
+
+// LoadedUpdated returns the timestamp of the cache loaded from disk or last saved.
+func (c *ValidationStateCache) LoadedUpdated() time.Time {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.loadedUpdated
 }
 
 // staleGenerationSkipSave returns true when another process already wrote a

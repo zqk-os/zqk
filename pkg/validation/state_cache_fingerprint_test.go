@@ -77,6 +77,53 @@ func TestRunningExecutableFingerprint_HasPathSizeMtime(t *testing.T) {
 	}
 }
 
+func TestRunningExecutableFingerprint_NormalizesZQKFamily(t *testing.T) {
+	t.Parallel()
+	got := runningExecutableFingerprint()
+	if got == emptyValue {
+		t.Fatal("expected running executable identity")
+	}
+	parts := strings.Split(got, ":")
+	if len(parts) < 3 {
+		t.Fatalf("expected at least 3 parts, got %q", got)
+	}
+	if !strings.HasPrefix(parts[0], "zqk") && !strings.HasSuffix(parts[0], ".test") {
+		t.Errorf("expected zqk or test binary in executable family identity, got %q", parts[0])
+	}
+}
+
+func TestRunningExecutableFingerprint_BinZqkAndStableParity(t *testing.T) {
+	t.Parallel()
+	tmpDir := t.TempDir()
+	binZqk := filepath.Join(tmpDir, "bin", "zqk")
+	binZqkStable := filepath.Join(tmpDir, ".zqk", "bin", "zqk-stable")
+
+	if err := fileutil.MkdirAll(filepath.Dir(binZqk), paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir binZqk: %v", err)
+	}
+	if err := fileutil.MkdirAll(filepath.Dir(binZqkStable), paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir binZqkStable: %v", err)
+	}
+
+	content := []byte("mock binary header content with some filler bytes to reach reasonable size")
+	if err := fileutil.WriteFile(binZqk, content, 0o755); err != nil {
+		t.Fatalf("write binZqk: %v", err)
+	}
+	if err := fileutil.WriteFile(binZqkStable, content, 0o755); err != nil {
+		t.Fatalf("write binZqkStable: %v", err)
+	}
+
+	fp1 := executableFingerprintForPath(binZqk)
+	fp2 := executableFingerprintForPath(binZqkStable)
+
+	if fp1 == emptyValue {
+		t.Fatal("expected non-empty fingerprint")
+	}
+	if fp1 != fp2 {
+		t.Fatalf("bin/zqk and .zqk/bin/zqk-stable must produce identical fingerprint, got %q vs %q", fp1, fp2)
+	}
+}
+
 func TestValidationFingerprintGlobs_IncludeUnlistedCheckerAndParser(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

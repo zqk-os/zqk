@@ -346,6 +346,46 @@ func TestValidationStateCache_Save_ErrorPaths(t *testing.T) {
 	}
 }
 
+func TestValidationStateCache_Save_DoesNotClobberPopulatedDiskWithEmptyMap(t *testing.T) {
+	t.Parallel()
+	testRoot := registerZQKTestRootForTest(t)
+
+	cache1 := NewValidationStateCache(testRoot, time.Hour)
+	cache1.Set(&ValidationState{
+		ObjectID:      "GOAL-PERSIST-1",
+		ObjectKind:    "goal",
+		FilePath:      "goal.yaml",
+		LastValidated: time.Now(),
+	})
+	if err := cache1.Save(); err != nil {
+		t.Fatalf("cache1.Save: %v", err)
+	}
+
+	// Verify on-disk has entry
+	cacheVerify := NewValidationStateCache(testRoot, time.Hour)
+	if err := cacheVerify.Load(); err != nil {
+		t.Fatalf("cacheVerify.Load: %v", err)
+	}
+	if _, ok := cacheVerify.Get("GOAL-PERSIST-1"); !ok {
+		t.Fatal("expected entry to be loaded from disk")
+	}
+
+	// An empty cache instance calls Save() - must NOT clobber on disk
+	emptyCache := NewValidationStateCache(testRoot, time.Hour)
+	if err := emptyCache.Save(); err != nil {
+		t.Fatalf("emptyCache.Save: %v", err)
+	}
+
+	// Reload - entry must STILL exist
+	cacheReload := NewValidationStateCache(testRoot, time.Hour)
+	if err := cacheReload.Load(); err != nil {
+		t.Fatalf("cacheReload.Load: %v", err)
+	}
+	if _, ok := cacheReload.Get("GOAL-PERSIST-1"); !ok {
+		t.Fatal("empty Save() must not clobber warm on-disk cache")
+	}
+}
+
 // TestValidationStateCache_Save_Concurrent tests concurrent save operations
 func TestValidationStateCache_Save_Concurrent(t *testing.T) {
 	t.Parallel()
