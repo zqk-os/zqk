@@ -44,7 +44,7 @@ EOF
 fi
 exit 0
 `
-	if err := fileutil.WriteFile(mockZqk, []byte(script), paths.DirPerm755); err != nil {
+	if err := fileutil.WriteDurableExecutableFile(mockZqk, []byte(script)); err != nil {
 		t.Fatalf("failed to write mock zqk: %v", err)
 	}
 

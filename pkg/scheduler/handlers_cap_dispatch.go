@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"os/exec"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -135,9 +136,10 @@ func (h *CapOrchestratorHandler) executeDispatchStage(ctx context.Context, exe, 
 	var activePersonas []string
 
 	// Attempt to resolve from priority_plan -> team_configuration_ref
-	planCmd := execwrap.CommandContext(ctx, exe, "object", "show", planID, "--format", "json")
-	planCmd = h.prepareCmd(planCmd)
-	planOut, err := planCmd.CombinedOutput()
+	planOut, err := execwrap.RunCombinedOutputWithRetry(ctx, func() *exec.Cmd {
+		cmd := execwrap.CommandContext(ctx, exe, "object", "show", planID, "--format", "json")
+		return h.prepareCmd(cmd)
+	}, 5, 10*time.Millisecond)
 	if err != nil {
 		h.logger.Error("cap_orchestrator_plan_fetch_failed", err, logging.OutputField(string(planOut)))
 		return errfmt.Errorf("failed to fetch priority plan: %w", err)
