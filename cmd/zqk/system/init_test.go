@@ -139,6 +139,9 @@ func registerInitTestCleanup(t *testing.T, dir string) {
 }
 
 func TestInit_Greenfield(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	// Do not use t.Parallel(): same *testing.T uses t.Setenv(ZQK_TEST_ROOT); parallel subtests could overwrite process env.
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
@@ -198,6 +201,9 @@ func TestInit_Greenfield(t *testing.T) {
 }
 
 func TestInit_Greenfield_NoEnvVars(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	// Simulates a user running `zqk system init` in an empty directory without ZQK_PROJECT_ROOT/ZQK_TEST_ROOT
 	tmpDir := t.TempDir()
 	if eval, err := filepath.EvalSymlinks(tmpDir); err == nil {
@@ -239,6 +245,9 @@ func TestInit_Greenfield_NoEnvVars(t *testing.T) {
 }
 
 func TestInit_Legacy(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	// Do not run in parallel: same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
@@ -300,6 +309,9 @@ func TestInit_Legacy(t *testing.T) {
 }
 
 func TestInit_Snapshot_Wipe(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
 
@@ -354,6 +366,9 @@ func TestInit_Snapshot_Wipe(t *testing.T) {
 }
 
 func TestInit_RespectsZQK_TEST_ROOT(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
 	registerInitTestCleanup(t, tmpDir)
@@ -389,6 +404,9 @@ func TestInit_RespectsZQK_TEST_ROOT(t *testing.T) {
 }
 
 func TestInit_ForceOverwrite(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	// Do not run in parallel: same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
@@ -427,6 +445,9 @@ func TestInit_ForceOverwrite(t *testing.T) {
 }
 
 func TestInit_SecondRunActionableGuidance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	// Do not run in parallel: same *testing.T uses t.Setenv(ZQK_TEST_ROOT).
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
@@ -465,6 +486,9 @@ func TestInit_SecondRunActionableGuidance(t *testing.T) {
 }
 
 func TestInit_SimpleMode(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
 	registerInitTestCleanup(t, tmpDir)
@@ -504,6 +528,9 @@ func TestInit_SimpleMode(t *testing.T) {
 }
 
 func TestInit_AdvancedMode(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
 	registerInitTestCleanup(t, tmpDir)
@@ -540,6 +567,9 @@ func TestInit_AdvancedMode(t *testing.T) {
 }
 
 func TestInit_GreenfieldAnchorsToCWD(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	liveRoot := moduleRootFromGoEnvSystem(t)
 	liveObjectSpecDraftsBefore := storage.InventoryObjectDraftPlane(liveRoot).ByKind[objects.KindObjectSpec]
 	parentDir := t.TempDir()
@@ -683,6 +713,9 @@ func TestWriteSystemAccount_MigratesLegacyFiles(t *testing.T) {
 }
 
 func TestInit_RegistersShippedDocs(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
 
@@ -774,6 +807,9 @@ func TestInit_RegistersShippedDocs(t *testing.T) {
 }
 
 func TestInit_RegistersShippedDocs_Legacy(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping heavy init test in short mode")
+	}
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SkipSetupTestEnvironment: true, SkipFileStorage: true})
 	tmpDir := proj.Root
 

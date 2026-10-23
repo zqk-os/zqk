@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
@@ -174,7 +175,11 @@ func (m *WaitGroupManager) Wait(id string) {
 	startTime := time.Now()
 	waitDone := make(chan struct{})
 	// Use context with timeout for deterministic behavior
-	waitCtx, waitCancel := context.WithTimeout(pkgctx.NewSystemContext(), 5*time.Minute)
+	waitTimeout := 5 * time.Minute
+	if testing.Short() {
+		waitTimeout = 5 * time.Second
+	}
+	waitCtx, waitCancel := context.WithTimeout(pkgctx.NewSystemContext(), waitTimeout)
 	defer waitCancel()
 	wgBud := goroutinelabels.DefaultBudget()
 	wgWaitBuilder := goroutinelabels.NewGoroutine(fmt.Sprintf(ConstMiscWaitgroupWaitS, id), fmt.Sprintf(ConstMiscWaitingForWaitGroupS, id)).
