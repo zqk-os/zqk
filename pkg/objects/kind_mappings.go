@@ -53,6 +53,7 @@ var legacyDirectoryToKind = map[string]string{
 	"technical_specs":           KindTechnicalSpec,
 	"lifecycles":                KindLifecycle,
 	"watchdog_registrations":    KindWatchdogRegistration,
+	"remote_kernels":            KindRemoteKernel,
 	tdeEnvelopesObjectDirectory: KindTdeEnvelope,
 	kindSynonymsObjectDirectory: KindSynonym,
 }
@@ -126,6 +127,7 @@ var legacyKindToDirectory = map[string]string{
 	KindTechnicalSpec:          "technical_specs",
 	KindLifecycle:              "lifecycles",
 	KindWatchdogRegistration:   "watchdog_registrations",
+	KindRemoteKernel:           "remote_kernels",
 	KindTdeEnvelope:            tdeEnvelopesObjectDirectory,
 	KindSynonym:                kindSynonymsObjectDirectory,
 }
