@@ -204,7 +204,7 @@ func TestExtended_FileLockMetricsAndHooks(t *testing.T) {
 	}
 	EmitConvergenceEvaluationEvent(ctx, tmpDir, "sess-1", "standard", res, map[string]any{"res": "ok"})
 
-	adapter := &ConvergenceStorageAdapter{storage: sp}
+	adapter := NewConvergenceStorageAdapter(sp)
 	_, _ = adapter.ListConvergenceSessions(ctx)
 	_ = adapter.UpdateSessionStatus(ctx, "sess-1", "active")
 	_ = adapter.CreatePriorityPlanForTimeout(ctx, "sess-1")

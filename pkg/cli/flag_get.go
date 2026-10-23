@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -58,6 +59,20 @@ func (b *FlagBag) String(cmd *cobra.Command, name string) string {
 	return v
 }
 
+// StringTrimmed reads a string flag and strips leading/trailing whitespace.
+func (b *FlagBag) StringTrimmed(cmd *cobra.Command, name string) string {
+	return strings.TrimSpace(b.String(cmd, name))
+}
+
+// StringTrimmedOrDefault reads a string flag, strips whitespace, and returns def if empty.
+func (b *FlagBag) StringTrimmedOrDefault(cmd *cobra.Command, name, def string) string {
+	v := b.StringTrimmed(cmd, name)
+	if v == emptyValue {
+		return def
+	}
+	return v
+}
+
 // Bool reads a bool flag.
 func (b *FlagBag) Bool(cmd *cobra.Command, name string) bool {
 	if !b.ready(cmd) {
@@ -75,6 +90,15 @@ func (b *FlagBag) Int(cmd *cobra.Command, name string) int {
 	}
 	v, err := cmd.Flags().GetInt(name)
 	b.fail(name, err)
+	return v
+}
+
+// IntOrDefault reads an int flag and returns def when the value is <= 0.
+func (b *FlagBag) IntOrDefault(cmd *cobra.Command, name string, def int) int {
+	v := b.Int(cmd, name)
+	if v <= 0 {
+		return def
+	}
 	return v
 }
 
@@ -98,6 +122,22 @@ func (b *FlagBag) StringSlice(cmd *cobra.Command, name string) []string {
 	return v
 }
 
+// StringSliceTrimmed reads a stringSlice flag, trims each entry, and drops empties.
+func (b *FlagBag) StringSliceTrimmed(cmd *cobra.Command, name string) []string {
+	raw := b.StringSlice(cmd, name)
+	if len(raw) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(raw))
+	for _, s := range raw {
+		trimmed := strings.TrimSpace(s)
+		if trimmed != emptyValue {
+			out = append(out, trimmed)
+		}
+	}
+	return out
+}
+
 // Duration reads a duration flag.
 func (b *FlagBag) Duration(cmd *cobra.Command, name string) time.Duration {
 	if !b.ready(cmd) {
@@ -105,6 +145,15 @@ func (b *FlagBag) Duration(cmd *cobra.Command, name string) time.Duration {
 	}
 	v, err := cmd.Flags().GetDuration(name)
 	b.fail(name, err)
+	return v
+}
+
+// DurationOrDefault reads a duration flag and returns def when the value is <= 0.
+func (b *FlagBag) DurationOrDefault(cmd *cobra.Command, name string, def time.Duration) time.Duration {
+	v := b.Duration(cmd, name)
+	if v <= 0 {
+		return def
+	}
 	return v
 }
 
