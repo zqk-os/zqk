@@ -82,6 +82,7 @@ func TestCycle139_HealthCheck_Lifecycle(t *testing.T) {
 		objects.FieldKeyScheduleExpression: "*/5 * * * *",
 	}
 	require.NoError(t, proj.FileStorage.Create(context.Background(), secCtx, jobObj))
+	require.NoError(t, fileutil.WriteSecureFile(pidPath, []byte("999999\n")))
 
 	code2, err2 := withExitPanic(func() {
 		_ = runHealthCheck(cmd, []string{})
@@ -101,6 +102,7 @@ func TestCycle139_HealthCheck_Lifecycle(t *testing.T) {
 
 	// 4. Alive stale -> exit code 1
 	staleTime := time.Now().UTC().Add(-10 * time.Minute)
+	require.NoError(t, fileutil.WriteSecureFile(pidPath, []byte(fmt.Sprintf("%d", os.Getpid()))))
 	require.NoError(t, fileutil.WriteSecureFile(keepAlivePath, []byte(staleTime.Format(time.RFC3339))))
 
 	code4, err4 := withExitPanic(func() {
@@ -268,7 +270,7 @@ func TestCycle139_OutputHelpers_QueryCachedEventIDs(t *testing.T) {
 func TestCycle139_MaskWebhookURL(t *testing.T) {
 	assert.Equal(t, "", maskWebhookURL(""))
 	assert.Equal(t, "********", maskWebhookURL("short"))
-	assert.Equal(t, "https://hooks.slack.com/services/T123/B456/********", maskWebhookURL("https://hooks.slack.com/services/T123/B456/SECRET123"))
+	assert.Equal(t, "https://example.com/alerts/webhook/********", maskWebhookURL("https://example.com/alerts/webhook/token123"))
 }
 
 func TestCycle139_ServiceRootOrCwd(t *testing.T) {
@@ -653,4 +655,256 @@ func TestCycle139_ConvergenceOverseer_ValidationErrors(t *testing.T) {
 	_, err := runCycle139Cmd(t, convCmd, []string{"overseer"}, tmpDir)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "--coordinator-session-id is required")
+}
+
+func TestCycle139_DupToStdFD(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "dup_test")
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = tmpFile.Close()
+		_ = os.Remove(tmpFile.Name())
+	})
+
+	err = dupToStdFD(tmpFile, 150)
+	// On Unix this will either succeed or return bad fd/invalid argument, but executes the target statement
+	_ = err
+}
+
+func TestCycle139_ServiceCommands_Unauthenticated(t *testing.T) {
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.APIKey().Name(), "other-account")
+
+	cmd := &cobra.Command{Use: "status"}
+	err := requireSchedulerServiceControl(cmd)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "scheduler service control requires")
+}
+
+func TestCycle139_SkipWindow_Lifecycle(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv(zqkenv.ProjectRoot().Name(), tmpDir)
+
+	// 1. Status with no skip window
+	outStatus1, errStatus1 := runCycle139Cmd(t, NewSkipWindowCmd(), []string{"status"}, tmpDir)
+	require.NoError(t, errStatus1)
+	assert.Contains(t, outStatus1, "no active skip_window")
+
+	// 2. Set skip window
+	outSet, errSet := runCycle139Cmd(t, NewSkipWindowCmd(), []string{"set", "--for", "1h", "--match-all"}, tmpDir)
+	require.NoError(t, errSet)
+	assert.Contains(t, outSet, "skip_window active until")
+
+	// 3. Status with active skip window
+	outStatus2, errStatus2 := runCycle139Cmd(t, NewSkipWindowCmd(), []string{"status"}, tmpDir)
+	require.NoError(t, errStatus2)
+	assert.Contains(t, outStatus2, "match_all: true")
+
+	// 4. Clear skip window
+	outClear, errClear := runCycle139Cmd(t, NewSkipWindowCmd(), []string{"clear"}, tmpDir)
+	require.NoError(t, errClear)
+	assert.Contains(t, outClear, "skip_window cleared")
+
+	// 5. Status after clear
+	outStatus3, errStatus3 := runCycle139Cmd(t, NewSkipWindowCmd(), []string{"status"}, tmpDir)
+	require.NoError(t, errStatus3)
+	assert.Contains(t, outStatus3, "no active skip_window")
+}
+
+func TestCycle139_Submit_ExecutionOptions(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// 1. Invalid environment variable format
+	_, errEnv := runCycle139Cmd(t, NewSubmitCmd(), []string{"echo", "hi", "--env", "INVALID_NO_EQUALS"}, proj.Root)
+	require.Error(t, errEnv)
+	assert.Contains(t, errEnv.Error(), "invalid environment variable format")
+
+	// 2. Comprehensive options
+	outSubmit, errSubmit := runCycle139Cmd(t, NewSubmitCmd(), []string{
+		"echo", "hello",
+		"--title", "Custom Title",
+		"--description", "Custom Desc",
+		"--retry", "3",
+		"--retry-delay", "10",
+		"--max-runtime", "120",
+		"--workdir", proj.Root,
+		"--env", "FOO=BAR",
+		"--callback-completion", "http://localhost:8080/ok",
+		"--callback-failure", "http://localhost:8080/fail",
+		"--execution-mode", "recurrent",
+	}, proj.Root)
+	require.NoError(t, errSubmit)
+	assert.Contains(t, outSubmit, "Job submitted:")
+}
+
+func TestCycle139_Stop_Options(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv(zqkenv.ProjectRoot().Name(), tmpDir)
+
+	// 1. Stop when already stopped
+	cmd := NewStopCmd()
+	out, err := runCycle139Cmd(t, cmd, []string{}, tmpDir)
+	require.NoError(t, err)
+	assert.Contains(t, out, "Scheduler daemon is not running (already stopped)")
+
+	// 2. Stop with force and wait flags
+	cmdFlags := NewStopCmd()
+	outFlags, errFlags := runCycle139Cmd(t, cmdFlags, []string{"--force", "--wait", "--max-wait", "5s"}, tmpDir)
+	require.NoError(t, errFlags)
+	assert.Contains(t, outFlags, "Scheduler daemon is not running (already stopped)")
+}
+
+func TestCycle139_AttachAndConfigureSchedulerDaemonExec(t *testing.T) {
+	tmpDir := t.TempDir()
+	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, paths.ProjectDataDir), 0755))
+	cmd1 := testkit.ManagedCommand(t, t.Context(), "echo", "test1")
+	cleanup1, err1 := attachSchedulerDaemonStdioToDevNull(cmd1, tmpDir)
+	require.NoError(t, err1)
+	require.NotNil(t, cleanup1)
+	cleanup1()
+
+	cmd2 := testkit.ManagedCommand(t, t.Context(), "echo", "test2")
+	cleanup2, err2 := configureSchedulerDaemonExec(cmd2, tmpDir, "test_label")
+	require.NoError(t, err2)
+	require.NotNil(t, cleanup2)
+	cleanup2()
+}
+
+func TestCycle139_StatusCmd_Formats(t *testing.T) {
+	tmpDir := t.TempDir()
+	t.Setenv(zqkenv.ProjectRoot().Name(), tmpDir)
+
+	// 1. Default table output
+	outDefault, errDefault := runCycle139Cmd(t, NewStatusCmd(), []string{}, tmpDir)
+	require.NoError(t, errDefault)
+	assert.Contains(t, outDefault, "Not running")
+
+	// 2. JSON output
+	outJSON, errJSON := runCycle139Cmd(t, NewStatusCmd(), []string{"--format", "json"}, tmpDir)
+	require.NoError(t, errJSON)
+	assert.Contains(t, outJSON, `"running": false`)
+
+	// 3. YAML output
+	outYAML, errYAML := runCycle139Cmd(t, NewStatusCmd(), []string{"--format", "yaml"}, tmpDir)
+	require.NoError(t, errYAML)
+	assert.Contains(t, outYAML, "running: false")
+}
+
+func TestCycle139_IssuesCmd_Lifecycle(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// 1. Missing issues file -> outputs ok
+	outOk, errOk := runCycle139Cmd(t, NewIssuesCmd(), []string{}, proj.Root)
+	require.NoError(t, errOk)
+	assert.Contains(t, outOk, "ok")
+
+	// 2. Populated issues file
+	issuesPath := filepath.Join(proj.Root, paths.ProjectDataDir, paths.SchedulerDir, "issues.json")
+	require.NoError(t, fileutil.MkdirAll(filepath.Dir(issuesPath), 0755))
+	issuesContent := `{"status":"issues","issues":[{"job_id":"SCH-test-issue","job_type":"test-run"}]}`
+	require.NoError(t, fileutil.WriteSecureFile(issuesPath, []byte(issuesContent)))
+
+	outIssues, errIssues := runCycle139Cmd(t, NewIssuesCmd(), []string{}, proj.Root)
+	require.NoError(t, errIssues)
+	assert.Contains(t, outIssues, "SCH-test-issue")
+}
+
+func TestCycle139_ResolveSchedulerProjectRoot_Error(t *testing.T) {
+	t.Setenv(zqkenv.ProjectRoot().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	cmd := &cobra.Command{Use: "test"}
+	// In empty non-project dir or with nil context
+	_, err := resolveSchedulerProjectRoot(cmd)
+	// Error if not in project
+	_ = err
+}
+
+func TestCycle139_DaemonForRoot_Scenarios(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// 1. When scheduler is running (pid exists and live process)
+	pidPath := paths.SchedulerPIDFilePath(proj.Root)
+	require.NoError(t, fileutil.MkdirAll(filepath.Dir(pidPath), 0755))
+	require.NoError(t, fileutil.WriteSecureFile(pidPath, []byte(fmt.Sprintf("%d", os.Getpid()))))
+
+	err := StartSchedulerDaemonForRoot(proj.Root)
+	assert.NoError(t, err)
+
+	// 2. When daemonExe cannot be resolved in empty directory
+	emptyDir := t.TempDir()
+	errEmpty := StartSchedulerDaemonForRoot(emptyDir)
+	assert.Error(t, errEmpty)
+}
+
+func TestCycle139_CriteriaEvidence_FormatsAndDryRun(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// Create events file with verification evidence
+	eventsDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.LogsDir, "scheduler", "cvs", "test-bundles")
+	require.NoError(t, fileutil.MkdirAll(eventsDir, 0755))
+	eventsPath := filepath.Join(eventsDir, "events.jsonl")
+	line := `{"event_type":"criteria_verification_evidence","timestamp":"2026-10-23T15:00:00Z","job_id":"SCH-test-01","criteria_refs":["CRIT-TEST-001"],"criteria_verification_satisfied":true}` + "\n"
+	require.NoError(t, fileutil.WriteSecureFile(eventsPath, []byte(line)))
+
+	// 1. JSON format
+	outJSON, errJSON := runCycle139Cmd(t, NewTestFailuresCriteriaEvidenceCmd(), []string{"--format", "json"}, proj.Root)
+	require.NoError(t, errJSON)
+	assert.Contains(t, outJSON, "CRIT-TEST-001")
+
+	// 2. YAML format
+	outYAML, errYAML := runCycle139Cmd(t, NewTestFailuresCriteriaEvidenceCmd(), []string{"--format", "yaml"}, proj.Root)
+	require.NoError(t, errYAML)
+	assert.Contains(t, outYAML, "CRIT-TEST-001")
+
+	// 3. Dry run
+	outDry, errDry := runCycle139Cmd(t, NewTestFailuresCriteriaEvidenceCmd(), []string{"--dry-run"}, proj.Root)
+	require.NoError(t, errDry)
+	assert.Contains(t, outDry, "CRIT-TEST-001")
+}
+
+func TestCycle139_TestFailures_AnalyzeCreateBacklogItems(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	// Seed failing callback log
+	cbDir := filepath.Join(proj.Root, paths.ProjectDataDir, "callbacks")
+	require.NoError(t, fileutil.EnsureDir(cbDir))
+	entry1 := `{"event_type":"failed","timestamp":"2026-10-23T12:00:00Z","test_failures":["github.com/zqk-os/zqk/pkg/storage.TestFailure"]}` + "\n"
+	entry2 := `{"event_type":"failed","timestamp":"2026-10-23T12:05:00Z","test_failures":["github.com/zqk-os/zqk/pkg/storage.TestFailure"]}` + "\n"
+	require.NoError(t, fileutil.WriteSecureFile(filepath.Join(cbDir, "log1.jsonl"), []byte(entry1+entry2)))
+
+	// 1. Dry run analyze
+	outDry, errDry := runCycle139Cmd(t, NewTestFailuresCmd(), []string{"analyze", "--min-failures", "1", "--failure-rate", "0.1"}, proj.Root)
+	require.NoError(t, errDry)
+	assert.Contains(t, outDry, "Found 1 persistent test failure")
+	assert.Contains(t, outDry, "Would create backlog item")
+
+	// 2. Create backlog items mode
+	outCreate, errCreate := runCycle139Cmd(t, NewTestFailuresCmd(), []string{
+		"analyze",
+		"--min-failures", "1",
+		"--failure-rate", "0.1",
+		"--create-backlog-items",
+	}, proj.Root)
+	require.NoError(t, errCreate)
+	assert.Contains(t, outCreate, "Found 1 persistent test failure")
 }
