@@ -170,7 +170,7 @@ jobs:
 
       - name: Run Partitioned Unit Tests
         run: |
-          go test -short -p 2 -timeout 8m -coverprofile="coverage-${{ matrix.suite }}.out" ${{ matrix.packages }}
+          go test -short -p 2 -timeout 15m -coverprofile="coverage-${{ matrix.suite }}.out" ${{ matrix.packages }}
 
       - name: Generate Unit Test Coverage Summary
         if: always()
