@@ -96,6 +96,9 @@ func (r *ReverseReferenceIndex) LoadCache(projectRoot string) (bool, error) {
 
 // SaveCache saves the cache to disk
 func (r *ReverseReferenceIndex) SaveCache(projectRoot string) error {
+	if projectRoot == emptyValue || isTestProjectRootUnbound(projectRoot) {
+		return nil
+	}
 	saveStart := time.Now()
 	var entryCount int
 	var errCount = r.withReadLock(

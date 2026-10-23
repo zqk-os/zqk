@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"path/filepath"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -18,7 +20,54 @@ const reverseReferencePersistDebounce = 250 * time.Millisecond
 var (
 	revRefBoundRoot    atomic.Value // string
 	revRefPersistTimer atomic.Pointer[time.Timer]
+
+	unboundTestRootsMu sync.RWMutex
+	unboundTestRoots   = make(map[string]struct{})
 )
+
+func forEachTestProjectRootKey(projectRoot string, fn func(key string)) {
+	if projectRoot == emptyValue {
+		return
+	}
+	clean := filepath.Clean(projectRoot)
+	fn(clean)
+	if abs, err := filepath.Abs(clean); err == nil && abs != clean {
+		fn(abs)
+	}
+}
+
+func markTestProjectRootUnbound(projectRoot string) {
+	unboundTestRootsMu.Lock()
+	defer unboundTestRootsMu.Unlock()
+	forEachTestProjectRootKey(projectRoot, func(key string) {
+		unboundTestRoots[key] = struct{}{}
+	})
+}
+
+func isTestProjectRootUnbound(projectRoot string) bool {
+	if projectRoot == emptyValue {
+		return false
+	}
+	clean := filepath.Clean(projectRoot)
+	unboundTestRootsMu.RLock()
+	defer unboundTestRootsMu.RUnlock()
+	if _, ok := unboundTestRoots[clean]; ok {
+		return true
+	}
+	if abs, err := filepath.Abs(clean); err == nil && abs != clean {
+		_, ok := unboundTestRoots[abs]
+		return ok
+	}
+	return false
+}
+
+func unmarkTestProjectRootUnbound(projectRoot string) {
+	unboundTestRootsMu.Lock()
+	defer unboundTestRootsMu.Unlock()
+	forEachTestProjectRootKey(projectRoot, func(key string) {
+		delete(unboundTestRoots, key)
+	})
+}
 
 // BindReverseReferenceIndexProjectRoot ties the global reverse-ref index to a project
 // and loads the on-disk cache if not already ready. Call from storage construction.
@@ -26,6 +75,7 @@ func BindReverseReferenceIndexProjectRoot(projectRoot string) {
 	if projectRoot == emptyValue {
 		return
 	}
+	unmarkTestProjectRootUnbound(projectRoot)
 	revRefBoundRoot.Store(projectRoot)
 	ensureReverseReferenceIndexLoaded(projectRoot)
 }
@@ -96,7 +146,7 @@ func resolveReverseReferenceProjectRoot(projectRoot string) string {
 // the JSON file on every single object write.
 func scheduleReverseReferenceIndexPersist(projectRoot string) {
 	root := resolveReverseReferenceProjectRoot(projectRoot)
-	if root == emptyValue {
+	if root == emptyValue || isTestProjectRootUnbound(root) {
 		return
 	}
 	timerReady := make(chan *time.Timer, 1)
@@ -105,6 +155,12 @@ func scheduleReverseReferenceIndexPersist(projectRoot string) {
 		timerReady <- readyT // put it back for any other readers, though there should be none
 		// Only clear if we are still the scheduled timer; a newer AfterFunc must stay.
 		revRefPersistTimer.CompareAndSwap(readyT, nil)
+		if reverseReferenceBoundProjectRoot() == emptyValue || !isProjectRootEquivalent(reverseReferenceBoundProjectRoot(), root) {
+			return
+		}
+		if isTestProjectRootUnbound(root) {
+			return
+		}
 		index := GetGlobalReverseReferenceIndex()
 		if err := index.SaveCache(root); err != nil {
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
@@ -123,7 +179,7 @@ func scheduleReverseReferenceIndexPersist(projectRoot string) {
 // FlushReverseReferenceIndexPersist runs any pending SaveCache immediately (tests).
 func FlushReverseReferenceIndexPersist() {
 	root := reverseReferenceBoundProjectRoot()
-	if root == emptyValue {
+	if root == emptyValue || isTestProjectRootUnbound(root) {
 		return
 	}
 	index := GetGlobalReverseReferenceIndex()
@@ -139,7 +195,7 @@ func FlushReverseReferenceIndexPersist() {
 
 func afterReverseReferenceIndexMutation() {
 	root := reverseReferenceBoundProjectRoot()
-	if root == emptyValue {
+	if root == emptyValue || isTestProjectRootUnbound(root) {
 		return
 	}
 	ensureReverseReferenceIndexLoaded(root)
@@ -151,7 +207,13 @@ func StopReverseReferenceIndexPersistForTest(projectRoot string) {
 	if old := revRefPersistTimer.Swap(nil); old != nil {
 		_ = old.Stop()
 	}
-	if projectRoot != emptyValue && reverseReferenceBoundProjectRoot() == projectRoot {
+	if projectRoot != emptyValue {
+		markTestProjectRootUnbound(projectRoot)
+		if reverseReferenceBoundProjectRoot() == projectRoot || isProjectRootEquivalent(reverseReferenceBoundProjectRoot(), projectRoot) {
+			revRefBoundRoot.Store(emptyValue)
+		}
+	} else if bound := reverseReferenceBoundProjectRoot(); bound != emptyValue {
+		markTestProjectRootUnbound(bound)
 		revRefBoundRoot.Store(emptyValue)
 	}
 }
