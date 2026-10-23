@@ -1,6 +1,8 @@
 package scheduler
 
 import (
+	"errors"
+	"os"
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
@@ -95,7 +97,13 @@ func WriteReloadConfigRequest(projectRoot string) error {
 		return errfmt.Newf("failed to ensure scheduler dir for reload request").Wrap(err)
 	}
 	path := filepath.Join(dir, ReloadConfigRequestFile)
-	return fileutil.WriteSecureFile(path, nil)
+	if err := fileutil.WriteDurableSecureFile(path, nil); err != nil {
+		if os.IsNotExist(err) || errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
 // ConsumeReloadConfigRequest removes the reload request file if present and returns true if it existed.
