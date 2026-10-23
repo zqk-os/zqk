@@ -120,3 +120,23 @@ func (h *CapOrchestratorHandler) ResumePendingVerificationTasksForTest(ctx conte
 func (h *CapOrchestratorHandler) WakeAgentAndScheduleHourglassForTest(taskID, persona string) {
 	h.wakeAgentAndScheduleHourglass(taskID, persona)
 }
+
+// AutoRecoverPlanTasksForTest exposes autoRecoverPlanTasks for facade package tests.
+func (h *CapOrchestratorHandler) AutoRecoverPlanTasksForTest(ctx context.Context, planID string) error {
+	return h.autoRecoverPlanTasks(ctx, planID)
+}
+
+// ExecuteMetricsStageForTest exposes executeMetricsStage for facade package tests.
+func (h *CapOrchestratorHandler) ExecuteMetricsStageForTest(ctx context.Context, exe string) error {
+	return h.executeMetricsStage(ctx, exe)
+}
+
+// NestPlanWorkstreamsForTest exposes nestPlanWorkstreams for facade package tests.
+func (h *CapOrchestratorHandler) NestPlanWorkstreamsForTest(ctx context.Context, planID string, planObj map[string]any) map[string]map[string]any {
+	return h.nestPlanWorkstreams(ctx, planID, planObj)
+}
+
+// ExecuteSentinelStageForTest exposes executeSentinelStage for facade package tests.
+func (h *CapOrchestratorHandler) ExecuteSentinelStageForTest(ctx context.Context, exe string) error {
+	return h.executeSentinelStage(ctx, exe)
+}
