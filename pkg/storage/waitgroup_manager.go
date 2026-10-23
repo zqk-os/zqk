@@ -2,9 +2,9 @@ package storage
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"sync"
-	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
@@ -176,7 +176,7 @@ func (m *WaitGroupManager) Wait(id string) {
 	waitDone := make(chan struct{})
 	// Use context with timeout for deterministic behavior
 	waitTimeout := 5 * time.Minute
-	if testing.Short() {
+	if f := flag.CommandLine.Lookup("test.short"); f != nil && f.Value.String() == "true" {
 		waitTimeout = 5 * time.Second
 	}
 	waitCtx, waitCancel := context.WithTimeout(pkgctx.NewSystemContext(), waitTimeout)
