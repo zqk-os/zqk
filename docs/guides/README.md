@@ -23,6 +23,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[Declarative Graph Queries (ZPARQL) & Atomic Mutations (ZQL)](./ZQL_ZPARQL_AGENT_GUIDE.md)** | Multi-hop graph traversals, Cypher-like pattern queries, and atomic multi-object ACID transactions. | AI Agents, Backend Devs | `zqk query`, `zqk mutate`, `query_zparql`, `mutate_zql` |
 | **[Object Lifecycle, State Machines & CAS Storage](./OBJECT_LIFECYCLE_AND_CAS_STORAGE_GUIDE.md)** | Schema contracts, Content-Addressed Storage (CAS) membrane, two-phase draft/authoritative isolation, and DoD criteria binding. | All Engineers & Agents | `zqk object create`, `zqk object inspect`, `zqk object promote` |
 | **[CLI Object Subsystem Operational Guide](./CLI_OBJECT_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, CAS storage membrane, two-phase draft plane isolation, and relational query pipelines. | All Engineers & Agents | `zqk object create`, `zqk object get`, `zqk object list`, `zqk object update`, `zqk object delete`, `zqk object promote`, `zqk object demote`, `zqk object ref` |
+| **[Storage Subsystem Operational & Architectural Guide](./STORAGE_SUBSYSTEM_GUIDE.md)** | Foundational persistence engine, Content Addressable Storage (CAS), write-behind audit event buffering, transaction safety, and TSDB engine. | Storage Engineers & Agents | `pkg/storage` |
 
 ---
 
