@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -89,6 +90,11 @@ func NewNotifyCmd() *cobra.Command {
 	notifyCmd.Flags().BoolP("append", "a", true, "Append to log file (default: true)")
 	notifyCmd.Flags().Int("queue-size", 0, "Queue size for buffering (0 = disabled, no queue)")
 	notifyCmd.Flags().String("sort", callbackSortTimestamp, "Sorting strategy: timestamp (oldest first) or priority (highest first)")
+	// Default off: log-only notify stays unchanged for existing public callers.
+	// Seat workers pass --stamp-mesh-status so hourglass completion is visible
+	// without undirected wake → inbox_unacked floods.
+	notifyCmd.Flags().Bool("stamp-mesh-status", false, "After logging, stamp undirected mesh_status on the agent feed (hourglass observability; does not fill inbox_unacked)")
+	notifyCmd.Flags().String("clear-inflight", "", "Remove this inflight lock file after a successful log write (agent-commit / hourglass)")
 
 	cli.AddCommonFlags(notifyCmd)
 	return notifyCmd
@@ -107,6 +113,8 @@ func handleCallback(cliCtx *cli.Context, cmd *cobra.Command) error {
 	appendMode, _ := cmd.Flags().GetBool("append")
 	queueSize, _ := cmd.Flags().GetInt("queue-size")
 	sortStrategy, _ := cmd.Flags().GetString("sort")
+	stampMesh, _ := cmd.Flags().GetBool("stamp-mesh-status")
+	clearInflight, _ := cmd.Flags().GetString("clear-inflight")
 
 	// Determine log file location
 	if logFile == emptyValue {
@@ -179,11 +187,33 @@ func handleCallback(cliCtx *cli.Context, cmd *cobra.Command) error {
 		if err := processor.Enqueue(payload); err != nil {
 			return errfmt.Newf("failed to enqueue callback").Wrap(err)
 		}
-
+		maybeStampSchedulerMeshStatus(stampMesh, projectRoot, payload)
+		maybeClearInflight(clearInflight)
 		// Queue processing happens in background
 		return nil
 	}
 
 	// No queue - process directly
-	return processor.ProcessDirect(projectRoot, logFile, appendMode, payload, format)
+	if err := processor.ProcessDirect(projectRoot, logFile, appendMode, payload, format); err != nil {
+		return err
+	}
+	maybeStampSchedulerMeshStatus(stampMesh, projectRoot, payload)
+	maybeClearInflight(clearInflight)
+	return nil
+}
+
+// maybeStampSchedulerMeshStatus is best-effort: durable log already succeeded.
+func maybeStampSchedulerMeshStatus(enabled bool, projectRoot string, payload map[string]any) {
+	if !enabled {
+		return
+	}
+	_ = stampSchedulerCallbackMeshStatus(projectRoot, payload)
+}
+
+func maybeClearInflight(path string) {
+	path = strings.TrimSpace(path)
+	if path == "" {
+		return
+	}
+	_ = os.Remove(path)
 }

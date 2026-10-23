@@ -25,7 +25,9 @@ type leadPlanDispatch struct {
 }
 
 func schedulerCallbackNotify(cli, logFile string) string {
-	return cli + " callback notify --log-file " + logFile
+	// --stamp-mesh-status: undirected mesh_status (not wake) so hourglass
+	// completion is visible without flooding inbox_unacked.
+	return cli + " callback notify --stamp-mesh-status --log-file " + logFile
 }
 
 func fillSubmitMarkPath(root, kind string) string {

@@ -9,6 +9,9 @@ description: |-
     - Account-based: Automatically determined from current account (default)
     - Custom: Specified via --log-file flag
 
+    Optional --stamp-mesh-status appends an undirected mesh_status feed event after
+    the log write (hourglass observability without inbox_unacked wake floods).
+
     The command is designed to be used as a callback handler:
       %s scheduler submit "command" --callback-completion "%s callback notify"
 
@@ -23,5 +26,7 @@ description: |-
       zqk callback notify --format jsonl --log-file event-log.json < callback-payload.json
       Use custom log file with text format
       zqk callback notify --log-file /tmp/job-results.log < callback-payload.json
+      Log + mesh_status stamp (seat-worker hourglass)
+      zqk callback notify --stamp-mesh-status --log-file /tmp/job-results.log < callback-payload.json
       Use as callback in scheduler submit with JSONL format
       zqk scheduler submit "echo test" --callback-completion "zqk callback notify --format jsonl"
