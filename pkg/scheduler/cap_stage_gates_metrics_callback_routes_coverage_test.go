@@ -51,7 +51,7 @@ func TestExtended_CapStageGates_Transitions(t *testing.T) {
 	h.clearGroomingPlannedZeroLatch()
 
 	// 3. Quarantine helpers
-	pending := capStagePending{
+	pending := CapStagePending{
 		Stage:           "plan",
 		PlanID:          "PRI-1",
 		FailureAttempts: capStageMaxAttempts + 1,

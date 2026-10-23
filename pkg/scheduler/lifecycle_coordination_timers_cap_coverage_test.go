@@ -1,10 +1,10 @@
 package scheduler
 
 import (
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"bytes"
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -348,7 +348,7 @@ func TestExtended_CapStageGates(t *testing.T) {
 		t.Fatalf("expected valid state file data: %v", err)
 	}
 
-	pending := capStagePending{Stage: "metrics", FailureAttempts: 7}
+	pending := CapStagePending{Stage: "metrics", FailureAttempts: 7}
 	if !capStageAttemptExhausted(pending) {
 		t.Fatal("expected exhausted")
 	}
@@ -805,7 +805,7 @@ func TestExtended_CleanupConfig(t *testing.T) {
 	cch := h.(*CleanupConfigHandler)
 
 	f1 := filepath.Join(tmpDir, "file1.tmp")
-	_ = os.WriteFile(f1, []byte("data"), 0644)
+	_ = fileutil.WriteFile(f1, []byte("data"), 0644)
 	err = cch.runDeleteFiles(tmpDir, map[string]any{
 		"path":     tmpDir,
 		"patterns": []any{"*.tmp"},
@@ -815,7 +815,7 @@ func TestExtended_CleanupConfig(t *testing.T) {
 	}
 
 	f2 := filepath.Join(tmpDir, "file2.log")
-	_ = os.WriteFile(f2, []byte("large file content\nsecond line\n"), 0644)
+	_ = fileutil.WriteFile(f2, []byte("large file content\nsecond line\n"), 0644)
 	err = cch.runTruncateFiles(tmpDir, map[string]any{
 		"path":            f2,
 		"keep_last_lines": 1,

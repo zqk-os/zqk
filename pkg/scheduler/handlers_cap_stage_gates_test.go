@@ -28,7 +28,7 @@ func TestMaybeWakeOnStageHold_WakesAfterHoldWindow(t *testing.T) {
 		},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_orchestrating",
 		EnteredAt: time.Now().UTC().Add(-45 * time.Minute).Format(time.RFC3339),
 		PlanID:    "PRI-TEST",
@@ -66,7 +66,7 @@ func TestMaybeWakeOnStageHold_SkipsFreshHold(t *testing.T) {
 		objects.KindConvergenceSession: {{objects.FieldKeyID: "CVS-1", objects.FieldKeyStatus: objects.ObjectStatusActive}},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_orchestrating",
 		EnteredAt: time.Now().UTC().Add(-5 * time.Minute).Format(time.RFC3339),
 		PlanID:    "PRI-TEST",
@@ -91,7 +91,7 @@ func TestMaybeAdvanceCAPStage_GroomingHoldsWithoutArtifacts(t *testing.T) {
 		},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_grooming",
 		EnteredAt: time.Now().UTC().Add(-time.Minute).Format(time.RFC3339),
 		PlanID:    "PLN-1",
@@ -127,7 +127,7 @@ func TestMaybeAdvanceCAPStage_GroomingAdvancesOnGraphMutation(t *testing.T) {
 		},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_grooming",
 		EnteredAt: entered,
 		PlanID:    "PLN-1",
@@ -155,7 +155,7 @@ func TestMaybeAdvanceCAPStage_UnboundCVSHolds(t *testing.T) {
 		objects.KindConvergenceSession: {},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_grooming",
 		EnteredAt: time.Now().UTC().Format(time.RFC3339),
 		PlanID:    "PLN-1",
@@ -175,7 +175,7 @@ func TestMaybeAdvanceCAPStage_ForgeReceiptRejected(t *testing.T) {
 		objects.KindConvergenceSession: {{objects.FieldKeyID: "CVS-1", objects.FieldKeyStatus: objects.ObjectStatusActive}},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_orchestrating",
 		EnteredAt: time.Now().UTC().Add(-time.Minute).Format(time.RFC3339),
 		CvsID:     "CVS-1",
@@ -200,7 +200,7 @@ func TestDispatchDeliveryComplete_OpenATKInsufficient(t *testing.T) {
 		objects.KindBacklogItem: {},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_orchestrating",
 		EnteredAt: time.Now().UTC().Add(-time.Minute).Format(time.RFC3339),
 		CvsID:     "CVS-1",
@@ -225,7 +225,7 @@ func TestDispatchDeliveryComplete_InProgressBacklogInsufficient(t *testing.T) {
 		},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_orchestrating",
 		EnteredAt: time.Now().UTC().Add(-time.Minute).Format(time.RFC3339),
 		CvsID:     "CVS-1",
@@ -247,7 +247,7 @@ func TestDispatchDeliveryComplete_ImplementedATKCounts(t *testing.T) {
 		objects.KindBacklogItem: {},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_design",
 		EnteredAt: time.Now().UTC().Add(-time.Minute).Format(time.RFC3339),
 		CvsID:     "CVS-1",
@@ -261,10 +261,10 @@ func TestDispatchDeliveryComplete_ImplementedATKCounts(t *testing.T) {
 func TestCAPStageAttemptCeiling(t *testing.T) {
 	t.Parallel()
 
-	if capStageAttemptExhausted(capStagePending{FailureAttempts: capStageMaxAttempts}) {
+	if capStageAttemptExhausted(CapStagePending{FailureAttempts: capStageMaxAttempts}) {
 		t.Fatal("attempt ceiling should allow the final bounded attempt")
 	}
-	if !capStageAttemptExhausted(capStagePending{FailureAttempts: capStageMaxAttempts + 1}) {
+	if !capStageAttemptExhausted(CapStagePending{FailureAttempts: capStageMaxAttempts + 1}) {
 		t.Fatal("attempt ceiling should quarantine after the bounded attempts are exhausted")
 	}
 }
@@ -279,7 +279,7 @@ func TestMarkStageEnteredResetsQuarantineAfterRetryWindow(t *testing.T) {
 		},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_review",
 		EnteredAt: time.Now().UTC().Add(-time.Hour).Format(time.RFC3339),
 		PlanID:    "PRI-CAP",
@@ -317,7 +317,7 @@ func TestMarkStageEnteredResetsQuarantineWhenCVSScopeChanges(t *testing.T) {
 		},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:     "cap_stage_review",
 		EnteredAt: time.Now().UTC().Add(-time.Hour).Format(time.RFC3339),
 		PlanID:    "PRI-CAP",
@@ -363,7 +363,7 @@ func TestClearCAPStageFailureAttemptsPreservesEntryWatermark(t *testing.T) {
 	root := t.TempDir()
 	h := NewCapOrchestratorHandler(&mockCapStorage{}, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
 	enteredAt := time.Now().UTC().Add(-time.Hour).Format(time.RFC3339)
-	h.writeStateFile(capStagePendingFile, capStagePending{
+	h.writeStateFile(CapStagePendingFile, CapStagePending{
 		Stage:           "cap_stage_review",
 		EnteredAt:       enteredAt,
 		Attempts:        12,
@@ -386,7 +386,7 @@ func TestCAPStageQuarantineActiveRequiresMatchingScope(t *testing.T) {
 
 	root := t.TempDir()
 	h := NewCapOrchestratorHandler(&mockCapStorage{}, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	pending := capStagePending{Stage: "cap_stage_review", PlanID: "PRI-CAP", CvsID: "CVS-1"}
+	pending := CapStagePending{Stage: "cap_stage_review", PlanID: "PRI-CAP", CvsID: "CVS-1"}
 	h.writeStateFile(capQuarantineFile, map[string]any{
 		"stage":        pending.Stage,
 		capFieldPlanID: pending.PlanID,
@@ -418,7 +418,7 @@ func TestCapCycleTamperDetected(t *testing.T) {
 		objects.KindConvergenceSession: {{objects.FieldKeyID: "CVS-1", objects.FieldKeyStatus: objects.ObjectStatusActive}},
 	}}
 	h := NewCapOrchestratorHandler(mStorage, root, logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).(*CapOrchestratorHandler)
-	h.writeStateFile(capStagePendingFile, capStagePending{Stage: "cap_stage_metrics", EnteredAt: time.Now().UTC().Format(time.RFC3339), CvsID: "CVS-1"})
+	h.writeStateFile(CapStagePendingFile, CapStagePending{Stage: "cap_stage_metrics", EnteredAt: time.Now().UTC().Format(time.RFC3339), CvsID: "CVS-1"})
 	err := h.maybeAdvanceCAPStage(context.Background(), "cap_stage_metrics")
 	if err == nil || !strings.Contains(err.Error(), "tamper") {
 		t.Fatalf("expected tamper hold, got %v", err)
@@ -637,7 +637,7 @@ func TestRefreshPendingBoundCVS_RebindsTerminal(t *testing.T) {
 			},
 		},
 	}
-	pending := capStagePending{
+	pending := CapStagePending{
 		Stage:  "cap_stage_grooming",
 		PlanID: "PRI-123",
 		CvsID:  "CVS-OLD",

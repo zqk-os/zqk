@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	capStagePendingFile   = "cap_stage_pending.json"
+	CapStagePendingFile   = "cap_stage_pending.json"
 	capStageReceiptFile   = "cap_stage_receipt.json"
 	capReviewResultFile   = "cap_review_result.json"
 	capHoldWakeFile       = "cap_hold_wake.json"
@@ -46,9 +46,9 @@ const (
 	capHoldWakePeriod = 30 * time.Minute
 )
 
-// capStagePending records when the current CAP stage began so delivery
+// CapStagePending records when the current CAP stage began so delivery
 // evidence can be measured against entry time (not against AGI create alone).
-type capStagePending struct {
+type CapStagePending struct {
 	Stage           string `json:"stage"`
 	EnteredAt       string `json:"entered_at"`
 	PlanID          string `json:"plan_id,omitempty"`
@@ -74,7 +74,7 @@ func (h *CapOrchestratorHandler) legacyCapStatePath(name string) string {
 
 func (h *CapOrchestratorHandler) markStageEntered(stage, planID string) {
 	now := time.Now().UTC()
-	pending := capStagePending{
+	pending := CapStagePending{
 		Stage:         stage,
 		EnteredAt:     now.Format(time.RFC3339),
 		PlanID:        planID,
@@ -107,7 +107,7 @@ func (h *CapOrchestratorHandler) markStageEntered(stage, planID string) {
 		pending.LastAttemptAt = pending.EnteredAt
 		h.clearCAPStageQuarantine()
 	}
-	h.writeStateFile(capStagePendingFile, pending)
+	h.writeStateFile(CapStagePendingFile, pending)
 }
 
 func (h *CapOrchestratorHandler) clearGroomingPlannedZeroLatch() {
@@ -117,14 +117,14 @@ func (h *CapOrchestratorHandler) clearGroomingPlannedZeroLatch() {
 
 // groomingPlannedZeroExhausted is true after N cap_stage_grooming ticks with
 // planned=0 (CRIT-CEF-R26-REMAINING-KINDS-001). Callers must skip Create+wake.
-func (h *CapOrchestratorHandler) groomingPlannedZeroExhausted(planned int) (capStagePending, bool) {
+func (h *CapOrchestratorHandler) groomingPlannedZeroExhausted(planned int) (CapStagePending, bool) {
 	if planned > 0 {
 		h.clearGroomingPlannedZeroLatch()
-		return capStagePending{}, false
+		return CapStagePending{}, false
 	}
 	pending, err := h.readPendingStage()
 	if err != nil || pending.Stage != "cap_stage_grooming" {
-		return capStagePending{}, false
+		return CapStagePending{}, false
 	}
 	if pending.Attempts <= capGroomingPlannedZeroMaxTicks {
 		return pending, false
@@ -132,11 +132,11 @@ func (h *CapOrchestratorHandler) groomingPlannedZeroExhausted(planned int) (capS
 	return pending, true
 }
 
-func capStageAttemptExhausted(pending capStagePending) bool {
+func capStageAttemptExhausted(pending CapStagePending) bool {
 	return pending.FailureAttempts > capStageMaxAttempts
 }
 
-func (h *CapOrchestratorHandler) quarantineCAPStage(pending capStagePending) {
+func (h *CapOrchestratorHandler) quarantineCAPStage(pending CapStagePending) {
 	h.writeStateFile(capQuarantineFile, map[string]any{
 		"stage":                           pending.Stage,
 		capFieldPlanID:                    pending.PlanID,
@@ -150,7 +150,7 @@ func (h *CapOrchestratorHandler) quarantineCAPStage(pending capStagePending) {
 	})
 }
 
-func (h *CapOrchestratorHandler) readQuarantineMatch(pending capStagePending) (quarantine map[string]any, fileFound bool, matches bool) {
+func (h *CapOrchestratorHandler) readQuarantineMatch(pending CapStagePending) (quarantine map[string]any, fileFound bool, matches bool) {
 	raw, err := h.readStateFile(capQuarantineFile)
 	if err != nil {
 		return nil, false, false
@@ -169,7 +169,7 @@ func (h *CapOrchestratorHandler) readQuarantineMatch(pending capStagePending) (q
 // fresh bounded attempt window. Scope changes reset immediately; otherwise the
 // retry window opens after capStageQuarantineRetryAfter. Malformed legacy state
 // is reset rather than wedging CAP forever.
-func (h *CapOrchestratorHandler) capStageQuarantineRetryReady(pending capStagePending, now time.Time) bool {
+func (h *CapOrchestratorHandler) capStageQuarantineRetryReady(pending CapStagePending, now time.Time) bool {
 	quarantine, fileFound, matches := h.readQuarantineMatch(pending)
 	if !fileFound {
 		return false
@@ -190,7 +190,7 @@ func (h *CapOrchestratorHandler) clearCAPStageQuarantine() {
 	_ = fileutil.RemoveFile(h.legacyCapStatePath(capQuarantineFile))
 }
 
-func (h *CapOrchestratorHandler) capStageQuarantineActive(pending capStagePending) bool {
+func (h *CapOrchestratorHandler) capStageQuarantineActive(pending CapStagePending) bool {
 	_, fileFound, matches := h.readQuarantineMatch(pending)
 	return fileFound && matches
 }
@@ -204,7 +204,7 @@ func (h *CapOrchestratorHandler) clearCAPStageFailureAttempts(stage string) {
 		return
 	}
 	pending.FailureAttempts = 0
-	h.writeStateFile(capStagePendingFile, pending)
+	h.writeStateFile(CapStagePendingFile, pending)
 }
 
 func (h *CapOrchestratorHandler) recordCAPStageFailureAttempt(stage string) {
@@ -213,36 +213,36 @@ func (h *CapOrchestratorHandler) recordCAPStageFailureAttempt(stage string) {
 		return
 	}
 	pending.FailureAttempts++
-	h.writeStateFile(capStagePendingFile, pending)
+	h.writeStateFile(CapStagePendingFile, pending)
 }
 
-func (h *CapOrchestratorHandler) readPendingStage() (capStagePending, error) {
-	raw, err := h.readStateFile(capStagePendingFile)
+func (h *CapOrchestratorHandler) readPendingStage() (CapStagePending, error) {
+	raw, err := h.readStateFile(CapStagePendingFile)
 	if err != nil {
-		return capStagePending{}, err
+		return CapStagePending{}, err
 	}
 	switch v := raw.(type) {
 	case map[string]any:
 		b, _ := json.Marshal(v)
-		var p capStagePending
+		var p CapStagePending
 		if err := json.Unmarshal(b, &p); err != nil {
-			return capStagePending{}, err
+			return CapStagePending{}, err
 		}
 		return p, nil
 	case string:
-		var p capStagePending
+		var p CapStagePending
 		if err := json.Unmarshal([]byte(v), &p); err != nil {
-			return capStagePending{}, err
+			return CapStagePending{}, err
 		}
 		return p, nil
 	default:
 		b, err := json.Marshal(v)
 		if err != nil {
-			return capStagePending{}, err
+			return CapStagePending{}, err
 		}
-		var p capStagePending
+		var p CapStagePending
 		if err := json.Unmarshal(b, &p); err != nil {
-			return capStagePending{}, err
+			return CapStagePending{}, err
 		}
 		return p, nil
 	}
@@ -319,7 +319,7 @@ func (h *CapOrchestratorHandler) resolveBoundCVS(ctx context.Context, planID str
 // refreshPendingBoundCVS rebinds pending.CvsID when the stored id is missing or terminal
 // (completed/abandoned/…); otherwise CAP forever journals against a dead session.
 // TRACK: CAP ops / stale pending CVS.
-func (h *CapOrchestratorHandler) refreshPendingBoundCVS(ctx context.Context, pending *capStagePending) (rewrote bool) {
+func (h *CapOrchestratorHandler) refreshPendingBoundCVS(ctx context.Context, pending *CapStagePending) (rewrote bool) {
 	if pending == nil {
 		return false
 	}
@@ -666,10 +666,10 @@ func (h *CapOrchestratorHandler) stateFileFresh(name, maxAgeHint string) bool {
 	return time.Since(fi.ModTime()) <= maxAge
 }
 
-func (h *CapOrchestratorHandler) readPendingAndResolveBoundCVS(ctx context.Context) (capStagePending, string, string) {
+func (h *CapOrchestratorHandler) readPendingAndResolveBoundCVS(ctx context.Context) (CapStagePending, string, string) {
 	pending, _ := h.readPendingStage()
 	if h.refreshPendingBoundCVS(ctx, &pending) {
-		h.writeStateFile(capStagePendingFile, pending)
+		h.writeStateFile(CapStagePendingFile, pending)
 	}
 	cvsID := pending.CvsID
 	focus := pending.FocusChildCvsID
