@@ -774,5 +774,3 @@ func TestCycle121_MoveAndPolicyStudio(t *testing.T) {
 	_, err = executeObjectCommand(t, tempDir, provider, "move", "BLI-MOVE-001", "--kind", "nonexistent_xyz")
 	assert.Error(t, err)
 }
-
-
