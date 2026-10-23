@@ -16,11 +16,13 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestSystemHygieneProvider(t *testing.T) {
-	tmpDir := t.TempDir()
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	tmpDir := env.Root
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, ".zqk", "state"), 0755))
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, ".zqk", "tmp"), 0755))
 
@@ -130,7 +132,8 @@ func TestLogSweepSummary(t *testing.T) {
 }
 
 func TestStewardDaemonCmdLifecycle(t *testing.T) {
-	tmpDir := t.TempDir()
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	tmpDir := env.Root
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, ".zqk", "state"), 0755))
 
 	// 1. Cancelled context shuts down cleanly
@@ -146,16 +149,17 @@ func TestStewardDaemonCmdLifecycle(t *testing.T) {
 	// 2. Already running lock held by singleton
 	release, err := singleton.Guard(tmpDir, "steward")
 	require.NoError(t, err)
-	defer release()
 
 	cmd2 := newStewardDaemonCmd()
 	cli.SetContext(cmd2, cli.ContextForProjectRoot(tmpDir))
 	err = cmd2.ExecuteContext(context.Background())
 	assert.NoError(t, err)
+	release()
 }
 
 func TestStewardSweepCmdExecution(t *testing.T) {
-	tmpDir := t.TempDir()
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	tmpDir := env.Root
 	require.NoError(t, fileutil.MkdirAll(filepath.Join(tmpDir, ".zqk", "state"), 0755))
 
 	cmd := newStewardSweepCmd()

@@ -317,6 +317,12 @@ func (f *FileObjectStorage) Shutdown(ctx context.Context) error {
 	return f.cachedShutdownErr
 }
 
+// Close shuts down the file object storage, releasing WAL, queues, and background workers.
+// It implements io.Closer.
+func (f *FileObjectStorage) Close() error {
+	return f.Shutdown(context.Background())
+}
+
 func (f *FileObjectStorage) shutdownInternal(ctx context.Context) error {
 	if f.projectRoot != emptyValue {
 		pending := caspkg.GetCASPendingVisibilityCache(f.projectRoot)

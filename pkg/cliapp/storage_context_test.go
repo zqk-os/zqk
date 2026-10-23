@@ -81,6 +81,13 @@ func TestStorageContext_ProviderLifecycleAndCache(t *testing.T) {
 		t.Errorf("expected registered mockP for root, got ok=%v", ok)
 	}
 
+	UnregisterStorageForProjectRoot(testRoot)
+	if _, ok := GetObjectStorageForProjectRoot(testRoot); ok {
+		t.Errorf("expected ok=false after UnregisterStorageForProjectRoot")
+	}
+	UnregisterStorageForProjectRoot("")
+	RegisterStorageForProjectRoot(testRoot, mockP)
+
 	// GetObjectStorageForCommand with provider in cmd context
 	cmd := pkgcli.NewCommandBuilder("test").Build()
 	cmd.SetContext(ctxWithP)
