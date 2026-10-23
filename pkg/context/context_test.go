@@ -68,6 +68,9 @@ func TestActorIDForAttribution(t *testing.T) {
 	if !IsSystemAccount("system") || !IsSystemAccount("account:system") || !IsSystemAccount(SystemAccountID) {
 		t.Error("retired system aliases and SystemAccountID must count as the system actor")
 	}
+	if !IsSystemAccount(LegacyStudioSystemAccountID) {
+		t.Error("legacy studio system account must count as the system actor")
+	}
 }
 
 func TestNewSystemSecurityContext(t *testing.T) {

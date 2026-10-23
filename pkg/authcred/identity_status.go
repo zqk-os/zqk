@@ -46,7 +46,7 @@ func ClassifyLane(secCtx *pkgctx.SecurityContext) string {
 	if secCtx == nil {
 		return ""
 	}
-	if secCtx.AccountID == pkgctx.SystemAccountID || slices.Contains(secCtx.Roles, "admin") {
+	if pkgctx.IsSystemAccount(secCtx.AccountID) || slices.Contains(secCtx.Roles, "admin") {
 		return LaneAdmin
 	}
 	if MayOrchestratePeers(secCtx) {

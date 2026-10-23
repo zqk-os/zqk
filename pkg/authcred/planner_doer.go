@@ -68,7 +68,7 @@ func HasWriteCode(secCtx *pkgctx.SecurityContext) bool {
 	if secCtx == nil {
 		return false
 	}
-	if slices.Contains(secCtx.Roles, "admin") || secCtx.AccountID == pkgctx.SystemAccountID {
+	if slices.Contains(secCtx.Roles, "admin") || pkgctx.IsSystemAccount(secCtx.AccountID) {
 		return true
 	}
 	for _, p := range secCtx.Permissions {
@@ -84,7 +84,7 @@ func MayOrchestratePeers(secCtx *pkgctx.SecurityContext) bool {
 	if secCtx == nil {
 		return false
 	}
-	if secCtx.AccountID == pkgctx.SystemAccountID || slices.Contains(secCtx.Roles, "admin") {
+	if pkgctx.IsSystemAccount(secCtx.AccountID) || slices.Contains(secCtx.Roles, "admin") {
 		return true
 	}
 	for _, p := range secCtx.Permissions {

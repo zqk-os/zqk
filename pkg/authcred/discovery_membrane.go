@@ -64,7 +64,7 @@ func ResolveDiscoveryLane(secCtx *pkgctx.SecurityContext) DiscoveryLane {
 	if secCtx == nil {
 		return DiscoveryLaneFull
 	}
-	if secCtx.AccountID == pkgctx.SystemAccountID ||
+	if pkgctx.IsSystemAccount(secCtx.AccountID) ||
 		slices.Contains(secCtx.Roles, "admin") ||
 		slices.Contains(secCtx.Roles, "owner") ||
 		HasExactPermission(secCtx, "write:*") {
