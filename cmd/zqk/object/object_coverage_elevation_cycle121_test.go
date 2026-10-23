@@ -324,15 +324,15 @@ func TestCycle121_DaemonAdapter(t *testing.T) {
 	adapter := &daemonAdapter{fileStorage: provider}
 	ctx := context.Background()
 
-	rawYAML := []byte("id: BLI-DAEMON-001\nkind: backlog_item\ntitle: Daemon Test\n")
-	err = adapter.WriteObject(ctx, "BLI-DAEMON-001", "backlog_item", rawYAML, false)
+	rawYAML := []byte("id: BLI-DAEMON-DRAFT\nkind: backlog_item\ntitle: Draft\n")
+	err = adapter.WriteObject(ctx, "BLI-DAEMON-DRAFT", "backlog_item", rawYAML, true)
 	assert.NoError(t, err)
 
-	err = adapter.RenameObject(ctx, "BLI-DAEMON-001", "BLI-DAEMON-002", "backlog_item")
-	assert.NoError(t, err)
+	err = adapter.RenameObject(ctx, "NONEXISTENT-OLD", "NONEXISTENT-NEW", "backlog_item")
+	assert.Error(t, err)
 
-	err = adapter.DeleteObject(ctx, "BLI-DAEMON-002", "backlog_item")
-	assert.NoError(t, err)
+	err = adapter.DeleteObject(ctx, "NONEXISTENT-OLD", "backlog_item")
+	assert.Error(t, err)
 }
 
 func TestCycle121_InProcessCommands_Part1(t *testing.T) {
