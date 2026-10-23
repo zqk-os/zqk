@@ -50,6 +50,8 @@ func TestSchedulerRuntimeLogEvents_wirePrefixes(t *testing.T) {
 		LogEventSchedulerLifecycleReloadJobsFailed,
 		LogEventSchedulerLifecycleConfigReloadCLIRequested,
 		LogEventSchedulerLifecycleLoadConfigWatchFailed,
+		LogEventSchedulerLifecycleConfigWatchFsnotifyFailed,
+		LogEventSchedulerLifecycleConfigWatchFsnotifyError,
 		LogEventSchedulerLifecycleConfigUpdated,
 		LogEventSchedulerLifecycleRescheduleAfterUnpauseFailed,
 		LogEventSchedulerLifecycleTimerJobsRescheduledFlowing,
