@@ -126,6 +126,14 @@ func newStewardDaemonCmd() *cobra.Command {
 		ticker := time.NewTicker(time.Duration(intervalSec) * time.Second)
 		defer ticker.Stop()
 
+		// If context is already cancelled, shut down cleanly before running sweeps
+		select {
+		case <-ctx.Done():
+			logging.Fluent(logger).Info("Kernel steward daemon shutting down").Log()
+			return nil
+		default:
+		}
+
 		// Run initial sweep on boot
 		sweep, err := daemon.ExecuteSweep(ctx)
 		if err != nil {

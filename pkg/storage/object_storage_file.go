@@ -303,6 +303,11 @@ func (f *FileObjectStorage) GetLifecycleLoader() *objects.LifecycleLoader {
 	return f.lifecycleLoader
 }
 
+// Close implements io.Closer by delegating to Shutdown with a background context.
+func (f *FileObjectStorage) Close() error {
+	return f.Shutdown(context.Background())
+}
+
 // Shutdown signals and drains all unregistered hash registries (those created with
 // skipHashRegistryShutdownRegistration). Call this from test cleanup so background
 // save workers finish transactional work and exit, avoiding goroutine leaks and timeouts.

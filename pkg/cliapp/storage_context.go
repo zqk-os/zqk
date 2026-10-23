@@ -74,6 +74,18 @@ func RegisterStorageForProjectRoot(projectRoot string, provider storage.ObjectSt
 	storageCacheMu.Unlock()
 }
 
+// UnregisterStorageForProjectRoot removes the cached storage provider for the given project root.
+func UnregisterStorageForProjectRoot(projectRoot string) {
+	if projectRoot == emptyValue {
+		return
+	}
+	storageCacheMu.Lock()
+	if storageCache != nil {
+		delete(storageCache, projectRoot)
+	}
+	storageCacheMu.Unlock()
+}
+
 // GetObjectStorageForProjectRoot returns the cached storage provider for the given project root, if any.
 // Used by lifecycle hook handlers (e.g. priority-plan-complete updater) that run without a command.
 // Returns (nil, false) when no storage is cached for that root (e.g. one-shot CLI that has not created storage yet).

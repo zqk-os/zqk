@@ -58,6 +58,8 @@ func setupOrgCliWorkspace(t *testing.T) (string, storage.ObjectStorageProvider, 
 	}
 
 	cleanup := func() {
+		_ = store.Close()
+		cli.UnregisterStorageForProjectRoot(testRoot)
 		_ = fileutil.Chdir(origDir)
 	}
 	t.Cleanup(cleanup)
