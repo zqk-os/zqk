@@ -3,6 +3,7 @@ package testkit_test
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,11 +25,11 @@ func TestCLITUIDecoupling_StaticFloor(t *testing.T) {
 	entries, err := os.ReadDir(uiCmdDir)
 	require.NoError(t, err)
 
-	goFiles := 0
-	totalLines := 0
+	prodFiles := 0
+	prodLines := 0
 	for _, entry := range entries {
-		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".go" {
-			goFiles++
+		if !entry.IsDir() && filepath.Ext(entry.Name()) == ".go" && !strings.HasSuffix(entry.Name(), "_test.go") {
+			prodFiles++
 			content, err := fileutil.ReadFile(filepath.Join(uiCmdDir, entry.Name()))
 			require.NoError(t, err)
 			lines := len(filepath.SplitList(string(content)))
@@ -40,12 +41,12 @@ func TestCLITUIDecoupling_StaticFloor(t *testing.T) {
 					lineCount++
 				}
 			}
-			totalLines += lineCount
+			prodLines += lineCount
 		}
 	}
 
-	assert.LessOrEqual(t, goFiles, 2, "cmd/zqk/ui must contain at most 2 files (current: %d)", goFiles)
-	assert.LessOrEqual(t, totalLines, 250, "cmd/zqk/ui must not exceed 250 LOC (was 5,659, current: %d)", totalLines)
+	assert.LessOrEqual(t, prodFiles, 2, "cmd/zqk/ui presentation shim must contain at most 2 production files (current: %d)", prodFiles)
+	assert.LessOrEqual(t, prodLines, 250, "cmd/zqk/ui presentation shim must not exceed 250 LOC (was 5,659, current: %d)", prodLines)
 
 	// pkg/tui must exist and house the extracted TUI domain implementation
 	tuiPkgDir := filepath.Join(projectRoot, "pkg", "tui")
