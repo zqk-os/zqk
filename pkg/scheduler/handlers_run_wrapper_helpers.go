@@ -147,6 +147,11 @@ func (h *RunWrapperHandler) isTestCommand(command string, args []string) bool {
 	return DefaultTestCommandDetector().IsTestCommand(command, args)
 }
 
+// IsTestCommandForTest exposes isTestCommand for facade package tests.
+func (h *RunWrapperHandler) IsTestCommandForTest(command string, args []string) bool {
+	return h.isTestCommand(command, args)
+}
+
 // sanitizeTestOutput removes test framework output from command output
 // This prevents test output pollution in logs (=== RUN, --- PASS, --- FAIL, etc.)
 func (h *RunWrapperHandler) sanitizeTestOutput(output string) string {
@@ -227,6 +232,11 @@ func (h *RunWrapperHandler) extractTestInfo(args []string) (testName, packageNam
 	}
 
 	return testName, packageName
+}
+
+// ExtractTestInfoForTest exposes extractTestInfo for facade package tests.
+func (h *RunWrapperHandler) ExtractTestInfoForTest(args []string) (testName, packageName string) {
+	return h.extractTestInfo(args)
 }
 
 // isShellScriptPath reports whether command looks like a path to a shell script

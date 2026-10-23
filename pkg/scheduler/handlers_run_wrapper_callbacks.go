@@ -88,6 +88,11 @@ func resolveJobCallbackTarget(job *ScheduledJob, callbackType string, payload ma
 	return callbackURL, cbType, payload, true
 }
 
+// ExecuteCallbackForTest exposes executeCallback for facade package tests.
+func (h *RunWrapperHandler) ExecuteCallbackForTest(ctx context.Context, job *ScheduledJob, callbackType string, payload map[string]any) {
+	h.executeCallback(ctx, job, callbackType, payload)
+}
+
 // executeCallback executes a callback hook (webhook, command, or event)
 // Callbacks are routed through the transceiver async router for queued, non-blocking execution
 func (h *RunWrapperHandler) executeCallback(ctx context.Context, job *ScheduledJob, callbackType string, payload map[string]any) {
