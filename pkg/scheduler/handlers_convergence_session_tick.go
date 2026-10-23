@@ -54,6 +54,33 @@ func NewConvergenceSessionTickHandler(storage storagepkg.ObjectStorageProvider, 
 	}
 }
 
+// ProjectRoot returns the handler project root (health.jsonl / outcome paths).
+// Facade accessor for studio EvaluationSurfaceAdapter.
+func (h *ConvergenceSessionTickHandler) ProjectRoot() string {
+	if h == nil {
+		return ""
+	}
+	return h.projectRoot
+}
+
+// Logger returns the handler logger.
+// Facade accessor for studio EvaluationSurfaceAdapter.
+func (h *ConvergenceSessionTickHandler) Logger() logging.Logger {
+	if h == nil {
+		return nil
+	}
+	return h.logger
+}
+
+// Storage returns the handler object storage provider.
+// Facade accessor for studio EvaluationSurfaceAdapter.
+func (h *ConvergenceSessionTickHandler) Storage() storagepkg.ObjectStorageProvider {
+	if h == nil {
+		return nil
+	}
+	return h.storage
+}
+
 // Execute runs one measure-and-update cycle for the configured CVS id.
 func (h *ConvergenceSessionTickHandler) Execute(ctx context.Context, job *ScheduledJob) error {
 	if h == nil || job == nil {

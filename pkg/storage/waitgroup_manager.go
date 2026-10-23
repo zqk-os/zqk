@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"sync"
 	"time"
@@ -174,7 +175,11 @@ func (m *WaitGroupManager) Wait(id string) {
 	startTime := time.Now()
 	waitDone := make(chan struct{})
 	// Use context with timeout for deterministic behavior
-	waitCtx, waitCancel := context.WithTimeout(pkgctx.NewSystemContext(), 5*time.Minute)
+	waitTimeout := 5 * time.Minute
+	if f := flag.CommandLine.Lookup("test.short"); f != nil && f.Value.String() == "true" {
+		waitTimeout = 5 * time.Second
+	}
+	waitCtx, waitCancel := context.WithTimeout(pkgctx.NewSystemContext(), waitTimeout)
 	defer waitCancel()
 	wgBud := goroutinelabels.DefaultBudget()
 	wgWaitBuilder := goroutinelabels.NewGoroutine(fmt.Sprintf(ConstMiscWaitgroupWaitS, id), fmt.Sprintf(ConstMiscWaitingForWaitGroupS, id)).

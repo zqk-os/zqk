@@ -23,12 +23,12 @@ func TestExtended_CapStageGates_DeepCoverage(t *testing.T) {
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
-		_ = os.RemoveAll(tmpDir)
+		_ = fileutil.RemoveAll(tmpDir)
 		t.Fatalf("failed to create storage: %v", err)
 	}
 	defer func() {
 		_ = sp.Shutdown(context.Background())
-		_ = os.RemoveAll(tmpDir)
+		_ = fileutil.RemoveAll(tmpDir)
 	}()
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
@@ -106,11 +106,11 @@ func TestExtended_CapStageGates_DeepCoverage(t *testing.T) {
 	}
 
 	// 6. capStageAttemptExhausted helper
-	pExh := capStagePending{FailureAttempts: 10}
+	pExh := CapStagePending{FailureAttempts: 10}
 	if !capStageAttemptExhausted(pExh) {
 		t.Errorf("expected attempt exhausted for 10 failures")
 	}
-	pNotExh := capStagePending{FailureAttempts: 2}
+	pNotExh := CapStagePending{FailureAttempts: 2}
 	if capStageAttemptExhausted(pNotExh) {
 		t.Errorf("expected attempt not exhausted for 2 failures")
 	}
@@ -123,7 +123,7 @@ func TestExtended_ConvergenceTestBundle_DeepCoverage(t *testing.T) {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
 	t.Setenv("ZQK_TEST_ROOT", tmpDir)
-	defer func() { _ = os.RemoveAll(tmpDir) }()
+	defer func() { _ = fileutil.RemoveAll(tmpDir) }()
 
 	// 1. Outcome classification helpers
 	if !outcomeIsBad("test_fail") || !outcomeIsBad("fail") || !outcomeIsBad("timeout") || !outcomeIsBad("flake") {

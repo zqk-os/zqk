@@ -118,6 +118,19 @@ func (h *ConvergenceSessionTickHandler) executeTerminalConvergenceSessionTick(
 	return nil
 }
 
+// ExecuteTerminalConvergenceSessionTickForTest exposes executeTerminalConvergenceSessionTick for
+// facade package adapters/tests (studio EvaluationSurfaceAdapter stays native across packages).
+func (h *ConvergenceSessionTickHandler) ExecuteTerminalConvergenceSessionTickForTest(
+	ctx context.Context,
+	secCtx *pkgctx.SecurityContext,
+	job *ScheduledJob,
+	sessionID string,
+	obj map[string]any,
+	snap *TestBundleConvergenceSnapshot,
+) error {
+	return h.executeTerminalConvergenceSessionTick(ctx, secCtx, job, sessionID, obj, snap)
+}
+
 type terminalFollowupMarker struct {
 	PriorSessionID  string `json:"prior_session_id"`
 	NewSessionID    string `json:"new_session_id"`
@@ -266,4 +279,16 @@ func (h *ConvergenceSessionTickHandler) maybeSpawnTerminalFollowupDraft(
 			Log()
 	}
 	return id, nil
+}
+
+// MaybeSpawnTerminalFollowupDraftForTest exposes maybeSpawnTerminalFollowupDraft for facade package tests.
+func (h *ConvergenceSessionTickHandler) MaybeSpawnTerminalFollowupDraftForTest(
+	ctx context.Context,
+	secCtx *pkgctx.SecurityContext,
+	job *ScheduledJob,
+	priorSessionID string,
+	prior map[string]any,
+	snap *TestBundleConvergenceSnapshot,
+) (newSessionID string, err error) {
+	return h.maybeSpawnTerminalFollowupDraft(ctx, secCtx, job, priorSessionID, prior, snap)
 }

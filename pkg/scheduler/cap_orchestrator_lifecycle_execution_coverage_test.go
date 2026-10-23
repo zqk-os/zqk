@@ -3,7 +3,6 @@ package scheduler
 import (
 	"context"
 	"errors"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -35,7 +34,7 @@ func TestExtended_CAPOrchestratorMethodsDeep(t *testing.T) {
 	coh.clearGroomingPlannedZeroLatch()
 	_, _ = coh.groomingPlannedZeroExhausted(0)
 
-	pending := capStagePending{Stage: "review", PlanID: "PRI-1"}
+	pending := CapStagePending{Stage: "review", PlanID: "PRI-1"}
 	_ = coh.capStageQuarantineRetryReady(pending, time.Now())
 	_ = coh.liveCVSOrEmpty(ctx, "CVS-1")
 	_, _ = coh.resolveBoundCVS(ctx, "PRI-1")
@@ -172,7 +171,7 @@ func TestExtended_HourglassDeep(t *testing.T) {
 	s.sweepStaleAgentTasks(ctx)
 
 	staleFile := filepath.Join(tmpDir, "stale.json")
-	_ = os.WriteFile(staleFile, []byte(`{"task_id": "t1", "expires_at": "2020-01-01T00:00:00Z", "type": "deadline"}`), 0644)
+	_ = fileutil.WriteFile(staleFile, []byte(`{"task_id": "t1", "expires_at": "2020-01-01T00:00:00Z", "type": "deadline"}`), 0644)
 	s.handleMissedCheckin(ctx, secCtx, staleFile)
 
 	s.recordSilentClaimBlocker(ctx, secCtx, "task-1")

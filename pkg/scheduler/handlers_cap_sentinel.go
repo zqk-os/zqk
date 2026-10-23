@@ -22,7 +22,7 @@ type capMorningReport struct {
 	GeneratedAt           string                          `json:"generated_at"`
 	PriorityPlan          any                             `json:"priority_plan,omitempty"`
 	BacklogCountsByStatus map[string]int                  `json:"backlog_counts_by_status,omitempty"`
-	PendingStage          capStagePending                 `json:"pending_stage"`
+	PendingStage          CapStagePending                 `json:"pending_stage"`
 	FailureTracker        capFailureTracker               `json:"failure_tracker"`
 	HealthSignals         agentprompt.KernelHealthSignals `json:"health_signals"`
 	AuditReport           any                             `json:"audit_report,omitempty"`

@@ -165,3 +165,8 @@ func (h *ConvergenceSessionTickHandler) resolveTestBundleHealthLinesForTick(ctx 
 	}
 	return lines, false, nil
 }
+
+// ResolveTestBundleHealthLinesForTickForTest exposes resolveTestBundleHealthLinesForTick for facade package tests.
+func (h *ConvergenceSessionTickHandler) ResolveTestBundleHealthLinesForTickForTest(ctx context.Context, job *ScheduledJob, limit int) ([]map[string]any, bool, error) {
+	return h.resolveTestBundleHealthLinesForTick(ctx, job, limit)
+}
