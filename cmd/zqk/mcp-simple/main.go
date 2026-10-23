@@ -92,6 +92,12 @@ func runWithServer(cfg ServerConfig, server serverRunner) error {
 	return server.Serve()
 }
 
+var serverFactory = func(projectRoot string) serverRunner {
+	return buildServer(projectRoot)
+}
+
+var osExit = os.Exit
+
 func run(args []string) error {
 	cfg, err := parseServerConfig(args)
 	if err != nil {
@@ -99,7 +105,7 @@ func run(args []string) error {
 	}
 
 	projectRoot := cli.ResolveProjectRoot(".")
-	server := buildServer(projectRoot)
+	server := serverFactory(projectRoot)
 	return runWithServer(cfg, server)
 }
 
@@ -107,7 +113,7 @@ func main() {
 	if err := run(os.Args[1:]); err != nil {
 		logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 		logging.Fluent(logger).Error("MCP server error", err).Log()
-		os.Exit(1)
+		osExit(1)
 	}
 }
 
