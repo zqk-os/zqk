@@ -28,6 +28,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[CLI Organizational Subsystem Architectural Guide](./CLI_ORGANIZATIONAL_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, domain modeling, impact analysis cascade, propagation lifecycle, and declarative structure sync. | All Engineers & Agents | `zqk organizational record-change`, `zqk organizational analyze-impact`, `zqk organizational propagate`, `zqk organizational sync` |
 | **[CLI Application Subsystem Architectural & Operational Guide](./CLI_APP_SUBSYSTEM_GUIDE.md)** | Root application bootstrap, command tree composition, execution context propagation, runtime diagnostics, and authentication middleware. | All Engineers & Agents | `zqk`, `cmd/zqk/app` |
 | **[CLI Code Search Subsystem Operational & Architectural Guide](./CLI_GREP_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, pure-Go in-process search, trigram indexing, Go AST structural queries, and token-budgeted AI agent output. | All Engineers & Agents | `zqk grep`, `zgrep` |
+| **[CLI Documentation Management Subsystem Operational & Architectural Guide](./CLI_DOCMAN_SUBSYSTEM_GUIDE.md)** | Subsystem taxonomy, markdown metadata extraction, doc_entry registration pipeline, cryptographic drift verification, and auto-sealing. | All Engineers & Agents | `zqk docman register`, `zqk docman verify` |
 
 ---
 
