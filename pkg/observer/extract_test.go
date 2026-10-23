@@ -61,3 +61,33 @@ func TestExtractFromDir_MultiFile(t *testing.T) {
 		}
 	}
 }
+
+func TestExtractFromDir_CanceledContext(t *testing.T) {
+	dir := t.TempDir()
+	err := fileutil.WriteFile(filepath.Join(dir, "a.go"), []byte("package p\nfunc F() {}"), paths.FilePerm644)
+	if err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	fsys := os.DirFS(dir)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	extractors := []Extractor{GoExtractor{}}
+	_, err = ExtractFromDir(ctx, fsys, ".", extractors)
+	if err == nil {
+		t.Fatal("expected error with canceled context, got nil")
+	}
+}
+
+func TestExtractFromDir_CanceledContext_EmptyDir(t *testing.T) {
+	dir := t.TempDir()
+	fsys := os.DirFS(dir)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	extractors := []Extractor{GoExtractor{}}
+	_, err := ExtractFromDir(ctx, fsys, ".", extractors)
+	if err == nil {
+		t.Fatal("expected error with canceled context on empty dir, got nil")
+	}
+}

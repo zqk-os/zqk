@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/config"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
@@ -234,97 +235,62 @@ func TestUpdateRequiresExplicitConfirmation(t *testing.T) {
 	_ = fos.Delete(ctx, secCtx, objID, false)
 }
 
-// TestConcurrentUpdatesPreventOverwrite tests that concurrent updates don't overwrite each other
-// TestConcurrentUpdatesPreventOverwrite tests that concurrent updates are handled correctly
-// This test verifies that optimistic locking prevents concurrent updates from overwriting each other.
-// Some concurrent updates should fail due to version conflicts when using expected_updated_at.
-func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
+func setupConcurrentUpdateStorage(t *testing.T) (string, *storage.FileObjectStorage) {
+	t.Helper()
 	tmpDir, err := fileutil.MkdirTemp("", "zqk-test-*")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
-	defer fileutil.RemoveAll(tmpDir)
+	require.NoError(t, err)
 
 	storage.MustEnsureProcessSpecsLayoutForTest(t, tmpDir)
-	if err := paths.EnsureDir(filepath.Join(tmpDir, paths.ProcessBacklogDir), paths.DirPerm755); err != nil {
-		t.Fatalf("mkdir backlog: %v", err)
-	}
+	err = paths.EnsureDir(filepath.Join(tmpDir, paths.ProcessBacklogDir), paths.DirPerm755)
+	require.NoError(t, err)
 
 	fos, err := storage.NewFileObjectStorageForTest(tmpDir)
-	if err != nil {
-		t.Fatalf("failed to create storage: %v", err)
-	}
+	require.NoError(t, err)
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(tmpDir, fos)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
 			t.Logf("teardown: %v", err)
 		}
+		if removeErr := fileutil.RemoveAll(tmpDir); removeErr != nil {
+			t.Logf("remove tmpDir: %v", removeErr)
+		}
 	})
 
-	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
-	ctx := context.Background()
+	return tmpDir, fos
+}
 
-	// Create initial object
-	objID := "BLI-997"
-	obj := map[string]any{
-		objects.FieldKeyID:            objID,
-		objects.FieldKeyKind:          "backlog_item",
-		objects.FieldKeyTitle:         "Original Title",
-		objects.FieldKeyStatus:        objects.ObjectStatusExploring,
-		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
-	}
-
-	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, "")
-
-	// Simulate concurrent updates
-	// All goroutines should read the same initial state, then all try to update
-	// This ensures that after the first update succeeds, all others will fail
-	initial, err := fos.Read(ctx, secCtx, objID)
-	if err != nil {
-		t.Fatalf("failed to read initial object: %v", err)
-	}
-	initialUpdatedAt, _ := initial[objects.FieldKeyUpdatedAt].(string)
-
-	// Small delay to ensure file system operations are complete (for timestamp precision, not deletion)
-	time.Sleep(10 * time.Millisecond)
-
-	// Enable test mode to serialize critical sections for reliable conflict detection
-	t.Setenv(zqkenv.TestMode().Name(), "true")
-
+func runConcurrentUpdateGoroutines(
+	ctx context.Context,
+	fos *storage.FileObjectStorage,
+	secCtx *pkgctx.SecurityContext,
+	objID string,
+	initialUpdatedAt string,
+	concurrency int,
+) (int, []error) {
 	var wg sync.WaitGroup
-	errs := make([]error, 10)
+	errs := make([]error, concurrency)
 	successCount := 0
 	var successMu sync.Mutex
-
-	// Use a channel to synchronize all goroutines to start at the same time
 	startChan := make(chan struct{})
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < concurrency; i++ {
 		wg.Add(1)
 		goroutinelabels.NewGoroutine("storage_test", "concurrent update attempt").StartSimple(func() {
 			func(index int) {
 				defer wg.Done()
-
-				// Wait for start signal to ensure all goroutines start simultaneously
 				<-startChan
 
-				// All goroutines use the same initial updated_at
-				// This ensures that after the first update succeeds, all others will fail
-				// In test mode, the critical section (re-check + write) is serialized,
-				// so only the first update will succeed, and all others will fail
 				updates := map[string]any{
 					objects.FieldKeyTitle: fmt.Sprintf("Update %d", index),
-					"expected_updated_at": initialUpdatedAt, // All use same initial value
+					"expected_updated_at": initialUpdatedAt,
 				}
 
 				syncCtx := storage.WithSkipWriteBehind(ctx)
 				err := fos.Update(syncCtx, secCtx, objID, updates)
 				if err != nil {
-					// Version conflict is expected for most concurrent updates
 					if errors.Is(err, storage.ErrVersionConflict) {
-						errs[index] = nil // This is expected
+						errs[index] = nil
 					} else {
 						errs[index] = err
 					}
@@ -337,60 +303,96 @@ func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
 		})
 	}
 
-	// Start all goroutines simultaneously
 	close(startChan)
-
 	wg.Wait()
+	return successCount, errs
+}
 
-	// Check for unexpected errors
+func verifyConcurrentUpdateFinalState(
+	t *testing.T,
+	ctx context.Context,
+	fos *storage.FileObjectStorage,
+	secCtx *pkgctx.SecurityContext,
+	objID string,
+) {
+	t.Helper()
+	flushCtx, cancelFlush := storage.DurabilityFlushContext()
+	defer cancelFlush()
+	require.NoError(t, fos.EnsureCLIObjectMutationVisible(flushCtx, []string{"backlog_item"}))
+
+	var final map[string]any
+	var err error
+	deadline := time.Now().Add(5 * time.Second)
+	for {
+		final, err = fos.Read(ctx, secCtx, objID)
+		if err == nil {
+			break
+		}
+		if time.Now().After(deadline) {
+			break
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	require.NoError(t, err, "failed to read final object")
+
+	title, ok := final[objects.FieldKeyTitle].(string)
+	require.True(t, ok, "title should be a string")
+	require.NotEqual(t, "Original Title", title, "object was not updated by any concurrent operation")
+
+	delCtx := storage.WithTestHardDelete(ctx)
+	require.NoError(t, fos.Delete(delCtx, secCtx, objID, false))
+}
+
+// TestConcurrentUpdatesPreventOverwrite tests that concurrent updates don't overwrite each other.
+// This test verifies that optimistic locking prevents concurrent updates from overwriting each other.
+func TestConcurrentUpdatesPreventOverwrite(t *testing.T) {
+	_, fos := setupConcurrentUpdateStorage(t)
+
+	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
+	ctx := context.Background()
+
+	objID := "BLI-997"
+	obj := map[string]any{
+		objects.FieldKeyID:            objID,
+		objects.FieldKeyKind:          "backlog_item",
+		objects.FieldKeyTitle:         "Original Title",
+		objects.FieldKeyDescription:   "Durable description for concurrent update test",
+		objects.FieldKeyStatus:        objects.ObjectStatusRoadmap,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+
+	storage.CreateCASVisible(t, fos, ctx, secCtx, obj, "")
+
+	initial, err := fos.Read(ctx, secCtx, objID)
+	require.NoError(t, err, "failed to read initial object")
+	initialUpdatedAt, ok := initial[objects.FieldKeyUpdatedAt].(string)
+	require.True(t, ok, "initial updated_at should be string")
+
+	time.Sleep(10 * time.Millisecond)
+	t.Setenv(zqkenv.TestMode().Name(), "true")
+
+	const concurrency = 10
+	successCount, errs := runConcurrentUpdateGoroutines(ctx, fos, secCtx, objID, initialUpdatedAt, concurrency)
+
 	for i, err := range errs {
 		if err != nil && !errors.Is(err, storage.ErrVersionConflict) {
 			t.Errorf("unexpected error in goroutine %d: %v", i, err)
 		}
 	}
 
-	// Log success count for debugging
-	t.Logf("Concurrent update test: %d succeeded, %d failed (expected: 1-9 succeed, 1-9 fail)", successCount, 10-successCount)
+	t.Logf("Concurrent update test: %d succeeded, %d failed (expected: 1-9 succeed, 1-9 fail)", successCount, concurrency-successCount)
 
-	// Verify test mode was set
 	testMode := config.TestingMode().Safe() || zqkenv.TestMode().Get() == "true"
 	t.Logf("TestingMode=%v", testMode)
 
-	// At least one update should succeed
-	// Note: Due to OS-level file system caching and timing, it's possible for all updates
-	// to succeed if they all read the same initial value before any writes are visible.
-	// The mutex serialization helps, but file system caching can still cause issues.
-	// The important thing is that at least one succeeds and the final state is consistent.
 	if successCount == 0 {
 		t.Error("expected at least one concurrent update to succeed")
 	}
-	// In an ideal scenario with perfect file system synchronization, only 1 should succeed.
-	// However, due to OS caching, we accept 1-10 as valid (all passing means they all
-	// read the same initial value before any writes were visible).
-	// The critical check is that the final state is consistent (verified below).
-	if successCount > 10 {
-		t.Errorf("unexpected success count: %d (should be <= 10)", successCount)
+	if successCount > concurrency {
+		t.Errorf("unexpected success count: %d (should be <= %d)", successCount, concurrency)
 	}
 
-	// Verify final state is consistent
-	flushCtx, cancelFlush := storage.DurabilityFlushContext()
-	defer cancelFlush()
-	_ = fos.EnsureCLIObjectMutationVisible(flushCtx, []string{"backlog_item"})
-
-	final, err := fos.Read(ctx, secCtx, objID)
-	if err != nil {
-		t.Fatalf("failed to read final object: %v", err)
-	}
-
-	// Title should be one of the update values
-	title := final[objects.FieldKeyTitle].(string)
-	if title == "Original Title" {
-		t.Error("object was not updated by any concurrent operation")
-	}
-
-	// Cleanup
-	//nolint:errcheck // Test cleanup - errors are acceptable
-	_ = fos.Delete(ctx, secCtx, objID, false)
+	verifyConcurrentUpdateFinalState(t, ctx, fos, secCtx, objID)
 }
 
 // TestDeletePreventsOverwrite tests that Delete doesn't allow overwrites
