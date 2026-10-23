@@ -96,6 +96,9 @@ func (p *ProxyDaemon) ensureTransports() {
 
 // Start begins the proxy loops
 func (p *ProxyDaemon) Start(ctx context.Context) error {
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
 	p.ensureTransports()
 	reader := bufio.NewReader(p.stdin)
 
@@ -105,10 +108,16 @@ func (p *ProxyDaemon) Start(ctx context.Context) error {
 		StartSimple(func() { p.heartbeatLoop(ctx) })
 
 	for {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 		msg, format, err := p.stdioTransport.ReadMessage(reader)
 		if err != nil {
-			if errors.Is(err, io.EOF) || strings.Contains(err.Error(), "EOF") {
-				logging.Fluent(p.logger).Info("Client disconnected (EOF), exiting proxy cleanly").Log()
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if errors.Is(err, io.EOF) || errors.Is(err, os.ErrClosed) || strings.Contains(err.Error(), "EOF") || strings.Contains(err.Error(), "file already closed") {
+				logging.Fluent(p.logger).Info("Client disconnected (EOF/closed), exiting proxy cleanly").Log()
 				return nil
 			}
 			return errfmt.Errorf("failed to read from stdio: %w", err)

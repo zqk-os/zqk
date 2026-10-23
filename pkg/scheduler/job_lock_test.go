@@ -342,6 +342,8 @@ func TestJobLock_ConcurrentAcquisition(t *testing.T) {
 	numGoroutines := 10
 	acquired := make(chan bool, numGoroutines)
 	start := make(chan struct{})
+	done := make(chan struct{})
+	defer close(done)
 
 	// Launch multiple goroutines trying to acquire the same lock
 	for i := 0; i < numGoroutines; i++ {
@@ -364,9 +366,12 @@ func TestJobLock_ConcurrentAcquisition(t *testing.T) {
 			}
 			acquired <- got
 
-			// Hold lock briefly
-			time.Sleep(50 * time.Millisecond)
-			_ = lock.(*JobLock).Release() //nolint:errcheck // Test helper - error handling not critical
+			if got {
+				<-done
+				if rErr := lock.(*JobLock).Release(); rErr != nil {
+					t.Logf("failed to release lock: %v", rErr)
+				}
+			}
 		})
 	}
 
