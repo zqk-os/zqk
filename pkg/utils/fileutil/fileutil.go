@@ -2,6 +2,7 @@ package fileutil
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -26,8 +27,12 @@ func writeFileWithMode(path string, data []byte, mode FileMode) error {
 	}
 	// os.WriteFile applies the process umask only when creating a file and does
 	// not repair an existing file's mode. These named helpers promise a mode, so
-	// enforce it after every successful write.
-	return Chmod(path, mode)
+	// enforce it after every successful write. Tolerate os.ErrNotExist if a concurrent
+	// consumer unlinked the file immediately upon write.
+	if err := Chmod(path, mode); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return nil
 }
 
 // WriteDurableFile writes data to a temporary file, fsyncs it to disk, and atomically renames it to path with mode.
