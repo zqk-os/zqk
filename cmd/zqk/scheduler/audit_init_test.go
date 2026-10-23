@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -16,6 +17,9 @@ import (
 
 func TestAuditSchedulerInitFull(t *testing.T) {
 	p := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{Kind: "cmd.scheduler.audit_init"})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(p.Root)
+	})
 	t.Logf("Project Root: %s", p.Root)
 	if p.FileStorage == nil {
 		t.Fatal("p.FileStorage is nil")

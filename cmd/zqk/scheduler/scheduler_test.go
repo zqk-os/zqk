@@ -85,6 +85,9 @@ func setupTestEnvironment(t *testing.T) (testRoot string, ctx *cli.Context, cmd 
 		ForceRemoveRootOnCleanup:  true,
 	})
 	testRoot = proj.Root
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(testRoot)
+	})
 
 	// Create CLI context (match production defaults: system profile, table format)
 	cliCtx := cli.ContextForProjectRoot(testRoot).WithProfile("system").WithFormat("table")
