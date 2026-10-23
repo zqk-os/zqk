@@ -371,12 +371,18 @@ func renderStateTab(b *strings.Builder, m *UIModel) {
 			visible = mutations[start:]
 		} else {
 			end := total - m.ScrollOffset
+			if end < 0 {
+				end = 0
+			}
 			if end > total {
 				end = total
 			}
 			start = end - availRows
 			if start < 0 {
 				start = 0
+			}
+			if start > end {
+				start = end
 			}
 			visible = mutations[start:end]
 		}
@@ -491,12 +497,18 @@ func renderAuditTab(b *strings.Builder, m *UIModel) {
 			visible = auditEvents[start:]
 		} else {
 			end := total - m.ScrollOffset
+			if end < 0 {
+				end = 0
+			}
 			if end > total {
 				end = total
 			}
 			start = end - availRows
 			if start < 0 {
 				start = 0
+			}
+			if start > end {
+				start = end
 			}
 			visible = auditEvents[start:end]
 		}
