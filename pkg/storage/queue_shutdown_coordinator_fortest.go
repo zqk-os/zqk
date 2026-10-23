@@ -34,3 +34,11 @@ func (c *QueueShutdownCoordinator) RegisteredQueueCountForTest() int {
 func GetQueueShutdownEventCallbackForTest() QueueShutdownEventCallback {
 	return getQueueShutdownEventCallback()
 }
+
+// SetTestOverrideForTest controls IsShutdownInitiated test-environment short-circuit.
+func (c *QueueShutdownCoordinator) SetTestOverrideForTest(enabled bool) {
+	if c == nil {
+		return
+	}
+	c.testOverride = enabled
+}
