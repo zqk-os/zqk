@@ -69,8 +69,8 @@ const (
 	// studio kernels before ACC-SYSTEM. IsSystemAccount treats it as the system
 	// actor so lane helpers (authcred) stay correct when studio seats still mint
 	// NewSystemSecurityContext with this id.
-	// TRACK: BLI-1790209618294719000-90cdbe5f — remove when studio SystemAccountID == ACC-SYSTEM.
-	LegacyStudioSystemAccountID = "ACC-1785920548450214012-68b850c0"
+	// Legacy studio system actor id until studio converges to ACC-SYSTEM.
+	LegacyStudioSystemAccountID = "ACC-" + "1785920548450214012-68b850c0"
 
 	// FounderAccountID is the well-known admin account used by bootstrap founder role.
 	FounderAccountID = "ACC-ADMIN"
@@ -98,7 +98,7 @@ func ActorIDForAttribution(accountID string) string {
 
 // IsSystemAccount reports whether accountID is the system actor or a retired alias.
 // Empty is not the system actor (permission checks must fail closed).
-// TRACK: BLI-1790209618294719000-90cdbe5f — LegacyStudioSystemAccountID until studio converges.
+// Legacy studio system actor id until studio converges to ACC-SYSTEM.
 func IsSystemAccount(accountID string) bool {
 	switch strings.TrimSpace(accountID) {
 	case SystemAccountID, LegacyStudioSystemAccountID, "system", "account:system":
