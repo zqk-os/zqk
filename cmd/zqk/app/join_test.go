@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/federation"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -68,7 +69,14 @@ func TestJoinCommand_Registration(t *testing.T) {
 }
 
 func TestJoinCommand_ExecutionAttempt(t *testing.T) {
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
+	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
+	origDir, _ := os.Getwd()
+	require.NoError(t, os.Chdir(env.Root))
+	defer func() { _ = os.Chdir(origDir) }()
+
 	cmd := NewJoinCmd()
+	cli.SetContext(cmd, cli.ContextForProjectRoot(env.Root))
 	cmd.SetArgs([]string{"http://127.0.0.1:65530/invalid"})
 	err := cmd.Execute()
 	if err == nil {
@@ -93,6 +101,7 @@ func TestJoinCommand_WithMockTransport_Declined(t *testing.T) {
 	defer federation.SetDefaultTransport(nil)
 
 	cmd := NewJoinCmd()
+	cli.SetContext(cmd, cli.ContextForProjectRoot(env.Root))
 	cmd.SetArgs([]string{"http://mock-peer.mesh/mcp"})
 	err := cmd.Execute()
 	assert.Error(t, err)
@@ -121,12 +130,14 @@ func TestJoinCommand_WithMockTransport_Accepted(t *testing.T) {
 
 	// Execute with custom alias
 	cmd := NewJoinCmd()
+	cli.SetContext(cmd, cli.ContextForProjectRoot(env.Root))
 	cmd.SetArgs([]string{"http://mock-peer.mesh/mcp", "--alias", "remote-alpha"})
 	err := cmd.Execute()
 	assert.NoError(t, err)
 
 	// Execute again to trigger update path (Upsert) without alias (auto-alias)
 	cmd2 := NewJoinCmd()
+	cli.SetContext(cmd2, cli.ContextForProjectRoot(env.Root))
 	cmd2.SetArgs([]string{"http://mock-peer.mesh/mcp"})
 	err = cmd2.Execute()
 	assert.NoError(t, err)
