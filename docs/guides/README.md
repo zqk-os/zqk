@@ -46,6 +46,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | Guide | Focus Area | Target Audience | Primary CLI & MCP Commands |
 | :--- | :--- | :--- | :--- |
 | **[Multi-Agent Swarm Orchestration & Mesh Collaboration](./AGENT_ORCHESTRATION_AND_SWARM_COLLABORATION_GUIDE.md)** | Agent seating, append-only agent feeds, conflict-free single-claimant work leases, and ambient signal interpretation rubrics. | Swarm Engineers, Multi-Agent Setups | `zqk system agent-onboard`, `zqk agent feed`, `zqk agent claim-work` |
+| **[CLI MCP-Simple Subsystem Architectural Guide](./CLI_MCP_SIMPLE_SUBSYSTEM_GUIDE.md)** | Minimal footprint Model Context Protocol (MCP) server, stdio & mTLS transports, diagnostic tools, and isolated client execution. | AI Agents, Swarm Integrators | `zqk mcp-simple`, `zqk mcp-simple -mtls-addr` |
 
 ---
 
@@ -54,6 +55,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | Guide | Focus Area | Target Audience | Primary CLI & MCP Commands |
 | :--- | :--- | :--- | :--- |
 | **[Diagnostics, Auto-Remedies & Self-Healing](./DIAGNOSTICS_SELF_HEALING_AND_REMEDY_GUIDE.md)** | 4-layer health checks, automated resolution of stale locks and orphaned temp buffers, and CAS quarantine recovery. | SREs, Operators, CI/CD | `zqk system check --auto-remedy`, `zqk system doctor` |
+| **[CLI System Subsystem & Health Operations Guide](./CLI_SYSTEM_SUBSYSTEM_GUIDE.md)** | Multi-layer validation, automated remediation engine, strategic alignment scoring, and service lifecycle management. | SREs, Operators, Swarm Engineers | `zqk system check`, `zqk system align`, `zqk system status` |
 
 ---
 

@@ -104,6 +104,18 @@ func runPreSubagentHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext
 		return emitHookDecision(out, "allow", nil)
 	}
 
+	// Case 1: Antigravity direct Prompt string in Args
+	if rawPrompt, ok := hookIn.ToolCall.Args["Prompt"].(string); ok && strings.TrimSpace(rawPrompt) != "" {
+		if enriched, changed := hydrateSinglePrompt(ctx, sec, sp, projectRoot, rawPrompt); changed {
+			overwrite := map[string]any{
+				"Prompt": enriched,
+			}
+			return emitHookDecision(out, "allow", overwrite)
+		}
+		return emitHookDecision(out, "allow", nil)
+	}
+
+	// Case 2: Subagents slice in Args
 	rawSubagents, ok := hookIn.ToolCall.Args["Subagents"]
 	if !ok {
 		return emitHookDecision(out, "allow", nil)
@@ -122,37 +134,8 @@ func runPreSubagentHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext
 	modified := false
 	for i, sub := range subagents {
 		prompt, _ := sub["Prompt"].(string)
-
-		// If prompt already has complete orchestration context or standing mandates, do not duplicate
-		if strings.Contains(prompt, "# Orchestration Context") || strings.Contains(prompt, "## Standing mandates") {
-			continue
-		}
-
-		targetID := ""
-		if m := atkRegex.FindString(prompt); m != "" {
-			targetID = m
-		} else if m := bliRegex.FindString(prompt); m != "" {
-			targetID = m
-		} else if m := priRegex.FindString(prompt); m != "" {
-			targetID = m
-		}
-
-		desc := prompt
-		if targetID != "" {
-			desc = ""
-		} else if len(desc) > 300 {
-			desc = desc[:300]
-		}
-
-		prepared, prepErr := AssemblePreparedContext(ctx, sec, sp, PreparedContextInput{
-			TaskID:      targetID,
-			Description: desc,
-			ProjectRoot: projectRoot,
-			Depth:       1,
-			IncludeTDD:  true,
-		})
-		if prepErr == nil && prepared.Prompt != "" {
-			subagents[i]["Prompt"] = fmt.Sprintf("%s\n\n## Subagent Specific Instructions\n%s", prepared.Prompt, prompt)
+		if enriched, changed := hydrateSinglePrompt(ctx, sec, sp, projectRoot, prompt); changed {
+			subagents[i]["Prompt"] = enriched
 			modified = true
 		}
 	}
@@ -165,6 +148,40 @@ func runPreSubagentHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext
 		"Subagents": subagents,
 	}
 	return emitHookDecision(out, "allow", overwrite)
+}
+
+func hydrateSinglePrompt(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot string, prompt string) (string, bool) {
+	if strings.Contains(prompt, "# Orchestration Context") || strings.Contains(prompt, "## Standing mandates") {
+		return prompt, false
+	}
+
+	targetID := ""
+	if m := atkRegex.FindString(prompt); m != "" {
+		targetID = m
+	} else if m := bliRegex.FindString(prompt); m != "" {
+		targetID = m
+	} else if m := priRegex.FindString(prompt); m != "" {
+		targetID = m
+	}
+
+	desc := prompt
+	if targetID != "" {
+		desc = ""
+	} else if len(desc) > 300 {
+		desc = desc[:300]
+	}
+
+	prepared, prepErr := AssemblePreparedContext(ctx, sec, sp, PreparedContextInput{
+		TaskID:      targetID,
+		Description: desc,
+		ProjectRoot: projectRoot,
+		Depth:       1,
+		IncludeTDD:  true,
+	})
+	if prepErr == nil && prepared.Prompt != "" {
+		return fmt.Sprintf("%s\n\n## Subagent Specific Instructions\n%s", prepared.Prompt, prompt), true
+	}
+	return prompt, false
 }
 
 func emitHookDecision(out io.Writer, decision string, overwrite map[string]any) error {
