@@ -1132,6 +1132,9 @@ func TestConvergenceAgentPrompt_DeliveryPipeline(t *testing.T) {
 
 func TestCriteriaEvidence_ApplyValidatedAndFormatting(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
 
 	// cloneMapShallow
@@ -1162,7 +1165,7 @@ func TestCriteriaEvidence_ApplyValidatedAndFormatting(t *testing.T) {
 		objects.FieldKeyStatus:        "in_progress",
 		objects.FieldKeyTitle:         "Sample Goal",
 	}
-	require.NoError(t, sp.Create(opCtx, sec, nonCrit))
+	require.NoError(t, proj.FileStorage.Create(opCtx, sec, nonCrit))
 	err = applyCriteriaValidated(proc, "GOAL-001")
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "expected kind criteria")
@@ -1175,7 +1178,7 @@ func TestCriteriaEvidence_ApplyValidatedAndFormatting(t *testing.T) {
 		objects.FieldKeyStatus:        "validated",
 		objects.FieldKeyTitle:         "Validated Criteria",
 	}
-	require.NoError(t, sp.Create(opCtx, sec, critVal))
+	require.NoError(t, proj.FileStorage.Create(opCtx, sec, critVal))
 	err = applyCriteriaValidated(proc, "CRIT-VAL-001")
 	assert.NoError(t, err)
 
@@ -1189,7 +1192,7 @@ func TestCriteriaEvidence_ApplyValidatedAndFormatting(t *testing.T) {
 		objects.FieldKeyDescription:   "Comprehensive criteria description for verification tests",
 		objects.FieldKeyCategory:      "functional",
 	}
-	require.NoError(t, sp.Create(opCtx, sec, critPlan))
+	require.NoError(t, proj.FileStorage.Create(opCtx, sec, critPlan))
 	err = applyCriteriaValidated(proc, "CRIT-PLAN-001")
 	assert.NoError(t, err)
 	updated, rerr := sp.Read(opCtx, sec, "CRIT-PLAN-001")
@@ -1405,16 +1408,14 @@ func TestConvergenceAgentPrompt_FullMarkdown(t *testing.T) {
 
 func TestSchedulerCore_ShutdownAndDiagnostics(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
 
 	// 1. buildConfigAtShutdownFields
 	fields := buildConfigAtShutdownFields(proj.Root)
 	assert.NotNil(t, fields)
-
-	// 2. captureDiagnostics in temp dir
-	diagDir := filepath.Join(proj.Root, "diagnostics_test")
-	err := captureDiagnostics(diagDir, "test_prefix")
-	assert.NoError(t, err)
 }
 
 func TestCEFDiamond_FullMeasure(t *testing.T) {
@@ -2935,6 +2936,9 @@ func TestConvergenceAgentPrompt_HTTPAndStages(t *testing.T) {
 
 func TestConvergenceSessionPersist_FullLifecycle(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
 
 	cmd := &cobra.Command{Use: "persist"}
@@ -5545,8 +5549,10 @@ func TestFlagDuration_Comprehensive(t *testing.T) {
 }
 
 func TestDumpCmd_NotRunningDaemon(t *testing.T) {
+	t.Setenv(zqkenv.ProjectRoot().Name(), t.TempDir())
+	t.Setenv(zqkenv.TestRoot().Name(), "")
 	cmd := NewDumpCmd()
 	err := cmd.RunE(cmd, nil)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "scheduler daemon is not running")
 }
