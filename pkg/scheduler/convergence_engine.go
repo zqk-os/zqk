@@ -105,7 +105,7 @@ func (s *Scheduler) prepareConvergenceStorage(ctx context.Context, warnMsg strin
 	if s.storage == nil {
 		return nil, nil
 	}
-	engineStorage := &ConvergenceStorageAdapter{storage: s.storage}
+	engineStorage := NewConvergenceStorageAdapter(s.storage)
 	sessions, err := engineStorage.ListConvergenceSessions(ctx)
 	if err != nil {
 		SchedulerDaemonLog(s.logger).Warn(warnMsg).WithError(err).Log()
