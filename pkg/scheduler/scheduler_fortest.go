@@ -1,10 +1,15 @@
 package scheduler
 
-// Package scheduler provides whitebox testing hooks and facade accessors for storage, logger, project root, spec loader, and executor.
+// Package scheduler provides whitebox testing hooks and facade accessors for storage, logger,
+// project root, spec loader, executor, and studio file-lease free-func fields.
 
 import (
+	"context"
+	"time"
+
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler/transceiver"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -46,4 +51,34 @@ func (s *Scheduler) SetExecutorForTest(executor CommandExecutor) {
 // ExecutorForTest exposes the command executor for facade package tests.
 func (s *Scheduler) ExecutorForTest() CommandExecutor {
 	return s.executor
+}
+
+// StateRegistryForTest exposes the job state registry (facade / studio lease free funcs).
+func (s *Scheduler) StateRegistryForTest() JobStateRegistryInterface {
+	return s.stateRegistry
+}
+
+// CoordinationChannelForTest exposes the coordination channel.
+func (s *Scheduler) CoordinationChannelForTest() CoordinationChannelInterface {
+	return s.coordinationChannel
+}
+
+// ProcessGroupManagerForTest exposes the process group manager.
+func (s *Scheduler) ProcessGroupManagerForTest() ProcessGroupManagerInterface {
+	return s.processGroupManager
+}
+
+// AsyncRouterForTest exposes the async transceiver router.
+func (s *Scheduler) AsyncRouterForTest() *transceiver.AsyncRouter {
+	return s.asyncRouter
+}
+
+// CreateJobAuditEventForTest exposes createJobAuditEvent for facade package tests.
+func (s *Scheduler) CreateJobAuditEventForTest(ctx context.Context, eventType, jobID, jobType, category string, success bool, duration time.Duration, jobErr error) error {
+	return s.createJobAuditEvent(ctx, eventType, jobID, jobType, category, success, duration, jobErr)
+}
+
+// DisableJobInStorageForTest exposes disableJobInStorage for facade package tests.
+func (s *Scheduler) DisableJobInStorageForTest(ctx context.Context, job *ScheduledJob) {
+	s.disableJobInStorage(ctx, job)
 }
