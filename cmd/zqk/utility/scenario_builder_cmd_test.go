@@ -7,8 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/paths"
+	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -125,6 +127,9 @@ func TestScenarioBuilder_ConfigMethods(t *testing.T) {
 
 func TestRunScenarioBuilder_ExecutionFlows(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	targetDir := filepath.Join(proj.Root, "test-target")
 
 	// 1. Dry run with kinds
@@ -188,9 +193,16 @@ func TestRunScenarioBuilder_ExecutionFlows(t *testing.T) {
 
 func TestCreateScenarioBuilder_Direct(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	targetDir := filepath.Join(proj.Root, "test-target-builder")
+	t.Cleanup(func() {
+		storagepkg.SetCacheOperationHandler(nil)
+		cli.UnregisterStorageForProjectRoot(targetDir)
+		storagepkg.ShutdownHashRegistriesForProjectTesting(targetDir)
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+		storagepkg.ShutdownHashRegistriesForProjectTesting(proj.Root)
+	})
 	cmd := NewScenarioBuilderCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)
-	targetDir := filepath.Join(proj.Root, "test-target-builder")
 
 	builder, err := createScenarioBuilder(cmd, targetDir)
 	require.NoError(t, err)

@@ -211,3 +211,27 @@ zqk utility scenario-builder \
 2. **Atomic Configuration Updates**: Never write directly to configuration files without verifying YAML validity and employing atomic write-and-rename semantics.
 3. **Audit Trail Preservation**: When running hash fixes in forced mode (`--force`), ensure operational context is available so audit records capture the operator identity and reason.
 4. **Isolated Test Sandboxes**: When validating migration or scenario generation logic, always execute within isolated temporary project roots using `testkit.PrepareIsolatedTempProject`.
+
+---
+
+## Verification & Statement Coverage Invariant
+
+The Utility Subsystem conforms to strict quality, hygiene, and verification gates:
+
+### Mandatory Statement Coverage Threshold
+- **Coverage Floor**: Statement coverage across `cmd/zqk/utility` must remain strictly **>= 85.0%** (target >= 88.0%).
+- **Verification Command**:
+  ```bash
+  ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -cover ./cmd/zqk/utility/...
+  ```
+
+### Three-Fold Proof Conformance
+1. **Static Floor Invariant**: Verified statement test coverage on package `cmd/zqk/utility` meeting or exceeding 85.0% across all commands and scenario generators.
+2. **Operational Dynamic Proof**: Validated end-to-end execution of migration detection, hash repair, prefix registration fixing, YAML gut-check syntax validation, and scenario synthesis.
+3. **Negative Adversarial Boundary**: Confirmed fail-closed rejection of corrupted YAML inputs, invalid version constraints, missing binary paths, mismatched content hashes, and circular dependency graphs.
+
+### Engineering Invariants
+1. **Zero Swallowed Errors**: No error return may be discarded with `_ = ...`. All error returns must be checked explicitly (`if err != nil` or `require.NoError`).
+2. **Deterministic Storage Teardown**: In all tests initializing temporary kernels, `cli.UnregisterStorageForProjectRoot(proj.Root)` must be registered in `t.Cleanup` to guarantee no open file descriptors or cached storage handles linger.
+3. **AST Line-Count Discipline**: Test helper functions and scenarios are kept under 80 lines to satisfy codebase hygiene and avoid cyclomatic complexity traps.
+

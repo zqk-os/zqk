@@ -77,6 +77,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[CLI System Subsystem & Health Operations Guide](./CLI_SYSTEM_SUBSYSTEM_GUIDE.md)** | Multi-layer validation, automated remediation engine, strategic alignment scoring, and service lifecycle management. | SREs, Operators, Swarm Engineers | `zqk system check`, `zqk system align`, `zqk system status` |
 | **[CLI Visual Studio & Interactive TUI Subsystem Operational Architecture Guide](./CLI_UI_SUBSYSTEM_GUIDE.md)** | Interactive full-screen terminal mission control, headless model projection, embedded Web Visual Studio, port auto-scanning, and >=85.0% coverage invariant. | All Engineers & Agents | `zqk ui`, `zqk dashboard`, `zqk console` |
 | **[TUI Engine & Terminal Interface Subsystem Architectural & Operational Guide](./TUI_SUBSYSTEM_GUIDE.md)** | High-performance terminal UI engine, Elm architecture in Go (Model-Update-View), TDS styling invariants, headless fallback, and >=85.0% coverage invariant. | All Engineers & Agents | `pkg/tui`, `zqk ui` |
+| **[CLI Utility Subsystem Architectural Guide](./CLI_UTILITY_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, scenario synthesis, hash fix, registration repair, YAML validation, migration engine, config file watcher, and >=85.0% coverage invariant. | All Engineers & Agents | `zqk utility`, `zqk utility fix-hashes`, `zqk utility fix-registration`, `zqk utility validate-yaml`, `zqk utility scenario-builder`, `zqk utility migrate` |
 
 ---
 

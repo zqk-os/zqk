@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -34,6 +35,10 @@ func setupTestStorageProvider(t *testing.T, projectRoot string) storage.ObjectSt
 		t.Fatalf("Expected file storage provider type, got %T", anyStorage)
 	}
 
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(projectRoot)
+		storage.ShutdownHashRegistriesForProjectTesting(projectRoot)
+	})
 	testkit.RegisterStorageTestCleanup(t, projectRoot, anyStorage)
 
 	return provider

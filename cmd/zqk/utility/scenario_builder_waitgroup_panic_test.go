@@ -18,6 +18,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_lifecycle_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
@@ -29,6 +30,8 @@ func cleanupStorageTestRoot(t *testing.T, tmpDir string, storageProvider storage
 	t.Helper()
 	storagepkg.SetCacheOperationHandler(func(*pkgctx.CacheContext) error { return nil })
 	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(tmpDir)
+		storagepkg.ShutdownHashRegistriesForProjectTesting(tmpDir)
 		fs, ok := nildecode.DecodeNonNilPayload[*storagepkg.FileObjectStorage](storageProvider)
 		if !ok {
 			return

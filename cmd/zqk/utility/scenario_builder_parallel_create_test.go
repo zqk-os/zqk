@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -33,6 +34,9 @@ func TestParallelCreate_ReproducesIssue(t *testing.T) {
 	t.Cleanup(metricsrecording.LeaveAllowRecording)
 
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{Kind: "utility.parallel_create"})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	tmpDir := proj.Root
 	storageProvider := proj.FileStorage
 

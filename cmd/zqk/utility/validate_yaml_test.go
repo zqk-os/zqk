@@ -85,6 +85,9 @@ func TestValidateYAML_DirectFunctions(t *testing.T) {
 
 func TestRunValidateYAML_ValidAndInvalid(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	cmd := NewValidateYAMLCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)
 
@@ -141,6 +144,9 @@ func TestOutputValidationSummary(t *testing.T) {
 
 func TestRegisterHashViaSystemCheck(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	cmd := NewValidateYAMLCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)
 	cliCtx := cli.GetContext(cmd)
