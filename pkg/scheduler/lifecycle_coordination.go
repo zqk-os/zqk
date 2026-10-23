@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/robfig/cron/v3"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
@@ -17,9 +19,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	"github.com/zqk-os/zqk/pkg/quality"
 	"github.com/zqk-os/zqk/pkg/specbuilder/instance_builders"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/when"
@@ -97,62 +101,159 @@ func (s *Scheduler) watchJobChanges(ctx context.Context) {
 	}
 }
 
-// configWatchInterval is how often the daemon checks for config changes or reload requests.
-// Short enough that "zqk scheduler config --no-jobs-paused" is picked up within a few seconds.
-const configWatchInterval = 2 * time.Second
+// configWatchDeadmanInterval is miss-recovery only. Happy-path reloads are fsnotify-driven.
+// Do not Stat reload_config_request on a 2s poll.
+const configWatchDeadmanInterval = 30 * time.Second
 
 // Pipeline kinds are used to keep stage metrics/logging grouped by orchestration flow.
 const pipelineKindCheckAndRecoverMissedJobsCompletionMap = "scheduler.check_and_recover_missed_jobs_completion_map"
 
-// watchSchedulerConfig watches for config reload requests (from CLI) and for config file changes.
-// When the CLI runs "scheduler config --no-jobs-paused" it writes a reload request file; the daemon
-// sees it within configWatchInterval and applies the change immediately. Also applies if jobs_paused
-// was edited on disk.
+// configWatchApplyResult reports what applySchedulerConfigWatchTick did (tests drive this).
+type configWatchApplyResult struct {
+	ReloadRequested bool
+	PeekHit         bool
+	Loaded          bool
+	Applied         bool
+}
+
+func isSchedulerConfigWatchEvent(ev fsnotify.Event) bool {
+	if ev.Name == emptyValue {
+		return false
+	}
+	base := filepath.Base(ev.Name)
+	if base != ReloadConfigRequestFile && base != paths.SchedulerConfigFile {
+		return false
+	}
+	return ev.Has(fsnotify.Create) || ev.Has(fsnotify.Write) || ev.Has(fsnotify.Rename)
+}
+
+func signalConfigWatchReady(s *Scheduler) {
+	if s != nil && s.TestHookConfigWatchReady != nil {
+		s.TestHookConfigWatchReady()
+	}
+}
+
+// applySchedulerConfigWatchTick consumes a CLI reload request (if present), Peek/loads
+// config.yaml via stampmemo, and applies jobs_paused. Extracted so tests can drive it
+// without waiting on the deadman ticker.
+func (s *Scheduler) applySchedulerConfigWatchTick(ctx context.Context) configWatchApplyResult {
+	var result configWatchApplyResult
+	if s == nil || s.projectRoot == emptyValue {
+		return result
+	}
+	if !s.IsRunning() {
+		return result
+	}
+	reloadRequested := ReloadConfigRequestExists(s.projectRoot)
+	if reloadRequested {
+		ConsumeReloadConfigRequest(s.projectRoot)
+		SchedulerLifecycleLog(s.logger).Debug(LogEventSchedulerLifecycleConfigReloadCLIRequested).Log()
+	}
+	result.ReloadRequested = reloadRequested
+	configPath := schedulerConfigFilePath(s.projectRoot)
+	stamp := stampmemo.Of(configPath)
+	var config *SchedulerConfig
+	if reloadRequested {
+		schedulerConfigs.Delete(s.projectRoot)
+	} else if cached, ok := schedulerConfigs.Peek(s.projectRoot, stamp); ok {
+		config = cached
+		result.PeekHit = true
+	}
+	if config == nil {
+		var err error
+		config, err = LoadSchedulerConfig(s.projectRoot)
+		if err != nil {
+			SchedulerLifecycleLog(s.logger).Debug(LogEventSchedulerLifecycleLoadConfigWatchFailed).
+				WithError(err).
+				Log()
+			return result
+		}
+		result.Loaded = true
+	}
+	if config.JobsPaused != s.onlyManualJobs {
+		s.SetOnlyManualJobs(config.JobsPaused)
+		result.Applied = true
+		SchedulerLifecycleLog(s.logger).Info(LogEventSchedulerLifecycleConfigUpdated).
+			Bool("jobs_paused", config.JobsPaused).
+			Log()
+		if !config.JobsPaused {
+			if err := s.loadAndScheduleJobs(ctx, true); err != nil {
+				SchedulerLifecycleLog(s.logger).Warn(LogEventSchedulerLifecycleRescheduleAfterUnpauseFailed).
+					WithError(err).
+					Log()
+			} else {
+				SchedulerLifecycleLog(s.logger).Info(LogEventSchedulerLifecycleTimerJobsRescheduledFlowing).Log()
+			}
+		}
+	}
+	s.scanAdmissionTimeouts(ctx)
+	return result
+}
+
+// watchSchedulerConfig watches the scheduler config directory with fsnotify. CREATE/WRITE/RENAME
+// of reload_config_request or config.yaml applies immediately. stampmemo Peek skips Load when
+// config.yaml mtime is unchanged. A ≥30s ticker is miss-recovery only; if fsnotify cannot start,
+// the loop falls back to that deadman and logs once.
 func (s *Scheduler) watchSchedulerConfig(ctx context.Context) {
 	if s.projectRoot == emptyValue {
 		return
 	}
-	ticker := time.NewTicker(configWatchInterval)
+	dir := schedulerConfigDir(s.projectRoot)
+	if err := fileutil.EnsureDir(dir); err != nil {
+		SchedulerLifecycleLog(s.logger).Debug(LogEventSchedulerLifecycleConfigWatchFsnotifyFailed).
+			WithError(err).
+			Log()
+	}
+
+	var events <-chan fsnotify.Event
+	var errs <-chan error
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		SchedulerLifecycleLog(s.logger).Warn(LogEventSchedulerLifecycleConfigWatchFsnotifyFailed).
+			WithError(err).
+			Log()
+	} else if addErr := watcher.Add(dir); addErr != nil {
+		SchedulerLifecycleLog(s.logger).Warn(LogEventSchedulerLifecycleConfigWatchFsnotifyFailed).
+			WithError(addErr).
+			Log()
+		_ = watcher.Close()
+		watcher = nil
+	} else {
+		defer watcher.Close()
+		events = watcher.Events
+		errs = watcher.Errors
+	}
+
+	signalConfigWatchReady(s)
+
+	ticker := time.NewTicker(configWatchDeadmanInterval)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
+		case ev, ok := <-events:
+			if !ok {
+				events = nil
+				continue
+			}
+			if !isSchedulerConfigWatchEvent(ev) {
+				continue
+			}
+			s.applySchedulerConfigWatchTick(ctx)
+		case watchErr, ok := <-errs:
+			if !ok {
+				errs = nil
+				continue
+			}
+			if watchErr != nil {
+				SchedulerLifecycleLog(s.logger).Debug(LogEventSchedulerLifecycleConfigWatchFsnotifyError).
+					WithError(watchErr).
+					Log()
+			}
 		case <-ticker.C:
-			if !s.IsRunning() {
-				continue
-			}
-			// If CLI requested reload (wrote reload_config_request), consume it and reload
-			if ReloadConfigRequestExists(s.projectRoot) {
-				ConsumeReloadConfigRequest(s.projectRoot)
-				SchedulerLifecycleLog(s.logger).Debug(LogEventSchedulerLifecycleConfigReloadCLIRequested).Log()
-			}
-			config, err := LoadSchedulerConfig(s.projectRoot)
-			if err != nil {
-				SchedulerLifecycleLog(s.logger).Debug(LogEventSchedulerLifecycleLoadConfigWatchFailed).
-					WithError(err).
-					Log()
-				continue
-			}
-			// Apply jobs_paused change so config --no-jobs-paused takes effect without restart
-			if config.JobsPaused != s.onlyManualJobs {
-				s.SetOnlyManualJobs(config.JobsPaused)
-				SchedulerLifecycleLog(s.logger).Info(LogEventSchedulerLifecycleConfigUpdated).
-					Bool("jobs_paused", config.JobsPaused).
-					Log()
-				if !config.JobsPaused {
-					// Transition to unpaused: re-schedule timer and immediate jobs
-					if err := s.loadAndScheduleJobs(ctx, true); err != nil {
-						SchedulerLifecycleLog(s.logger).Warn(LogEventSchedulerLifecycleRescheduleAfterUnpauseFailed).
-							WithError(err).
-							Log()
-					} else {
-						SchedulerLifecycleLog(s.logger).Info(LogEventSchedulerLifecycleTimerJobsRescheduledFlowing).Log()
-					}
-				}
-			}
-			s.scanAdmissionTimeouts(ctx)
+			s.applySchedulerConfigWatchTick(ctx)
 		}
 	}
 }

@@ -15,6 +15,14 @@ import (
 // When present in .zqk/scheduler/, the daemon reloads config and then removes the file.
 const ReloadConfigRequestFile = "reload_config_request"
 
+func schedulerConfigDir(projectRoot string) string {
+	return paths.ResolvePathFromCacheOrConstant(projectRoot, "scheduler", filepath.Join(paths.ProjectDataDir, paths.SchedulerDir))
+}
+
+func schedulerConfigFilePath(projectRoot string) string {
+	return filepath.Join(schedulerConfigDir(projectRoot), paths.SchedulerConfigFile)
+}
+
 // SchedulerConfig holds scheduler configuration (persisted at .zqk/scheduler/config.yaml).
 // Used by both the daemon (to read jobs_paused) and the CLI (to get/set config).
 type SchedulerConfig struct {
@@ -93,7 +101,7 @@ func WriteReloadConfigRequest(projectRoot string) error {
 // ConsumeReloadConfigRequest removes the reload request file if present and returns true if it existed.
 // The daemon calls this to detect that the CLI requested an immediate config reload.
 func ConsumeReloadConfigRequest(projectRoot string) bool {
-	path := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir, ReloadConfigRequestFile)
+	path := filepath.Join(schedulerConfigDir(projectRoot), ReloadConfigRequestFile)
 	if err := fileutil.Remove(path); err != nil {
 		return false
 	}

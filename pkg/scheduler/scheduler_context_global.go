@@ -417,6 +417,10 @@ type Scheduler struct {
 	// (tests only; nil in production).
 	TestHookEnvelopeTickTargetForJobType func(jobType string) string
 
+	// TestHookConfigWatchReady is invoked after the config-dir watcher is armed (or after
+	// fsnotify setup fails and the deadman ticker is used). Tests only; nil in production.
+	TestHookConfigWatchReady func()
+
 	// immediateDispatchPending tracks one_time immediate jobs accepted onto a worker pool but not yet
 	// started (LastRunAt unset). Reload must not re-submit these (pool flood) but may start never-queued ones.
 	immediateDispatchPending sync.Map // jobID -> struct{}

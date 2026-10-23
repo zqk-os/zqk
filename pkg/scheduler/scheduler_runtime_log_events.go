@@ -44,6 +44,8 @@ const (
 	LogEventSchedulerLifecycleReloadJobsFailed                     = schedulerLifecycleWirePrefix + "_reload_jobs_failed"
 	LogEventSchedulerLifecycleConfigReloadCLIRequested             = schedulerLifecycleWirePrefix + "_config_reload_cli_requested"
 	LogEventSchedulerLifecycleLoadConfigWatchFailed                = schedulerLifecycleWirePrefix + "_load_config_watch_failed"
+	LogEventSchedulerLifecycleConfigWatchFsnotifyFailed            = schedulerLifecycleWirePrefix + "_config_watch_fsnotify_failed"
+	LogEventSchedulerLifecycleConfigWatchFsnotifyError             = schedulerLifecycleWirePrefix + "_config_watch_fsnotify_error"
 	LogEventSchedulerLifecycleConfigUpdated                        = schedulerLifecycleWirePrefix + "_config_updated"
 	LogEventSchedulerLifecycleRescheduleAfterUnpauseFailed         = schedulerLifecycleWirePrefix + "_reschedule_after_unpause_failed"
 	LogEventSchedulerLifecycleTimerJobsRescheduledFlowing          = schedulerLifecycleWirePrefix + "_timer_jobs_rescheduled_flowing"
