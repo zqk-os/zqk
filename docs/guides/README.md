@@ -50,6 +50,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[CLI Workflow Subsystem Architectural & Operational Guide](./CLI_WORKFLOW_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, composite ambient routing, deterministic next-action resolution, gate preconditions, and VDS verification. | All Engineers & Agents | `zqk workflow whats-next`, `zqk workflow next`, `zqk workflow check`, `zqk workflow add` |
 | **[CLI Ambient Compute Subsystem Architectural & Operational Guide](./CLI_AMBIENT_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, singleton daemon supervision, background wave scheduling, automerge synchronization, and HTTP event ingestion. | All Engineers & Agents | `zqk ambient`, `zqk ambient status`, `zqk ambient wave`, `zqk ambient automerge`, `zqk ambient ingest` |
 | **[Scheduler Subsystem Operational & Architectural Guide](./SCHEDULER_SUBSYSTEM_GUIDE.md)** | Embedded job queue, CAP loop orchestrator, transient retry membranes, atomic job state registry, retention cleanup, and watchdog monitoring. | Kernel Engineers & Agents | `pkg/scheduler`, `zqk scheduler` |
+| **[Concurrency Primitives Subsystem Architectural & Operational Guide](./CONCURRENCY_SUBSYSTEM_GUIDE.md)** | Synchronization primitives, deadlock prevention, TimeoutMutex invariants, adaptive GoroutineCeiling token pools, context-aware waits, named WaitGroupManager, and >=85.0% coverage invariant. | All Engineers & Agents | `pkg/concurrency` |
 
 ---
 
