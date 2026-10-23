@@ -636,7 +636,6 @@ func TestIsNonBlockingWarningError_ExitCode3(t *testing.T) {
 	assert.False(t, isNonBlockingWarningError(errors.New("other error")))
 }
 
-
 func TestCheckCLIReminderInRoot_Branches(t *testing.T) {
 	checkCLIReminderInRoot("")
 
@@ -762,8 +761,6 @@ func TestAuth_RunLoginAndLogout_Direct(t *testing.T) {
 	err = runLogout(logoutCmd, nil)
 	require.NoError(t, err)
 }
-
-
 
 func TestValidationTriggerBatch_AdditionalEdgeCases(t *testing.T) {
 	AddValidationTrigger("", "task", "ATK-1", "create")

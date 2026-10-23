@@ -34,3 +34,23 @@ func TestFindLineWithPrefix(t *testing.T) {
 		t.Errorf("expected './bin/zqk do something', got '%s'", result)
 	}
 }
+
+func TestIsAllDigits(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"", false},
+		{"12345", true},
+		{"0", true},
+		{"123a45", false},
+		{" 123", false},
+		{"123 ", false},
+		{"-123", false},
+	}
+	for _, tc := range tests {
+		if got := IsAllDigits(tc.input); got != tc.expected {
+			t.Errorf("IsAllDigits(%q) = %v; want %v", tc.input, got, tc.expected)
+		}
+	}
+}
