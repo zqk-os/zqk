@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -18,7 +19,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
-	cli "github.com/zqk-os/zqk/pkg/cliapp"
 
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_lifecycle_v1"
 	_ "github.com/zqk-os/zqk/pkg/specbuilder/bldr_v2"
