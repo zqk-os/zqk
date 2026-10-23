@@ -94,18 +94,20 @@ type ValidatorRegistry struct {
 	defaultValidator string
 }
 
-// NewValidatorRegistry creates a new validator registry
+// NewValidatorRegistry creates a new validator registry with the Core Go validator.
 func NewValidatorRegistry() *ValidatorRegistry {
+	return NewValidatorRegistryWithDefault(NewGoValidator())
+}
+
+// NewValidatorRegistryWithDefault creates a registry and registers defaultValidator
+// as both "go" and "default". Facades inject their GoValidator implementation.
+func NewValidatorRegistryWithDefault(defaultValidator Validator) *ValidatorRegistry {
 	registry := &ValidatorRegistry{
 		validators:       make(map[string]Validator),
-		defaultValidator: "go", // Default to Go-based validator
+		defaultValidator: "go",
 	}
-
-	// Register default Go validator (SHACL-inspired)
-	goValidator := NewGoValidator()
-	registry.Register("go", goValidator)
-	registry.Register("default", goValidator) // Alias for "go"
-
+	registry.Register("go", defaultValidator)
+	registry.Register("default", defaultValidator)
 	return registry
 }
 
