@@ -90,7 +90,9 @@ func TestResolveAndReadSessionAccountID_Branches(t *testing.T) {
 	assert.Error(t, err)
 
 	// 2. Project with storage
-	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		ForceRemoveRootOnCleanup: true,
+	})
 	tmpDir := proj.Root
 	sp := proj.FileStorage
 	defer func() {
@@ -368,7 +370,9 @@ func TestCheckSchedulerDaemonStatus_RoleAndPermVariations(t *testing.T) {
 }
 
 func TestRootPersistentPostRunE_WithStorageAndSession(t *testing.T) {
-	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		ForceRemoveRootOnCleanup: true,
+	})
 	defer func() {
 		if proj.FileStorage != nil {
 			_ = proj.FileStorage.Shutdown(context.Background())

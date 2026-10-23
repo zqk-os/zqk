@@ -58,7 +58,8 @@
   1. **Operational Surface:** Credentials required, environment variables, secret management (`.env.example`).
   2. **Execution Topology:** On-demand CLI vs. Scheduled Cron vs. Always-on Daemon with URLs and ports.
   3. **Documentation Manifest:** Verified links to architecture docs, runbooks, and diagrams.
-  4. **Next Strategic Action:** Immediate next priority plan discovered via `zqk workflow whats-next`.
+  4. **Documentation Site Regeneration:** Mandatory compilation and deployment of the public documentation portal to `docs.zqk.dev` via `scripts/open-core/docs-portal/deploy-docs-portal.sh` with every release cut.
+  5. **Next Strategic Action:** Immediate next priority plan discovered via `zqk workflow whats-next`.
 
 ## Chat Issue Intake & TPM Anti-Distraction Protocol (POL-AGENT-TPM-INTAKE-FIREWALL-001)
 - **The Chat-to-Kernel Firewall:** When an operator or chat message reports a bug, test failure, stack trace, or unexpected behavior, the TPM MUST NOT drop the active plan or begin writing code and running tests directly.

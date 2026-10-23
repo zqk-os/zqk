@@ -351,3 +351,12 @@ git clone https://github.com/zqk-os/zqk && cd zqk && make
 
 echo ""
 echo "✅ Release ${VERSION} published: https://github.com/zqk-os/zqk/releases/tag/${TAG_NAME}"
+
+# Deploy static documentation portal to docs.zqk.dev with every release
+DEPLOY_DOCS_SCRIPT="${REPO_ROOT}/scripts/open-core/docs-portal/deploy-docs-portal.sh"
+if [ -f "$DEPLOY_DOCS_SCRIPT" ]; then
+  echo ""
+  echo "🌐 [Docs Site] Deploying updated documentation portal to docs.zqk.dev..."
+  bash "$DEPLOY_DOCS_SCRIPT"
+fi
+

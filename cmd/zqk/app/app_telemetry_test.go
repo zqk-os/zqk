@@ -200,7 +200,7 @@ func TestTelemetry_AuditCoordinationAndMetadata(t *testing.T) {
 	emitCommandExecutionEventViaCoordinator(ctx, ".", nil, opDesc, auditSeverityHigh, meta, metric, profileHuman)
 
 	// emit with valid temp project
-	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
 	defer func() {
 		if proj.FileStorage != nil {
 			_ = proj.FileStorage.Shutdown(context.Background())
