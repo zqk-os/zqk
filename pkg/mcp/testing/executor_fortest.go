@@ -2,8 +2,7 @@ package testing
 
 import "context"
 
-// ScenarioExecutor ForTest seams for studio facade alias peels.
-// TRACK: BLI-1790209618294719000-90cdbe5f
+// ScenarioExecutor ForTest seams for facade alias peels (studio zqke).
 
 // ValidateStepResultForTest exposes validateStepResult for facade package tests.
 func (se *ScenarioExecutor) ValidateStepResultForTest(step *TestStep, result StepResult) error {
