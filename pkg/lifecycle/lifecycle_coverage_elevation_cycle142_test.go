@@ -39,7 +39,9 @@ func TestCycle142_Registry_Coverage(t *testing.T) {
 
 func createTestLifecycleWAL(t *testing.T, dir string) *LifecycleEventWAL {
 	t.Helper()
-	wal := createTestLifecycleWAL(t, dir)
+	wal, err := GetOrCreateLifecycleWAL(dir)
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, CloseLifecycleWAL(dir)) })
 	return wal
 }
 
@@ -558,4 +560,3 @@ func TestCycle142_DependencyPropagation_More(t *testing.T) {
 	lcBli := loadGlobalLifecycle(objects.KindBacklogItem)
 	require.NotNil(t, lcBli)
 }
-
