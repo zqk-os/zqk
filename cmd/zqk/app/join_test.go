@@ -11,7 +11,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/federation"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
@@ -33,8 +32,10 @@ func (m *mockJoinTransport) ExecuteTool(ctx context.Context, endpoint string, to
 }
 
 func TestJoinCommand_Registration(t *testing.T) {
-	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
-	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		ForceRemoveRootOnCleanup: true,
+		SeedSchemaPlane:          true,
+	})
 	store := env.FileStorage
 	ctx := pkgctx.NewSystemContext()
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -77,8 +78,10 @@ func TestJoinCommand_ExecutionAttempt(t *testing.T) {
 }
 
 func TestJoinCommand_WithMockTransport_Declined(t *testing.T) {
-	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
-	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		ForceRemoveRootOnCleanup: true,
+		SeedSchemaPlane:          true,
+	})
 	origDir, _ := os.Getwd()
 	require.NoError(t, os.Chdir(env.Root))
 	defer func() { _ = os.Chdir(origDir) }()
@@ -100,8 +103,10 @@ func TestJoinCommand_WithMockTransport_Declined(t *testing.T) {
 }
 
 func TestJoinCommand_WithMockTransport_Accepted(t *testing.T) {
-	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{ForceRemoveRootOnCleanup: true})
-	_ = testenvroot.CopyObjectSpecsFromProject(env.Root, "../../..")
+	env := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
+		ForceRemoveRootOnCleanup: true,
+		SeedSchemaPlane:          true,
+	})
 	origDir, _ := os.Getwd()
 	require.NoError(t, os.Chdir(env.Root))
 	defer func() { _ = os.Chdir(origDir) }()

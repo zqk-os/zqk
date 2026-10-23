@@ -88,10 +88,25 @@ type MultiKindConfig struct {
 var kindMappings stampmemo.Table[*KindMappingsConfig] // keyed by kind_mappings_config.yaml path (closed set)
 
 func defaultKindMappingsConfig() *KindMappingsConfig {
+	k2d := map[string]string{
+		KindRemoteKernel: "remote_kernels",
+	}
+	d2k := map[string]string{
+		"remote_kernels": KindRemoteKernel,
+	}
 	return &KindMappingsConfig{
-		Backends:        make(map[string]BackendConfig),
-		KindToDirectory: make(map[string]string),
-		DirectoryToKind: make(map[string]string),
+		Backends: map[string]BackendConfig{
+			backendDefaultKey: {
+				KindToDirectory: k2d,
+				DirectoryToKind: d2k,
+			},
+			"file": {
+				KindToDirectory: k2d,
+				DirectoryToKind: d2k,
+			},
+		},
+		KindToDirectory: k2d,
+		DirectoryToKind: d2k,
 		SkipDirectories: []string{"_internal", "_external", "architecture", "ontology", "planning", "audit"},
 		SkipSpecs:       []string{KindBaseObject, KindAuditable, KindWorkInterval, KindWorkUnit, KindOccupancy, KindRemainingOpen},
 		currentBackend:  defaultBackendType,

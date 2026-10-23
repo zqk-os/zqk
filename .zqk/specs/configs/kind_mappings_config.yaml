@@ -68,6 +68,7 @@ backends:
             qa_success: qa_success
             questions: question
             releases: release
+            remote_kernels: remote_kernel
             requirements: requirement
             resolvers: resolver
             risk_blockers: risk_blocker
@@ -161,6 +162,7 @@ backends:
             qa_success: qa_success
             question: questions
             release: releases
+            remote_kernel: remote_kernels
             requirement: requirements
             resolver: resolvers
             risk_blocker: risk_blockers
