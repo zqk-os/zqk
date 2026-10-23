@@ -83,4 +83,3 @@ func TestSpecValidator_FieldTraitValidationErrors(t *testing.T) {
 	}
 	assert.True(t, foundTraitErr)
 }
-
