@@ -63,6 +63,52 @@ func TestPIDFile_ReadNonExistent(t *testing.T) {
 	}
 }
 
+func TestPIDFile_ReadWhitespaceAndNewlines(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name    string
+		content string
+		wantPID int
+		wantErr bool
+	}{
+		{name: "clean pid", content: "12345", wantPID: 12345},
+		{name: "trailing newline", content: "12345\n", wantPID: 12345},
+		{name: "trailing crlf", content: "12345\r\n", wantPID: 12345},
+		{name: "surrounding whitespace", content: "  \t12345 \n", wantPID: 12345},
+		{name: "empty content", content: "\n", wantErr: true},
+		{name: "invalid pid string", content: "not-a-pid\n", wantErr: true},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			testRoot := t.TempDir()
+			pidPath := getPIDFilePath(testRoot)
+			if err := fileutil.MkdirAll(filepath.Dir(pidPath), paths.DirPerm755); err != nil {
+				t.Fatalf("failed to create dir: %v", err)
+			}
+			if err := fileutil.WriteFile(pidPath, []byte(tc.content), paths.FilePerm644); err != nil {
+				t.Fatalf("failed to write pid file: %v", err)
+			}
+
+			pid, err := readPIDFile(testRoot)
+			if tc.wantErr {
+				if err == nil {
+					t.Errorf("expected error for content %q, got nil", tc.content)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("readPIDFile() unexpected error: %v", err)
+			}
+			if pid != tc.wantPID {
+				t.Errorf("readPIDFile() = %d, want %d", pid, tc.wantPID)
+			}
+		})
+	}
+}
+
 func TestIsPIDFileNotExist(t *testing.T) {
 	t.Parallel()
 
