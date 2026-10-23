@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/paths"
 
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -29,6 +30,8 @@ func cleanupStorageTestRoot(t *testing.T, tmpDir string, storageProvider storage
 	t.Helper()
 	storagepkg.SetCacheOperationHandler(func(*pkgctx.CacheContext) error { return nil })
 	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(tmpDir)
+		storagepkg.ShutdownHashRegistriesForProjectTesting(tmpDir)
 		fs, ok := nildecode.DecodeNonNilPayload[*storagepkg.FileObjectStorage](storageProvider)
 		if !ok {
 			return

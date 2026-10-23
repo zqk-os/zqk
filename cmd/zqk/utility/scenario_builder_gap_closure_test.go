@@ -23,6 +23,9 @@ import (
 
 func TestValidateYAML_InitializeContextAndSummary(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	cmd := &cobra.Command{Use: "test"}
 	cliCtx := cli.ContextForProjectRoot(proj.Root)
 	cli.SetContext(cmd, cliCtx)
@@ -104,6 +107,9 @@ func TestVersion_GetExecutableNameDirect(t *testing.T) {
 
 func TestScenarioBuilder_CopyHelpers_UpdateScenarioObjectAndCalculateTotal(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -146,6 +152,9 @@ func TestScenarioBuilder_CopyHelpers_UpdateScenarioObjectAndCalculateTotal(t *te
 
 func TestScenarioBuilder_Copy_ReconstructObjectState_Direct(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -195,6 +204,9 @@ func TestScenarioBuilder_CopyHelpers_LoadSpecForKind(t *testing.T) {
 
 func TestScenarioBuilder_DataLoader_References_CollectAndMemoized(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -268,13 +280,20 @@ func TestScenarioBuilder_EventSubscriber_AllProfiles(t *testing.T) {
 
 func TestScenarioBuilder_HelpersBuilder_CreateScenarioBuilder(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	targetDir := filepath.Join(proj.Root, "sb_target")
+	t.Cleanup(func() {
+		storage.SetCacheOperationHandler(nil)
+		cli.UnregisterStorageForProjectRoot(targetDir)
+		storage.ShutdownHashRegistriesForProjectTesting(targetDir)
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+		storage.ShutdownHashRegistriesForProjectTesting(proj.Root)
+	})
 	cmd := &cobra.Command{Use: "scenario-builder"}
 	stdCtx := pkgctx.WithSecurityContext(context.Background(), pkgctx.NewSystemSecurityContext())
 	cmd.SetContext(stdCtx)
 	cliCtx := cli.ContextForProjectRoot(proj.Root)
 	cli.SetContext(cmd, cliCtx)
 
-	targetDir := filepath.Join(proj.Root, "sb_target")
 	b, err := createScenarioBuilder(cmd, targetDir)
 	assert.NoError(t, err)
 	assert.NotNil(t, b)
@@ -282,6 +301,9 @@ func TestScenarioBuilder_HelpersBuilder_CreateScenarioBuilder(t *testing.T) {
 
 func TestScenarioBuilder_CreateNewScenario_ConflictBranch(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},

@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/datacell"
@@ -66,6 +67,9 @@ func TestScenarioBuilder_DataLoader_LockAndMetrics(t *testing.T) {
 
 func TestScenarioBuilder_DataLoader_PathsAndCache(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -118,6 +122,9 @@ func TestScenarioBuilder_Dependency_CAS(t *testing.T) {
 
 func TestScenarioBuilder_GenerateObject_AllKindsAndDiversities(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -167,6 +174,9 @@ func TestScenarioBuilder_GenerateObject_AllKindsAndDiversities(t *testing.T) {
 
 func TestScenarioBuilder_CreateHelpers_UpdateScenario(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -200,6 +210,9 @@ func TestScenarioBuilder_CreateHelpers_UpdateScenario(t *testing.T) {
 
 func TestScenarioBuilder_CopyHelpers_HashAndReconstruct(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -273,6 +286,9 @@ func TestFixHashes_ValidateObjectFields(t *testing.T) {
 
 func TestScenarioBuilder_BuildFromObjects_WithRealObject(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	targetDir := filepath.Join(proj.Root, "copy-target")
 	require.NoError(t, fileutil.MkdirAll(datacell.ProcessPrimaryDir(targetDir), paths.DirPerm755))
 
@@ -308,6 +324,9 @@ func TestScenarioBuilder_BuildFromObjects_WithRealObject(t *testing.T) {
 
 func TestScenarioBuilder_BuildFromDataFile_Pipeline(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	targetDir := filepath.Join(proj.Root, "pipeline-target")
 	require.NoError(t, fileutil.MkdirAll(datacell.ProcessPrimaryDir(targetDir), paths.DirPerm755))
 
@@ -339,6 +358,9 @@ func TestScenarioBuilder_BuildFromDataFile_Pipeline(t *testing.T) {
 
 func TestScenarioBuilder_ProcessObjectsSequentially_ForceAndDuplicates(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -399,6 +421,9 @@ func TestScenarioBuilder_ProcessObjectsSequentially_ForceAndDuplicates(t *testin
 
 func TestScenarioBuilder_CreateObjectInLayer_ForceAndDuplicates(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},
@@ -455,6 +480,9 @@ func TestScenarioBuilder_CreateObjectInLayer_ForceAndDuplicates(t *testing.T) {
 
 func TestReadObjectFromSource(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	logger := logging.NewEventLogger(pkgctx.NewSystemContext())
 	ctx := context.Background()
 

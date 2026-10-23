@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/datacell"
@@ -22,6 +23,10 @@ import (
 func TestScenarioBuilder_BuildGeneration(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
 	targetDir := filepath.Join(proj.Root, "build-target")
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(targetDir)
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	require.NoError(t, fileutil.MkdirAll(datacell.ProcessPrimaryDir(targetDir), paths.DirPerm755))
 
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{

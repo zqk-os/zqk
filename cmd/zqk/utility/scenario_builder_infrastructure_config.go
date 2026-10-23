@@ -69,11 +69,15 @@ func (sb *ScenarioBuilder) copyBootstrapConfigFiles(targetInternalDir string) er
 	recorder := sb.getInfrastructureMetricsRecorder()
 
 	// Find source directory (main project root)
-	// Walk up from current directory to find .zqk/specs
+	// Walk up from project root or current directory to find .zqk/specs
 	searchStart := time.Now()
-	dir, err := fileutil.Getwd()
-	if err != nil {
-		return errfmt.Newf("failed to get current directory").Wrap(err)
+	dir := sb.projectRoot
+	if dir == emptyValue {
+		var err error
+		dir, err = fileutil.Getwd()
+		if err != nil {
+			return errfmt.Newf("failed to get current directory").Wrap(err)
+		}
 	}
 
 	var sourceInternalDir string

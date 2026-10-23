@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -33,6 +34,9 @@ func TestNewFixRegistrationCmd(t *testing.T) {
 
 func TestRunFixRegistration_Flows(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	cmd := NewFixRegistrationCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)
 

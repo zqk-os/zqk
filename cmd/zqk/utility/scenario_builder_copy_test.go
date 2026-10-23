@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/datacell"
@@ -65,6 +66,9 @@ func TestCopyDirectoryHelpers(t *testing.T) {
 
 func TestCopyObjects_CaptureAndExecute(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	targetDir := filepath.Join(proj.Root, "scenario-target")
 	require.NoError(t, fileutil.MkdirAll(datacell.ProcessPrimaryDir(targetDir), paths.DirPerm755))
 
@@ -114,6 +118,9 @@ func TestCopyObjects_CaptureAndExecute(t *testing.T) {
 
 func TestScenarioBuilder_UpdateReferences(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	coordinator := coordination.NewCoordinator(coordination.CoordinatorConfig{
 		LoggingRouter:     &coordination.DefaultLoggingRouter{},
 		OperationalRouter: &coordination.DefaultOperationalRouter{},

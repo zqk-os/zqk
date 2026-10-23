@@ -165,6 +165,9 @@ func TestFixHashes_FlagsValidationAndReporting(t *testing.T) {
 
 func TestFixRegistration_ScanningAndEdgeCases(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 
 	// 1. notifyScanning
 	cmd := &cobra.Command{}
@@ -286,6 +289,9 @@ func TestValidateYAML_ElevationBranches(t *testing.T) {
 
 func TestMigrate_ElevationBranches(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 
 	cmd := NewMigrateCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)

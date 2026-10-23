@@ -216,7 +216,7 @@ func (w *ConfigFileWatcher) checkForChanges(ctx context.Context) {
 	for filename, state := range files {
 		info, err := fileutil.Stat(state.Path)
 		if err != nil {
-			if fileutil.IsNotExist(err) {
+			if fileutil.IsNotExist(err) && !state.MTime.IsZero() {
 				// File was deleted - emit event
 				w.emitFileChangeEvent(ctx, filename, state, nil, configWatcherChangeDeleted)
 				// Update state to reflect deletion

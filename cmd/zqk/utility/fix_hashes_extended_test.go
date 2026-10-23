@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -37,6 +38,9 @@ func TestNewFixHashesCmd(t *testing.T) {
 
 func TestRunFixHashes_Flows(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	cmd := NewFixHashesCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)
 
@@ -108,6 +112,9 @@ func TestRunFixHashes_Flows(t *testing.T) {
 
 func TestFixHashesHelpers(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 
 	// Test outputSummary
 	cmd := &cobra.Command{}

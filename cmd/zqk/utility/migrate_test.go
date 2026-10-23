@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"testing"
@@ -31,6 +32,9 @@ func TestRunMigrate_InvalidConstraint(t *testing.T) {
 
 func TestRunMigrate_MissingBinary(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(proj.Root)
+	})
 	cmd := NewMigrateCmd()
 	initTestCmdContext(t, cmd, proj.Root, nil)
 
