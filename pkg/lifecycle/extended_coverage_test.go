@@ -711,10 +711,11 @@ func TestListenerUpdaterRegistry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewLifecycleEventWAL failed: %v", err)
 	}
-	defer func() {
+	t.Cleanup(func() {
 		_ = wal.Close()
 		_ = CloseLifecycleWAL(dir)
-	}()
+		_ = fileutil.RemoveAll(dir)
+	})
 
 	mock := newMockStorageProvider()
 	getStorage := func(string) (storage.ObjectStorageProvider, bool) {
