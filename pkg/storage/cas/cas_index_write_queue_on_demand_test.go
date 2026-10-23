@@ -99,6 +99,8 @@ func TestListingIndexWriteQueue_CoordinatorIntegration(t *testing.T) {
 	})
 	defer caspkg.SetListingIndexBatchEventCallback(nil)
 
+	_ = queue.FlushAll(2 * time.Second)
+
 	for i := 1; i <= 3; i++ {
 		err := queue.EnqueueUpdate("audit_event", fmt.Sprintf("test-%03d", i), fmt.Sprintf("hash%d", i), cas)
 		if err != nil {
@@ -114,6 +116,8 @@ func TestListingIndexWriteQueue_CoordinatorIntegration(t *testing.T) {
 		context.Background(),
 		func() bool {
 			events := eventCollector.GetEvents()
+			hasStart := false
+			hasComplete := false
 			for _, event := range events {
 				evt, ok := event.(struct {
 					kind      string
@@ -123,17 +127,20 @@ func TestListingIndexWriteQueue_CoordinatorIntegration(t *testing.T) {
 				if !ok {
 					continue
 				}
+				if evt.status == "start" {
+					hasStart = true
+				}
 				if evt.status == "complete" {
-					return true
+					hasComplete = true
 				}
 			}
-			return false
+			return hasStart && hasComplete
 		},
 		5*time.Second,
 		10*time.Millisecond,
 	) {
 		events := eventCollector.GetEvents()
-		t.Fatalf("Expected at least one 'complete' event within timeout, but did not observe one. Events: %#v", events)
+		t.Fatalf("Expected both 'start' and 'complete' events within timeout, but did not observe both. Events: %#v", events)
 	}
 
 	events := eventCollector.GetEvents()
