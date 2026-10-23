@@ -26,10 +26,17 @@ type PolicyRegistry struct {
 	kindOverrides  map[string]PerKindOverride
 }
 
-var globalPolicyRegistry = &PolicyRegistry{
-	tokenOverrides: make(map[string]DispatchPolicyOverride),
-	kindOverrides:  make(map[string]PerKindOverride),
+// NewPolicyRegistry returns an empty override registry.
+// Exported so studio facades can type-alias PolicyRegistry without composite
+// literals on unexported fields.
+func NewPolicyRegistry() *PolicyRegistry {
+	return &PolicyRegistry{
+		tokenOverrides: make(map[string]DispatchPolicyOverride),
+		kindOverrides:  make(map[string]PerKindOverride),
+	}
 }
+
+var globalPolicyRegistry = NewPolicyRegistry()
 
 func (r *PolicyRegistry) SetOverride(key string, policy DispatchPolicyOverride) {
 	r.mu.Lock()
