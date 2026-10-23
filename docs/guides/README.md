@@ -45,6 +45,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | :--- | :--- | :--- | :--- |
 | **[Single-Command Execution Loop (`zqk do`)](./SINGLE_COMMAND_EXECUTION_LOOP_GUIDE.md)** | 5-phase execution engine (Intent ➔ Preflight ➔ Locks ➔ Dispatch ➔ Verification), fail-closed invariant guards, and anti-thrashing discipline. | Autonomous AI Agents | `zqk do <intent>`, `zqk workflow whats-next` |
 | **[CLI Application Subsystem Architectural & Operational Guide](./CLI_APP_SUBSYSTEM_GUIDE.md)** | Subsystem lifecycle, execution topology, session persistence, runtime diagnostics, profiling, shell completions, and failure isolation. | All Engineers & Agents | `zqk`, `cmd/zqk/app`, `zqk completion` |
+| **[CLI Workflow Subsystem Architectural & Operational Guide](./CLI_WORKFLOW_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, composite ambient routing, deterministic next-action resolution, gate preconditions, and VDS verification. | All Engineers & Agents | `zqk workflow whats-next`, `zqk workflow next`, `zqk workflow check`, `zqk workflow add` |
 | **[Scheduler Subsystem Operational & Architectural Guide](./SCHEDULER_SUBSYSTEM_GUIDE.md)** | Embedded job queue, CAP loop orchestrator, transient retry membranes, atomic job state registry, retention cleanup, and watchdog monitoring. | Kernel Engineers & Agents | `pkg/scheduler`, `zqk scheduler` |
 
 ---

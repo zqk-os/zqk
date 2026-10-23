@@ -68,6 +68,14 @@ func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 	if err := sp.Create(sCtx, sec, bli2); err != nil {
 		t.Fatalf("create bli2 failed: %v", err)
 	}
+
+	flushCtx, cancel := storage.DurabilityFlushContext()
+	defer cancel()
+	_ = storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, sp, testRoot, []string{
+		objects.KindOrganization, objects.KindMission, objects.KindVision, objects.KindGoal,
+		objects.KindRequirement, objects.KindPriorityPlan, objects.KindBacklogItem,
+	})
+	_ = sp.Shutdown(sCtx)
 }
 
 func TestStateTree_WithPopulatedHierarchy(t *testing.T) {
