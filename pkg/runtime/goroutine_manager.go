@@ -63,6 +63,35 @@ type TrackedGoroutine struct {
 	mu        sync.RWMutex       // Protects fields
 }
 
+// NewTrackedGoroutine constructs a tracked goroutine record (mutex is zero-value).
+// Facades that type-alias TrackedGoroutine must use this instead of a composite literal.
+func NewTrackedGoroutine(id string, config GoroutineConfig, ctx context.Context, cancel context.CancelFunc) *TrackedGoroutine {
+	meta := config.Metadata
+	if meta == nil {
+		meta = make(map[string]any)
+	}
+	return &TrackedGoroutine{
+		ID:        id,
+		Name:      config.Name,
+		Purpose:   config.Purpose,
+		Category:  config.Category,
+		StartTime: time.Now(),
+		Context:   ctx,
+		Cancel:    cancel,
+		Resources: config.Resources,
+		Metadata:  meta,
+		Status:    StatusStarting,
+	}
+}
+
+// Mu returns the goroutine mutex for coordinated locking from facade packages.
+func (t *TrackedGoroutine) Mu() *sync.RWMutex {
+	if t == nil {
+		return nil
+	}
+	return &t.mu
+}
+
 // Resource represents a resource used by a goroutine (ticker, channel, etc.)
 type Resource struct {
 	Type        string       // "ticker", "channel", "file", "connection", etc.
@@ -131,22 +160,7 @@ func (gm *GoroutineManager) Start(config GoroutineConfig, fn func(ctx context.Co
 	}
 	ctx, cancel := context.WithCancel(baseCtx) //nolint:gosec // G118: cancel stored on TrackedGoroutine
 
-	// Create tracked goroutine
-	tracked := &TrackedGoroutine{
-		ID:        id,
-		Name:      config.Name,
-		Purpose:   config.Purpose,
-		Category:  config.Category,
-		StartTime: time.Now(),
-		Context:   ctx,
-		Cancel:    cancel,
-		Resources: config.Resources,
-		Metadata:  config.Metadata,
-		Status:    StatusStarting,
-	}
-	if tracked.Metadata == nil {
-		tracked.Metadata = make(map[string]any)
-	}
+	tracked := NewTrackedGoroutine(id, config, ctx, cancel)
 
 	// Register goroutine
 	_ = concurrency.RunInLock(&gm.mu, func() error {
@@ -169,7 +183,7 @@ func (gm *GoroutineManager) Start(config GoroutineConfig, fn func(ctx context.Co
 
 	// Update status to running
 	_ = concurrency.RunInLockWithLogger(
-		&tracked.mu, LockNameGoroutineManagerSetRunning, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		tracked.Mu(), LockNameGoroutineManagerSetRunning, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			tracked.Status = StatusRunning
 			return nil
@@ -197,7 +211,7 @@ func (gm *GoroutineManager) Start(config GoroutineConfig, fn func(ctx context.Co
 			tracked, exists := gm.lookupTracked(id)
 			if exists && tracked != nil {
 				var status GoroutineStatus
-				_ = concurrency.RunInRLock(&tracked.mu, func() error {
+				_ = concurrency.RunInRLock(tracked.Mu(), func() error {
 					status = tracked.Status
 					return nil
 				})
@@ -327,7 +341,7 @@ func (gm *GoroutineManager) Shutdown() error {
 			for id, tracked := range goroutinesCopy {
 				var wasMarkedLeaked bool
 				_ = concurrency.RunInLockWithLogger(
-					&tracked.mu, LockNameGoroutineManagerMarkLeaked, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+					tracked.Mu(), LockNameGoroutineManagerMarkLeaked, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 					func() error {
 						if tracked.Status == StatusRunning || tracked.Status == StatusStopping {
 							tracked.Status = StatusLeaked
@@ -368,7 +382,7 @@ func (gm *GoroutineManager) stopGoroutine(id string, err error, onStop func(stri
 	// Use context.Background() for lock acquisition to ensure it works even if
 	// gm.shutdownCtx is cancelled (e.g., when called from Shutdown())
 	_ = concurrency.RunInLockWithLogger(
-		&tracked.mu, LockNameGoroutineManagerStopCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		tracked.Mu(), LockNameGoroutineManagerStopCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			if tracked.Status == StatusStopped || tracked.Status == StatusError {
 				alreadyStopped = true
@@ -393,7 +407,7 @@ func (gm *GoroutineManager) stopGoroutine(id string, err error, onStop func(stri
 	// Use context.Background() for lock acquisition to ensure it works even if
 	// gm.shutdownCtx is cancelled (e.g., when called from Shutdown())
 	_ = concurrency.RunInLockWithLogger(
-		&tracked.mu, LockNameGoroutineManagerStopUpdate, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		tracked.Mu(), LockNameGoroutineManagerStopUpdate, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			tracked.StopTime = &now
 			tracked.Error = err
@@ -430,7 +444,7 @@ func (gm *GoroutineManager) emitGoroutineEvent(id, eventType string, tracked *Tr
 	var duration time.Duration
 	var status string
 	var metadata map[string]any
-	_ = concurrency.RunInRLock(&tracked.mu, func() error {
+	_ = concurrency.RunInRLock(tracked.Mu(), func() error {
 		duration = time.Since(tracked.StartTime)
 		if tracked.StopTime != nil {
 			duration = tracked.StopTime.Sub(tracked.StartTime)
@@ -562,7 +576,7 @@ func (gm *GoroutineManager) DetectLeaks() []*TrackedGoroutine {
 		var status GoroutineStatus
 		var startTime time.Time
 		_ = concurrency.RunInRLockWithLogger(
-			&tracked.mu, LockNameGoroutineManagerLeakCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+			tracked.Mu(), LockNameGoroutineManagerLeakCheck, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
 				status = tracked.Status
 				startTime = tracked.StartTime
@@ -657,7 +671,7 @@ func (gm *GoroutineManager) GetRuntimeStats() map[string]any {
 		var status string
 		var category string
 		_ = concurrency.RunInRLockWithLogger(
-			&tracked.mu, LockNameGoroutineManagerStatsRead, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+			tracked.Mu(), LockNameGoroutineManagerStatsRead, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 			func() error {
 				status = string(tracked.Status)
 				category = tracked.Category
