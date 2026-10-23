@@ -68,6 +68,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | :--- | :--- | :--- | :--- |
 | **[Diagnostics, Auto-Remedies & Self-Healing](./DIAGNOSTICS_SELF_HEALING_AND_REMEDY_GUIDE.md)** | 4-layer health checks, automated resolution of stale locks and orphaned temp buffers, and CAS quarantine recovery. | SREs, Operators, CI/CD | `zqk system check --auto-remedy`, `zqk system doctor` |
 | **[CLI System Subsystem & Health Operations Guide](./CLI_SYSTEM_SUBSYSTEM_GUIDE.md)** | Multi-layer validation, automated remediation engine, strategic alignment scoring, and service lifecycle management. | SREs, Operators, Swarm Engineers | `zqk system check`, `zqk system align`, `zqk system status` |
+| **[CLI Visual Studio & Interactive TUI Subsystem Operational Architecture Guide](./CLI_UI_SUBSYSTEM_GUIDE.md)** | Interactive full-screen terminal mission control, headless model projection, embedded Web Visual Studio, port auto-scanning, and >=85.0% coverage invariant. | All Engineers & Agents | `zqk ui`, `zqk dashboard`, `zqk console` |
 
 ---
 
