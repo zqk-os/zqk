@@ -350,20 +350,18 @@ func TestJobStateRegistry_MigrateUnbucketedJobStateDirsBestEffort(t *testing.T) 
 func TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight(t *testing.T) {
 	t.Parallel()
 
-	prev := stateRetentionFullCleanupMinInterval
-	stateRetentionFullCleanupMinInterval = time.Hour
-	t.Cleanup(func() { stateRetentionFullCleanupMinInterval = prev })
+	t.Cleanup(SetStateRetentionFullCleanupMinIntervalForTest(time.Hour))
 
 	tmpDir := t.TempDir()
 	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
 
 	var calls int
 	var mu sync.Mutex
-	reg.fullCleanupTestHook = func() {
+	reg.SetFullCleanupTestHook(func() {
 		mu.Lock()
 		calls++
 		mu.Unlock()
-	}
+	})
 
 	reg.scheduleFullRetentionCleanup()
 	reg.scheduleFullRetentionCleanup()
@@ -390,10 +388,7 @@ func TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight(t
 	// Wait for in-flight to finish, then still rate-limited.
 	deadline = time.Now().Add(2 * time.Second)
 	for time.Now().Before(deadline) {
-		reg.cleanupMu.Lock()
-		inflight := reg.fullCleanupInFlight
-		reg.cleanupMu.Unlock()
-		if !inflight {
+		if !reg.FullCleanupInFlight() {
 			break
 		}
 		time.Sleep(10 * time.Millisecond)
@@ -411,16 +406,14 @@ func TestJobStateRegistry_scheduleFullRetentionCleanup_RateLimitedSingleFlight(t
 func TestJobStateRegistry_CompleteExecution_LocalCleanupOnlyHotPath(t *testing.T) {
 	t.Parallel()
 
-	prev := stateRetentionFullCleanupMinInterval
-	stateRetentionFullCleanupMinInterval = time.Hour
-	t.Cleanup(func() { stateRetentionFullCleanupMinInterval = prev })
+	t.Cleanup(SetStateRetentionFullCleanupMinIntervalForTest(time.Hour))
 
 	tmpDir := t.TempDir()
 	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
-	reg.retention = time.Hour // expired = older than 1h
+	reg.SetRetentionForTest(time.Hour) // expired = older than 1h
 
 	var fullCalls int
-	reg.fullCleanupTestHook = func() { fullCalls++ }
+	reg.SetFullCleanupTestHook(func() { fullCalls++ })
 
 	const jobA = "SCH-local-a"
 	const jobB = "SCH-local-b"

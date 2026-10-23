@@ -134,6 +134,68 @@ type JobStateRegistry struct {
 	fullCleanupTestHook func() // optional; tests count scheduled full cleanups
 }
 
+// SetFullCleanupTestHook installs a hook invoked when a full retention cleanup is scheduled.
+// For tests only — enables facade aliases across package boundaries.
+func (r *JobStateRegistry) SetFullCleanupTestHook(fn func()) {
+	if r == nil {
+		return
+	}
+	r.fullCleanupTestHook = fn
+}
+
+// FullCleanupInFlight reports whether a full retention cleanup goroutine is running.
+// For tests only.
+func (r *JobStateRegistry) FullCleanupInFlight() bool {
+	if r == nil {
+		return false
+	}
+	r.cleanupMu.Lock()
+	defer r.cleanupMu.Unlock()
+	return r.fullCleanupInFlight
+}
+
+// SetRetentionForTest overrides the completed-state retention window. For tests only.
+func (r *JobStateRegistry) SetRetentionForTest(d time.Duration) {
+	if r == nil {
+		return
+	}
+	r.retention = d
+}
+
+// SetStateRetentionFullCleanupMinIntervalForTest overrides the rate-limit interval for full
+// retention cleanup. Returns a restore func. For tests only — enables facade aliases.
+func SetStateRetentionFullCleanupMinIntervalForTest(d time.Duration) (restore func()) {
+	prev := stateRetentionFullCleanupMinInterval
+	stateRetentionFullCleanupMinInterval = d
+	return func() { stateRetentionFullCleanupMinInterval = prev }
+}
+
+// ScheduleFullRetentionCleanupForTest exposes scheduleFullRetentionCleanup for facade tests.
+func (r *JobStateRegistry) ScheduleFullRetentionCleanupForTest() {
+	r.scheduleFullRetentionCleanup()
+}
+
+// StateDirForTest returns the registry state directory. For tests only.
+func (r *JobStateRegistry) StateDirForTest() string {
+	if r == nil {
+		return ""
+	}
+	return r.stateDir
+}
+
+// LocksDirForTest returns the registry locks directory. For tests only.
+func (r *JobStateRegistry) LocksDirForTest() string {
+	if r == nil {
+		return ""
+	}
+	return r.locksDir
+}
+
+// StateFilePathForJobExecutionForTest exposes stateFilePathForJobExecution for facade tests.
+func (r *JobStateRegistry) StateFilePathForJobExecutionForTest(jobID, executionID string) string {
+	return r.stateFilePathForJobExecution(jobID, executionID)
+}
+
 type cachedFileState struct {
 	modTime time.Time
 	size    int64
