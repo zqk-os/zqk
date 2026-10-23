@@ -34,6 +34,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 
 | Guide | Focus Area | Target Audience | Primary CLI & MCP Commands |
 | :--- | :--- | :--- | :--- |
+| **[Validation Subsystem Architectural & Operational Guide](./VALIDATION_SUBSYSTEM_GUIDE.md)** | Multi-layer validation architecture (Layers 0–4), AST invariant checks, async priority queue execution, automated remediation engine, and >=85.0% statement coverage invariant. | All Engineers & Agents | `pkg/validation`, `zqk system check`, `zqk object inspect` |
 | **[Custom Validation Policy Creation & Rule DSL](./POLICY_CREATION_AND_VALIDATION_DSL_GUIDE.md)** | Composing declarative Validation Rule DSL expressions, live population dry-run audits, grandfathering, and check-valve registration. | Tech Leads, Governance Stewards | `zqk object inspect --policy-studio`, `zqk system check-policy` |
 
 ---
