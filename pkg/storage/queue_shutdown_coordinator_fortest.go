@@ -5,7 +5,10 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
-// NewQueueShutdownCoordinatorForTest builds a coordinator for storage_test package tests.
+// Promoted from export_test so dependent modules (type-aliased facades) can construct
+// coordinators without writing unexported fields.
+
+// NewQueueShutdownCoordinatorForTest builds a coordinator for cross-module / facade tests.
 // If cfg is nil, DefaultShutdownConfig is used.
 func NewQueueShutdownCoordinatorForTest(cfg *ShutdownConfig, testOverride bool) *QueueShutdownCoordinator {
 	if cfg == nil {
@@ -25,4 +28,17 @@ func (c *QueueShutdownCoordinator) RegisteredQueueCountForTest() int {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return len(c.queues)
+}
+
+// GetQueueShutdownEventCallbackForTest exposes the global shutdown event callback for tests.
+func GetQueueShutdownEventCallbackForTest() QueueShutdownEventCallback {
+	return getQueueShutdownEventCallback()
+}
+
+// SetTestOverrideForTest controls IsShutdownInitiated test-environment short-circuit.
+func (c *QueueShutdownCoordinator) SetTestOverrideForTest(enabled bool) {
+	if c == nil {
+		return
+	}
+	c.testOverride = enabled
 }
