@@ -2,6 +2,7 @@ package errfmt
 
 import (
 	"fmt"
+	"io"
 	"strings"
 )
 
@@ -72,7 +73,41 @@ func (b *ErrorStringBuilder) AndIfTrue(cond bool, template string, args ...any) 
 
 // Build returns the composed message.
 func (b *ErrorStringBuilder) Build() string {
+	if b == nil {
+		return ""
+	}
 	return strings.Join(b.parts, ": ")
+}
+
+// String returns the composed error message, implementing fmt.Stringer.
+func (b *ErrorStringBuilder) String() string {
+	return b.Build()
+}
+
+// Error returns the composed error message, implementing the error interface.
+func (b *ErrorStringBuilder) Error() string {
+	return b.Build()
+}
+
+// Format implements fmt.Formatter to support %s, %v, and %q formatting verbs.
+func (b *ErrorStringBuilder) Format(s fmt.State, verb rune) {
+	if b == nil {
+		return
+	}
+	switch verb {
+	case 's', 'v':
+		if _, err := io.WriteString(s, b.Build()); err != nil {
+			return
+		}
+	case 'q':
+		if _, err := fmt.Fprintf(s, "%q", b.Build()); err != nil {
+			return
+		}
+	default:
+		if _, err := fmt.Fprintf(s, "%%!%c(*ErrorStringBuilder=%s)", verb, b.Build()); err != nil {
+			return
+		}
+	}
 }
 
 // Wrap composes the message and wraps err via %w.
