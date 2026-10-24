@@ -19,6 +19,7 @@ func IsSidecarFileName(name string) bool {
 // (e.g. cli_specs/system/._x.yaml or ._dir/file.yaml).
 func PathHasSidecarSegment(path string) bool {
 	path = filepath.ToSlash(path)
+	path = strings.ReplaceAll(path, `\`, `/`)
 	for _, seg := range strings.Split(path, "/") {
 		if seg == "" {
 			continue
