@@ -52,6 +52,11 @@ func (r Result[T]) IsErr() bool {
 	return r.err != nil
 }
 
+// Err returns the underlying error if present, or nil if successful
+func (r Result[T]) Err() error {
+	return r.err
+}
+
 // Value returns the value and error (unwraps the Result)
 func (r Result[T]) Value() (T, error) {
 	return r.value, r.err
@@ -104,6 +109,56 @@ func AndThen[T, U any](r Result[T], fn func(T) Result[U]) Result[U] {
 		return Err[U](r.err)
 	}
 	return fn(r.value)
+}
+
+// FlatMap chains operations, returning a new Result. This is an alias for AndThen.
+func FlatMap[T, U any](r Result[T], fn func(T) Result[U]) Result[U] {
+	return AndThen(r, fn)
+}
+
+// Match executes onSuccess if r is Ok, or onFailure if r is Err, returning the resulting value.
+func Match[T, U any](r Result[T], onSuccess func(T) U, onFailure func(error) U) U {
+	if r.err != nil {
+		if onFailure != nil {
+			return onFailure(r.err)
+		}
+		var zero U
+		return zero
+	}
+	if onSuccess != nil {
+		return onSuccess(r.value)
+	}
+	var zero U
+	return zero
+}
+
+// Match executes onSuccess if r is Ok, or onFailure if r is Err.
+func (r Result[T]) Match(onSuccess func(T), onFailure func(error)) {
+	if r.err != nil {
+		if onFailure != nil {
+			onFailure(r.err)
+		}
+		return
+	}
+	if onSuccess != nil {
+		onSuccess(r.value)
+	}
+}
+
+// MatchErr executes fn if the Result is Err, returning r for chaining.
+func MatchErr[T any](r Result[T], fn func(error)) Result[T] {
+	if r.err != nil && fn != nil {
+		fn(r.err)
+	}
+	return r
+}
+
+// MatchErr executes fn if the Result is Err, returning r for chaining.
+func (r Result[T]) MatchErr(fn func(error)) Result[T] {
+	if r.err != nil && fn != nil {
+		fn(r.err)
+	}
+	return r
 }
 
 // OrElse returns the Result if successful, otherwise returns the alternative
