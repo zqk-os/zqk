@@ -12,7 +12,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-runewidth v0.0.31
 	github.com/mitchellh/go-ps v1.0.0
-	github.com/neo4j/neo4j-go-driver/v5 v5.28.5
+	github.com/neo4j/neo4j-go-driver/v5 v5.28.6
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/shirou/gopsutil/v3 v3.24.5
@@ -23,8 +23,8 @@ require (
 	golang.org/x/crypto v0.58.0
 	golang.org/x/sync v0.24.0
 	golang.org/x/sys v0.49.0
-	golang.org/x/tools v0.52.0
 	golang.org/x/term v0.47.0
+	golang.org/x/tools v0.52.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -42,6 +42,6 @@ require (
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
-	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 )
