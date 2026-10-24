@@ -39,6 +39,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[Paths & Directory Topology Subsystem Operational & Architectural Guide](./PATHS_SUBSYSTEM_GUIDE.md)** | Subsystem filesystem topology, 4-tier project root discovery, runtime layout (.zqk/), ephemeral worktree isolation, trunk lock eviction, path resolver, and >=85.0% coverage invariant. | Kernel Architects, SREs & Agents | `pkg/paths` |
 | **[CLI Query Subsystem Architectural & Operational Guide](./CLI_QUERY_SUBSYSTEM_GUIDE.md)** | Subsystem command taxonomy, declarative ZPARQL pattern queries, interactive REPL console, graph edge path visualization, and >=85.0% coverage invariant. | All Engineers & Agents | `zqk query`, `zqk query -i`, `zqk query --visualize` |
 | **[Knowledge Graph Traversal & Query Execution Subsystem Guide](./GRAPH_TRAVERSAL_AND_QUERY_EXECUTION_GUIDE.md)** | Subsystem architecture, ZPARQL pattern grammar, AST compilation, cost-based physical planner, cycle-safe DFS traversal, bounded streaming joins, and >=85.0% statement coverage invariant. | Graph Engineers & AI Agents | `pkg/traversal`, `zqk query` |
+| **[Graph Mutation, Preflight Validation & Transaction Engine Subsystem Guide](./GRAPH_MUTATION_AND_TRANSACTION_ENGINE_GUIDE.md)** | Subsystem architecture, ZQL grammar compilation, Draft 2020-12 AST, preflight invariant validation, atomic ACID transactions, multi-engine write isolation, rollback unwinding, and >=85.0% statement coverage invariant. | Kernel Architects, Database Engineers & AI Agents | `pkg/mutation`, `zqk mutate` |
 
 ---
 
