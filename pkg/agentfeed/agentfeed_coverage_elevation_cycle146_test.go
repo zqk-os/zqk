@@ -509,7 +509,6 @@ func TestCycle146_PrioritizeSeatInbox_Ordering(t *testing.T) {
 	assert.Equal(t, "EVT-REGULAR", ordered[2].EventID)
 }
 
-
 func TestCycle146_PeerAckAuth_Matrix(t *testing.T) {
 	root := setupTestFeedRoot(t)
 
@@ -684,7 +683,6 @@ func TestCycle146_Wake_DeliverAndPasteStubs(t *testing.T) {
 	assert.Equal(t, "empty_message", resEmpty.Skipped)
 }
 
-
 func TestCycle146_SeatWorker_HandleNonComms_Branches(t *testing.T) {
 	ctx := context.Background()
 
@@ -776,7 +774,6 @@ func TestCycle146_PeerAckAwait_Storage_EdgeCases(t *testing.T) {
 	require.NoError(t, err)
 	assert.Empty(t, emptyLoaded.Awaits)
 }
-
 
 func TestCycle146_PeerSeats_RefreshLivePIDs_Mocked(t *testing.T) {
 	dir := t.TempDir()
