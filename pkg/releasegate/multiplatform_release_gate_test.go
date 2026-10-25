@@ -35,6 +35,9 @@ func TestMultiPlatformCompilation(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping multiplatform compilation in -short mode")
 	}
+	if deadline, ok := t.Deadline(); ok && time.Until(deadline) < 90*time.Second {
+		t.Skipf("skipping multiplatform compilation: remaining time %s < recommended 90s (run with -timeout 120s or -short)", time.Until(deadline).Round(time.Second))
+	}
 	t.Parallel()
 	root := findModuleRoot(t)
 
