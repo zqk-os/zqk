@@ -33,36 +33,13 @@ type Result struct {
 	Missing []string
 }
 
+var defaultEvaluator = NewEvaluator()
+
 // Evaluate checks MMORCH CRI-SHOVEL-READY against a backlog_item map.
 // AUTO-/synthetic grooming rows (id prefix AUTO-BLI-) are treated as ready so TPM
 // empty-plan recovery is not blocked by the dispatch gate.
 func Evaluate(bli map[string]any) Result {
-	if bli == nil {
-		return Result{Ready: false, Missing: []string{"object"}}
-	}
-	id, _ := bli[objects.FieldKeyID].(string)
-	if strings.HasPrefix(strings.TrimSpace(id), "AUTO-BLI-") {
-		return Result{Ready: true}
-	}
-
-	var missing []string
-	if !hasNonEmptyRefList(bli, objects.FieldKeyRequirementRefs) &&
-		!hasNonEmptyRefList(bli, objects.FieldKeyTechnicalSpecRefs) {
-		missing = append(missing, "requirement_refs|technical_spec_refs")
-	}
-	if !hasNonEmptyRefList(bli, objects.FieldKeyCriteriaRefs) {
-		missing = append(missing, objects.FieldKeyCriteriaRefs)
-	}
-	if !hasEstimatedScope(bli) {
-		missing = append(missing, objects.FieldKeyEstimatedEffort+"|scope_signal")
-	}
-	if !hasLaneAssignment(bli) {
-		missing = append(missing, "persona|stakeholders")
-	}
-	if hasUnresolvedBlocker(bli) {
-		missing = append(missing, "unresolved_blocker")
-	}
-	return Result{Ready: len(missing) == 0, Missing: missing}
+	return defaultEvaluator.Evaluate(bli)
 }
 
 // IsReady is the boolean form of Evaluate.
