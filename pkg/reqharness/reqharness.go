@@ -141,6 +141,18 @@ func RegisterPredicate(name string, fn PredicateFunc) error {
 	return nil
 }
 
+// MustRegister binds a name to a runnable check or panics if registration fails.
+func MustRegister(name string, fn PredicateFunc) {
+	if err := RegisterPredicate(name, fn); err != nil {
+		panic(err)
+	}
+}
+
+// Names returns a sorted list of registered predicate names.
+func Names() []string {
+	return registeredNames()
+}
+
 // lookupPredicate resolves a name; ok=false when never registered.
 func lookupPredicate(name string) (PredicateFunc, bool) {
 	regMu.RLock()
@@ -304,9 +316,18 @@ func nameOrID(c Criterion) string {
 
 // --- Requirement file IO ------------------------------------------------------
 
+// DefaultRequirementsPath defines the default storage path for requirements.
+var DefaultRequirementsPath = filepath.Join(paths.ProjectDataDir, "requirements.json")
+
+// jsonMarshalIndent is pluggable for test error injection.
+var jsonMarshalIndent = json.MarshalIndent
+
 // LoadRequirements reads a JSON requirement list; empty lists are rejected so
 // a harness run can never vacuously pass.
 func LoadRequirements(path string) ([]Requirement, error) {
+	if path == "" {
+		path = DefaultRequirementsPath
+	}
 	b, err := fileutil.ReadFile(filepath.Clean(path)) // #nosec G304
 	if err != nil {
 		return nil, fmt.Errorf(msgRead, path, err)
@@ -323,13 +344,16 @@ func LoadRequirements(path string) ([]Requirement, error) {
 
 // SaveRequirements writes the requirement list as stable JSON.
 func SaveRequirements(path string, reqs []Requirement) error {
+	if path == "" {
+		path = DefaultRequirementsPath
+	}
 	if len(reqs) == 0 {
 		return fmt.Errorf(msgRefuseSave, path)
 	}
 	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm750); err != nil {
 		return fmt.Errorf(msgMkdir, path, err)
 	}
-	b, err := json.MarshalIndent(reqs, "", "  ")
+	b, err := jsonMarshalIndent(reqs, "", "  ")
 	if err != nil {
 		return fmt.Errorf(msgMarshal, err)
 	}
