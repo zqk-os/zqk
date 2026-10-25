@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 ZQK Authors. All rights reserved.
+// Use of this source code is governed by an Apache-2.0 license.
+
 // Package aliases provides small helpers for domain-specific string alias tables.
 //
 // Use this for static map[string]string alias → canonical normalization at command
