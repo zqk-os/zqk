@@ -1,19 +1,23 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 ZQK Authors. All rights reserved.
+// Use of this source code is governed by an Apache-2.0 license.
+
 package kindsynonyms
 
 import "github.com/zqk-os/zqk/pkg/kindnames"
 
 var (
-	aliasesBacklogItem = []string{"task", "tasks", "item", "items", "backlog", "story", "stories", "work_item"}
+	aliasesBacklogItem = []string{"task", "tasks", "item", "items", "backlog", "story", "stories", "work_item", "bli", "blis"}
 	aliasesRequirement = []string{"req", "reqs", "spec", "specs", "specification"}
-	aliasesGoal        = []string{"objective", "objectives", "aim", "target"}
-	aliasesMilestone   = []string{"milestones", "checkpoint", "checkpoints", "phase"}
+	aliasesGoal        = []string{"objective", "objectives", "aim", "target", "goals"}
+	aliasesMilestone   = []string{"milestones", "checkpoint", "checkpoints", "phase", "mil", "mils"}
 	aliasesComponent   = []string{"comp", "components", "module", "modules", "part"}
-	aliasesCriteria    = []string{"criterion", "acceptance_criteria", "acceptance", "test_criteria"}
+	aliasesCriteria    = []string{"criterion", "acceptance_criteria", "acceptance", "test_criteria", "crit", "crits"}
 	// ADRs are the same ontology as decision (ADR- vs DEC- id prefixes), not extra kinds.
 	aliasesDecision = []string{"adr", "arch_decision_record", "architectural_decision"}
-	aliasesTestCase = []string{"test", "tests", "testcase", "testcases", "tc"}
+	aliasesTestCase = []string{"test", "tests", "testcase", "testcases", "tc", "tcs", "tst", "tsts"}
 	// Do not alias "roadmap" to priority_plan: roadmap is a distinct object kind (ontology roadmap).
-	aliasesPriority   = []string{"plan", "priority", "priorities", "pplan"}
+	aliasesPriority   = []string{"plan", "priority", "priorities", "pplan", "pplans", "pri", "pris"}
 	aliasesWorkstream = []string{"stream", "streams", "work_stream", "initiative"}
 	// prompt_template: avoid "template" — conflicts with kindnames.Template (CAS template objects).
 	aliasesPromptTemplate = []string{"prompt", "prompts", "prompt_tpl"}
@@ -22,6 +26,10 @@ var (
 	aliasesStrategicPlan        = []string{"splan", "strat_plan", "strategic"}
 	aliasesWorkstreamTransition = []string{"wstrans", "ws_trans"}
 	aliasesEvolutionManagement  = []string{"evoman", "evo_man"}
+	aliasesEpic                 = []string{"epics"}
+	aliasesChangeJournalEntry   = []string{"journal", "change_journal", "journal_entry"}
+	aliasesPolicy               = []string{"policies"}
+	aliasesVocabularyScheme     = []string{"vocab", "vocabulary"}
 )
 
 // KindAliasEntry defines a canonical kind and its accepted synonyms.
@@ -90,6 +98,22 @@ func DefaultKindAliasEntries() []KindAliasEntry {
 		{
 			Kind:    kindnames.EvolutionManagement,
 			Aliases: aliasesEvolutionManagement,
+		},
+		{
+			Kind:    kindnames.Epic,
+			Aliases: aliasesEpic,
+		},
+		{
+			Kind:    kindnames.ChangeJournalEntry,
+			Aliases: aliasesChangeJournalEntry,
+		},
+		{
+			Kind:    kindnames.Policy,
+			Aliases: aliasesPolicy,
+		},
+		{
+			Kind:    kindnames.VocabularyScheme,
+			Aliases: aliasesVocabularyScheme,
 		},
 	}
 }
