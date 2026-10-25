@@ -18,9 +18,11 @@ import (
 const testEmptyID = ""
 
 func TestCapture_Disabled(t *testing.T) {
-	t.Parallel()
 	_ = zqkenv.RollbackCaptureDisabled().Set("1")
-	defer zqkenv.RollbackCaptureDisabled().Unset()
+	defer func() {
+		_ = zqkenv.RollbackCaptureDisabled().Unset()
+		_ = DefaultConfig()
+	}()
 	// Reset config cache by running DefaultConfig after env set
 	_ = DefaultConfig()
 
