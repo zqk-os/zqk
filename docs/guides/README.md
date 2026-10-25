@@ -45,6 +45,7 @@ Every guide is structured to serve both **human pair programmers** using the int
 | **[Time Standardization & Deterministic Simulation Subsystem Guide](./TIME_AND_DETERMINISTIC_SIMULATION_GUIDE.md)** | Subsystem architecture, UTC timestamp invariants, RFC3339/RFC3339Nano formatting, deterministic simulation and WAL replay, nil pointer safety, and >=85.0% statement coverage invariant. | All Engineers & Autonomous AI Agents | `pkg/zqktime` |
 | **[Acronym Vocabulary & Progressive Disclosure Subsystem Guide](./ACRONYM_VOCABULARY_AND_PROGRESSIVE_DISCLOSURE_GUIDE.md)** | Subsystem architecture, canonical acronym registry, VOC-KERNEL-ACRONYMS vocabulary scheme, live storage projection, approximate search, progressive disclosure, and >=85.0% statement coverage invariant. | All Engineers & Autonomous AI Agents | `pkg/acronyms`, `zqk explain` |
 | **[Batch AF (Aggregation & Orphaned Processing) Subsystem Architectural & Operational Guide](./BATCH_AF_SUBSYSTEM_GUIDE.md)** | Subsystem architecture, dual-trigger batch aggregation, bounded worker pool execution, exponential backoff retries, orphaned batch reclamation, and >=85.0% statement coverage invariant. | All Engineers & Autonomous AI Agents | `pkg/batchaf` |
+| **[Stamp Memoization & Generation Tracking Subsystem Guide](./STAMP_MEMOIZATION_AND_GENERATION_TRACKING_GUIDE.md)** | Subsystem architecture, stamp-invalidated memoization, generation tracking, zero-copy view projections, non-blocking peek, and >=85.0% statement coverage invariant. | All Engineers & Autonomous AI Agents | `pkg/stampmemo` |
 
 ---
 
