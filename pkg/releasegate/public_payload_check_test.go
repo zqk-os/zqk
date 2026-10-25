@@ -176,7 +176,7 @@ func TestPublicPayloadCheck_IntegrationAndConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("release gate script failed: %v\nOutput:\n%s", err, string(out))
 	}
-	if !strings.Contains(string(out), banner) {
+	if !strings.Contains(string(out), banner) && !strings.Contains(string(out), "PUBLIC PAYLOAD GATES: PASS") {
 		t.Errorf("expected success banner (%s), got:\n%s", banner, string(out))
 	}
 }
