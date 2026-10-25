@@ -22,6 +22,9 @@ type SystemdAdapter struct {
 	// UserMode specifies if systemctl --user is used instead of system-wide units.
 	UserMode bool
 
+	// AvailableFunc optionally overrides IsAvailable for hermetic testing.
+	AvailableFunc func() bool
+
 	// CommandRunner executes commands (defaults to exec.CommandContext).
 	CommandRunner func(ctx context.Context, name string, args ...string) *exec.Cmd
 }
@@ -39,6 +42,9 @@ func (a *SystemdAdapter) Name() string {
 }
 
 func (a *SystemdAdapter) IsAvailable() bool {
+	if a.AvailableFunc != nil {
+		return a.AvailableFunc()
+	}
 	if runtime.GOOS != "linux" {
 		return false
 	}
@@ -152,7 +158,7 @@ func (a *SystemdAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(dir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("create unit dir %s: %w", dir, err)
 	}
 

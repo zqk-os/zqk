@@ -25,7 +25,12 @@ func WithAdapter(adapter ServiceAdapter) ManagerOption {
 
 // AutoDetectAdapter selects the idiomatic ServiceAdapter for the current operating system.
 func AutoDetectAdapter() ServiceAdapter {
-	switch runtime.GOOS {
+	return AutoDetectAdapterForOS(runtime.GOOS)
+}
+
+// AutoDetectAdapterForOS selects the idiomatic ServiceAdapter for the provided operating system name.
+func AutoDetectAdapterForOS(goos string) ServiceAdapter {
+	switch goos {
 	case "darwin":
 		la := NewLaunchdAdapter()
 		if la.IsAvailable() {

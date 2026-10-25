@@ -19,6 +19,9 @@ type LaunchdAdapter struct {
 	// BaseDir overrides the default ~/Library/LaunchAgents directory if set (useful for tests).
 	BaseDir string
 
+	// AvailableFunc optionally overrides IsAvailable for hermetic testing.
+	AvailableFunc func() bool
+
 	// CommandRunner executes commands (defaults to exec.CommandContext).
 	CommandRunner func(ctx context.Context, name string, args ...string) *exec.Cmd
 }
@@ -35,6 +38,9 @@ func (a *LaunchdAdapter) Name() string {
 }
 
 func (a *LaunchdAdapter) IsAvailable() bool {
+	if a.AvailableFunc != nil {
+		return a.AvailableFunc()
+	}
 	if runtime.GOOS != "darwin" {
 		return false
 	}
@@ -132,7 +138,7 @@ func (a *LaunchdAdapter) Install(ctx context.Context, spec ServiceSpec) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(dir, paths.DirPerm755); err != nil {
+	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return fmt.Errorf("create launchd dir %s: %w", dir, err)
 	}
 
