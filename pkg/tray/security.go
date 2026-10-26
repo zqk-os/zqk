@@ -32,16 +32,17 @@ func IsPrivilegedArgv(argv []string) (bool, string) {
 		{"io", "reap", "io reap"},
 	}
 
-	for i, arg := range argv {
+	var prevArg string
+	for _, arg := range argv {
 		for _, flag := range restrictedFlags {
 			if arg == flag || strings.HasPrefix(arg, flag+"=") {
 				return true, flag
 			}
 		}
 
-		if i+1 < len(argv) {
+		if prevArg != "" {
 			for _, v := range twoWordVerbs {
-				if arg == v.w1 && argv[i+1] == v.w2 {
+				if prevArg == v.w1 && arg == v.w2 {
 					return true, v.token
 				}
 			}
@@ -56,6 +57,8 @@ func IsPrivilegedArgv(argv []string) (bool, string) {
 		if arg == "delete" {
 			return true, "delete"
 		}
+
+		prevArg = arg
 	}
 
 	return false, ""
