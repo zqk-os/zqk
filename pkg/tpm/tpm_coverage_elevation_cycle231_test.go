@@ -761,7 +761,6 @@ func TestSubscribeWAL_FallbackNilEngine_Cycle231(t *testing.T) {
 }
 
 func TestAccumulatorRegistry_Cycle231(t *testing.T) {
-	tempDir := t.TempDir()
 	names := accumulator.RegisteredSubscribers()
 
 	found := false
@@ -778,10 +777,12 @@ func TestAccumulatorRegistry_Cycle231(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	subscribers := accumulator.StartAllSubscribers(ctx, tempDir)
+	subscribers := accumulator.StartAllSubscribers(ctx, "/test/project")
 	if len(subscribers) == 0 {
 		t.Fatal("expected at least one subscriber started from registry")
 	}
+	cancel()
+	time.Sleep(50 * time.Millisecond)
 }
 
 func TestStrategicReadinessConcurrencySafety_Cycle231(t *testing.T) {
