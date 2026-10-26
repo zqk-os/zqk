@@ -57,11 +57,14 @@ type CommandExitCodeStrategy struct{}
 
 func (s *CommandExitCodeStrategy) Verify(ctx context.Context, secCtx *storage.SecurityContext, sp storage.ObjectStorageProvider, step map[string]any) (VerificationResult, error) {
 	cmdStr, _ := step[objects.FieldKeyCommand].(string)
-	if cmdStr == "" {
+	if strings.TrimSpace(cmdStr) == "" {
 		return VerificationResult{Passed: false, Feedback: "Verification Failed: No command specified."}, nil
 	}
 
 	parts := strings.Fields(cmdStr)
+	if len(parts) == 0 {
+		return VerificationResult{Passed: false, Feedback: "Verification Failed: No command specified."}, nil
+	}
 	vCmd := execwrap.CommandContext(ctx, parts[0], parts[1:]...)
 
 	// Ensure verification commands run in the repository root directory
