@@ -180,4 +180,3 @@ func (m *InMemoryEventMesh) Subscribe(ctx context.Context, types []EventType) (<
 func (m *InMemoryEventMesh) WaitForAudits() {
 	m.auditWg.Wait()
 }
-
