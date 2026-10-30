@@ -42,6 +42,7 @@ type InMemoryEventMesh struct {
 	subscribers map[EventType][]chan AmbientEvent
 	projectRoot string
 	secCtx      *pkgctx.SecurityContext
+	auditWg     sync.WaitGroup
 }
 
 // NewInMemoryEventMesh creates a new InMemoryEventMesh.
@@ -93,7 +94,9 @@ func (m *InMemoryEventMesh) Publish(ctx context.Context, event AmbientEvent) err
 	})
 
 	if root != "" && sCtx != nil {
+		m.auditWg.Add(1)
 		goroutinelabels.NewGoroutine("ambient_audit", "emit audit for ambient event").StartSimple(func() {
+			defer m.auditWg.Done()
 			targetKind := objects.KindAuditEvent
 			targetURI := event.URI
 
@@ -172,3 +175,9 @@ func (m *InMemoryEventMesh) Subscribe(ctx context.Context, types []EventType) (<
 
 	return ch, nil
 }
+
+// WaitForAudits blocks until all asynchronous audit event emissions complete.
+func (m *InMemoryEventMesh) WaitForAudits() {
+	m.auditWg.Wait()
+}
+
