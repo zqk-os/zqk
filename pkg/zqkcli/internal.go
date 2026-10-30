@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -78,7 +79,14 @@ func runInternalPersistentPreRunE(cmd *cobra.Command, args []string) error {
 
 // requireAdminRole checks that the user has admin role
 func requireAdminRole(cmd *cobra.Command, _ []string) error {
-	logger := logging.GetLoggerFromContext(cmd.Context())
+	if cmd == nil {
+		return errfmt.Errorf("command is nil")
+	}
+	cmdCtx := cmd.Context()
+	if cmdCtx == nil {
+		cmdCtx = context.Background()
+	}
+	logger := logging.GetLoggerFromContext(cmdCtx)
 
 	// Get context to check security
 	ctx := cli.GetContext(cmd)

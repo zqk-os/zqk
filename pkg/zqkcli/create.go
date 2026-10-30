@@ -28,6 +28,7 @@ func NewInternalCreateCmd() *cobra.Command {
 	cli.BindAsyncProgress(cmd, runInternalCreate)
 	cmd.Flags().String("file", "", "Path to YAML file containing object data (required)")
 	cmd.Flags().String("data", "", "Inline YAML data for the object")
+	cmd.Flags().StringArray("field", []string{}, "Field values for the object (field=value). Repeatable.")
 	cmd.Flags().Bool("dry-run", false, "Show what would be created without actually creating it")
 
 	ensureCmdAnnotations(cmd)

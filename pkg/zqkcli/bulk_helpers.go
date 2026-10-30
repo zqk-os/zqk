@@ -3,6 +3,7 @@ package internal
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -12,17 +13,29 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // uniqueKindsFromObjectIDs returns distinct canonical kinds inferred from object IDs.
 // BulkResult rows for update/delete often only include id; CAS flush needs kinds (see object bulk paths).
 func uniqueKindsFromObjectIDs(ids []string) []string {
 	seen := make(map[string]bool)
+	idVal := validation.GetIDValidator()
 	for _, id := range ids {
 		if id == emptyValue {
 			continue
 		}
-		k := objects.GetCanonicalKind(id)
+		k := idVal.InferKindFromID(id)
+		if k == emptyValue {
+			prefix := id
+			if idx := strings.Index(id, "-"); idx > 0 {
+				prefix = id[:idx]
+			}
+			k = objects.GetCanonicalKind(prefix)
+			if k == emptyValue || k == prefix {
+				k = objects.GetCanonicalKind(id)
+			}
+		}
 		if k != emptyValue && k != id {
 			seen[k] = true
 		}
