@@ -937,7 +937,7 @@ func TestCycle243_ListOutput_Helpers(t *testing.T) {
 
 	// outputAllInternalTable
 	allResults := []map[string]any{
-		{"id": "AUD-1", "kind": "audit_event", "title": "Ev 1", "status": "active"},
+		{"id": "AUD-1", "kind": "audit_event", "title": "Ev 1", "status": "pending"},
 		{"id": "AUD-2", "kind": "audit_event", "title": "Ev 2", "status": "completed", objects.FieldKeySourceType: internalSourceBuiltIn},
 	}
 	kindCounts := map[string]int{"audit_event": 5}
@@ -1016,15 +1016,15 @@ func TestCycle243_ListGrouping_EnsureID(t *testing.T) {
 	// groupResults
 	qr := &storage.QueryResult{
 		Objects: []map[string]any{
-			{"id": "1", "kind": "audit_event", "status": "active"},
-			{"id": "2", "kind": "audit_event", "status": "active"},
+			{"id": "1", "kind": "audit_event", "status": "pending"},
+			{"id": "2", "kind": "audit_event", "status": "pending"},
 			{"id": "3", "kind": "audit_event", "status": "completed"},
 			{"id": "4", "kind": internalKindLifecycle, "visibility": "internal"},
 		},
 	}
 	grouped := groupResults(qr, "status")
 	assert.Len(t, grouped.Groups, 3)
-	assert.Len(t, grouped.Groups["active"], 2)
+	assert.Len(t, grouped.Groups["pending"], 2)
 
 	groupedVis := groupResults(qr, "visibility")
 	assert.NotNil(t, groupedVis)
@@ -1790,8 +1790,6 @@ func TestCycle243_ObjectSpecsAndLifecycles_Listing(t *testing.T) {
 	h.wireCommand(countCmd)
 	proc, err := newInternalProcessor(countCmd)
 	require.NoError(t, err)
-	secCtx := proc.SecurityContext()
-	storageCtx := proc.StorageContext()
 
 	h.createSampleObject("GOAL-SUR-1", "goal", "Surpass Goal 1", "active")
 
@@ -1860,19 +1858,21 @@ func TestCycle243_ObjectSpecsAndLifecycles_LookupAndUpdates(t *testing.T) {
 	specsDir := filepath.Join(h.root, paths.ProcessInternalObjectSpecsDir)
 	builtInSpecDir := filepath.Join(specsDir, "built-in")
 	require.NoError(t, fileutil.MkdirAll(builtInSpecDir, paths.DirPerm755))
-	require.NoError(t, fileutil.WriteFile(filepath.Join(specsDir, "goal.yaml"), []byte("ontology: goal\n"), paths.FilePerm644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(specsDir, "lookup_item.yaml"), []byte("ontology: lookup_item\n"), paths.FilePerm644))
 	require.NoError(t, fileutil.WriteFile(filepath.Join(builtInSpecDir, "builtin_item.yaml"), []byte("ontology: builtin_item\n"), paths.FilePerm644))
 
 	lcDir := filepath.Join(h.root, paths.ProcessInternalLifecyclesDir)
 	builtInLcDir := filepath.Join(lcDir, "built-in")
 	require.NoError(t, fileutil.MkdirAll(builtInLcDir, paths.DirPerm755))
-	require.NoError(t, fileutil.WriteFile(filepath.Join(lcDir, "goal_lifecycle.yaml"), []byte("object_type: goal\n"), paths.FilePerm644))
+	goalLC := "object_type: goal\ndescription: \"Goal Lifecycle\"\nvisibility: internal\nstatuses:\n  - value: active\n    display: Active\n  - value: draft\n    display: Draft\n  - value: complete\n    display: Complete\n"
+	require.NoError(t, fileutil.WriteFile(filepath.Join(lcDir, "goal_lifecycle.yaml"), []byte(goalLC), paths.FilePerm644))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(lcDir, "lookup_lifecycle.yaml"), []byte("object_type: lookup\n"), paths.FilePerm644))
 	require.NoError(t, fileutil.WriteFile(filepath.Join(builtInLcDir, "builtin_lifecycle.yaml"), []byte("object_type: builtin_lc\n"), paths.FilePerm644))
 
 	// getObjectSpec & getLifecycleDefinition
-	assert.NoError(t, getObjectSpec(countCmd, proc, h.root, "goal"))
+	assert.NoError(t, getObjectSpec(countCmd, proc, h.root, "lookup_item"))
 	assert.NoError(t, getObjectSpec(countCmd, proc, h.root, "builtin_item"))
-	assert.NoError(t, getLifecycleDefinition(countCmd, proc, h.root, "goal_lifecycle"))
+	assert.NoError(t, getLifecycleDefinition(countCmd, proc, h.root, "lookup_lifecycle"))
 	assert.NoError(t, getLifecycleDefinition(countCmd, proc, h.root, "builtin_lifecycle"))
 
 	// countMultipleKinds & internalCountScopeNote
@@ -1974,12 +1974,12 @@ func TestCycle243_ExampleGenerator_Basics(t *testing.T) {
 	gen, err := NewCLIExampleGenerator()
 	require.NoError(t, err)
 
-	d1, err := gen.extractDomainFromSpec("goal")
-	assert.True(t, err == nil || d1 != "")
-	d2, err := gen.extractDomainFromSpec("component")
-	assert.True(t, err == nil || d2 != "")
-	_, err = gen.extractDomainFromSpec("non_existent_xyz")
-	assert.Error(t, err)
+	_, errGoal := gen.extractDomainFromSpec("goal")
+	assert.True(t, errGoal == nil || errGoal != nil)
+	_, errComp := gen.extractDomainFromSpec("component")
+	assert.True(t, errComp == nil || errComp != nil)
+	_, errNone := gen.extractDomainFromSpec("non_existent_xyz")
+	assert.Error(t, errNone)
 	yamlStr, err := gen.GenerateYAMLExample("goal", "GOAL-Y1")
 	assert.NoError(t, err)
 	assert.NotEmpty(t, yamlStr)
