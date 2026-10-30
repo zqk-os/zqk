@@ -282,9 +282,9 @@ func TestApplyPending_ComprehensiveScenarios(t *testing.T) {
 	})
 
 	listObjs := []map[string]any{
-		nil,                                                                                 // nil object
-		{objects.FieldKeyID: "", objects.FieldKeyStatus: "active"},                           // empty ID
-		{objects.FieldKeyID: "plan-grooming", objects.FieldKeyStatus: "grooming"},           // non shovel/locked
+		nil, // nil object
+		{objects.FieldKeyID: "", objects.FieldKeyStatus: "active"},                                                                  // empty ID
+		{objects.FieldKeyID: "plan-grooming", objects.FieldKeyStatus: "grooming"},                                                   // non shovel/locked
 		{objects.FieldKeyID: "plan-with-team", objects.FieldKeyStatus: "active", objects.FieldKeyTeamConfigurationRef: "TC-TEAM-1"}, // has dispatch identity
 		{objects.FieldKeyID: "plan-read-fail", objects.FieldKeyStatus: "active"},
 		{objects.FieldKeyID: "plan-read-nil", objects.FieldKeyStatus: "active"},
