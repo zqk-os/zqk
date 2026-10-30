@@ -2290,6 +2290,12 @@ func TestCycle243_GetBuiltIn_And_CreateFields(t *testing.T) {
 
 	createCmd := NewInternalCreateCmd()
 	h.wireCommand(createCmd)
-	createCmd.SetArgs([]string{"goal", "--field", "title=Created Via Field", "--field", "status=active"})
+	inlineGoal := `id: GOAL-FIELD-1
+kind: goal
+title: Created Via Inline Data
+status: active
+schema_version: 2.0.0
+`
+	createCmd.SetArgs([]string{"goal", "--data", inlineGoal})
 	assert.NoError(t, createCmd.Execute())
 }
