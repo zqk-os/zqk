@@ -83,11 +83,11 @@ func TestExtensibleCLIExamples(t *testing.T) {
 				objects.FieldKeyID:                idRoot,
 				objects.FieldKeyKind:              "component",
 				objects.FieldKeyTitle:             "Root Container",
+				objects.FieldKeyDescription:       "Durable root container description",
 				objects.FieldKeyComponentType:     "container",
 				objects.FieldKeyDomain:            "visualization",
 				objects.FieldKeySpecInterpreter:   "component_interpreter",
 				objects.FieldKeySpecContextBroker: "component_broker",
-				objects.FieldKeyStatus:            objects.ObjectStatusCreated,
 				objects.FieldKeySchemaVersion:     objects.DefaultSchemaVersion,
 				objects.FieldKeySourceType:        internalSourceInternal,
 				objects.FieldKeyCreatedAt:         zqktime.NowRFC3339UTC(),
@@ -99,12 +99,12 @@ func TestExtensibleCLIExamples(t *testing.T) {
 				objects.FieldKeyID:                  idChildA,
 				objects.FieldKeyKind:                "component",
 				objects.FieldKeyTitle:               "Task Bar Component",
+				objects.FieldKeyDescription:         "Durable task bar component description",
 				objects.FieldKeyComponentType:       "task_bar",
 				objects.FieldKeyDomain:              "visualization",
 				objects.FieldKeySpecInterpreter:     "component_interpreter",
 				objects.FieldKeySpecContextBroker:   "component_broker",
 				objects.FieldKeyParentComponentRefs: []string{idRoot},
-				objects.FieldKeyStatus:              objects.ObjectStatusCreated,
 				objects.FieldKeySchemaVersion:       objects.DefaultSchemaVersion,
 				objects.FieldKeySourceType:          internalSourceInternal,
 				objects.FieldKeyCreatedAt:           zqktime.NowRFC3339UTC(),
@@ -116,12 +116,12 @@ func TestExtensibleCLIExamples(t *testing.T) {
 				objects.FieldKeyID:                  idChildB,
 				objects.FieldKeyKind:                "component",
 				objects.FieldKeyTitle:               "Milestone Marker",
+				objects.FieldKeyDescription:         "Durable milestone marker description",
 				objects.FieldKeyComponentType:       "milestone_marker",
 				objects.FieldKeyDomain:              "visualization",
 				objects.FieldKeySpecInterpreter:     "component_interpreter",
 				objects.FieldKeySpecContextBroker:   "component_broker",
 				objects.FieldKeyParentComponentRefs: []string{idRoot},
-				objects.FieldKeyStatus:              objects.ObjectStatusCreated,
 				objects.FieldKeySchemaVersion:       objects.DefaultSchemaVersion,
 				objects.FieldKeySourceType:          internalSourceInternal,
 				objects.FieldKeyCreatedAt:           zqktime.NowRFC3339UTC(),
@@ -148,7 +148,7 @@ func TestExtensibleCLIExamples(t *testing.T) {
 		// Create components via CLI
 		createdIDs := make([]string, 0, len(components))
 		for i, filePath := range componentFiles {
-			cmd := execwrap.Command(cliBinary, "object", "create", "component", "--file", filePath, "--context=system")
+			cmd := execwrap.Command(cliBinary, "object", "create", "component", "--file", filePath, "--promote", "--context=system")
 			cmd.Dir = tmpRoot
 			cmd.Env = cliEnv
 			output, err := cmd.CombinedOutput()
