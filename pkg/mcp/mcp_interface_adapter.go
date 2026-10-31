@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -543,19 +544,19 @@ func (a *MCPServerAdapter) CallToolsBatch(ctx context.Context, params []*ToolCal
 				eventCtx := BuildMCPBatchToolCallEventContext(operationID, len(params), 0, duration)
 				// Update error count from executor
 				executor := NewParallelExecutor()
-				errorCount := 0
+				var errorCount atomic.Int64
 				for _, param := range params {
 					paramCopy := param
 					executor.Execute(func() error {
 						_, err := a.CallTool(ctx, paramCopy)
 						if err != nil {
-							errorCount++
+							errorCount.Add(1)
 						}
 						return err
 					})
 				}
 				_ = executor.Wait() //nolint:errcheck // Best effort - executor cleanup
-				eventCtx.EventData.MetricsData["error_count"] = errorCount
+				eventCtx.EventData.MetricsData["error_count"] = int(errorCount.Load())
 				_ = a.coordinator.Emit(ctx, eventCtx) //nolint:errcheck
 			}
 
@@ -563,7 +564,7 @@ func (a *MCPServerAdapter) CallToolsBatch(ctx context.Context, params []*ToolCal
 		}).
 		StartSimple(func() {
 			executor := NewParallelExecutor()
-			errorCount := 0
+			var errorCount atomic.Int64
 
 			for i, param := range params {
 				index := i
@@ -571,7 +572,7 @@ func (a *MCPServerAdapter) CallToolsBatch(ctx context.Context, params []*ToolCal
 				executor.Execute(func() error {
 					result, err := a.CallTool(ctx, paramCopy)
 					if err != nil {
-						errorCount++
+						errorCount.Add(1)
 					}
 					resultChan <- AsyncBatchToolResult{
 						Index:  index,
@@ -583,7 +584,7 @@ func (a *MCPServerAdapter) CallToolsBatch(ctx context.Context, params []*ToolCal
 			}
 
 			_ = executor.Wait() //nolint:errcheck // Best effort - executor cleanup
-			a.metrics.RecordBatchToolCall(len(params), errorCount)
+			a.metrics.RecordBatchToolCall(len(params), int(errorCount.Load()))
 		})
 
 	return resultChan

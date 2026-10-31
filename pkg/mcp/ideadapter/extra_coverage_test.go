@@ -242,3 +242,195 @@ func itoa(n int) string {
 	}
 	return string(b[i:])
 }
+
+func TestExtraForwardDaemonNotificationsAndKeepalive(t *testing.T) {
+	logger := logging.GetLoggerFromProfile("system")
+	a := New(DefaultConfig(), logger)
+
+	// Test forwardDaemonNotifications
+	ctx, cancel := context.WithCancel(context.Background())
+
+	a.session.notifyCh <- []byte(`{"jsonrpc":"2.0","method":"notifications/event"}`)
+	a.session.notifyCh <- []byte(`{"jsonrpc":"2.0","method":"notifications/custom","params":{"k":"v"}}`)
+
+	var out bytes.Buffer
+	w := bufio.NewWriter(&out)
+	queue := mcp.NewMessageQueue(w, &mcp.MessageFormat{IsRawJSON: true}, mcp.DefaultQueueConfig())
+	defer queue.Stop()
+
+	a.queue = queue
+
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine("test.ideadapter.forward_notif", "forward notifications in test").StartSimple(func() {
+		a.forwardDaemonNotifications(ctx)
+		close(done)
+	})
+
+	time.Sleep(20 * time.Millisecond)
+	cancel()
+	<-done
+
+	// Test stdioKeepaliveLoop
+	a.stdioKeepaliveLoop(context.Background())
+
+	// Test handleIDEMessage with invalid json
+	_ = a.handleIDEMessage(context.Background(), w, []byte(`{invalid`), nil)
+	// Response with empty method
+	_ = a.handleIDEMessage(context.Background(), w, []byte(`{"jsonrpc":"2.0","id":99,"result":{}}`), nil)
+}
+
+func TestExtraForwardRPCAndWriteStdout(t *testing.T) {
+	logger := logging.GetLoggerFromProfile("system")
+	a := New(DefaultConfig(), logger)
+
+	var out bytes.Buffer
+	w := bufio.NewWriter(&out)
+	format := &mcp.MessageFormat{IsRawJSON: true}
+
+	// 1. writeResult and writeError
+	_ = a.writeResult(w, format, json.RawMessage(`1`), map[string]any{"ok": true})
+	_ = a.writeError(w, format, json.RawMessage(`2`), mcp.InvalidParams, "bad params")
+	_ = a.writeError(w, nil, nil, mcp.InternalError, "internal")
+
+	// 2. Queue full path in writeStdout
+	cfgQ := mcp.DefaultQueueConfig()
+	cfgQ.MaxQueueSize = 1
+	var qBuf bytes.Buffer
+	queue := mcp.NewMessageQueue(bufio.NewWriter(&qBuf), format, cfgQ)
+	defer queue.Stop()
+
+	// Fill queue
+	queue.Enqueue([]byte("dummy"), format, "high", nil)
+	a.queue = queue
+
+	err := a.writeStdout(w, []byte("will be dropped"), format)
+	if err == nil {
+		t.Error("expected message dropped by queue error")
+	}
+
+	// 3. forwardRPC with invalid params
+	ctx := context.Background()
+	_ = a.forwardRPC(ctx, w, format, json.RawMessage(`3`), "test_method", json.RawMessage(`{invalid-json`))
+	a.stdioKeepaliveLoop(ctx)
+
+	// 5. isExpectedDaemonDisconnect & heartbeatDropAfterConsecutiveFails
+	if !isExpectedDaemonDisconnect(io.EOF) {
+		t.Error("expected true for EOF")
+	}
+	if !isExpectedDaemonDisconnect(net.ErrClosed) {
+		t.Error("expected true for ErrClosed")
+	}
+	if isExpectedDaemonDisconnect(nil) {
+		t.Error("expected false for nil")
+	}
+	if isExpectedDaemonDisconnect(errors.New("other err")) {
+		t.Error("expected false for other err")
+	}
+
+	if heartbeatDropAfterConsecutiveFails(1) {
+		t.Error("expected false for 1 fail")
+	}
+	if !heartbeatDropAfterConsecutiveFails(3) {
+		t.Error("expected true for 3 fails")
+	}
+}
+
+func TestExtraDaemonSessionReadLoopAndHeartbeat(t *testing.T) {
+	logger := logging.GetLoggerFromProfile("system")
+	cfg := DefaultConfig()
+	ds := newDaemonSession(cfg, logger)
+
+	c1, c2 := net.Pipe()
+	defer c1.Close()
+	defer c2.Close()
+
+	ds.mu.Lock()
+	ds.conn = c1
+	ds.reader = bufio.NewReader(c1)
+	ds.writer = bufio.NewWriter(c1)
+	ds.xport = mcp.NewDefaultTransport()
+	ds.mu.Unlock()
+
+	// Pending request for matched response
+	ch := make(chan json.RawMessage, 1)
+	ds.pendingMu.Lock()
+	ds.pending[123] = ch
+	ds.pendingMu.Unlock()
+
+	readDone := make(chan struct{})
+	goroutinelabels.NewGoroutine("test.readloop", "test readloop").StartSimple(func() {
+		ds.readLoop()
+		close(readDone)
+	})
+
+	// 1. Matched response
+	_, _ = c2.Write([]byte(`{"jsonrpc":"2.0","id":123,"result":{"ok":true}}` + "\n"))
+	select {
+	case <-ch:
+	case <-time.After(time.Second):
+	}
+
+	// 2. Unmatched numeric id response
+	_, _ = c2.Write([]byte(`{"jsonrpc":"2.0","id":999,"result":{}}` + "\n"))
+
+	// 3. Non-numeric id
+	_, _ = c2.Write([]byte(`{"jsonrpc":"2.0","id":"abc","result":{}}` + "\n"))
+
+	// 4. Notification with null id
+	_, _ = c2.Write([]byte(`{"jsonrpc":"2.0","id":null,"method":"test/notify"}` + "\n"))
+
+	// 5. Fill notification channel and trigger drop
+	for len(ds.notifyCh) < cap(ds.notifyCh) {
+		ds.notifyCh <- []byte("{}")
+	}
+	_, _ = c2.Write([]byte(`{"jsonrpc":"2.0","method":"test/drop"}` + "\n"))
+
+	// Drain notifyCh so it doesn't block anything
+	for len(ds.notifyCh) > 0 {
+		<-ds.notifyCh
+	}
+
+	// 6. Close c2 to end readLoop with EOF
+	_ = c2.Close()
+	select {
+	case <-readDone:
+	case <-time.After(2 * time.Second):
+	}
+
+	// 7. HeartbeatLoop: test tick when alive is false
+	hbCfg := DefaultConfig()
+	hbCfg.HeartbeatInterval = 5 * time.Millisecond
+	hbDS := newDaemonSession(hbCfg, logger)
+	hbDS.alive.Store(false)
+
+	hbCtx, hbCancel := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer hbCancel()
+	hbDone := make(chan struct{})
+	goroutinelabels.NewGoroutine("test.hb", "test heartbeat").StartSimple(func() {
+		hbDS.HeartbeatLoop(hbCtx)
+		close(hbDone)
+	})
+	select {
+	case <-hbDone:
+	case <-time.After(2 * time.Second):
+	}
+
+	// HeartbeatLoop: test tick when alive is true and pendingCount > 0
+	hbDS2 := newDaemonSession(hbCfg, logger)
+	hbDS2.alive.Store(true)
+	hbDS2.pendingMu.Lock()
+	hbDS2.pending[1] = make(chan json.RawMessage, 1)
+	hbDS2.pendingMu.Unlock()
+
+	hbCtx2, hbCancel2 := context.WithTimeout(context.Background(), 20*time.Millisecond)
+	defer hbCancel2()
+	hbDone2 := make(chan struct{})
+	goroutinelabels.NewGoroutine("test.hb2", "test heartbeat 2").StartSimple(func() {
+		hbDS2.HeartbeatLoop(hbCtx2)
+		close(hbDone2)
+	})
+	select {
+	case <-hbDone2:
+	case <-time.After(2 * time.Second):
+	}
+}
