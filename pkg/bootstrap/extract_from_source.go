@@ -153,7 +153,13 @@ func copyDirRecursive(src, dst string, force bool, logger logging.Logger) error 
 		}
 		srcPath := filepath.Join(src, ent.Name())
 		dstPath := filepath.Join(dst, ent.Name())
-		if ent.IsDir() {
+		isDir := ent.IsDir()
+		if !isDir {
+			if st, err := fileutil.Stat(srcPath); err == nil && st.IsDir() {
+				isDir = true
+			}
+		}
+		if isDir {
 			if err := fileutil.EnsureDir(dstPath); err != nil {
 				return err
 			}
