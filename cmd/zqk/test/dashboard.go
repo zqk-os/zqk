@@ -409,7 +409,9 @@ func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error
 
 	for _, tcID := range s.TestCaseOrder {
 		tc := s.TestCases[tcID]
-		if tc == nil || tc.Status == objects.ObjectStatusArchived || tc.Status == objects.ObjectStatusConceptual || tc.Status == objects.ObjectStatusDraft || sc.IsPreliminary(objects.KindTestCase, tc.Status) {
+		// Originated TSTs are realign-plane: root lineage is not a DoD obligation until
+		// they leave originated / enter shovel-ready (coverage cycles mint originated TSTs).
+		if tc == nil || tc.Status == objects.ObjectStatusArchived || tc.Status == objects.ObjectStatusConceptual || tc.Status == objects.ObjectStatusDraft || tc.Status == objects.ObjectStatusOriginated || sc.IsPreliminary(objects.KindTestCase, tc.Status) {
 			continue
 		}
 		if tc.Lineage != nil && tc.Lineage.IsIntact {
@@ -441,7 +443,9 @@ func (s *DashboardState) ValidateTPMDefinitionOfDone(out, errOut ioWriter) error
 
 	var unboundList []string
 	for _, uc := range s.UnboundTestCriteria {
-		if uc == nil || uc.Status == objects.ObjectStatusArchived || uc.Status == objects.ObjectStatusConceptual || uc.Status == objects.ObjectStatusDraft || sc.IsPreliminary(objects.KindCriteria, uc.Status) {
+		// Binding is enforced at originated→awaiting_verification; originated unbound
+		// automated_test CRITs must not fail closed the TPM DoD gate.
+		if uc == nil || uc.Status == objects.ObjectStatusArchived || uc.Status == objects.ObjectStatusConceptual || uc.Status == objects.ObjectStatusDraft || uc.Status == objects.ObjectStatusOriginated || sc.IsPreliminary(objects.KindCriteria, uc.Status) {
 			continue
 		}
 		unboundList = append(unboundList, fmt.Sprintf("%s [%s] (%s): category=%s, method=%s", uc.ID, uc.Status, uc.Title, uc.Category, uc.ValidationMethod))
