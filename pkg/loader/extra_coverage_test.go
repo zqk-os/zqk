@@ -3,9 +3,12 @@ package loader
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 type testStateCallback struct {
@@ -73,12 +76,13 @@ func TestRunner_LifecycleAndConcurrency(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
-		go func() {
+		workerID := i
+		goroutinelabels.NewGoroutine(fmt.Sprintf("extra_coverage_worker_%d", workerID), "concurrent load test").StartSimple(func() {
 			defer wg.Done()
 			if err := r.Load(ctx); err != nil {
 				t.Errorf("concurrent Load failed: %v", err)
 			}
-		}()
+		})
 	}
 	wg.Wait()
 
