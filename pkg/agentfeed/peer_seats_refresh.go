@@ -24,8 +24,8 @@ import (
 var DefaultPeerSeatIDs = []string{"peer-agent-1", "peer-agent-2"}
 
 // peerExecutableNames are argv0 bases treated as peer worker seats (matches wake-agy.sh).
-// TRACK: BLI-1793453601066678500-8e0cb0a2 — seat-worker heartbeats also count (see
-// listSeatWorkerAlivePIDs); do not rely on agy alone for peer_seats_live.
+// Seat-worker heartbeats also count (see listSeatWorkerAlivePIDs); do not rely on
+// agy alone for peer_seats_live.
 var peerExecutableNames = []string{"agy"}
 
 // seatWorkerAliveMaxAge is how fresh a seat_workers/*.alive.json must be to count as live.
