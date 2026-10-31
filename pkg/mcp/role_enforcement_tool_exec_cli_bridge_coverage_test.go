@@ -234,10 +234,9 @@ func TestBatch4_RoleEnforcement_AllRules(t *testing.T) {
 		objects.FieldKeyRoles: "developer,admin",
 	}
 	res3, err := enforceRoleEnforcement(clientInfoAcc, cfgAcc, tmpDir, server)
-	if err != nil {
-		t.Fatalf("enforceRoleEnforcement account failed: %v", err)
+	if err == nil {
+		t.Fatalf("expected fail-closed on missing ACC-TEST, got clientInfo=%v", res3)
 	}
-	_ = res3
 }
 
 // 5. Server Tool Execution & CLI Bridge Execution Extended
