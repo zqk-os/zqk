@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -401,45 +402,45 @@ func TestOverseerAndRollup_ConcurrencyAndRace(t *testing.T) {
 	}
 
 	rollup := map[string]any{
-		"recommended_next_action":      "Execute step 1",
-		"ready_for_parent_completion":  false,
-		"rollup_status":                "partial",
+		"recommended_next_action":     "Execute step 1",
+		"ready_for_parent_completion": false,
+		"rollup_status":               "partial",
 	}
 
 	for i := 0; i < iterations; i++ {
 		wg.Add(4)
 
-		go func() {
+		goroutinelabels.NewGoroutine("test_active_child_ids", "inspect active children").StartSimple(func() {
 			defer wg.Done()
 			active := ActiveChildIDsUnderCoordinator(tree)
 			if len(active) != 1 || active[0] != "CVS-child1" {
 				t.Errorf("unexpected active child ids: %v", active)
 			}
-		}()
+		})
 
-		go func() {
+		goroutinelabels.NewGoroutine("test_arbitrated_parent", "build arbitrated parent message").StartSimple(func() {
 			defer wg.Done()
 			msg := BuildArbitratedParentMessage(rollup, tree, "CVS-coord")
 			if !strings.Contains(msg, "CVS-child1") || !strings.Contains(msg, "Execute step 1") {
 				t.Errorf("unexpected message: %s", msg)
 			}
-		}()
+		})
 
-		go func() {
+		goroutinelabels.NewGoroutine("test_compute_rollup", "compute rollup status concurrently").StartSimple(func() {
 			defer wg.Done()
 			tb := TestBundleInput{ReadyForSessionCompletion: true}
 			st, _, _, _ := ComputeRollupStatus(tb, 0, 0, nil, "", nil)
 			if st != RollupStatusSatisfied {
 				t.Errorf("unexpected status: %s", st)
 			}
-		}()
+		})
 
-		go func() {
+		goroutinelabels.NewGoroutine("test_detect_cycle", "detect cycle concurrently").StartSimple(func() {
 			defer wg.Done()
 			_, _ = DetectCVSRefCycle("CVS-coord", func(id string) ([]string, error) {
 				return []string{"CVS-child1"}, nil
 			}, 3)
-		}()
+		})
 	}
 
 	wg.Wait()
