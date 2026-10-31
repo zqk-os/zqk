@@ -11,6 +11,7 @@ import (
 	"go/ast"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -111,6 +112,7 @@ func TestSteward_Loop_CanceledContext(t *testing.T) {
 
 type stewardMockStorage struct {
 	storage.ObjectStorageProvider
+	mu       sync.RWMutex
 	plans    []map[string]any
 	promoted map[string]string
 }
@@ -123,6 +125,8 @@ func (s *stewardMockStorage) List(ctx context.Context, secCtx *pkgctx.SecurityCo
 }
 
 func (s *stewardMockStorage) Update(ctx context.Context, secCtx *storage.SecurityContext, id string, data map[string]any) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if s.promoted == nil {
 		s.promoted = make(map[string]string)
 	}
@@ -130,6 +134,15 @@ func (s *stewardMockStorage) Update(ctx context.Context, secCtx *storage.Securit
 		s.promoted[id] = st
 	}
 	return nil
+}
+
+func (s *stewardMockStorage) getPromoted(id string) string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if s.promoted == nil {
+		return ""
+	}
+	return s.promoted[id]
 }
 
 func TestSteward_Loop_PreflightAndPromotion(t *testing.T) {
@@ -179,14 +192,14 @@ func TestSteward_Loop_PreflightAndPromotion(t *testing.T) {
 	})
 
 	require.Eventually(t, func() bool {
-		return mockStore.promoted["PRI-WITHBLI-002"] == objects.ObjectStatusActive
+		return mockStore.getPromoted("PRI-WITHBLI-002") == objects.ObjectStatusActive
 	}, 1*time.Second, 10*time.Millisecond)
 
 	cancel()
 	err = <-done
 	require.NoError(t, err)
 
-	assert.NotEqual(t, objects.ObjectStatusActive, mockStore.promoted["PRI-NOBLI-001"])
+	assert.NotEqual(t, objects.ObjectStatusActive, mockStore.getPromoted("PRI-NOBLI-001"))
 
 	out := buf.String()
 	assert.Contains(t, out, "Plan PRI-NOBLI-001 is grooming but lacks backlog items")
