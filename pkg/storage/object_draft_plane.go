@@ -418,6 +418,36 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 	}
 }
 
+
+// omitEmptyEpicRefsDraftResidue drops empty epic_refs template residue from draft YAML.
+// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca
+func omitEmptyEpicRefsDraftResidue(obj map[string]any) {
+	if obj == nil {
+		return
+	}
+	v, ok := obj[objects.FieldKeyEpicRefs]
+	if !ok {
+		return
+	}
+	if isEmptyDraftListResidue(v) {
+		delete(obj, objects.FieldKeyEpicRefs)
+	}
+}
+
+func isEmptyDraftListResidue(val any) bool {
+	if val == nil {
+		return true
+	}
+	switch v := val.(type) {
+	case []any:
+		return len(v) == 0
+	case []string:
+		return len(v) == 0
+	default:
+		return false
+	}
+}
+
 func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte) []byte {
 	if len(data) == 0 {
 		return data
@@ -462,6 +492,11 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 	delete(merged, objects.FieldKeyUpdatedBy)
 	delete(merged, "hash")
 	delete(merged, "cas_address")
+
+	// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
+	// Empty epic_refs: [] from template fill is poison under confidential-filtered
+	// StrictMode (unknown_field blocks conceptual→originated). Omit until set.
+	omitEmptyEpicRefsDraftResidue(merged)
 
 	marshaled, err := f.yamlMarshalForPersistence(merged)
 	if err != nil {

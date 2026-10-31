@@ -147,6 +147,10 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	gv.validatePropertyShapes(spec, obj, kind, options, result)
 
 	if options.StrictMode {
+		// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
+		// drop empty template residue (epic_refs: []) when access-filtered ResolvedFields
+		// omit confidential keys; otherwise draft promote dies on unknown_field.
+		stripEmptyUnknownFieldResidue(kind, obj, spec)
 		result.Errors = append(result.Errors, gv.validateUnknownFields(kind, obj, spec)...)
 		result.Errors = append(result.Errors, validateDuplicateRefs(obj)...)
 	}
@@ -1311,6 +1315,58 @@ func isStandardMetadataField(key string) bool {
 	}
 }
 
+
+// stripEmptyUnknownFieldResidue deletes empty values for keys absent from
+// ResolvedFields (and not composition-allowed). Mutates obj in place so persist
+// paths do not re-write template residue that StrictMode would otherwise reject.
+// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca
+func stripEmptyUnknownFieldResidue(kind string, obj map[string]any, spec *objects.Spec) {
+	if spec == nil || spec.ResolvedFields == nil || obj == nil {
+		return
+	}
+	for key, val := range obj {
+		if isStandardMetadataField(key) {
+			continue
+		}
+		if _, ok := spec.ResolvedFields[key]; ok {
+			continue
+		}
+		if objects.IsCompositionFieldAllowed(kind, key, spec) {
+			continue
+		}
+		if isEmptyUnknownFieldResidue(val) {
+			delete(obj, key)
+		}
+	}
+}
+
+func isEmptyUnknownFieldResidue(val any) bool {
+	if val == nil || val == "<UNSET>" {
+		return true
+	}
+	if reflect.TypeOf(val).Name() == "fieldUnsetMarker" {
+		return true
+	}
+	switch v := val.(type) {
+	case string:
+		return strings.TrimSpace(v) == ""
+	case []any:
+		return len(v) == 0
+	case []string:
+		return len(v) == 0
+	case map[string]any:
+		return len(v) == 0
+	default:
+		rv := reflect.ValueOf(val)
+		switch rv.Kind() {
+		case reflect.Slice, reflect.Map:
+			return rv.Len() == 0
+		default:
+			return false
+		}
+	}
+}
+
 func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, spec *objects.Spec) []ValidationError {
 	if spec == nil || spec.ResolvedFields == nil {
 		return nil
@@ -1321,6 +1377,10 @@ func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, sp
 			continue
 		}
 		if val == nil || val == "<UNSET>" || reflect.TypeOf(val).Name() == "fieldUnsetMarker" {
+			continue
+		}
+		// Empty template residue must not fail StrictMode (parity with stripEmptyUnknownFieldResidue).
+		if isEmptyUnknownFieldResidue(val) {
 			continue
 		}
 		if _, ok := spec.ResolvedFields[key]; !ok {
