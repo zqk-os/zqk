@@ -209,8 +209,14 @@ func checkInstanceValidationWithValidatorAndData(ctx *cli.Context, stdCtx stdcon
 		}
 	}
 
-	// Invariant: test criteria must be bound to at least one test case
-	if kind == objects.KindCriteria && currentState != objects.ObjectStatusArchived && currentState != "rejected" {
+	// Invariant: shovel-ready+ test criteria must be bound to at least one test case.
+	// Originated CRITs stay unbound until originated→awaiting_verification (lifecycle
+	// precondition: active test_case_ref). Do not Tier-1 block coverage-minted originated
+	// criteria that have not entered the TDD matrix yet.
+	if kind == objects.KindCriteria &&
+		currentState != objects.ObjectStatusArchived &&
+		currentState != "rejected" &&
+		currentState != objects.ObjectStatusOriginated {
 		category, _ := objMap[objects.FieldKeyCategory].(string)
 		vMethod, _ := objMap["validation_method"].(string)
 		if strings.EqualFold(category, "test") || strings.EqualFold(vMethod, "automated_test") {

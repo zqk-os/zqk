@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -67,5 +68,34 @@ func TestIsPIDAlive_Self(t *testing.T) {
 	}
 	if IsPIDAlive(0) || IsPIDAlive(-1) {
 		t.Fatal("expected invalid pids dead")
+	}
+}
+
+func TestRefreshPeerSeatsFromLivePIDs_SeatWorkerAliveHeartbeats(t *testing.T) {
+	root := t.TempDir()
+	self := os.Getpid()
+	prevExec := listPeerExecutablePIDsFn
+	listPeerExecutablePIDsFn = func() ([]int, error) { return nil, nil }
+	t.Cleanup(func() { listPeerExecutablePIDsFn = prevExec })
+
+	if _, err := WriteSeatWorkerAlive(root, "peer-agent-1", "sess-test", time.Now().UTC()); err != nil {
+		t.Fatalf("alive: %v", err)
+	}
+	// Rewrite alive with known pid=self (WriteSeatWorkerAlive uses os.Getpid already).
+	_ = self
+
+	res, err := RefreshPeerSeatsFromLivePIDs(root, false)
+	if err != nil {
+		t.Fatalf("refresh: %v", err)
+	}
+	if res.Assigned["peer-agent-1"] != self {
+		t.Fatalf("assigned=%v want self=%d on peer-agent-1 from heartbeat", res.Assigned, self)
+	}
+	if len(res.Issues) != 0 {
+		t.Fatalf("unexpected issues with live heartbeat: %v", res.Issues)
+	}
+	doc := InspectFeed(DoctorOptions{ProjectRoot: root})
+	if doc.PeerSeatsLive < 1 {
+		t.Fatalf("PeerSeatsLive=%d", doc.PeerSeatsLive)
 	}
 }
