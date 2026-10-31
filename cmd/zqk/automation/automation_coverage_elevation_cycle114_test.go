@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -383,6 +384,7 @@ func TestLintBypass_CoordinationEmissionEdges(t *testing.T) {
 		longFiles,
 		automationProfileAIAgent,
 	)
+	time.Sleep(150 * time.Millisecond)
 }
 
 func TestLintBypass_CreateAuditEventFallback(t *testing.T) {

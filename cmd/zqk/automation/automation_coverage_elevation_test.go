@@ -5,6 +5,7 @@ import (
 	"context"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -157,6 +158,7 @@ func TestLintBypassAudit_ExplicitFlags(t *testing.T) {
 	wd, err := fileutil.Getwd()
 	require.NoError(t, err)
 	t.Cleanup(func() {
+		time.Sleep(150 * time.Millisecond)
 		_ = fileutil.Chdir(wd)
 	})
 	require.NoError(t, fileutil.Chdir(tempDir))
@@ -192,6 +194,7 @@ func TestLintBypassAudit_ExplicitFlags(t *testing.T) {
 		err := cmd.Execute()
 		// Only git-user is required by validateLintBypassAuditFlags
 		assert.NoError(t, err)
+		time.Sleep(150 * time.Millisecond)
 	})
 
 	t.Run("successful execution creates audit event", func(t *testing.T) {
@@ -208,6 +211,7 @@ func TestLintBypassAudit_ExplicitFlags(t *testing.T) {
 		})
 		err := cmd.Execute()
 		assert.NoError(t, err)
+		time.Sleep(150 * time.Millisecond)
 	})
 }
 
@@ -321,6 +325,7 @@ func TestLintBypassAudit_AutoDetectExecution(t *testing.T) {
 	wd, err := fileutil.Getwd()
 	require.NoError(t, err)
 	t.Cleanup(func() {
+		time.Sleep(150 * time.Millisecond)
 		_ = fileutil.Chdir(wd)
 	})
 	require.NoError(t, fileutil.Chdir(tempDir))
@@ -355,6 +360,7 @@ func TestLintBypassAudit_AutoDetectExecution(t *testing.T) {
 		err := cmd.Execute()
 		assert.NoError(t, err)
 		assert.Contains(t, buf.String(), "Created lint bypass audit event")
+		time.Sleep(150 * time.Millisecond)
 	})
 
 	t.Run("auto-detect with quiet flag produces no output", func(t *testing.T) {
@@ -367,6 +373,7 @@ func TestLintBypassAudit_AutoDetectExecution(t *testing.T) {
 		err := cmd.Execute()
 		assert.NoError(t, err)
 		assert.Empty(t, buf.String())
+		time.Sleep(150 * time.Millisecond)
 	})
 }
 
