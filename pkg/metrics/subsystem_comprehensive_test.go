@@ -431,8 +431,8 @@ func TestSampler_EvictionAndDisabledKind(t *testing.T) {
 	for i := 0; i <= maxSamplerBatchKeys+5; i++ {
 		_, err := s.Sample(map[string]any{
 			objects.FieldKeyKind: "sampler_evict_test",
-			"object_id":           fmt.Sprintf("obj_%d", i),
-			"val":                 float64(i),
+			"object_id":          fmt.Sprintf("obj_%d", i),
+			"val":                float64(i),
 		})
 		assert.NoError(t, err)
 	}
