@@ -163,70 +163,39 @@ func enforceRoleEnforcement(clientInfo map[string]any, config *ServerConfig, pro
 
 			return clientInfo, nil
 		}
-		// If account lookup fails, send helpful notification and continue with other enforcement rules
-		// This allows the server to continue operating with fallback permissions instead of failing
-		// NOTE: For dynamic registration, observer agent should create the account file first,
-		// then the agent can re-initialize with the account_id to get proper permissions
+		// TRACK: BLI-1790155068391099000-c86bd852 / CRIT-1790155068391100000-e5a685ec —
+		// EnforceAccountRoles + account lookup miss must deny (fail closed), never fall
+		// open with client-claimed or residual permissions.
+		roleErrorsTotal.Add(1)
+		displayAccountID := accountID
+		if strings.HasPrefix(accountID, "account-") && !strings.HasPrefix(accountID, "account:") {
+			username := strings.TrimPrefix(accountID, "account-")
+			displayAccountID = fmt.Sprintf("account:%s", username)
+		}
+		var expectedFilename string
+		if strings.HasPrefix(displayAccountID, "account:") {
+			username := strings.TrimPrefix(displayAccountID, "account:")
+			expectedFilename = fmt.Sprintf("account-%s.yaml", username)
+		} else {
+			expectedFilename = fmt.Sprintf("%s.yaml", displayAccountID)
+		}
+		accountYAMLPath := filepath.ToSlash(filepath.Join(paths.ProcessAccountsDir, expectedFilename))
 		if notificationSender != nil {
-			// Normalize account ID for display (handle both account:username and account-username formats)
-			displayAccountID := accountID
-			if strings.HasPrefix(accountID, "account-") && !strings.HasPrefix(accountID, "account:") {
-				// Convert account-ide-seat-01 -> for display
-				username := strings.TrimPrefix(accountID, "account-")
-				displayAccountID = fmt.Sprintf("account:%s", username)
-			}
-
-			// Determine expected filename
-			var expectedFilename string
-			if strings.HasPrefix(displayAccountID, "account:") {
-				username := strings.TrimPrefix(displayAccountID, "account:")
-				expectedFilename = fmt.Sprintf("account-%s.yaml", username)
-			} else {
-				expectedFilename = fmt.Sprintf("%s.yaml", displayAccountID)
-			}
-
-			// Send helpful notification with instructions
-			// Guide users to check for MCP tools, use CLI, or escalate to administrator
-			accountYAMLPath := filepath.ToSlash(filepath.Join(paths.ProcessAccountsDir, expectedFilename))
 			message := fmt.Sprintf(
-				"⚠️ Account lookup failed for '%s'. The account object was not found at '%s'.\n\n"+
-					"**To resolve this issue, try the following options in order:**\n\n"+
-					"**Option 1: Check if account creation is available via MCP tools**\n"+
-					"1. Use `tools/list` to see all available tools\n"+
-					"2. Look for account creation tools:\n"+
-					"   - Interactive tool: `%s` (with kind='account')\n"+
-					"   - Or CLI-based tools: check for tools matching `*object*create*account*` or `*account*create*`\n"+
-					"3. If available, use the MCP tool to create the account object\n\n"+
-					"**Option 2: Use CLI directly (if MCP tools are not available or not surfaced)**\n"+
-					"1. If account creation tools are not available in MCP, use the CLI directly:\n"+
-					"   - Run: `%s object create account` with appropriate fields (roles, permissions, etc.)\n"+
-					"   - Or manually create the file: `%s` with proper YAML structure\n\n"+
-					"**Option 3: Escalate to system administrator**\n"+
-					"1. If you don't have permissions to create accounts, contact your system administrator\n"+
-					"2. Request that they either:\n"+
-					"   - Create the account file: `%s`\n"+
-					"   - Or ensure account creation functionality is registered in MCP tools (if not already available)\n"+
-					"   - Or update your `account_id` to reference an existing account\n\n"+
-					"**Alternative: Provide authentication credentials**\n"+
-					"- Provide keystore key, username/password, or other authentication credentials to resolve the account\n\n"+
-					"**Note:** Once the account file exists, re-initialize the MCP connection with the `account_id` to get proper permissions.\n"+
-					"The server will continue with fallback permissions until the account is resolved. Some operations may be limited.",
+				"Account lookup failed for '%s' (fail-closed). Expected account object at '%s'.\n\n"+
+					"Create the account (CLI: `%s object create account` or MCP create tools), then re-initialize with account_id.\n"+
+					"Do not continue with client-claimed permissions.",
 				displayAccountID, accountYAMLPath,
-				GetToolName("create_object_interactive"),
 				GetCommandPath("object create account"),
-				accountYAMLPath,
-				accountYAMLPath,
 			)
-
-			// Send as both a message notification and a log message
-			_ = notificationSender.SendMessageToClient(message, "account_lookup_failed", "high")                                       //nolint:errcheck // Notification failures are non-critical
-			_ = notificationSender.SendLogMessage(LogLevelWarn, fmt.Sprintf("Account lookup failed: %s", err.Error()), map[string]any{ //nolint:errcheck // Notification failures are non-critical
+			_ = notificationSender.SendMessageToClient(message, "account_lookup_failed", "high") //nolint:errcheck // Notification failures are non-critical
+			_ = notificationSender.SendLogMessage(LogLevelWarn, fmt.Sprintf("Account lookup failed (fail-closed): %s", err.Error()), map[string]any{ //nolint:errcheck // Notification failures are non-critical
 				clientInfoAccountID: displayAccountID,
 				"expected_filename": expectedFilename,
 				"error":             err.Error(),
 			})
 		}
-		// Continue with other enforcement rules (don't fail initialization)
+		return nil, errfmt.Errorf("account lookup failed for %s (enforce_account_roles fail-closed): %w", displayAccountID, err)
 	}
 
 	// Rule 3: Allowed roles whitelist
