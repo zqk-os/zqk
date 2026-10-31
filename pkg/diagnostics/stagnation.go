@@ -60,9 +60,10 @@ func BuildCheckpoints(history []FailureEnvelope) []StateCheckpoint {
 		return nil
 	}
 	checkpoints := make([]StateCheckpoint, len(history))
+	var prevSig string
 	for i, env := range history {
 		entropy := true
-		if i > 0 && history[i-1].Signature == env.Signature {
+		if i > 0 && prevSig == env.Signature {
 			entropy = false
 		}
 		checkpoints[i] = StateCheckpoint{
@@ -71,6 +72,7 @@ func BuildCheckpoints(history []FailureEnvelope) []StateCheckpoint {
 			Timestamp:    env.Timestamp,
 			EntropyDelta: entropy,
 		}
+		prevSig = env.Signature
 	}
 	return checkpoints
 }
