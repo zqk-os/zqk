@@ -243,11 +243,16 @@ func TestWriteObjectToDraftPlane_FullTemplateOfPossiblesAndMembraneTimestamps(t 
 		}
 	}
 
-	// 2. Verify non-required spec fields appear as placeholders (full template of possibles)
-	for _, expectedSlot := range []string{"persona_refs", "epic_refs", "workstream_refs", "code_location", "commit_hashes"} {
+	// 2. Verify non-required spec fields appear as placeholders (full template of possibles).
+	// epic_refs is intentionally omitted when empty — empty [] blocks conceptual→originated
+	// under confidential-filtered StrictMode (RIS-1793446317704936000-61dc49df).
+	for _, expectedSlot := range []string{"persona_refs", "workstream_refs", "code_location", "commit_hashes"} {
 		if _, exists := parsed[expectedSlot]; !exists {
 			t.Errorf("expected full template of possibles to include %q on draft plane, but missing", expectedSlot)
 		}
+	}
+	if _, exists := parsed[objects.FieldKeyEpicRefs]; exists {
+		t.Errorf("empty epic_refs must be omitted from draft plane (got %#v)", parsed[objects.FieldKeyEpicRefs])
 	}
 
 	// 3. Complete fields and promote to originated (crossing CAS membrane)
@@ -277,3 +282,40 @@ func TestWriteObjectToDraftPlane_FullTemplateOfPossiblesAndMembraneTimestamps(t 
 		t.Errorf("expected created_by to be stamped upon CAS origination, but was empty")
 	}
 }
+
+// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
+// PRI mint must not inject epic_refs: [] (blocks conceptual→originated under StrictMode).
+func TestWriteObjectToDraftPlane_PriorityPlanOmitsEmptyEpicRefs(t *testing.T) {
+	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+
+	id := "PRI-1777000000000000000-epicomit01"
+	sparseObj := map[string]any{
+		objects.FieldKeyID:            id,
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeyTitle:         "PRI omit empty epic_refs",
+		objects.FieldKeyStatus:        objects.ObjectStatusConceptual,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyPersonaRefs:   []any{"PER-DEFAULT-OPERATOR"},
+	}
+	sparseData, err := yaml.Marshal(sparseObj)
+	if err != nil {
+		t.Fatalf("marshal sparse object: %v", err)
+	}
+	if err := fileStorage.WriteObjectToDraftPlane(id, objects.KindPriorityPlan, sparseData); err != nil {
+		t.Fatalf("WriteObjectToDraftPlane failed: %v", err)
+	}
+
+	draftPath := fileStorage.objectDraftPlanePath(objects.KindPriorityPlan, id)
+	data, err := fileutil.ReadFile(draftPath)
+	if err != nil {
+		t.Fatalf("read draft file: %v", err)
+	}
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("unmarshal draft YAML: %v", err)
+	}
+	if _, exists := parsed[objects.FieldKeyEpicRefs]; exists {
+		t.Fatalf("priority_plan draft must omit empty epic_refs; got %#v", parsed[objects.FieldKeyEpicRefs])
+	}
+}
+
