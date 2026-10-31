@@ -214,7 +214,7 @@ func (mp *MetricPipeline) DiscoverMetricFields(ontology string) ([]MetricField, 
 
 	// Check object-level traits
 	objectTraits := spec.ResolvedTraits
-	expandedTraits, _ := mp.traitRegistry.ExpandTraits(objectTraits) //nolint:errcheck // Use original traits if expansion fails
+	expandedTraits, _ := mp.getTraitRegistry().ExpandTraits(objectTraits) //nolint:errcheck // Use original traits if expansion fails
 	hasMetricEnabled := false
 	for _, trait := range expandedTraits {
 		if trait == "base_metric_enabled_group" {
