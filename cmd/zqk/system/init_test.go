@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -128,7 +130,13 @@ func requireFieldRegistryReloaded(t *testing.T) {
 }
 
 func registerInitTestCleanup(t *testing.T, dir string) {
+	// Scrub registers first so it runs last (LIFO), right before t.TempDir RemoveAll.
 	t.Cleanup(func() {
+		testkit.ScrubProjectRootForTempCleanup(dir, 100, 50*time.Millisecond)
+		_ = fileutil.RemoveAll(filepath.Join(dir, paths.ProjectDataDir))
+	})
+	t.Cleanup(func() {
+		_ = ambient.StopDaemon(dir)
 		_ = WaitProjectCacheBackgroundWork(context.Background(), dir)
 		validation.StopSharedValidationCacheForTest(dir)
 		if provider, ok := storage.GetGlobalStorageProviderCache().Get(dir); ok {
@@ -754,6 +762,8 @@ func TestInit_RegistersShippedDocs(t *testing.T) {
 		t.Fatalf("Failed to change to temp directory: %v", err)
 	}
 
+	registerInitTestCleanup(t, tmpDir)
+
 	cmd := NewInitCmd()
 	cmd.SetArgs([]string{"--force"})
 	if err := cmd.Execute(); err != nil {
@@ -781,7 +791,8 @@ func TestInit_RegistersShippedDocs(t *testing.T) {
 		registeredPaths[cleanP] = true
 	}
 
-	// Ensure shipped canonical docs were registered
+	// Ensure shipped canonical docs were registered via the greenfield init path
+	// (docs/ alone must not auto-detect legacy — REQ-1789654891514127000-25cbd9d1).
 	expectedDocs := []string{
 		"docs/architecture/sample.md",
 		"docs/best-practices/guidelines.md",
