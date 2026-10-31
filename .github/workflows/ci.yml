@@ -81,6 +81,9 @@ jobs:
     name: Unit Tests (${{ matrix.suite }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      GOTMPDIR: ${{ runner.temp }}
+      TMPDIR: ${{ runner.temp }}
     strategy:
       fail-fast: false
       matrix:
@@ -162,6 +165,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
 
+      - name: Free Disk Space on Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" 2>/dev/null || true
+          df -h
+
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -184,9 +192,17 @@ jobs:
     name: Extended Unit Tests (Full Non-Short)
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      GOTMPDIR: ${{ runner.temp }}
+      TMPDIR: ${{ runner.temp }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
+
+      - name: Free Disk Space on Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" 2>/dev/null || true
+          df -h
 
       - name: Set up Go
         uses: actions/setup-go@v7
