@@ -162,6 +162,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
 
+      - name: Free Disk Space on Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" 2>/dev/null || true
+          df -h
+          echo "GOTMPDIR=${RUNNER_TEMP}" >> "$GITHUB_ENV"
+          echo "TMPDIR=${RUNNER_TEMP}" >> "$GITHUB_ENV"
+
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -169,6 +176,9 @@ jobs:
           cache: true
 
       - name: Run Partitioned Unit Tests
+        env:
+          GOTMPDIR: ${{ runner.temp }}
+          TMPDIR: ${{ runner.temp }}
         run: |
           go test -short -p 2 -timeout 15m -coverprofile="coverage-${{ matrix.suite }}.out" ${{ matrix.packages }}
 
@@ -188,6 +198,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v7
 
+      - name: Free Disk Space on Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" 2>/dev/null || true
+          df -h
+
       - name: Set up Go
         uses: actions/setup-go@v7
         with:
@@ -195,6 +210,9 @@ jobs:
           cache: true
 
       - name: Run Full Unit Tests (Non-Short)
+        env:
+          GOTMPDIR: ${{ runner.temp }}
+          TMPDIR: ${{ runner.temp }}
         run: |
           go test -p 2 -timeout 20m -coverprofile=coverage-extended.out \
             ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
