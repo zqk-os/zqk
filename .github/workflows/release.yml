@@ -12,6 +12,8 @@ permissions:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    env:
+      HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -37,7 +39,16 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Homebrew Tap Formula Update
+        if: env.HOMEBREW_TAP_GITHUB_TOKEN != ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+        run: |
+          gh api repos/zqk-os/homebrew-tap/dispatches \
+            --field event_type="release-published" \
+            --raw-field client_payload="{\"tag\":\"${GITHUB_REF_NAME}\",\"repository\":\"${GITHUB_REPOSITORY}\",\"actor\":\"${GITHUB_ACTOR}\"}"
 
   docs-portal:
     name: Build & Verify Docs Portal
