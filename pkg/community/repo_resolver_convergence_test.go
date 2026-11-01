@@ -365,7 +365,7 @@ func TestRepoResolverConvergence_NegativeAdversarialBoundary(t *testing.T) {
 
 	// 7. Safe JSON unmarshaling into RepoResolverConvergenceSession
 	t.Run("ValidJSON_ParseSuccess", func(t *testing.T) {
-		validSession := community.RepoResolverConvergenceSession{
+		validSession := &community.RepoResolverConvergenceSession{
 			SessionID:  "sess-json-01",
 			Schema:     community.RepoResolverConvergenceSchema,
 			PersonaRef: community.RepoResolverRole,
