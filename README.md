@@ -32,6 +32,9 @@ brew tap zqk-os/tap && brew install zqk
 # Initialize kernel in your repo
 zqk init
 
+# Scaffold zero-config GitHub Actions CI/CD and Homebrew formula
+zqk ci init
+
 # Launch the visual web studio
 zqk ui -w
 
@@ -39,7 +42,7 @@ zqk ui -w
 zqk mcp ensure
 
 # Execute work with autonomous multi-agent swarm
-zqk do
+zqk swarm dispatch
 ```
 
 ### Visual Web Studio (`zqk ui -w`)

@@ -111,14 +111,16 @@ zqk grep "error" --max-tokens 2000 -f json     # Token-budgeted JSON output for 
 ## After green
 
 1. `zqk quickstart` — same text as `zqk system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
-2. `zqk mcp install` then optionally `zqk mcp ensure --tcp 127.0.0.1:8443`.
-3. `zqk run <url|file>` — run a portable agent swarm package.
-4. `zqk state stream --dashboard` — stream live change journal mutations and CPCP status with the visual seismograph.
-5. `zqk state tree` — inspect the live knowledge graph hierarchy.
-6. `zqk object list` — first-run scoreboard.
-7. `zqk object inspect` — interactive object inspector, lineage radar, and live Policy Studio.
-8. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated Audit Tab (`--tab audit`).
-9. `zqk test dashboard --check-dod` — test_case ↔ criteria lineage and 100% Definition of Done verification.
-10. `zqk workflow whats-next --format json`.
+2. `zqk ci init` — scaffold zero-config GitHub Actions CI/CD and Homebrew formula.
+3. `zqk swarm dispatch` — one-click autonomous worker swarm dispatch with token budgeting and AST verification.
+4. `zqk mcp install` then optionally `zqk mcp ensure --tcp 127.0.0.1:8443`.
+5. `zqk run <url|file>` — run a portable agent swarm package.
+6. `zqk state stream --dashboard` — stream live change journal mutations and CPCP status with the visual seismograph.
+7. `zqk state tree` — inspect the live knowledge graph hierarchy.
+8. `zqk object list` — first-run scoreboard.
+9. `zqk object inspect` — interactive object inspector, lineage radar, and live Policy Studio.
+10. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated Audit Tab (`--tab audit`).
+11. `zqk test dashboard --check-dod` — test_case ↔ criteria lineage and 100% Definition of Done verification.
+12. `zqk workflow whats-next --format json`.
 
 ZQK Core provides the complete system kernel: object lifecycle, spec origination, command codegen, scheduler daemons (`zqk scheduler start|stop|status`), and Model Context Protocol (MCP) integration are fully native and offline-capable out of the box.
