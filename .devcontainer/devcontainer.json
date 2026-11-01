@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+  "name": "ZQK Knowledge Kernel (Zero-Touch Devcontainer)",
+  "image": "mcr.microsoft.com/devcontainers/go:1.26",
+  "remoteUser": "vscode",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "redhat.vscode-yaml",
+        "bierner.markdown-mermaid",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "go.useLanguageServer": true,
+        "go.lintTool": "golangci-lint",
+        "go.lintOnSave": "package",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "containerEnv": {
+    "ZQK_CONTEXT": "ai-agent",
+    "ZQK_ALLOW_DEGRADED": "true"
+  },
+  "postCreateCommand": "go build -o bin/zqk ./cmd/zqk && ./bin/zqk mcp ensure && ./bin/zqk system agent-onboard --headless --format json",
+  "runArgs": [
+    "--cap-drop=ALL"
+  ]
+}
