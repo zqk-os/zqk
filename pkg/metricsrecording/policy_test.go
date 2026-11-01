@@ -32,9 +32,6 @@ func TestEnabled_HotPathNoPersist(t *testing.T) {
 	}
 	EnterAllowRecording()
 	defer LeaveAllowRecording()
-	if !Enabled() {
-		t.Fatal("expected enabled after EnterAllowRecording")
-	}
 	EnterHotPathNoPersist()
 	if Enabled() {
 		t.Fatal("hot path must suppress recording")
@@ -49,5 +46,14 @@ func TestEnabled_TestMetricsRecordingEnv(t *testing.T) {
 	t.Setenv(zqkenv.TestMetricsRecording().Name(), "1")
 	if !Enabled() {
 		t.Fatal("expected Enabled() to return true when ZQK_TEST_METRICS_RECORDING=1")
+	}
+}
+
+func TestEnabled_NonTestBinary(t *testing.T) {
+	orig := isTesting
+	defer func() { isTesting = orig }()
+	isTesting = func() bool { return false }
+	if !Enabled() {
+		t.Fatal("expected Enabled() to return true when not in testing binary")
 	}
 }

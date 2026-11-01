@@ -185,6 +185,7 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			kindnames.WorkstreamTransition:   {"WST-"},
 			kindnames.Policy:                 {"POL-"},
 			kindnames.TechnicalDebt:          {"TDE-"},
+			kindnames.Epic:                   {"EPC-", "EPI-", "EPIC-"},
 			objects.KindDocEntry:             {"DOC-"},
 			objects.KindOrganizationalChange: {"OCH-"},
 			objects.KindOrganization:         {"ORG-"},
