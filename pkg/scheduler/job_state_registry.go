@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -73,8 +74,19 @@ const (
 	defaultStateRetentionFullCleanupMinInterval = 5 * time.Minute
 )
 
-// stateRetentionFullCleanupMinInterval is overridable in tests.
-var stateRetentionFullCleanupMinInterval = defaultStateRetentionFullCleanupMinInterval
+var stateRetentionFullCleanupMinIntervalNs atomic.Int64
+
+func init() {
+	stateRetentionFullCleanupMinIntervalNs.Store(int64(defaultStateRetentionFullCleanupMinInterval))
+}
+
+func getStateRetentionFullCleanupMinInterval() time.Duration {
+	ns := stateRetentionFullCleanupMinIntervalNs.Load()
+	if ns <= 0 {
+		return defaultStateRetentionFullCleanupMinInterval
+	}
+	return time.Duration(ns)
+}
 
 func jobStateDirsForLookup(stateDir, jobID string) []string {
 	seg := sanitizeJobIDForPathSegment(jobID)
@@ -165,9 +177,8 @@ func (r *JobStateRegistry) SetRetentionForTest(d time.Duration) {
 // SetStateRetentionFullCleanupMinIntervalForTest overrides the rate-limit interval for full
 // retention cleanup. Returns a restore func. For tests only — enables facade aliases.
 func SetStateRetentionFullCleanupMinIntervalForTest(d time.Duration) (restore func()) {
-	prev := stateRetentionFullCleanupMinInterval
-	stateRetentionFullCleanupMinInterval = d
-	return func() { stateRetentionFullCleanupMinInterval = prev }
+	prev := stateRetentionFullCleanupMinIntervalNs.Swap(int64(d))
+	return func() { stateRetentionFullCleanupMinIntervalNs.Store(prev) }
 }
 
 // ScheduleFullRetentionCleanupForTest exposes scheduleFullRetentionCleanup for facade tests.
@@ -1081,7 +1092,7 @@ func (r *JobStateRegistry) writeStateAtomically(state *JobExecutionState) error 
 }
 
 // scheduleFullRetentionCleanup starts at most one full-tree retention pass, and not more often
-// than stateRetentionFullCleanupMinInterval. Safe to call from CompleteExecution (does not block).
+// than getStateRetentionFullCleanupMinInterval(). Safe to call from CompleteExecution (does not block).
 func (r *JobStateRegistry) scheduleFullRetentionCleanup() {
 	if r == nil || r.retention <= 0 {
 		return
@@ -1091,7 +1102,7 @@ func (r *JobStateRegistry) scheduleFullRetentionCleanup() {
 		r.cleanupMu.Unlock()
 		return
 	}
-	if !r.lastFullCleanupAt.IsZero() && time.Since(r.lastFullCleanupAt) < stateRetentionFullCleanupMinInterval {
+	if !r.lastFullCleanupAt.IsZero() && time.Since(r.lastFullCleanupAt) < getStateRetentionFullCleanupMinInterval() {
 		r.cleanupMu.Unlock()
 		return
 	}
