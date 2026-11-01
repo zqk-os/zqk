@@ -79,7 +79,7 @@ func (tx *mockHelperTx) Read(ctx context.Context, secCtx *pkgctx.SecurityContext
 func (tx *mockHelperTx) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
 	existing, err := tx.m.Read(ctx, secCtx, id)
 	if err != nil {
-		existing = make(map[string]any)
+		return err
 	}
 	for k, v := range updates {
 		existing[k] = v
