@@ -163,7 +163,6 @@ func enforceRoleEnforcement(clientInfo map[string]any, config *ServerConfig, pro
 
 			return clientInfo, nil
 		}
-		// TRACK: BLI-1790155068391099000-c86bd852 / CRIT-1790155068391100000-e5a685ec —
 		// EnforceAccountRoles + account lookup miss must deny (fail closed), never fall
 		// open with client-claimed or residual permissions.
 		roleErrorsTotal.Add(1)

@@ -7,7 +7,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// TRACK: BLI-1790155068391099000-c86bd852 / CRIT-1790155068391100000-e5a685ec
 func TestEnforceRoleEnforcement_AccountLookupFailClosed(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
