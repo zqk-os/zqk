@@ -354,6 +354,7 @@ func determineProjectRoot() string {
 	return ""
 }
 
+// greenfield init registers shipped docs via RegisterShippedDocs.
 func registerShippedDocsHelper(projectRoot string, logger logging.Logger) error {
 	reg, skip, err := docman.RegisterShippedDocs(context.Background(), projectRoot, logger)
 	if err != nil {
