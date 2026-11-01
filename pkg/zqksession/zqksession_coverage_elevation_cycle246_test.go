@@ -361,7 +361,7 @@ func TestCycle246_CreateSession_BoundaryAndErrors(t *testing.T) {
 	})
 }
 
-// TestCycle246_TouchAndThrottleCoverage tests Touch and TouchIfNotThrottled branches.
+// TestCycle246_TouchAndThrottleCoverage tests Touch and empty guards.
 func TestCycle246_TouchAndThrottleCoverage(t *testing.T) {
 	t.Parallel()
 
@@ -402,6 +402,24 @@ func TestCycle246_TouchAndThrottleCoverage(t *testing.T) {
 		}
 	})
 
+	t.Run("TouchIfNotThrottled_EmptyGuardConditions", func(t *testing.T) {
+		tmpDir, store := setupCycle246TestEnv(t)
+
+		TouchIfNotThrottled(ctx, "", "sess-1", "t", "a", store)
+		TouchIfNotThrottled(ctx, tmpDir, "", "t", "a", store)
+		TouchIfNotThrottled(ctx, tmpDir, "sess-1", "t", "a", nil)
+		if store.updateCalls != 0 {
+			t.Fatalf("update calls on guards = %d, want 0", store.updateCalls)
+		}
+	})
+}
+
+// TestCycle246_TouchThrottleVariations tests file lock fallback and timestamp variations.
+func TestCycle246_TouchThrottleVariations(t *testing.T) {
+	t.Parallel()
+
+	ctx := pkgctx.NewSystemContext()
+
 	t.Run("TouchIfNotThrottled_FileLockErrorFallback", func(t *testing.T) {
 		t.Parallel()
 		tmpDir := t.TempDir()
@@ -412,17 +430,6 @@ func TestCycle246_TouchAndThrottleCoverage(t *testing.T) {
 		TouchIfNotThrottled(ctx, tmpDir, "sess-fallback", "title", "acc", store)
 		if store.updateCalls != 1 {
 			t.Fatalf("expected fallback Touch call on file lock error, got %d calls", store.updateCalls)
-		}
-	})
-
-	t.Run("TouchIfNotThrottled_EmptyGuardConditions", func(t *testing.T) {
-		tmpDir, store := setupCycle246TestEnv(t)
-
-		TouchIfNotThrottled(ctx, "", "sess-1", "t", "a", store)
-		TouchIfNotThrottled(ctx, tmpDir, "", "t", "a", store)
-		TouchIfNotThrottled(ctx, tmpDir, "sess-1", "t", "a", nil)
-		if store.updateCalls != 0 {
-			t.Fatalf("update calls on guards = %d, want 0", store.updateCalls)
 		}
 	})
 
@@ -579,7 +586,7 @@ func TestCycle246_IdleTimeoutCoverage(t *testing.T) {
 	})
 }
 
-// TestCycle246_TryReuseAndPersistedIDEdgeCases tests all branches in TryReuse and WritePersistedID.
+// TestCycle246_TryReuseAndPersistedIDEdgeCases tests GetCurrentID, TryReuse, and basic write branches.
 func TestCycle246_TryReuseAndPersistedIDEdgeCases(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 
@@ -615,6 +622,13 @@ func TestCycle246_TryReuseAndPersistedIDEdgeCases(t *testing.T) {
 			t.Fatalf("persisted ID = %q, want %q", ReadPersistedID(tmpDir), sessID)
 		}
 	})
+}
+
+// TestCycle246_WritePersistedIDEdgeCases tests conditional overwrite rules in WritePersistedID.
+func TestCycle246_WritePersistedIDEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	ctx := pkgctx.NewSystemContext()
 
 	t.Run("WritePersistedID_ReadErrorAllowsOverwrite", func(t *testing.T) {
 		t.Parallel()
