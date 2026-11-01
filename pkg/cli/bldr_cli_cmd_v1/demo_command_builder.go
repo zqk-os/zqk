@@ -5,7 +5,6 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewDemoCommandBuilder creates a new demo command
@@ -24,9 +23,7 @@ func NewDemoCommandBuilder() *cobra.Command {
 	builder.AddBoolFlag("non-interactive", "", false, "Run automated showcase without pausing for keyboard prompts")
 	builder.AddStringFlag("speed", "", "normal", "Showcase animation speed: normal, fast, instant")
 	builder.AddStringFlag("step", "s", "all", "Run specific demonstration step: all, ast, vds, swarm, star")
+	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
-	cli.RequireStorage(cmd, false)
-	cli.RequireSession(cmd, false)
-	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

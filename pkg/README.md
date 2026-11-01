@@ -46,7 +46,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+2 | 2 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
-| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 16+47 | 47 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
+| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 16+49 | 49 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
 | [concurrency](./concurrency/) | `github.com/zqk-os/zqk/pkg/concurrency` | 11+12 | 12 | - | ✅ [README](./concurrency/README.md) | This package provides standardized concurrency primitives and patterns to ensure consistent, safe, and observable concurrent op... |
 | [config](./config/) | `github.com/zqk-os/zqk/pkg/config` | 10+8 | 8 | - | ❌ - | Kernel configuration loading, YAML parsing, environment overrides, and schema validation. |
 | [context](./context/) | `github.com/zqk-os/zqk/pkg/context` | 15+6 | 6 | - | ❌ - | Context management, security principal propagation, and request-scoped state. |
@@ -192,7 +192,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [storage](./storage/) | `github.com/zqk-os/zqk/pkg/storage` | 331+320 | 320 | audit, binary, +11 more | ✅ [README](./storage/README.md) | This package provides a unified storage abstraction layer for zqk, supporting both file-based and graph-based storage backends... |
 | [storagetesting](./storagetesting/) | `github.com/zqk-os/zqk/pkg/storagetesting` | 2+2 | 2 | - | ❌ - | Holds the minimal interfaces and option structs shared by [github.com/zqk-os/zqk/pkg/testing.SetupCompleteTestEnvironment] and... |
 | [strutil](./strutil/) | `github.com/zqk-os/zqk/pkg/strutil` | 4+5 | 5 | - | ❌ - | String manipulation, token extraction, and text formatting utilities. |
-| [studio](./studio/) | `github.com/zqk-os/zqk/pkg/studio` | 3+2 | 2 | components | ❌ - | Visual Studio Web UI backend, asset serving, and interactive dashboard APIs. |
+| [studio](./studio/) | `github.com/zqk-os/zqk/pkg/studio` | 4+2 | 2 | components | ❌ - | Visual Studio Web UI backend, asset serving, and interactive dashboard APIs. |
 | [supervision](./supervision/) | `github.com/zqk-os/zqk/pkg/supervision` | 4+3 | 3 | - | ❌ - | Process supervision trees, worker restarts, and crash resilience. |
 | [supply](./supply/) | `github.com/zqk-os/zqk/pkg/supply` | 1+6 | 6 | - | ❌ - | Dependency supply chain validation, vendor verification, and bill of materials. |
 | [swarm](./swarm/) | `github.com/zqk-os/zqk/pkg/swarm` | 17+19 | 19 | metabolism, pack, remote | ❌ - | Multi-agent swarm coordination, task allocation, and consensus protocols. |

@@ -50,6 +50,7 @@
 ./cli_specs/agent/feed_command.yaml
 ./cli_specs/agent/guiding_step_command.yaml
 ./cli_specs/agent/hook/
+./cli_specs/agent/hook/continuation_command.yaml
 ./cli_specs/agent/hook/pre_subagent_command.yaml
 ./cli_specs/agent/hook_command.yaml
 ./cli_specs/agent/new_command.yaml
@@ -62,6 +63,7 @@
 ./cli_specs/agent/seat_worker_command.yaml
 ./cli_specs/agent/status_command.yaml
 ./cli_specs/agent/swarm/
+./cli_specs/agent/swarm/dispatch_command.yaml
 ./cli_specs/agent/swarm/run_command.yaml
 ./cli_specs/agent/swarm/status_command.yaml
 ./cli_specs/agent/swarm_command.yaml
@@ -94,6 +96,7 @@
 ./cli_specs/ci/
 ./cli_specs/ci/checkout_command.yaml
 ./cli_specs/ci/demote_command.yaml
+./cli_specs/ci/init_command.yaml
 ./cli_specs/ci/run_command.yaml
 ./cli_specs/ci/status_command.yaml
 ./cli_specs/ci_command.yaml
@@ -123,6 +126,7 @@
 ./cli_specs/daemon/status_command.yaml
 ./cli_specs/daemon/stop_command.yaml
 ./cli_specs/daemon_command.yaml
+./cli_specs/demo_command.yaml
 ./cli_specs/do_command.yaml
 ./cli_specs/docman/
 ./cli_specs/docman/register_command.yaml
@@ -201,6 +205,7 @@
 ./cli_specs/mcp/ide_adapter_command.yaml
 ./cli_specs/mcp/supervise_command.yaml
 ./cli_specs/mcp/svc/
+./cli_specs/mcp/svc/cursor_adapter_command.yaml
 ./cli_specs/mcp/svc/daemon_command.yaml
 ./cli_specs/mcp/svc/install_command.yaml
 ./cli_specs/mcp/svc/list_tools_command.yaml
@@ -258,6 +263,7 @@
 ./cli_specs/pack/seal_command.yaml
 ./cli_specs/pack/validate_command.yaml
 ./cli_specs/pack_command.yaml
+./cli_specs/prime_command.yaml
 ./cli_specs/query_command.yaml
 ./cli_specs/quickstart_command.yaml
 ./cli_specs/rollback/
@@ -268,6 +274,9 @@
 ./cli_specs/rollback_command.yaml
 ./cli_specs/root/
 ./cli_specs/root/version_command.yaml
+./cli_specs/rules/
+./cli_specs/rules/generate_command.yaml
+./cli_specs/rules_command.yaml
 ./cli_specs/run_command.yaml
 ./cli_specs/scheduler/
 ./cli_specs/scheduler/activity_command.yaml
@@ -380,6 +389,7 @@
 ./cli_specs/state/tsdb_command.yaml
 ./cli_specs/state_command.yaml
 ./cli_specs/swarm/
+./cli_specs/swarm/dispatch_command.yaml
 ./cli_specs/swarm/init_command.yaml
 ./cli_specs/swarm/run_command.yaml
 ./cli_specs/swarm/status_command.yaml
@@ -409,6 +419,7 @@
 ./cli_specs/system/completion_command.yaml
 ./cli_specs/system/config_get_command.yaml
 ./cli_specs/system/dashboard_command.yaml
+./cli_specs/system/data_cells_command.yaml
 ./cli_specs/system/disk_usage_command.yaml
 ./cli_specs/system/emergency_manager_command.yaml
 ./cli_specs/system/ensure_retention_jobs_command.yaml

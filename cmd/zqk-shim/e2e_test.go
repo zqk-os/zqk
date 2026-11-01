@@ -13,6 +13,9 @@ import (
 )
 
 func TestZQKShim_E2E(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping e2e binary compilation test in -short mode")
+	}
 	// Setup: compile the shim binary
 	tempDir := t.TempDir()
 	shimBinary := filepath.Join(tempDir, "zqk-shim")

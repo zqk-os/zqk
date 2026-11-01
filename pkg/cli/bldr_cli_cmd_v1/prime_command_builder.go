@@ -5,7 +5,6 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewPrimeCommandBuilder creates a new prime command
@@ -26,9 +25,7 @@ func NewPrimeCommandBuilder() *cobra.Command {
 	builder.AddStringFlag("format", "f", "text", "Output format: text, json")
 	builder.AddBoolFlag("quiet", "q", false, "Suppress detailed progress output")
 	builder.AddBoolFlag("verify", "", true, "Verify zero git modifications to tracked files")
+	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
-	cli.RequireStorage(cmd, false)
-	cli.RequireSession(cmd, false)
-	cli.RequireSchedulerCheck(cmd, false)
 	return cmd
 }

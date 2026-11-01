@@ -50,6 +50,13 @@ func (s *Showcase) Run() (*DemoReport, error) {
 		step = StepAll
 	}
 
+	switch step {
+	case StepAll, StepAST, StepVDS, StepSwarm, StepStar:
+		// valid step
+	default:
+		return nil, fmt.Errorf("unknown step: %q (valid: %s, %s, %s, %s, %s)", s.opts.Step, StepAll, StepAST, StepVDS, StepSwarm, StepStar)
+	}
+
 	report := &DemoReport{
 		Success: true,
 	}
@@ -246,6 +253,6 @@ func (s *Showcase) pause() {
 	dim := color.New(color.Faint).SprintFunc()
 	fmt.Fprintf(s.out, "%s%s", indentLeader, dim("[Press Enter for next scene...] "))
 	scanner := bufio.NewScanner(s.in)
-	_ = scanner.Scan()
+	scanner.Scan()
 	fmt.Fprintln(s.out)
 }
