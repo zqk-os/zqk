@@ -58,6 +58,10 @@ type WhatsNextOut struct {
 	MaterializedViewRecovering bool `json:"materialized_view_recovering,omitempty"`
 	// MaterializedViewDegradedReason explains the disruption condition (e.g. staleness or cold boot).
 	MaterializedViewDegradedReason string `json:"materialized_view_degraded_reason,omitempty"`
+	// PipelineFeedback captures build/CI pipeline execution telemetry and status.
+	PipelineFeedback *PipelineTelemetrySummary `json:"pipeline_feedback,omitempty"`
+	// PipelineConvergenceCue recommends actions when build or CI failures block convergence.
+	PipelineConvergenceCue string `json:"pipeline_convergence_cue,omitempty"`
 }
 
 type WhatsNextPriorityPlan struct {
@@ -748,6 +752,12 @@ func Execute(ctx context.Context, sp storage.ObjectStorageProvider, projectRoot 
 		out.MaterializedViewStale = lite.Stale
 		out.MaterializedViewRecovering = lite.Recovering
 		out.MaterializedViewDegradedReason = lite.DegradedReason
+	}
+
+	// Ingest Pipeline Telemetry Feedback and Convergence Cues
+	if feedback, err := LoadPipelineTelemetrySummary(projectRoot); err == nil && feedback != nil {
+		out.PipelineFeedback = feedback
+		out.PipelineConvergenceCue = EvaluatePipelineConvergenceCue(feedback)
 	}
 
 	return &out, nil
