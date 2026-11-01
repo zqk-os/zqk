@@ -290,4 +290,3 @@ func RunRulesGenerate(cmd *cobra.Command, _ []string) error {
 		"previews":             res.Previews,
 	})
 }
-
