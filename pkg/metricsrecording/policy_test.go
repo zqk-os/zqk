@@ -51,3 +51,12 @@ func TestEnabled_TestMetricsRecordingEnv(t *testing.T) {
 		t.Fatal("expected Enabled() to return true when ZQK_TEST_METRICS_RECORDING=1")
 	}
 }
+
+func TestEnabled_NonTestBinary(t *testing.T) {
+	orig := isTesting
+	defer func() { isTesting = orig }()
+	isTesting = func() bool { return false }
+	if !Enabled() {
+		t.Fatal("expected Enabled() to return true when not in testing binary")
+	}
+}

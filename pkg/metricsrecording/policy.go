@@ -57,6 +57,8 @@ func decRef(p *int32) {
 	}
 }
 
+var isTesting = testing.Testing
+
 // Enabled returns true if metrics recording should run (storage counters, pipeline Sample,
 // MetricFactory creates, etc.).
 //
@@ -70,7 +72,7 @@ func Enabled() bool {
 	if atomic.LoadInt32(&hotPathNoPersistRef) > 0 {
 		return false
 	}
-	if !testing.Testing() {
+	if !isTesting() {
 		return true
 	}
 	if isTruthy(zqkenv.TestMetricsRecording().Get()) || config.TestingMetricsRecording().OrDefault(false) {
