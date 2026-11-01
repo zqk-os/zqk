@@ -1,10 +1,35 @@
-# ZQK OS
+# ZQK: Git for AI Agent Memory and Task Truth
+
+**The persistence, coordination, and verification substrate for Cursor, Claude Code, Cline, and Windsurf.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
 [![Documentation](https://img.shields.io/badge/docs-docs.zqk.dev-blue)](https://docs.zqk.dev)
 
-**The Cellular Knowledge Operating System for autonomous agent swarms.** This repository is **ZQK Core**, the open-core community microkernel. Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md).
+Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md) · Documentation: [docs.zqk.dev](https://docs.zqk.dev)
+
+---
+
+### The Problem: Autonomous Agents Code Blind
+
+When using autonomous coding agents (Cursor Composer, Claude Code, Windsurf, Cline, Aider), developers run into the same painful failure modes:
+
+- **Agent Amnesia & Context Drift:** Ephemeral chat sessions lose goals and constraints across prompts, causing agents to wander off-track.
+- **Hallucinated Tasks:** Without an authoritative backlog, agents invent unnecessary work or tackle the wrong problems.
+- **Silent Regressions:** Edits pass locally in a single file while breaking structural invariants across the broader repository.
+- **Runaway Token Burn:** Blind `grep`, `find`, or dumping raw chat history into context windows burns millions of tokens on irrelevant noise.
+
+### The Solution: Persistent Knowledge Kernel
+
+ZQK provides the missing infrastructure layer between your LLMs and your code:
+
+- **Git-Like Task Truth:** Goals, requirements, acceptance criteria, and backlog items are versioned, verifiable graph objects—not transient LLM prompts.
+- **Fail-Closed AST Verification Gates:** Code changes must satisfy structural AST checks and automated test suites before work units can transition to done.
+- **1-Command Universal MCP Discovery:** Wire up local kernel context to Cursor or Claude Code instantly via Model Context Protocol (`zqk mcp ensure` / `zqk mcp proxy`).
+- **Token-Budgeted Search (`zgrep`):** Sub-15ms trigram indexing and Go AST search with strict token budgeting (default 500 tokens) to eliminate context blowouts.
+- **Real-Time Visual Web Studio:** Interactive Gantt timelines, DAG dependency trees, and live task tracking with zero cloud dependencies (`zqk ui -w`).
+
+---
 
 ## Quickstart
 
@@ -20,13 +45,29 @@ Or install via Homebrew:
 brew tap zqk-os/tap && brew install zqk
 ```
 
+### 30-Second Greenfield Setup
+
+```sh
+# Initialize kernel in your repo
+zqk init
+
+# Launch the visual web studio
+zqk ui -w
+
+# Wire up MCP for Cursor / Claude Code
+zqk mcp ensure
+
+# Execute work with autonomous multi-agent swarm
+zqk do
+```
+
 ---
 
 ### Choose Your Path: Go Fast vs. Walk Through
 
-ZQK offers two paths for Polyglot projects (Go, Python, TypeScript, Rust):
+ZQK offers two paths for polyglot projects (Go, Python, TypeScript, Rust):
 
-#### Option 1: Go Fast
+#### Option 1: Go Fast (Immediate Token Savings)
 *For developers who want immediate token savings with zero learning curve.*
 
 Installs `zqk` and links `zgrep` (`zqk grep`) into your PATH. Drop it directly into Cursor, Claude Code, Cline, or Aider to stop context-window blowouts:
@@ -48,8 +89,8 @@ Add this to `.cursorrules`, `CLAUDE.md`, or `.clinerules`:
 
 Full agent configuration reference: [Go Fast Agent Code Search Guide](docs/guides/GO_FAST_AGENT_CODE_SEARCH.md).
 
-#### Option 2: Walk Through
-*For developers who want to understand core principles and see the Knowledge Kernel in action.*
+#### Option 2: Walk Through (Full Knowledge Kernel)
+*For developers who want persistent task truth and autonomous swarm orchestration.*
 
 Conducts an interactive walkthrough to capture intent, objectify goals, and experience the 5-layer cascade:
 
@@ -71,33 +112,16 @@ zqk system start-here
 
 ---
 
-> *The Substrate for Living Software: Sovereign Cells. Verified Truth. Autonomous Organisms.*
+## Architecture Deep-Dive: Biological Holonic Microkernel
 
-ZQK (Zen Quantum Kernel) is an open-core, distributed **Cellular Knowledge Operating System (Cellular OS)** engineered in high-performance Go. It fundamentally rejects the status quo of gluing autonomous agents together with fragile Python scripts and chaotic vector swamps.
-
-Instead, ZQK treats multi-agent systems as a biological computing substrate built upon a rigorous **microkernel architecture**: where individual repositories and services function as **autonomous holons**—sovereign, self-governing wholes that integrate seamlessly into a collaborative distributed organism.
-
-**Your AI agents are coding blind.** Dumping uncurated conversation logs into vector lakes produces context decay and runaway hallucination blast radiuses. ZQK provides **cellular memory isolation**, **epistemic hygiene**, **ambient feedback sensing**, and **biological self-healing guardrails** so agent swarms govern themselves.
-
-## Biological Systems & Holonic Architecture
-
-Rather than treating multi-agent work as loose prompt scripts or terminal splits, ZQK introduces four foundational biological primitives:
+For teams orchestrating complex multi-agent swarms, ZQK operates as a high-performance Go **Cellular Operating System (Cellular OS)**:
 
 1. **The Cell / Holon (Sovereign Node):** Each ZQK kernel is an autonomous holon—simultaneously a complete, self-governing whole and an organic participant in the wider mesh. It maintains authoritative stewardship over its local codebase, tests, and private knowledge graph without relying on bloated global vector lakes.
-2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`Draft` → `Promoted` (via CAS membrane qualification)) ensuring that zero unverified agent mutations ever pollute working code or canonical state.
+2. **The Membrane (Deterministic Boundaries):** A strict multi-plane state machine (`Draft` → `Promoted` via CAS qualification) ensuring that zero unverified agent mutations ever pollute working code or canonical state.
 3. **The Nervous System (Active Operational Graph):** An active, real-time synaptic state bus driving task execution, causal provenance lineage, and dependency trees—not a passive secondary data lake.
 4. **The Organism (Inter-Cellular Mesh):** Domain-expert kernels communicating over a typed P2P wire protocol to achieve compound objectives without central micromanagement.
 
-## Autonomous Memory & Imparted Human Intent
-
-Knowledge in ZQK is never static documentation. It is an active, sensing memory layer:
-
-- **Programmed Human Intent:** Human goals, non-negotiable rules, architectural invariants, mission, and vision are encoded directly into kernel schema objects (`Goal`, `Policy`, `InvariantGate`). Agents never invent objectives in isolation; their actions are strictly bounded by human-imparted intent.
-- **Ambient Feedback Sensing:** Integrated background daemons monitor filesystem changes, test execution suites, and process drift. The kernel senses when reality diverges from intent and dynamically triggers corrective cycles.
-- **Temporal Agility (Snapshot, Rollback & Cherry-Pick):** Treat knowledge like Git commits. Create atomic cryptographic snapshots, fork or branch memory planes for parallel experimentation, rollback failed excursions, and cherry-pick verified knowledge across cells.
-- **Laser Context Curation & Token Efficiency:** Rather than exhausting LLM context windows on uncurated chat history, ZQK slices precise graph subtrees based on the specific WorkUnit an agent claims—**significantly reducing token consumption** while maximizing reasoning accuracy.
-
-## The 3-Tier Layering Model
+### The 3-Tier Layering Model
 
 | Layer | System Tier | Responsibilities |
 | :--- | :--- | :--- |
@@ -105,7 +129,7 @@ Knowledge in ZQK is never static documentation. It is an active, sensing memory 
 | **Layer 2** | **The Kernel Standard Library (Core DNA)** | `Goal` (Objective), `BacklogItem` (BLI / WorkUnit), `InvariantGate` (Verification), `Decision` (ADR) |
 | **Layer 1** | **Microkernel Runtime Engine** | Graph State Bus, Multi-Plane Isolation (`Draft` vs `Promoted`), Deterministic Scheduler, IPC Protocol |
 
-## Open-Core Boundary: Single Cell vs. Organism Mesh
+### Open-Core Boundary: Single Cell vs. Organism Mesh
 
 ZQK follows the classical operating system boundary: **POSIX/Kernel primitives are 100% open-source; distributed multi-tenant mesh clustering and fleet governance are commercial.**
 
