@@ -21,15 +21,15 @@ import (
 )
 
 const (
-	errEmptyProjectRoot      = "project root path cannot be empty"
-	errGitStatusFailed       = "git status check failed: %w"
-	errTrackedFilesModified  = "negative boundary violation: tracked git files were modified during prime execution"
-	errOrphanOutsideZqk      = "negative boundary violation: orphaned file created outside .zqk/: %s"
-	errBuildTrigramFailed    = "failed to build trigram index: %w"
-	errSaveASTIndexFailed    = "failed to persist AST symbol index: %w"
-	errSaveManifestFailed    = "failed to persist prime manifest: %w"
-	msgPrimeSuccess          = "repository successfully primed"
-	goExtension              = ".go"
+	errEmptyProjectRoot     = "project root path cannot be empty"
+	errGitStatusFailed      = "git status check failed: %w"
+	errTrackedFilesModified = "negative boundary violation: tracked git files were modified during prime execution"
+	errOrphanOutsideZqk     = "negative boundary violation: orphaned file created outside .zqk/: %s"
+	errBuildTrigramFailed   = "failed to build trigram index: %w"
+	errSaveASTIndexFailed   = "failed to persist AST symbol index: %w"
+	errSaveManifestFailed   = "failed to persist prime manifest: %w"
+	msgPrimeSuccess         = "repository successfully primed"
+	goExtension             = ".go"
 )
 
 // Engine orchestrates brownfield scanning, trigram indexing, and AST symbol extraction.

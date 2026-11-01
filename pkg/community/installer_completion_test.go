@@ -292,4 +292,3 @@ func TestInstaller_StandaloneAndOneLinerQuickstart(t *testing.T) {
 		t.Fatalf("expected symlink at %s", installedZgrep)
 	}
 }
-

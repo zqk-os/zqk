@@ -215,4 +215,3 @@ func TestServer_AssetsEndpoints(t *testing.T) {
 	defer respNotFound.Body.Close()
 	assert.Equal(t, http.StatusNotFound, respNotFound.StatusCode)
 }
-
