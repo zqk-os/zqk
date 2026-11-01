@@ -51,16 +51,3 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-
-brews:
-  - name: zqk
-    repository:
-      owner: zqk-os
-      name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    directory: Formula
-    homepage: "https://zqk.dev"
-    description: "The AI Operating System and Persistent Knowledge Kernel"
-    license: "Apache-2.0"
-    test: |
-      system "#{bin}/zqk", "--version"
