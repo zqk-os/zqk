@@ -139,7 +139,7 @@ func TestDetectLegacyCodebase(t *testing.T) {
 	}
 
 	// 6. Dir with only shipped documentation trees stays greenfield so system init
-	// registers doc_entry rows via the greenfield path (REQ-1789654891514127000-25cbd9d1).
+	// registers doc_entry rows via the greenfield path.
 	dir5 := t.TempDir()
 	for _, rel := range []string{
 		"docs/architecture/sample.md",

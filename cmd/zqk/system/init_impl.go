@@ -1280,7 +1280,7 @@ func isIgnoredInitEntry(projectRoot string, entry fileutil.DirEntry) bool {
 	case "zqk", "zqk-community", "zqk-mcp":
 		return true
 	// Shipped manuals under docs/ are greenfield seed content, not brownfield source.
-	// TRACK: REQ-1789654891514127000-25cbd9d1 — greenfield init must register these via RegisterShippedDocs.
+	// Greenfield init must register these via RegisterShippedDocs.
 	case "docs":
 		return true
 	}

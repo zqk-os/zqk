@@ -792,7 +792,7 @@ func TestInit_RegistersShippedDocs(t *testing.T) {
 	}
 
 	// Ensure shipped canonical docs were registered via the greenfield init path
-	// (docs/ alone must not auto-detect legacy — REQ-1789654891514127000-25cbd9d1).
+	// (docs/ alone must not auto-detect legacy).
 	expectedDocs := []string{
 		"docs/architecture/sample.md",
 		"docs/best-practices/guidelines.md",
