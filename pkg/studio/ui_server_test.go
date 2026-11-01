@@ -69,12 +69,17 @@ func setupTestStudioServer(t *testing.T) (*studio.Server, *storage.PureGoIndexer
 	require.NotEmpty(t, addr)
 
 	t.Cleanup(func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-		defer cancel()
-		require.NoError(t, server.Shutdown(ctx))
+		shutdownTestStudioServer(t, server)
 	})
 
 	return server, indexer, fmt.Sprintf("http://%s", addr)
+}
+
+func shutdownTestStudioServer(t *testing.T, s *studio.Server) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	require.NoError(t, s.Shutdown(ctx))
 }
 
 func TestServer_HealthEndpoint(t *testing.T) {
@@ -205,4 +210,43 @@ func TestServer_AssetsEndpoints(t *testing.T) {
 	require.NoError(t, err)
 	defer respNotFound.Body.Close()
 	assert.Equal(t, http.StatusNotFound, respNotFound.StatusCode)
+}
+
+func TestServer_EventsEndpoint(t *testing.T) {
+	_, _, baseURL := setupTestStudioServer(t)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, baseURL+"/api/events", nil)
+	require.NoError(t, err)
+
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Contains(t, resp.Header.Get("Content-Type"), "text/event-stream")
+	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
+
+	buf := make([]byte, 512)
+	n, err := resp.Body.Read(buf)
+	require.NoError(t, err)
+	assert.Positive(t, n)
+	assert.Contains(t, string(buf[:n]), "event: init")
+}
+
+func TestServer_StartWithPortFallback(t *testing.T) {
+	server := studio.NewServer(t.TempDir())
+	port, err := server.StartWithPortFallback("127.0.0.1", 38900, 38950)
+	require.NoError(t, err)
+	assert.GreaterOrEqual(t, port, 38900)
+	assert.LessOrEqual(t, port, 38950)
+
+	shutdownTestStudioServer(t, server)
+
+	// Invalid range
+	server2 := studio.NewServer(t.TempDir())
+	_, err = server2.StartWithPortFallback("127.0.0.1", 38950, 38900)
+	assert.Error(t, err)
 }
