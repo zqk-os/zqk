@@ -3,7 +3,7 @@ package prime
 import "time"
 
 const (
-	// DefaultMaxPrimingDuration is the target boundary (<5s) from CRIT-1793495698371444000-1c17aaef.
+	// DefaultMaxPrimingDuration is the target boundary (<5s) for brownfield repository priming.
 	DefaultMaxPrimingDuration = 5 * time.Second
 
 	// ASTSymbolsCacheFile is the cached AST index file name under .zqk/cache/.

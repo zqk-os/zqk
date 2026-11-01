@@ -1,6 +1,6 @@
 #!/bin/sh
 # scripts/install_test.sh — Automated tests for standalone zero-dependency installer
-# Verifies BLI-1793495698371442500-6973f74c and CRIT-1793495698371442000-f24c8cb7
+# Verifies standalone zero-dependency installer flags and headless execution
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
