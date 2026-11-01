@@ -1,0 +1,44 @@
+$schema: schemas/command_spec.schema.json
+name: prime
+short: Fast-prime brownfield repository and seed AST search caches
+description: |-
+    Deliver 1-command brownfield repo priming to seed in-memory and on-disk AST memory caches in <5s
+    with zero git modification to tracked source files. Enforces the negative adversarial boundary
+    that no stale lockfiles or orphaned state are left outside .zqk/.
+args:
+    type: maximum
+    count: 1
+flags:
+    - name: path
+      shorthand: p
+      type: string
+      default: ""
+      description: Target repository path to prime (defaults to current directory)
+    - name: force
+      type: bool
+      default: "false"
+      description: Force rebuilding and overwriting existing caches
+    - name: format
+      shorthand: f
+      type: string
+      default: text
+      description: "Output format: text, json"
+    - name: quiet
+      shorthand: q
+      type: bool
+      default: "false"
+      description: Suppress detailed progress output
+    - name: verify
+      type: bool
+      default: "true"
+      description: Verify zero git modifications to tracked files
+help:
+    examples:
+        - comment: Prime current repository and seed AST search caches
+          command: zqk prime
+        - comment: Prime a specific repository directory
+          command: zqk prime ./other-repo
+        - comment: Prime with JSON summary output
+          command: zqk prime -f json
+run_e: runPrimeExecution
+common_flags: false
