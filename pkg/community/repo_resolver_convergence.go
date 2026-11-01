@@ -381,12 +381,13 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 			}
 
 		case PolicyActionTriageFailures:
-			if policy.ThresholdScore > 0 && matrix.ConvergenceScore < policy.ThresholdScore {
+			switch {
+			case policy.ThresholdScore > 0 && matrix.ConvergenceScore < policy.ThresholdScore:
 				decision.Applicable = true
 				deficit := policy.ThresholdScore - matrix.ConvergenceScore
 				decision.MatchScore = policy.Weight * (1.0 + deficit)
 				decision.DecisionReason = fmt.Sprintf("Critical failure rate: convergence score %.2f is below threshold %.2f", matrix.ConvergenceScore, policy.ThresholdScore)
-			} else if matrix.FailureCount > 0 && matrix.ConvergenceScore < 0.6 {
+			case matrix.FailureCount > 0 && matrix.ConvergenceScore < 0.6:
 				decision.Applicable = true
 				decision.MatchScore = policy.Weight
 				decision.DecisionReason = fmt.Sprintf("Multiple stage failures detected (%d failed)", matrix.FailureCount)
@@ -492,7 +493,8 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 	var rationale = "Pipeline in steady state; no steering adjustments required"
 	var sessionStatus = ConvergenceStatusConverged
 
-	if len(candidates) > 0 {
+	switch {
+	case len(candidates) > 0:
 		best := candidates[0]
 		polCopy := best.policy
 		selected = &polCopy
@@ -509,7 +511,7 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 		default:
 			sessionStatus = ConvergenceStatusActionRequired
 		}
-	} else if matrix.FailureCount > 0 {
+	case matrix.FailureCount > 0:
 		sessionStatus = ConvergenceStatusDegraded
 		recommendedAction = PolicyActionTriageFailures
 		rationale = fmt.Sprintf("Pipeline has %d failures across %d steps", matrix.FailureCount, matrix.TotalSteps)
