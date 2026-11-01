@@ -25,7 +25,11 @@ class Zqk < Formula
   end
 
   def install
-    bin.install "zqk"
+    if File.exist?("zqk")
+      bin.install "zqk"
+    else
+      bin.install "zqk-community" => "zqk"
+    end
   end
 
   test do

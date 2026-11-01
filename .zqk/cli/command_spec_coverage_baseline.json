@@ -1,4 +1,6 @@
 {
-  "commands_without_specs": [],
+  "commands_without_specs": [
+    "onboard"
+  ],
   "specs_without_commands": []
 }
