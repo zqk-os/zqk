@@ -30,15 +30,7 @@ func NewCICmd() *cobra.Command {
 }
 
 func newInitCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "init",
-		Short: "Initialize zero-config GitHub Actions CI/CD workflow and Homebrew packaging",
-		Long:  "Scaffolds production-grade GitHub Actions audit workflow (.github/workflows/zqk-audit.yml) and Homebrew formula template (Formula/zqk.rb).",
-	}
-	cmd.Flags().Bool("dry-run", false, "Preview workflow generation without writing files")
-	cmd.Flags().Bool("force", false, "Overwrite existing workflow files")
-	cmd.Flags().String("workflow-path", "", "Custom relative path for the workflow file")
-	cmd.Flags().String("formula-path", "", "Custom relative path for the formula file")
+	cmd := bldr.NewCiInitCommandBuilder()
 	cli.BindAsyncProgress(cmd, runCIInit)
 	return cmd
 }

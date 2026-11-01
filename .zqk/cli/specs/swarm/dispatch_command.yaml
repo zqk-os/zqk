@@ -1,0 +1,30 @@
+$schema: ../schemas/command_spec.schema.json
+name: dispatch
+short: One-click autonomous worker swarm dispatch with token budgeting and AST verification
+description: Dispatches an autonomous swarm execution runner with bounded token budgeting, concurrency limits, and live progress reporting.
+args:
+    type: maximum
+    count: 0
+flags:
+    - name: token-budget
+      type: int
+      default: "100000"
+      description: Total token budget allocated across workers
+    - name: max-parallel
+      type: int
+      default: "4"
+      description: Maximum concurrent worker subagents
+    - name: entrypoint
+      type: string
+      default: auto-pilot
+      description: Entrypoint instruction or execution phase
+    - name: dry-run
+      type: bool
+      default: "false"
+      description: Validate swarm configuration and token allocations without dispatching
+help:
+    examples:
+        - comment: Dispatch autonomous worker swarm
+          command: zqk swarm dispatch --token-budget 50000
+run_e: runDispatch
+common_flags: true
