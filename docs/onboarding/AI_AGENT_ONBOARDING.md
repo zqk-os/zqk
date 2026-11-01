@@ -95,6 +95,39 @@ zqk system check
 
 ---
 
+## 🖥️ Visual Web Studio & Terminal Mission Control (`zqk ui`)
+
+Inspect and orchestrate multi-agent workflows across graphical and terminal interfaces:
+
+### 1. Interactive Terminal Mission Control (TUI)
+Launch the interactive full-screen dashboard with keyboard navigation:
+```bash
+zqk ui
+```
+- Tabs: `state`, `audit`, `swarm`, `pm`, `metrics`, `scheduler`, `health`, `seismograph`.
+- Use arrow keys and number shortcuts to navigate between views.
+
+### 2. Headless Agent Non-Interactive Fallback
+In non-TTY, CI/CD, or background subagent environments, pass structured output flags:
+```bash
+zqk ui --format json --tab state
+zqk ui --format yaml --tab metrics
+```
+
+### 3. Visual Web Studio (`zqk ui -w`)
+Launch the embedded local web server to explore DAG dependency graphs and Gantt timelines:
+```bash
+# Auto-discovers open port in range 8080-8095
+zqk ui -w
+
+# Or bind to an explicit port
+zqk ui -w --port 8088
+```
+- Real-time Server-Sent Events (SSE) stream (`/api/events`) provides zero-latency live graph updates.
+- Inspect goals, requirements, criteria, and atomic backlog items without cloud telemetry.
+
+---
+
 ## 📜 Core Directives for Autonomous Agents
 
 1. **Kernel Primacy & State Integrity**:

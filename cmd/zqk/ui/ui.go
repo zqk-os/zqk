@@ -42,18 +42,14 @@ func NewUICmd() *cobra.Command {
 						return fmt.Errorf("port %d is already in use. Specify a different port with: %s ui -w --port <port> (or -p <port>): %w", port, brand.ExecutableName(), err)
 					}
 				} else {
-					for p := port; p <= port+15; p++ {
-						if err = server.Start(fmt.Sprintf("127.0.0.1:%d", p)); err == nil {
-							if p != port {
-								if err := cli.WriteOutput(cmd, []byte(fmt.Sprintf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, p))); err != nil {
-									return err
-								}
-							}
-							break
-						}
-					}
+					selectedPort, err := server.StartWithPortFallback("127.0.0.1", port, port+15)
 					if err != nil {
 						return fmt.Errorf("ports %d-%d are already in use. Specify an open port with: %s ui -w --port <port> (or -p <port>): %w", port, port+15, brand.ExecutableName(), err)
+					}
+					if selectedPort != port {
+						if err := cli.WriteOutput(cmd, []byte(fmt.Sprintf("ℹ️  Port %d was in use; automatically selected port %d (use --port / -p to override)\n", port, selectedPort))); err != nil {
+							return err
+						}
 					}
 				}
 

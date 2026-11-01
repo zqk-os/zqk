@@ -106,6 +106,7 @@ func (s *Server) Start(addr string) error {
 	mux.HandleFunc("/api/inbox/respond", s.handleInboxRespond)
 	mux.HandleFunc("/api/acronyms", s.handleAcronyms)
 	mux.HandleFunc("/api/explain", s.handleExplain)
+	mux.HandleFunc("/api/events", s.handleEvents)
 
 	s.httpServer = &http.Server{
 		Handler:      mux,
