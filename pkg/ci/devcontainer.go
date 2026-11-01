@@ -142,7 +142,7 @@ func validateSecurityBoundaries(rawContent string, cfg *DevcontainerConfig, pass
 	*passed = append(*passed, "cap_drop_isolation_enforced")
 
 	// Secrets leakage check
-	secretSignatures := []string{"ghp_", "gho_", "glpat-", "AKIA", "BEGIN RSA PRIVATE KEY"}
+	secretSignatures := []string{"ghp_", "gho_", "glpat-", "AKIA", "PRIVATE KEY"}
 	for _, sig := range secretSignatures {
 		if strings.Contains(rawContent, sig) {
 			return fmt.Errorf("security invariant violated: detected possible hardcoded credential pattern %q", sig)
