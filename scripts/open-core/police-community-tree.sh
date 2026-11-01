@@ -72,6 +72,7 @@ if command -v find >/dev/null 2>&1; then
     extras=$(find "$ROOT/scripts" -type f \( -name '*.sh' -o -name '*.py' \) \
       ! -name 'package-community.sh' \
       ! -name 'install.sh' \
+      ! -name 'install_test.sh' \
       ! -name 'generate-openvex.sh' \
       ! -name 'check-hardcoded-paths-and-perms-repo.sh' \
       ! -name 'scan-secrets.sh' \

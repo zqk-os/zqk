@@ -14,6 +14,7 @@ import (
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
 	"github.com/zqk-os/zqk/cmd/zqk/daemon"
+	"github.com/zqk-os/zqk/cmd/zqk/demo"
 	"github.com/zqk-os/zqk/cmd/zqk/do"
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
@@ -41,6 +42,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/organizational"
 	packcmd "github.com/zqk-os/zqk/cmd/zqk/pack"
 	"github.com/zqk-os/zqk/cmd/zqk/precommit"
+	"github.com/zqk-os/zqk/cmd/zqk/prime"
 	querycmd "github.com/zqk-os/zqk/cmd/zqk/query"
 	"github.com/zqk-os/zqk/cmd/zqk/reports"
 	rollbackcmd "github.com/zqk-os/zqk/cmd/zqk/rollback"
@@ -58,6 +60,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/validate"
 	"github.com/zqk-os/zqk/cmd/zqk/vendor"
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
+	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
 )
@@ -191,6 +194,16 @@ func registerCommands() {
 	runCmdInst := swarm.NewTopLevelRunCmd()
 	runCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(runCmdInst)
+
+	// Top-level prime command (1-command brownfield repo priming)
+	primeCmdInst := prime.NewPrimeCmd()
+	primeCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(primeCmdInst)
+
+	// Top-level demo command (interactive terminal showcase)
+	demoCmdInst := demo.NewDemoCmd()
+	demoCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(demoCmdInst)
 
 	// Tray: named shortcuts to zqk argv (.zqk/tray.yaml over embedded defaults)
 	trayCmdInst := tray.NewTrayCmd()
@@ -344,6 +357,11 @@ func registerCommands() {
 	vendorCmdInst := vendor.NewVendorCmd()
 	vendorCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(vendorCmdInst)
+
+	// Rules: Multi-host IDE directives and rules generator
+	rulesCmdInst := bldr_cli_cmd_v1.NewRulesCommand()
+	rulesCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(rulesCmdInst)
 
 	// Ops commands
 	opsCmdInst := ops.NewOpsCmd()

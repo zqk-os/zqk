@@ -36,6 +36,9 @@ Flags:
       Merge snapshot data with existing (snapshot mode only)
     --project-name <string>
       Project name (defaults to directory name)
+    --rules-only
+      Generate only multi-host IDE rules without creating full kernel directory
+      structure
     --simple
       Initialize with a simple, guided interface (Semantic Bridge Phase 1)
     --template <string> (default: standard)
@@ -86,6 +89,7 @@ Flags:
   -o, --output string             Write output to file
       --project-name string       Project name (defaults to directory name)
   -q, --quiet                     Suppress non-essential output
+      --rules-only                Generate only multi-host IDE rules without creating full kernel directory structure
       --simple                    Initialize with a simple, guided interface (Semantic Bridge Phase 1)
       --template string           Template to use (standard, minimal) (default "standard")
       --timeout duration          Timeout for command execution (0 = auto-calculate)

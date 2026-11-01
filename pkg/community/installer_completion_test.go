@@ -215,3 +215,80 @@ func TestInstaller_IntegrationAndConformance(t *testing.T) {
 		t.Errorf("unexpected version output in isolated directory: %s", string(verOut))
 	}
 }
+
+// TestInstaller_StandaloneAndOneLinerQuickstart verifies headless, zero-dependency one-line installation
+// and quickstart guidance (CRIT-1793495698371442000-f24c8cb7 / BLI-1793495698371442500-6973f74c).
+func TestInstaller_StandaloneAndOneLinerQuickstart(t *testing.T) {
+	root := communityRepoRoot(t)
+	installScript := filepath.Join(root, "scripts", "install.sh")
+
+	if !fileutil.Exists(installScript) {
+		t.Fatalf("installer script not found at %s", installScript)
+	}
+
+	contentBytes, err := fileutil.ReadFile(installScript)
+	if err != nil {
+		t.Fatalf("failed reading install.sh: %v", err)
+	}
+	content := string(contentBytes)
+
+	// Invariant 1: Required argument handling
+	requiredArgs := []string{
+		"--standalone|-s)",
+		"--headless)",
+		"--fast|-f)",
+		"--walkthrough|-w)",
+	}
+	for _, arg := range requiredArgs {
+		if !strings.Contains(content, arg) {
+			t.Errorf("install.sh missing required argument handler: %q", arg)
+		}
+	}
+
+	// Invariant 2: Install dir resolution handles user local fallback
+	if !strings.Contains(content, ".local/bin") {
+		t.Errorf("install.sh must support fallback to .local/bin for non-root zero-dependency install")
+	}
+
+	// Invariant 3: ANSI banner and 10-second value prop
+	if !strings.Contains(content, "10-Second Value Prop:") {
+		t.Errorf("install.sh missing 10-Second Value Prop in post-install output")
+	}
+
+	// Invariant 4: Next step guidance
+	if !strings.Contains(content, "zqk mcp install") || !strings.Contains(content, "sub-15ms persistent memory") {
+		t.Errorf("install.sh missing next step prompt recommending zqk mcp install")
+	}
+
+	// Invariant 5: Standalone execution end-to-end in isolated temp dir
+	tmpDir := t.TempDir()
+	installDir := filepath.Join(tmpDir, "bin")
+
+	cmd := execwrap.Command("sh", installScript, "--standalone")
+	cmd.Dir = root
+	cmd.Env = append(cmd.Environ(), "ZQK_INSTALL_DIR="+installDir)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("scripts/install.sh --standalone failed: %v, out: %s", err, out.String())
+	}
+
+	outputStr := out.String()
+	if !strings.Contains(outputStr, "ZQK: Git for AI Agent Memory & Task Truth") {
+		t.Errorf("expected banner in installer output, got: %s", outputStr)
+	}
+	if !strings.Contains(outputStr, "zqk mcp install") {
+		t.Errorf("expected zqk mcp install guidance in installer output, got: %s", outputStr)
+	}
+
+	// Verify installed binary and zgrep symlink
+	installedZqk := filepath.Join(installDir, "zqk")
+	if !fileutil.Exists(installedZqk) {
+		t.Fatalf("expected binary at %s", installedZqk)
+	}
+	installedZgrep := filepath.Join(installDir, "zgrep")
+	if !fileutil.Exists(installedZgrep) {
+		t.Fatalf("expected symlink at %s", installedZgrep)
+	}
+}
