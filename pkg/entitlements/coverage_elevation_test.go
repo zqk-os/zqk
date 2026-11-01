@@ -3,12 +3,12 @@ package entitlements
 import (
 	"crypto/ed25519"
 	"encoding/hex"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/license"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -57,9 +57,8 @@ func TestLoadLicense_ValidCryptoToken_StateDir(t *testing.T) {
 	t.Cleanup(func() {
 		RegisterChecker(priorChecker)
 		DefaultPublicKeyHex = priorKey
-		_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
 	})
-	_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "")
 
 	pub, priv := generateEntitlementTestKeys(t)
 	DefaultPublicKeyHex = hex.EncodeToString(pub)
@@ -96,9 +95,8 @@ func TestLoadLicense_ValidCryptoToken_FallbackDataDir(t *testing.T) {
 	t.Cleanup(func() {
 		RegisterChecker(priorChecker)
 		DefaultPublicKeyHex = priorKey
-		_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
 	})
-	_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "")
 
 	pub, priv := generateEntitlementTestKeys(t)
 	DefaultPublicKeyHex = hex.EncodeToString(pub)
@@ -136,15 +134,14 @@ func TestLoadLicense_InvalidHexPublicKey(t *testing.T) {
 	t.Cleanup(func() {
 		RegisterChecker(priorChecker)
 		DefaultPublicKeyHex = priorKey
-		_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
 	})
-	_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "")
 
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	stateDir := filepath.Join(home, paths.ProjectStateDir)
-	_ = fileutil.MkdirAll(stateDir, paths.DirPerm755)
-	_ = fileutil.WriteFile(filepath.Join(stateDir, "license.jwt"), []byte("some-jwt-token"), paths.FilePerm600)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+	require.NoError(t, fileutil.WriteFile(filepath.Join(stateDir, "license.jwt"), []byte("some-jwt-token"), paths.FilePerm600))
 
 	// Corrupt the public key hex string
 	DefaultPublicKeyHex = "not-a-valid-hex-key"
@@ -162,9 +159,8 @@ func TestLoadLicense_NoLicenseFiles(t *testing.T) {
 	priorChecker := CurrentCheckerForTest()
 	t.Cleanup(func() {
 		RegisterChecker(priorChecker)
-		_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
 	})
-	_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "")
 
 	home := t.TempDir()
 	t.Setenv("HOME", home)
@@ -181,9 +177,8 @@ func TestLoadLicense_UserHomeDirError(t *testing.T) {
 	priorChecker := CurrentCheckerForTest()
 	t.Cleanup(func() {
 		RegisterChecker(priorChecker)
-		_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
 	})
-	_ = os.Unsetenv(brand.DefaultEnvPrefix + "_LICENSE_KEY")
+	t.Setenv(brand.DefaultEnvPrefix+"_LICENSE_KEY", "")
 
 	t.Setenv("HOME", "")
 	RegisterChecker(&CommunityChecker{})
