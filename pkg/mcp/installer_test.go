@@ -139,3 +139,117 @@ func TestAutoInstall_ProjectWorkspace(t *testing.T) {
 	assert.True(t, fileutil.Exists(ideConfig), ".ide/mcp.json should exist")
 	assert.True(t, fileutil.Exists(cursorConfig), ".cursor/mcp.json should exist")
 }
+
+func TestInstallToIDE_Cline(t *testing.T) {
+	tmpDir := t.TempDir()
+	clineDir := filepath.Join(tmpDir, "Code", "User", "globalStorage", "saoudrizwan.claude-dev", "settings")
+	require.NoError(t, fileutil.MkdirAll(clineDir, paths.DirPerm755))
+
+	configPath := filepath.Join(clineDir, "cline_mcp_settings.json")
+	logger := logging.GetLoggerFromProfile("")
+	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
+
+	err := mcp.InstallToIDE("Cline", configPath, fakeExec, tmpDir, logger)
+	require.NoError(t, err)
+
+	updatedBytes, err := fileutil.ReadFile(configPath)
+	require.NoError(t, err)
+
+	var config struct {
+		MCPServers map[string]struct {
+			Command string   `json:"command"`
+			Args    []string `json:"args"`
+		} `json:"mcpServers"`
+	}
+	require.NoError(t, json.Unmarshal(updatedBytes, &config))
+
+	serverKey := "zqk-" + filepath.Base(tmpDir)
+	server, exists := config.MCPServers[serverKey]
+	require.True(t, exists, "cline must receive project-specific key: %s", serverKey)
+	assert.Equal(t, "zqk", server.Command)
+	assert.Equal(t, []string{"mcp", "serve"}, server.Args)
+}
+
+func TestInstallToIDE_Windsurf(t *testing.T) {
+	tmpDir := t.TempDir()
+	windsurfDir := filepath.Join(tmpDir, ".codeium", "windsurf")
+	require.NoError(t, fileutil.MkdirAll(windsurfDir, paths.DirPerm755))
+
+	configPath := filepath.Join(windsurfDir, "mcp_config.json")
+	logger := logging.GetLoggerFromProfile("")
+	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
+
+	err := mcp.InstallToIDE("Global Daemon (AGY/Windsurf)", configPath, fakeExec, tmpDir, logger)
+	require.NoError(t, err)
+
+	updatedBytes, err := fileutil.ReadFile(configPath)
+	require.NoError(t, err)
+
+	var config struct {
+		MCPServers map[string]struct {
+			Command string   `json:"command"`
+			Args    []string `json:"args"`
+		} `json:"mcpServers"`
+	}
+	require.NoError(t, json.Unmarshal(updatedBytes, &config))
+
+	serverKey := "zqk-" + filepath.Base(tmpDir)
+	server, exists := config.MCPServers[serverKey]
+	require.True(t, exists, "windsurf must receive project-specific key: %s", serverKey)
+	assert.Equal(t, "zqk", server.Command)
+	assert.Equal(t, []string{"mcp", "serve"}, server.Args)
+}
+
+func TestInstallToIDE_MissingDirectory(t *testing.T) {
+	tmpDir := t.TempDir()
+	nonExistentPath := filepath.Join(tmpDir, "does-not-exist", "mcp.json")
+	logger := logging.GetLoggerFromProfile("")
+	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
+
+	err := mcp.InstallToIDE("Claude Desktop", nonExistentPath, fakeExec, tmpDir, logger)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "config directory does not exist")
+}
+
+func TestInstallToIDE_CorruptConfig(t *testing.T) {
+	tmpDir := t.TempDir()
+	appDir := filepath.Join(tmpDir, "App")
+	require.NoError(t, fileutil.MkdirAll(appDir, paths.DirPerm755))
+
+	configPath := filepath.Join(appDir, "claude_desktop_config.json")
+	require.NoError(t, fileutil.WriteFile(configPath, []byte("{invalid-json"), paths.FilePerm644))
+
+	logger := logging.GetLoggerFromProfile("")
+	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
+
+	err := mcp.InstallToIDE("Claude Desktop", configPath, fakeExec, tmpDir, logger)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to parse existing config")
+}
+
+func TestInstallToIDE_EmptyProjectRootFallback(t *testing.T) {
+	tmpDir := t.TempDir()
+	appDir := filepath.Join(tmpDir, "App")
+	require.NoError(t, fileutil.MkdirAll(appDir, paths.DirPerm755))
+
+	configPath := filepath.Join(appDir, "claude_desktop_config.json")
+	logger := logging.GetLoggerFromProfile("")
+	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
+
+	// Call with empty projectRoot
+	err := mcp.InstallToIDE("Claude Desktop", configPath, fakeExec, "", logger)
+	require.NoError(t, err)
+
+	updatedBytes, err := fileutil.ReadFile(configPath)
+	require.NoError(t, err)
+
+	var config struct {
+		MCPServers map[string]struct {
+			Command string   `json:"command"`
+			Args    []string `json:"args"`
+		} `json:"mcpServers"`
+	}
+	require.NoError(t, json.Unmarshal(updatedBytes, &config))
+	assert.NotEmpty(t, config.MCPServers)
+}
+
