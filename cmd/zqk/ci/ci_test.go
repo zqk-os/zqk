@@ -72,6 +72,7 @@ func TestNewCICmd_Hierarchy(t *testing.T) {
 	assert.True(t, subNames["run"], "ci command must have run subcommand")
 	assert.True(t, subNames["status"], "ci command must have status subcommand")
 	assert.True(t, subNames["demote"], "ci command must have demote subcommand")
+	assert.True(t, subNames["init"], "ci command must have init subcommand")
 }
 
 func TestCICmd_Status_Unset(t *testing.T) {
@@ -242,4 +243,74 @@ func TestCICmd_MissingProjectRoot_Errors(t *testing.T) {
 	err = runTestCasesAfterCheckout(runCmd)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "project root not found")
+
+	initCmd := newInitCmd()
+	err = runCIInit(initCmd, nil)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "project root not found")
+}
+
+func TestCICmd_Init_DryRun(t *testing.T) {
+	repo, _ := setupTestGitRepo(t)
+	t.Setenv("ZQK_PROJECT_ROOT", repo)
+
+	cmd := NewCICmd()
+	cmd.SetArgs([]string{"init", "--dry-run"})
+	out := bytes.NewBuffer(nil)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), out))
+	cmd.SetOut(out)
+	cmd.SetErr(out)
+
+	err := cmd.Execute()
+	require.NoError(t, err)
+	assert.Contains(t, out.String(), "ci init (dry-run): would scaffold")
+
+	// Ensure files were NOT created
+	wfPath := filepath.Join(repo, ".github", "workflows", "zqk-audit.yml")
+	assert.False(t, fileutil.Exists(wfPath))
+}
+
+func TestCICmd_Init_ScaffoldLifecycle(t *testing.T) {
+	repo, _ := setupTestGitRepo(t)
+	t.Setenv("ZQK_PROJECT_ROOT", repo)
+
+	cmd := NewCICmd()
+	cmd.SetArgs([]string{"init"})
+	out := bytes.NewBuffer(nil)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), out))
+	cmd.SetOut(out)
+	cmd.SetErr(out)
+
+	err := cmd.Execute()
+	require.NoError(t, err)
+	assert.Contains(t, out.String(), "ci init: created")
+
+	wfPath := filepath.Join(repo, ".github", "workflows", "zqk-audit.yml")
+	formPath := filepath.Join(repo, "Formula", "zqk.rb")
+	assert.True(t, fileutil.Exists(wfPath))
+	assert.True(t, fileutil.Exists(formPath))
+
+	// Re-running without --force should fail
+	cmd2 := NewCICmd()
+	cmd2.SetArgs([]string{"init"})
+	out2 := bytes.NewBuffer(nil)
+	cmd2.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), out2))
+	cmd2.SetOut(out2)
+	cmd2.SetErr(out2)
+
+	err = cmd2.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "already exists")
+
+	// Re-running with --force should succeed
+	cmd3 := NewCICmd()
+	cmd3.SetArgs([]string{"init", "--force"})
+	out3 := bytes.NewBuffer(nil)
+	cmd3.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), out3))
+	cmd3.SetOut(out3)
+	cmd3.SetErr(out3)
+
+	err = cmd3.Execute()
+	require.NoError(t, err)
+	assert.Contains(t, out3.String(), "ci init: created")
 }
