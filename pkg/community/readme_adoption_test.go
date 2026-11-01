@@ -116,4 +116,3 @@ func TestREADMEAdoption_DocumentationAndKnowledgeBase(t *testing.T) {
 	assert.Contains(t, content, "zqk workflow whats-next", "must reference whats-next")
 	assert.Contains(t, content, "zqk do", "must reference zqk do autonomous execution")
 }
-
