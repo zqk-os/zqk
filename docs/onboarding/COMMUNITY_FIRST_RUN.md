@@ -108,6 +108,37 @@ First-run CRUD, `object list`, and `whats-next` work without the daemon. Start i
 
 Init's maintenance jobs are **kernel survival** (retention, object validation, caches). They are not a prompt to configure linting. Lint, policy, and integrity timers are an optional source-code pack — see [Scheduler and maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md).
 
+## Mint Intent & Features (`zqk new <kind>`)
+
+ZQK organizes work into an authoritative 5-layer cascade: **Vision/Mission ➔ Goals ➔ Priority Plans ➔ Requirements ➔ Backlog Items**.
+Mint new objects onto the safe Draft Plane using `zqk new <kind>` (never edit `.zqk/process/` YAML directly):
+
+```bash
+# 1. High-level strategic compass (timeless intent)
+zqk new goal --title "Support Dark Mode Theme"
+
+# 2. Time-bounded 1-cycle execution batch (aimed toward a milestone)
+zqk new plan --title "Dark Mode Sprint 1"             # Aliases: priority_plan, pri
+
+# 3. Whole feature functional requirement (declares criteria)
+zqk new req --title "Render dark CSS color variables" # Aliases: requirement
+
+# 4. Atomic work unit (satisfies 1–3 criteria)
+zqk new bli --title "Implement CSS token mapping"     # Aliases: backlog_item
+
+# 5. Non-functional technical debt or test fixes
+zqk new td --title "Fix theme switch test flake"      # Aliases: technical_debt
+```
+
+Link relationships across the knowledge graph with `zqk object ref add`:
+```bash
+zqk object ref add BLI-001 REQ-001                    # Link atomic task to parent requirement
+zqk object ref add REQ-001 CRIT-001 CRIT-002          # Link acceptance criteria to requirement
+```
+
+Promote verified items from draft to authoritative CAS with `zqk object promote <id>`, or run `zqk do` to claim and execute them autonomously.
+See [First-Run Object Tutorial](./FIRST_RUN_OBJECT_TUTORIAL.md) for full relational and lifecycle details.
+
 ## In-Process Code Search (`zqk grep`)
 
 Use `zqk grep` (alias `zgrep`) instead of external `grep` or `find`. It runs sub-15ms in-process searches using persistent trigram indexing and Go AST parsing, preventing token blowup in AI agent context windows:
@@ -123,16 +154,17 @@ zqk grep "error" --max-tokens 2000 -f json     # Token-budgeted JSON output for 
 ## After green
 
 1. `zqk quickstart` — same text as `zqk system start-here`. See [`QUICKSTART.md`](./QUICKSTART.md).
-2. `zqk ci init` — scaffold zero-config GitHub Actions CI/CD and Homebrew formula.
-3. `zqk swarm dispatch` — one-click autonomous worker swarm dispatch with token budgeting and AST verification.
-4. `zqk mcp install` then optionally `zqk mcp ensure --tcp 127.0.0.1:8443`.
-5. `zqk run <url|file>` — run a portable agent swarm package.
-6. `zqk state stream --dashboard` — stream live change journal mutations and CPCP status with the visual seismograph.
-7. `zqk state tree` — inspect the live knowledge graph hierarchy.
-8. `zqk object list` — first-run scoreboard.
-9. `zqk object inspect` — interactive object inspector, lineage radar, and live Policy Studio.
-10. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated Audit Tab (`--tab audit`).
-11. `zqk test dashboard --check-dod` — test_case ↔ criteria lineage and 100% Definition of Done verification.
-12. `zqk workflow whats-next --format json`.
+2. `zqk new <kind>` — mint goals, priority plans, requirements, or atomic backlog items (`zqk new goal`, `zqk new plan`, `zqk new req`, `zqk new bli`).
+3. `zqk ci init` — scaffold zero-config GitHub Actions CI/CD and Homebrew formula.
+4. `zqk swarm dispatch` — one-click autonomous worker swarm dispatch with token budgeting and AST verification.
+5. `zqk mcp install` then optionally `zqk mcp ensure --tcp 127.0.0.1:8443`.
+6. `zqk run <url|file>` — run a portable agent swarm package.
+7. `zqk state stream --dashboard` — stream live change journal mutations and CPCP status with the visual seismograph.
+8. `zqk state tree` — inspect the live knowledge graph hierarchy.
+9. `zqk object list` — first-run scoreboard.
+10. `zqk object inspect` — interactive object inspector, lineage radar, and live Policy Studio.
+11. `zqk system dashboard` (or `zqk ui`) — Mission Control Console with dedicated Audit Tab (`--tab audit`).
+12. `zqk test dashboard --check-dod` — test_case ↔ criteria lineage and 100% Definition of Done verification.
+13. `zqk workflow whats-next --format json`.
 
 ZQK Core provides the complete system kernel: object lifecycle, spec origination, command codegen, scheduler daemons (`zqk scheduler start|stop|status`), and Model Context Protocol (MCP) integration are fully native and offline-capable out of the box.

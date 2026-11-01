@@ -166,8 +166,7 @@ func writeVarint(w *bufio.Writer, x int64) error {
 // writeZigZagVarint encodes a signed integer using zigzag + varint.
 func writeZigZagVarint(w *bufio.Writer, x int64) error {
 	// ZigZag encode (same shape as protobuf PutUvarint after zigzag).
-	u := uint64(x) //nolint:gosec // G115: intentional two's-complement bit pattern for zigzag (all int64 values)
-	ux := (u << 1) ^ (u >> 63)
+	ux := uint64((x << 1) ^ (x >> 63)) //nolint:gosec // G115: intentional two's-complement bit pattern for zigzag (all int64 values)
 	var buf [binary.MaxVarintLen64]byte
 	n := binary.PutUvarint(buf[:], ux)
 	_, err := w.Write(buf[:n])

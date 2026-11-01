@@ -101,3 +101,11 @@ func TestWakeContext_EmptyInputs(t *testing.T) {
 		t.Errorf("expected error for empty agent ID")
 	}
 }
+
+func TestWakeContext_NonExistentFile(t *testing.T) {
+	logger := logging.GetLoggerFromProfile("test")
+	_, err := WakeContext(t.TempDir(), "missing-agent", logger)
+	if err == nil {
+		t.Error("expected error for non-existent snapshot file")
+	}
+}

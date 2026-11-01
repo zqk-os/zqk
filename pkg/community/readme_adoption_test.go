@@ -42,12 +42,14 @@ func TestREADMEAdoption_FunctionalAcceptance(t *testing.T) {
 	assert.Contains(t, content, "zqk ci init", "must include zqk ci init")
 	assert.Contains(t, content, "zqk ui -w", "must include zqk ui -w Web Studio")
 	assert.Contains(t, content, "zqk mcp ensure", "must include zqk mcp ensure")
+	assert.Contains(t, content, "zqk do", "must include zqk do autonomous execution")
 
 	// 5. Progressive Disclosure Paths (Go Fast vs. Walk Through)
 	assert.Contains(t, content, "Option 1: Go Fast (Immediate Token Savings)", "must provide Go Fast path")
 	assert.Contains(t, content, "zgrep", "must highlight token-budgeted zgrep")
 	assert.Contains(t, content, "Option 2: Walk Through (Full Knowledge Kernel)", "must provide Walk Through path")
 	assert.Contains(t, content, "zqk system start-here", "must reference zqk system start-here")
+	assert.Contains(t, content, "zqk new", "must reference zqk new for minting kernel objects")
 
 	// 6. Visual Web Studio Highlights
 	assert.Contains(t, content, "Visual Web Studio (`zqk ui -w`)", "must highlight Web Studio visual surface")
@@ -115,4 +117,20 @@ func TestREADMEAdoption_DocumentationAndKnowledgeBase(t *testing.T) {
 	assert.Contains(t, content, "zqk system agent-onboard", "must reference zqk system agent-onboard")
 	assert.Contains(t, content, "zqk workflow whats-next", "must reference whats-next")
 	assert.Contains(t, content, "zqk do", "must reference zqk do autonomous execution")
+	assert.Contains(t, content, "zqk new", "must reference zqk new for minting kernel objects")
+	assert.Contains(t, content, "zqk new goal", "must demonstrate minting goals")
+	assert.Contains(t, content, "zqk new plan", "must demonstrate minting plans")
+	assert.Contains(t, content, "zqk new req", "must demonstrate minting requirements")
+	assert.Contains(t, content, "zqk new bli", "must demonstrate minting backlog items")
+
+	// Verify AI_AGENT_ONBOARDING.md directives and modern CLI verbs
+	agentDocPath := filepath.Join(repoRoot, "docs", "onboarding", "AI_AGENT_ONBOARDING.md")
+	agentBytes, err := fileutil.ReadFile(agentDocPath)
+	require.NoError(t, err, "AI_AGENT_ONBOARDING.md must exist")
+	agentContent := string(agentBytes)
+	assert.Contains(t, agentContent, "zqk system agent-onboard", "must guide agent to run agent-onboard")
+	assert.Contains(t, agentContent, "zqk workflow whats-next", "must guide agent to run whats-next")
+	assert.Contains(t, agentContent, "zqk do", "must guide agent to run zqk do")
+	assert.Contains(t, agentContent, "zqk new", "must guide agent to use zqk new")
+	assert.Contains(t, agentContent, "zgrep", "must direct agent to use token-budgeted zgrep")
 }
