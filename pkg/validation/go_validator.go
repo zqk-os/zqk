@@ -1320,6 +1320,9 @@ func stripEmptyUnknownFieldResidue(kind string, obj map[string]any, spec *object
 		return
 	}
 	for key, val := range obj {
+		if key != objects.FieldKeyEpicRefs {
+			continue
+		}
 		if isStandardMetadataField(key) {
 			continue
 		}
