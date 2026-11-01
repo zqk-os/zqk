@@ -347,6 +347,9 @@ func getDraftPlaneTemplateForKind(kind string) map[string]any {
 			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
 				continue
 			}
+			if field.Name == objects.FieldKeyEpicRefs {
+				continue
+			}
 			if !field.Required && (field.Type == "enum" || len(field.EnumValues) > 0) {
 				continue
 			}
@@ -455,6 +458,9 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 	}
 
 	merged := getDraftPlaneTemplateForKind(kind)
+	// Empty epic_refs: [] from template fill is poison under confidential-filtered
+	// StrictMode (unknown_field blocks conceptual→originated). Omit template residue before layering user values.
+	omitEmptyEpicRefsDraftResidue(merged)
 
 	// 3. Seed canonical lifecycle origin status if not already populated
 	if originStatus, err := f.GetLifecycleLoader().GetOriginStatus(kind); err == nil && originStatus != "" {
@@ -489,10 +495,6 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 	delete(merged, objects.FieldKeyUpdatedBy)
 	delete(merged, "hash")
 	delete(merged, "cas_address")
-
-	// Empty epic_refs: [] from template fill is poison under confidential-filtered
-	// StrictMode (unknown_field blocks conceptual→originated). Omit until set.
-	omitEmptyEpicRefsDraftResidue(merged)
 
 	marshaled, err := f.yamlMarshalForPersistence(merged)
 	if err != nil {

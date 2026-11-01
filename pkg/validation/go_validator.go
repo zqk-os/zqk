@@ -147,9 +147,6 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	gv.validatePropertyShapes(spec, obj, kind, options, result)
 
 	if options.StrictMode {
-		// drop empty template residue (epic_refs: []) when access-filtered ResolvedFields
-		// omit confidential keys; otherwise draft promote dies on unknown_field.
-		stripEmptyUnknownFieldResidue(kind, obj, spec)
 		result.Errors = append(result.Errors, gv.validateUnknownFields(kind, obj, spec)...)
 		result.Errors = append(result.Errors, validateDuplicateRefs(obj)...)
 	}
