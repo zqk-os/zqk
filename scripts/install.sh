@@ -17,10 +17,11 @@ set -e
 
 REPO="${ZQK_REPO:-zqk-os/zqk}"
 MODULE="${ZQK_MODULE:-github.com/zqk-os/zqk}"
-INSTALL_DIR="${ZQK_INSTALL_DIR:-/usr/local/bin}"
 # INSTALL_METHOD: auto | binary | goinstall | source
 INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
 MODE="${ZQK_MODE:-}"
+STANDALONE=0
+HEADLESS=0
 VERSION="latest"
 
 for arg in "$@"; do
@@ -30,6 +31,17 @@ for arg in "$@"; do
       ;;
     --walkthrough|-w)
       MODE="walkthrough"
+      ;;
+    --standalone|-s)
+      STANDALONE=1
+      MODE="fast"
+      ;;
+    --headless)
+      HEADLESS=1
+      MODE="fast"
+      ;;
+    --yes|-y)
+      MODE="fast"
       ;;
     -*)
       echo "Unknown flag: $arg" >&2
@@ -43,8 +55,19 @@ for arg in "$@"; do
   esac
 done
 
+# Resolve install directory: prefer user-specified ZQK_INSTALL_DIR,
+# otherwise /usr/local/bin if writable, else user-local $HOME/.local/bin for zero-dependency non-root install
+if [ -n "${ZQK_INSTALL_DIR:-}" ]; then
+  INSTALL_DIR="${ZQK_INSTALL_DIR}"
+elif [ -w "/usr/local/bin" ]; then
+  INSTALL_DIR="/usr/local/bin"
+else
+  INSTALL_DIR="${HOME}/.local/bin"
+fi
+mkdir -p "$INSTALL_DIR" 2>/dev/null || true
+
 if [ -z "$MODE" ]; then
-  if [ -t 0 ] && [ -t 1 ]; then
+  if [ -t 0 ] && [ -t 1 ] && [ "$STANDALONE" != "1" ] && [ "$HEADLESS" != "1" ]; then
     echo "========================================================================"
     echo "⚡ Welcome to ZQK (Zen Quantum Kernel) Installer"
     echo "========================================================================"
@@ -348,13 +371,29 @@ install_go() {
 # ---------------------------------------------------------------------------
 install_source() {
   command -v go >/dev/null 2>&1 || { echo "Go toolchain not found. Install from https://go.dev/dl/" >&2; exit 1; }
+
+  # Fast path: if running within local repository checkout, build directly
+  if [ -f "./cmd/zqk/main.go" ]; then
+    echo "🔧 Building from local repository..."
+    local local_bin
+    local_bin="$(mktemp -d)/zqk"
+    go build -o "$local_bin" ./cmd/zqk
+    _place_binary "$local_bin" ""
+    rm -rf "$(dirname "$local_bin")"
+    return 0
+  fi
+
   command -v git >/dev/null 2>&1 || { echo "git not found." >&2; exit 1; }
   local src_dir
   src_dir="$(mktemp -d)/zqk-src"
   echo "📦 Cloning ${REPO} (shallow)..."
   git clone --depth=1 "https://github.com/${REPO}.git" "$src_dir"
   echo "🔧 Building..."
-  make -C "$src_dir" zqk
+  if command -v make >/dev/null 2>&1 && [ -f "${src_dir}/Makefile" ]; then
+    make -C "$src_dir" zqk || go build -o "${src_dir}/bin/zqk" "${src_dir}/cmd/zqk"
+  else
+    go build -o "${src_dir}/bin/zqk" "${src_dir}/cmd/zqk"
+  fi
   if [ -f "${src_dir}/bin/zqk" ]; then
     _place_binary "${src_dir}/bin/zqk" ""
   elif [ -f "${src_dir}/zqk" ]; then
@@ -441,10 +480,44 @@ if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
   fi
   ln -sf "$ZQK_BIN" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
   ZQK_VER="$("$ZQK_BIN" version 2>/dev/null || echo 'installed')"
+
+  if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    BOLD="\033[1m"
+    CYAN="\033[36m"
+    GREEN="\033[32m"
+    YELLOW="\033[33m"
+    RESET="\033[0m"
+  else
+    BOLD=""
+    CYAN=""
+    GREEN=""
+    YELLOW=""
+    RESET=""
+  fi
+
   echo ""
-  echo "✅ ZQK ${ZQK_VER} installed to ${INSTALL_DIR}/zqk"
-  echo "✅ zgrep linked to ${INSTALL_DIR}/zgrep"
+  echo "${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════════════════════════╗${RESET}"
+  echo "${CYAN}${BOLD}║                     ⚡ ZQK: Git for AI Agent Memory & Task Truth                 ║${RESET}"
+  echo "${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════════════════════════╝${RESET}"
   echo ""
+  echo "  ${GREEN}✓${RESET} ${BOLD}zqk${RESET}   (${ZQK_VER}) installed to ${INSTALL_DIR}/zqk"
+  echo "  ${GREEN}✓${RESET} ${BOLD}zgrep${RESET} linked to ${INSTALL_DIR}/zgrep"
+  echo ""
+  echo "  ${BOLD}10-Second Value Prop:${RESET}"
+  echo "  • Sub-15ms AST code search stops context-window blowouts in Cursor, Claude Code, Cline & Windsurf."
+  echo "  • Persistent Knowledge Kernel coordinates multi-agent delivery with zero hallucination drift."
+  echo ""
+  echo "  ${YELLOW}${BOLD}Next step:${RESET} run ${CYAN}zqk mcp install${RESET} to supercharge Cursor / Claude Code with sub-15ms persistent memory."
+  echo ""
+
+  case ":$PATH:" in
+    *":$INSTALL_DIR:"*) ;;
+    *)
+      echo "  ${YELLOW}ℹ️  Note:${RESET} ${INSTALL_DIR} is not in your current PATH."
+      echo "     Add it with: export PATH=\"${INSTALL_DIR}:\$PATH\""
+      echo ""
+      ;;
+  esac
 
   if [ "$MODE" = "fast" ]; then
     echo "========================================================================"

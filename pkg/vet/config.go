@@ -121,7 +121,7 @@ func DefaultConfig() *GatesConfig {
 			},
 			ArchivedDocDirs:       []string{"docs"},
 			ArchivedDocNames:      []string{"archive", "_archive"},
-			AllowedScripts:        []string{"package-community.sh", "install.sh", "generate-openvex.sh"},
+			AllowedScripts:        []string{"package-community.sh", "install.sh", "install_test.sh", "generate-openvex.sh"},
 			AllowedScriptPrefixes: []string{"scripts/open-core/"},
 			GrepExemptions:        []string{"scripts/open-core/police-community-tree.sh", "pkg/vet/*", "config/gates.yaml"},
 		},

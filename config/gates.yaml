@@ -124,6 +124,7 @@ tree_police:
   allowed_scripts:
     - "package-community.sh"
     - "install.sh"
+    - "install_test.sh"
     - "generate-openvex.sh"
     - "check-hardcoded-paths-and-perms-repo.sh"
     - "build-bootstrap-archive.sh"
