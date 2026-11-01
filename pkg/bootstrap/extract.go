@@ -109,68 +109,14 @@ func ExtractGzipTar(data []byte, projectRoot string, logger logging.Logger, forc
 			}
 			continue
 		}
-		var targetPath string
-		switch {
-		case strings.HasPrefix(name, archivePrefixCLISpecs):
-			if rest, ok := strings.CutPrefix(name, archivePrefixCLISpecs); ok {
-				targetPath = filepath.Join(cliSpecsDir, rest)
-			} else {
-				targetPath = filepath.Join(internalDir, name)
-			}
-		case strings.HasPrefix(name, archivePrefixScripts):
-			if rest, ok := strings.CutPrefix(name, archivePrefixScripts); ok {
-				targetPath = filepath.Join(scriptsDir, rest)
-			} else {
-				targetPath = filepath.Join(internalDir, name)
-			}
-		case strings.HasPrefix(name, archivePrefixCleanupConfig):
-			if rest, ok := strings.CutPrefix(name, archivePrefixCleanupConfig); ok {
-				targetPath = filepath.Join(cleanupConfigDir, rest)
-			} else {
-				targetPath = filepath.Join(internalDir, name)
-			}
-		default:
-			targetPath = filepath.Join(internalDir, name)
-		}
-		baseDir := filepath.Dir(targetPath)
-		if !withinBase(internalDir, targetPath) && !withinBase(cliSpecsDir, targetPath) && !withinBase(scriptsDir, targetPath) && !withinBase(cleanupConfigDir, targetPath) {
-			return errfmt.Errorf("archive entry path escapes target: %s", hdr.Name)
+
+		targetPath, err := resolveArchiveTargetPath(name, hdr.Name, internalDir, cliSpecsDir, scriptsDir, cleanupConfigDir)
+		if err != nil {
+			return err
 		}
 
-		switch hdr.Typeflag {
-		case tar.TypeDir:
-			if err := fileutil.MkdirAll(targetPath, bootstrapDirPerm); err != nil {
-				return errfmt.Errorf("failed to create directory %s: %w", hdr.Name, err)
-			}
-		case tar.TypeReg:
-			if err := fileutil.MkdirAll(baseDir, bootstrapDirPerm); err != nil {
-				return errfmt.Errorf("failed to create directory for %s: %w", hdr.Name, err)
-			}
-			if _, err := fileutil.Stat(targetPath); err == nil && !force {
-				continue
-			}
-			size := hdr.Size
-			if size < 0 || size > maxFileSize {
-				return errfmt.Errorf("archive entry %s has invalid or oversized length %d", hdr.Name, size)
-			}
-			flags := fileutil.O_WRONLY | fileutil.O_CREATE | fileutil.O_TRUNC
-			f, err := fileutil.OpenFile(targetPath, flags, bootstrapFilePerm) //nolint:gosec // Bootstrap files - 0600 acceptable
-			if err != nil {
-				return errfmt.Errorf("failed to create file %s: %w", hdr.Name, err)
-			}
-			if _, err := io.CopyN(f, tr, size); err != nil {
-				_ = f.Close()
-				return errfmt.Errorf("failed to write %s: %w", hdr.Name, err)
-			}
-			if err := f.Close(); err != nil {
-				return errfmt.Errorf("failed to close %s: %w", hdr.Name, err)
-			}
-			if logger != nil {
-				logging.Fluent(logger).Debug("Extracted bootstrap file").
-					File(hdr.Name).
-					Path(targetPath).
-					Log()
-			}
+		if err := extractArchiveEntry(tr, hdr, targetPath, force, logger); err != nil {
+			return err
 		}
 	}
 
@@ -182,9 +128,88 @@ func ExtractGzipTar(data []byte, projectRoot string, logger logging.Logger, forc
 	return nil
 }
 
+func resolveArchiveTargetPath(name, origName, internalDir, cliSpecsDir, scriptsDir, cleanupConfigDir string) (string, error) {
+	var targetPath string
+	switch {
+	case strings.HasPrefix(name, archivePrefixCLISpecs):
+		if rest, ok := strings.CutPrefix(name, archivePrefixCLISpecs); ok {
+			targetPath = filepath.Join(cliSpecsDir, rest)
+		} else {
+			targetPath = filepath.Join(internalDir, name)
+		}
+	case strings.HasPrefix(name, archivePrefixScripts):
+		if rest, ok := strings.CutPrefix(name, archivePrefixScripts); ok {
+			targetPath = filepath.Join(scriptsDir, rest)
+		} else {
+			targetPath = filepath.Join(internalDir, name)
+		}
+	case strings.HasPrefix(name, archivePrefixCleanupConfig):
+		if rest, ok := strings.CutPrefix(name, archivePrefixCleanupConfig); ok {
+			targetPath = filepath.Join(cleanupConfigDir, rest)
+		} else {
+			targetPath = filepath.Join(internalDir, name)
+		}
+	default:
+		targetPath = filepath.Join(internalDir, name)
+	}
+
+	if !withinBase(internalDir, targetPath) && !withinBase(cliSpecsDir, targetPath) && !withinBase(scriptsDir, targetPath) && !withinBase(cleanupConfigDir, targetPath) {
+		return "", errfmt.Errorf("archive entry path escapes target: %s", origName)
+	}
+	return targetPath, nil
+}
+
+func extractArchiveEntry(tr *tar.Reader, hdr *tar.Header, targetPath string, force bool, logger logging.Logger) error {
+	baseDir := filepath.Dir(targetPath)
+	switch hdr.Typeflag {
+	case tar.TypeDir:
+		if err := fileutil.MkdirAll(targetPath, bootstrapDirPerm); err != nil {
+			return errfmt.Errorf("failed to create directory %s: %w", hdr.Name, err)
+		}
+	case tar.TypeReg:
+		if err := fileutil.MkdirAll(baseDir, bootstrapDirPerm); err != nil {
+			return errfmt.Errorf("failed to create directory for %s: %w", hdr.Name, err)
+		}
+		if _, err := fileutil.Stat(targetPath); err == nil && !force {
+			return nil
+		}
+		size := hdr.Size
+		if size < 0 || size > maxFileSize {
+			return errfmt.Errorf("archive entry %s has invalid or oversized length %d", hdr.Name, size)
+		}
+		flags := fileutil.O_WRONLY | fileutil.O_CREATE | fileutil.O_TRUNC
+		f, err := fileutil.OpenFile(targetPath, flags, bootstrapFilePerm) //nolint:gosec // Bootstrap files - 0600 acceptable
+		if err != nil {
+			return errfmt.Errorf("failed to create file %s: %w", hdr.Name, err)
+		}
+		if _, err := io.CopyN(f, tr, size); err != nil {
+			if closeErr := f.Close(); closeErr != nil {
+				return errfmt.Errorf("failed to write %s: %w (close error: %v)", hdr.Name, err, closeErr)
+			}
+			return errfmt.Errorf("failed to write %s: %w", hdr.Name, err)
+		}
+		if err := f.Close(); err != nil {
+			return errfmt.Errorf("failed to close %s: %w", hdr.Name, err)
+		}
+		if logger != nil {
+			logging.Fluent(logger).Debug("Extracted bootstrap file").
+				File(hdr.Name).
+				Path(targetPath).
+				Log()
+		}
+	}
+	return nil
+}
+
 func withinBase(base, path string) bool {
-	absBase, _ := filepath.Abs(base)
-	absPath, _ := filepath.Abs(path)
+	absBase, err := filepath.Abs(base)
+	if err != nil {
+		return false
+	}
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return false
+	}
 	rel, err := filepath.Rel(absBase, absPath)
 	if err != nil {
 		return false
