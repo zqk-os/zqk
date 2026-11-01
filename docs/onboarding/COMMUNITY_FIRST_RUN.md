@@ -25,6 +25,18 @@ make                 # → ./bin/zqk  (or ./bin/<brand.executable_name>)
 
 Use `zqk` (or `./bin/zqk` from this tree). **Do not** `export ZQK_PROJECT_ROOT` in your shell profile.
 
+### 1-Click Cloud Sandbox (GitHub Codespaces)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/zqk-os/zqk)
+
+Launch a zero-touch development environment in under 60 seconds with zero local dependencies:
+1. Click the **Open in GitHub Codespaces** badge above.
+2. The container automatically compiles `./bin/zqk`, configures MCP daemon bindings, and seeds the agent host seat.
+3. Start exploring right away:
+   ```bash
+   ./bin/zqk ui -w     # Launch Web Studio
+   ./bin/zqk do        # Run autonomous swarm loop
+   ```
+
 ## Quickstart (2–3 Commands)
 
 **New Project (Greenfield):**
