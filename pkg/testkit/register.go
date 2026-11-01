@@ -59,7 +59,13 @@ func RegisterAuditResetTeardown(t testing.TB, opts TeardownOptions, storageRef *
 // (GetTestCleanup when present) or falls back to [RegisterStandardTeardown] with FileStorage.
 func RegisterStorageTestCleanup(t testing.TB, projectRoot string, storageAny any) {
 	t.Helper()
-	if storageAny == nil || projectRoot == emptyValue {
+	if projectRoot == emptyValue {
+		return
+	}
+	if storageAny == nil {
+		opts := TempProjectTeardown(projectRoot, nil)
+		opts.SkipWaitWAL = false
+		RegisterStandardTeardown(t, opts)
 		return
 	}
 	type cleanupGetter interface {

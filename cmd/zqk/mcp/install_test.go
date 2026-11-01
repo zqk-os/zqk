@@ -19,7 +19,9 @@ func TestInstallCmd_Metadata(t *testing.T) {
 
 func TestInstallCmd_RunInProject(t *testing.T) {
 	tempRoot := t.TempDir()
-	testkit.RegisterStorageTestCleanup(t, tempRoot, nil)
+	opts := testkit.TempProjectTeardown(tempRoot, nil)
+	opts.SkipWaitWAL = false
+	testkit.RegisterStandardTeardown(t, opts)
 	t.Setenv(zqkenv.ProjectRoot().Name(), tempRoot)
 
 	cmd := NewInstallCmd()
