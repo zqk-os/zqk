@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	testcmd "github.com/zqk-os/zqk/cmd/zqk/test"
+	pkgci "github.com/zqk-os/zqk/pkg/ci"
 	bldr "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -24,7 +25,54 @@ func NewCICmd() *cobra.Command {
 	cmd.AddCommand(newRunCmd())
 	cmd.AddCommand(newStatusCmd())
 	cmd.AddCommand(newDemoteCmd())
+	cmd.AddCommand(newInitCmd())
 	return cmd
+}
+
+func newInitCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "init",
+		Short: "Initialize zero-config GitHub Actions CI/CD workflow and Homebrew packaging",
+		Long:  "Scaffolds production-grade GitHub Actions audit workflow (.github/workflows/zqk-audit.yml) and Homebrew formula template (Formula/zqk.rb).",
+	}
+	cmd.Flags().Bool("dry-run", false, "Preview workflow generation without writing files")
+	cmd.Flags().Bool("force", false, "Overwrite existing workflow files")
+	cmd.Flags().String("workflow-path", "", "Custom relative path for the workflow file")
+	cmd.Flags().String("formula-path", "", "Custom relative path for the formula file")
+	cli.BindAsyncProgress(cmd, runCIInit)
+	return cmd
+}
+
+func runCIInit(cmd *cobra.Command, args []string) error {
+	studio, err := resolveStudioRoot()
+	if err != nil {
+		return err
+	}
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	force, _ := cmd.Flags().GetBool("force")
+	workflowPath, _ := cmd.Flags().GetString("workflow-path")
+	formulaPath, _ := cmd.Flags().GetString("formula-path")
+
+	res, err := pkgci.InitCI(cmd.Context(), pkgci.InitOptions{
+		RepoRoot:     studio,
+		WorkflowPath: workflowPath,
+		FormulaPath:  formulaPath,
+		DryRun:       dryRun,
+		Force:        force,
+	})
+	if err != nil {
+		return errfmt.Errorf("ci init failed: %w", err)
+	}
+
+	if res.DryRun {
+		fmt.Fprintf(cmd.OutOrStdout(), "ci init (dry-run): would scaffold %s and %s\n", res.WorkflowPath, res.FormulaPath)
+		return nil
+	}
+
+	for _, f := range res.WrittenFiles {
+		fmt.Fprintf(cmd.OutOrStdout(), "ci init: created %s\n", f)
+	}
+	return nil
 }
 
 func newDemoteCmd() *cobra.Command {
