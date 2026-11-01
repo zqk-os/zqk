@@ -5,6 +5,7 @@ package remote_kernel
 
 import (
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
+	shared_remote_kernelsenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/shared_remote_kernels"
 )
 
 type Plane = base_objectenum.Plane
@@ -33,15 +34,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = base_objectenum.Status
+type Status = shared_remote_kernelsenum.Status
 
 const (
-	StatusApproved    Status = base_objectenum.StatusApproved
-	StatusArchived    Status = base_objectenum.StatusArchived
-	StatusConceptual  Status = base_objectenum.StatusConceptual
-	StatusError       Status = base_objectenum.StatusError
-	StatusImplemented Status = base_objectenum.StatusImplemented
-	StatusInProgress  Status = base_objectenum.StatusInProgress
-	StatusOriginated  Status = base_objectenum.StatusOriginated
-	StatusProposed    Status = base_objectenum.StatusProposed
+	StatusApproved    Status = shared_remote_kernelsenum.StatusApproved
+	StatusArchived    Status = shared_remote_kernelsenum.StatusArchived
+	StatusConceptual  Status = shared_remote_kernelsenum.StatusConceptual
+	StatusError       Status = shared_remote_kernelsenum.StatusError
+	StatusImplemented Status = shared_remote_kernelsenum.StatusImplemented
+	StatusInProgress  Status = shared_remote_kernelsenum.StatusInProgress
+	StatusOriginated  Status = shared_remote_kernelsenum.StatusOriginated
+	StatusProposed    Status = shared_remote_kernelsenum.StatusProposed
 )

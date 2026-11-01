@@ -5,7 +5,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -216,3 +219,75 @@ func GenerateRules(projectRoot string, opts RulesGenerateOptions) (*RulesGenerat
 
 	return res, nil
 }
+
+// NewRulesCommand creates the parent 'rules' command group.
+func NewRulesCommand() *cobra.Command {
+	cmd := NewRulesCommandBuilder()
+	cmd.AddCommand(NewRulesGenerateCommand())
+	return cmd
+}
+
+// NewRulesGenerateCommand creates the executable 'rules generate' command.
+func NewRulesGenerateCommand() *cobra.Command {
+	cmd := NewRulesGenerateCommandBuilder()
+	cmd.RunE = RunRulesGenerate
+	return cmd
+}
+
+// RunRulesGenerate executes the rules generate command.
+func RunRulesGenerate(cmd *cobra.Command, _ []string) error {
+	root, _ := cli.ResolveCommandProjectRoot(cmd)
+	if root == "" {
+		root = paths.FindNearestProjectRoot(".")
+	}
+	if root == "" {
+		var err error
+		root, err = os.Getwd()
+		if err != nil {
+			return err
+		}
+	}
+
+	hostFlag, _ := cmd.Flags().GetString("host")
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	force, _ := cmd.Flags().GetBool("force")
+
+	opts := RulesGenerateOptions{
+		Hosts:  []string{hostFlag},
+		DryRun: dryRun,
+		Force:  force,
+	}
+
+	res, err := GenerateRules(root, opts)
+	if err != nil {
+		return err
+	}
+
+	if dryRun {
+		cmd.Printf("DRY-RUN: Previewing multi-host rules generation in %s\n", root)
+		for _, file := range res.Written {
+			cmd.Printf("  [WOULD WRITE] %s\n", file)
+		}
+		for _, file := range res.Skipped {
+			cmd.Printf("  [WOULD SKIP]  %s (already exists, use --force to overwrite)\n", file)
+		}
+	} else {
+		cmd.Printf("Generated multi-host IDE rules in %s\n", root)
+		for _, file := range res.Written {
+			cmd.Printf("  ✓ Wrote %s\n", file)
+		}
+		for _, file := range res.Skipped {
+			cmd.Printf("  ⚠️ Skipped %s (already exists, use --force to overwrite)\n", file)
+		}
+	}
+
+	return cli.FormatOutput(cmd, map[string]any{
+		objects.FieldKeyStatus: "success",
+		"dry_run":              dryRun,
+		"force":                force,
+		"written":              res.Written,
+		"skipped":              res.Skipped,
+		"previews":             res.Previews,
+	})
+}
+
