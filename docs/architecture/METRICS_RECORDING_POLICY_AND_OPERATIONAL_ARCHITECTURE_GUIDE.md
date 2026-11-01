@@ -96,4 +96,4 @@ This guarantees that mismatched `Leave` calls never cause integer underflow or i
 The subsystem is fully verified by automated unit and stress tests in `pkg/metricsrecording/policy_test.go` and `pkg/metricsrecording/kind_test.go`:
 - **Statement Coverage:** 100.0% of statements.
 - **Concurrent Stress Verification:** Concurrently executing hundreds of goroutines acquiring and releasing scopes without race conditions or memory corruption.
-- **Traceability:** Aligns directly with Priority Plan `PRI-1792977117649882000-5f0e910c`, Requirement `REQ-1792977098511683000-9cc980b1`, and Test Case `TST-1792977099212542001-8f4edeab`.
+- **Verification Lineage:** Verified against test case and requirement invariants in pkg/metricsrecording.
