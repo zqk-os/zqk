@@ -11,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/config"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -75,6 +76,34 @@ func (m *mockCycle246Storage) Update(_ context.Context, _ *storage.SecurityConte
 	}
 	m.updateMap[id] = updates
 	return nil
+}
+
+func setupCycle246TestEnv(t *testing.T) (string, *mockCycle246Storage) {
+	t.Helper()
+	t.Parallel()
+	return t.TempDir(), &mockCycle246Storage{}
+}
+
+func createBlockedStateDir(t *testing.T, tmpDir string) {
+	t.Helper()
+	blockedPath := sessionStateDir(tmpDir)
+	if err := fileutil.MkdirAll(filepath.Dir(blockedPath), paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(blockedPath, []byte("blocking-file"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func writeTestSessionConfig(t *testing.T, tmpDir, cfgContent string) {
+	t.Helper()
+	cfgDir := filepath.Join(tmpDir, paths.ConfigDir)
+	if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(cfgDir, paths.ZqkConfigFileName), []byte(cfgContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 }
 
 // TestCycle246_ContextCoverage tests all branches in context.go.
@@ -174,7 +203,9 @@ func TestCycle246_IDCoverage(t *testing.T) {
 			t.Fatalf("failed to get wd: %v", err)
 		}
 		defer func() {
-			_ = fileutil.Chdir(oldWd)
+			if chdirErr := fileutil.Chdir(oldWd); chdirErr != nil {
+				t.Logf("failed to restore wd: %v", chdirErr)
+			}
 			validation.ResetGlobalIDPrefixesConfig()
 			validation.ResetGlobalPathsConfig()
 		}()
@@ -278,9 +309,7 @@ func TestCycle246_CreateSession_BoundaryAndErrors(t *testing.T) {
 	})
 
 	t.Run("DefaultAccountIDResolution", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		store := &mockCycle246Storage{}
+		tmpDir, store := setupCycle246TestEnv(t)
 		id := StartCLISession(ctx, tmpDir, "default-acc-title", "", store)
 		if id == EmptyValue {
 			t.Fatal("expected successful session creation")
@@ -339,9 +368,7 @@ func TestCycle246_TouchAndThrottleCoverage(t *testing.T) {
 	ctx := pkgctx.NewSystemContext()
 
 	t.Run("Touch_GuardConditions", func(t *testing.T) {
-		t.Parallel()
-		store := &mockCycle246Storage{}
-		tmpDir := t.TempDir()
+		tmpDir, store := setupCycle246TestEnv(t)
 
 		// Nil checks and empty guards
 		Touch(ctx, "", "sess-1", "title", "acc", store)
@@ -378,14 +405,7 @@ func TestCycle246_TouchAndThrottleCoverage(t *testing.T) {
 	t.Run("TouchIfNotThrottled_FileLockErrorFallback", func(t *testing.T) {
 		t.Parallel()
 		tmpDir := t.TempDir()
-		// Block state dir by writing a regular file where state dir would be
-		stateFile := sessionStateDir(tmpDir)
-		if err := fileutil.MkdirAll(filepath.Dir(stateFile), paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		if err := fileutil.WriteFile(stateFile, []byte("file-not-dir"), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		createBlockedStateDir(t, tmpDir)
 
 		store := &mockCycle246Storage{}
 		// When NewFileLock fails, it falls back to direct unthrottled Touch
@@ -396,9 +416,7 @@ func TestCycle246_TouchAndThrottleCoverage(t *testing.T) {
 	})
 
 	t.Run("TouchIfNotThrottled_EmptyGuardConditions", func(t *testing.T) {
-		t.Parallel()
-		store := &mockCycle246Storage{}
-		tmpDir := t.TempDir()
+		tmpDir, store := setupCycle246TestEnv(t)
 
 		TouchIfNotThrottled(ctx, "", "sess-1", "t", "a", store)
 		TouchIfNotThrottled(ctx, tmpDir, "", "t", "a", store)
@@ -468,14 +486,7 @@ func TestCycle246_UnderLockFileOperations(t *testing.T) {
 		}
 
 		tmpDir := t.TempDir()
-		// Lock error when state dir is blocked by a file
-		stateFile := sessionStateDir(tmpDir)
-		if err := fileutil.MkdirAll(filepath.Dir(stateFile), paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		if err := fileutil.WriteFile(stateFile, []byte("blocking-file"), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		createBlockedStateDir(t, tmpDir)
 		if got := readSessionFileUnderLock(tmpDir); got != EmptyValue {
 			t.Fatalf("readSessionFileUnderLock with lock error = %q, want empty", got)
 		}
@@ -493,13 +504,7 @@ func TestCycle246_UnderLockFileOperations(t *testing.T) {
 
 		// Block state dir creation
 		blockDir := t.TempDir()
-		blockedPath := sessionStateDir(blockDir)
-		if err := fileutil.MkdirAll(filepath.Dir(blockedPath), paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		if err := fileutil.WriteFile(blockedPath, []byte("block"), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		createBlockedStateDir(t, blockDir)
 		if ok := writeSessionFileUnderLock(blockDir, "sess-1"); ok {
 			t.Fatal("writeSessionFileUnderLock with blocked directory should return false")
 		}
@@ -525,13 +530,7 @@ func TestCycle246_UnderLockFileOperations(t *testing.T) {
 
 		// Guard check for lock failure
 		tmpDir := t.TempDir()
-		blockedPath := sessionStateDir(tmpDir)
-		if err := fileutil.MkdirAll(filepath.Dir(blockedPath), paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		if err := fileutil.WriteFile(blockedPath, []byte("block"), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		createBlockedStateDir(t, tmpDir)
 		clearSessionFileUnderLock(tmpDir)
 	})
 }
@@ -552,16 +551,7 @@ func TestCycle246_IdleTimeoutCoverage(t *testing.T) {
 	t.Run("EmptyIdleTimeoutConfigValue", func(t *testing.T) {
 		t.Parallel()
 		tmpDir := t.TempDir()
-		cfgDir := filepath.Join(tmpDir, paths.ConfigDir)
-		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		cfgContent := `session:
-  idle_timeout: ""
-`
-		if err := fileutil.WriteFile(filepath.Join(cfgDir, paths.ZqkConfigFileName), []byte(cfgContent), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		writeTestSessionConfig(t, tmpDir, "session:\n  idle_timeout: \"\"\n")
 		d := GetIdleTimeout(tmpDir)
 		if d != defaultIdleTimeout {
 			t.Fatalf("GetIdleTimeout with empty timeout = %v, want default %v", d, defaultIdleTimeout)
@@ -571,16 +561,7 @@ func TestCycle246_IdleTimeoutCoverage(t *testing.T) {
 	t.Run("NegativeOrZeroDurationFallback", func(t *testing.T) {
 		t.Parallel()
 		tmpDir := t.TempDir()
-		cfgDir := filepath.Join(tmpDir, paths.ConfigDir)
-		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		cfgContent := `session:
-  idle_timeout: "-10s"
-`
-		if err := fileutil.WriteFile(filepath.Join(cfgDir, paths.ZqkConfigFileName), []byte(cfgContent), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		writeTestSessionConfig(t, tmpDir, "session:\n  idle_timeout: \"-10s\"\n")
 		d := GetIdleTimeout(tmpDir)
 		if d != defaultIdleTimeout {
 			t.Fatalf("GetIdleTimeout with negative timeout = %v, want default %v", d, defaultIdleTimeout)
@@ -590,15 +571,7 @@ func TestCycle246_IdleTimeoutCoverage(t *testing.T) {
 	t.Run("NonMapSessionConfigFallback", func(t *testing.T) {
 		t.Parallel()
 		tmpDir := t.TempDir()
-		cfgDir := filepath.Join(tmpDir, paths.ConfigDir)
-		if err := fileutil.MkdirAll(cfgDir, paths.DirPerm755); err != nil {
-			t.Fatal(err)
-		}
-		cfgContent := `session: "not-a-map"
-`
-		if err := fileutil.WriteFile(filepath.Join(cfgDir, paths.ZqkConfigFileName), []byte(cfgContent), paths.FilePerm644); err != nil {
-			t.Fatal(err)
-		}
+		writeTestSessionConfig(t, tmpDir, "session: \"not-a-map\"\n")
 		d := GetIdleTimeout(tmpDir)
 		if d != defaultIdleTimeout {
 			t.Fatalf("GetIdleTimeout with non-map session = %v, want default %v", d, defaultIdleTimeout)
@@ -619,9 +592,7 @@ func TestCycle246_TryReuseAndPersistedIDEdgeCases(t *testing.T) {
 	})
 
 	t.Run("TryReuse_EmptySessionPersisted", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		store := &mockCycle246Storage{}
+		tmpDir, store := setupCycle246TestEnv(t)
 		// No persisted ID in tmpDir
 		sid, ok := TryReuse(ctx, tmpDir, "title", "acc", store)
 		if ok || sid != EmptyValue {
@@ -630,9 +601,7 @@ func TestCycle246_TryReuseAndPersistedIDEdgeCases(t *testing.T) {
 	})
 
 	t.Run("WritePersistedID_OverwriteSameID", func(t *testing.T) {
-		t.Parallel()
-		tmpDir := t.TempDir()
-		store := &mockCycle246Storage{}
+		tmpDir, store := setupCycle246TestEnv(t)
 		sessID := "ZQK-SAME-1"
 
 		if !WritePersistedID(ctx, tmpDir, sessID, "acc-1", store) {
@@ -863,7 +832,7 @@ func TestCycle246_ConcurrentPersistedIDAndTouchStress(t *testing.T) {
 	for i := 0; i < workers; i++ {
 		workerID := i
 		wg.Add(1)
-		go func() {
+		goroutinelabels.NewGoroutine("cycle246_stress_worker", fmt.Sprintf("worker-%d", workerID)).StartSimple(func() {
 			defer wg.Done()
 			account := fmt.Sprintf("ACC-WORKER-%d", workerID)
 			sessID := fmt.Sprintf("ZQK-SESS-%d", workerID)
@@ -877,9 +846,9 @@ func TestCycle246_ConcurrentPersistedIDAndTouchStress(t *testing.T) {
 			store.mu.Unlock()
 
 			for j := 0; j < iterations; j++ {
-				_ = WritePersistedID(ctx, tmpDir, sessID, account, store)
-				_ = ReadPersistedID(tmpDir)
-				_ = GetCurrentID(tmpDir)
+				WritePersistedID(ctx, tmpDir, sessID, account, store)
+				ReadPersistedID(tmpDir)
+				GetCurrentID(tmpDir)
 				TouchIfNotThrottled(ctx, tmpDir, sessID, "stress-title", account, store)
 				Touch(ctx, tmpDir, sessID, "touch-title", account, store)
 
@@ -887,7 +856,7 @@ func TestCycle246_ConcurrentPersistedIDAndTouchStress(t *testing.T) {
 					ClearPersisted(tmpDir)
 				}
 			}
-		}()
+		})
 	}
 
 	wg.Wait()
