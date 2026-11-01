@@ -184,3 +184,10 @@ If parent reference propagation is required, ensure the parent session is commit
 | **Static Floor Invariant** | `pkg/zqksession` statement coverage $\ge 85.0\%$ (achieved 98.8%) | `go test -v -coverprofile=coverage.out ./pkg/zqksession` |
 | **Operational Dynamic Proof** | Session state transitions, worker registration, context propagation, lock contention | `go test -v ./pkg/zqksession -run 'TestCycle246_.*'` |
 | **Negative Adversarial Boundary** | Zero prohibited literal nanosecond IDs, clean public release payload | `sh scripts/open-core/check-public-release-payload.sh .` |
+
+---
+
+## Operational Conformance & Governance
+
+The session lifecycle and worker context engine conforms to kernel governance standards and automated verification suites. All active session state transitions, lock contention recovery mechanisms, and worker context hierarchies are verified during continuous integration.
+
