@@ -357,14 +357,16 @@ func (p *CommandEscalationProvider) Escalate(ctx context.Context, notice Escalat
 	prompt := notice.buildPrompt()
 
 	// Write prompt to temp file for command to read
-	promptDir := p.ProjectRoot
-	if promptDir == "" {
-		promptDir = fileutil.TempDir()
+	var promptFile string
+	if p.ProjectRoot != "" {
+		stateDir := filepath.Join(p.ProjectRoot, paths.ProjectDataDir, paths.StateDir)
+		_ = fileutil.EnsureDir(stateDir) //nolint:errcheck
+		promptFile = filepath.Join(stateDir, "cap_escalation_prompt.txt")
+	} else {
+		promptDir := filepath.Join(fileutil.TempDir(), "zqk_escalation")
+		_ = fileutil.EnsureDir(promptDir) //nolint:errcheck
+		promptFile = filepath.Join(promptDir, "cap_escalation_prompt.txt")
 	}
-	stateDir := filepath.Join(promptDir, paths.ProjectDataDir, paths.StateDir)
-	_ = fileutil.EnsureDir(stateDir) //nolint:errcheck
-
-	promptFile := filepath.Join(stateDir, "cap_escalation_prompt.txt")
 	if err := fileutil.WriteSecureFile(promptFile, []byte(prompt)); err != nil {
 		return fmt.Errorf("failed to write prompt file: %w", err)
 	}

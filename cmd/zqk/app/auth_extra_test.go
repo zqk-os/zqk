@@ -3,17 +3,31 @@ package app_test
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/cmd/zqk/app"
+	"github.com/zqk-os/zqk/pkg/brand"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestAuthCommands_RunLogin_MissingProjectRoot(t *testing.T) {
+	// Clean up any stray .zqk in os.TempDir() from prior tests
+	tempZqk := filepath.Join(os.TempDir(), paths.ProjectDataDir)
+	_ = fileutil.RemoveAll(tempZqk)
+	if evalTemp, err := filepath.EvalSymlinks(os.TempDir()); err == nil {
+		_ = fileutil.RemoveAll(filepath.Join(evalTemp, paths.ProjectDataDir))
+	}
+
+	defer brand.SetExecutableName("zqk")
+	brand.SetExecutableName("zqk")
+
 	t.Setenv("ZQK_PROJECT_ROOT", "")
 	t.Setenv("ZQK_TEST_ROOT", "")
 	origDir, _ := os.Getwd()
@@ -24,6 +38,7 @@ func TestAuthCommands_RunLogin_MissingProjectRoot(t *testing.T) {
 	loginCmd := app.NewLoginCmd()
 	err := loginCmd.Execute()
 	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "project root not found")
 }
 
 func TestAuthCommands_RunLogout_MissingProjectRoot(t *testing.T) {

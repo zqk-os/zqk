@@ -160,27 +160,41 @@ func IsValidProjectRoot(dir string) bool {
 
 func isIgnoredNestedProjectRoot(dir string) bool {
 	d := filepath.Clean(dir)
-	if d == "/" || d == "." || d == "/tmp" || d == "/var/tmp" || d == "/private/tmp" || d == "/private/var/tmp" {
+	if d == "/" || d == "." || d == "/tmp" || d == "/var/tmp" || d == "/private/tmp" || d == "/private/var/tmp" || d == "/var/folders" || d == "/private/var/folders" {
 		return true
 	}
 	// User home directory can contain ~/.zqk for global config/credentials, but is never a project root.
 	if home, err := os.UserHomeDir(); err == nil && home != "" {
-		if d == filepath.Clean(home) {
+		cleanHome := filepath.Clean(home)
+		if d == cleanHome {
+			return true
+		}
+		if evalHome, err := filepath.EvalSymlinks(cleanHome); err == nil && d == filepath.Clean(evalHome) {
 			return true
 		}
 	}
-	// System temporary directory ancestors can never be valid project roots
+	// System temporary directory and its ancestors can never be valid project roots
 	tempDir := filepath.Clean(os.TempDir())
+	evalTemp := tempDir
+	if et, err := filepath.EvalSymlinks(tempDir); err == nil {
+		evalTemp = filepath.Clean(et)
+	}
+	evalD := d
+	if ed, err := filepath.EvalSymlinks(d); err == nil {
+		evalD = filepath.Clean(ed)
+	}
+
+	if d == tempDir || d == evalTemp || evalD == tempDir || evalD == evalTemp {
+		return true
+	}
 	for p := tempDir; p != "/" && p != "." && p != filepath.Dir(p); p = filepath.Dir(p) {
-		if d == p {
+		if d == p || evalD == p {
 			return true
 		}
 	}
-	if evalTemp, err := filepath.EvalSymlinks(tempDir); err == nil && evalTemp != tempDir {
-		for p := filepath.Clean(evalTemp); p != "/" && p != "." && p != filepath.Dir(p); p = filepath.Dir(p) {
-			if d == p {
-				return true
-			}
+	for p := evalTemp; p != "/" && p != "." && p != filepath.Dir(p); p = filepath.Dir(p) {
+		if d == p || evalD == p {
+			return true
 		}
 	}
 	slash := filepath.ToSlash(d)
