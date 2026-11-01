@@ -418,7 +418,6 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 	}
 }
 
-
 // omitEmptyEpicRefsDraftResidue drops empty epic_refs template residue from draft YAML.
 // TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca
 func omitEmptyEpicRefsDraftResidue(obj map[string]any) {

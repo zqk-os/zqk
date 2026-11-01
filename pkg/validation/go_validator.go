@@ -1315,7 +1315,6 @@ func isStandardMetadataField(key string) bool {
 	}
 }
 
-
 // stripEmptyUnknownFieldResidue deletes empty values for keys absent from
 // ResolvedFields (and not composition-allowed). Mutates obj in place so persist
 // paths do not re-write template residue that StrictMode would otherwise reject.

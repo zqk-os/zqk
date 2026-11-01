@@ -318,4 +318,3 @@ func TestWriteObjectToDraftPlane_PriorityPlanOmitsEmptyEpicRefs(t *testing.T) {
 		t.Fatalf("priority_plan draft must omit empty epic_refs; got %#v", parsed[objects.FieldKeyEpicRefs])
 	}
 }
-
