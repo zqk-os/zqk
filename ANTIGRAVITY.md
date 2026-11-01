@@ -1,4 +1,4 @@
-# ZQK Agent Boot Protocol
+# ZQK Agent Boot Protocol 
 
 ## Orchestration & State Management
 - **Context-Bound Subagent Orchestration:** Do not use any subagent tools for orchestration without ensuring proper initialization context is included. ZQK makes this easy with tooling targeting lean, adequate context provision for prompt generation (e.g. zqk agent orchestrate, zqk agent prepare-context)—attempting to orchestrate with inadequate or irrelevant context is where execution fails.
