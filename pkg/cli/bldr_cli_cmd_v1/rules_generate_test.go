@@ -135,7 +135,7 @@ func TestRulesGenerate_DryRun(t *testing.T) {
 func TestRulesGenerate_CommandExecution(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	cmd := bldr.NewRulesGenerateCommandBuilder()
+	cmd := bldr.NewRulesGenerateCommand()
 	require.NotNil(t, cmd)
 
 	buf := &bytes.Buffer{}
