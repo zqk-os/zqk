@@ -136,6 +136,9 @@ func (s *AmbientIngestService) IngestAmbientEvent(ctx context.Context, event amb
 
 // BindToMesh binds the service to an EventMesh to automatically ingest events.
 func (s *AmbientIngestService) BindToMesh(mesh ambience.EventMesh) {
+	if mesh == nil {
+		return
+	}
 	ctx := context.Background()
 	ch, err := mesh.Subscribe(ctx, []ambience.EventType{
 		ambience.EventFileModified,

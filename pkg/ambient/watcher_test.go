@@ -306,3 +306,102 @@ func TestFSWatcher_IdempotentStopAndChannelLeakSafety(t *testing.T) {
 		}
 	}
 }
+
+func TestBindProcessYAMLInvalidator(t *testing.T) {
+	hub := NewEventHub()
+	activityCount := 0
+	onActivity := func() {
+		activityCount++
+	}
+
+	BindProcessYAMLInvalidator(hub, onActivity)
+
+	ctx := context.Background()
+
+	// 1. Process YAML WRITE event
+	targetGoal := filepath.Join("/tmp/project", paths.ProcessDir, "goals", "GOAL-1.yaml")
+	err := hub.Publish(ctx, Event{
+		Type: EventTypeFilesystem,
+		Payload: map[string]any{
+			objects.FieldKeyTargetID:  targetGoal,
+			objects.FieldKeyOperation: "WRITE",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Publish WRITE failed: %v", err)
+	}
+
+	// 2. Process YAML CREATE event
+	targetReq := filepath.Join("/tmp/project", paths.ProcessDir, "requirements", "REQ-1.yaml")
+	err = hub.Publish(ctx, Event{
+		Type: EventTypeFilesystem,
+		Payload: map[string]any{
+			objects.FieldKeyTargetID:  targetReq,
+			objects.FieldKeyOperation: "CREATE",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Publish CREATE failed: %v", err)
+	}
+
+	// 3. Process YAML REMOVE event
+	err = hub.Publish(ctx, Event{
+		Type: EventTypeFilesystem,
+		Payload: map[string]any{
+			objects.FieldKeyTargetID:  targetGoal,
+			objects.FieldKeyOperation: "REMOVE",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Publish REMOVE failed: %v", err)
+	}
+
+	// 4. Ignored non-process files and invalid payloads
+	_ = hub.Publish(ctx, Event{
+		Type: EventTypeFilesystem,
+		Payload: map[string]any{
+			objects.FieldKeyTargetID:  "/tmp/project/src/main.go",
+			objects.FieldKeyOperation: "WRITE",
+		},
+	})
+	_ = hub.Publish(ctx, Event{
+		Type: EventTypeFilesystem,
+		Payload: map[string]any{
+			objects.FieldKeyTargetID: 12345,
+		},
+	})
+	_ = hub.Publish(ctx, Event{
+		Type:    EventTypeFilesystem,
+		Payload: "not a map payload",
+	})
+
+	if activityCount != 6 {
+		t.Errorf("expected onActivity called 6 times, got %d", activityCount)
+	}
+
+	// Test nil onActivity safely
+	hubNilActivity := NewEventHub()
+	BindProcessYAMLInvalidator(hubNilActivity, nil)
+	_ = hubNilActivity.Publish(ctx, Event{
+		Type: EventTypeFilesystem,
+		Payload: map[string]any{
+			objects.FieldKeyTargetID:  targetGoal,
+			objects.FieldKeyOperation: "WRITE",
+		},
+	})
+}
+
+func TestRunWatcherDaemon_Lifecycle(t *testing.T) {
+	tmpDir := t.TempDir()
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // Already cancelled context
+
+	activityCalled := false
+	err := RunWatcherDaemon(ctx, tmpDir, func() {
+		activityCalled = true
+	})
+	if err != nil {
+		t.Fatalf("expected nil error on cancelled context, got %v", err)
+	}
+	_ = activityCalled
+}

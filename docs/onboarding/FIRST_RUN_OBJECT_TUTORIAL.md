@@ -166,7 +166,7 @@ zqk object delete <QUESTION_ID>
 
 | Operation | 🌟 Preferred Modern Command | ⚠️ Legacy / Low-Level Fallback | Rationale |
 | :--- | :--- | :--- | :--- |
-| **Object Creation** | `zqk new object <kind> --title "..."` | `zqk object template` + `object create --file` | Safe draft plane isolation; zero CAS pollution. |
+| **Object Creation** | `zqk new <kind> --title "..."` (or `zqk new object <kind>`) | `zqk object template` + `object create --file` | Safe draft plane isolation; zero CAS pollution. |
 | **Lifecycle Advance** | `zqk object promote <id>` | `zqk object update <id> --field status=<st>` | Evaluates VDS done-gates, criteria latches, and FSM rules. |
 | **Lifecycle Demote** | `zqk object demote <id>` | `zqk object update <id> --field status=<st>` | Enforces valid backwards state-machine transitions. |
 | **Add References** | `zqk object ref add <src> <targ>` | `zqk object update <id> --field "*_ref=<id>"` | Validates target existence, deduplicates, and avoids cycles. |

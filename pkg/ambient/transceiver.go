@@ -21,6 +21,12 @@ func NewTransceiver(inbox InboxPusher) *Transceiver {
 
 // EmitEnvelope synthesizes a .csnap (Compressed Snapshot) envelope and pushes it to the inbox.
 func (t *Transceiver) EmitEnvelope(ctx context.Context, filePath string, fileContent []byte) error {
+	if t.inbox == nil {
+		return fmt.Errorf("inbox is nil")
+	}
+	if t.builder == nil {
+		t.builder = NewCSnapBuilder()
+	}
 	payload, err := t.builder.BuildEnvelope(filePath, fileContent)
 	if err != nil {
 		return fmt.Errorf("failed to build csnap envelope: %w", err)

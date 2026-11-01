@@ -52,7 +52,10 @@ zqk ui -w
 # Wire up MCP for Cursor / Claude Code
 zqk mcp ensure
 
-# Execute work with autonomous multi-agent swarm
+# Autonomously claim and execute work
+zqk do
+
+# Or execute work with autonomous multi-agent swarm
 zqk swarm dispatch
 ```
 
@@ -112,6 +115,7 @@ zqk system start-here
 ```
 
 - **5-Layer Cascade:** Vision ➔ Goals ➔ Priority Plans ➔ Requirements ➔ Backlog Items.
+- **Minting Kernel Objects:** Declare intent via `zqk new <kind>` (`zqk new goal`, `zqk new plan`, `zqk new req`, `zqk new bli`, `zqk new td`).
 - **Fail-Closed Done Gates:** Automated AST verification and test execution before state transitions.
 - **Visual Web Studio:** Real-time Gantt timeline and DAG visualization:
   ```sh
@@ -119,7 +123,7 @@ zqk system start-here
   ```
 - **Ambient MCP Server:** Expose local kernel tools to Cursor or Claude:
   ```sh
-  zqk mcp proxy --tcp 127.0.0.1:7777
+  zqk mcp ensure --tcp 127.0.0.1:8443
   ```
 
 ---

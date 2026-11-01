@@ -108,11 +108,41 @@ Then ask your AI agent a question in your IDE that requires project context, for
 
 The agent will automatically invoke the `get_project_context` tool to read your policies and goals and respond accurately.
 
-## 4. Run Swarms & Live Telemetry
+## 4. Discover, Execute & Mint Work
+
+### Discover Active Tasks
+Query the active priority plan and shovel-ready backlog items:
+```sh
+zqk workflow whats-next
+```
+
+### Autonomous Single-Command Execution (`zqk do`)
+Claim and execute the next prioritized backlog item end-to-end with AST verification:
+```sh
+zqk do
+```
+Or target a specific backlog item:
+```sh
+zqk do BLI-001
+```
+
+### Mint New Goals & Tasks (`zqk new <kind>`)
+Mint new objects directly onto the safe Draft Plane:
+```sh
+zqk new goal --title "Build User Authentication"
+zqk new plan --title "Sprint 1: OAuth & JWT"
+zqk new req --title "Support GitHub OAuth login"
+zqk new bli --title "Implement GitHub OAuth handler"
+```
+
+## 5. Run Swarms & Live Telemetry
 
 Execute portable multi-agent swarms with fail-closed membrane isolation:
 
 ```sh
+# Launch the visual Web Studio (DAG graph & Gantt timeline)
+zqk ui -w
+
 # Run a remote or local swarm package
 zqk run https://github.com/zqk-os/swarm-starter-kit
 
