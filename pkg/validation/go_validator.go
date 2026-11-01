@@ -781,7 +781,6 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 }
 
 // appendUnmetLifecyclePreconditions evaluates YAML transition or status-hold preconditions.
-// TRACK: Plane A exam; dispatch lives in go_validator_preconditions.go.
 func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 	errors []ValidationError,
 	kind, currentState, status string,
@@ -1021,7 +1020,6 @@ func (gv *GoValidator) isRefActive(refID string, obj map[string]any, options *Va
 // checkCommitHashesGitMutationEvidence requires non-merge product commits that
 // mention this BLI id. When already holding status=complete, skip (grandfather
 // historical completes); transitions into complete always enforce.
-// TRACK: follow-up in kernel backlog
 func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, options *ValidationOptions) bool {
 	if options != nil {
 		cur := strings.ToLower(strings.TrimSpace(options.CurrentState))
@@ -1311,6 +1309,59 @@ func isStandardMetadataField(key string) bool {
 	}
 }
 
+// stripEmptyUnknownFieldResidue deletes empty values for keys absent from
+// ResolvedFields (and not composition-allowed). Mutates obj in place so persist
+// paths do not re-write template residue that StrictMode would otherwise reject.
+func stripEmptyUnknownFieldResidue(kind string, obj map[string]any, spec *objects.Spec) {
+	if spec == nil || spec.ResolvedFields == nil || obj == nil {
+		return
+	}
+	for key, val := range obj {
+		if key != objects.FieldKeyEpicRefs {
+			continue
+		}
+		if isStandardMetadataField(key) {
+			continue
+		}
+		if _, ok := spec.ResolvedFields[key]; ok {
+			continue
+		}
+		if objects.IsCompositionFieldAllowed(kind, key, spec) {
+			continue
+		}
+		if isEmptyUnknownFieldResidue(val) {
+			delete(obj, key)
+		}
+	}
+}
+
+func isEmptyUnknownFieldResidue(val any) bool {
+	if val == nil || val == "<UNSET>" {
+		return true
+	}
+	if reflect.TypeOf(val).Name() == "fieldUnsetMarker" {
+		return true
+	}
+	switch v := val.(type) {
+	case string:
+		return strings.TrimSpace(v) == ""
+	case []any:
+		return len(v) == 0
+	case []string:
+		return len(v) == 0
+	case map[string]any:
+		return len(v) == 0
+	default:
+		rv := reflect.ValueOf(val)
+		switch rv.Kind() {
+		case reflect.Slice, reflect.Map:
+			return rv.Len() == 0
+		default:
+			return false
+		}
+	}
+}
+
 func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, spec *objects.Spec) []ValidationError {
 	if spec == nil || spec.ResolvedFields == nil {
 		return nil
@@ -1321,6 +1372,10 @@ func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, sp
 			continue
 		}
 		if val == nil || val == "<UNSET>" || reflect.TypeOf(val).Name() == "fieldUnsetMarker" {
+			continue
+		}
+		// Empty template residue must not fail StrictMode (parity with stripEmptyUnknownFieldResidue).
+		if isEmptyUnknownFieldResidue(val) {
 			continue
 		}
 		if _, ok := spec.ResolvedFields[key]; !ok {

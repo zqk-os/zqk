@@ -212,7 +212,6 @@ func IsObjectDraftPlanePath(projectRoot, path string) bool {
 // shouldUseObjectDraftPlane is true for CAS (non-stream) kinds in a preliminary lifecycle status.
 // When the lifecycle loader errors, do not force draft solely because status equals origin —
 // kinds whose origin is a terminal/active status (e.g. glossary_term origin=active) must use CAS.
-// TRACK: (draft-plane create path); VDS glossary materialization.
 func shouldUseObjectDraftPlane(kind, status string) bool {
 	if StreamStorageEnabledForKind(kind) {
 		return false
@@ -348,6 +347,9 @@ func getDraftPlaneTemplateForKind(kind string) map[string]any {
 			if isDraftPlaneMembraneField(field.Name) || field.Name == objects.FieldKeyKind || field.Name == objects.FieldKeyID || field.Name == objects.FieldKeySchemaVersion {
 				continue
 			}
+			if field.Name == objects.FieldKeyEpicRefs {
+				continue
+			}
 			if !field.Required && (field.Type == "enum" || len(field.EnumValues) > 0) {
 				continue
 			}
@@ -418,6 +420,34 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 	}
 }
 
+// omitEmptyEpicRefsDraftResidue drops empty epic_refs template residue from draft YAML.
+func omitEmptyEpicRefsDraftResidue(obj map[string]any) {
+	if obj == nil {
+		return
+	}
+	v, ok := obj[objects.FieldKeyEpicRefs]
+	if !ok {
+		return
+	}
+	if isEmptyDraftListResidue(v) {
+		delete(obj, objects.FieldKeyEpicRefs)
+	}
+}
+
+func isEmptyDraftListResidue(val any) bool {
+	if val == nil {
+		return true
+	}
+	switch v := val.(type) {
+	case []any:
+		return len(v) == 0
+	case []string:
+		return len(v) == 0
+	default:
+		return false
+	}
+}
+
 func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte) []byte {
 	if len(data) == 0 {
 		return data
@@ -428,6 +458,9 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 	}
 
 	merged := getDraftPlaneTemplateForKind(kind)
+	// Empty epic_refs: [] from template fill is poison under confidential-filtered
+	// StrictMode (unknown_field blocks conceptual→originated). Omit template residue before layering user values.
+	omitEmptyEpicRefsDraftResidue(merged)
 
 	// 3. Seed canonical lifecycle origin status if not already populated
 	if originStatus, err := f.GetLifecycleLoader().GetOriginStatus(kind); err == nil && originStatus != "" {
