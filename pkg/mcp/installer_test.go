@@ -252,4 +252,3 @@ func TestInstallToIDE_EmptyProjectRootFallback(t *testing.T) {
 	require.NoError(t, json.Unmarshal(updatedBytes, &config))
 	assert.NotEmpty(t, config.MCPServers)
 }
-

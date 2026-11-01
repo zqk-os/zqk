@@ -16,8 +16,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/studio"
 )
 
-// Satisfies TST-VISUAL-STUDIO-UI-001 and CRIT-VISUAL-STUDIO-UI-001:
-// Verify Embedded Local Web UI Server and API Endpoints
+func getSuccessfulTestEndpoint(t *testing.T, baseURL, path string) *http.Response {
+	t.Helper()
+	resp, err := http.Get(baseURL + path)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
+	return resp
+}
 
 func setupTestStudioServer(t *testing.T) (*studio.Server, *storage.PureGoIndexer, string) {
 	indexer := storage.NewPureGoIndexer()
@@ -65,7 +71,7 @@ func setupTestStudioServer(t *testing.T) (*studio.Server, *storage.PureGoIndexer
 	t.Cleanup(func() {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
-		_ = server.Shutdown(ctx)
+		require.NoError(t, server.Shutdown(ctx))
 	})
 
 	return server, indexer, fmt.Sprintf("http://%s", addr)
@@ -74,13 +80,10 @@ func setupTestStudioServer(t *testing.T) (*studio.Server, *storage.PureGoIndexer
 func TestServer_HealthEndpoint(t *testing.T) {
 	_, indexer, baseURL := setupTestStudioServer(t)
 
-	resp, err := http.Get(baseURL + "/api/health")
-	require.NoError(t, err)
+	resp := getSuccessfulTestEndpoint(t, baseURL, "/api/health")
 	defer resp.Body.Close()
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Equal(t, "application/json", resp.Header.Get("Content-Type"))
-	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 
 	var data struct {
 		Status    string `json:"status"`
@@ -94,12 +97,8 @@ func TestServer_HealthEndpoint(t *testing.T) {
 func TestServer_GraphEndpoint(t *testing.T) {
 	_, _, baseURL := setupTestStudioServer(t)
 
-	resp, err := http.Get(baseURL + "/api/graph")
-	require.NoError(t, err)
+	resp := getSuccessfulTestEndpoint(t, baseURL, "/api/graph")
 	defer resp.Body.Close()
-
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 
 	var payload studio.GraphPayload
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&payload))
@@ -134,13 +133,10 @@ func TestServer_GraphEndpoint(t *testing.T) {
 func TestServer_DashboardHTML(t *testing.T) {
 	_, _, baseURL := setupTestStudioServer(t)
 
-	resp, err := http.Get(baseURL + "/")
-	require.NoError(t, err)
+	resp := getSuccessfulTestEndpoint(t, baseURL, "/")
 	defer resp.Body.Close()
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.Contains(t, resp.Header.Get("Content-Type"), "text/html")
-	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 
 	body, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
@@ -156,23 +152,18 @@ func TestServer_ObjectsEndpoint(t *testing.T) {
 	_, _, baseURL := setupTestStudioServer(t)
 
 	// List objects
-	resp, err := http.Get(baseURL + "/api/objects?kind=backlog_item")
-	require.NoError(t, err)
+	resp := getSuccessfulTestEndpoint(t, baseURL, "/api/objects?kind=backlog_item")
 	defer resp.Body.Close()
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.Contains(t, resp.Header.Get("Cache-Control"), "no-cache")
 	var objects []*storage.IndexedNode
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&objects))
 	require.Len(t, objects, 1)
 	assert.Equal(t, "BLI-TEST-001", objects[0].ID)
 
 	// Get single object
-	respObj, err := http.Get(baseURL + "/api/objects/BLI-TEST-001")
-	require.NoError(t, err)
+	respObj := getSuccessfulTestEndpoint(t, baseURL, "/api/objects/BLI-TEST-001")
 	defer respObj.Body.Close()
 
-	assert.Equal(t, http.StatusOK, respObj.StatusCode)
 	var single storage.IndexedNode
 	require.NoError(t, json.NewDecoder(respObj.Body).Decode(&single))
 	assert.Equal(t, "BLI-TEST-001", single.ID)
@@ -215,4 +206,3 @@ func TestServer_AssetsEndpoints(t *testing.T) {
 	defer respNotFound.Body.Close()
 	assert.Equal(t, http.StatusNotFound, respNotFound.StatusCode)
 }
-
