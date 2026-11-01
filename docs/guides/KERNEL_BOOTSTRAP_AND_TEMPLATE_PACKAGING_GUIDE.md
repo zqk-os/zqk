@@ -2,13 +2,13 @@
 
 ## 1. Executive Architectural Summary
 
-The **Kernel Bootstrap & Template Packaging Subsystem** ([`pkg/bootstrap`](file:///Users/lanceettl/zqk-worktree-cycle-264/pkg/bootstrap/extract.go)) is responsible for seeding, extracting, and verifying foundational Knowledge Kernel specifications, command schemas, lifecycles, and configuration templates during greenfield project initialization and system bootstrapping.
+The **Kernel Bootstrap & Template Packaging Subsystem** ([`pkg/bootstrap`](file:///Users/lanceettl/zqk-public-candidate/pkg/bootstrap/extract.go)) is responsible for seeding, extracting, and verifying foundational Knowledge Kernel specifications, command schemas, lifecycles, and configuration templates during greenfield project initialization and system bootstrapping.
 
 When initializing a new workspace or upgrading an existing project via `zqk system init`, the subsystem provisions the complete operational surface required for autonomous AI agents and human engineers—without requiring network calls, external registry dependencies, or git clones.
 
 The `pkg/bootstrap` package guarantees:
-1. **Dual-Path Bootstrap Architecture:** Executes production extraction from an embedded gzip-tar archive ([`ExtractTo`](file:///Users/lanceettl/zqk-worktree-cycle-264/pkg/bootstrap/extract.go)), falling back to localized source-tree extraction ([`ExtractFiles`](file:///Users/lanceettl/zqk-worktree-cycle-264/pkg/bootstrap/extract_from_source.go)) when operating in local development environments.
-2. **Defensive Decompression & Path Jail Containment:** Enforces strict anti-traversal validation, bounded file sizes (50 MiB ceiling against decompression bombs), and jail boundary validation ([`withinBase`](file:///Users/lanceettl/zqk-worktree-cycle-264/pkg/bootstrap/extract.go)) to eliminate security vulnerabilities during archive unpacking.
+1. **Dual-Path Bootstrap Architecture:** Executes production extraction from an embedded gzip-tar archive ([`ExtractTo`](file:///Users/lanceettl/zqk-public-candidate/pkg/bootstrap/extract.go)), falling back to localized source-tree extraction ([`ExtractFiles`](file:///Users/lanceettl/zqk-public-candidate/pkg/bootstrap/extract_from_source.go)) when operating in local development environments.
+2. **Defensive Decompression & Path Jail Containment:** Enforces strict anti-traversal validation, bounded file sizes (50 MiB ceiling against decompression bombs), and jail boundary validation ([`withinBase`](file:///Users/lanceettl/zqk-public-candidate/pkg/bootstrap/extract.go)) to eliminate security vulnerabilities during archive unpacking.
 3. **AppleDouble & Filesystem Hygiene:** Automatically strips macOS resource forks and Finder metadata sidecars (`._*`) during both archive compilation and extraction cycles.
 4. **Open-Core Community Denylist Filtering:** Dynamically purges internal or developer-only command specifications when running within the open-core community binary distribution.
 5. **High Statement Test Coverage Invariant:** Maintains comprehensive automated verification with statement test coverage exceeding the strict >= 85.0% threshold (achieving 93.9%).
@@ -183,3 +183,15 @@ Before cutting a release or publishing branches, verify that no private or inter
 ```bash
 sh scripts/open-core/check-public-release-payload.sh .
 ```
+
+---
+
+## 5. Traceability & Knowledge Kernel Lineage
+- **Requirement:** `REQ-1792994434515417000-3701dd3d` (*Kernel Bootstrap, Template Extraction & Greenfield Project Initialization Subsystem Test Coverage Elevation & Operational Architecture Guide (pkg/bootstrap)*)
+- **Criteria:** `CRIT-1792994456721520000-b9d15bf1`, `CRIT-1792994463082389000-2d0939c1`, `CRIT-1792994468062849000-6c936ded`
+- **Backlog Items:**
+  - `BLI-1792994534189687000-7e7a2d78`: Implement pkg/bootstrap Test Coverage Elevation & Operational Architecture Guide (Cycle 264)
+  - `BLI-1792994537614050000-1ceef013`: Verify pkg/bootstrap Test Coverage Elevation & Operational Architecture Guide (Cycle 264)
+  - `BLI-1792994541641174000-044b0234`: Document pkg/bootstrap Test Coverage Elevation & Operational Architecture Guide (Cycle 264)
+- **Priority Plan:** `PRI-1792994575514899000-431d4f91`
+
