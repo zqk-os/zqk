@@ -108,6 +108,28 @@ First-run CRUD, `object list`, and `whats-next` work without the daemon. Start i
 
 Init's maintenance jobs are **kernel survival** (retention, object validation, caches). They are not a prompt to configure linting. Lint, policy, and integrity timers are an optional source-code pack — see [Scheduler and maintenance](../howto/SCHEDULER_AND_MAINTENANCE.md).
 
+## Intent Discovery & The Holonic Consciousness Architecture
+
+ZQK models multi-agent engineering not as transient LLM chat prompts, but as a persistent, self-evolving **holonic consciousness**:
+- **The Intent Seed:** Every initiative begins with human operator intent objectified as persistent Vision (`VIS-*`) and Mission (`MIS-*`) objects.
+- **The Nervous System & Spinal Cord:** The 5-layer cascade (`Vision/Mission` ➔ `Goals` ➔ `Priority Plans` ➔ `Requirements` ➔ `Backlog Items`) anchors high-level strategic compass points down to AST-verified code mutations.
+- **The Middle-Brain Holons (Amygdala):** Ambient routines, filesystem watchers, repository branch hygiene monitors, and automated information processors operate autonomously to maintain their specific subsystem ecosystems without human micro-management.
+
+When greenfield onboarding (`PRI-STARTER-COMMUNITY-001`) begins, the pairing agent walks the operator through intent capture before locking execution:
+```bash
+# Objectify the high-level intent seed
+zqk new vision --title "<Your High-Level Vision>"
+zqk new mission --title "<Your Active Mission>"
+zqk new goal --title "<Timeless Strategic Compass>"
+zqk new plan --title "<1-Cycle Bounded Batch>"
+
+# Generate complete Three-Fold Proof traceability with one command
+zqk workflow gen-trace-pipeline <REQ-ID>
+
+# Immediately launch concurrent, token-budgeted execution
+zqk do
+```
+
 ## Mint Intent & Features (`zqk new <kind>`)
 
 ZQK organizes work into an authoritative 5-layer cascade: **Vision/Mission ➔ Goals ➔ Priority Plans ➔ Requirements ➔ Backlog Items**.
