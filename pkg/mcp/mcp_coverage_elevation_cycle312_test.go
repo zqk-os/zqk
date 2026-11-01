@@ -3342,7 +3342,15 @@ func (m *mockTestEventCoordinator) Emit(ctx context.Context, eventCtx any) error
 // adapter coordinator integration, messaging queue priority paths, and workflow CLI handling.
 func TestCoverageElevation_InteractiveAdapterMessagingWorkflowFinal(t *testing.T) {
 	t.Parallel()
+
+	tmpDir := t.TempDir()
+	processDir := filepath.Join(tmpDir, ".zqk", "process")
+	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+		t.Fatalf("failed to create process dir: %v", err)
+	}
+
 	server := createTestServerWithoutRegistry()
+	server.SetProjectRoot(tmpDir)
 	ctx := context.Background()
 
 	// 1. HandleCreateObjectInteractive

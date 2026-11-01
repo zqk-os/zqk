@@ -1,35 +1,31 @@
 class Zqk < Formula
   desc "Kernel and orchestration CLI for AI-human hybrid software engineering"
   homepage "https://github.com/zqk-os/zqk"
-  version "0.1.0-beta.20"
+  version "0.2.0"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_arm64.tar.gz"
-      sha256 "0589ee71ef9a17e4a3adc3e10611386f87157273700a51034dd24e75cd2cf236"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_arm64.tar.gz"
+      sha256 "eb88d5a03ef2ba5287ffa764741807cf4c401ab32c5568b65d85a0650b5362d1"
     else
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_darwin_amd64.tar.gz"
-      sha256 "648689d3e85e3e0e4eb359e8d5daa5f99dd3984e4d794ab069ab7c2bea5bae6f"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_darwin_amd64.tar.gz"
+      sha256 "88320572e534880eebe6983eeebec7b381225f5d3b8d9e243c0b1ced263f9a67"
     end
   end
 
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_arm64.tar.gz"
-      sha256 "bb26f20a9862df6ea817d98ac6229c930e4dc0177f2012e78df140f2ae0b0082"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_arm64.tar.gz"
+      sha256 "cbb606d07371ed80ca2ef2c9cea3dc98750b6bac1822f6d2b7f649044b5fe5e6"
     else
-      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk-community_#{version}_linux_amd64.tar.gz"
-      sha256 "850912f19c500e27ba3ea03fc2a967dfd77db84bd31750e4774ac72fdb487bea"
+      url "https://github.com/zqk-os/zqk/releases/download/v#{version}/zqk_#{version}_linux_amd64.tar.gz"
+      sha256 "f88c5b34f22566b473dc0b578f75d6334c877e3087761c39ef5540df8d8bc4a3"
     end
   end
 
   def install
-    if File.exist?("zqk")
-      bin.install "zqk"
-    else
-      bin.install "zqk-community" => "zqk"
-    end
+    bin.install "zqk"
   end
 
   test do

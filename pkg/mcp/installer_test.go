@@ -252,3 +252,64 @@ func TestInstallToIDE_EmptyProjectRootFallback(t *testing.T) {
 	require.NoError(t, json.Unmarshal(updatedBytes, &config))
 	assert.NotEmpty(t, config.MCPServers)
 }
+
+func TestInstallToIDE_ClaudeCode(t *testing.T) {
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, ".claude.json")
+	initialConfig := map[string]any{
+		"theme":             "dark",
+		"autoUpdaterStatus": "disabled",
+		"mcpServers": map[string]any{
+			"existing-server": map[string]any{
+				"command": "node",
+				"args":    []string{"server.js"},
+			},
+		},
+	}
+	initialBytes, err := json.MarshalIndent(initialConfig, "", "  ")
+	require.NoError(t, err)
+	require.NoError(t, fileutil.WriteFile(configPath, initialBytes, paths.FilePerm644))
+
+	logger := logging.GetLoggerFromProfile("")
+	fakeExec := filepath.Join(tmpDir, "bin", "zqk")
+
+	err = mcp.InstallToIDE("Claude Code (Workspace)", configPath, fakeExec, tmpDir, logger)
+	require.NoError(t, err)
+
+	updatedBytes, err := fileutil.ReadFile(configPath)
+	require.NoError(t, err)
+
+	var raw map[string]any
+	require.NoError(t, json.Unmarshal(updatedBytes, &raw))
+
+	// Verify top-level keys outside mcpServers are preserved
+	assert.Equal(t, "dark", raw["theme"])
+	assert.Equal(t, "disabled", raw["autoUpdaterStatus"])
+
+	// Verify mcpServers has both existing-server and zqk
+	servers, ok := raw["mcpServers"].(map[string]any)
+	require.True(t, ok)
+	assert.Contains(t, servers, "existing-server")
+	assert.Contains(t, servers, "zqk")
+}
+
+func TestAutoInstall_AllHosts(t *testing.T) {
+	tmpDir := t.TempDir()
+	logger := logging.GetLoggerFromProfile("")
+
+	err := mcp.AutoInstall(tmpDir, logger)
+	require.NoError(t, err)
+
+	// Verify workspace configurations were generated across all supported hosts
+	ideConfig := filepath.Join(tmpDir, ".ide", "mcp.json")
+	cursorConfig := filepath.Join(tmpDir, ".cursor", "mcp.json")
+	claudeConfig := filepath.Join(tmpDir, ".claude.json")
+	windsurfConfig := filepath.Join(tmpDir, ".codeium", "windsurf", "mcp_config.json")
+	clineConfig := filepath.Join(tmpDir, ".cline", "mcp_settings.json")
+
+	assert.True(t, fileutil.Exists(ideConfig), ".ide/mcp.json should exist")
+	assert.True(t, fileutil.Exists(cursorConfig), ".cursor/mcp.json should exist")
+	assert.True(t, fileutil.Exists(claudeConfig), ".claude.json should exist")
+	assert.True(t, fileutil.Exists(windsurfConfig), ".codeium/windsurf/mcp_config.json should exist")
+	assert.True(t, fileutil.Exists(clineConfig), ".cline/mcp_settings.json should exist")
+}

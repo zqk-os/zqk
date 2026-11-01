@@ -185,6 +185,14 @@ func registerCommands() {
 	quickstartCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(quickstartCmdInst)
 
+	// Top-level onboard command (multi-host AI agent onboarding wizard)
+	onboardCmdInst := system.NewAgentOnboardCmd()
+	onboardCmdInst.Use = "onboard"
+	onboardCmdInst.Aliases = []string{"agent-onboard"}
+	onboardCmdInst.Short = "Interactive and headless multi-host onboarding wizard for Cursor, Claude Code, Cline, and Windsurf"
+	onboardCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(onboardCmdInst)
+
 	// Top-level init command (zero-friction Day-0 onboarding)
 	initCmdInst := system.NewInitCmd()
 	initCmdInst.GroupID = "getting_started"

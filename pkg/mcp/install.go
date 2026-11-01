@@ -41,6 +41,18 @@ func isForeignMCPConfig(ideName, configPath string) bool {
 	return strings.Contains(ideName, "AGY") || strings.Contains(ideName, "Windsurf")
 }
 
+func isWorkspaceConfig(ideName, projectRoot, configPath string) bool {
+	if projectRoot == "" {
+		return false
+	}
+	if strings.Contains(ideName, "Desktop") || strings.Contains(ideName, "Global") {
+		return false
+	}
+	cleanRoot := filepath.Clean(projectRoot)
+	cleanPath := filepath.Clean(configPath)
+	return strings.HasPrefix(cleanPath, cleanRoot+string(filepath.Separator)) || cleanPath == cleanRoot
+}
+
 // isIDEStdioAdapterConfig is true for Cursor/IDE mcp.json that must spawn
 // ide-adapter (stdio → daemon TCP), not fat mcp serve.
 func isIDEStdioAdapterConfig(ideName, configPath string) bool {
@@ -97,6 +109,9 @@ func findMCPConfigs(homeDir, projectRoot string) map[string]string {
 		configs["IDE (Workspace)"] = filepath.Join(projectRoot, ".ide", "mcp.json")
 		// Cursor 2026 Customize reads project .cursor/mcp.json (not only .ide/).
 		configs["Cursor (Workspace)"] = filepath.Join(projectRoot, ".cursor", "mcp.json")
+		configs["Claude Code (Workspace)"] = filepath.Join(projectRoot, ".claude.json")
+		configs["Windsurf (Workspace)"] = filepath.Join(projectRoot, ".codeium", "windsurf", "mcp_config.json")
+		configs["Cline (Workspace)"] = filepath.Join(projectRoot, ".cline", "mcp_settings.json")
 	}
 	if homeDir == "" {
 		return configs
@@ -105,12 +120,16 @@ func findMCPConfigs(homeDir, projectRoot string) map[string]string {
 	// Relocated MCP controls (Customize sidebar) edit ~/.cursor/mcp.json.
 	// Empty global mcpServers leaves the connector red even when project file is valid.
 	configs["Cursor (Global)"] = filepath.Join(homeDir, ".cursor", "mcp.json")
+	if fileutil.Exists(filepath.Join(homeDir, ".claude.json")) {
+		configs["Claude Code (Global)"] = filepath.Join(homeDir, ".claude.json")
+	}
 
 	knownFiles := map[string]string{
 		"mcp_config.json":            "Global Daemon (AGY/Windsurf)",
 		"mcp.json":                   "IDE (Global)",
 		"claude_desktop_config.json": "Claude Desktop",
 		"cline_mcp_settings.json":    "Cline",
+		".claude.json":               "Claude Code",
 	}
 
 	searchDirs := []string{
@@ -164,7 +183,7 @@ func findMCPConfigs(homeDir, projectRoot string) map[string]string {
 func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logging.Logger) error {
 	// Check if directory exists; if not, IDE is likely not installed or not initialized
 	dir := filepath.Dir(configPath)
-	if isIDEStdioAdapterConfig(ideName, configPath) {
+	if isIDEStdioAdapterConfig(ideName, configPath) || isWorkspaceConfig(ideName, projectRoot, configPath) {
 		if err := fileutil.EnsureDir(dir); err != nil {
 			return fmt.Errorf("failed to create workspace config directory: %w", err)
 		}
@@ -172,11 +191,12 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 		return fmt.Errorf("config directory does not exist: %s", dir)
 	}
 
+	var rawConfig map[string]any
 	var config mcpConfig
 
 	// Read existing config if it exists
 	if data, err := fileutil.ReadFile(configPath); err == nil {
-		if err := json.Unmarshal(data, &config); err != nil {
+		if err := json.Unmarshal(data, &rawConfig); err != nil {
 			// Vendor/global files we do not own (empty Gemini mcp_config.json)
 			// must not warn-flood AutoInstall. Skip; do not rewrite.
 			// no longer walks ~/.gemini / AGY paths.
@@ -185,8 +205,12 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 			}
 			return fmt.Errorf("failed to parse existing config: %w", err)
 		}
+		_ = json.Unmarshal(data, &config)
 	}
 
+	if rawConfig == nil {
+		rawConfig = make(map[string]any)
+	}
 	if config.MCPServers == nil {
 		config.MCPServers = make(map[string]mcpServerConfig)
 	}
@@ -245,8 +269,12 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 			args = []string{"mcp", "ide-adapter", "--tcp", DefaultDaemonTCP}
 		} else {
 			// For global daemons and IDEs (AGY, Claude Desktop, Windsurf), we need a project-specific entry
-			// so that they don't overwrite each other. For IDE (Workspace), the bare brand name is fine.
-			serverName = exeName + "-" + filepath.Base(projectRoot)
+			// so that they don't overwrite each other. For IDE (Workspace) and Claude Code workspace, the bare brand name is fine.
+			if strings.Contains(ideName, "Workspace") || ideName == "Claude Code" {
+				serverName = exeName
+			} else {
+				serverName = exeName + "-" + filepath.Base(projectRoot)
+			}
 			cwd = projectRoot
 			command = filepath.Base(execPath)
 			args = []string{"mcp", "serve"}
@@ -272,9 +300,10 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 		entry.EnvFile = "${workspaceFolder}/" + paths.ProjectDataDir + "/" + paths.MCPDir + "/cursor-stdio.env"
 	}
 	config.MCPServers[serverName] = entry
+	rawConfig["mcpServers"] = config.MCPServers
 
 	// Write back
-	data, err := json.MarshalIndent(config, "", "  ")
+	data, err := json.MarshalIndent(rawConfig, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}

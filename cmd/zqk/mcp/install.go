@@ -12,6 +12,7 @@ import (
 
 func NewInstallCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewMcpSvcInstallCommandBuilder()
+	cmd.Flags().Bool("all", false, "Install MCP server configuration for all supported hosts (Cursor, Claude Code, Cline, Windsurf)")
 	cmd.RunE = runInstall
 	return cmd
 }

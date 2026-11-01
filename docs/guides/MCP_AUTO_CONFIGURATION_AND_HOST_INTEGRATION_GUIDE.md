@@ -81,21 +81,44 @@ When `zqk mcp install` runs, `AutoInstall` queries `findMCPConfigs` across platf
 | :--- | :--- | :--- | :--- | :--- |
 | **Cursor** | Workspace | `<projectRoot>/.cursor/mcp.json` | `stdio` | `${workspaceFolder}/bin/zqk-mcp-ide-adapter` |
 | **Cursor** | Global | `~/.cursor/mcp.json` | `stdio` | `${workspaceFolder}/bin/zqk-mcp-ide-adapter` |
-| **IDE Generic** | Workspace | `<projectRoot>/.ide/mcp.json` | `stdio` | `${workspaceFolder}/bin/zqk-mcp-ide-adapter` |
-| **Claude Desktop** | Global | `~/Library/Application Support/Claude/claude_desktop_config.json` | `stdio` | `zqk mcp serve` |
-| **Cline** | Global | `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json` | `stdio` | `zqk mcp serve` |
+| **Claude Code** | Workspace | `<projectRoot>/.claude.json` | `stdio` | `zqk mcp serve` |
+| **Claude Code** | Global | `~/.claude.json` | `stdio` | `zqk mcp serve` |
+| **Windsurf** | Workspace | `<projectRoot>/.codeium/windsurf/mcp_config.json` | `stdio` | `zqk mcp serve` |
 | **Windsurf** | Global | `~/.codeium/windsurf/mcp_config.json` | `stdio` | `zqk mcp serve` |
+| **Cline** | Workspace | `<projectRoot>/.cline/mcp_settings.json` | `stdio` | `zqk mcp serve` |
+| **Cline** | Global | `~/Library/Application Support/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json` | `stdio` | `zqk mcp serve` |
+| **Claude Desktop** | Global | `~/Library/Application Support/Claude/claude_desktop_config.json` | `stdio` | `zqk mcp serve` |
+| **IDE Generic** | Workspace | `<projectRoot>/.ide/mcp.json` | `stdio` | `${workspaceFolder}/bin/zqk-mcp-ide-adapter` |
 
 ---
 
 ## 4. Single-Command Recipes
 
-### Automatic Installation
+### Interactive & Headless Multi-Host Onboarding Wizard
 
-Run the unified installer inside your project root:
+Run the top-level onboarding wizard to detect all active agent hosts, seed default personas, and prime directive files:
 
 ```sh
+# Interactive multi-host onboarding
+zqk onboard
+
+# Headless / CI automated onboarding
+zqk onboard --headless --format json
+
+# Scan only without disk writes
+zqk onboard --detect-only --format json
+```
+
+### Automatic MCP Server Installation Across All Hosts
+
+Run the unified installer to configure MCP servers across all supported hosts:
+
+```sh
+# Discover and install MCP configuration into active IDE
 zqk mcp install
+
+# Explicitly install into all supported hosts (Cursor, Claude Code, Cline, Windsurf)
+zqk mcp install --all
 ```
 
 **Console Output:**
