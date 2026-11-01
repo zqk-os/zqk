@@ -1,9 +1,14 @@
 package system
 
 import (
+	"context"
 	"path/filepath"
 	"testing"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -95,5 +100,36 @@ func TestCollectGlossaryCandidates_DedupesByTitle(t *testing.T) {
 	}
 	if len(cands) != 2 {
 		t.Fatalf("candidates len = %d want 2", len(cands))
+	}
+}
+
+func TestEnsureParentVocabularySchemes(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, nil)
+	sf, err := storage.NewStorageFactory(context.Background(), proj.Root)
+	if err != nil {
+		t.Fatalf("NewStorageFactory: %v", err)
+	}
+	sp := sf.GetStorage()
+	testkit.RegisterStorageTestCleanup(t, proj.Root, sp)
+
+	ctx := context.Background()
+	if err := ensureParentVocabularySchemes(ctx, sp); err != nil {
+		t.Fatalf("ensureParentVocabularySchemes failed: %v", err)
+	}
+
+	secCtx := pkgctx.NewSystemSecurityContext()
+	for _, id := range []string{"VOC-KERNEL-ARCHITECTURE", "VOC-KERNEL-CLI", "VOC-KERNEL-PROCESS", "VOC-KERNEL-ACRONYMS"} {
+		obj, err := sp.Read(ctx, secCtx, id)
+		if err != nil {
+			t.Fatalf("failed to read created scheme %s: %v", id, err)
+		}
+		if obj[objects.FieldKeyStatus] != "active" {
+			t.Fatalf("expected status active for %s, got %v", id, obj[objects.FieldKeyStatus])
+		}
+	}
+
+	// Idempotency: second run should succeed without error
+	if err := ensureParentVocabularySchemes(ctx, sp); err != nil {
+		t.Fatalf("idempotent second run failed: %v", err)
 	}
 }

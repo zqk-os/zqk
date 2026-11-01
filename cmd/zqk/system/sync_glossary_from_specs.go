@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -124,6 +125,9 @@ func runSyncGlossaryFromSpecs(cmd *cobra.Command, _ []string) error {
 		skippedDup := 0
 		createdList := make([]glossaryCandidate, 0)
 		if apply && !dryRun {
+			if err := ensureParentVocabularySchemes(cmd.Context(), proc.Storage()); err != nil {
+				return err
+			}
 			for _, c := range missing {
 				skipped, err := createGlossaryCandidate(cmd, proc.Storage(), c, titles, sourceKeys)
 				if err != nil {
@@ -139,7 +143,7 @@ func runSyncGlossaryFromSpecs(cmd *cobra.Command, _ []string) error {
 			if created > 0 {
 				flushCtx, cancelFlush := storage.DurabilityFlushContext()
 				defer cancelFlush()
-				if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), []string{objects.KindGlossaryTerm}); err != nil {
+				if err := storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, proc.Storage(), proc.ProjectRoot(), []string{objects.KindGlossaryTerm, objects.KindVocabularyScheme}); err != nil {
 					logging.FluentEvent(proc.Logger()).Warn("Persist flush after glossary sync timed out").WithError(err).Log()
 				}
 			}
@@ -192,6 +196,86 @@ func newCASGlossaryTermID() (string, error) {
 	return fmt.Sprintf("%s%d-%s", prefix, baseTime, hex.EncodeToString(randomBytes)), nil
 }
 
+// ensureParentVocabularySchemes guarantees the 4 canonical parent vocabulary_scheme objects exist
+// in storage before glossary_term objects referencing them are persisted.
+func ensureParentVocabularySchemes(ctx context.Context, sp storage.ObjectStorageProvider) error {
+	if sp == nil {
+		return nil
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	secCtx := pkgctx.NewSystemSecurityContext()
+	createCtx := pkgctx.WithPromoteOnCreate(ctx)
+
+	canonicalSchemes := []map[string]any{
+		{
+			objects.FieldKeyID:            "VOC-KERNEL-ARCHITECTURE",
+			objects.FieldKeyKind:          objects.KindVocabularyScheme,
+			objects.FieldKeyTitle:         "Kernel Architecture & Object Kinds Taxonomy",
+			objects.FieldKeyStatus:        "active",
+			objects.FieldKeyContextScope:  "operational",
+			"purpose":                     "mixed",
+			"summary":                     "Architectural object kinds, traits, and structural schemas.",
+			objects.FieldKeyMachineHints:  `{"glossary_type":"architecture","source_path":".zqk/specs/objects"}`,
+			objects.FieldKeyNamespaceID:   "zqk:kernel",
+			objects.FieldKeySchemaVersion: "2.0.0",
+			objects.FieldKeySourceType:    "internal",
+		},
+		{
+			objects.FieldKeyID:            "VOC-KERNEL-CLI",
+			objects.FieldKeyKind:          objects.KindVocabularyScheme,
+			objects.FieldKeyTitle:         "Kernel CLI Command Taxonomy",
+			objects.FieldKeyStatus:        "active",
+			objects.FieldKeyContextScope:  "operational",
+			"purpose":                     "navigation",
+			"summary":                     "Commands, subcommands, and flags for the zqk command line interface.",
+			objects.FieldKeyMachineHints:  `{"glossary_type":"cli","source_path":".zqk/cli/specs"}`,
+			objects.FieldKeyNamespaceID:   "zqk:kernel",
+			objects.FieldKeySchemaVersion: "2.0.0",
+			objects.FieldKeySourceType:    "internal",
+		},
+		{
+			objects.FieldKeyID:            "VOC-KERNEL-PROCESS",
+			objects.FieldKeyKind:          objects.KindVocabularyScheme,
+			objects.FieldKeyTitle:         "Kernel Process & Governance Taxonomy",
+			objects.FieldKeyStatus:        "active",
+			objects.FieldKeyContextScope:  "operational",
+			"purpose":                     "mixed",
+			"summary":                     "Process configurations, lifecycles, and operational governance entities.",
+			objects.FieldKeyMachineHints:  `{"glossary_type":"process","source_path":".zqk/specs/lifecycles"}`,
+			objects.FieldKeyNamespaceID:   "zqk:kernel",
+			objects.FieldKeySchemaVersion: "2.0.0",
+			objects.FieldKeySourceType:    "internal",
+		},
+		{
+			objects.FieldKeyID:            "VOC-KERNEL-ACRONYMS",
+			objects.FieldKeyKind:          objects.KindVocabularyScheme,
+			objects.FieldKeyTitle:         "Kernel Acronym & Jargon Taxonomy",
+			objects.FieldKeyStatus:        "active",
+			objects.FieldKeyContextScope:  "operational",
+			"purpose":                     "mixed",
+			"summary":                     "Core system acronyms across architecture, process, and data planes.",
+			objects.FieldKeyMachineHints:  `{"glossary_type":"acronyms","cli_command":"zqk explain"}`,
+			objects.FieldKeyNamespaceID:   "zqk:kernel",
+			objects.FieldKeySchemaVersion: "2.0.0",
+			objects.FieldKeySourceType:    "internal",
+		},
+	}
+
+	for _, scheme := range canonicalSchemes {
+		id, _ := scheme[objects.FieldKeyID].(string)
+		if _, err := sp.Read(ctx, secCtx, id); err != nil {
+			if createErr := sp.Create(createCtx, secCtx, scheme); createErr != nil {
+				if _, readErr := sp.Read(ctx, secCtx, id); readErr != nil {
+					return errfmt.Errorf("ensure vocabulary_scheme %s: %w", id, createErr)
+				}
+			}
+		}
+	}
+	return nil
+}
+
 // createGlossaryCandidate persists one glossary_term for a missing candidate. Returns (true, nil) when the
 // ingest preflight finds an existing row with the same title or same spec/lifecycle/config source path
 // (fresh index read) so callers can count skips separately from creates.
@@ -204,6 +288,13 @@ func createGlossaryCandidate(cmd *cobra.Command, sp storage.ObjectStorageProvide
 	}
 	if proc.ProjectRoot() == emptyValue {
 		return false, errfmt.Errorf("project root not found")
+	}
+	var cmdCtx context.Context
+	if cmd != nil {
+		cmdCtx = cmd.Context()
+	}
+	if err := ensureParentVocabularySchemes(cmdCtx, sp); err != nil {
+		return false, errfmt.Newf("ensure parent vocabulary schemes").Wrap(err)
 	}
 	var titles map[string]struct{}
 	var sourceKeys map[string]struct{}
