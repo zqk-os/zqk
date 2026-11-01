@@ -5,6 +5,7 @@
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
 [![Documentation](https://img.shields.io/badge/docs-docs.zqk.dev-blue)](https://docs.zqk.dev)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/zqk-os/zqk)
 
 ZQK gives AI coding agents (Cursor Composer, Claude Code, Cline, Windsurf) persistent memory, verifiable task truth, and AST-guarded execution. Stop context drift, hallucinated tasks, and token blowouts.
 
@@ -25,6 +26,16 @@ Or install via Homebrew:
 ```sh
 brew tap zqk-os/tap && brew install zqk
 ```
+
+### 1-Click Instant Cloud Sandbox (GitHub Codespaces)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/zqk-os/zqk)
+
+Experience ZQK instantly in your browser without installing Go or Docker locally:
+- **Instant Pre-Warmed Toolchain:** Go 1.26 container pre-configured with required linters, formatters, and extensions.
+- **Zero-Touch CLI Build:** `./bin/zqk` is automatically compiled and ready on launch.
+- **Pre-Wired MCP & Agent Seating:** Automatic MCP daemon bootstrap and agent profile detection.
+- **Security-First Isolation:** Hardened non-root `vscode` user with `--cap-drop=ALL` sandbox containment.
 
 ### 30-Second Greenfield Setup
 
