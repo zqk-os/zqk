@@ -37,9 +37,9 @@ type DevcontainerConfig struct {
 
 // DevcontainerValidationResult records verification findings.
 type DevcontainerValidationResult struct {
-	Valid          bool     `json:"valid"`
-	DevcontainerPath string `json:"devcontainer_path"`
-	ChecksPassed   []string `json:"checks_passed"`
+	Valid            bool     `json:"valid"`
+	DevcontainerPath string   `json:"devcontainer_path"`
+	ChecksPassed     []string `json:"checks_passed"`
 }
 
 // ValidateRepoDevcontainer locates and validates .devcontainer/devcontainer.json in repoRoot.
