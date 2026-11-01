@@ -16,9 +16,8 @@ import (
 
 // Canonical identifiers and roles for the repo_resolver persona.
 const (
-	RepoResolverPersonaID = "PER-1793541871378023000-273387ff"
-	RepoResolverRole      = "repo_resolver"
-	RepoResolverSkillRef  = "ASK-DEFAULT-FEED-CORRESPONDENCE"
+	RepoResolverRole     = "repo_resolver"
+	RepoResolverSkillRef = "ASK-DEFAULT-FEED-CORRESPONDENCE"
 )
 
 // Pipeline step outcome classifications.

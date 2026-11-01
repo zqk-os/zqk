@@ -13,6 +13,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
+const testRepoResolverPersonaID = "PER-1793541871378023000-273387ff"
+
 // TestPipelineTelemetry_StaticFloorInvariant satisfies CRIT-1793541695675095000-417479fe.
 // Verifies that the repo_resolver persona (PER-1793541871378023000-273387ff) is registered,
 // bound to canonical skills, has required role definitions, and satisfies CAS index contracts.
@@ -20,12 +22,12 @@ func TestPipelineTelemetry_StaticFloorInvariant(t *testing.T) {
 	repoRoot := findRepoRootForSDK(t)
 
 	// 1. Verify persona exists in CAS and loads cleanly
-	persona, err := community.LoadPersonaFromCAS(repoRoot, community.RepoResolverPersonaID)
+	persona, err := community.LoadPersonaFromCAS(repoRoot, testRepoResolverPersonaID)
 	require.NoError(t, err, "repo_resolver persona must exist and load from CAS index")
 	require.NotNil(t, persona)
 
 	// 2. Invariant assertions on persona fields
-	assert.Equal(t, community.RepoResolverPersonaID, persona.ID)
+	assert.Equal(t, testRepoResolverPersonaID, persona.ID)
 	assert.Equal(t, "persona", persona.Kind)
 	assert.Equal(t, community.RepoResolverRole, persona.Role)
 	assert.Equal(t, "approved", persona.Status)
