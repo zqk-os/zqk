@@ -676,6 +676,13 @@ func TestCycle246_WritePersistedIDEdgeCases(t *testing.T) {
 			t.Fatalf("persisted ID = %q, want %q", ReadPersistedID(tmpDir), newID)
 		}
 	})
+}
+
+// TestCycle246_WritePersistedIDActiveOwnerEdgeCases tests active session overwrite rules.
+func TestCycle246_WritePersistedIDActiveOwnerEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	ctx := pkgctx.NewSystemContext()
 
 	t.Run("WritePersistedID_ActiveSessionEmptyOwnerAllowsOverwrite", func(t *testing.T) {
 		t.Parallel()
