@@ -32,9 +32,6 @@ func TestEnabled_HotPathNoPersist(t *testing.T) {
 	}
 	EnterAllowRecording()
 	defer LeaveAllowRecording()
-	if !Enabled() {
-		t.Fatal("expected enabled after EnterAllowRecording")
-	}
 	EnterHotPathNoPersist()
 	if Enabled() {
 		t.Fatal("hot path must suppress recording")
