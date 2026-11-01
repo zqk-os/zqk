@@ -28,7 +28,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [agentrules](./agentrules/) | `github.com/zqk-os/zqk/pkg/agentrules` | 1+6 | 6 | - | ❌ - | Parsing, validation, and enforcement of agent behavioral rules, directives, and constraints. |
 | [aliases](./aliases/) | `github.com/zqk-os/zqk/pkg/aliases` | 2+2 | 2 | - | ❌ - | Command and object alias resolution, shorthand mapping, and synonym expansion. |
 | [ambience](./ambience/) | `github.com/zqk-os/zqk/pkg/ambience` | 4+5 | 5 | - | ❌ - | Background ambient intelligence, contextual awareness, and environment state tracking. |
-| [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 17+15 | 15 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
+| [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 17+17 | 17 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
 | [appledouble](./appledouble/) | `github.com/zqk-os/zqk/pkg/appledouble` | 1+2 | 2 | - | ❌ - | Sanitization and handling of AppleDouble and macOS resource fork metadata files. |
 | [architecture](./architecture/) | `github.com/zqk-os/zqk/pkg/architecture` | 1+1 | 1 | - | ❌ - | Codebase architectural boundaries, layering rules, and static AST governance checks. |
 | [audit](./audit/) | `github.com/zqk-os/zqk/pkg/audit` | 2+3 | 3 | - | ❌ - | High-volume audit log streaming, event persistence, and validation policies. |
@@ -121,7 +121,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [mcp](./mcp/) | `github.com/zqk-os/zqk/pkg/mcp` | 140+125 | 125 | ideadapter, mcp_helpers, testing | ✅ [README](./mcp/README.md) | This package provides a complete MCP server implementation that enables AI assistants and other MCP clients to interact with th... |
 | [mesh](./mesh/) | `github.com/zqk-os/zqk/pkg/mesh` | 10+13 | 13 | multimodal | ❌ - | Peer-to-peer agent mesh networking, ambient signal exchange, and distributed sync. |
 | [metricpack](./metricpack/) | `github.com/zqk-os/zqk/pkg/metricpack` | 1+1 | 1 | - | ❌ - | System and agent metric definitions pack for performance tracking. |
-| [metrics](./metrics/) | `github.com/zqk-os/zqk/pkg/metrics` | 25+25 | 25 | tsdb | ❌ - | Lock operation names for RunInLockWithLogger / RunInRLockWithLogger. CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A. |
+| [metrics](./metrics/) | `github.com/zqk-os/zqk/pkg/metrics` | 25+26 | 26 | tsdb | ❌ - | Lock operation names for RunInLockWithLogger / RunInRLockWithLogger. CONSTANTS_AND_DRY_INVENTORY_PLAN Phase A. |
 | [metricsrecording](./metricsrecording/) | `github.com/zqk-os/zqk/pkg/metricsrecording` | 2+4 | 4 | - | ❌ - | Centralizes whether test runs should record metrics (storage counters, pipeline sampling, metric object creation). Production b... |
 | [migration](./migration/) | `github.com/zqk-os/zqk/pkg/migration` | 10+9 | 9 | detector, exporter, +6 more | ✅ [README](./migration/README.md) | This package implements the file-based to graph backend migration tools as defined in the Migration Strategy v1.0. |
 | [mutation](./mutation/) | `github.com/zqk-os/zqk/pkg/mutation` | 7+11 | 11 | - | ❌ - | Atomic kernel object mutation, version incrementing, and change event publishing. |
