@@ -196,10 +196,14 @@ func (a *ASTAuditor) auditInterfaceUsage(fn *ast.FuncDecl) []Violation {
 			if sel, ok := star.X.(*ast.SelectorExpr); ok {
 				name := sel.Sel.Name
 				if strings.Contains(name, "Storage") || strings.Contains(name, "Manager") || strings.Contains(name, "Provider") {
+					paramName := "_"
+					if len(field.Names) > 0 && field.Names[0] != nil {
+						paramName = field.Names[0].Name
+					}
 					violations = append(violations, Violation{
 						Pos:      a.fset.Position(field.Pos()),
 						Type:     "abstraction_violation",
-						Message:  fmt.Sprintf("Parameter '%s' uses concrete type '*%s.%s'. Prefer interface types for better decoupling and testability.", field.Names[0].Name, sel.X, name),
+						Message:  fmt.Sprintf("Parameter '%s' uses concrete type '*%s.%s'. Prefer interface types for better decoupling and testability.", paramName, sel.X, name),
 						Severity: "medium",
 					})
 				}
