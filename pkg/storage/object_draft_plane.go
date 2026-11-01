@@ -212,7 +212,6 @@ func IsObjectDraftPlanePath(projectRoot, path string) bool {
 // shouldUseObjectDraftPlane is true for CAS (non-stream) kinds in a preliminary lifecycle status.
 // When the lifecycle loader errors, do not force draft solely because status equals origin —
 // kinds whose origin is a terminal/active status (e.g. glossary_term origin=active) must use CAS.
-// TRACK: (draft-plane create path); VDS glossary materialization.
 func shouldUseObjectDraftPlane(kind, status string) bool {
 	if StreamStorageEnabledForKind(kind) {
 		return false
@@ -419,7 +418,6 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 }
 
 // omitEmptyEpicRefsDraftResidue drops empty epic_refs template residue from draft YAML.
-// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca
 func omitEmptyEpicRefsDraftResidue(obj map[string]any) {
 	if obj == nil {
 		return
@@ -492,7 +490,6 @@ func (f *FileObjectStorage) mergeDraftPlaneTemplate(kind, id string, data []byte
 	delete(merged, "hash")
 	delete(merged, "cas_address")
 
-	// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
 	// Empty epic_refs: [] from template fill is poison under confidential-filtered
 	// StrictMode (unknown_field blocks conceptual→originated). Omit until set.
 	omitEmptyEpicRefsDraftResidue(merged)

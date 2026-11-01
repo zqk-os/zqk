@@ -245,7 +245,6 @@ func TestWriteObjectToDraftPlane_FullTemplateOfPossiblesAndMembraneTimestamps(t 
 
 	// 2. Verify non-required spec fields appear as placeholders (full template of possibles).
 	// epic_refs is intentionally omitted when empty — empty [] blocks conceptual→originated
-	// under confidential-filtered StrictMode (RIS-1793446317704936000-61dc49df).
 	for _, expectedSlot := range []string{"persona_refs", "workstream_refs", "code_location", "commit_hashes"} {
 		if _, exists := parsed[expectedSlot]; !exists {
 			t.Errorf("expected full template of possibles to include %q on draft plane, but missing", expectedSlot)
@@ -283,7 +282,6 @@ func TestWriteObjectToDraftPlane_FullTemplateOfPossiblesAndMembraneTimestamps(t 
 	}
 }
 
-// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
 // PRI mint must not inject epic_refs: [] (blocks conceptual→originated under StrictMode).
 func TestWriteObjectToDraftPlane_PriorityPlanOmitsEmptyEpicRefs(t *testing.T) {
 	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)

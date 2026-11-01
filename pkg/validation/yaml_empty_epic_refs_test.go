@@ -9,7 +9,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
-// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
 // YAML [] must not fail StrictMode when confidential-filtered ResolvedFields omit epic_refs.
 func TestStrictMode_YAMLEmptyEpicRefsOnPriorityPlan(t *testing.T) {
 	t.Parallel()

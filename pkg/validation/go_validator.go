@@ -147,7 +147,6 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	gv.validatePropertyShapes(spec, obj, kind, options, result)
 
 	if options.StrictMode {
-		// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca —
 		// drop empty template residue (epic_refs: []) when access-filtered ResolvedFields
 		// omit confidential keys; otherwise draft promote dies on unknown_field.
 		stripEmptyUnknownFieldResidue(kind, obj, spec)
@@ -785,7 +784,6 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 }
 
 // appendUnmetLifecyclePreconditions evaluates YAML transition or status-hold preconditions.
-// TRACK: Plane A exam; dispatch lives in go_validator_preconditions.go.
 func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 	errors []ValidationError,
 	kind, currentState, status string,
@@ -1025,7 +1023,6 @@ func (gv *GoValidator) isRefActive(refID string, obj map[string]any, options *Va
 // checkCommitHashesGitMutationEvidence requires non-merge product commits that
 // mention this BLI id. When already holding status=complete, skip (grandfather
 // historical completes); transitions into complete always enforce.
-// TRACK: follow-up in kernel backlog
 func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, options *ValidationOptions) bool {
 	if options != nil {
 		cur := strings.ToLower(strings.TrimSpace(options.CurrentState))
@@ -1318,7 +1315,6 @@ func isStandardMetadataField(key string) bool {
 // stripEmptyUnknownFieldResidue deletes empty values for keys absent from
 // ResolvedFields (and not composition-allowed). Mutates obj in place so persist
 // paths do not re-write template residue that StrictMode would otherwise reject.
-// TRACK: RIS-1793446317704936000-61dc49df / BLI-1793470168999105000-a0236cca
 func stripEmptyUnknownFieldResidue(kind string, obj map[string]any, spec *objects.Spec) {
 	if spec == nil || spec.ResolvedFields == nil || obj == nil {
 		return
