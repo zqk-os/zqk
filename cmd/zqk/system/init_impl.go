@@ -1279,6 +1279,10 @@ func isIgnoredInitEntry(projectRoot string, entry fileutil.DirEntry) bool {
 		return true
 	case "zqk", "zqk-community", "zqk-mcp":
 		return true
+	// Shipped manuals under docs/ are greenfield seed content, not brownfield source.
+	// Greenfield init must register these via RegisterShippedDocs.
+	case "docs":
+		return true
 	}
 	// If it's a "bin" directory, check if it only contains zqk binary artifacts
 	if name == "bin" && entry.IsDir() {

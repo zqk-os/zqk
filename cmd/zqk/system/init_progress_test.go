@@ -137,6 +137,35 @@ func TestDetectLegacyCodebase(t *testing.T) {
 	if !detectLegacyCodebase(dir4) {
 		t.Errorf("expected dir with custom script in bin/ to be detected as legacy codebase")
 	}
+
+	// 6. Dir with only shipped documentation trees stays greenfield so system init
+	// registers doc_entry rows via the greenfield path.
+	dir5 := t.TempDir()
+	for _, rel := range []string{
+		"docs/architecture/sample.md",
+		"docs/best-practices/guidelines.md",
+		"docs/onboarding/first_run.md",
+		"docs/onboarding/archive/ignored.md",
+	} {
+		full := filepath.Join(dir5, rel)
+		if err := fileutil.MkdirAll(filepath.Dir(full), paths.DirPerm755); err != nil {
+			t.Fatal(err)
+		}
+		if err := fileutil.WriteFile(full, []byte("# Doc\n"), paths.FilePerm644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if detectLegacyCodebase(dir5) {
+		t.Errorf("expected dir with only shipped docs/ trees to be greenfield (not legacy)")
+	}
+
+	// 7. Shipped docs plus application source still counts as legacy/brownfield.
+	if err := fileutil.WriteFile(filepath.Join(dir5, "main.go"), []byte("package main\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	if !detectLegacyCodebase(dir5) {
+		t.Errorf("expected dir with docs/ plus main.go to be detected as legacy codebase")
+	}
 }
 
 func TestInit_AllStepsProgressSequencing(t *testing.T) {
