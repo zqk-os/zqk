@@ -162,18 +162,6 @@ func setupSyncLoopTestProject(t *testing.T) (string, storage.ObjectStorageProvid
 		t.Fatalf("GetOrCreate storage: %v", err)
 	}
 	testkit.RegisterStorageTestCleanup(t, root, store)
-	t.Cleanup(func() {
-		writeQueue := caspkg.GetListingIndexWriteQueueForProjectRoot(root)
-		if writeQueue != nil {
-			_ = writeQueue.FlushAll(1 * time.Second)
-		}
-		fos, _ := store.(*storage.FileObjectStorage)
-		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, fos))
-		storage.ScrubProjectRootForTempCleanup(filepath.Join(root, paths.ProjectDataDir), 40, 25*time.Millisecond)
-		_ = fileutil.RemoveAll(filepath.Join(root, paths.ProjectDataDir))
-		_ = fileutil.RemoveAll(filepath.Join(root, paths.GitWorktreeMetadataEntry))
-		_ = fileutil.RemoveAll(root)
-	})
 
 	// Create an agent_skill to satisfy CRIT-PERSONA-SKILL-BOUND
 	skillCtx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentSkill)
@@ -303,7 +291,8 @@ func TestSyncLoop_MaxVerificationAttempts(t *testing.T) {
 }
 
 func TestApplyStateMutation_ErrorPropagation(t *testing.T) {
-	root, store := setupSyncLoopTestProject(t)
+	tempDir := t.TempDir()
+	store := newMockHelperStore()
 
 	ctx := storage.WithSkipWriteBehind(context.Background())
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -317,10 +306,12 @@ func TestApplyStateMutation_ErrorPropagation(t *testing.T) {
 		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaOrchestratorAlpha,
 		objects.FieldKeyEstimatedEffort:    "1h",
 	}
-	storage.CreateCASVisible(t, store, ctx, secCtx, task, objects.ObjectStatusInProgress)
+	if err := store.Create(ctx, secCtx, task); err != nil {
+		t.Fatalf("failed to create task in mock store: %v", err)
+	}
 
 	validator := mutation.NewValidator(nil)
-	auditStream := audit.NewAuditStream(root)
+	auditStream := audit.NewAuditStream(tempDir)
 
 	// An update to a non-existent object or failed transaction must fail closed and propagate an explicit error
 	err := applyStateMutation(ctx, secCtx, store, "ATK-nonexistent-missing-id", objects.KindAgentTask, validator, auditStream, objects.ObjectStatusInProgress)
