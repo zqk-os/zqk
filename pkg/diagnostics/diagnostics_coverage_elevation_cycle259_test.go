@@ -325,7 +325,9 @@ func TestDisambiguation_EdgeCases(t *testing.T) {
 	if len(ctxBounded.NegativeConstraints) > 1 {
 		t.Fatalf("expected at most 1 negative constraint, got %d", len(ctxBounded.NegativeConstraints))
 	}
+}
 
+func TestDisambiguation_EdgeCases_PromptFormatting(t *testing.T) {
 	// Bounding of guidance items from failing constraints
 	historyConstraints := []FailureEnvelope{
 		{
@@ -344,6 +346,13 @@ func TestDisambiguation_EdgeCases(t *testing.T) {
 	})
 	if len(ctxBoundedGuidance.Guidance) != 1 {
 		t.Fatalf("expected exactly 1 guidance item, got %d", len(ctxBoundedGuidance.Guidance))
+	}
+
+	ctx := DisambiguationContext{
+		Attempt: 1,
+		NegativeConstraints: []NegativeConstraint{
+			{ActionPattern: "test-pattern", Reason: "test-reason"},
+		},
 	}
 
 	// FormatDisambiguationPrompt with non-positive limit
@@ -374,9 +383,15 @@ func TestCapturePrune_AdditionalBranches(t *testing.T) {
 	}
 
 	// Create files with unknown suffixes or invalid timestamps
-	_ = fileutil.WriteFile(filepath.Join(dir, "test_20260101-120000_unknown.txt"), []byte("data"), paths.FilePerm644)
-	_ = fileutil.WriteFile(filepath.Join(dir, "test_invalidts_goroutines.txt"), []byte("data"), paths.FilePerm644)
-	_ = fileutil.WriteFile(filepath.Join(dir, "unrelated_file.log"), []byte("data"), paths.FilePerm644)
+	if err := fileutil.WriteFile(filepath.Join(dir, "test_20260101-120000_unknown.txt"), []byte("data"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(dir, "test_invalidts_goroutines.txt"), []byte("data"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(filepath.Join(dir, "unrelated_file.log"), []byte("data"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
 
 	pruneDiagnosticsCaptures(dir, "test")
 
@@ -462,7 +477,9 @@ func TestSetupSignalHandler_CaptureErrorPath(t *testing.T) {
 	SetupSignalHandler(ctx, badRoot, "test_fail_prefix")
 
 	// Trigger SIGUSR1 - this exercises the capture failure logging path
-	_ = syscall.Kill(os.Getpid(), syscall.SIGUSR1)
+	if err := syscall.Kill(os.Getpid(), syscall.SIGUSR1); err != nil {
+		t.Fatalf("failed to send SIGUSR1: %v", err)
+	}
 
 	// Wait briefly for background goroutine to execute
 	time.Sleep(100 * time.Millisecond)
@@ -477,7 +494,9 @@ func TestSetupSignalHandler_CaptureErrorPath(t *testing.T) {
 
 	goodRoot := t.TempDir()
 	SetupSignalHandler(ctx2, goodRoot, "test_success_prefix")
-	_ = syscall.Kill(os.Getpid(), syscall.SIGUSR1)
+	if err := syscall.Kill(os.Getpid(), syscall.SIGUSR1); err != nil {
+		t.Fatalf("failed to send SIGUSR1: %v", err)
+	}
 
 	// Wait until files are written or timeout
 	outDir := filepath.Join(goodRoot, paths.ProjectDataDir, diagnosticsSubdir, "test_success_prefix")
