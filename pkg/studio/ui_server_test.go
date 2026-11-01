@@ -184,3 +184,35 @@ func TestServer_ObjectsEndpoint(t *testing.T) {
 	defer respMissing.Body.Close()
 	assert.Equal(t, http.StatusNotFound, respMissing.StatusCode)
 }
+
+func TestServer_AssetsEndpoints(t *testing.T) {
+	_, _, baseURL := setupTestStudioServer(t)
+
+	// Test CSS asset endpoint
+	respCSS, err := http.Get(baseURL + "/assets/style.css")
+	require.NoError(t, err)
+	defer respCSS.Body.Close()
+	assert.Equal(t, http.StatusOK, respCSS.StatusCode)
+	assert.Contains(t, respCSS.Header.Get("Content-Type"), "text/css")
+	cssBytes, err := io.ReadAll(respCSS.Body)
+	require.NoError(t, err)
+	assert.NotEmpty(t, cssBytes)
+	assert.Contains(t, string(cssBytes), ":root")
+
+	// Test JavaScript asset endpoint
+	respJS, err := http.Get(baseURL + "/assets/app.js")
+	require.NoError(t, err)
+	defer respJS.Body.Close()
+	assert.Equal(t, http.StatusOK, respJS.StatusCode)
+	assert.Contains(t, respJS.Header.Get("Content-Type"), "application/javascript")
+	jsBytes, err := io.ReadAll(respJS.Body)
+	require.NoError(t, err)
+	assert.NotEmpty(t, jsBytes)
+
+	// Test 404 for unknown asset
+	respNotFound, err := http.Get(baseURL + "/assets/unknown.xyz")
+	require.NoError(t, err)
+	defer respNotFound.Body.Close()
+	assert.Equal(t, http.StatusNotFound, respNotFound.StatusCode)
+}
+
