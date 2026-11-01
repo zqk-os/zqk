@@ -5,7 +5,6 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewSystemAutoFixBatchCommandBuilder creates a new system_auto_fix_batch command
@@ -30,10 +29,7 @@ func NewSystemAutoFixBatchCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("  With explicit project root")
 	help.WithDescriptionLines("  zqk system auto-fix-process-pending --project-root /path/to/project")
 	builder.WithHelpBuilder(help)
-	builder.AddStringFlag("batch-file", "", "", "Path to batch JSON file (required)")
-	builder.AddStringFlag("project-root", "", "", "Project root directory")
-	builder.AddIntFlag("chunk-size", "", 0, "Number of issues per transactional chunk")
-	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
+	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
 	return cmd
 }
