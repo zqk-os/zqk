@@ -29,6 +29,7 @@ func runInstall(cmd *cobra.Command, _ []string) error {
 		}
 
 		logging.Fluent(logger).Info("ZQK MCP server configuration applied; restart IDE(s) for changes to take effect").Log()
+		cmd.Println("✓ ZQK MCP server configuration applied; restart IDE(s) for changes to take effect")
 		return nil
 	})(cmd, nil)
 }
