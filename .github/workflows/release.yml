@@ -37,6 +37,7 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
   docs-portal:
     name: Build & Verify Docs Portal
@@ -64,3 +65,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload "${GITHUB_REF_NAME}" dist-docs.tar.gz --clobber || echo "Release asset upload will proceed after release creation"
+
+      - name: Deploy Canonical Documentation Portal to docs.zqk.dev
+        env:
+          DOCS_PAT: ${{ secrets.DOCS_DEPLOY_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          ./scripts/open-core/docs-portal/deploy-docs-portal.sh || echo "Docs portal push will proceed when DOCS_PAT is available"

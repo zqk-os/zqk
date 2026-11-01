@@ -297,6 +297,10 @@ func EquivalentCommandIDs(id string) []string {
 		cands = append(cands, "vendor_cursor_adapter")
 	case "vendor_cursor_adapter":
 		cands = append(cands, "mcp_cursor_adapter")
+	case "onboard":
+		cands = append(cands, "system_agent_onboard")
+	case "system_agent_onboard":
+		cands = append(cands, "onboard")
 	}
 
 	if id == "pplan" || strings.HasPrefix(id, "pplan_") {
