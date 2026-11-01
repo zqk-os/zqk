@@ -201,7 +201,7 @@ kind_to_prefixes:
         # Seeded short-form policies (POL-GATE-001 / POL-GIT-001 / POL-ORCH-001).
         # Without these, InferKindFromID fails and ATK policy_refs surface as
         # "Cannot determine object kind" GhostRef-class warnings.
-        # TRACK: PRI-1793536182809443000-4b20ad48 — POL-GATE GhostRef triage
+        # TRACK: POL-GATE GhostRef triage
         - POL-GATE-
         - POL-GIT-
         - POL-ORCH-
