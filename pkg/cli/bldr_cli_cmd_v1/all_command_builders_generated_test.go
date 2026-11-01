@@ -314,6 +314,8 @@ var allCommandBuilders = []struct {
 	{"NewRollbackReconstructCommandBuilder", NewRollbackReconstructCommandBuilder},
 	{"NewRollbackRetainCommandBuilder", NewRollbackRetainCommandBuilder},
 	{"NewRootVersionCommandBuilder", NewRootVersionCommandBuilder},
+	{"NewRulesCommandBuilder", NewRulesCommandBuilder},
+	{"NewRulesGenerateCommandBuilder", NewRulesGenerateCommandBuilder},
 	{"NewRunCommandBuilder", NewRunCommandBuilder},
 	{"NewSchedulerActivityCommandBuilder", NewSchedulerActivityCommandBuilder},
 	{"NewSchedulerAnalyzeCommandBuilder", NewSchedulerAnalyzeCommandBuilder},

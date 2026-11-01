@@ -58,6 +58,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/validate"
 	"github.com/zqk-os/zqk/cmd/zqk/vendor"
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
+	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/objects"
 	internal "github.com/zqk-os/zqk/pkg/zqkcli"
 )
@@ -344,6 +345,11 @@ func registerCommands() {
 	vendorCmdInst := vendor.NewVendorCmd()
 	vendorCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(vendorCmdInst)
+
+	// Rules: Multi-host IDE directives and rules generator
+	rulesCmdInst := bldr_cli_cmd_v1.NewRulesCommand()
+	rulesCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(rulesCmdInst)
 
 	// Ops commands
 	opsCmdInst := ops.NewOpsCmd()

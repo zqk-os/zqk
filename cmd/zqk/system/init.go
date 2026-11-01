@@ -67,11 +67,36 @@ func NewInitCmd() *cobra.Command {
 	initCmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemInitCommandBuilder(), &cobra.Command{
 		Use: "init",
 	})
+	initCmd.Flags().Bool("rules-only", false, "Generate only multi-host IDE rules without creating full kernel directory structure")
 	cli.RequireSession(initCmd, false)
 	cli.RequireStorage(initCmd, false)
 	cli.RequireSchedulerCheck(initCmd, false)
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
+		rulesOnly, _ := cmd.Flags().GetBool("rules-only")
+		if rulesOnly {
+			force, _ := cmd.Flags().GetBool("force")
+			root, _ := cli.ResolveCommandProjectRoot(cmd)
+			if root == "" {
+				root = paths.FindNearestProjectRoot(".")
+			}
+			res, err := bldr_cli_cmd_v1.GenerateRules(root, bldr_cli_cmd_v1.RulesGenerateOptions{
+				Hosts: []string{"all"},
+				Force: force,
+			})
+			if err != nil {
+				return err
+			}
+			cmd.Printf("Generated multi-host IDE rules in %s\n", root)
+			for _, file := range res.Written {
+				cmd.Printf("  ✓ Wrote %s\n", file)
+			}
+			for _, file := range res.Skipped {
+				cmd.Printf("  ⚠️ Skipped %s (already exists, use --force to overwrite)\n", file)
+			}
+			return nil
+		}
+
 		projectName, _ = cmd.Flags().GetString("project-name")
 		template, _ = cmd.Flags().GetString("template")
 		force, _ = cmd.Flags().GetBool("force")
