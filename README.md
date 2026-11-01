@@ -6,28 +6,9 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/zqk-os/zqk)](https://goreportcard.com/report/github.com/zqk-os/zqk)
 [![Documentation](https://img.shields.io/badge/docs-docs.zqk.dev-blue)](https://docs.zqk.dev)
 
+ZQK gives AI coding agents (Cursor Composer, Claude Code, Cline, Windsurf) persistent memory, verifiable task truth, and AST-guarded execution. Stop context drift, hallucinated tasks, and token blowouts.
+
 Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md) · Documentation: [docs.zqk.dev](https://docs.zqk.dev)
-
----
-
-### The Problem: Autonomous Agents Code Blind
-
-When using autonomous coding agents (Cursor Composer, Claude Code, Windsurf, Cline, Aider), developers run into the same painful failure modes:
-
-- **Agent Amnesia & Context Drift:** Ephemeral chat sessions lose goals and constraints across prompts, causing agents to wander off-track.
-- **Hallucinated Tasks:** Without an authoritative backlog, agents invent unnecessary work or tackle the wrong problems.
-- **Silent Regressions:** Edits pass locally in a single file while breaking structural invariants across the broader repository.
-- **Runaway Token Burn:** Blind `grep`, `find`, or dumping raw chat history into context windows burns millions of tokens on irrelevant noise.
-
-### The Solution: Persistent Knowledge Kernel
-
-ZQK provides the missing infrastructure layer between your LLMs and your code:
-
-- **Git-Like Task Truth:** Goals, requirements, acceptance criteria, and backlog items are versioned, verifiable graph objects—not transient LLM prompts.
-- **Fail-Closed AST Verification Gates:** Code changes must satisfy structural AST checks and automated test suites before work units can transition to done.
-- **1-Command Universal MCP Discovery:** Wire up local kernel context to Cursor or Claude Code instantly via Model Context Protocol (`zqk mcp ensure` / `zqk mcp proxy`).
-- **Token-Budgeted Search (`zgrep`):** Sub-15ms trigram indexing and Go AST search with strict token budgeting (default 500 tokens) to eliminate context blowouts.
-- **Real-Time Visual Web Studio:** Interactive Gantt timelines, DAG dependency trees, and live task tracking with zero cloud dependencies (`zqk ui -w`).
 
 ---
 
@@ -65,7 +46,7 @@ zqk do
 
 ### Choose Your Path: Go Fast vs. Walk Through
 
-ZQK offers two paths for polyglot projects (Go, Python, TypeScript, Rust):
+ZQK offers two paths for Polyglot projects (Go, Python, TypeScript, Rust):
 
 #### Option 1: Go Fast (Immediate Token Savings)
 *For developers who want immediate token savings with zero learning curve.*
@@ -109,6 +90,27 @@ zqk system start-here
   ```sh
   zqk mcp proxy --tcp 127.0.0.1:7777
   ```
+
+---
+
+## Why ZQK: Autonomous Agents Code Blind
+
+When using autonomous coding agents (Cursor Composer, Claude Code, Windsurf, Cline, Aider), developers run into the same painful failure modes:
+
+- **Agent Amnesia & Context Drift:** Ephemeral chat sessions lose goals and constraints across prompts, causing agents to wander off-track.
+- **Hallucinated Tasks:** Without an authoritative backlog, agents invent unnecessary work or tackle the wrong problems.
+- **Silent Regressions:** Edits pass locally in a single file while breaking structural invariants across the broader repository.
+- **Runaway Token Burn:** Blind `grep`, `find`, or dumping raw chat history into context windows burns millions of tokens on irrelevant noise.
+
+### The Solution: Persistent Knowledge Kernel
+
+ZQK provides the missing infrastructure layer between your LLMs and your code:
+
+- **Git-Like Task Truth:** Goals, requirements, acceptance criteria, and backlog items are versioned, verifiable graph objects—not transient LLM prompts.
+- **Fail-Closed AST Verification Gates:** Code changes must satisfy structural AST checks and automated test suites before work units can transition to done.
+- **1-Command Universal MCP Discovery:** Wire up local kernel context to Cursor or Claude Code instantly via Model Context Protocol (`zqk mcp ensure` / `zqk mcp proxy`).
+- **Token-Budgeted Search (`zgrep`):** Sub-15ms trigram indexing and Go AST search with strict token budgeting (default 500 tokens) to eliminate context blowouts.
+- **Real-Time Visual Web Studio:** Interactive Gantt timelines, DAG dependency trees, and live task tracking with zero cloud dependencies (`zqk ui -w`).
 
 ---
 
