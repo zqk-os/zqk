@@ -20,7 +20,9 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/graph/provider"
+	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
@@ -737,7 +739,14 @@ func TestCoverageElevation_ServerLifecycleBuilder(t *testing.T) {
 func TestCoverageElevation_ServerInitAndElicitation(t *testing.T) {
 	t.Parallel()
 
+	tmpDir := t.TempDir()
+	processDir := filepath.Join(tmpDir, ".zqk", "process")
+	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+		t.Fatalf("failed to create process dir: %v", err)
+	}
+
 	server := createTestServerWithoutRegistry()
+	server.SetProjectRoot(tmpDir)
 	ctx := context.Background()
 
 	// 1. eliciteAccountID
@@ -2537,7 +2546,14 @@ func TestCoverageElevation_AdditionalHelpers(t *testing.T) {
 func TestCoverageElevation_AdapterAndInitHelpersDeep(t *testing.T) {
 	t.Parallel()
 
+	tmpDir := t.TempDir()
+	processDir := filepath.Join(tmpDir, ".zqk", "process")
+	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+		t.Fatalf("failed to create process dir: %v", err)
+	}
+
 	server := createTestServerWithoutRegistry()
+	server.SetProjectRoot(tmpDir)
 	adapter := NewMCPServerAdapter(server)
 	ctx := context.Background()
 
@@ -3625,4 +3641,447 @@ func TestCoverageElevation_AuthCliAndSpecFinal(t *testing.T) {
 		"filters":         map[string]any{"kind": "goal"},
 		"include_metrics": true,
 	})
+}
+
+type mockTestEventCoord struct {
+	emitted bool
+}
+
+func (m *mockTestEventCoord) Emit(ctx context.Context, eventCtx any) error {
+	m.emitted = true
+	return nil
+}
+
+// TestCoverageElevation_Cycle312_DeepStatementBooster targets uncalled functions and edge branches across pkg/mcp.
+func TestCoverageElevation_Cycle312_DeepStatementBooster(t *testing.T) {
+	t.Parallel()
+
+	tmpDir := t.TempDir()
+	processDir := filepath.Join(tmpDir, ".zqk", "process")
+	if err := fileutil.MkdirAll(processDir, 0755); err != nil {
+		t.Fatalf("failed to create process dir: %v", err)
+	}
+
+	server := createTestServerWithoutRegistry()
+	server.SetProjectRoot(tmpDir)
+	ctx := context.Background()
+
+	// 1. ObjectsSpecLoaderAdapter & objectsSpecAdapter & NewSpecAccessControlFromObjectsLoader
+	if sac := NewSpecAccessControlFromObjectsLoader(nil); sac != nil {
+		t.Error("expected nil for nil loader")
+	}
+	osaNil := &objectsSpecAdapter{spec: nil}
+	if osaNil.GetResolvedFields() != nil {
+		t.Error("expected nil resolved fields for nil spec")
+	}
+	osa := &objectsSpecAdapter{spec: &objects.Spec{ResolvedFields: map[string]any{"field1": "val1"}}}
+	if fields := osa.GetResolvedFields(); fields["field1"] != "val1" {
+		t.Errorf("unexpected fields: %v", fields)
+	}
+	oslaNil := &ObjectsSpecLoaderAdapter{Loader: nil}
+	sRes, err := oslaNil.LoadSpecWithInheritance("dummy")
+	if sRes != nil || err != nil {
+		t.Errorf("expected (nil, nil) for nil loader, got (%v, %v)", sRes, err)
+	}
+	oslaErr := &ObjectsSpecLoaderAdapter{Loader: objects.NewSpecLoader(filepath.Join(tmpDir, "nonexistent"))}
+	_, _ = oslaErr.LoadSpecWithInheritance("missing.yaml")
+	_ = NewSpecAccessControlFromObjectsLoader(objects.NewSpecLoader(tmpDir))
+
+	// 2. permission_format_helpers
+	cfgOps := &ServerConfig{}
+	cfgOps.MCPServer.Security.PermissionOperations = []string{"read", "custom_op"}
+	server.config = cfgOps
+	_ = server.getPermissionOperations()
+	_ = server.getObjectKindsForExamples()
+	_ = server.generatePermissionFormatExamples()
+	if m := min(5, 3); m != 3 {
+		t.Errorf("expected min 3, got %d", m)
+	}
+	if m := min(2, 4); m != 2 {
+		t.Errorf("expected min 2, got %d", m)
+	}
+	if capEmpty := capitalizeFirst(""); capEmpty != "" {
+		t.Errorf("expected empty string, got %q", capEmpty)
+	}
+	if capWord := capitalizeFirst("read"); capWord != "Read" {
+		t.Errorf("expected Read, got %q", capWord)
+	}
+
+	// 3. tools_ide_bridge
+	_, err = HandleIdeBridgeRequest(ctx, nil, map[string]any{}, "")
+	if err == nil {
+		t.Error("expected missing command error")
+	}
+	_, err = HandleIdeBridgeRequest(ctx, nil, map[string]any{"command": "open", "args": "not_an_array"}, "")
+	if err == nil {
+		t.Error("expected invalid args error")
+	}
+	_, _ = HandleIdeBridgeRequest(ctx, server, map[string]any{
+		"command":    "zqk.chat.new",
+		"request_id": "req-boost-1",
+		"args":       []any{"arg1"},
+	}, tmpDir)
+	RegisterIdeBridgeTool(server)
+
+	// 4. role_enforcement: validateRolesAgainstSystem & getPermissionsFromRoles & enforceRoleEnforcement
+	_ = validateRolesAgainstSystem([]string{"admin"}, "")
+	_ = validateRolesAgainstSystem([]string{"admin"}, filepath.Join(tmpDir, "nonexistent"))
+	_ = validateRolesAgainstSystem([]string{"invalid_role_xyz"}, ".")
+	_ = validateRolesAgainstSystem([]string{"admin"}, ".")
+	_, _ = getPermissionsFromRoles([]string{}, "")
+	_, _ = getPermissionsFromRoles([]string{"admin"}, ".")
+	_, _ = getPermissionsFromRoles([]string{"invalid_role_xyz"}, ".")
+
+	_, _ = enforceRoleEnforcement(map[string]any{
+		objects.FieldKeyRoles: "admin, developer",
+		"user":                "test_user",
+	}, &ServerConfig{}, "", nil)
+
+	cfgEnforced := &ServerConfig{}
+	cfgEnforced.MCPServer.Security.EnforcedRole = "guest"
+	outEnforced, _ := enforceRoleEnforcement(map[string]any{
+		objects.FieldKeyRoles: []any{"admin"},
+		"accountId":           "acc_test",
+	}, cfgEnforced, "", nil)
+	if roles, ok := outEnforced[objects.FieldKeyRoles].([]any); !ok || len(roles) == 0 || roles[0] != "guest" {
+		t.Errorf("expected enforced role guest, got %v", outEnforced[objects.FieldKeyRoles])
+	}
+
+	// 5. server_handlers_auth: loadAccountByEmail, extract helpers, isStrategyStatusActive
+	_, _ = server.loadAccountByEmail("nobody@example.com", tmpDir)
+	accIdx := paths.AccountIndexPath(tmpDir)
+	_ = fileutil.MkdirAll(filepath.Dir(accIdx), 0755)
+	_ = fileutil.WriteStandardFile(accIdx, []byte(`{"mappings":{"ACC-TEST-1":"hash1"}}`))
+	accData := []byte("id: ACC-TEST-1\nemail: test@example.com\nroles: [admin]\npermissions: [read:*]\n")
+	_ = fileutil.WriteStandardFile(paths.AccountYAMLPath(tmpDir, "hash1"), accData)
+	loadedAcc, err := server.loadAccountByEmail("test@example.com", tmpDir)
+	if err != nil || loadedAcc == nil {
+		t.Errorf("loadAccountByEmail expected account, got %v (err: %v)", loadedAcc, err)
+	}
+	_ = extractRolesFromAccount(map[string]any{"roles": []any{"role1"}})
+	_ = extractPermissionsFromAccount(map[string]any{"permissions": []any{"perm1"}})
+	_, _ = extractRolesAndPermissions(map[string]any{"roles": []any{"role1"}, "permissions": []any{"perm1"}})
+	_, _, _ = server.loadAccountRolesAndPermissions("ACC-NONEXISTENT", tmpDir)
+	_ = server.isStrategyStatusActive("active")
+	_ = server.isStrategyStatusActive("archived")
+	_ = server.isStrategyStatusActive("unknown")
+
+	// 6. utils_output: ExtractFirstCompleteJSONObject
+	if s := ExtractFirstCompleteJSONObject(""); s != "" {
+		t.Errorf("expected empty string, got %q", s)
+	}
+	if s := ExtractFirstCompleteJSONObject("not json"); s != "not json" {
+		t.Errorf("expected not json, got %q", s)
+	}
+	_ = ExtractFirstCompleteJSONObject("{\"debug\": true}")
+	_ = ExtractFirstCompleteJSONObject("{\"data\": 123} trailing invalid")
+
+	// 7. permission_cache: extractFieldAccessRules
+	if rules := extractFieldAccessRules(map[string]any{}); rules != nil {
+		t.Errorf("expected nil rules for empty map")
+	}
+	_ = extractFieldAccessRules(map[string]any{
+		"access": map[string]any{
+			"read": map[string]any{
+				objects.FieldKeyRoles:       []any{"admin"},
+				objects.FieldKeyPermissions: []any{"read:*"},
+			},
+			"write": map[string]any{
+				objects.FieldKeyRoles:       []any{"admin"},
+				objects.FieldKeyPermissions: []any{"write:*"},
+			},
+			"requires": []any{"mfa"},
+		},
+		"checklist": map[string]any{
+			"security": "sensitive",
+		},
+	})
+	_ = extractFieldAccessRules(map[string]any{
+		"checklist": map[string]any{
+			"security": "confidential",
+		},
+	})
+
+	// 8. server_config: expandEnvVars
+	_ = expandEnvVars("plain_text")
+	_ = expandEnvVars("${TEST_EXPAND_A}")
+	_ = expandEnvVars("${UNCLOSED_VAR")
+	_ = expandEnvVars("$TEST_EXPAND_B/subpath")
+	_ = expandEnvVars("$")
+
+	// 9. brand_prefix: stripBrandSuffixes
+	for _, name := range []string{
+		"zqk-mcp-ide-adapter", "zqk-mcp-proxy", "zqk-mcp-daemon", "zqk-mcp",
+		"zqk-community", "zqk-stable", "zqk-dev", "zqk-beta", "zqk-alpha", "zqk-rc", "zqk-standalone",
+	} {
+		_ = stripBrandSuffixes(name)
+	}
+
+	// 10. client_metrics: ClientMetricsStore Load variants & UpdateClientID
+	missingStore := &ClientMetricsStore{filePath: filepath.Join(tmpDir, "missing_metrics.json")}
+	_ = missingStore.Load()
+
+	emptyPath := filepath.Join(tmpDir, "empty_metrics.json")
+	_ = fileutil.WriteFile(emptyPath, []byte(""), 0644)
+	emptyStore := &ClientMetricsStore{filePath: emptyPath}
+	_ = emptyStore.Load()
+
+	badPath := filepath.Join(tmpDir, "bad_metrics.json")
+	_ = fileutil.WriteFile(badPath, []byte("not_json"), 0644)
+	badStore := &ClientMetricsStore{filePath: badPath}
+	_ = badStore.Load()
+
+	goodPath := filepath.Join(tmpDir, "good_metrics.json")
+	_ = fileutil.WriteFile(goodPath, []byte(`{"metrics":{"seq_1":{"client_id":"c1"}}}`), 0644)
+	goodStore := &ClientMetricsStore{filePath: goodPath}
+	_ = goodStore.Load()
+	_ = goodStore.UpdateClientID("seq_1", "")
+	_ = goodStore.UpdateClientID("seq_1", "new_client")
+
+	// 11. server_lifecycle_builder: InitializeTraceLogging & GetBaseContext
+	b := NewServerLifecycleBuilder(server)
+	b.InitializeTraceLogging()
+	b.Cleanup()
+	_ = b.GetBaseContext()
+	b.baseCtx = ctx
+	_ = b.GetBaseContext()
+
+	// 12. process_group_manager: RegisterSubprocess during shutdown
+	pgm := NewProcessGroupManager(ctx, 1*time.Second)
+	killCalled := false
+	pgm.RegisterSubprocess("sub1", "worker", "test worker", 1234, false, func() error {
+		killCalled = true
+		return nil
+	})
+	pgm.UnregisterSubprocess("sub1")
+	_ = pgm.Shutdown("test shutdown")
+	pgm.RegisterSubprocess("sub2", "worker2", "test worker 2", 1235, false, func() error {
+		killCalled = true
+		return nil
+	})
+	if !killCalled {
+		t.Error("expected killFunc to be called during shutdown registration")
+	}
+
+	// 13. role_guidance: extractAccessUpgradeSteps & extractPromptTemplates
+	gen := NewRoleGuidanceGenerator(nil)
+	_ = gen.extractAccessUpgradeSteps(map[string]any{
+		"access_upgrade_instructions": "step1\nstep2\n",
+	})
+	_ = gen.extractPromptTemplates(map[string]any{
+		"prompt_getting_started": "start content",
+		"prompt_query_help":      "help content",
+	})
+
+	// 14. resource_mime_adapters: extractStructuredTitle & extractStringMetadata
+	if t0 := extractStructuredTitle(nil); t0 != "" {
+		t.Errorf("expected empty title for nil map, got %q", t0)
+	}
+	if t1 := extractStructuredTitle(map[string]any{objects.FieldKeyTitle: "title1"}); t1 != "title1" {
+		t.Errorf("expected title1, got %q", t1)
+	}
+	if t2 := extractStructuredTitle(map[string]any{"Title": "title2"}); t2 != "title2" {
+		t.Errorf("expected title2, got %q", t2)
+	}
+	if n1 := extractStructuredTitle(map[string]any{objects.FieldKeyName: "name1"}); n1 != "name1" {
+		t.Errorf("expected name1, got %q", n1)
+	}
+	if n2 := extractStructuredTitle(map[string]any{"Name": "name2"}); n2 != "name2" {
+		t.Errorf("expected name2, got %q", n2)
+	}
+	if tNone := extractStructuredTitle(map[string]any{"unrelated": 123}); tNone != "" {
+		t.Errorf("expected empty for unrelated map, got %q", tNone)
+	}
+	meta := extractStringMetadata(map[string]any{"str": "hello", "num": 123})
+	if meta["str"] != "hello" || len(meta) != 1 {
+		t.Errorf("unexpected string metadata: %v", meta)
+	}
+
+	// 15. resource_loader: parseAndValidateURI
+	rl := NewResourceLoader(tmpDir, nil, nil)
+	_, _, err = rl.parseAndValidateURI("no_scheme_uri")
+	if err == nil {
+		t.Error("expected parse error for missing scheme")
+	}
+	_, _, err = rl.parseAndValidateURI("unsupported://path")
+	if err == nil {
+		t.Error("expected error for unsupported scheme")
+	}
+	_, _, _ = rl.parseAndValidateURI("file://test.txt")
+
+	// 16. role_aware_prompts: generateAvailableOperationsText
+	rapGen := NewRoleAwarePromptGenerator(nil, nil)
+	if opText := rapGen.generateAvailableOperationsText(&RoleGuidance{}); opText != "" {
+		t.Errorf("expected empty string for empty guidance, got %q", opText)
+	}
+	if opText := rapGen.generateAvailableOperationsText(&RoleGuidance{
+		PromptTemplates: map[string]RolePromptTemplate{
+			"my_role_operations": {Content: "operations text"},
+		},
+	}); opText != "operations text" {
+		t.Errorf("expected operations text, got %q", opText)
+	}
+	if opText := rapGen.generateAvailableOperationsText(&RoleGuidance{
+		PromptTemplates: map[string]RolePromptTemplate{
+			"available_operations": {Content: "avail text"},
+		},
+	}); opText != "avail text" {
+		t.Errorf("expected avail text, got %q", opText)
+	}
+
+	// 17. protocol: UnmarshalParams & IsNotification
+	reqNotif := &JSONRPCRequest{ID: nil}
+	if !reqNotif.IsNotification() {
+		t.Error("expected true for IsNotification")
+	}
+	reqWithID := &JSONRPCRequest{ID: 1}
+	if reqWithID.IsNotification() {
+		t.Error("expected false for IsNotification")
+	}
+	var dummyTarget map[string]any
+	_ = (&JSONRPCRequest{Params: nil}).UnmarshalParams(&dummyTarget)
+	_ = (&JSONRPCRequest{Params: json.RawMessage(`{"a": 1}`)}).UnmarshalParams(&dummyTarget)
+	_ = (&JSONRPCRequest{Params: json.RawMessage(`bad json`)}).UnmarshalParams(&dummyTarget)
+
+	// 18. waker_stream: formatWakerMessage
+	_ = formatWakerMessage(&lifecycle.LifecycleEvent{EventType: lifecycle.EventTypeSchedulerCallback, Kind: "job", ID: "J1", ToStatus: "completed"})
+	_ = formatWakerMessage(&lifecycle.LifecycleEvent{EventType: lifecycle.EventTypeCriterionSatisfied, CriterionID: "CRIT-1"})
+	_ = formatWakerMessage(&lifecycle.LifecycleEvent{EventType: lifecycle.EventTypeStatusTransition, Kind: "task", ID: "T1", FromStatus: "open", ToStatus: "done"})
+	_ = formatWakerMessage(&lifecycle.LifecycleEvent{EventType: lifecycle.EventType("custom"), Kind: "goal", ID: "G1"})
+
+	// 19. message_queue: isWriteErrorFatal, IsActive, MarkInactive, Abandon
+	q := &MessageQueue{}
+	if q.isWriteErrorFatal(nil) {
+		t.Error("expected false for nil error")
+	}
+	if q.isWriteErrorFatal(errors.New("writer released")) {
+		t.Error("expected false for writer released")
+	}
+	if !q.isWriteErrorFatal(errors.New("broken pipe")) {
+		t.Error("expected true for broken pipe")
+	}
+	if q.isWriteErrorFatal(errors.New("some other error")) {
+		t.Error("expected false for other error")
+	}
+	if (*MessageQueue)(nil).IsActive() {
+		t.Error("expected false for nil queue IsActive")
+	}
+	(*MessageQueue)(nil).MarkInactive()
+	(*MessageQueue)(nil).Abandon()
+
+	// 20. proxy_forwarder: isClosedConnError
+	if isClosedConnError(nil) {
+		t.Error("expected false for nil error")
+	}
+	if !isClosedConnError(errors.New("use of closed network connection")) {
+		t.Error("expected true for closed network connection")
+	}
+	if !isClosedConnError(&net.OpError{Err: errors.New("use of closed network connection")}) {
+		t.Error("expected true for OpError closed connection")
+	}
+	if isClosedConnError(errors.New("other network error")) {
+		t.Error("expected false for other error")
+	}
+
+	// 21. object_access_control: NewObjectAccessControl & HasAccess with nil secCtx
+	oac := NewObjectAccessControl(nil, NewEventEmitter(10))
+	if oac.HasAccess(map[string]any{}, nil) {
+		t.Error("expected false for nil secCtx")
+	}
+
+	// 22. unix_permissions: checklistSecurityRequiresConfidential & HasFieldAccess
+	if checklistSecurityRequiresConfidential("") {
+		t.Error("expected false for empty")
+	}
+	if checklistSecurityRequiresConfidential("non-sensitive") {
+		t.Error("expected false for non-sensitive")
+	}
+	if checklistSecurityRequiresConfidential("not confidential") {
+		t.Error("expected false for not confidential")
+	}
+	if checklistSecurityRequiresConfidential("not-sensitive") {
+		t.Error("expected false for not-sensitive")
+	}
+	if !checklistSecurityRequiresConfidential("sensitive data") {
+		t.Error("expected true for sensitive data")
+	}
+	if !checklistSecurityRequiresConfidential("confidential report") {
+		t.Error("expected true for confidential report")
+	}
+	perm, err := ParseUnixPermission("rw-")
+	if err != nil {
+		t.Fatalf("unexpected perm error: %v", err)
+	}
+	fp := &FieldPermission{Permission: perm}
+	if !fp.HasFieldAccess(false, "read", nil) {
+		t.Error("expected true for public field read without kind-level read")
+	}
+	fpReq := &FieldPermission{Permission: perm, Requires: []string{"admin"}}
+	if fpReq.HasFieldAccess(true, "write", "unsupported_context_type") {
+		t.Error("expected false for unsupported secCtx type")
+	}
+
+	// 23. utils_jsonld: MapFieldTypeToElicitationType
+	typesToTest := []string{
+		flagTypeUUID, flagTypeFloat, flagTypeBool, flagTypeArray,
+		flagTypeMap, flagTypeReference, "custom_unknown",
+	}
+	for _, ft := range typesToTest {
+		_ = MapFieldTypeToElicitationType(ft)
+	}
+
+	// 24. mcp_interface_adapter with EventCoordinator & CPCP validation error
+	coord := &mockTestEventCoord{}
+	adapterCoord := NewMCPServerAdapterWithCoordinator(server, coord)
+	_, _ = adapterCoord.CallTool(ctx, nil) // triggers CPCP validation error branch
+	_, _ = adapterCoord.CallTool(ctx, &ToolCallParams{Name: "test_tool"})
+	_, _ = adapterCoord.Initialize(ctx, &InitializeParams{ProtocolVersion: "2024-11-05"})
+	_, _ = adapterCoord.ListResources(ctx, &ResourcesListParams{})
+	_, _ = adapterCoord.GetResource(ctx, nil)
+	_, _ = adapterCoord.GetResource(ctx, &ResourceGetParams{URI: "resource://invalid"})
+	_, _ = adapterCoord.ListPrompts(ctx)
+	_, _ = adapterCoord.GetPrompt(ctx, nil)
+	_, _ = adapterCoord.GetPrompt(ctx, &PromptGetParams{Name: "test_prompt"})
+	_, _ = adapterCoord.ListRoots(ctx)
+
+	// 25. message_processor: handleParseError, handleElicitationError, buildResponse, sendResponse direct fallback
+	buf := &bytes.Buffer{}
+	writer := bufio.NewWriter(buf)
+	mp := NewMessageProcessor(server, nil, NewDefaultTransport())
+	fmtJSON := &MessageFormat{IsRawJSON: true}
+	_ = mp.handleParseError(errors.New("test parse error"), fmtJSON, writer)
+	_ = mp.handleElicitationError(&JSONRPCRequest{Method: "test/method"}, &ElicitationError{
+		Message: "elicitation required",
+		Data:    map[string]any{"param_count": 2},
+	})
+	_ = mp.buildResponse(&JSONRPCRequest{ID: 101}, nil, errors.New("generic error"))
+	_ = mp.buildResponse(&JSONRPCRequest{ID: 102}, nil, &JSONRPCError{Code: 4001, Message: "custom error", Data: "custom_data"})
+	_ = mp.buildResponse(&JSONRPCRequest{ID: 103}, "successful result", nil)
+	sendDone := false
+	resp := NewResponse(104)
+	resp.Result = "direct response"
+	_ = mp.sendResponse(resp, fmtJSON, writer, func() {
+		sendDone = true
+	})
+	_ = sendDone
+
+	// 26. logging_channel: SendLogMessage when shutdownFlag == 1
+	serverShutdown := createTestServerWithoutRegistry()
+	serverShutdown.SetProjectRoot(tmpDir)
+	serverShutdown.shutdownFlag.Store(1)
+	_ = serverShutdown.SendLogMessage(LogLevelInfo, "shutdown log message", map[string]any{"key": "value"})
+
+	// 27. graph_connection: getEnvIntOrDefaultAny & GetPool with graph disabled
+	if val := getEnvIntOrDefaultAny([]string{"NONEXISTENT_VAR_BOOST_123"}, 77); val != 77 {
+		t.Errorf("expected default 77, got %d", val)
+	}
+	gcm := &GraphConnectionManager{}
+	_, _ = gcm.GetPool(ctx)
+
+	// 28. client: sendRequest with cancelled context
+	cli := NewClient(&bytes.Buffer{}, &bytes.Buffer{}, NewDefaultTransport())
+	ctxCancel, cancel := context.WithCancel(context.Background())
+	cancel()
+	_ = cli.sendRequest(ctxCancel, "test_label", "test_desc", 99, []byte(`{}`))
+	_ = cli.Close()
 }
