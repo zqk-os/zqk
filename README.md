@@ -42,6 +42,23 @@ zqk mcp ensure
 zqk do
 ```
 
+### Visual Web Studio (`zqk ui -w`)
+
+Inspect real-time swarm delivery, interactive DAG dependencies, and agent seating directly in your browser:
+
+```sh
+# Launch local Web Studio (auto-discovers open port between 8080-8095)
+zqk ui -w
+```
+
+[![Web Studio Architecture](docs/manual/screenshots/ui_web_studio.svg)](docs/guides/WEB_STUDIO_AND_VISUAL_GRAPH_EXPLORER_GUIDE.md)
+
+- **Interactive DAG & Gantt View:** Live tracking of goals, milestones, requirements, and atomic backlog items.
+- **Autonomous Swarm Seating:** Inspect agent pods, active tokens, and AST validation gates in flight.
+- **Instant Day-Zero Telemetry:** Stream live execution events from `zqk do` directly into the web UI.
+
+[![Day-Zero Swarm Telemetry](docs/demos/screenshots/demo1_dayzero_dx.svg)](docs/guides/WEB_STUDIO_AND_VISUAL_GRAPH_EXPLORER_GUIDE.md)
+
 ---
 
 ### Choose Your Path: Go Fast vs. Walk Through
