@@ -2,14 +2,16 @@
 //
 // Subsystem Comprehensive Verification Suite satisfying the Three-Fold Proof:
 // 1. Static Floor Invariant Proof:
-//    - Strict structural validation of Spec, Step, Options, Prerequisite, and History schemas.
-//    - Invariant statement coverage floor >= 85.0% across all files in pkg/migration.
+//   - Strict structural validation of Spec, Step, Options, Prerequisite, and History schemas.
+//   - Invariant statement coverage floor >= 85.0% across all files in pkg/migration.
+//
 // 2. Operational Dynamic Proof:
-//    - Multi-phase migration execution: scan_files, read_id_list, read_objects, transform, create_objects, execute_command, delete_objects.
-//    - End-to-end integration with SnapshotCreator (pre, post, checkpoint) and validation rules.
+//   - Multi-phase migration execution: scan_files, read_id_list, read_objects, transform, create_objects, execute_command, delete_objects.
+//   - End-to-end integration with SnapshotCreator (pre, post, checkpoint) and validation rules.
+//
 // 3. Negative Adversarial Boundary Proof:
-//    - Invalid specifications, circular/missing step dependencies, missing inputs.
-//    - Storage collision failures, unreadable directories, corrupted state files, command exit failures.
+//   - Invalid specifications, circular/missing step dependencies, missing inputs.
+//   - Storage collision failures, unreadable directories, corrupted state files, command exit failures.
 package migration
 
 import (
