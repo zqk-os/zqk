@@ -188,7 +188,7 @@ func enforceRoleEnforcement(clientInfo map[string]any, config *ServerConfig, pro
 				displayAccountID, accountYAMLPath,
 				GetCommandPath("object create account"),
 			)
-			_ = notificationSender.SendMessageToClient(message, "account_lookup_failed", "high") //nolint:errcheck // Notification failures are non-critical
+			_ = notificationSender.SendMessageToClient(message, "account_lookup_failed", "high")                                                     //nolint:errcheck // Notification failures are non-critical
 			_ = notificationSender.SendLogMessage(LogLevelWarn, fmt.Sprintf("Account lookup failed (fail-closed): %s", err.Error()), map[string]any{ //nolint:errcheck // Notification failures are non-critical
 				clientInfoAccountID: displayAccountID,
 				"expected_filename": expectedFilename,
