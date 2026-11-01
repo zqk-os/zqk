@@ -11,5 +11,6 @@ func NewSwarmCmd() *cobra.Command {
 	cmd.AddCommand(NewStatusCmd())
 	cmd.AddCommand(NewInitCmd())
 	cmd.AddCommand(NewRunCmd())
+	cmd.AddCommand(NewDispatchCmd())
 	return cmd
 }

@@ -314,4 +314,3 @@ func TestCICmd_Init_ScaffoldLifecycle(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, out3.String(), "ci init: created")
 }
-
