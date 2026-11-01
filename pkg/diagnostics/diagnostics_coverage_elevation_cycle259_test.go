@@ -325,7 +325,9 @@ func TestDisambiguation_EdgeCases(t *testing.T) {
 	if len(ctxBounded.NegativeConstraints) > 1 {
 		t.Fatalf("expected at most 1 negative constraint, got %d", len(ctxBounded.NegativeConstraints))
 	}
+}
 
+func TestDisambiguation_EdgeCases_PromptFormatting(t *testing.T) {
 	// Bounding of guidance items from failing constraints
 	historyConstraints := []FailureEnvelope{
 		{
@@ -344,6 +346,13 @@ func TestDisambiguation_EdgeCases(t *testing.T) {
 	})
 	if len(ctxBoundedGuidance.Guidance) != 1 {
 		t.Fatalf("expected exactly 1 guidance item, got %d", len(ctxBoundedGuidance.Guidance))
+	}
+
+	ctx := DisambiguationContext{
+		Attempt: 1,
+		NegativeConstraints: []NegativeConstraint{
+			{ActionPattern: "test-pattern", Reason: "test-reason"},
+		},
 	}
 
 	// FormatDisambiguationPrompt with non-positive limit
