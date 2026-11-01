@@ -42,9 +42,22 @@ jobs:
         run: |
           python3 scripts/open-core/generate-coverage-summary.py coverage.out "Code Coverage Report"
 
+      - name: Generate Verified Package Coverage Rollup
+        if: always()
+        run: |
+          go run ./scripts/open-core/coverage-rollup \
+            -in coverage.out \
+            -out-dir . \
+            -threshold 85
+          # Drop the raw coverprofile after rollup to keep runner disk pressure low.
+          rm -f coverage.out
+          df -h
+
       - name: Upload Coverage Artifact
         uses: actions/upload-artifact@v7
         with:
           name: coverage-report
-          path: coverage.out
+          path: |
+            package-coverage-rollup.json
+            package-coverage-rollup.json.sha256
           if-no-files-found: warn
