@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -18,6 +19,7 @@ func TestInstallCmd_Metadata(t *testing.T) {
 
 func TestInstallCmd_RunInProject(t *testing.T) {
 	tempRoot := t.TempDir()
+	testkit.RegisterStorageTestCleanup(t, tempRoot, nil)
 	t.Setenv(zqkenv.ProjectRoot().Name(), tempRoot)
 
 	cmd := NewInstallCmd()
