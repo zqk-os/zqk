@@ -95,6 +95,7 @@ const (
 	autoFixTraceStatusFixedPrepared   = "fixed_prepared"
 	autoFixTraceStatusSkippedNoChange = "skipped_no_change"
 	autoFixProcessingLockFile         = "autofix-processing.lock"
+	autoFixBatchInitialIssuesCapacity = 64
 )
 
 var (
@@ -969,7 +970,7 @@ func normalizeAutoFixBatchIssues(batch *AutoFixBatch) []AutoFixBatchIssue {
 	if len(batch.Objects) == 0 {
 		return nil
 	}
-	out := make([]AutoFixBatchIssue, 0, 64)
+	out := make([]AutoFixBatchIssue, 0, autoFixBatchInitialIssuesCapacity)
 	for _, obj := range batch.Objects {
 		for _, issue := range obj.Issues {
 			out = append(out, AutoFixBatchIssue{

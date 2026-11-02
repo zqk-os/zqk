@@ -328,7 +328,7 @@ func TestObjectWAL_ReplayLargeLine(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Marshal: %v", err)
 	}
-	if len(line) < 64*1024 {
+	if len(line) < DefaultWALScanBufferSize {
 		t.Skip("JSON line is under 64KB on this platform; increase payload to exercise large-line path")
 	}
 	wal, err := NewObjectWAL(tmpDir)

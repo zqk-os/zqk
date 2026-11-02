@@ -210,8 +210,8 @@ func MergeDailySegmentsForKind(projectRoot, kind string, snap *streamRegistrySna
 				continue
 			}
 			sc := bufio.NewScanner(fIn)
-			buf := make([]byte, 0, 1024*1024)
-			sc.Buffer(buf, 1024*1024)
+			buf := make([]byte, 0, DefaultStreamScanBufferSize)
+			sc.Buffer(buf, DefaultStreamScanBufferSize)
 			for sc.Scan() {
 				line := sc.Bytes()
 				id := parseSegmentLineIDFast(line)

@@ -33,6 +33,11 @@ const (
 	streamPathOffsetSep    = "::"           // segmentPath::offset for cache/registry
 	legacyStreamFileSuffix = ".jsonl"       // Legacy suffix for existing stream segments
 	streamFileSuffix       = "_stream.json" // New convention: <yyyy-mm-dd>_stream.json
+
+	// DefaultStreamScanBufferSize is the initial allocation buffer size for scanning stream segments (1 MiB).
+	DefaultStreamScanBufferSize = 1024 * 1024
+	// MaxStreamScanBufferSize is the maximum line buffer size for scanning stream segments (10 MiB).
+	MaxStreamScanBufferSize = 10 * 1024 * 1024
 )
 
 // Stream storage uses one mutex per kind to allow concurrent appends to different kinds.
@@ -317,8 +322,8 @@ func CountStreamSegmentLines(ctx context.Context, projectRoot, kind string) (int
 				}
 				scanner := bufio.NewScanner(f)
 				// Use a larger buffer for potentially large JSON records (up to 1MB)
-				buf := make([]byte, 0, 1024*1024)
-				scanner.Buffer(buf, 1024*1024)
+				buf := make([]byte, 0, DefaultStreamScanBufferSize)
+				scanner.Buffer(buf, DefaultStreamScanBufferSize)
 				for scanner.Scan() {
 					workerTotal++
 					if interrupt.Check(ctx) != nil {

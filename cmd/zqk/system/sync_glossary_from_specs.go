@@ -28,6 +28,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/validation"
 )
 
+const (
+	glossaryCandidateInitialCapacity    = 256
+	commandSpecCandidateInitialCapacity = 128
+)
+
 type glossaryCandidate struct {
 	Title       string `json:"title" yaml:"title"`
 	Category    string `json:"category" yaml:"category"`
@@ -484,7 +489,7 @@ func ingestSourceKeysFromGlossaryObject(obj map[string]any, out map[string]struc
 }
 
 func collectGlossaryCandidates(root, specsDir, commandSpecsDir, lifecyclesDir, configsDir string) ([]glossaryCandidate, error) {
-	out := make([]glossaryCandidate, 0, 256)
+	out := make([]glossaryCandidate, 0, glossaryCandidateInitialCapacity)
 	seen := map[string]struct{}{}
 
 	specCandidates, err := scanSpecCandidates(root, specsDir)
@@ -535,7 +540,7 @@ func collectGlossaryCandidates(root, specsDir, commandSpecsDir, lifecyclesDir, c
 }
 
 func scanCommandSpecCandidates(root, dir string) ([]glossaryCandidate, error) {
-	out := make([]glossaryCandidate, 0, 128)
+	out := make([]glossaryCandidate, 0, commandSpecCandidateInitialCapacity)
 	err := filepath.Walk(dir, func(path string, info fileutil.FileInfo, err error) error {
 		if err != nil {
 			return err

@@ -38,6 +38,10 @@ const (
 	repairCASOutcomeKeyRepairFailed   = "repair_failed"
 	repairCASOutcomeKeyCommitDone     = "commit_done"
 	repairCASOutcomeKeyFinalizeDone   = "finalize_done"
+
+	// Scanner buffer limits for parsing corruption TSV streams with long paths and messages.
+	repairCASTSVScannerInitBufCap = 64 * 1024   // 64 KiB initial scan buffer capacity
+	repairCASTSVScannerMaxBufCap  = 1024 * 1024 // 1 MiB maximum scan buffer limit
 )
 
 type repairCASCorruptionPipelinePayload struct {
@@ -208,7 +212,7 @@ func RunRepairCASCorruptionViaPipeline(
 
 			scanner := bufio.NewScanner(f)
 			// TSV lines can be large (long absolute paths + messages).
-			scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+			scanner.Buffer(make([]byte, 0, repairCASTSVScannerInitBufCap), repairCASTSVScannerMaxBufCap)
 
 			lineNo := 0
 			for scanner.Scan() {

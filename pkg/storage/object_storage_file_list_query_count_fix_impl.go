@@ -124,8 +124,8 @@ func (f *FileObjectStorage) listStreamSegmentsWithLimit(ctx context.Context, _ *
 				}
 
 				scanner := bufio.NewScanner(file)
-				buf := make([]byte, 0, 1024*1024)
-				scanner.Buffer(buf, 10*1024*1024)
+				buf := make([]byte, 0, DefaultStreamScanBufferSize)
+				scanner.Buffer(buf, MaxStreamScanBufferSize)
 
 				for scanner.Scan() {
 					if ctx.Err() != nil {
@@ -319,8 +319,8 @@ func (f *FileObjectStorage) countStreamSegmentsWithFilters(ctx context.Context, 
 				}
 
 				scanner := bufio.NewScanner(file)
-				buf := make([]byte, 0, 1024*1024)
-				scanner.Buffer(buf, 10*1024*1024)
+				buf := make([]byte, 0, DefaultStreamScanBufferSize)
+				scanner.Buffer(buf, MaxStreamScanBufferSize)
 
 				for scanner.Scan() {
 					if ctx.Err() != nil {
