@@ -28,6 +28,9 @@ const (
 
 	// MaterializedViewSchemaVersion defines the schema for whats_next_lite.json.
 	MaterializedViewSchemaVersion = "whats_next_lite_v1"
+
+	// maxRecentEventsCapacity caps the retained event summaries in the materialized view.
+	maxRecentEventsCapacity = 20
 )
 
 // WhatsNextLiteFilePath returns the canonical path to the materialized view projection.
@@ -136,7 +139,7 @@ func NewWhatsNextMaterializedView(projectRoot string) *WhatsNextMaterializedView
 		backlogs:     make(map[string]*BacklogNode),
 		tasks:        make(map[string]*TaskNode),
 		cvsSessions:  make(map[string]*CVSNode),
-		recentEvents: make([]WhatsNextEventSummary, 0, 20),
+		recentEvents: make([]WhatsNextEventSummary, 0, maxRecentEventsCapacity),
 		lastUpdated:  time.Now(),
 	}
 	spec := accumulator.AccumulatorSpec{
@@ -637,8 +640,8 @@ func (v *WhatsNextMaterializedView) ApplyLifecycleEvent(ev *lifecycle.LifecycleE
 
 func (v *WhatsNextMaterializedView) appendRecentEventLocked(ev WhatsNextEventSummary) {
 	v.recentEvents = append(v.recentEvents, ev)
-	if len(v.recentEvents) > 20 {
-		v.recentEvents = v.recentEvents[len(v.recentEvents)-20:]
+	if len(v.recentEvents) > maxRecentEventsCapacity {
+		v.recentEvents = v.recentEvents[len(v.recentEvents)-maxRecentEventsCapacity:]
 	}
 }
 

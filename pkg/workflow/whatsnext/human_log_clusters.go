@@ -16,6 +16,10 @@ const (
 	humanLogLevelWarn  = "warn"
 	// MaxHumanLogClusters caps ranked error/warn clusters in ambient digests.
 	MaxHumanLogClusters = 3
+
+	// Scanner buffer limits for parsing human log streams with large stack fragments.
+	humanLogScannerInitBufCap = 64 * 1024   // 64 KiB initial scan buffer capacity
+	humanLogScannerMaxBufCap  = 1024 * 1024 // 1 MiB maximum scan buffer limit
 )
 
 // HumanLogClusters is a ranked rollup of human-log [error]/[warn] message bodies.
@@ -39,7 +43,7 @@ func ParseHumanLogClusters(projectRoot string) HumanLogClusters {
 
 	scanner := bufio.NewScanner(f)
 	// Large log lines (stack fragments) — raise buffer above default 64KiB.
-	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	scanner.Buffer(make([]byte, 0, humanLogScannerInitBufCap), humanLogScannerMaxBufCap)
 
 	for scanner.Scan() {
 		line := scanner.Text()

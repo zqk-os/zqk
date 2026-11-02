@@ -19,16 +19,17 @@ import (
 )
 
 const (
-	autoFixBatchPrefix        = "AUTOFIX-"
-	autoFixBatchStatusPending = "pending"
-	autoFixJobPrefix          = "SCH-AUTOFIX-"
-	autoFixJobTypeRunWrapper  = "run_wrapper"
-	autoFixJobTriggerManual   = "manual"
-	autoFixJobCategory        = "auto_fix"
-	autoFixJobExecutionOnce   = "one_time"
-	autoFixJobStatusActive    = "active"
-	autoFixJobLogLevel        = "default"
-	autoFixJobReuseMsg        = "Reusing existing one-time job for auto-fix batch"
+	autoFixBatchPrefix                 = "AUTOFIX-"
+	autoFixBatchStatusPending          = "pending"
+	autoFixJobPrefix                   = "SCH-AUTOFIX-"
+	autoFixJobTypeRunWrapper           = "run_wrapper"
+	autoFixJobTriggerManual            = "manual"
+	autoFixJobCategory                 = "auto_fix"
+	autoFixJobExecutionOnce            = "one_time"
+	autoFixJobStatusActive             = "active"
+	autoFixJobLogLevel                 = "default"
+	autoFixJobReuseMsg                 = "Reusing existing one-time job for auto-fix batch"
+	autoFixInitialObjectIssuesCapacity = 4
 )
 
 // AutoFixBatch represents a batch of auto-fixable issues to be processed
@@ -154,7 +155,7 @@ func (asb *AutoFixSchedulerBatcher) CreateBatches(issues []AutoFixBatchIssue) []
 					ObjectID:   it.ObjectID,
 					ObjectKind: it.ObjectKind,
 					FilePath:   it.FilePath,
-					Issues:     make([]Issue, 0, 4),
+					Issues:     make([]Issue, 0, autoFixInitialObjectIssuesCapacity),
 				}
 				byObject[it.ObjectID] = obj
 				orderedIDs = append(orderedIDs, it.ObjectID)
