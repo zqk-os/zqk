@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewSystemAutoFixProcessPendingCommandBuilder creates a new system_auto_fix_process_pending command
@@ -29,7 +30,10 @@ func NewSystemAutoFixProcessPendingCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("  With explicit project root")
 	help.WithDescriptionLines("  zqk system auto-fix-process-pending --project-root /path/to/project")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.AddStringFlag("project-root", "", "", "Project root directory")
+	builder.AddBoolFlag("sync-glossary", "", false, "Scan for missing glossary terms after processing")
+	builder.AddBoolFlag("sync-glossary-apply", "", false, "Create missing glossary terms inferred from specs")
+	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
 	cmd := builder.Build()
 	return cmd
 }

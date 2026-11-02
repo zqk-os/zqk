@@ -4,7 +4,6 @@ import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/testdrive"
 )
 
@@ -33,15 +32,6 @@ Examples:
 			return runTestDrive(cmd)
 		},
 	})
-
-	cmd.Flags().String("intent", "", "Developer intent prompt or feature brief to simulate")
-	cmd.Flags().String("scenario", testdrive.ScenarioAPIService, "Preset scenario (api-service, cli-tool, stream-pipeline, custom)")
-	cmd.Flags().String("speed", testdrive.SpeedNormal, "Pacing speed for demonstration (normal, fast, instant)")
-	cmd.Flags().Bool("non-interactive", false, "Run non-interactively with automatic defaults (recommended for CI/testing)")
-	cmd.Flags().Bool("dry-run", false, "Simulate test-drive workflow without disk mutations")
-
-	cli.RequireStorage(cmd, false)
-	cli.RequireSession(cmd, false)
 
 	return cmd
 }
