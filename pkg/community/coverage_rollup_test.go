@@ -14,6 +14,17 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+func setupTestProfile(t *testing.T, profile string) (string, string, *community.CoverageRollupReport) {
+	t.Helper()
+	dir := t.TempDir()
+	profilePath := filepath.Join(dir, "coverage.out")
+	require.NoError(t, fileutil.WriteFile(profilePath, []byte(profile), paths.FilePerm644))
+
+	report, err := community.ParseCoverProfile(profilePath)
+	require.NoError(t, err)
+	return dir, profilePath, report
+}
+
 // TestCoverageRollup_ParseAndVerifyArtifact satisfies CRIT-1793575220034202000-1b185e5b:
 // automated package coverage rollups emit a verified statement-coverage telemetry artifact.
 func TestCoverageRollup_ParseAndVerifyArtifact(t *testing.T) {
@@ -28,12 +39,7 @@ func TestCoverageRollup_ParseAndVerifyArtifact(t *testing.T) {
 		"",
 	}, "\n")
 
-	dir := t.TempDir()
-	profilePath := filepath.Join(dir, "coverage.out")
-	require.NoError(t, fileutil.WriteFile(profilePath, []byte(profile), paths.FilePerm644))
-
-	report, err := community.ParseCoverProfile(profilePath)
-	require.NoError(t, err)
+	dir, _, report := setupTestProfile(t, profile)
 	require.NotNil(t, report)
 
 	assert.Equal(t, community.CoverageRollupSchema, report.Schema)
@@ -100,12 +106,7 @@ func TestCoverageRollup_VerifyDetectsTamper(t *testing.T) {
 	t.Parallel()
 
 	profile := "mode: set\ngithub.com/zqk-os/zqk/pkg/community/a.go:1.1,2.2 4 4\n"
-	dir := t.TempDir()
-	profilePath := filepath.Join(dir, "coverage.out")
-	require.NoError(t, fileutil.WriteFile(profilePath, []byte(profile), paths.FilePerm644))
-
-	report, err := community.ParseCoverProfile(profilePath)
-	require.NoError(t, err)
+	dir, _, report := setupTestProfile(t, profile)
 	report.ThresholdPct = 50
 	report.MeetsThreshold = report.CoveragePct >= report.ThresholdPct
 
@@ -124,12 +125,7 @@ func TestCoverageRollup_IngestIntoPipelineTelemetry(t *testing.T) {
 	t.Parallel()
 
 	profile := "mode: atomic\ngithub.com/zqk-os/zqk/pkg/community/a.go:1.1,2.2 8 8\n"
-	dir := t.TempDir()
-	profilePath := filepath.Join(dir, "coverage.out")
-	require.NoError(t, fileutil.WriteFile(profilePath, []byte(profile), paths.FilePerm644))
-
-	report, err := community.ParseCoverProfile(profilePath)
-	require.NoError(t, err)
+	dir, _, report := setupTestProfile(t, profile)
 	report.ThresholdPct = 85
 	report.MeetsThreshold = report.CoveragePct >= report.ThresholdPct
 	assert.True(t, report.MeetsThreshold)
