@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -18,8 +20,9 @@ func TestCheckinWriteQueue(t *testing.T) {
 		doneCh:     make(chan struct{}),
 	}
 
-	// Start the worker manually
-	go queue.worker()
+	// Start the worker manually using labeled goroutine
+	goroutinelabels.NewGoroutine("test_checkin_write_queue", "test checkin queue worker").StartSimple(queue.worker)
+	defer queue.Stop()
 
 	timer1 := &CheckinTimer{
 		TaskID:    "ATK-123",
@@ -30,17 +33,11 @@ func TestCheckinWriteQueue(t *testing.T) {
 	// Enqueue an item
 	queue.Enqueue(tmpDir, timer1)
 
-	// Wait for the next tick (50ms + buffer)
-	time.Sleep(100 * time.Millisecond)
-
-	// Verify it was written
+	// Verify it was written using assert.Eventually with a 2-3s window to account for async channel dispatch under runner load
 	path := CheckinTimerPath(tmpDir, "ATK-123")
-	if !fileutil.Exists(path) {
-		t.Errorf("Expected timer to be written to %s, but it was not", path)
-	}
-
-	// Stop the queue
-	queue.Stop()
+	assert.Eventually(t, func() bool {
+		return fileutil.Exists(path)
+	}, 3*time.Second, 20*time.Millisecond, "Expected timer to be written to %s, but it was not", path)
 }
 
 func TestCheckinWriteQueue_Reducer(t *testing.T) {
@@ -87,7 +84,7 @@ func TestCheckinWriteQueue_Tombstone(t *testing.T) {
 		shutdownCh: make(chan chan struct{}),
 		doneCh:     make(chan struct{}),
 	}
-	go queue.worker()
+	goroutinelabels.NewGoroutine("test_checkin_tombstone", "test checkin queue worker").StartSimple(queue.worker)
 	defer queue.Stop()
 
 	timer := &CheckinTimer{
@@ -108,7 +105,7 @@ func TestCheckinWriteQueue_Tombstone(t *testing.T) {
 		t.Errorf("Expected Get on tombstoned path to return nil, false, got %v", val)
 	}
 
-	time.Sleep(100 * time.Millisecond)
+	queue.FlushWait()
 
 	if fileutil.Exists(path) {
 		t.Errorf("Expected timer NOT to be written to %s after tombstone, but it exists", path)
