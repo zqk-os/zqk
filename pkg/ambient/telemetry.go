@@ -5,17 +5,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Canonical telemetry status states for ambient engine health.
 const (
 	TelemetryStatusHealthy   = "healthy"
+	TelemetryStatusRunning   = "running"
 	TelemetryStatusDegraded  = "degraded"
 	TelemetryStatusStopped   = "stopped"
 	TelemetryStatusQuiescent = "quiescent"
@@ -81,6 +84,8 @@ type AmbientTelemetryReport struct {
 	ConsensusRevoked      uint64                     `json:"consensus_revoked"`
 	ReflexActionsTotal    uint64                     `json:"reflex_actions_total"`
 	ReflexRealignCount    uint64                     `json:"reflex_realign_count"`
+	TicksExecuted         uint64                     `json:"ticks_executed,omitempty"`
+	Holons                []HolonRecord              `json:"holons,omitempty"`
 	Warnings              []string                   `json:"warnings,omitempty"`
 }
 
@@ -239,7 +244,7 @@ func (r *AmbientTelemetryReport) IsHealthy() bool {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	if !strings.EqualFold(r.Status, TelemetryStatusHealthy) {
+	if !strings.EqualFold(r.Status, TelemetryStatusHealthy) && !strings.EqualFold(r.Status, TelemetryStatusRunning) {
 		return false
 	}
 	if strings.EqualFold(r.CircuitBreakerStatus, CircuitBreakerStatusOpen) ||
@@ -757,6 +762,38 @@ func SaveTelemetryReport(path string, report *AmbientTelemetryReport) error {
 		return ErrNilTelemetryReport
 	}
 	return fileutil.WriteSecureJSONIndent(path, report)
+}
+
+// LoadTelemetryReport loads the latest ambient telemetry snapshot for the specified projectRoot.
+// It checks the latest snapshot location first (filepath.Join(projectRoot, paths.AmbientTelemetryLatestRelFile)),
+// then falls back to paths.StateDirPath(projectRoot)/ambient/telemetry-latest.json,
+// and paths.StateDirPath(projectRoot)/ambient/telemetry.json.
+func LoadTelemetryReport(projectRoot string) (*AmbientTelemetryReport, error) {
+	if strings.TrimSpace(projectRoot) == "" {
+		return nil, ErrStatePathRequired
+	}
+
+	candidates := []string{
+		filepath.Join(projectRoot, paths.AmbientTelemetryLatestRelFile),
+		filepath.Join(paths.StateDirPath(projectRoot), "ambient", "telemetry-latest.json"),
+		filepath.Join(paths.StateDirPath(projectRoot), "ambient", "telemetry.json"),
+	}
+
+	for _, candidate := range candidates {
+		if fi, err := fileutil.Stat(candidate); err == nil && !fi.IsDir() && fi.Size() > 0 {
+			report, err := SafeLoadTelemetryReport(candidate)
+			if err == nil && report != nil {
+				if report.Status == TelemetryStatusHealthy {
+					report.Status = TelemetryStatusRunning
+				}
+				report.CircuitBreakerStatus = strings.ToLower(report.CircuitBreakerStatus)
+				return report, nil
+			}
+		}
+	}
+
+	primaryPath := filepath.Join(projectRoot, paths.AmbientTelemetryLatestRelFile)
+	return SafeLoadTelemetryReport(primaryPath)
 }
 
 func validateChannelAndReport(ch chan<- *AmbientTelemetryReport, report *AmbientTelemetryReport) error {

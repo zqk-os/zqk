@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -112,8 +111,7 @@ func runHolonStatusFromCommand(cmd *cobra.Command) error {
 
 func runHolonStatusWithEngine(w io.Writer, jsonOut bool) error {
 	projectRoot := paths.ResolveProjectRoot(".")
-	telemetryFile := filepath.Join(paths.StateDirPath(projectRoot), "ambient", "telemetry.json")
-	report, err := ambient.SafeLoadTelemetryReport(telemetryFile)
+	report, err := ambient.LoadTelemetryReport(projectRoot)
 	if err != nil || report == nil || report.Status == ambient.TelemetryStatusStopped {
 		report = ambient.NewAmbientTelemetryReport(
 			ambient.WithStatus(ambient.TelemetryStatusHealthy),

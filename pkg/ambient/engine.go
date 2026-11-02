@@ -3,6 +3,8 @@ package ambient
 
 import (
 	"context"
+	"errors"
+	"strings"
 	"sync"
 	"time"
 
@@ -42,6 +44,7 @@ const (
 var (
 	ErrNilEngine              = errfmt.Errorf("ambient engine cannot be nil")
 	ErrEngineStopped          = errfmt.Errorf("ambient engine is stopped")
+	ErrEngineNotRunning       = ErrEngineStopped
 	ErrEngineAlreadyRunning   = errfmt.Errorf("ambient engine is already running")
 	ErrEngineDegraded         = errfmt.Errorf("ambient engine is degraded")
 	ErrInvalidTickInterval    = errfmt.Errorf("tick interval must be strictly positive")
@@ -61,6 +64,7 @@ type AmbientEngineConfig struct {
 	ConsensusArbiterConfig *ConsensusArbiterConfig  `json:"consensus_arbiter_config,omitempty"`
 	ReflexConfig           *ReflexLoopConfig        `json:"reflex_config,omitempty"`
 	ReflexLoopConfig       *ReflexLoopConfig        `json:"reflex_loop_config,omitempty"`
+	StatePath              string                   `json:"state_path,omitempty"`
 }
 
 // DefaultAmbientEngineConfig returns production defaults for AmbientEngine.
@@ -139,6 +143,7 @@ type AmbientEngine struct {
 	mu                    sync.RWMutex
 	config                AmbientEngineConfig
 	state                 EngineState
+	statePath             string
 	intentStream          *AmbientIntentStream
 	epochSynchronizer     *EpochSynchronizer
 	backpressureRegulator *BackpressureRegulator
@@ -191,6 +196,7 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 	return &AmbientEngine{
 		config:                cfg,
 		state:                 EngineStateStopped,
+		statePath:             cfg.StatePath,
 		intentStream:          stream,
 		epochSynchronizer:     epochSyncer,
 		backpressureRegulator: regulator,
@@ -352,4 +358,65 @@ func (e *AmbientEngine) Transition(to EngineState) error {
 // TransitionState is an alias for Transition.
 func (e *AmbientEngine) TransitionState(to EngineState) error {
 	return e.Transition(to)
+}
+
+// StatePath returns the configured state path for telemetry snapshots.
+func (e *AmbientEngine) StatePath() string {
+	if e == nil {
+		return ""
+	}
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.statePath
+}
+
+// SetStatePath updates the state path for telemetry snapshots.
+func (e *AmbientEngine) SetStatePath(p string) {
+	if e == nil {
+		return
+	}
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	e.statePath = p
+}
+
+// SaveTelemetryReport persists the engine's current telemetry report to the specified paths or default statePath.
+func (e *AmbientEngine) SaveTelemetryReport(customPaths ...string) error {
+	if e == nil {
+		return ErrNilEngine
+	}
+	report := e.TelemetryReport()
+	if report == nil {
+		return ErrNilTelemetryReport
+	}
+
+	var targets []string
+	for _, p := range customPaths {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			targets = append(targets, p)
+		}
+	}
+	if len(targets) == 0 {
+		e.mu.RLock()
+		sp := e.statePath
+		e.mu.RUnlock()
+		if sp != "" {
+			targets = append(targets, sp)
+		}
+	}
+	if len(targets) == 0 {
+		return ErrStatePathRequired
+	}
+
+	var errs []error
+	for _, target := range targets {
+		if err := SaveTelemetryReport(target, report); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+	return nil
 }

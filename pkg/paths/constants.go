@@ -34,6 +34,12 @@ var (
 
 	// AgentPacksDir holds regenerable per-vendor boot packs.
 	AgentPacksDir = ProjectDataDir + "/agent_packs"
+
+	// AmbientTelemetryLatestRelFile is the project-relative path to the latest ambient telemetry snapshot.
+	AmbientTelemetryLatestRelFile = ProjectDataDir + "/state/ambient/telemetry-latest.json"
+
+	// AmbientTelemetryRelFile is the project-relative path to the ambient telemetry snapshot.
+	AmbientTelemetryRelFile = ProjectDataDir + "/state/ambient/telemetry.json"
 )
 
 const (
