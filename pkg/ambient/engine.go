@@ -1,6 +1,7 @@
 package ambient
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -104,6 +105,12 @@ type AmbientEngine struct {
 	epochSynchronizer     *EpochSynchronizer
 	backpressureRegulator *BackpressureRegulator
 	faultIsolator         *FaultIsolator
+
+	startedAt      time.Time
+	ticksExecuted  uint64
+	cancelFn       context.CancelFunc
+	supervisorDone chan struct{}
+	supervisorWg   sync.WaitGroup
 }
 
 // NewAmbientEngine constructs a new AmbientEngine with validated configuration and initialized sub-components.
