@@ -423,6 +423,44 @@ func (e *AmbientEngine) GetActiveLease(taskID string) (*SwarmTaskLease, bool) {
 	return disp.GetTaskLease(taskID)
 }
 
+// CompleteTask finalizes work-claiming and commits consensus state.
+func (e *AmbientEngine) CompleteTask(taskID, seatID string) error {
+	return withSwarmDispatcher(e, func(disp *SwarmDispatcher) error {
+		return disp.CompleteTask(taskID, seatID)
+	})
+}
+
+// YieldTask relinquishes work-claiming and handles task retry or quarantine.
+func (e *AmbientEngine) YieldTask(taskID, seatID, reason string) error {
+	return withSwarmDispatcher(e, func(disp *SwarmDispatcher) error {
+		return disp.YieldTask(taskID, seatID, reason)
+	})
+}
+
+// TaskEvents returns the receive-only channel for published swarm task lifecycle events.
+func (e *AmbientEngine) TaskEvents() <-chan SwarmTaskEvent {
+	if e == nil {
+		return nil
+	}
+	disp := e.SwarmDispatcher()
+	if disp == nil {
+		return nil
+	}
+	return disp.EventStream()
+}
+
+// EnqueueTask adds a task to the engine's unassigned queue.
+func (e *AmbientEngine) EnqueueTask(taskID string) bool {
+	if e == nil {
+		return false
+	}
+	disp := e.SwarmDispatcher()
+	if disp == nil {
+		return false
+	}
+	return disp.EnqueueTask(taskID)
+}
+
 // Transition attempts to transition the engine to a new lifecycle state following valid FSM paths.
 func (e *AmbientEngine) Transition(to EngineState) error {
 	if e == nil {

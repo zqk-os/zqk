@@ -140,7 +140,7 @@ func (e *AmbientEngine) superviseTick(ctx context.Context) {
 	}
 
 	if e.swarmDispatcher != nil {
-		e.swarmDispatcher.EvictExpiredLeases()
+		e.swarmDispatcher.ObserveTick(ctx)
 	}
 }
 
