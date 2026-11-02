@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func testMCPLogger() logging.Logger {
@@ -107,8 +108,18 @@ func TestInstallToIDE_CursorMcpJSONIncludesStdioType(t *testing.T) {
 	if entry.Type != mcpTransportStdio {
 		t.Fatalf("type=%q want %q", entry.Type, mcpTransportStdio)
 	}
-	if !strings.Contains(entry.Command, "${workspaceFolder}/bin/") {
-		t.Fatalf("command=%q want workspaceFolder bin interpolation", entry.Command)
+	wantCmd := filepath.Join(root, "bin", MCPRoleProcessName(MCPRoleIDEAdapter))
+	if entry.Command != wantCmd && entry.Command != target {
+		t.Fatalf("command=%q want absolute seated root %q (or target %q)", entry.Command, wantCmd, target)
+	}
+	if entry.Cwd != root {
+		t.Fatalf("cwd=%q want absolute projectRoot %q", entry.Cwd, root)
+	}
+	if got := entry.Env[zqkenv.ProjectRoot().Name()]; got != root {
+		t.Fatalf("%s=%q want %q", zqkenv.ProjectRoot().Name(), got, root)
+	}
+	if strings.Contains(entry.Command, "${workspaceFolder}") || strings.Contains(entry.Cwd, "${workspaceFolder}") {
+		t.Fatalf("must not use workspaceFolder interpolation for multi-root pin: command=%q cwd=%q", entry.Command, entry.Cwd)
 	}
 	if len(entry.Args) < 2 || entry.Args[0] != "mcp" || entry.Args[1] != "ide-adapter" {
 		t.Fatalf("args=%v want mcp ide-adapter …", entry.Args)

@@ -251,6 +251,13 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 			if !fileutil.IsRegularFile(target) {
 				target = execPath
 			}
+			// Pin absolute seated-kernel paths — never ${workspaceFolder}.
+			// Cursor multi-root can resolve workspaceFolder to a sibling checkout
+			// (e.g. public-candidate) while the studio daemon listens on :8443,
+			// spawning the wrong-tree ide-adapter against the seated kernel.
+			// Re-run mcp ensure / AutoInstall after clone relocate.
+			// TRACK: TDE-MCP-MULTIROOT-IDE-ADAPTER-001 / POL-AGENT-KERNEL-ROOT-BINDING-001
+			roleBin := filepath.Join(projectRoot, "bin", MCPRoleProcessName(MCPRoleIDEAdapter))
 			if _, linkErr := EnsureMCPRoleSymlink(projectRoot, MCPRoleIDEAdapter, target); linkErr != nil {
 				logging.Fluent(logger).Warn("MCP ide-adapter role symlink unavailable; using target bin in mcp.json").
 					WithError(linkErr).
@@ -258,14 +265,10 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 					Log()
 				command = target
 			} else {
-				// Interpolated paths: Cursor Customize + clones must not bake machine abs paths.
-				command = "${workspaceFolder}/bin/" + MCPRoleProcessName(MCPRoleIDEAdapter)
+				command = roleBin
 			}
-			cwd = "${workspaceFolder}"
-			env = map[string]string{
-				zqkenv.ProjectRoot().Name():   "${workspaceFolder}",
-				zqkenv.MCPConfigPath().Name(): "${workspaceFolder}/" + paths.ProjectDataDir + "/" + paths.MCPDir + "/config.yaml",
-			}
+			cwd = projectRoot
+			env = mcpEnv
 			args = []string{"mcp", "ide-adapter", "--tcp", DefaultDaemonTCP}
 		} else {
 			// For global daemons and IDEs (AGY, Claude Desktop, Windsurf), we need a project-specific entry
@@ -297,7 +300,9 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 	}
 	if isIDEStdioAdapterConfig(ideName, configPath) {
 		entry.Type = mcpTransportStdio
-		entry.EnvFile = "${workspaceFolder}/" + paths.ProjectDataDir + "/" + paths.MCPDir + "/cursor-stdio.env"
+		if projectRoot != "" {
+			entry.EnvFile = filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, "cursor-stdio.env")
+		}
 	}
 	config.MCPServers[serverName] = entry
 	rawConfig["mcpServers"] = config.MCPServers
