@@ -259,13 +259,20 @@ func expectsPeerAck(ev map[string]any, eventType, toAgentID string) bool {
 	}
 }
 
+const (
+	// DefaultCorrespondenceScanBufferSize is the initial allocation size for scanning JSONL feed events (64 KiB).
+	DefaultCorrespondenceScanBufferSize = 64 * 1024
+	// MaxCorrespondenceLineSize is the maximum supported line size for feed events including large steering bodies (2 MiB).
+	MaxCorrespondenceLineSize = 2 * 1024 * 1024
+)
+
 func readJSONLEvents(path string) ([]map[string]any, error) {
 	var events []map[string]any
 	err := fileutil.WithOpenFile(path, func(f *os.File) error {
 		sc := bufio.NewScanner(f)
 		// Large steer bodies; raise buffer.
-		buf := make([]byte, 0, 64*1024)
-		sc.Buffer(buf, 2*1024*1024)
+		buf := make([]byte, 0, DefaultCorrespondenceScanBufferSize)
+		sc.Buffer(buf, MaxCorrespondenceLineSize)
 		for sc.Scan() {
 			line := strings.TrimSpace(sc.Text())
 			if line == "" {

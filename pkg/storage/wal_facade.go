@@ -20,6 +20,8 @@ const (
 	LegacyObjectWALFileName2 = wal.LegacyObjectWALFileName2
 	MaxWALLineSize           = wal.MaxWALLineSize
 	maxWALLineSize           = wal.MaxWALLineSize
+	DefaultWALScanBufferSize = wal.DefaultWALScanBufferSize
+	defaultWALScanBufferSize = wal.DefaultWALScanBufferSize
 	objectWALFileName        = wal.ObjectWALFileName
 	objectWALCheckpointExt   = wal.ObjectWALCheckpointExt
 	legacyObjectWALFileName  = wal.LegacyObjectWALFileName

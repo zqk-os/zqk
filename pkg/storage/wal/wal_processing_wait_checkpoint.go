@@ -44,7 +44,7 @@ func WaitForWALProcessingCheckpoint(projectRoot string, timeout time.Duration, s
 	walFile, err := fileutil.Open(walPath)
 	if err == nil {
 		scanner := bufio.NewScanner(walFile)
-		buf := make([]byte, 0, 64*1024)
+		buf := make([]byte, 0, DefaultWALScanBufferSize)
 		scanner.Buffer(buf, maxWALLineSize)
 		var maxSeq int64
 		for scanner.Scan() {

@@ -32,12 +32,15 @@ const (
 	// MaxWALLineSize is the maximum supported line length when reading the WAL.
 	// Records can contain base64-encoded YAML (data_base64); default bufio.Scanner limit (64KB) is too small.
 	MaxWALLineSize = 2 * 1024 * 1024 // 2 MiB per line
+	// DefaultWALScanBufferSize is the initial allocation size for WAL scanner and tail read buffers (64 KiB).
+	DefaultWALScanBufferSize = 64 * 1024
 
 	objectWALFileName        = ObjectWALFileName
 	objectWALCheckpointExt   = ObjectWALCheckpointExt
 	legacyObjectWALFileName  = LegacyObjectWALFileName
 	legacyObjectWALFileName2 = LegacyObjectWALFileName2
 	maxWALLineSize           = MaxWALLineSize
+	defaultWALScanBufferSize = DefaultWALScanBufferSize
 )
 
 // walReplayIdle memos a ReplayWALChunk pass so idle polls skip Open while the WAL stamp
@@ -163,7 +166,7 @@ func sanitizeTornTailOnOpen(path string) error {
 		return nil
 	}
 
-	chunkSize := int64(64 * 1024)
+	chunkSize := int64(DefaultWALScanBufferSize)
 	if chunkSize > size {
 		chunkSize = size
 	}
@@ -508,7 +511,7 @@ func ReplayWALChunk(projectRoot string, appliedSeq int64, limit int, fn func(rec
 	defer f.Close()
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	sc := bufio.NewScanner(f)
-	buf := make([]byte, 0, 64*1024)
+	buf := make([]byte, 0, DefaultWALScanBufferSize)
 	sc.Buffer(buf, maxWALLineSize)
 	for sc.Scan() {
 		if limit > 0 && replayed >= limit {
@@ -606,7 +609,7 @@ func CompactWAL(projectRoot string) error {
 	var unappliedRecords []WALRecord
 	var corruptLines [][]byte
 	scanner := bufio.NewScanner(walFile)
-	buf := make([]byte, 0, 64*1024)
+	buf := make([]byte, 0, DefaultWALScanBufferSize)
 	scanner.Buffer(buf, maxWALLineSize)
 	var totalLines, totalRecords, keptCount int64
 	var minSeq, maxSeq int64
@@ -753,7 +756,7 @@ func ReadLastSeqFromTail(projectRoot string) (int64, error) {
 		return 0, err
 	}
 
-	readSize := int64(64 * 1024)
+	readSize := int64(DefaultWALScanBufferSize)
 	if st.Size() < readSize {
 		readSize = st.Size()
 	}
@@ -763,7 +766,8 @@ func ReadLastSeqFromTail(projectRoot string) (int64, error) {
 	}
 
 	scanner := bufio.NewScanner(f)
-	scanner.Buffer(make([]byte, maxWALLineSize), maxWALLineSize)
+	buf := make([]byte, 0, DefaultWALScanBufferSize)
+	scanner.Buffer(buf, maxWALLineSize)
 	var lastSeq int64
 	for scanner.Scan() {
 		line := scanner.Bytes()
