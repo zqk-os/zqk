@@ -532,6 +532,33 @@ if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
 			exit 1
 		fi
 	fi
+
+	# 7. Gofmt Formatting Ratchet Gate
+	# Enforces that all staged Go files are strictly formatted according to gofmt standards.
+	if [ -n "$STAGED_GO_FILES" ]; then
+		FORMAT_VIOLATIONS=0
+		for gf in $STAGED_GO_FILES; do
+			# Skip exemptions (vendor, testdata)
+			case "$gf" in
+				vendor/*|*/testdata/*|testdata/*)
+					continue
+					;;
+			esac
+
+			if [ -f "$gf" ]; then
+				if [ -n "$(gofmt -l "$gf" 2>/dev/null)" ]; then
+					echo "❌ [ZQK PRE-COMMIT] Formatting violation in staged file: $gf" >&2
+					echo "   File is not formatted according to gofmt standards." >&2
+					echo "   Remediation: run 'gofmt -w $gf' and stage the changes." >&2
+					FORMAT_VIOLATIONS=$((FORMAT_VIOLATIONS + 1))
+				fi
+			fi
+		done
+
+		if [ "$FORMAT_VIOLATIONS" -gt 0 ]; then
+			exit 1
+		fi
+	fi
 fi
 `
 
