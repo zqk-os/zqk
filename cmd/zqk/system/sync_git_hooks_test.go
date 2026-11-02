@@ -128,6 +128,12 @@ func TestEnsureGitHooks_InstallsPreCommitAndPrePush(t *testing.T) {
 	if !bytes.Contains(preCommitContent, []byte("Failed to find or compile zqk-vet verification engine! Aborting commit.")) {
 		t.Errorf("pre-commit missing fail-closed zqk-vet check")
 	}
+	if !bytes.Contains(preCommitContent, []byte("Gofmt Formatting Ratchet Gate")) {
+		t.Errorf("pre-commit missing gofmt formatting ratchet gate")
+	}
+	if !bytes.Contains(preCommitContent, []byte("Formatting violation in staged file")) {
+		t.Errorf("pre-commit missing formatting violation message")
+	}
 
 	prePushContent, err := fileutil.ReadFile(prePush)
 	if err != nil {
@@ -166,5 +172,94 @@ func TestEnsureGitHooks_PreCommitSkipsZqkVetInConsumerRepo(t *testing.T) {
 	// Verify that the hook guards zqk-vet with cmd/zqk-vet/main.go check
 	if !bytes.Contains(content, []byte(`if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then`)) {
 		t.Errorf("pre-commit missing guard: if [ -f \"$REPO_ROOT/cmd/zqk-vet/main.go\" ]; then")
+	}
+}
+
+func TestPreCommitHook_GofmtFormattingGate(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	gitDir := filepath.Join(root, ".git")
+	if err := fileutil.EnsureDir(gitDir); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := EnsureGitHooks(root, nil); err != nil {
+		t.Fatalf("EnsureGitHooks failed: %v", err)
+	}
+
+	preCommit := filepath.Join(gitDir, "hooks", "pre-commit")
+	content, err := fileutil.ReadFile(preCommit)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	requiredTokens := []string{
+		"7. Gofmt Formatting Ratchet Gate",
+		`gofmt -l "$gf"`,
+		"❌ [ZQK PRE-COMMIT] Formatting violation in staged file: $gf",
+		"File is not formatted according to gofmt standards.",
+		"Remediation: run 'gofmt -w $gf' and stage the changes.",
+		"vendor/*|*/testdata/*|testdata/*",
+	}
+
+	for _, token := range requiredTokens {
+		if !bytes.Contains(content, []byte(token)) {
+			t.Errorf("pre-commit hook missing required token %q", token)
+		}
+	}
+
+	// Verify template in tools/git-hooks also contains Gate 7
+	toolsHook := filepath.Join(root, "tools", "git-hooks", "pre-commit")
+	toolsContent, err := fileutil.ReadFile(toolsHook)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, token := range requiredTokens {
+		if !bytes.Contains(toolsContent, []byte(token)) {
+			t.Errorf("tools/git-hooks/pre-commit missing required token %q", token)
+		}
+	}
+}
+
+func TestSyncGitHooks_ValidatesAndInstallsHookTemplates(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	gitDir := filepath.Join(root, ".git")
+	if err := fileutil.EnsureDir(gitDir); err != nil {
+		t.Fatal(err)
+	}
+
+	err := EnsureGitHooks(root, nil)
+	if err != nil {
+		t.Fatalf("EnsureGitHooks failed: %v", err)
+	}
+
+	toolsHook := filepath.Join(root, "tools", "git-hooks", "pre-commit")
+	installedHook := filepath.Join(gitDir, "hooks", "pre-commit")
+
+	if !fileutil.Exists(toolsHook) {
+		t.Fatalf("expected template hook at %s", toolsHook)
+	}
+	if !fileutil.Exists(installedHook) {
+		t.Fatalf("expected installed hook at %s", installedHook)
+	}
+
+	// Corrupt installed hook and verify re-sync repairs it
+	if err := fileutil.WriteFile(installedHook, []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	err = EnsureGitHooks(root, nil)
+	if err != nil {
+		t.Fatalf("EnsureGitHooks repair failed: %v", err)
+	}
+
+	equal, err := compareFiles(toolsHook, installedHook)
+	if err != nil {
+		t.Fatalf("compareFiles: %v", err)
+	}
+	if !equal {
+		t.Fatalf("re-sync did not restore installed hook to match template")
 	}
 }
