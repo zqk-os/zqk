@@ -156,7 +156,7 @@ func NewRiverConvergenceEngine(ctx context.Context, cfg RiverConfig) (*RiverConv
 
 // IngestDrop sends a single raindrop of intent into the convergence engine.
 func (e *RiverConvergenceEngine) IngestDrop(drop IntentDrop) error {
-	if e.closed.Load() {
+	if e == nil || e.closed.Load() {
 		return ErrEngineClosed
 	}
 	if drop.MissionID == "" {
@@ -183,7 +183,7 @@ func (e *RiverConvergenceEngine) IngestDrop(drop IntentDrop) error {
 
 // Close gracefully terminates the convergence engine and waits for worker goroutines to flush.
 func (e *RiverConvergenceEngine) Close() error {
-	if e.closed.Swap(true) {
+	if e == nil || e.closed.Swap(true) {
 		return nil
 	}
 	e.cancel()
@@ -194,8 +194,14 @@ func (e *RiverConvergenceEngine) Close() error {
 
 // GetRiver retrieves an active Intent River by ID.
 func (e *RiverConvergenceEngine) GetRiver(riverID string) (*IntentRiver, bool) {
+	if e == nil {
+		return nil, false
+	}
 	e.mu.RLock()
 	defer e.mu.RUnlock()
+	if e.rivers == nil {
+		return nil, false
+	}
 	river, ok := e.rivers[riverID]
 	if !ok {
 		return nil, false
@@ -209,8 +215,14 @@ func (e *RiverConvergenceEngine) GetRiver(riverID string) (*IntentRiver, bool) {
 
 // ListRivers returns a snapshot of all active rivers.
 func (e *RiverConvergenceEngine) ListRivers() []*IntentRiver {
+	if e == nil {
+		return nil
+	}
 	e.mu.RLock()
 	defer e.mu.RUnlock()
+	if e.rivers == nil {
+		return nil
+	}
 	result := make([]*IntentRiver, 0, len(e.rivers))
 	for _, r := range e.rivers {
 		copyRiver := *r
@@ -223,6 +235,9 @@ func (e *RiverConvergenceEngine) ListRivers() []*IntentRiver {
 
 // Metrics returns real-time convergence statistics.
 func (e *RiverConvergenceEngine) Metrics() ConvergenceMetrics {
+	if e == nil {
+		return ConvergenceMetrics{}
+	}
 	e.mu.RLock()
 	defer e.mu.RUnlock()
 	avgAlign := 0.0
