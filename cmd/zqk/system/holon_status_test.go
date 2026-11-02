@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/ambient"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
 
 func TestHolonStatusCommand_HumanOutput(t *testing.T) {
@@ -367,5 +368,20 @@ func TestNewSystemCmd_HolonRegistration(t *testing.T) {
 	compatCmd, _, err := sysCmd.Find([]string{"holon-status"})
 	if err != nil || compatCmd == nil {
 		t.Fatalf("expected to resolve 'system holon-status', got err: %v", err)
+	}
+}
+
+// TestHolonStatus_ASTAudit ensures that holon_status.go has zero medium or high severity AST violations.
+func TestHolonStatus_ASTAudit(t *testing.T) {
+	auditor := qa.NewASTAuditor()
+	violations, err := auditor.AuditFile("holon_status.go")
+	if err != nil {
+		t.Fatalf("failed to audit holon_status.go: %v", err)
+	}
+
+	for _, v := range violations {
+		if v.Severity == "high" || v.Severity == "medium" {
+			t.Errorf("AST violation [%s] at %s: %s", v.Severity, v.Pos, v.Message)
+		}
 	}
 }
