@@ -168,4 +168,3 @@ func assertStreamMergedSuccessfully(t *testing.T, hydrator *StreamHydrator, stre
 	assert.Equal(t, StreamStatusMerged, merged.Status)
 	return merged
 }
-
