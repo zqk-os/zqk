@@ -146,41 +146,105 @@ func TestHolonStatus_TableDrivenOutputFormats(t *testing.T) {
 	}
 }
 
-// TestHolonStatus_BoundaryAndErrorRecovery satisfies CRIT-1793589814624126000-aa123817
-// by verifying nil-safe error recovery when ambient holon telemetry providers or stream hydrators
-// are uninitialized, nil, or empty.
-func TestHolonStatus_BoundaryAndErrorRecovery(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
+type boundaryTestCase struct {
+	name                string
+	aggregator          *ambient.HolonTelemetryAggregator
+	expectedHealth      string
+	expectedWarningText string
+	expectNoHolonsText  bool
+}
 
-	healthyReg := ambient.NewHolonLifecycleRegistry()
-	_ = healthyReg.Register("test-worker", "Test worker holon")
-	_ = healthyReg.Transition("test-worker", ambient.HolonPhaseStarting)
-	_ = healthyReg.Transition("test-worker", ambient.HolonPhaseRunning)
+func createTestHealthyProviders(t *testing.T, ctx context.Context) (*ambient.HolonLifecycleRegistry, *ambient.StreamHydrator, *ambient.RiverConvergenceEngine) {
+	t.Helper()
+	reg := ambient.NewHolonLifecycleRegistry()
+	if err := reg.Register("test-worker", "Test worker holon"); err != nil {
+		t.Fatalf("failed to register test worker: %v", err)
+	}
+	if err := reg.Transition("test-worker", ambient.HolonPhaseStarting); err != nil {
+		t.Fatalf("failed to transition test worker to starting: %v", err)
+	}
+	if err := reg.Transition("test-worker", ambient.HolonPhaseRunning); err != nil {
+		t.Fatalf("failed to transition test worker to running: %v", err)
+	}
 
-	healthyHydrator := ambient.NewStreamHydrator(ambient.DefaultStreamCapacity, ambient.DefaultMinWeightFloor)
+	hydrator := ambient.NewStreamHydrator(ambient.DefaultStreamCapacity, ambient.DefaultMinWeightFloor)
 
-	healthyEngine, err := ambient.NewRiverConvergenceEngine(ctx, ambient.RiverConfig{
+	engine, err := ambient.NewRiverConvergenceEngine(ctx, ambient.RiverConfig{
 		RootVisionID:       "VIS-ROOT-TEST",
 		RootVisionVector:   []float64{1.0, 0.0, 0.0},
 		ConvergenceWindow:  ambient.DefaultConvergenceWindow,
 		MinConsensusDrops:  1,
 		AlignmentThreshold: 0.70,
 	})
-	if err == nil && healthyEngine != nil {
-		defer healthyEngine.Close()
+	if err != nil {
+		t.Fatalf("failed to initialize river engine: %v", err)
 	}
+	return reg, hydrator, engine
+}
 
-	emptyReg := ambient.NewHolonLifecycleRegistry()
-	emptyHydrator := ambient.NewStreamHydrator(ambient.DefaultStreamCapacity, ambient.DefaultMinWeightFloor)
+func assertBoundaryRecoveryOutput(t *testing.T, tc boundaryTestCase) {
+	t.Helper()
+	t.Run(tc.name+"_tabular", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := runHolonStatusWithAggregator(&buf, false, tc.aggregator)
+		if err != nil {
+			t.Fatalf("expected nil error on boundary recovery, got %v", err)
+		}
 
-	tests := []struct {
-		name                string
-		aggregator          *ambient.HolonTelemetryAggregator
-		expectedHealth      string
-		expectedWarningText string
-		expectNoHolonsText  bool
-	}{
+		output := buf.String()
+		if !strings.Contains(output, "Middle-Brain Holon Vitality & Telemetry Dashboard") {
+			t.Fatalf("expected dashboard banner in output, got: %s", output)
+		}
+		if !strings.Contains(output, tc.expectedHealth) {
+			t.Fatalf("expected health status %q in output, got:\n%s", tc.expectedHealth, output)
+		}
+		if tc.expectedWarningText != "" && !strings.Contains(output, tc.expectedWarningText) {
+			t.Fatalf("expected warning %q in output, got:\n%s", tc.expectedWarningText, output)
+		}
+		if tc.expectNoHolonsText && !strings.Contains(output, "(no holons registered)") {
+			t.Fatalf("expected '(no holons registered)' in output, got:\n%s", output)
+		}
+	})
+
+	t.Run(tc.name+"_json", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := runHolonStatusWithAggregator(&buf, true, tc.aggregator)
+		if err != nil {
+			t.Fatalf("expected nil error on boundary recovery json, got %v", err)
+		}
+
+		var snap ambient.MiddleBrainTelemetrySnapshot
+		if err := json.Unmarshal(buf.Bytes(), &snap); err != nil {
+			t.Fatalf("failed to decode JSON output: %v\nOutput: %s", err, buf.String())
+		}
+		if snap.HealthStatus != tc.expectedHealth {
+			t.Fatalf("expected health %q in snapshot, got %q", tc.expectedHealth, snap.HealthStatus)
+		}
+		if tc.expectedWarningText != "" {
+			found := false
+			for _, w := range snap.Warnings {
+				if strings.Contains(w, tc.expectedWarningText) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Fatalf("expected warning containing %q in warnings %v", tc.expectedWarningText, snap.Warnings)
+			}
+		}
+	})
+}
+
+// TestHolonStatus_BoundaryRecovery_NilAggregatorAndNilRegistry tests boundary resilience
+// when aggregator or lifecycle registry is nil.
+func TestHolonStatus_BoundaryRecovery_NilAggregatorAndNilRegistry(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	_, healthyHydrator, healthyEngine := createTestHealthyProviders(t, ctx)
+	defer healthyEngine.Close()
+
+	tests := []boundaryTestCase{
 		{
 			name:                "nil aggregator receiver recovery",
 			aggregator:          nil,
@@ -202,6 +266,23 @@ func TestHolonStatus_BoundaryAndErrorRecovery(t *testing.T) {
 			expectedWarningText: "holon registry not configured",
 			expectNoHolonsText:  true,
 		},
+	}
+
+	for _, tc := range tests {
+		assertBoundaryRecoveryOutput(t, tc)
+	}
+}
+
+// TestHolonStatus_BoundaryRecovery_DegradedProviders tests boundary resilience
+// when hydrator or river convergence engine are uninitialized.
+func TestHolonStatus_BoundaryRecovery_DegradedProviders(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	healthyReg, healthyHydrator, healthyEngine := createTestHealthyProviders(t, ctx)
+	defer healthyEngine.Close()
+
+	tests := []boundaryTestCase{
 		{
 			name:                "nil hydrator provider recovery",
 			aggregator:          ambient.NewHolonTelemetryAggregator(healthyReg, nil, healthyEngine),
@@ -216,66 +297,28 @@ func TestHolonStatus_BoundaryAndErrorRecovery(t *testing.T) {
 			expectedWarningText: "river convergence engine not configured",
 			expectNoHolonsText:  false,
 		},
-		{
-			name:                "empty initialized providers recovery",
-			aggregator:          ambient.NewHolonTelemetryAggregator(emptyReg, emptyHydrator, nil),
-			expectedHealth:      ambient.TelemetryHealthQuiescent,
-			expectedWarningText: "river convergence engine not configured",
-			expectNoHolonsText:  true,
-		},
 	}
 
 	for _, tc := range tests {
-		t.Run(tc.name+"_tabular", func(t *testing.T) {
-			var buf bytes.Buffer
-			err := runHolonStatusWithAggregator(&buf, false, tc.aggregator)
-			if err != nil {
-				t.Fatalf("expected nil error on boundary recovery, got %v", err)
-			}
-
-			output := buf.String()
-			if !strings.Contains(output, "Middle-Brain Holon Vitality & Telemetry Dashboard") {
-				t.Fatalf("expected dashboard banner in output, got: %s", output)
-			}
-			if !strings.Contains(output, tc.expectedHealth) {
-				t.Fatalf("expected health status %q in output, got:\n%s", tc.expectedHealth, output)
-			}
-			if tc.expectedWarningText != "" && !strings.Contains(output, tc.expectedWarningText) {
-				t.Fatalf("expected warning %q in output, got:\n%s", tc.expectedWarningText, output)
-			}
-			if tc.expectNoHolonsText && !strings.Contains(output, "(no holons registered)") {
-				t.Fatalf("expected '(no holons registered)' in output, got:\n%s", output)
-			}
-		})
-
-		t.Run(tc.name+"_json", func(t *testing.T) {
-			var buf bytes.Buffer
-			err := runHolonStatusWithAggregator(&buf, true, tc.aggregator)
-			if err != nil {
-				t.Fatalf("expected nil error on boundary recovery json, got %v", err)
-			}
-
-			var snap ambient.MiddleBrainTelemetrySnapshot
-			if err := json.Unmarshal(buf.Bytes(), &snap); err != nil {
-				t.Fatalf("failed to decode JSON output: %v\nOutput: %s", err, buf.String())
-			}
-			if snap.HealthStatus != tc.expectedHealth {
-				t.Fatalf("expected health %q in snapshot, got %q", tc.expectedHealth, snap.HealthStatus)
-			}
-			if tc.expectedWarningText != "" {
-				found := false
-				for _, w := range snap.Warnings {
-					if strings.Contains(w, tc.expectedWarningText) {
-						found = true
-						break
-					}
-				}
-				if !found {
-					t.Fatalf("expected warning containing %q in warnings %v", tc.expectedWarningText, snap.Warnings)
-				}
-			}
-		})
+		assertBoundaryRecoveryOutput(t, tc)
 	}
+}
+
+// TestHolonStatus_BoundaryRecovery_EmptyProviders tests boundary resilience
+// when providers are empty initialized structures.
+func TestHolonStatus_BoundaryRecovery_EmptyProviders(t *testing.T) {
+	emptyReg := ambient.NewHolonLifecycleRegistry()
+	emptyHydrator := ambient.NewStreamHydrator(ambient.DefaultStreamCapacity, ambient.DefaultMinWeightFloor)
+
+	tc := boundaryTestCase{
+		name:                "empty initialized providers recovery",
+		aggregator:          ambient.NewHolonTelemetryAggregator(emptyReg, emptyHydrator, nil),
+		expectedHealth:      ambient.TelemetryHealthQuiescent,
+		expectedWarningText: "river convergence engine not configured",
+		expectNoHolonsText:  true,
+	}
+
+	assertBoundaryRecoveryOutput(t, tc)
 }
 
 // TestRenderHolonTelemetry_NilSnapshot tests that RenderHolonTelemetry handles a completely nil snapshot gracefully.
@@ -371,17 +414,20 @@ func TestNewSystemCmd_HolonRegistration(t *testing.T) {
 	}
 }
 
-// TestHolonStatus_ASTAudit ensures that holon_status.go has zero medium or high severity AST violations.
+// TestHolonStatus_ASTAudit ensures that holon_status.go and holon_status_test.go
+// have zero medium or high severity AST violations.
 func TestHolonStatus_ASTAudit(t *testing.T) {
 	auditor := qa.NewASTAuditor()
-	violations, err := auditor.AuditFile("holon_status.go")
-	if err != nil {
-		t.Fatalf("failed to audit holon_status.go: %v", err)
-	}
+	for _, file := range []string{"holon_status.go", "holon_status_test.go"} {
+		violations, err := auditor.AuditFile(file)
+		if err != nil {
+			t.Fatalf("failed to audit %s: %v", file, err)
+		}
 
-	for _, v := range violations {
-		if v.Severity == "high" || v.Severity == "medium" {
-			t.Errorf("AST violation [%s] at %s: %s", v.Severity, v.Pos, v.Message)
+		for _, v := range violations {
+			if v.Severity == "high" || v.Severity == "medium" {
+				t.Errorf("AST violation [%s] in %s at %s: %s", v.Severity, file, v.Pos, v.Message)
+			}
 		}
 	}
 }
