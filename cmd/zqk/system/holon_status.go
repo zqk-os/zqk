@@ -21,7 +21,7 @@ const (
 
 // NewHolonCmd creates the 'zqk system holon' parent command group.
 func NewHolonCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemHolonCommandBuilder(), &cobra.Command{
 		Use:     "holon",
 		Aliases: []string{"holons"},
 		Short:   "Middle-brain holon telemetry and status operations",
@@ -32,7 +32,7 @@ Commands:
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return runHolonStatusFromCommand(cmd)
 		},
-	}
+	})
 	cmd.AddCommand(NewHolonStatusSubCmd())
 	addHolonStatusFlags(cmd)
 	return cmd

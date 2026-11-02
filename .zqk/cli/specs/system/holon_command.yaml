@@ -1,0 +1,25 @@
+$schema: ../_schemas/command_spec.schema.json
+name: holon
+aliases:
+    - holons
+short: Middle-brain holon telemetry and status operations
+description: |-
+    Middle-brain holon telemetry, lifecycle, and stream convergence management.
+flags:
+    - name: format
+      shorthand: f
+      type: string
+      default: table
+      description: Output format (table, json)
+    - name: json
+      type: bool
+      default: "false"
+      description: Output telemetry snapshot as JSON
+help:
+    examples:
+        - comment: View middle-brain holon vitality and convergence metrics
+          command: zqk system holon
+        - comment: View middle-brain holon status
+          command: zqk system holon status
+        - comment: Output telemetry as JSON
+          command: zqk system holon --format json
