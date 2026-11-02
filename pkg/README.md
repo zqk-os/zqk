@@ -154,7 +154,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [primaryorch](./primaryorch/) | `github.com/zqk-os/zqk/pkg/primaryorch` | 3+5 | 5 | - | ❌ - | Primary agent orchestration engine, session coordination, and run tracking. |
 | [prime](./prime/) | `github.com/zqk-os/zqk/pkg/prime` | 3+1 | 1 | - | ❌ - | Prime component and domain abstractions for ZQK Core. |
 | [process](./process/) | `github.com/zqk-os/zqk/pkg/process` | 3+3 | 3 | - | ❌ - | Operating system process management, PID tracking, and graceful signal handling. |
-| [processhygiene](./processhygiene/) | `github.com/zqk-os/zqk/pkg/processhygiene` | 6+15 | 15 | - | ❌ - | Workspace hygiene auditing, dead-code detection, and repository cleanliness. |
+| [processhygiene](./processhygiene/) | `github.com/zqk-os/zqk/pkg/processhygiene` | 6+17 | 17 | - | ❌ - | Workspace hygiene auditing, dead-code detection, and repository cleanliness. |
 | [processing](./processing/) | `github.com/zqk-os/zqk/pkg/processing` | 2+3 | 3 | - | ❌ - | Processing component and domain abstractions for ZQK Core. |
 | [projecttemp](./projecttemp/) | `github.com/zqk-os/zqk/pkg/projecttemp` | 3+1 | 1 | - | ❌ - | Hosts isolated temp-project teardown helpers that must not import pkg/storage (storage imports pkg/validation and other consume... |
 | [qapack](./qapack/) | `github.com/zqk-os/zqk/pkg/qapack` | 1+1 | 1 | - | ❌ - | Quality assurance, test coverage, and verification pack. |

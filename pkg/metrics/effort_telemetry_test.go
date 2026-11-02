@@ -353,7 +353,7 @@ func TestEffortTelemetry_OperationalDynamicProof(t *testing.T) {
 
 		for g := 0; g < numGoroutines; g++ {
 			workerID := g
-			goroutinelabels.NewGoroutine("effort_telemetry_test_worker", "test parallel event publishing").StartSimple(func() {
+			goroutinelabels.NewGoroutine("effort_telemetry_worker", "parallel event publishing").StartSimple(func() {
 				defer wg.Done()
 				for i := 0; i < eventsPerGoroutine; i++ {
 					ev := map[string]any{
