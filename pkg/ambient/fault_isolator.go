@@ -153,29 +153,34 @@ func (t *SlidingWindowRateTracker) Record(success bool) error {
 	return t.RecordAt(success, time.Now())
 }
 
-// RecordAt increments a success or failure sample at a specific timestamp.
-func (t *SlidingWindowRateTracker) RecordAt(success bool, at time.Time) error {
+func (t *SlidingWindowRateTracker) mutate(fn func()) error {
 	if t == nil {
 		return ErrNilRateTracker
 	}
 	t.mu.Lock()
 	defer t.mu.Unlock()
-
-	epoch := at.UnixNano() / t.bucketDuration.Nanoseconds()
-	idx := int((epoch%int64(t.numBuckets) + int64(t.numBuckets)) % int64(t.numBuckets))
-
-	if t.buckets[idx].bucketEpoch != epoch {
-		t.buckets[idx].bucketEpoch = epoch
-		t.buckets[idx].successes = 0
-		t.buckets[idx].failures = 0
-	}
-
-	if success {
-		t.buckets[idx].successes++
-	} else {
-		t.buckets[idx].failures++
-	}
+	fn()
 	return nil
+}
+
+// RecordAt increments a success or failure sample at a specific timestamp.
+func (t *SlidingWindowRateTracker) RecordAt(success bool, at time.Time) error {
+	return t.mutate(func() {
+		epoch := at.UnixNano() / t.bucketDuration.Nanoseconds()
+		idx := int((epoch%int64(t.numBuckets) + int64(t.numBuckets)) % int64(t.numBuckets))
+
+		if t.buckets[idx].bucketEpoch != epoch {
+			t.buckets[idx].bucketEpoch = epoch
+			t.buckets[idx].successes = 0
+			t.buckets[idx].failures = 0
+		}
+
+		if success {
+			t.buckets[idx].successes++
+		} else {
+			t.buckets[idx].failures++
+		}
+	})
 }
 
 // FailureRate returns the ratio of failures to total samples within the sliding window.
@@ -246,13 +251,19 @@ func (t *SlidingWindowRateTracker) CountsAt(now time.Time) (successes, failures 
 
 // SuccessCount returns active success counts within the sliding window.
 func (t *SlidingWindowRateTracker) SuccessCount() int64 {
-	s, _ := t.Counts()
+	s, f := t.Counts()
+	if s < 0 || f < 0 {
+		return 0
+	}
 	return s
 }
 
 // FailureCount returns active failure counts within the sliding window.
 func (t *SlidingWindowRateTracker) FailureCount() int64 {
-	_, f := t.Counts()
+	s, f := t.Counts()
+	if s < 0 || f < 0 {
+		return 0
+	}
 	return f
 }
 
@@ -264,19 +275,14 @@ func (t *SlidingWindowRateTracker) clearBucketLocked(idx int) {
 
 // Prune evicts expired buckets older than the sliding window.
 func (t *SlidingWindowRateTracker) Prune(now time.Time) error {
-	if t == nil {
-		return ErrNilRateTracker
-	}
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	minEpoch := (now.UnixNano() - t.windowDuration.Nanoseconds()) / t.bucketDuration.Nanoseconds()
-	for i := 0; i < t.numBuckets; i++ {
-		if t.buckets[i].bucketEpoch < minEpoch {
-			t.clearBucketLocked(i)
+	return t.mutate(func() {
+		minEpoch := (now.UnixNano() - t.windowDuration.Nanoseconds()) / t.bucketDuration.Nanoseconds()
+		for i := 0; i < t.numBuckets; i++ {
+			if t.buckets[i].bucketEpoch < minEpoch {
+				t.clearBucketLocked(i)
+			}
 		}
-	}
-	return nil
+	})
 }
 
 // EvictStale evicts expired buckets older than the sliding window (alias for Prune).
@@ -286,16 +292,11 @@ func (t *SlidingWindowRateTracker) EvictStale(now time.Time) error {
 
 // Reset clears all accumulated buckets.
 func (t *SlidingWindowRateTracker) Reset() error {
-	if t == nil {
-		return ErrNilRateTracker
-	}
-	t.mu.Lock()
-	defer t.mu.Unlock()
-
-	for i := 0; i < t.numBuckets; i++ {
-		t.clearBucketLocked(i)
-	}
-	return nil
+	return t.mutate(func() {
+		for i := 0; i < t.numBuckets; i++ {
+			t.clearBucketLocked(i)
+		}
+	})
 }
 
 // FaultIsolator manages adaptive circuit breaking for ambient holons.
@@ -336,7 +337,10 @@ func NewFaultIsolator(cfg FaultIsolatorConfig) (*FaultIsolator, error) {
 
 // DefaultFaultIsolator constructs a FaultIsolator with production default configuration.
 func DefaultFaultIsolator() *FaultIsolator {
-	iso, _ := NewFaultIsolator(DefaultFaultIsolatorConfig())
+	iso, err := NewFaultIsolator(DefaultFaultIsolatorConfig())
+	if err != nil {
+		return nil
+	}
 	return iso
 }
 
@@ -344,6 +348,18 @@ func (f *FaultIsolator) checkOpenCoolOffLocked(now time.Time) {
 	if f.state == StateOpen && now.Sub(f.lastStateTransition) >= f.cfg.CoolOffDuration {
 		f.transitionToLocked(StateHalfOpen, now)
 	}
+}
+
+func (f *FaultIsolator) withActiveLock(fn func(now time.Time) error) error {
+	if f == nil {
+		return ErrNilFaultIsolator
+	}
+	f.mu.Lock()
+	defer f.mu.Unlock()
+
+	now := time.Now()
+	f.checkOpenCoolOffLocked(now)
+	return fn(now)
 }
 
 // Allow evaluates whether a caller is permitted to execute an action.
@@ -354,32 +370,25 @@ func (f *FaultIsolator) checkOpenCoolOffLocked(now time.Time) {
 // In StateHalfOpen: permits exactly HalfOpenMaxProbes concurrent probes, rejecting excess
 // with ErrCircuitProbeLimitExceeded.
 func (f *FaultIsolator) Allow() error {
-	if f == nil {
-		return ErrNilFaultIsolator
-	}
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
-	now := time.Now()
-	f.checkOpenCoolOffLocked(now)
-
-	switch f.state {
-	case StateClosed:
-		return nil
-
-	case StateHalfOpen:
-		if f.activeProbes < f.cfg.HalfOpenMaxProbes {
-			f.activeProbes++
+	return f.withActiveLock(func(now time.Time) error {
+		switch f.state {
+		case StateClosed:
 			return nil
+
+		case StateHalfOpen:
+			if f.activeProbes < f.cfg.HalfOpenMaxProbes {
+				f.activeProbes++
+				return nil
+			}
+			return ErrCircuitProbeLimitExceeded
+
+		case StateOpen:
+			return ErrCircuitOpen
+
+		default:
+			return ErrCircuitOpen
 		}
-		return ErrCircuitProbeLimitExceeded
-
-	case StateOpen:
-		return ErrCircuitOpen
-
-	default:
-		return ErrCircuitOpen
-	}
+	})
 }
 
 // RecordResult records the outcome of an execution.
@@ -388,53 +397,46 @@ func (f *FaultIsolator) Allow() error {
 // In StateHalfOpen: decrements active probes. Consecutive successes reset to StateClosed;
 // any failure immediately trips back to StateOpen.
 func (f *FaultIsolator) RecordResult(success bool) error {
-	if f == nil {
-		return ErrNilFaultIsolator
-	}
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
-	now := time.Now()
-	f.checkOpenCoolOffLocked(now)
-
-	switch f.state {
-	case StateClosed:
-		if f.tracker != nil {
-			if err := f.tracker.RecordAt(success, now); err != nil {
-				return err
-			}
-			total := f.tracker.TotalSamplesAt(now)
-			if total >= int64(f.cfg.MinSamplesThreshold) {
-				rate := f.tracker.FailureRateAt(now)
-				if rate > f.cfg.FailureRateThreshold {
-					f.transitionToLocked(StateOpen, now)
+	return f.withActiveLock(func(now time.Time) error {
+		switch f.state {
+		case StateClosed:
+			if f.tracker != nil {
+				if err := f.tracker.RecordAt(success, now); err != nil {
+					return err
+				}
+				total := f.tracker.TotalSamplesAt(now)
+				if total >= int64(f.cfg.MinSamplesThreshold) {
+					rate := f.tracker.FailureRateAt(now)
+					if rate > f.cfg.FailureRateThreshold {
+						f.transitionToLocked(StateOpen, now)
+					}
 				}
 			}
-		}
-		return nil
+			return nil
 
-	case StateHalfOpen:
-		if f.activeProbes > 0 {
-			f.activeProbes--
-		}
-		if success {
-			f.consecutiveSuccesses++
-			if f.consecutiveSuccesses >= f.cfg.ConsecutiveSuccessesReset {
-				f.transitionToLocked(StateClosed, now)
+		case StateHalfOpen:
+			if f.activeProbes > 0 {
+				f.activeProbes--
 			}
-		} else {
-			// Fail-closed recovery: probe failed, trip back to Open
-			f.transitionToLocked(StateOpen, now)
+			if success {
+				f.consecutiveSuccesses++
+				if f.consecutiveSuccesses >= f.cfg.ConsecutiveSuccessesReset {
+					f.transitionToLocked(StateClosed, now)
+				}
+			} else {
+				// Fail-closed recovery: probe failed, trip back to Open
+				f.transitionToLocked(StateOpen, now)
+			}
+			return nil
+
+		case StateOpen:
+			// When circuit is open, reject new admissions; incoming results are safe no-ops
+			return nil
+
+		default:
+			return nil
 		}
-		return nil
-
-	case StateOpen:
-		// When circuit is open, reject new admissions; incoming results are safe no-ops
-		return nil
-
-	default:
-		return nil
-	}
+	})
 }
 
 // Record is an alias for RecordResult.
@@ -475,13 +477,10 @@ func (f *FaultIsolator) Config() FaultIsolatorConfig {
 }
 
 func (f *FaultIsolator) transitionWithLock(target CircuitBreakerState) error {
-	if f == nil {
-		return ErrNilFaultIsolator
-	}
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.transitionToLocked(target, time.Now())
-	return nil
+	return f.withActiveLock(func(now time.Time) error {
+		f.transitionToLocked(target, now)
+		return nil
+	})
 }
 
 // Reset restores the isolator to StateClosed and clears all trackers.
@@ -499,24 +498,23 @@ func (f *FaultIsolator) ForceState(state CircuitBreakerState) error {
 	return f.transitionWithLock(state)
 }
 
-// ActiveProbes returns the current count of in-flight half-open probes.
-func (f *FaultIsolator) ActiveProbes() int {
+func (f *FaultIsolator) readMetric(extractor func() int) int {
 	if f == nil {
 		return 0
 	}
 	f.mu.RLock()
 	defer f.mu.RUnlock()
-	return f.activeProbes
+	return extractor()
+}
+
+// ActiveProbes returns the current count of in-flight half-open probes.
+func (f *FaultIsolator) ActiveProbes() int {
+	return f.readMetric(func() int { return f.activeProbes })
 }
 
 // ConsecutiveSuccesses returns the current count of consecutive half-open probe successes.
 func (f *FaultIsolator) ConsecutiveSuccesses() int {
-	if f == nil {
-		return 0
-	}
-	f.mu.RLock()
-	defer f.mu.RUnlock()
-	return f.consecutiveSuccesses
+	return f.readMetric(func() int { return f.consecutiveSuccesses })
 }
 
 // LastStateTransition returns the timestamp of the most recent state change.
@@ -566,6 +564,8 @@ func (f *FaultIsolator) transitionToLocked(newState CircuitBreakerState, now tim
 	f.consecutiveSuccesses = 0
 
 	if newState == StateClosed && f.tracker != nil {
-		_ = f.tracker.Reset()
+		if err := f.tracker.Reset(); err != nil {
+			return
+		}
 	}
 }
