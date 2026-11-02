@@ -256,7 +256,6 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 			// (e.g. public-candidate) while the studio daemon listens on :8443,
 			// spawning the wrong-tree ide-adapter against the seated kernel.
 			// Re-run mcp ensure / AutoInstall after clone relocate.
-			// TRACK: TDE-MCP-MULTIROOT-IDE-ADAPTER-001 / POL-AGENT-KERNEL-ROOT-BINDING-001
 			roleBin := filepath.Join(projectRoot, "bin", MCPRoleProcessName(MCPRoleIDEAdapter))
 			if _, linkErr := EnsureMCPRoleSymlink(projectRoot, MCPRoleIDEAdapter, target); linkErr != nil {
 				logging.Fluent(logger).Warn("MCP ide-adapter role symlink unavailable; using target bin in mcp.json").
