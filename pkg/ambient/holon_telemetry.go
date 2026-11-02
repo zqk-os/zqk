@@ -56,12 +56,26 @@ func NewHolonTelemetryAggregator(
 	hydrator *StreamHydrator,
 	engine *RiverConvergenceEngine,
 ) *HolonTelemetryAggregator {
+	return NewHolonTelemetryAggregatorWithLimit(registry, hydrator, engine, DefaultTelemetryHistoryLimit)
+}
+
+// NewHolonTelemetryAggregatorWithLimit creates an aggregator with a custom history capacity floor.
+// If limit <= 0, DefaultTelemetryHistoryLimit is enforced as the fallback floor.
+func NewHolonTelemetryAggregatorWithLimit(
+	registry *HolonLifecycleRegistry,
+	hydrator *StreamHydrator,
+	engine *RiverConvergenceEngine,
+	limit int,
+) *HolonTelemetryAggregator {
+	if limit <= 0 {
+		limit = DefaultTelemetryHistoryLimit
+	}
 	return &HolonTelemetryAggregator{
 		registry: registry,
 		hydrator: hydrator,
 		engine:   engine,
-		history:  make([]*MiddleBrainTelemetrySnapshot, 0, DefaultTelemetryHistoryLimit),
-		limit:    DefaultTelemetryHistoryLimit,
+		history:  make([]*MiddleBrainTelemetrySnapshot, 0, limit),
+		limit:    limit,
 	}
 }
 
@@ -70,11 +84,12 @@ func NewHolonTelemetryAggregator(
 func (a *HolonTelemetryAggregator) Snapshot(ctx context.Context) *MiddleBrainTelemetrySnapshot {
 	now := time.Now()
 	if a == nil {
+		nilWarnings := []string{"nil telemetry aggregator receiver"}
 		return &MiddleBrainTelemetrySnapshot{
 			Timestamp:    now,
 			HealthStatus: TelemetryHealthQuiescent,
-			Warnings:     []string{"nil telemetry aggregator receiver"},
-			WarningCount: 1,
+			Warnings:     nilWarnings,
+			WarningCount: len(nilWarnings),
 		}
 	}
 
@@ -167,6 +182,17 @@ func (a *HolonTelemetryAggregator) History() []*MiddleBrainTelemetrySnapshot {
 	return out
 }
 
+// HistoryLimit returns the configured history retention limit.
+// Nil receiver returns 0 safely.
+func (a *HolonTelemetryAggregator) HistoryLimit() int {
+	if a == nil {
+		return 0
+	}
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.limit
+}
+
 // deriveHealthStatus computes health state based on middle-brain operational metrics.
 func deriveHealthStatus(activeHolons int, riverCount int, divergences int64, warningCount int) string {
 	if activeHolons == 0 && riverCount == 0 && warningCount > 0 {
@@ -196,4 +222,62 @@ func (s *MiddleBrainTelemetrySnapshot) String() string {
 		s.AverageAlignmentScore,
 		s.DivergenceCount,
 	)
+}
+
+// IsHealthy returns true if the snapshot indicates a healthy middle-brain state.
+// Nil receiver returns false safely.
+func (s *MiddleBrainTelemetrySnapshot) IsHealthy() bool {
+	if s == nil {
+		return false
+	}
+	return s.HealthStatus == TelemetryHealthHealthy
+}
+
+// IsDegraded returns true if the snapshot indicates a degraded middle-brain state.
+// Nil receiver returns false safely.
+func (s *MiddleBrainTelemetrySnapshot) IsDegraded() bool {
+	if s == nil {
+		return false
+	}
+	return s.HealthStatus == TelemetryHealthDegraded
+}
+
+// IsCritical returns true if the snapshot indicates a critical middle-brain state.
+// Nil receiver returns false safely.
+func (s *MiddleBrainTelemetrySnapshot) IsCritical() bool {
+	if s == nil {
+		return false
+	}
+	return s.HealthStatus == TelemetryHealthCritical
+}
+
+// IsQuiescent returns true if the snapshot indicates a quiescent/unconfigured state.
+// Nil receiver returns true safely.
+func (s *MiddleBrainTelemetrySnapshot) IsQuiescent() bool {
+	if s == nil {
+		return true
+	}
+	return s.HealthStatus == TelemetryHealthQuiescent
+}
+
+// HasWarnings returns true if any telemetry warnings are recorded.
+// Nil receiver returns true safely.
+func (s *MiddleBrainTelemetrySnapshot) HasWarnings() bool {
+	if s == nil {
+		return true
+	}
+	return s.WarningCount > 0 || len(s.Warnings) > 0
+}
+
+// HolonIDs extracts the list of active/registered holon IDs recorded in the snapshot.
+// Nil receiver returns nil safely.
+func (s *MiddleBrainTelemetrySnapshot) HolonIDs() []string {
+	if s == nil || len(s.Holons) == 0 {
+		return nil
+	}
+	ids := make([]string, len(s.Holons))
+	for i, h := range s.Holons {
+		ids[i] = h.ID
+	}
+	return ids
 }

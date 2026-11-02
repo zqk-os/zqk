@@ -36,15 +36,69 @@ func TestHolonTelemetry_StaticFloorInvariants(t *testing.T) {
 	if len(snap.Warnings) == 0 {
 		t.Fatal("expected warnings for nil aggregator call")
 	}
+	if snap.WarningCount != len(snap.Warnings) {
+		t.Fatalf("expected warning count %d, got %d", len(snap.Warnings), snap.WarningCount)
+	}
 
 	history := nilAggregator.History()
 	if history != nil {
 		t.Fatalf("expected nil history for nil aggregator, got %v", history)
 	}
+	if limit := nilAggregator.HistoryLimit(); limit != 0 {
+		t.Fatalf("expected 0 history limit for nil aggregator, got %d", limit)
+	}
 
+	// 3. MiddleBrainTelemetrySnapshot nil-safety
 	var nilSnapshot *MiddleBrainTelemetrySnapshot
 	if str := nilSnapshot.String(); !strings.Contains(str, "<nil>") {
 		t.Fatalf("expected nil representation in string, got %s", str)
+	}
+	if nilSnapshot.IsHealthy() {
+		t.Fatal("expected IsHealthy() to return false for nil snapshot")
+	}
+	if nilSnapshot.IsDegraded() {
+		t.Fatal("expected IsDegraded() to return false for nil snapshot")
+	}
+	if nilSnapshot.IsCritical() {
+		t.Fatal("expected IsCritical() to return false for nil snapshot")
+	}
+	if !nilSnapshot.IsQuiescent() {
+		t.Fatal("expected IsQuiescent() to return true for nil snapshot")
+	}
+	if !nilSnapshot.HasWarnings() {
+		t.Fatal("expected HasWarnings() to return true for nil snapshot")
+	}
+	if ids := nilSnapshot.HolonIDs(); ids != nil {
+		t.Fatalf("expected nil HolonIDs for nil snapshot, got %v", ids)
+	}
+
+	// 4. Aggregator builder with custom limit floor
+	aggWithLimit := NewHolonTelemetryAggregatorWithLimit(nil, nil, nil, -10)
+	if aggWithLimit.HistoryLimit() != DefaultTelemetryHistoryLimit {
+		t.Fatalf("expected default history limit fallback, got %d", aggWithLimit.HistoryLimit())
+	}
+	aggWithCustom := NewHolonTelemetryAggregatorWithLimit(nil, nil, nil, 42)
+	if aggWithCustom.HistoryLimit() != 42 {
+		t.Fatalf("expected custom history limit 42, got %d", aggWithCustom.HistoryLimit())
+	}
+
+	// 5. Test snapshot receiver predicates on populated snapshots
+	healthySnap := &MiddleBrainTelemetrySnapshot{
+		HealthStatus: TelemetryHealthHealthy,
+		Holons: []HolonRecord{
+			{ID: "holon-1", Phase: HolonPhaseRunning},
+			{ID: "holon-2", Phase: HolonPhaseRunning},
+		},
+	}
+	if !healthySnap.IsHealthy() || healthySnap.IsDegraded() || healthySnap.IsCritical() || healthySnap.IsQuiescent() {
+		t.Fatalf("unexpected predicates for healthy snapshot: %+v", healthySnap)
+	}
+	if healthySnap.HasWarnings() {
+		t.Fatal("expected no warnings on healthy snapshot")
+	}
+	ids := healthySnap.HolonIDs()
+	if len(ids) != 2 || ids[0] != "holon-1" || ids[1] != "holon-2" {
+		t.Fatalf("unexpected holon IDs: %v", ids)
 	}
 }
 
