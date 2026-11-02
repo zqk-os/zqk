@@ -74,6 +74,14 @@ func DefaultElasticCapacityConfig() ElasticCapacityConfig {
 	}
 }
 
+// BackpressureConfig is a type alias for ElasticCapacityConfig.
+type BackpressureConfig = ElasticCapacityConfig
+
+// DefaultBackpressureConfig returns production defaults for backpressure regulation.
+func DefaultBackpressureConfig() BackpressureConfig {
+	return DefaultElasticCapacityConfig()
+}
+
 // Validate checks invariant bounds on the configuration parameters.
 func (c ElasticCapacityConfig) Validate() error {
 	if c.BaselineCapacity <= 0 {
