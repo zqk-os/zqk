@@ -172,6 +172,11 @@ func LoadCorrespondence(projectRoot string, seat Seat, limit int) (Correspondenc
 			// mesh_status (no to_agent_id) must not fill outbox or agents hit
 			// standby_forbidden after every emit-status and idle out of the loop.
 			if !hasPeer && expectsPeerAck(ev, et, to) {
+				// Expired/cancelled hourglass awaits must not keep outbox hot
+				// after ExpirePeerAckAwaits (CSRF-blocked peers, dead seats).
+				if PeerAckAwaitRelievesOutbox(projectRoot, eid) {
+					continue
+				}
 				outbox = append(outbox, item)
 			}
 			continue
