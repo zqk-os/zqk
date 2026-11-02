@@ -168,6 +168,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 				"epic": []any{
 					"EPC-",
 					"EPI-",
+					"EPIC-",
 				},
 				"evolution_management": []any{
 					"EVO-",
@@ -295,6 +296,9 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 					"POL-AGENT-",
 					"POL-OBS-",
 					"POL-DEFAULT-",
+					"POL-GATE-",
+					"POL-GIT-",
+					"POL-ORCH-",
 				},
 				"priority_plan": []any{
 					"PRI-",

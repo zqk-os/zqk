@@ -213,6 +213,11 @@ func registerCommands() {
 	demoCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(demoCmdInst)
 
+	// Top-level test-drive command (interactive developer onboarding walkthrough)
+	testDriveCmdInst := system.NewTestDriveCmd()
+	testDriveCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(testDriveCmdInst)
+
 	// Tray: named shortcuts to zqk argv (.zqk/tray.yaml over embedded defaults)
 	trayCmdInst := tray.NewTrayCmd()
 	trayCmdInst.GroupID = "integrations"

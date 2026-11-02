@@ -510,6 +510,7 @@
 ./cli_specs/system/sync_command.yaml
 ./cli_specs/system/sync_git_hooks_command.yaml
 ./cli_specs/system/telemetry_command.yaml
+./cli_specs/system/test_drive_command.yaml
 ./cli_specs/system/truth_sentinel_command.yaml
 ./cli_specs/system/update_specs_command.yaml
 ./cli_specs/system/validate/
@@ -537,6 +538,7 @@
 ./cli_specs/test/run_command.yaml
 ./cli_specs/test/stream_command.yaml
 ./cli_specs/test_command.yaml
+./cli_specs/test_drive_command.yaml
 ./cli_specs/tray/
 ./cli_specs/tray/sign_command.yaml
 ./cli_specs/ui_command.yaml
