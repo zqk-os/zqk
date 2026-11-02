@@ -13,6 +13,7 @@ import (
 
 // mockHolon implements Holon for unit verification.
 type mockHolon struct {
+	mu          sync.Mutex
 	id          string
 	name        string
 	role        string
@@ -41,7 +42,9 @@ func (m *mockHolon) Role() string      { return m.role }
 func (m *mockHolon) Ecosystem() string { return m.ecosystem }
 
 func (m *mockHolon) Start(ctx context.Context) error {
+	m.mu.Lock()
 	m.state = HolonStateRunning
+	m.mu.Unlock()
 	close(m.startedChan)
 	if m.startFn != nil {
 		return m.startFn(ctx)
@@ -51,7 +54,9 @@ func (m *mockHolon) Start(ctx context.Context) error {
 }
 
 func (m *mockHolon) Stop() error {
+	m.mu.Lock()
 	m.state = HolonStateStopped
+	m.mu.Unlock()
 	if m.stopFn != nil {
 		return m.stopFn()
 	}
@@ -59,15 +64,19 @@ func (m *mockHolon) Stop() error {
 }
 
 func (m *mockHolon) Status() HolonStatus {
+	m.mu.Lock()
+	state := m.state
+	restarts := m.restarts
+	m.mu.Unlock()
 	return HolonStatus{
 		ID:        m.id,
 		Name:      m.name,
 		Role:      m.role,
 		Ecosystem: m.ecosystem,
 		Health: HolonHealth{
-			State:        m.state,
-			Healthy:      m.state == HolonStateRunning,
-			RestartCount: m.restarts,
+			State:        state,
+			Healthy:      state == HolonStateRunning,
+			RestartCount: restarts,
 		},
 	}
 }

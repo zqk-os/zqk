@@ -69,6 +69,9 @@ func NewStreamHydrator(capacity int, minWeight float64) *StreamHydrator {
 
 // PoolRaindrop ingests an IntentRaindrop into the designated stream, validating boundaries and deduplicating.
 func (h *StreamHydrator) PoolRaindrop(ctx context.Context, streamID string, drop IntentRaindrop) error {
+	if h == nil {
+		return errfmt.Errorf("stream hydrator: nil receiver")
+	}
 	if ctx != nil && ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -87,6 +90,10 @@ func (h *StreamHydrator) PoolRaindrop(ctx context.Context, streamID string, drop
 
 	h.mu.Lock()
 	defer h.mu.Unlock()
+
+	if h.streams == nil || h.raindropIDs == nil {
+		return errfmt.Errorf("stream hydrator: uninitialized internal store")
+	}
 
 	if _, exists := h.raindropIDs[drop.ID]; exists {
 		return errfmt.Errorf("stream hydrator: duplicate raindrop ID %q rejected", drop.ID)
@@ -121,6 +128,9 @@ func (h *StreamHydrator) PoolRaindrop(ctx context.Context, streamID string, drop
 }
 
 func copyStreamSnapshot(st *IntentStream) *IntentStream {
+	if st == nil {
+		return nil
+	}
 	copied := *st
 	copied.Raindrops = make([]IntentRaindrop, len(st.Raindrops))
 	copy(copied.Raindrops, st.Raindrops)
@@ -129,9 +139,15 @@ func copyStreamSnapshot(st *IntentStream) *IntentStream {
 
 // GetStream retrieves an intent stream snapshot by ID.
 func (h *StreamHydrator) GetStream(streamID string) (*IntentStream, bool) {
+	if h == nil {
+		return nil, false
+	}
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
+	if h.streams == nil {
+		return nil, false
+	}
 	st, exists := h.streams[streamID]
 	if !exists {
 		return nil, false
@@ -141,9 +157,15 @@ func (h *StreamHydrator) GetStream(streamID string) (*IntentStream, bool) {
 
 // ListStreams returns a snapshot of all tracked intent streams.
 func (h *StreamHydrator) ListStreams() []*IntentStream {
+	if h == nil {
+		return nil
+	}
 	h.mu.RLock()
 	defer h.mu.RUnlock()
 
+	if h.streams == nil {
+		return nil
+	}
 	out := make([]*IntentStream, 0, len(h.streams))
 	for _, st := range h.streams {
 		out = append(out, copyStreamSnapshot(st))
@@ -153,9 +175,15 @@ func (h *StreamHydrator) ListStreams() []*IntentStream {
 
 // MergeStream merges all pooled raindrops in a stream into a unified preference summary and flips status to merged.
 func (h *StreamHydrator) MergeStream(streamID string) (*IntentStream, error) {
+	if h == nil {
+		return nil, errfmt.Errorf("stream hydrator: nil receiver")
+	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
+	if h.streams == nil {
+		return nil, errfmt.Errorf("stream hydrator: uninitialized stream store")
+	}
 	st, exists := h.streams[streamID]
 	if !exists {
 		return nil, errfmt.Errorf("stream hydrator: stream %q not found", streamID)
