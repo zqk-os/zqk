@@ -160,6 +160,14 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 		findings = append(findings, refFindings...)
 	}
 
+	if r.Config.Hygiene.CheckMagicBuffers {
+		bufFindings, err := CheckMagicBuffers(r.Root, files, r.Config)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, bufFindings...)
+	}
+
 	if r.Config.Hygiene.CheckDups {
 		dupFindings, err := CheckDuplication(r.Root, files, r.Config)
 		if err != nil {

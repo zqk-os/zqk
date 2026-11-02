@@ -28,7 +28,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [agentrules](./agentrules/) | `github.com/zqk-os/zqk/pkg/agentrules` | 1+6 | 6 | - | ❌ - | Parsing, validation, and enforcement of agent behavioral rules, directives, and constraints. |
 | [aliases](./aliases/) | `github.com/zqk-os/zqk/pkg/aliases` | 2+2 | 2 | - | ❌ - | Command and object alias resolution, shorthand mapping, and synonym expansion. |
 | [ambience](./ambience/) | `github.com/zqk-os/zqk/pkg/ambience` | 4+5 | 5 | - | ❌ - | Background ambient intelligence, contextual awareness, and environment state tracking. |
-| [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 17+17 | 17 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
+| [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 22+22 | 22 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
 | [appledouble](./appledouble/) | `github.com/zqk-os/zqk/pkg/appledouble` | 1+2 | 2 | - | ❌ - | Sanitization and handling of AppleDouble and macOS resource fork metadata files. |
 | [architecture](./architecture/) | `github.com/zqk-os/zqk/pkg/architecture` | 1+1 | 1 | - | ❌ - | Codebase architectural boundaries, layering rules, and static AST governance checks. |
 | [audit](./audit/) | `github.com/zqk-os/zqk/pkg/audit` | 2+3 | 3 | - | ❌ - | High-volume audit log streaming, event persistence, and validation policies. |
@@ -86,7 +86,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [git](./git/) | `github.com/zqk-os/zqk/pkg/git` | 7+8 | 8 | - | ❌ - | Git operations wrapper, branch inspection, worktree management, and status reporting. |
 | [gitconstants](./gitconstants/) | `github.com/zqk-os/zqk/pkg/gitconstants` | 1+1 | 1 | - | ❌ - | Centralized Git command, subcommand, flag, and option constant definitions. |
 | [gitevidence](./gitevidence/) | `github.com/zqk-os/zqk/pkg/gitevidence` | 1+1 | 1 | - | ❌ - | Git commit evidence verification, trunk tip freshness, and branch validation gates. |
-| [gitplumbing](./gitplumbing/) | `github.com/zqk-os/zqk/pkg/gitplumbing` | 1+1 | 1 | - | ❌ - | Gitplumbing component and domain abstractions for ZQK Core. |
+| [gitplumbing](./gitplumbing/) | `github.com/zqk-os/zqk/pkg/gitplumbing` | 2+2 | 2 | - | ❌ - | Gitplumbing component and domain abstractions for ZQK Core. |
 | [goroutinelabels](./goroutinelabels/) | `github.com/zqk-os/zqk/pkg/goroutinelabels` | 5+5 | 5 | - | ✅ [README](./goroutinelabels/README.md) | The GoroutineBuilder provides a fluent API for creating goroutines with consistent patterns and best practices. It ensures all... |
 | [gotestparse](./gotestparse/) | `github.com/zqk-os/zqk/pkg/gotestparse` | 1+2 | 2 | - | ❌ - | Streaming parser and event normalizer for go test terminal output and JSON test events. |
 | [graph](./graph/) | `github.com/zqk-os/zqk/pkg/graph` | 4+4 | 4 | databook, memgraph, +4 more | ✅ [README](./graph/README.md) | This package implements the pluggable graph backend interface for the zqk knowledge kernel. |
@@ -222,7 +222,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [validation](./validation/) | `github.com/zqk-os/zqk/pkg/validation` | 67+101 | 101 | qa, scenario | ✅ [README](./validation/README.md) | This package provides object validation for zqk: instance validation (schema, lifecycle, semantic types), ID validation (prefix... |
 | [vds](./vds/) | `github.com/zqk-os/zqk/pkg/vds` | 10+7 | 7 | - | ❌ - | Verifiable Decomposition Spine (VDS) verification, traceability, and done-gates. |
 | [verification](./verification/) | `github.com/zqk-os/zqk/pkg/verification` | 1+3 | 3 | matrix | ❌ - | Formal verification of kernel constraints, schemas, and invariants. |
-| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 14+8 | 8 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
+| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 15+8 | 8 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
 | [vocabularypack](./vocabularypack/) | `github.com/zqk-os/zqk/pkg/vocabularypack` | 1+1 | 1 | - | ❌ - | Canonical domain terminology and glossary definitions pack. |
 | [walutil](./walutil/) | `github.com/zqk-os/zqk/pkg/walutil` | 3+4 | 4 | - | ❌ - | Walutil component and domain abstractions for ZQK Core. |
 | [when](./when/) | `github.com/zqk-os/zqk/pkg/when` | 5+5 | 5 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |

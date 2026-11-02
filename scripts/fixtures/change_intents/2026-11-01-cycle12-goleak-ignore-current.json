@@ -1,0 +1,15 @@
+{
+  "schema": "zqk_change_intent_v1",
+  "id": "2026-11-01-cycle12-goleak-ignore-current",
+  "summary": "Fix holon lifecycle goleak package-gate pollution via IgnoreCurrent",
+  "changes": [
+    {
+      "path": "pkg/ambient/holon_lifecycle_test.go",
+      "reason": "package-gate goleak scope"
+    },
+    {
+      "path": "scripts/fixtures/change_intents/2026-11-01-cycle12-goleak-ignore-current.json",
+      "reason": "authorize"
+    }
+  ]
+}
