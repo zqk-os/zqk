@@ -27,6 +27,9 @@ func cleanupIsolatedProject(t *testing.T, root string) {
 		return
 	}
 	if p, ok := storage.GetGlobalStorageProviderCache().Get(root); ok && p != nil {
+		if flusher, ok := p.(interface{ Flush() error }); ok {
+			_ = flusher.Flush()
+		}
 		if shutdowner, ok := p.(interface{ Shutdown(context.Context) error }); ok {
 			_ = shutdowner.Shutdown(context.Background())
 		}
@@ -35,6 +38,8 @@ func cleanupIsolatedProject(t *testing.T, root string) {
 		}
 		storage.GetGlobalStorageProviderCache().Delete(root)
 	}
+	storage.ShutdownAllAuditBuffersForTesting()
+	_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, nil))
 	storage.GetGlobalBufferRegistry().Unregister(root)
 	cas.RemoveListingIndexWriteQueueForProjectRoot(root)
 	_ = fileutil.RemoveAll(root)
@@ -59,6 +64,7 @@ func execUIWithContext(t *testing.T, cliCtx *cli.Context, ctx context.Context, a
 
 func TestUICmd_InteractiveRunTUI_NonInteractiveFallback(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	testkit.RegisterStorageTestCleanup(t, proj.Root, nil)
 	defer cleanupIsolatedProject(t, proj.Root)
 
 	// Execute without --format flag, defaulting to format=table and invoking RunTUI.
@@ -69,6 +75,7 @@ func TestUICmd_InteractiveRunTUI_NonInteractiveFallback(t *testing.T) {
 
 func TestUICmd_ContextFormatInheritance(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	testkit.RegisterStorageTestCleanup(t, proj.Root, nil)
 	defer cleanupIsolatedProject(t, proj.Root)
 
 	// Set Context.Format to JSON while omitting --format flag on CLI.
@@ -84,6 +91,7 @@ func TestUICmd_ContextFormatInheritance(t *testing.T) {
 
 func TestUICmd_Web_ZeroOrNegativePortFallback(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	testkit.RegisterStorageTestCleanup(t, proj.Root, nil)
 	defer cleanupIsolatedProject(t, proj.Root)
 
 	// Passing --port 0 with --web triggers port <= 0 reset to 8080
@@ -112,6 +120,7 @@ func TestUICmd_Aliases(t *testing.T) {
 
 func TestUICmd_InvalidFlagValues(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	testkit.RegisterStorageTestCleanup(t, proj.Root, nil)
 	defer cleanupIsolatedProject(t, proj.Root)
 
 	_, err := execUI(t, proj.Root, nil, "--port", "invalid-number")
@@ -120,6 +129,7 @@ func TestUICmd_InvalidFlagValues(t *testing.T) {
 
 func TestUICmd_AllTabsInteractiveRunTUI(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	testkit.RegisterStorageTestCleanup(t, proj.Root, nil)
 	defer cleanupIsolatedProject(t, proj.Root)
 
 	tabs := []string{"seismograph", "state", "audit", "swarm", "pm", "metrics", "scheduler", "health"}
@@ -131,6 +141,7 @@ func TestUICmd_AllTabsInteractiveRunTUI(t *testing.T) {
 
 func TestUICmd_Web_GracefulContextCancellation(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	testkit.RegisterStorageTestCleanup(t, proj.Root, nil)
 	defer cleanupIsolatedProject(t, proj.Root)
 
 	l, err := net.Listen("tcp", "127.0.0.1:0")
