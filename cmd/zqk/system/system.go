@@ -159,6 +159,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewSemanticBridgeDaemonCmd())
 	systemCmd.AddCommand(NewFSWatcherDaemonCmd())
 	systemCmd.AddCommand(NewEmergencyManagerCmd())
+	systemCmd.AddCommand(NewHolonCmd())
 	systemCmd.AddCommand(NewHolonStatusCmd())
 
 	// Studio-only operations
