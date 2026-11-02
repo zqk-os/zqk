@@ -103,22 +103,17 @@ func ParseCoverProfile(profilePath string) (*CoverageRollupReport, error) {
 	return report, nil
 }
 
-// ParseCoverProfileBytes parses coverprofile bytes into a package rollup report.
-func ParseCoverProfileBytes(data []byte) (*CoverageRollupReport, error) {
-	if len(bytes.TrimSpace(data)) == 0 {
-		return nil, ErrCoverageProfileEmpty
-	}
+type packageCounters struct {
+	total   int
+	covered int
+}
 
-	type counters struct {
-		total   int
-		covered int
-	}
-	packages := map[string]*counters{}
+func scanCoverProfile(data []byte) (map[string]*packageCounters, int, int, error) {
+	packages := map[string]*packageCounters{}
 	totalStmts := 0
 	coveredStmts := 0
 
 	scanner := bufio.NewScanner(bytes.NewReader(data))
-	// Cover profiles can contain long paths; raise the token limit.
 	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 
 	for scanner.Scan() {
@@ -148,7 +143,7 @@ func ParseCoverProfileBytes(data []byte) (*CoverageRollupReport, error) {
 
 		c := packages[pkgName]
 		if c == nil {
-			c = &counters{}
+			c = &packageCounters{}
 			packages[pkgName] = c
 		}
 		c.total += stmts
@@ -159,12 +154,12 @@ func ParseCoverProfileBytes(data []byte) (*CoverageRollupReport, error) {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("coverage rollup: scan profile: %w", err)
+		return nil, 0, 0, fmt.Errorf("coverage rollup: scan profile: %w", err)
 	}
-	if totalStmts == 0 || len(packages) == 0 {
-		return nil, ErrCoverageProfileEmpty
-	}
+	return packages, totalStmts, coveredStmts, nil
+}
 
+func buildRollupEntries(packages map[string]*packageCounters) ([]PackageCoverageEntry, int, int, int) {
 	entries := make([]PackageCoverageEntry, 0, len(packages))
 	high, med, low := 0, 0, 0
 	for name, c := range packages {
@@ -192,7 +187,24 @@ func ParseCoverProfileBytes(data []byte) (*CoverageRollupReport, error) {
 	sort.Slice(entries, func(i, j int) bool {
 		return entries[i].Package < entries[j].Package
 	})
+	return entries, high, med, low
+}
 
+// ParseCoverProfileBytes parses coverprofile bytes into a package rollup report.
+func ParseCoverProfileBytes(data []byte) (*CoverageRollupReport, error) {
+	if len(bytes.TrimSpace(data)) == 0 {
+		return nil, ErrCoverageProfileEmpty
+	}
+
+	packages, totalStmts, coveredStmts, err := scanCoverProfile(data)
+	if err != nil {
+		return nil, err
+	}
+	if totalStmts == 0 || len(packages) == 0 {
+		return nil, ErrCoverageProfileEmpty
+	}
+
+	entries, high, med, low := buildRollupEntries(packages)
 	totalPct := (float64(coveredStmts) / float64(totalStmts)) * 100.0
 	sum := sha256.Sum256(data)
 
