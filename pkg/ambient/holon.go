@@ -100,6 +100,14 @@ func (s *HolonSupervisor) Register(h Holon) error {
 	return nil
 }
 
+func (s *HolonSupervisor) getHolonLocked(id string) (Holon, error) {
+	h, exists := s.holons[id]
+	if !exists {
+		return nil, fmt.Errorf("holon %q not found", id)
+	}
+	return h, nil
+}
+
 // Start launches a registered holon inside a supervised goroutine.
 func (s *HolonSupervisor) Start(id string) error {
 	s.mu.Lock()
@@ -107,10 +115,10 @@ func (s *HolonSupervisor) Start(id string) error {
 		s.mu.Unlock()
 		return errors.New("supervisor has been stopped")
 	}
-	h, exists := s.holons[id]
-	if !exists {
+	h, err := s.getHolonLocked(id)
+	if err != nil {
 		s.mu.Unlock()
-		return fmt.Errorf("holon %q not found", id)
+		return err
 	}
 	if _, running := s.cancelFns[id]; running {
 		s.mu.Unlock()
@@ -152,12 +160,12 @@ func (s *HolonSupervisor) handleHolonCrash(id string, err error) {
 // Stop terminates an individual running holon gracefully.
 func (s *HolonSupervisor) Stop(id string) error {
 	s.mu.Lock()
-	cancelFn, running := s.cancelFns[id]
-	h, exists := s.holons[id]
-	if !exists {
+	h, err := s.getHolonLocked(id)
+	if err != nil {
 		s.mu.Unlock()
-		return fmt.Errorf("holon %q not found", id)
+		return err
 	}
+	cancelFn, running := s.cancelFns[id]
 	if !running {
 		s.mu.Unlock()
 		return nil // already stopped

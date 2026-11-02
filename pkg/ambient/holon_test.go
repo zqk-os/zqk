@@ -185,7 +185,9 @@ func TestHolonSupervisor_ConcurrentAccess(t *testing.T) {
 			h := newMockHolon(id, "neural-mesh")
 			if err := sup.Register(h); err == nil {
 				registered.Add(1)
-				_ = sup.Start(id)
+				if startErr := sup.Start(id); startErr != nil {
+					t.Errorf("start failed: %v", startErr)
+				}
 			}
 		})
 	}
@@ -202,7 +204,10 @@ func TestHolonSupervisor_ConcurrentAccess(t *testing.T) {
 }
 
 func TestHolonSupervisor_StartAlreadyRunningAndStoppedSupervisor(t *testing.T) {
-	sup, _ := setupSupervisorWithHolon(t, "h-stopped-test")
+	sup, hMock := setupSupervisorWithHolon(t, "h-stopped-test")
+	if hMock == nil {
+		t.Fatal("expected non-nil mock")
+	}
 
 	if err := sup.Start("h-stopped-test"); err != nil {
 		t.Fatalf("initial start failed: %v", err)
@@ -250,5 +255,7 @@ func TestHolonSupervisor_StopFailurePropagation(t *testing.T) {
 		t.Fatal("expected stop error propagation")
 	}
 
-	_ = sup.Shutdown(time.Second)
+	if err := sup.Shutdown(time.Second); err == nil {
+		t.Log("clean shutdown")
+	}
 }
