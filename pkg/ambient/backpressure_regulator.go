@@ -74,6 +74,14 @@ func DefaultElasticCapacityConfig() ElasticCapacityConfig {
 	}
 }
 
+// BackpressureConfig is a type alias for ElasticCapacityConfig.
+type BackpressureConfig = ElasticCapacityConfig
+
+// DefaultBackpressureConfig returns production defaults for backpressure regulation.
+func DefaultBackpressureConfig() BackpressureConfig {
+	return DefaultElasticCapacityConfig()
+}
+
 // Validate checks invariant bounds on the configuration parameters.
 func (c ElasticCapacityConfig) Validate() error {
 	if c.BaselineCapacity <= 0 {
@@ -437,6 +445,16 @@ func (r *BackpressureRegulator) EvaluateAdmission(cost int) (AdmissionDecision, 
 		r.consecutiveWaits--
 	}
 	return AdmissionAllow, 0, nil
+}
+
+// Admit evaluates whether an incoming request of specified cost is admitted immediately.
+// Returns true if admitted (AdmissionAllow), false if delayed, rejected, or on error.
+func (r *BackpressureRegulator) Admit(cost int) bool {
+	if r == nil {
+		return false
+	}
+	decision, _, err := r.EvaluateAdmission(cost)
+	return err == nil && decision == AdmissionAllow
 }
 
 // CalculateBackoff calculates the recommended backoff duration for a given retry attempt.

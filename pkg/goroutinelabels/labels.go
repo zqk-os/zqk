@@ -78,3 +78,44 @@ func DoWithLabels(name, purpose string, fn func()) {
 		})
 	}
 }
+
+// WithLabel wraps ctx with pprof labels for the given name and optional purpose/arguments.
+// If an executable function (func() or func(context.Context)) is provided in extra,
+// it executes the function under pprof.Do.
+func WithLabel(ctx context.Context, name string, extra ...any) context.Context {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	purpose := ""
+	var runFn func()
+	var runCtxFn func(context.Context)
+
+	for _, arg := range extra {
+		switch v := arg.(type) {
+		case string:
+			if purpose == "" {
+				purpose = v
+			}
+		case func():
+			runFn = v
+		case func(context.Context):
+			runCtxFn = v
+		}
+	}
+
+	labels := pprof.Labels(labelKeyName, name)
+	ctx = pprof.WithLabels(ctx, labels)
+	if purpose != emptyValue {
+		ctx = pprof.WithLabels(ctx, pprof.Labels(labelKeyPurpose, purpose))
+	}
+
+	if runFn != nil {
+		pprof.Do(ctx, labels, func(context.Context) {
+			runFn()
+		})
+	} else if runCtxFn != nil {
+		pprof.Do(ctx, labels, runCtxFn)
+	}
+
+	return ctx
+}

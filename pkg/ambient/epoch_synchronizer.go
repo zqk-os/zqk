@@ -398,6 +398,15 @@ type EpochSynchronizerConfig struct {
 	ChecksumAlgo    ChecksumAlgorithm `json:"checksum_algo"`
 }
 
+// DefaultEpochSynchronizerConfig returns production defaults for epoch synchronization.
+func DefaultEpochSynchronizerConfig() EpochSynchronizerConfig {
+	return EpochSynchronizerConfig{
+		EpochTimeout:    DefaultEpochTimeout,
+		MinParticipants: DefaultMinParticipants,
+		ChecksumAlgo:    ChecksumAlgorithmSHA256,
+	}
+}
+
 // EpochSynchronizer coordinates multi-agent barrier synchronization and epoch snapshotting.
 type EpochSynchronizer struct {
 	mu           sync.RWMutex
