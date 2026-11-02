@@ -47,6 +47,8 @@ Available Commands:
   generate-agent-configs         Write kernel boot directives into vendor agent config files
   git                            Git commit analysis and integration with work items
   health-data                    Output aggregated system-health data for dashboard
+  holon                          Middle-brain holon telemetry and status operations
+  holon-status                   Display middle-brain holon vitality, stream hydrator capacities, and river convergence metrics
   improvement-report             Generate system improvement report with comparative analysis and prioritized work items
   init                           Initialize a new ZQK project
   kernel-integrity               Kernel Mutation Pipeline coverage, dangling-ref heal, and work-envelope backfill
