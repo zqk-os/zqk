@@ -238,10 +238,10 @@ func TestCycle12_HealthData_TableAndOutputs(t *testing.T) {
 			StreamVolume: &healthcheck.Result{Summary: "100 events (20/hr)"},
 		},
 		TestBundleHealth: &scheduler.TestBundleHealthStreamSummary{
-			PathAlias:         "bundle-1",
-			LineCount:         50,
-			ByteSize:          1024,
-			UpdatedAtRFC3339:  time.Now().UTC().Format(time.RFC3339),
+			PathAlias:        "bundle-1",
+			LineCount:        50,
+			ByteSize:         1024,
+			UpdatedAtRFC3339: time.Now().UTC().Format(time.RFC3339),
 		},
 		RetentionAdvisory: &RetentionAdvisoryData{
 			OverTarget:      true,
