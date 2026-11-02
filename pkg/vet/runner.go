@@ -168,6 +168,14 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 		findings = append(findings, dupFindings...)
 	}
 
+	if r.Config.Hygiene.CheckFormatting {
+		formattingFindings, err := CheckGoFormatting(r.Root, files, r.Config)
+		if err != nil {
+			return nil, err
+		}
+		findings = append(findings, formattingFindings...)
+	}
+
 	return findings, nil
 }
 
