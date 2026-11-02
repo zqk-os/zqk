@@ -45,6 +45,16 @@ func TestBranchHygieneDaemon_StaticFloor(t *testing.T) {
 	}
 }
 
+func newDaemonAndTick(t *testing.T, pruner BranchPruner) (*BranchHygieneDaemon, []string, error) {
+	t.Helper()
+	d, err := NewBranchHygieneDaemon(pruner)
+	if err != nil {
+		t.Fatalf("construct: %v", err)
+	}
+	pruned, tickErr := d.Tick(context.Background())
+	return d, pruned, tickErr
+}
+
 func TestBranchHygieneDaemon_TickPrunesViaEngine(t *testing.T) {
 	pruner := &mockBranchPruner{
 		pruneFn: func(ctx context.Context, dryRun bool) ([]string, error) {
@@ -54,12 +64,7 @@ func TestBranchHygieneDaemon_TickPrunesViaEngine(t *testing.T) {
 			return []string{"integration/pri-stale-1"}, nil
 		},
 	}
-	d, err := NewBranchHygieneDaemon(pruner)
-	if err != nil {
-		t.Fatalf("construct: %v", err)
-	}
-
-	pruned, err := d.Tick(context.Background())
+	_, pruned, err := newDaemonAndTick(t, pruner)
 	if err != nil {
 		t.Fatalf("tick: %v", err)
 	}
@@ -78,11 +83,7 @@ func TestBranchHygieneDaemon_TickFailClosed(t *testing.T) {
 			return nil, want
 		},
 	}
-	d, err := NewBranchHygieneDaemon(pruner)
-	if err != nil {
-		t.Fatalf("construct: %v", err)
-	}
-	pruned, err := d.Tick(context.Background())
+	d, pruned, err := newDaemonAndTick(t, pruner)
 	if !errors.Is(err, want) {
 		t.Fatalf("expected engine error, got %v", err)
 	}

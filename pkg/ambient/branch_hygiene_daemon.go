@@ -158,7 +158,11 @@ func (d *BranchHygieneDaemon) Start(ctx context.Context) error {
 	d.mu.Lock()
 	d.state = HolonStateRunning
 	d.mu.Unlock()
-	_, _ = d.Tick(runCtx)
+	if _, err := d.Tick(runCtx); err != nil {
+		d.mu.Lock()
+		d.state = HolonStateDegraded
+		d.mu.Unlock()
+	}
 
 	ticker := time.NewTicker(d.interval)
 	defer ticker.Stop()
@@ -173,7 +177,11 @@ func (d *BranchHygieneDaemon) Start(ctx context.Context) error {
 			d.mu.Unlock()
 			return runCtx.Err()
 		case <-ticker.C:
-			_, _ = d.Tick(runCtx)
+			if _, err := d.Tick(runCtx); err != nil {
+				d.mu.Lock()
+				d.state = HolonStateDegraded
+				d.mu.Unlock()
+			}
 		}
 	}
 }
