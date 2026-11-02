@@ -447,6 +447,16 @@ func (r *BackpressureRegulator) EvaluateAdmission(cost int) (AdmissionDecision, 
 	return AdmissionAllow, 0, nil
 }
 
+// Admit evaluates whether an incoming request of specified cost is admitted immediately.
+// Returns true if admitted (AdmissionAllow), false if delayed, rejected, or on error.
+func (r *BackpressureRegulator) Admit(cost int) bool {
+	if r == nil {
+		return false
+	}
+	decision, _, err := r.EvaluateAdmission(cost)
+	return err == nil && decision == AdmissionAllow
+}
+
 // CalculateBackoff calculates the recommended backoff duration for a given retry attempt.
 func (r *BackpressureRegulator) CalculateBackoff(retries int) time.Duration {
 	if r == nil {
