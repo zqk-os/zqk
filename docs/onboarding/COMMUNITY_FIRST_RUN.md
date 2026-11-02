@@ -41,6 +41,7 @@ Launch a zero-touch development environment in under 60 seconds with zero local 
 
 **New Project (Greenfield):**
 ```bash
+zqk test-drive                           # Interactive 60-second tour: intent → kernel graph → verified swarm
 zqk system init --with-onboarding-roadmap # zqk init is a top-level alias for zqk system init
 zqk ui -w
 zqk do
@@ -65,6 +66,7 @@ See [Sovereign Air-Gapped AI Engineering Specification](../architecture/SOVEREIG
 ## Fail-closed sequence
 
 ```bash
+zqk test-drive                                    # Guided interactive tour of the Knowledge Kernel & swarm execution
 zqk init                                          # Greenfield setup (skip if .zqk/ exists)
 zqk system agent-onboard                          # Detect IDE/Ollama, prime rules, & seat agent
 zqk quickstart                                    # Walkthrough (alias: zqk system start-here)

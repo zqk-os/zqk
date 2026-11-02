@@ -128,6 +128,7 @@ func NewSystemCmd() *cobra.Command {
 	systemCmd.AddCommand(NewStartHereCmd())
 	systemCmd.AddCommand(NewQuickstartCmd())
 	systemCmd.AddCommand(NewAgentOnboardCmd())
+	systemCmd.AddCommand(NewTestDriveCmd())
 	systemCmd.AddCommand(NewGenerateAgentConfigsCmd())
 	systemCmd.AddCommand(NewSeedDefaultAgentSeatingCmd())
 	systemCmd.AddCommand(NewRebuildGraphProjectionCmd())
