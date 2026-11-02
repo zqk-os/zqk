@@ -183,3 +183,44 @@ func TestCoverageRollup_BelowThresholdMarksFailedOutcome(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, community.OutcomeFailed, metric.Outcome)
 }
+
+func TestCoverageRollup_WriteAndVerifyEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	// BLI-1793575333482336000-e560a1ca: Elevate unit test statement coverage past 85% across core subsystems.
+	_, _, err := community.WriteVerifiedCoverageArtifact("", &community.CoverageRollupReport{})
+	require.Error(t, err)
+
+	_, _, err = community.WriteVerifiedCoverageArtifact("dir", nil)
+	require.ErrorIs(t, err, community.ErrNilCoverageReport)
+
+	_, err = community.CoverageRollupToStageMetric(nil, "job", "pipe", "")
+	require.ErrorIs(t, err, community.ErrNilCoverageReport)
+
+	dir := t.TempDir()
+	report := &community.CoverageRollupReport{
+		TotalStatements:   100,
+		CoveredStatements: 90,
+		CoveragePct:       90,
+	}
+	artPath, chkPath, err := community.WriteVerifiedCoverageArtifact(dir, report)
+	require.NoError(t, err)
+	require.NotEmpty(t, artPath)
+	require.NotEmpty(t, chkPath)
+
+	sess, err := community.NewRepoResolverConvergenceSession("cov-sess-2", community.RepoResolverPersonaID, nil)
+	require.NoError(t, err)
+	require.NoError(t, sess.IngestCoverageRollup(report, "job-3", "pipe-3", artPath))
+	require.ErrorIs(t, sess.IngestCoverageRollup(nil, "job-3", "pipe-3", artPath), community.ErrNilCoverageReport)
+
+	// Missing checksum sidecar error
+	require.NoError(t, fileutil.Remove(chkPath))
+	_, err = community.VerifyCoverageArtifact(artPath)
+	require.Error(t, err)
+
+	// Empty checksum sidecar error
+	require.NoError(t, fileutil.WriteFile(chkPath, []byte(""), paths.FilePerm644))
+	_, err = community.VerifyCoverageArtifact(artPath)
+	require.ErrorIs(t, err, community.ErrCoverageArtifactTampered)
+}
+
