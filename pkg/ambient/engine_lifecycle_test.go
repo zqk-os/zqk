@@ -106,8 +106,8 @@ func TestAmbientEngine_OperationalDynamicProof(t *testing.T) {
 		if report == nil {
 			t.Fatal("expected non-nil telemetry report from running engine")
 		}
-		if report.GetActiveHolonsCount() != 4 {
-			t.Fatalf("expected 4 active holons in report, got %d", report.GetActiveHolonsCount())
+		if report.GetActiveHolonsCount() != 6 {
+			t.Fatalf("expected 6 active holons in report, got %d", report.GetActiveHolonsCount())
 		}
 		if report.GetCircuitBreakerStatus() != StateClosed.String() {
 			t.Fatalf("expected circuit breaker %s, got %s", StateClosed, report.GetCircuitBreakerStatus())

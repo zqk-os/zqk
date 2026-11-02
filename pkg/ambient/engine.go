@@ -51,12 +51,16 @@ var (
 
 // AmbientEngineConfig defines configuration parameters and sub-component configs for AmbientEngine.
 type AmbientEngineConfig struct {
-	TickInterval        time.Duration            `json:"tick_interval"`
-	GracefulStopTimeout time.Duration            `json:"graceful_stop_timeout"`
-	IntentStreamConfig  *IntentStreamConfig      `json:"intent_stream_config"`
-	EpochConfig         *EpochSynchronizerConfig `json:"epoch_config"`
-	BackpressureConfig  *BackpressureConfig      `json:"backpressure_config"`
-	FaultIsolatorConfig *FaultIsolatorConfig     `json:"fault_isolator_config"`
+	TickInterval           time.Duration            `json:"tick_interval"`
+	GracefulStopTimeout    time.Duration            `json:"graceful_stop_timeout"`
+	IntentStreamConfig     *IntentStreamConfig      `json:"intent_stream_config"`
+	EpochConfig            *EpochSynchronizerConfig `json:"epoch_config"`
+	BackpressureConfig     *BackpressureConfig      `json:"backpressure_config"`
+	FaultIsolatorConfig    *FaultIsolatorConfig     `json:"fault_isolator_config"`
+	ConsensusConfig        *ConsensusArbiterConfig  `json:"consensus_config,omitempty"`
+	ConsensusArbiterConfig *ConsensusArbiterConfig  `json:"consensus_arbiter_config,omitempty"`
+	ReflexConfig           *ReflexLoopConfig        `json:"reflex_config,omitempty"`
+	ReflexLoopConfig       *ReflexLoopConfig        `json:"reflex_loop_config,omitempty"`
 }
 
 // DefaultAmbientEngineConfig returns production defaults for AmbientEngine.
@@ -65,14 +69,20 @@ func DefaultAmbientEngineConfig() AmbientEngineConfig {
 	epochCfg := DefaultEpochSynchronizerConfig()
 	backpressureCfg := DefaultBackpressureConfig()
 	faultCfg := DefaultFaultIsolatorConfig()
+	consensusCfg := DefaultConsensusArbiterConfig()
+	reflexCfg := DefaultReflexConfig()
 
 	return AmbientEngineConfig{
-		TickInterval:        DefaultTickInterval,
-		GracefulStopTimeout: DefaultGracefulStopTimeout,
-		IntentStreamConfig:  &intentCfg,
-		EpochConfig:         &epochCfg,
-		BackpressureConfig:  &backpressureCfg,
-		FaultIsolatorConfig: &faultCfg,
+		TickInterval:           DefaultTickInterval,
+		GracefulStopTimeout:    DefaultGracefulStopTimeout,
+		IntentStreamConfig:     &intentCfg,
+		EpochConfig:            &epochCfg,
+		BackpressureConfig:     &backpressureCfg,
+		FaultIsolatorConfig:    &faultCfg,
+		ConsensusConfig:        &consensusCfg,
+		ConsensusArbiterConfig: &consensusCfg,
+		ReflexConfig:           &reflexCfg,
+		ReflexLoopConfig:       &reflexCfg,
 	}
 }
 
@@ -93,11 +103,38 @@ func (c AmbientEngineConfig) Validate() error {
 	if err := c.FaultIsolatorConfig.Validate(); err != nil {
 		return err
 	}
+	if c.ConsensusConfig == nil && c.ConsensusArbiterConfig == nil {
+		return ErrNilSubConfig
+	}
+	if c.ConsensusConfig != nil {
+		if err := c.ConsensusConfig.Validate(); err != nil {
+			return err
+		}
+	}
+	if c.ConsensusArbiterConfig != nil {
+		if err := c.ConsensusArbiterConfig.Validate(); err != nil {
+			return err
+		}
+	}
+	if c.ReflexConfig == nil && c.ReflexLoopConfig == nil {
+		return ErrNilSubConfig
+	}
+	if c.ReflexConfig != nil {
+		if err := c.ReflexConfig.Validate(); err != nil {
+			return err
+		}
+	}
+	if c.ReflexLoopConfig != nil {
+		if err := c.ReflexLoopConfig.Validate(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
 // AmbientEngine coordinates the autonomous runtime microkernel loops, orchestrating
-// the AmbientIntentStream, EpochSynchronizer, BackpressureRegulator, and FaultIsolator.
+// the AmbientIntentStream, EpochSynchronizer, BackpressureRegulator, FaultIsolator,
+// ConsensusArbiter, and ReflexLoop.
 type AmbientEngine struct {
 	mu                    sync.RWMutex
 	config                AmbientEngineConfig
@@ -106,6 +143,8 @@ type AmbientEngine struct {
 	epochSynchronizer     *EpochSynchronizer
 	backpressureRegulator *BackpressureRegulator
 	faultIsolator         *FaultIsolator
+	consensusArbiter      *ConsensusArbiter
+	reflexLoop            *ReflexLoop
 
 	startedAt      time.Time
 	ticksExecuted  uint64
@@ -131,6 +170,24 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 		return nil, err
 	}
 
+	consensusCfg := cfg.ConsensusConfig
+	if consensusCfg == nil {
+		consensusCfg = cfg.ConsensusArbiterConfig
+	}
+	arbiter, err := NewConsensusArbiterWithConfig(*consensusCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	reflexCfg := cfg.ReflexConfig
+	if reflexCfg == nil {
+		reflexCfg = cfg.ReflexLoopConfig
+	}
+	reflex, err := NewReflexLoopWithConfig(*reflexCfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &AmbientEngine{
 		config:                cfg,
 		state:                 EngineStateStopped,
@@ -138,6 +195,8 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 		epochSynchronizer:     epochSyncer,
 		backpressureRegulator: regulator,
 		faultIsolator:         isolator,
+		consensusArbiter:      arbiter,
+		reflexLoop:            reflex,
 	}, nil
 }
 
@@ -221,6 +280,30 @@ func (e *AmbientEngine) FaultIsolator() *FaultIsolator {
 	s := e.faultIsolator
 	e.mu.RUnlock()
 	return s
+}
+
+func withEngineRLock[T any](e *AmbientEngine, extractor func(*AmbientEngine) T) T {
+	var zero T
+	if e == nil {
+		return zero
+	}
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return extractor(e)
+}
+
+// ConsensusArbiter returns the sub-component ConsensusArbiter. Returns nil if receiver is nil.
+func (e *AmbientEngine) ConsensusArbiter() *ConsensusArbiter {
+	return withEngineRLock(e, func(eng *AmbientEngine) *ConsensusArbiter {
+		return eng.consensusArbiter
+	})
+}
+
+// ReflexLoop returns the sub-component ReflexLoop. Returns nil if receiver is nil.
+func (e *AmbientEngine) ReflexLoop() *ReflexLoop {
+	return withEngineRLock(e, func(eng *AmbientEngine) *ReflexLoop {
+		return eng.reflexLoop
+	})
 }
 
 // Transition attempts to transition the engine to a new lifecycle state following valid FSM paths.

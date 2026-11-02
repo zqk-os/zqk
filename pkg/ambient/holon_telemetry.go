@@ -50,6 +50,9 @@ type MiddleBrainTelemetrySnapshot struct {
 	RiverCount            int           `json:"river_count"`
 	TotalDropsIngested    int64         `json:"total_drops_ingested"`
 	AverageAlignmentScore float64       `json:"average_alignment_score"`
+	ConvergenceScore      float64       `json:"convergence_score,omitempty"`
+	TotalStreamEvents     int64         `json:"total_stream_events,omitempty"`
+	PendingIntentSeeds    int           `json:"pending_intent_seeds,omitempty"`
 	DivergenceCount       int64         `json:"divergence_count"`
 	WarningCount          int           `json:"warning_count"`
 	Warnings              []string      `json:"warnings,omitempty"`

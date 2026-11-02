@@ -52,26 +52,36 @@ func (c ComponentHealth) IsHealthy() bool {
 // HolonMeshMetrics aggregates operational throughput and convergence indicators
 // across the distributed holon execution fabric.
 type HolonMeshMetrics struct {
-	IngestRate       float64 `json:"ingest_rate"`
-	ConvergenceScore float64 `json:"convergence_score"`
-	DivergenceCount  int64   `json:"divergence_count"`
-	EventThroughput  float64 `json:"event_throughput"`
-	StreamLatencyMs  float64 `json:"stream_latency_ms"`
+	IngestRate            float64 `json:"ingest_rate"`
+	ConvergenceScore      float64 `json:"convergence_score"`
+	DivergenceCount       int64   `json:"divergence_count"`
+	EventThroughput       float64 `json:"event_throughput"`
+	StreamLatencyMs       float64 `json:"stream_latency_ms"`
+	ConsensusLeasesActive int     `json:"consensus_leases_active"`
+	ConsensusCommitted    uint64  `json:"consensus_committed"`
+	ConsensusRevoked      uint64  `json:"consensus_revoked"`
+	ReflexActionsTotal    uint64  `json:"reflex_actions_total"`
+	ReflexRealignCount    uint64  `json:"reflex_realign_count"`
 }
 
 // AmbientTelemetryReport represents a comprehensive, point-in-time runtime telemetry
 // snapshot of the Ambient Engine, its holons, circuit breaker, and component health.
 type AmbientTelemetryReport struct {
-	mu                   sync.RWMutex               `json:"-"`
-	Timestamp            time.Time                  `json:"timestamp"`
-	Status               string                     `json:"status"`
-	Uptime               time.Duration              `json:"uptime"`
-	ActiveHolonsCount    int                        `json:"active_holons_count"`
-	MeshMetrics          HolonMeshMetrics           `json:"mesh_metrics"`
-	Components           map[string]ComponentHealth `json:"components"`
-	CircuitBreakerStatus string                     `json:"circuit_breaker_status"`
-	RunwayWatermark      int64                      `json:"runway_watermark"`
-	Warnings             []string                   `json:"warnings,omitempty"`
+	mu                    sync.RWMutex               `json:"-"`
+	Timestamp             time.Time                  `json:"timestamp"`
+	Status                string                     `json:"status"`
+	Uptime                time.Duration              `json:"uptime"`
+	ActiveHolonsCount     int                        `json:"active_holons_count"`
+	MeshMetrics           HolonMeshMetrics           `json:"mesh_metrics"`
+	Components            map[string]ComponentHealth `json:"components"`
+	CircuitBreakerStatus  string                     `json:"circuit_breaker_status"`
+	RunwayWatermark       int64                      `json:"runway_watermark"`
+	ConsensusLeasesActive int                        `json:"consensus_leases_active"`
+	ConsensusCommitted    uint64                     `json:"consensus_committed"`
+	ConsensusRevoked      uint64                     `json:"consensus_revoked"`
+	ReflexActionsTotal    uint64                     `json:"reflex_actions_total"`
+	ReflexRealignCount    uint64                     `json:"reflex_realign_count"`
+	Warnings              []string                   `json:"warnings,omitempty"`
 }
 
 // TelemetryReportOption configures an AmbientTelemetryReport during instantiation.
@@ -119,6 +129,51 @@ func WithActiveHolonsCount(count int) TelemetryReportOption {
 func WithMeshMetrics(metrics HolonMeshMetrics) TelemetryReportOption {
 	return func(r *AmbientTelemetryReport) {
 		r.MeshMetrics = metrics
+		r.ConsensusLeasesActive = metrics.ConsensusLeasesActive
+		r.ConsensusCommitted = metrics.ConsensusCommitted
+		r.ConsensusRevoked = metrics.ConsensusRevoked
+		r.ReflexActionsTotal = metrics.ReflexActionsTotal
+		r.ReflexRealignCount = metrics.ReflexRealignCount
+	}
+}
+
+// WithConsensusLeasesActive sets the active consensus lease count.
+func WithConsensusLeasesActive(count int) TelemetryReportOption {
+	return func(r *AmbientTelemetryReport) {
+		r.ConsensusLeasesActive = count
+		r.MeshMetrics.ConsensusLeasesActive = count
+	}
+}
+
+// WithConsensusCommitted sets the count of committed consensus tasks.
+func WithConsensusCommitted(count uint64) TelemetryReportOption {
+	return func(r *AmbientTelemetryReport) {
+		r.ConsensusCommitted = count
+		r.MeshMetrics.ConsensusCommitted = count
+	}
+}
+
+// WithConsensusRevoked sets the count of revoked consensus tasks.
+func WithConsensusRevoked(count uint64) TelemetryReportOption {
+	return func(r *AmbientTelemetryReport) {
+		r.ConsensusRevoked = count
+		r.MeshMetrics.ConsensusRevoked = count
+	}
+}
+
+// WithReflexActionsTotal sets the total count of reflex actions triggered.
+func WithReflexActionsTotal(count uint64) TelemetryReportOption {
+	return func(r *AmbientTelemetryReport) {
+		r.ReflexActionsTotal = count
+		r.MeshMetrics.ReflexActionsTotal = count
+	}
+}
+
+// WithReflexRealignCount sets the count of intent realignment reflex actions.
+func WithReflexRealignCount(count uint64) TelemetryReportOption {
+	return func(r *AmbientTelemetryReport) {
+		r.ReflexRealignCount = count
+		r.MeshMetrics.ReflexRealignCount = count
 	}
 }
 
@@ -262,6 +317,33 @@ func (r *AmbientTelemetryReport) UnmarshalJSON(data []byte) error {
 	if r.Components == nil {
 		r.Components = make(map[string]ComponentHealth)
 	}
+
+	if r.ConsensusLeasesActive == 0 && r.MeshMetrics.ConsensusLeasesActive != 0 {
+		r.ConsensusLeasesActive = r.MeshMetrics.ConsensusLeasesActive
+	} else if r.ConsensusLeasesActive != 0 && r.MeshMetrics.ConsensusLeasesActive == 0 {
+		r.MeshMetrics.ConsensusLeasesActive = r.ConsensusLeasesActive
+	}
+	if r.ConsensusCommitted == 0 && r.MeshMetrics.ConsensusCommitted != 0 {
+		r.ConsensusCommitted = r.MeshMetrics.ConsensusCommitted
+	} else if r.ConsensusCommitted != 0 && r.MeshMetrics.ConsensusCommitted == 0 {
+		r.MeshMetrics.ConsensusCommitted = r.ConsensusCommitted
+	}
+	if r.ConsensusRevoked == 0 && r.MeshMetrics.ConsensusRevoked != 0 {
+		r.ConsensusRevoked = r.MeshMetrics.ConsensusRevoked
+	} else if r.ConsensusRevoked != 0 && r.MeshMetrics.ConsensusRevoked == 0 {
+		r.MeshMetrics.ConsensusRevoked = r.ConsensusRevoked
+	}
+	if r.ReflexActionsTotal == 0 && r.MeshMetrics.ReflexActionsTotal != 0 {
+		r.ReflexActionsTotal = r.MeshMetrics.ReflexActionsTotal
+	} else if r.ReflexActionsTotal != 0 && r.MeshMetrics.ReflexActionsTotal == 0 {
+		r.MeshMetrics.ReflexActionsTotal = r.ReflexActionsTotal
+	}
+	if r.ReflexRealignCount == 0 && r.MeshMetrics.ReflexRealignCount != 0 {
+		r.ReflexRealignCount = r.MeshMetrics.ReflexRealignCount
+	} else if r.ReflexRealignCount != 0 && r.MeshMetrics.ReflexRealignCount == 0 {
+		r.MeshMetrics.ReflexRealignCount = r.ReflexRealignCount
+	}
+
 	return nil
 }
 
@@ -289,6 +371,23 @@ func (r *AmbientTelemetryReport) GetComponent(name string) (ComponentHealth, boo
 	}
 	comp, ok := r.Components[name]
 	return comp, ok
+}
+
+// GetComponents returns a copy of all component health records in a thread-safe and nil-safe manner.
+func (r *AmbientTelemetryReport) GetComponents() map[string]ComponentHealth {
+	if r == nil {
+		return nil
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.Components == nil {
+		return nil
+	}
+	comps := make(map[string]ComponentHealth, len(r.Components))
+	for k, v := range r.Components {
+		comps[k] = v
+	}
+	return comps
 }
 
 // SetComponent safely adds or updates a component's health status.
@@ -365,6 +464,71 @@ func (r *AmbientTelemetryReport) GetMeshMetrics() HolonMeshMetrics {
 	return r.MeshMetrics
 }
 
+// GetConsensusLeasesActive returns the active consensus lease count in a nil-safe manner.
+func (r *AmbientTelemetryReport) GetConsensusLeasesActive() int {
+	if r == nil {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.ConsensusLeasesActive != 0 {
+		return r.ConsensusLeasesActive
+	}
+	return r.MeshMetrics.ConsensusLeasesActive
+}
+
+// GetConsensusCommitted returns the committed consensus task count in a nil-safe manner.
+func (r *AmbientTelemetryReport) GetConsensusCommitted() uint64 {
+	if r == nil {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.ConsensusCommitted != 0 {
+		return r.ConsensusCommitted
+	}
+	return r.MeshMetrics.ConsensusCommitted
+}
+
+// GetConsensusRevoked returns the revoked consensus task count in a nil-safe manner.
+func (r *AmbientTelemetryReport) GetConsensusRevoked() uint64 {
+	if r == nil {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.ConsensusRevoked != 0 {
+		return r.ConsensusRevoked
+	}
+	return r.MeshMetrics.ConsensusRevoked
+}
+
+// GetReflexActionsTotal returns the total reflex actions triggered in a nil-safe manner.
+func (r *AmbientTelemetryReport) GetReflexActionsTotal() uint64 {
+	if r == nil {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.ReflexActionsTotal != 0 {
+		return r.ReflexActionsTotal
+	}
+	return r.MeshMetrics.ReflexActionsTotal
+}
+
+// GetReflexRealignCount returns the reflex realignment actions count in a nil-safe manner.
+func (r *AmbientTelemetryReport) GetReflexRealignCount() uint64 {
+	if r == nil {
+		return 0
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.ReflexRealignCount != 0 {
+		return r.ReflexRealignCount
+	}
+	return r.MeshMetrics.ReflexRealignCount
+}
+
 // GetWarnings returns a copy of the warnings slice in a thread-safe and nil-safe manner.
 func (r *AmbientTelemetryReport) GetWarnings() []string {
 	if r == nil {
@@ -397,15 +561,20 @@ func (r *AmbientTelemetryReport) Clone() *AmbientTelemetryReport {
 	}
 	r.mu.RLock()
 	cloned := &AmbientTelemetryReport{
-		Timestamp:            r.Timestamp,
-		Status:               r.Status,
-		Uptime:               r.Uptime,
-		ActiveHolonsCount:    r.ActiveHolonsCount,
-		MeshMetrics:          r.MeshMetrics,
-		Components:           make(map[string]ComponentHealth, len(r.Components)),
-		CircuitBreakerStatus: r.CircuitBreakerStatus,
-		RunwayWatermark:      r.RunwayWatermark,
-		Warnings:             append([]string(nil), r.Warnings...),
+		Timestamp:             r.Timestamp,
+		Status:                r.Status,
+		Uptime:                r.Uptime,
+		ActiveHolonsCount:     r.ActiveHolonsCount,
+		MeshMetrics:           r.MeshMetrics,
+		Components:            make(map[string]ComponentHealth, len(r.Components)),
+		CircuitBreakerStatus:  r.CircuitBreakerStatus,
+		RunwayWatermark:       r.RunwayWatermark,
+		ConsensusLeasesActive: r.ConsensusLeasesActive,
+		ConsensusCommitted:    r.ConsensusCommitted,
+		ConsensusRevoked:      r.ConsensusRevoked,
+		ReflexActionsTotal:    r.ReflexActionsTotal,
+		ReflexRealignCount:    r.ReflexRealignCount,
+		Warnings:              append([]string(nil), r.Warnings...),
 	}
 	for k, v := range r.Components {
 		cloned.Components[k] = v
@@ -440,6 +609,31 @@ func (r *AmbientTelemetryReport) SummaryTable() string {
 	fmt.Fprintf(&sb, "  Divergence Count:     %d\n", r.MeshMetrics.DivergenceCount)
 	fmt.Fprintf(&sb, "  Event Throughput:     %.2f events/sec\n", r.MeshMetrics.EventThroughput)
 	fmt.Fprintf(&sb, "  Stream Latency:       %.2f ms\n", r.MeshMetrics.StreamLatencyMs)
+	leasesActive := r.MeshMetrics.ConsensusLeasesActive
+	if leasesActive == 0 && r.ConsensusLeasesActive != 0 {
+		leasesActive = r.ConsensusLeasesActive
+	}
+	committed := r.MeshMetrics.ConsensusCommitted
+	if committed == 0 && r.ConsensusCommitted != 0 {
+		committed = r.ConsensusCommitted
+	}
+	revoked := r.MeshMetrics.ConsensusRevoked
+	if revoked == 0 && r.ConsensusRevoked != 0 {
+		revoked = r.ConsensusRevoked
+	}
+	reflexTotal := r.MeshMetrics.ReflexActionsTotal
+	if reflexTotal == 0 && r.ReflexActionsTotal != 0 {
+		reflexTotal = r.ReflexActionsTotal
+	}
+	reflexRealign := r.MeshMetrics.ReflexRealignCount
+	if reflexRealign == 0 && r.ReflexRealignCount != 0 {
+		reflexRealign = r.ReflexRealignCount
+	}
+	fmt.Fprintf(&sb, "  Consensus Leases:     %d active\n", leasesActive)
+	fmt.Fprintf(&sb, "  Consensus Committed:  %d\n", committed)
+	fmt.Fprintf(&sb, "  Consensus Revoked:    %d\n", revoked)
+	fmt.Fprintf(&sb, "  Reflex Actions:       %d total\n", reflexTotal)
+	fmt.Fprintf(&sb, "  Reflex Realignments:  %d\n", reflexRealign)
 	sb.WriteString("--------------------------------------------------------------------------------\n")
 	sb.WriteString("COMPONENTS\n")
 	if len(r.Components) == 0 {

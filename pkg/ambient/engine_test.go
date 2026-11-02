@@ -27,6 +27,12 @@ func TestAmbientEngine_StaticFloorInvariants(t *testing.T) {
 		if cfg.FaultIsolatorConfig == nil {
 			t.Fatal("expected FaultIsolatorConfig not nil")
 		}
+		if cfg.ConsensusConfig == nil || cfg.ConsensusArbiterConfig == nil {
+			t.Fatal("expected ConsensusConfig not nil")
+		}
+		if cfg.ReflexConfig == nil || cfg.ReflexLoopConfig == nil {
+			t.Fatal("expected ReflexConfig not nil")
+		}
 		if err := cfg.Validate(); err != nil {
 			t.Fatalf("expected DefaultAmbientEngineConfig to be valid, got: %v", err)
 		}
@@ -37,6 +43,12 @@ func TestAmbientEngine_StaticFloorInvariants(t *testing.T) {
 		}
 		if engine == nil {
 			t.Fatal("expected engine not nil")
+		}
+		if engine.ConsensusArbiter() == nil {
+			t.Fatal("expected ConsensusArbiter not nil")
+		}
+		if engine.ReflexLoop() == nil {
+			t.Fatal("expected ReflexLoop not nil")
 		}
 		if engine.State() != EngineStateStopped {
 			t.Fatalf("expected initial state %s, got %s", EngineStateStopped, engine.State())
@@ -104,6 +116,22 @@ func TestAmbientEngine_StaticFloorInvariants(t *testing.T) {
 				mutate:      func(c *AmbientEngineConfig) { c.FaultIsolatorConfig = nil },
 				expectedErr: ErrNilSubConfig,
 			},
+			{
+				name: "nil consensus config",
+				mutate: func(c *AmbientEngineConfig) {
+					c.ConsensusConfig = nil
+					c.ConsensusArbiterConfig = nil
+				},
+				expectedErr: ErrNilSubConfig,
+			},
+			{
+				name: "nil reflex loop config",
+				mutate: func(c *AmbientEngineConfig) {
+					c.ReflexConfig = nil
+					c.ReflexLoopConfig = nil
+				},
+				expectedErr: ErrNilSubConfig,
+			},
 		}
 
 		for _, tc := range cases {
@@ -161,6 +189,12 @@ func TestAmbientEngine_StaticFloorInvariants(t *testing.T) {
 		}
 		if iso := nilEngine.FaultIsolator(); iso != nil {
 			t.Fatal("expected nil FaultIsolator() on nil engine")
+		}
+		if arb := nilEngine.ConsensusArbiter(); arb != nil {
+			t.Fatal("expected nil ConsensusArbiter() on nil engine")
+		}
+		if ref := nilEngine.ReflexLoop(); ref != nil {
+			t.Fatal("expected nil ReflexLoop() on nil engine")
 		}
 		if err := nilEngine.Transition(EngineStateRunning); !errors.Is(err, ErrNilEngine) {
 			t.Fatalf("expected ErrNilEngine on Transition(), got %v", err)
