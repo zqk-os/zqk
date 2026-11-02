@@ -1,32 +1,23 @@
 package ambient
 
 import (
-	"errors"
+	"context"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // Named constants enforcing bounded lease timing floors and deterministic execution.
 const (
-	DefaultLeaseDuration = 30 * time.Second
-	DefaultReapInterval  = 100 * time.Millisecond
-)
-
-// Sentinel domain errors for consensus arbiter lifecycle and leasing operations.
-var (
-	ErrNilTaskLease          = errors.New("task lease cannot be nil")
-	ErrInvalidTaskID         = errors.New("invalid task id")
-	ErrInvalidWorkerID       = errors.New("invalid worker id")
-	ErrTaskAlreadyLeased     = errors.New("task is already leased")
-	ErrLeaseExpired          = errors.New("task lease has expired")
-	ErrLeaseNotFound         = errors.New("task lease not found")
-	ErrInvalidConsensusState = errors.New("invalid consensus state")
-	ErrTaskAlreadyCommitted  = errors.New("task is already committed")
-	ErrUnauthorizedWorker    = errors.New("worker is not authorized for this lease")
-	ErrNoPendingTasks        = errors.New("no pending tasks available for leasing")
-	ErrArbiterClosed         = errors.New("consensus arbiter is closed")
+	DefaultLeaseDuration     = 30 * time.Second
+	DefaultReapInterval      = 100 * time.Millisecond
+	DefaultShutdownWaitTime  = 2 * time.Second
+	DefaultLeaseTTL          = DefaultLeaseDuration
+	DefaultMaxConsensusTasks = 4096
 )
 
 // ConsensusState represents the distributed lifecycle phase of a task lease.
@@ -38,6 +29,9 @@ const (
 	ConsensusStateCommitted ConsensusState = "committed"
 	ConsensusStateRevoked   ConsensusState = "revoked"
 	ConsensusStateExpired   ConsensusState = "expired"
+
+	// ConsensusStateActive is an alias for ConsensusStateLeased.
+	ConsensusStateActive ConsensusState = "leased"
 )
 
 // IsValid validates whether the ConsensusState is an authorized lifecycle state.
@@ -59,6 +53,31 @@ func (s ConsensusState) String() string {
 	return string(s)
 }
 
+// Sentinel domain errors for consensus arbiter lifecycle and leasing operations.
+var (
+	ErrNilReceiver           = errfmt.Errorf("consensus arbiter: receiver is nil")
+	ErrNilConsensusArbiter   = ErrNilReceiver
+	ErrNilTaskLease          = errfmt.Errorf("task lease cannot be nil")
+	ErrInvalidTaskID         = errfmt.Errorf("invalid task id")
+	ErrEmptyTaskID           = ErrInvalidTaskID
+	ErrInvalidWorkerID       = errfmt.Errorf("invalid worker id")
+	ErrEmptyWorkerID         = ErrInvalidWorkerID
+	ErrInvalidLeaseDuration  = errfmt.Errorf("invalid lease duration: duration must be positive")
+	ErrTaskAlreadyLeased     = errfmt.Errorf("task is already leased")
+	ErrTaskAlreadyExists     = errfmt.Errorf("task already exists")
+	ErrLeaseExpired          = errfmt.Errorf("task lease has expired")
+	ErrLeaseNotFound         = errfmt.Errorf("task lease not found")
+	ErrTaskNotFound          = ErrLeaseNotFound
+	ErrInvalidConsensusState = errfmt.Errorf("invalid consensus state")
+	ErrTaskAlreadyCommitted  = errfmt.Errorf("task is already committed")
+	ErrTaskNotLeased         = errfmt.Errorf("task is not currently leased")
+	ErrInvalidLeaseToken     = errfmt.Errorf("invalid or mismatched lease token")
+	ErrUnauthorizedWorker    = errfmt.Errorf("worker is not authorized for this lease")
+	ErrNoPendingTasks        = errfmt.Errorf("no pending tasks available for leasing")
+	ErrArbiterClosed         = errfmt.Errorf("consensus arbiter is closed")
+	ErrArbiterAlreadyRun     = errfmt.Errorf("consensus arbiter is already running")
+)
+
 // TaskLease captures the exclusive assignment and commitment contract for a distributed task.
 type TaskLease struct {
 	ID            string         `json:"id"`
@@ -69,6 +88,7 @@ type TaskLease struct {
 	State         ConsensusState `json:"state"`
 	CreatedAt     time.Time      `json:"created_at"`
 	UpdatedAt     time.Time      `json:"updated_at"`
+	RenewedAt     time.Time      `json:"renewed_at,omitempty"`
 	Payload       []byte         `json:"payload,omitempty"`
 }
 
@@ -86,8 +106,42 @@ func (l *TaskLease) Validate() error {
 	return nil
 }
 
+// Clone creates a detached shallow copy of the lease.
+func (l *TaskLease) Clone() *TaskLease {
+	if l == nil {
+		return nil
+	}
+	dst := *l
+	if len(l.Payload) > 0 {
+		dst.Payload = append([]byte(nil), l.Payload...)
+	}
+	return &dst
+}
+
+// IsExpired returns true if current time has passed the lease expiration timestamp.
+func (l *TaskLease) IsExpired() bool {
+	if l == nil {
+		return true
+	}
+	if l.ExpiresAt.IsZero() {
+		return false
+	}
+	return time.Now().UTC().After(l.ExpiresAt)
+}
+
+// IsActive returns true if the lease is actively held and has not expired.
+func (l *TaskLease) IsActive() bool {
+	if l == nil {
+		return false
+	}
+	return l.State == ConsensusStateLeased && !l.IsExpired()
+}
+
 // ArbiterOption configures runtime parameters for the consensus arbiter.
 type ArbiterOption func(*AmbientConsensusArbiter)
+
+// ConsensusArbiterOption is an alias for ArbiterOption.
+type ConsensusArbiterOption = ArbiterOption
 
 // WithDefaultLeaseDuration overrides the fallback duration for newly granted leases.
 func WithDefaultLeaseDuration(d time.Duration) ArbiterOption {
@@ -98,11 +152,25 @@ func WithDefaultLeaseDuration(d time.Duration) ArbiterOption {
 	}
 }
 
+// WithDefaultLeaseTTL sets the default lease duration.
+func WithDefaultLeaseTTL(ttl time.Duration) ArbiterOption {
+	return WithDefaultLeaseDuration(ttl)
+}
+
 // WithReapInterval overrides the interval between background expiration sweeps.
 func WithReapInterval(d time.Duration) ArbiterOption {
 	return func(a *AmbientConsensusArbiter) {
 		if d > 0 {
 			a.reapInterval = d
+		}
+	}
+}
+
+// WithMaxConsensusTasks sets the upper bound on tracked tasks.
+func WithMaxConsensusTasks(maxTasks int) ArbiterOption {
+	return func(a *AmbientConsensusArbiter) {
+		if maxTasks > 0 {
+			a.maxTasks = maxTasks
 		}
 	}
 }
@@ -116,16 +184,24 @@ func WithClock(c func() time.Time) ArbiterOption {
 	}
 }
 
-// AmbientConsensusArbiter manages atomic task proposals, exclusive worker leases, and consensus commits.
+// AmbientConsensusArbiter manages atomic task proposals, exclusive worker leases,
+// background expiration reaping, and consensus commits.
 type AmbientConsensusArbiter struct {
 	mu                   sync.RWMutex
 	leases               map[string]*TaskLease
 	pendingQueue         []string
 	defaultLeaseDuration time.Duration
 	reapInterval         time.Duration
+	maxTasks             int
 	nowFunc              func() time.Time
+	running              bool
 	closed               bool
+	stopCh               chan struct{}
+	doneCh               chan struct{}
 }
+
+// ConsensusArbiter is a type alias for AmbientConsensusArbiter.
+type ConsensusArbiter = AmbientConsensusArbiter
 
 // NewConsensusArbiter creates an initialized, thread-safe AmbientConsensusArbiter.
 func NewConsensusArbiter(opts ...ArbiterOption) *AmbientConsensusArbiter {
@@ -134,7 +210,8 @@ func NewConsensusArbiter(opts ...ArbiterOption) *AmbientConsensusArbiter {
 		pendingQueue:         make([]string, 0),
 		defaultLeaseDuration: DefaultLeaseDuration,
 		reapInterval:         DefaultReapInterval,
-		nowFunc:              time.Now,
+		maxTasks:             DefaultMaxConsensusTasks,
+		nowFunc:              func() time.Time { return time.Now().UTC() },
 	}
 	for _, opt := range opts {
 		opt(arbiter)
@@ -142,15 +219,159 @@ func NewConsensusArbiter(opts ...ArbiterOption) *AmbientConsensusArbiter {
 	return arbiter
 }
 
+func validateIdentifier(val string, errIfEmpty error) (string, error) {
+	cleaned := strings.TrimSpace(val)
+	if cleaned == "" {
+		return "", errIfEmpty
+	}
+	return cleaned, nil
+}
+
+func (a *AmbientConsensusArbiter) checkActiveReceiver() error {
+	if a == nil {
+		return ErrNilReceiver
+	}
+	return nil
+}
+
+func (a *AmbientConsensusArbiter) validateTaskInput(taskID string) (string, error) {
+	if err := a.checkActiveReceiver(); err != nil {
+		return "", err
+	}
+	return validateIdentifier(taskID, ErrInvalidTaskID)
+}
+
+func (a *AmbientConsensusArbiter) validateTaskAndWorker(taskID, workerID string) (string, string, error) {
+	cleanTaskID, err := a.validateTaskInput(taskID)
+	if err != nil {
+		return "", "", err
+	}
+	cleanWorkerID, err := validateIdentifier(workerID, ErrInvalidWorkerID)
+	if err != nil {
+		return "", "", err
+	}
+	return cleanTaskID, cleanWorkerID, nil
+}
+
+func validateDuration(d time.Duration) error {
+	if d <= 0 {
+		return ErrInvalidLeaseDuration
+	}
+	return nil
+}
+
+func (a *AmbientConsensusArbiter) execMutation(action func(now time.Time) error) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.closed {
+		return ErrArbiterClosed
+	}
+	return action(a.nowFunc())
+}
+
+// Start spawns the background lease reaper goroutine with graceful context lifecycle.
+func (a *AmbientConsensusArbiter) Start(ctx context.Context) error {
+	if err := a.checkActiveReceiver(); err != nil {
+		return err
+	}
+
+	a.mu.Lock()
+	if a.closed {
+		a.mu.Unlock()
+		return ErrArbiterClosed
+	}
+	if a.running {
+		a.mu.Unlock()
+		return ErrArbiterAlreadyRun
+	}
+	a.running = true
+	a.stopCh = make(chan struct{})
+	a.doneCh = make(chan struct{})
+	a.mu.Unlock()
+
+	goroutinelabels.NewGoroutine("consensus_arbiter_reaper", "reap expired task leases").
+		StartSimple(func() {
+			a.runReaper(ctx)
+		})
+
+	return nil
+}
+
+// Stop initiates graceful shutdown of the background reaper and awaits completion.
+func (a *AmbientConsensusArbiter) Stop() error {
+	if err := a.checkActiveReceiver(); err != nil {
+		return err
+	}
+
+	a.mu.Lock()
+	if !a.running {
+		a.mu.Unlock()
+		return nil
+	}
+	a.running = false
+	close(a.stopCh)
+	done := a.doneCh
+	a.mu.Unlock()
+
+	select {
+	case <-done:
+	case <-time.After(DefaultShutdownWaitTime):
+	}
+	return nil
+}
+
+// runReaper executes the periodic expiration reap loop.
+func (a *AmbientConsensusArbiter) runReaper(ctx context.Context) {
+	ticker := time.NewTicker(a.reapInterval)
+	defer ticker.Stop()
+	defer close(a.doneCh)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-a.stopCh:
+			return
+		case <-ticker.C:
+			reaped := a.ReapExpiredLeases()
+			if reaped < 0 {
+				continue
+			}
+		}
+	}
+}
+
+// ReapExpiredLeases scans active leases, revoking ownership and marking expired leases.
+func (a *AmbientConsensusArbiter) ReapExpiredLeases() int {
+	if a == nil {
+		return 0
+	}
+
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	reaped := 0
+	now := a.nowFunc()
+	for _, lease := range a.leases {
+		if lease.State == ConsensusStateLeased && a.isExpiredUnsafe(lease, now) {
+			lease.State = ConsensusStateExpired
+			lease.WorkerID = ""
+			lease.UpdatedAt = now
+			reaped++
+		}
+	}
+	return reaped
+}
+
 // ProposeTask registers a new task candidate in the consensus pool in Pending state.
 func (a *AmbientConsensusArbiter) ProposeTask(taskID string, payload []byte) (*TaskLease, error) {
-	cleanTaskID, err := sanitizeIdentifier(a, taskID, ErrInvalidTaskID)
+	cleanTaskID, err := a.validateTaskInput(taskID)
 	if err != nil {
 		return nil, err
 	}
 
-	var result *TaskLease
-	err = a.execMutation(func(now time.Time) error {
+	var created *TaskLease
+	mutErr := a.execMutation(func(now time.Time) error {
 		if existing, exists := a.leases[cleanTaskID]; exists {
 			if existing.State == ConsensusStateCommitted {
 				return ErrTaskAlreadyCommitted
@@ -171,49 +392,80 @@ func (a *AmbientConsensusArbiter) ProposeTask(taskID string, payload []byte) (*T
 		}
 		a.leases[cleanTaskID] = lease
 		a.enqueuePendingUnsafe(cleanTaskID)
-		result = cloneTaskLease(lease)
+		created = cloneTaskLease(lease)
 		return nil
 	})
-
-	return result, err
+	return created, mutErr
 }
 
-// LeaseTask grants exclusive execution rights for a proposed task to the given worker.
+// LeaseTask grants exclusive execution rights for a proposed or unassigned task to the given worker.
 func (a *AmbientConsensusArbiter) LeaseTask(taskID string, workerID string, duration time.Duration) (*TaskLease, error) {
-	cleanTaskID, err := sanitizeIdentifier(a, taskID, ErrInvalidTaskID)
-	if err != nil {
+	if err := validateDuration(duration); err != nil {
 		return nil, err
 	}
-	cleanWorkerID, err := sanitizeIdentifier(a, workerID, ErrInvalidWorkerID)
-	if err != nil {
-		return nil, err
-	}
-
-	var result *TaskLease
-	err = a.execMutation(func(now time.Time) error {
-		lease, lookupErr := a.getActiveLeaseUnsafe(cleanTaskID)
-		if lookupErr != nil {
-			return lookupErr
-		}
-		if lease.State == ConsensusStateLeased && !a.isExpiredUnsafe(lease, now) {
-			return ErrTaskAlreadyLeased
-		}
-		result = a.bindLeaseUnsafe(lease, cleanWorkerID, duration, now)
-		return nil
-	})
-
-	return result, err
-}
-
-// LeaseNext allocates the oldest pending task in FIFO order to the requesting worker.
-func (a *AmbientConsensusArbiter) LeaseNext(workerID string, duration time.Duration) (*TaskLease, error) {
-	worker, err := sanitizeIdentifier(a, workerID, ErrInvalidWorkerID)
+	cleanTaskID, cleanWorkerID, err := a.validateTaskAndWorker(taskID, workerID)
 	if err != nil {
 		return nil, err
 	}
 
 	var assigned *TaskLease
-	mutationErr := a.execMutation(func(now time.Time) error {
+	mutErr := a.execMutation(func(now time.Time) error {
+		existing, exists := a.leases[cleanTaskID]
+		if exists {
+			if existing.State == ConsensusStateCommitted {
+				return ErrTaskAlreadyCommitted
+			}
+			if existing.State == ConsensusStateLeased && !a.isExpiredUnsafe(existing, now) {
+				if existing.WorkerID != cleanWorkerID {
+					return ErrTaskAlreadyLeased
+				}
+				existing.ExpiresAt = now.Add(duration)
+				existing.RenewedAt = now
+				existing.UpdatedAt = now
+				assigned = cloneTaskLease(existing)
+				return nil
+			}
+			assigned = a.bindLeaseUnsafe(existing, cleanWorkerID, duration, now)
+			return nil
+		}
+
+		lease := &TaskLease{
+			ID:            fmt.Sprintf("lease-%s-%d", cleanTaskID, now.UnixNano()),
+			TaskID:        cleanTaskID,
+			WorkerID:      cleanWorkerID,
+			LeaseDuration: duration,
+			ExpiresAt:     now.Add(duration),
+			State:         ConsensusStateLeased,
+			CreatedAt:     now,
+			UpdatedAt:     now,
+		}
+		a.leases[cleanTaskID] = lease
+		assigned = cloneTaskLease(lease)
+		return nil
+	})
+	return assigned, mutErr
+}
+
+// AcquireLease is an alias for LeaseTask for compatibility with boundary callers.
+func (a *AmbientConsensusArbiter) AcquireLease(taskID string, workerID string, duration time.Duration) (*TaskLease, error) {
+	return a.LeaseTask(taskID, workerID, duration)
+}
+
+// LeaseNext allocates the oldest pending task in FIFO order to the requesting worker.
+func (a *AmbientConsensusArbiter) LeaseNext(workerID string, duration time.Duration) (*TaskLease, error) {
+	if err := validateDuration(duration); err != nil {
+		return nil, err
+	}
+	if err := a.checkActiveReceiver(); err != nil {
+		return nil, err
+	}
+	cleanWorkerID, err := validateIdentifier(workerID, ErrInvalidWorkerID)
+	if err != nil {
+		return nil, err
+	}
+
+	var assigned *TaskLease
+	mutErr := a.execMutation(func(now time.Time) error {
 		for len(a.pendingQueue) > 0 {
 			candidateID := a.pendingQueue[0]
 			a.pendingQueue = a.pendingQueue[1:]
@@ -225,40 +477,76 @@ func (a *AmbientConsensusArbiter) LeaseNext(workerID string, duration time.Durat
 			if lease.State == ConsensusStateLeased && !a.isExpiredUnsafe(lease, now) {
 				continue
 			}
-			assigned = a.bindLeaseUnsafe(lease, worker, duration, now)
+			assigned = a.bindLeaseUnsafe(lease, cleanWorkerID, duration, now)
 			return nil
 		}
 		return ErrNoPendingTasks
 	})
-	return assigned, mutationErr
+	return assigned, mutErr
+}
+
+func (a *AmbientConsensusArbiter) resolveAuthorizedLease(taskID, workerID string, now time.Time) (*TaskLease, error) {
+	lease, exists := a.leases[taskID]
+	if !exists {
+		return nil, ErrLeaseNotFound
+	}
+	if lease.State == ConsensusStateCommitted {
+		return nil, ErrTaskAlreadyCommitted
+	}
+	if lease.State == ConsensusStateExpired {
+		return nil, ErrLeaseExpired
+	}
+	if lease.State != ConsensusStateLeased {
+		return nil, ErrLeaseNotFound
+	}
+	if lease.WorkerID != workerID {
+		return nil, ErrUnauthorizedWorker
+	}
+	if a.isExpiredUnsafe(lease, now) {
+		lease.State = ConsensusStateExpired
+		lease.WorkerID = ""
+		lease.UpdatedAt = now
+		return nil, ErrLeaseExpired
+	}
+	return lease, nil
+}
+
+// RenewLease extends an active task lease by an additional duration for the authorized worker.
+func (a *AmbientConsensusArbiter) RenewLease(taskID string, workerID string, additional time.Duration) (*TaskLease, error) {
+	if err := validateDuration(additional); err != nil {
+		return nil, err
+	}
+	cleanTaskID, cleanWorkerID, err := a.validateTaskAndWorker(taskID, workerID)
+	if err != nil {
+		return nil, err
+	}
+
+	var renewed *TaskLease
+	mutErr := a.execMutation(func(now time.Time) error {
+		lease, resErr := a.resolveAuthorizedLease(cleanTaskID, cleanWorkerID, now)
+		if resErr != nil {
+			return resErr
+		}
+		lease.ExpiresAt = lease.ExpiresAt.Add(additional)
+		lease.RenewedAt = now
+		lease.UpdatedAt = now
+		renewed = cloneTaskLease(lease)
+		return nil
+	})
+	return renewed, mutErr
 }
 
 // CommitTask finalizes the lease upon successful worker completion and transitions state to Committed.
 func (a *AmbientConsensusArbiter) CommitTask(taskID string, workerID string) error {
-	cleanTaskID, err := sanitizeIdentifier(a, taskID, ErrInvalidTaskID)
-	if err != nil {
-		return err
-	}
-	cleanWorkerID, err := sanitizeIdentifier(a, workerID, ErrInvalidWorkerID)
+	cleanTaskID, cleanWorkerID, err := a.validateTaskAndWorker(taskID, workerID)
 	if err != nil {
 		return err
 	}
 
 	return a.execMutation(func(now time.Time) error {
-		lease, lookupErr := a.getActiveLeaseUnsafe(cleanTaskID)
-		if lookupErr != nil {
-			return lookupErr
-		}
-		if lease.State != ConsensusStateLeased {
-			return ErrLeaseNotFound
-		}
-		if lease.WorkerID != cleanWorkerID {
-			return ErrUnauthorizedWorker
-		}
-		if a.isExpiredUnsafe(lease, now) {
-			lease.State = ConsensusStateExpired
-			lease.UpdatedAt = now
-			return ErrLeaseExpired
+		lease, resErr := a.resolveAuthorizedLease(cleanTaskID, cleanWorkerID, now)
+		if resErr != nil {
+			return resErr
 		}
 		lease.State = ConsensusStateCommitted
 		lease.UpdatedAt = now
@@ -268,32 +556,34 @@ func (a *AmbientConsensusArbiter) CommitTask(taskID string, workerID string) err
 
 // RevokeTask cancels an in-flight or pending lease, marking the state as Revoked.
 func (a *AmbientConsensusArbiter) RevokeTask(taskID string, reason string) error {
-	cleanTaskID, err := sanitizeIdentifier(a, taskID, ErrInvalidTaskID)
+	cleanTaskID, err := a.validateTaskInput(taskID)
 	if err != nil {
 		return err
 	}
+	_ = reason
 
 	return a.execMutation(func(now time.Time) error {
-		lease, lookupErr := a.getActiveLeaseUnsafe(cleanTaskID)
-		if lookupErr != nil {
-			return lookupErr
+		lease, exists := a.leases[cleanTaskID]
+		if !exists {
+			return ErrLeaseNotFound
 		}
+		if lease.State == ConsensusStateCommitted {
+			return ErrTaskAlreadyCommitted
+		}
+
 		lease.State = ConsensusStateRevoked
+		lease.WorkerID = ""
 		lease.UpdatedAt = now
 		a.removeFromQueueUnsafe(cleanTaskID)
-		_ = reason
 		return nil
 	})
 }
 
-// GetLease retrieves a point-in-time snapshot of the lease by task ID, nil-safe.
-func (a *AmbientConsensusArbiter) GetLease(taskID string) (*TaskLease, bool) {
-	if a == nil {
-		return nil, false
-	}
-	cleanTaskID := strings.TrimSpace(taskID)
-	if cleanTaskID == "" {
-		return nil, false
+// LookupLease retrieves a snapshot of the lease by task ID returning explicit domain errors.
+func (a *AmbientConsensusArbiter) LookupLease(taskID string) (*TaskLease, error) {
+	cleanTaskID, err := a.validateTaskInput(taskID)
+	if err != nil {
+		return nil, err
 	}
 
 	a.mu.Lock()
@@ -301,58 +591,95 @@ func (a *AmbientConsensusArbiter) GetLease(taskID string) (*TaskLease, bool) {
 
 	lease, exists := a.leases[cleanTaskID]
 	if !exists {
-		return nil, false
+		return nil, ErrLeaseNotFound
 	}
 
 	now := a.nowFunc()
 	if lease.State == ConsensusStateLeased && a.isExpiredUnsafe(lease, now) {
 		lease.State = ConsensusStateExpired
+		lease.WorkerID = ""
 		lease.UpdatedAt = now
 	}
 
-	return cloneTaskLease(lease), true
+	return cloneTaskLease(lease), nil
 }
 
-// Close marks the arbiter closed and prevents further proposals or lease acquisitions.
-func (a *AmbientConsensusArbiter) Close() error {
+// GetLease retrieves a point-in-time snapshot of the lease by task ID, nil-safe.
+func (a *AmbientConsensusArbiter) GetLease(taskID string) (*TaskLease, bool) {
+	lease, err := a.LookupLease(taskID)
+	return lease, err == nil
+}
+
+// ListLeases returns a point-in-time snapshot of all registered task leases.
+func (a *AmbientConsensusArbiter) ListLeases() []*TaskLease {
 	if a == nil {
-		return nil
+		return []*TaskLease{}
+	}
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
+	result := make([]*TaskLease, 0, len(a.leases))
+	for _, l := range a.leases {
+		result = append(result, cloneTaskLease(l))
+	}
+	return result
+}
+
+// ListTasks is an alias for ListLeases.
+func (a *AmbientConsensusArbiter) ListTasks() []*TaskLease {
+	return a.ListLeases()
+}
+
+func (a *AmbientConsensusArbiter) countByState(targetState ConsensusState) int {
+	if a == nil {
+		return 0
+	}
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
+	matched := 0
+	for _, lease := range a.leases {
+		if lease != nil && lease.State == targetState {
+			matched++
+		}
+	}
+	return matched
+}
+
+// ProposedCount returns the total tasks currently awaiting worker leasing.
+func (a *AmbientConsensusArbiter) ProposedCount() int {
+	return a.countByState(ConsensusStatePending)
+}
+
+// LeasedCount returns the total tasks currently actively leased.
+func (a *AmbientConsensusArbiter) LeasedCount() int {
+	return a.countByState(ConsensusStateLeased)
+}
+
+// CommittedCount returns the total completed and committed tasks.
+func (a *AmbientConsensusArbiter) CommittedCount() int {
+	return a.countByState(ConsensusStateCommitted)
+}
+
+// RevokedCount returns the total revoked tasks.
+func (a *AmbientConsensusArbiter) RevokedCount() int {
+	return a.countByState(ConsensusStateRevoked)
+}
+
+// ExpiredCount returns the total expired tasks.
+func (a *AmbientConsensusArbiter) ExpiredCount() int {
+	return a.countByState(ConsensusStateExpired)
+}
+
+// Close gracefully stops the arbiter and rejects future mutations.
+func (a *AmbientConsensusArbiter) Close() error {
+	if err := a.checkActiveReceiver(); err != nil {
+		return err
 	}
 	a.mu.Lock()
 	a.closed = true
 	a.mu.Unlock()
-	return nil
-}
-
-func sanitizeIdentifier(arbiter *AmbientConsensusArbiter, raw string, errIfEmpty error) (string, error) {
-	if arbiter == nil {
-		return "", ErrArbiterClosed
-	}
-	cleaned := strings.TrimSpace(raw)
-	if cleaned == "" {
-		return "", errIfEmpty
-	}
-	return cleaned, nil
-}
-
-func (a *AmbientConsensusArbiter) getActiveLeaseUnsafe(taskID string) (*TaskLease, error) {
-	lease, exists := a.leases[taskID]
-	if !exists {
-		return nil, ErrLeaseNotFound
-	}
-	if lease.State == ConsensusStateCommitted {
-		return nil, ErrTaskAlreadyCommitted
-	}
-	return lease, nil
-}
-
-func (a *AmbientConsensusArbiter) execMutation(action func(time.Time) error) error {
-	a.mu.Lock()
-	defer a.mu.Unlock()
-	if a.closed {
-		return ErrArbiterClosed
-	}
-	return action(a.nowFunc())
+	return a.Stop()
 }
 
 func (a *AmbientConsensusArbiter) bindLeaseUnsafe(l *TaskLease, workerID string, d time.Duration, now time.Time) *TaskLease {
