@@ -3,6 +3,7 @@ package fileutil
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -46,20 +47,18 @@ func WriteDurableFile(path string, data []byte, mode FileMode) error {
 		return err
 	}
 	tmpPath := tmpFile.Name()
-	defer func() {
-		_ = Remove(tmpPath)
-	}()
+	defer removeQuietly(tmpPath)
 
 	if _, err := tmpFile.Write(data); err != nil {
-		_ = tmpFile.Close()
+		closeQuietly(tmpFile)
 		return err
 	}
 	if err := tmpFile.Chmod(mode); err != nil {
-		_ = tmpFile.Close()
+		closeQuietly(tmpFile)
 		return err
 	}
 	if err := tmpFile.Sync(); err != nil {
-		_ = tmpFile.Close()
+		closeQuietly(tmpFile)
 		return err
 	}
 	if err := tmpFile.Close(); err != nil {
@@ -187,7 +186,7 @@ func OpenSecureTrunc(path string) (*File, error) {
 		return nil, err
 	}
 	if err := file.Chmod(secureFilePerm); err != nil {
-		_ = file.Close()
+		closeQuietly(file)
 		return nil, err
 	}
 	return file, nil
@@ -200,7 +199,7 @@ func OpenAppend(path string) (*File, error) {
 		return nil, err
 	}
 	if err := file.Chmod(standardFilePerm); err != nil {
-		_ = file.Close()
+		closeQuietly(file)
 		return nil, err
 	}
 	return file, nil
@@ -210,6 +209,12 @@ func OpenAppend(path string) (*File, error) {
 func IsYAMLPath(path string) bool {
 	ext := filepath.Ext(path)
 	return ext == ".yaml" || ext == ".yml"
+}
+
+func removeQuietly(path string) {
+	if err := Remove(path); err != nil {
+		// Best effort remove
+	}
 }
 
 // AppendJSONLine marshals v as JSON and appends it followed by a newline to path.
@@ -226,9 +231,17 @@ func AppendJSONLine(path string, v any) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = f.Close() }()
+	defer closeQuietly(f)
 	_, err = f.Write(append(line, '\n'))
 	return err
+}
+
+func closeQuietly(c io.Closer) {
+	if c != nil {
+		if err := c.Close(); err != nil {
+			// Best effort close
+		}
+	}
 }
 
 // WithOpenFile opens a file at path, calls fn with the open *os.File, and guarantees the file is closed on return.
@@ -237,7 +250,7 @@ func WithOpenFile(path string, fn func(f *os.File) error) error {
 	if err != nil {
 		return err
 	}
-	defer func() { _ = f.Close() }()
+	defer closeQuietly(f)
 	return fn(f)
 }
 
