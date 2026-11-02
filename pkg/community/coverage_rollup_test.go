@@ -219,4 +219,3 @@ func TestCoverageRollup_WriteAndVerifyEdgeCases(t *testing.T) {
 	_, err = community.VerifyCoverageArtifact(artPath)
 	require.ErrorIs(t, err, community.ErrCoverageArtifactTampered)
 }
-
