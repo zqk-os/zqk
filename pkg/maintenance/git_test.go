@@ -8,6 +8,34 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
+func TestPruneQuarantinedRefs_canceledContextStopsEarly(t *testing.T) {
+	tmpDir := t.TempDir()
+	initCmd := testkit.ManagedCommand(t, t.Context(), "git", "init")
+	initCmd.Dir = tmpDir
+	if err := initCmd.Run(); err != nil {
+		t.Fatalf("git init: %v", err)
+	}
+	for _, args := range [][]string{
+		{"git", "config", "user.name", "test"},
+		{"git", "config", "user.email", "test@example.com"},
+		{"git", "checkout", "-b", "main"},
+		{"git", "commit", "--allow-empty", "-m", "initial"},
+	} {
+		c := testkit.ManagedCommand(t, t.Context(), args[0], args[1:]...)
+		c.Dir = tmpDir
+		if err := c.Run(); err != nil {
+			t.Fatalf("%v: %v", args, err)
+		}
+	}
+	svc := NewGitMaintenanceService(tmpDir)
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	_, err := svc.PruneQuarantinedRefs(ctx, time.Hour)
+	if err == nil {
+		t.Fatal("expected context canceled error")
+	}
+}
+
 func TestPruneQuarantinedRefs(t *testing.T) {
 	tmpDir := t.TempDir()
 
