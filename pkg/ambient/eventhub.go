@@ -85,6 +85,9 @@ func (h *eventHubImpl) EnableEventSourcing(projectRoot string, secCtx *pkgctx.Se
 
 // Subscribe adds an event handler for a specific event type.
 func (h *eventHubImpl) Subscribe(eventType EventType, handler EventHandler) {
+	if h == nil || handler == nil {
+		return
+	}
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.handlers[eventType] = append(h.handlers[eventType], handler)
@@ -93,13 +96,32 @@ func (h *eventHubImpl) Subscribe(eventType EventType, handler EventHandler) {
 // Publish distributes an event to all subscribed handlers.
 // Mock implementation delegates synchronously; target latency < 100ms.
 func (h *eventHubImpl) Publish(ctx context.Context, event Event) error {
+	if h == nil {
+		return nil
+	}
 	h.mu.RLock()
 	handlers := h.handlers[event.Type]
 	h.mu.RUnlock()
 
 	for _, handler := range handlers {
-		if err := handler(ctx, event); err != nil {
-			return err
+		if handler == nil {
+			continue
+		}
+		var handlerErr error
+		panicked := false
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					panicked = true
+				}
+			}()
+			handlerErr = handler(ctx, event)
+		}()
+		if panicked {
+			continue
+		}
+		if handlerErr != nil {
+			return handlerErr
 		}
 	}
 

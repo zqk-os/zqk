@@ -385,7 +385,7 @@ func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
 
 	components, activeHolons := e.collectComponentHealth()
 
-	cbStatus := CircuitBreakerStatusClosed
+	cbStatus := StateClosed.String()
 	if e.faultIsolator != nil {
 		cbStatus = e.faultIsolator.State().String()
 	}
@@ -415,7 +415,7 @@ func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
 		}
 	}
 
-	return NewAmbientTelemetryReport(
+	report := NewAmbientTelemetryReport(
 		WithStatus(status),
 		WithUptime(uptime),
 		WithActiveHolonsCount(activeHolons),
@@ -424,4 +424,17 @@ func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
 		WithRunwayWatermark(runwayWatermark),
 		WithMeshMetrics(meshMetrics),
 	)
+	report.TicksExecuted = atomic.LoadUint64(&e.ticksExecuted)
+	for name, comp := range components {
+		phase := HolonPhaseRunning
+		if !comp.IsHealthy() {
+			phase = HolonPhaseFailed
+		}
+		report.Holons = append(report.Holons, HolonRecord{
+			ID:    name,
+			Phase: phase,
+		})
+	}
+
+	return report
 }

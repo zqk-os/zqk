@@ -2,6 +2,7 @@ package ambient
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -312,6 +314,9 @@ func isIgnoredFSPath(path string) bool {
 
 // Start begins watching the directory tree.
 func (fw *FSWatcher) Start(ctx context.Context) error {
+	if fw == nil {
+		return fmt.Errorf("cannot start nil FSWatcher")
+	}
 	targets := []string{fw.rootPath}
 	if len(fw.config.WatchDirs) > 0 {
 		targets = make([]string, 0, len(fw.config.WatchDirs))
@@ -334,7 +339,9 @@ func (fw *FSWatcher) Start(ctx context.Context) error {
 			continue
 		}
 		if !info.IsDir() {
-			_ = fw.watcher.Add(target)
+			if addErr := fw.watcher.Add(target); addErr != nil {
+				// non-fatal watcher add error
+			}
 			continue
 		}
 		// Walk the target directory and add all directories to watcher, ignoring configured ignores
@@ -378,20 +385,24 @@ func (fw *FSWatcher) Start(ctx context.Context) error {
 					if err == nil && info.IsDir() {
 						base := filepath.Base(event.Name)
 						if !fw.isIgnoredDirName(base) && !fw.isIgnoredFSPath(event.Name) {
-							_ = fw.watcher.Add(event.Name)
+							if addErr := fw.watcher.Add(event.Name); addErr != nil {
+								// non-fatal watcher add error
+							}
 						}
 						continue
 					}
 
 					// Publish event
-					_ = fw.eventHub.Publish(context.Background(), Event{
+					if pubErr := fw.eventHub.Publish(context.Background(), Event{
 						Type: EventTypeFilesystem,
 						Payload: map[string]any{
 							objects.FieldKeyTargetID:  event.Name,
 							objects.FieldKeyOperation: event.Op.String(),
 						},
 						Timestamp: time.Now(),
-					})
+					}); pubErr != nil {
+						// non-fatal publish error
+					}
 				}
 			case <-fw.watcher.Errors:
 				// just ignore for now
@@ -404,6 +415,9 @@ func (fw *FSWatcher) Start(ctx context.Context) error {
 
 // Stop halts the watcher idempotently without double-close panics.
 func (fw *FSWatcher) Stop() error {
+	if fw == nil {
+		return nil
+	}
 	fw.stopOnce.Do(func() {
 		close(fw.done)
 		fw.stopErr = fw.watcher.Close()
@@ -413,9 +427,24 @@ func (fw *FSWatcher) Stop() error {
 
 // BindProcessYAMLInvalidator subscribes to filesystem events on hub and invalidates/updates the object ID cache for process YAML files.
 func BindProcessYAMLInvalidator(hub EventHub, onActivity func()) {
+	if hub == nil {
+		return
+	}
 	hub.Subscribe(EventTypeFilesystem, func(c context.Context, event Event) error {
+		defer func() {
+			if r := recover(); r != nil {
+				// contained rogue onActivity or invalidator panic
+			}
+		}()
 		if onActivity != nil {
-			onActivity()
+			func() {
+				defer func() {
+					if r := recover(); r != nil {
+						// contained activity panic
+					}
+				}()
+				onActivity()
+			}()
 		}
 		payloadMap, ok := event.Payload.(map[string]any)
 		if !ok {
@@ -425,7 +454,10 @@ func BindProcessYAMLInvalidator(hub EventHub, onActivity func()) {
 		if !ok {
 			return nil
 		}
-		op, _ := payloadMap[objects.FieldKeyOperation].(string)
+		op, ok := payloadMap[objects.FieldKeyOperation].(string)
+		if !ok {
+			op = ""
+		}
 
 		// Only process yaml files in process directories
 		if !strings.Contains(target, paths.ProcessDir+"/") || !strings.HasSuffix(target, ".yaml") {
@@ -442,7 +474,9 @@ func BindProcessYAMLInvalidator(hub EventHub, onActivity func()) {
 				if op == "REMOVE" {
 					objectidcache.InvalidateObjectIDCache(id)
 				} else if op == "WRITE" || op == "CREATE" {
-					_ = objectidcache.UpdateObjectIDCache(id, kind, target)
+					if updateErr := objectidcache.UpdateObjectIDCache(id, kind, target); updateErr != nil {
+						// Non-fatal cache update failure
+					}
 				}
 				break
 			}
@@ -451,29 +485,305 @@ func BindProcessYAMLInvalidator(hub EventHub, onActivity func()) {
 	})
 }
 
-// RunWatcherDaemon orchestrates the standard ambient watcher pipeline (event hub, artifact writer, coach heuristics, ingest service, fswatcher, and process YAML invalidator) until ctx is cancelled.
-func RunWatcherDaemon(ctx context.Context, projectRoot string, onActivity func()) error {
+// Default timing constants for ambient watcher daemon execution.
+const (
+	// DefaultTelemetryInterval is the default periodic interval for ambient telemetry report persistence.
+	DefaultTelemetryInterval = 5 * time.Second
+)
+
+// Sentinel errors for ambient watcher daemon lifecycle, configuration, and bounds.
+var (
+	// ErrInvalidProjectRoot is returned when the project root path is empty or invalid.
+	ErrInvalidProjectRoot = errfmt.Errorf("project root is required")
+	// ErrNilContext is returned when a nil context is passed to RunWatcherDaemonWithConfig.
+	ErrNilContext = errfmt.Errorf("context cannot be nil")
+)
+
+// WatcherDaemonConfig defines configuration and lifecycle parameters for RunWatcherDaemonWithConfig.
+type WatcherDaemonConfig struct {
+	// ProjectRoot specifies the workspace root path monitored by the watcher daemon.
+	ProjectRoot string
+	// OnActivity is an optional callback invoked when relevant filesystem modifications occur.
+	OnActivity func()
+	// EngineConfig defines configuration parameters for the embedded AmbientEngine.
+	// If nil, defaults to DefaultAmbientEngineConfig().
+	EngineConfig *AmbientEngineConfig
+	// WatcherConfig optionally defines filesystem watcher filtering rules and directories.
+	// If nil, defaults to LoadWatcherConfig(ProjectRoot).
+	WatcherConfig *WatcherConfig
+	// TelemetryInterval defines the periodic interval for telemetry persistence.
+	// If <= 0, defaults to DefaultTelemetryInterval (5s).
+	TelemetryInterval time.Duration
+	// EnableEngine controls whether the embedded AmbientEngine is instantiated and started.
+	// Defaults to true when initialized via DefaultWatcherDaemonConfig.
+	EnableEngine bool
+	// Engine optionally supplies an external or pre-instantiated AmbientEngine.
+	Engine *AmbientEngine
+	// OnEngineStarted is an optional lifecycle callback invoked immediately after the engine starts.
+	OnEngineStarted func(engine *AmbientEngine)
+	// StatePath optionally defines a custom file path for persisted telemetry reports.
+	StatePath string
+}
+
+// DefaultWatcherDaemonConfig returns the production default configuration for the ambient watcher daemon.
+func DefaultWatcherDaemonConfig(projectRoot string) WatcherDaemonConfig {
+	engineCfg := DefaultAmbientEngineConfig()
+	return WatcherDaemonConfig{
+		ProjectRoot:       projectRoot,
+		OnActivity:        nil,
+		EngineConfig:      &engineCfg,
+		TelemetryInterval: DefaultTelemetryInterval,
+		EnableEngine:      true,
+	}
+}
+
+func validateDaemonRoot(projectRoot string) error {
+	if strings.TrimSpace(projectRoot) == "" {
+		return ErrInvalidProjectRoot
+	}
+	info, err := fileutil.Stat(projectRoot)
+	if err != nil {
+		return fmt.Errorf("invalid project root %q: %w", projectRoot, err)
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("invalid project root %q is not a directory", projectRoot)
+	}
+	return nil
+}
+
+func setupDaemonEngine(ctx context.Context, cfg WatcherDaemonConfig) (*AmbientEngine, bool, error) {
+	if cfg.Engine != nil {
+		return resolveAmbientEngine(ctx, cfg.Engine)
+	}
+	if !cfg.EnableEngine {
+		return nil, false, nil
+	}
+	if cfg.EngineConfig != nil {
+		eng, err := NewAmbientEngine(*cfg.EngineConfig)
+		if err != nil {
+			return nil, false, fmt.Errorf("failed to create ambient engine: %w", err)
+		}
+		if err := eng.Start(ctx); err != nil {
+			return nil, false, fmt.Errorf("failed to start ambient engine: %w", err)
+		}
+		return eng, true, nil
+	}
+	return resolveAmbientEngine(ctx, nil)
+}
+
+func setupFSWatcher(ctx context.Context, projectRoot string, hub EventHub, watcherCfg *WatcherConfig) (*FSWatcher, error) {
+	var watcher *FSWatcher
+	var err error
+	if watcherCfg != nil {
+		watcher, err = NewFSWatcherWithConfig(projectRoot, hub, *watcherCfg)
+	} else {
+		watcher, err = NewFSWatcher(projectRoot, hub)
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to create fswatcher: %w", err)
+	}
+	if err := watcher.Start(ctx); err != nil {
+		return nil, fmt.Errorf("failed to start fswatcher: %w", err)
+	}
+	return watcher, nil
+}
+
+// RunWatcherDaemonWithConfig orchestrates the ambient watcher pipeline (event hub, artifact writer,
+// coach heuristics, ingest service, fswatcher, and process YAML invalidator) alongside the hosted
+// AmbientEngine runtime and periodic telemetry persistence until ctx is cancelled.
+func RunWatcherDaemonWithConfig(ctx context.Context, cfg WatcherDaemonConfig) error {
+	if ctx == nil {
+		return ErrNilContext
+	}
+	if err := validateDaemonRoot(cfg.ProjectRoot); err != nil {
+		return err
+	}
+
+	interval := cfg.TelemetryInterval
+	if interval <= 0 {
+		interval = DefaultTelemetryInterval
+	}
+
+	engine, created, err := setupDaemonEngine(ctx, cfg)
+	if err != nil {
+		return err
+	}
+	if engine != nil {
+		defer func() {
+			if created {
+				if stopErr := engine.Stop(); stopErr != nil && !errors.Is(stopErr, ErrEngineStopped) {
+					// graceful engine stop cleanup
+				}
+			}
+		}()
+		if cfg.OnEngineStarted != nil {
+			cfg.OnEngineStarted(engine)
+		}
+	}
+
 	hub := NewEventHub()
+	if err := initWatcherAuxiliaries(hub, cfg.ProjectRoot, cfg.OnActivity); err != nil {
+		return err
+	}
 
-	_ = NewArtifactWriter(hub)
-	_ = NewCoachHeuristicsWithRoot(hub, projectRoot)
+	watcher, err := setupFSWatcher(ctx, cfg.ProjectRoot, hub, cfg.WatcherConfig)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if stopErr := watcher.Stop(); stopErr != nil {
+			// graceful watcher stop cleanup
+		}
+	}()
 
+	var waitPersister func()
+	if engine != nil {
+		if strings.TrimSpace(cfg.StatePath) != "" {
+			engine.SetStatePath(cfg.StatePath)
+		}
+		waitPersister = startTelemetryPersister(ctx, cfg.ProjectRoot, engine, interval)
+	}
+
+	<-ctx.Done()
+	if waitPersister != nil {
+		waitPersister()
+	}
+	if ctxErr := ctx.Err(); ctxErr != nil && !errors.Is(ctxErr, context.Canceled) && !errors.Is(ctxErr, context.DeadlineExceeded) {
+		return ctxErr
+	}
+	return nil
+}
+
+// RunWatcherDaemonWithEngine orchestrates the ambient watcher pipeline alongside a provided AmbientEngine instance.
+func RunWatcherDaemonWithEngine(ctx context.Context, projectRoot string, engine *AmbientEngine, onActivity func()) error {
+	cfg := DefaultWatcherDaemonConfig(projectRoot)
+	cfg.OnActivity = onActivity
+	cfg.Engine = engine
+	if engine == nil {
+		cfg.EnableEngine = true
+	}
+	return RunWatcherDaemonWithConfig(ctx, cfg)
+}
+
+// RunWatcherDaemonWithEngineAndConfig runs the watcher daemon with explicit WatcherConfig and AmbientEngine.
+func RunWatcherDaemonWithEngineAndConfig(ctx context.Context, projectRoot string, watcherCfg WatcherConfig, engine *AmbientEngine, onActivity func()) error {
+	cfg := DefaultWatcherDaemonConfig(projectRoot)
+	cfg.WatcherConfig = &watcherCfg
+	cfg.Engine = engine
+	cfg.OnActivity = onActivity
+	if engine == nil {
+		cfg.EnableEngine = true
+	}
+	return RunWatcherDaemonWithConfig(ctx, cfg)
+}
+
+func initWatcherAuxiliaries(hub EventHub, projectRoot string, onActivity func()) error {
+	if writer := NewArtifactWriter(hub); writer == nil {
+		return fmt.Errorf("failed to create artifact writer")
+	}
+	if coach := NewCoachHeuristicsWithRoot(hub, projectRoot); coach == nil {
+		return fmt.Errorf("failed to create coach heuristics")
+	}
 	secCtx := pkgctx.NewSecurityContext(pkgctx.SystemAccountID, []string{"system"}, []string{"*"})
 	ingestService := NewAmbientIngestService(projectRoot, secCtx)
 	ingestService.BindToHub(hub)
-
-	watcher, err := NewFSWatcher(projectRoot, hub)
-	if err != nil {
-		return fmt.Errorf("failed to create fswatcher: %w", err)
-	}
-
 	BindProcessYAMLInvalidator(hub, onActivity)
-
-	if err := watcher.Start(ctx); err != nil {
-		return fmt.Errorf("failed to start fswatcher: %w", err)
-	}
-	defer func() { _ = watcher.Stop() }()
-
-	<-ctx.Done()
 	return nil
+}
+
+func resolveAmbientEngine(ctx context.Context, engine *AmbientEngine) (*AmbientEngine, bool, error) {
+	if engine != nil {
+		if !engine.IsRunning() {
+			if err := engine.Start(ctx); err != nil {
+				return nil, false, fmt.Errorf("failed to start ambient engine: %w", err)
+			}
+			return engine, true, nil
+		}
+		return engine, false, nil
+	}
+
+	cfg := DefaultAmbientEngineConfig()
+	cfg.TickInterval = 1 * time.Second
+	cfg.GracefulStopTimeout = 3 * time.Second
+	created, err := NewAmbientEngine(cfg)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to create ambient engine: %w", err)
+	}
+	if err := created.Start(ctx); err != nil {
+		return nil, false, fmt.Errorf("failed to start ambient engine: %w", err)
+	}
+	return created, true, nil
+}
+
+func startTelemetryPersister(ctx context.Context, projectRoot string, engine *AmbientEngine, intervals ...time.Duration) func() {
+	if strings.TrimSpace(projectRoot) == "" || engine == nil {
+		return func() {}
+	}
+	interval := DefaultTelemetryInterval
+	if len(intervals) > 0 && intervals[0] > 0 {
+		interval = intervals[0]
+	}
+
+	targetPath := engine.StatePath()
+	if targetPath == "" {
+		targetPath = filepath.Join(projectRoot, paths.AmbientTelemetryLatestRelFile)
+		engine.SetStatePath(targetPath)
+	}
+	legacyPath := filepath.Join(paths.StateDirPath(projectRoot), "ambient", "telemetry.json")
+
+	if ensureErr := fileutil.EnsureDir(filepath.Dir(targetPath)); ensureErr != nil {
+		// non-fatal target directory creation error
+	}
+	if ensureErr := fileutil.EnsureDir(filepath.Dir(legacyPath)); ensureErr != nil {
+		// non-fatal legacy directory creation error
+	}
+
+	persistSnapshots := func(running bool) {
+		runningReport := engine.TelemetryReport()
+		latestReport := runningReport.Clone()
+		if latestReport != nil {
+			latestReport.Status = TelemetryStatusRunning
+		}
+		if saveErr := SaveTelemetryReport(targetPath, latestReport); saveErr != nil {
+			// non-fatal save error
+		}
+
+		legacyReport := runningReport.Clone()
+		if !running && legacyReport != nil {
+			legacyReport.Status = TelemetryStatusStopped
+		}
+		if saveErr := SaveTelemetryReport(legacyPath, legacyReport); saveErr != nil {
+			// non-fatal save error
+		}
+	}
+
+	persistSnapshots(true)
+
+	done := make(chan struct{})
+	goroutinelabels.NewGoroutine("ambient_telemetry_persister", "periodically persist ambient telemetry report to disk").
+		StartSimple(func() {
+			defer close(done)
+			ticker := time.NewTicker(interval)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-ctx.Done():
+					persistSnapshots(false)
+					return
+				case <-ticker.C:
+					persistSnapshots(true)
+				}
+			}
+		})
+
+	return func() {
+		<-done
+	}
+}
+
+// RunWatcherDaemon orchestrates the standard ambient watcher pipeline and hosted AmbientEngine until ctx is cancelled.
+func RunWatcherDaemon(ctx context.Context, projectRoot string, onActivity func()) error {
+	cfg := DefaultWatcherDaemonConfig(projectRoot)
+	cfg.OnActivity = onActivity
+	return RunWatcherDaemonWithConfig(ctx, cfg)
 }

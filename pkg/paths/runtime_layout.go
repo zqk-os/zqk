@@ -87,6 +87,16 @@ func ObserverTipsPath(projectRoot string) string {
 	return filepath.Join(StateDirPath(projectRoot), ObserverTipsFile)
 }
 
+// AmbientTelemetryLatestPath returns the absolute path to the latest ambient telemetry snapshot.
+func AmbientTelemetryLatestPath(projectRoot string) string {
+	return filepath.Join(projectRoot, AmbientTelemetryLatestRelFile)
+}
+
+// AmbientTelemetryPath returns the absolute path to the standard ambient telemetry report.
+func AmbientTelemetryPath(projectRoot string) string {
+	return filepath.Join(StateDirPath(projectRoot), "ambient", "telemetry.json")
+}
+
 // MeshStateDirPath returns the absolute mesh state directory.
 func MeshStateDirPath(projectRoot string) string {
 	fallback := filepath.Join(ProjectDataDir, StateDir, MeshStateSubdir)

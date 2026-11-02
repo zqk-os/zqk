@@ -140,8 +140,7 @@ func buildRunningStatus(projectRoot string, pid int) (map[string]any, *ambient.A
 		uptime = time.Since(fi.ModTime()).Round(time.Millisecond)
 	}
 
-	telemetryFile := filepath.Join(paths.StateDirPath(projectRoot), "ambient", "telemetry.json")
-	report, err := ambient.SafeLoadTelemetryReport(telemetryFile)
+	report, err := ambient.LoadTelemetryReport(projectRoot)
 	if err != nil || report == nil {
 		report = buildDefaultRunningReport(uptime)
 	} else if report.Uptime == 0 && uptime > 0 {
