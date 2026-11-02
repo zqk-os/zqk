@@ -258,4 +258,3 @@ func TestCommandSpec_EquivalentCommandIDs(t *testing.T) {
 		}
 	}
 }
-

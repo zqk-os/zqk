@@ -19,7 +19,7 @@ func TestContext_CloneYAMLSliceAndMap(t *testing.T) {
 		"simple_string",
 		42,
 		map[string]any{
-			"inner_key": "inner_val",
+			"inner_key":   "inner_val",
 			"inner_slice": []any{"a", "b"},
 		},
 		[]any{1, 2, 3},
@@ -230,5 +230,3 @@ func TestBrandSettings_ErrorBranches(t *testing.T) {
 		t.Fatal("expected error for nonexistent path in ResolveProjectRootFromSettings")
 	}
 }
-
-
