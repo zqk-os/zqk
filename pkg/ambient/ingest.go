@@ -15,7 +15,8 @@ import (
 )
 
 // AmbientIngestService handles ingesting ambient events directly into the Knowledge Kernel (Graph).
-// It maps ambient events to discrete system objects and emits audit_event objects.
+// It maps ambient events to discrete system objects and emits audit_event objects, functioning as
+// an autonomous middle-brain holon maintaining subsystem state.
 type AmbientIngestService struct {
 	projectRoot string
 	secCtx      *pkgctx.SecurityContext
