@@ -30,6 +30,7 @@ type HygieneConfig struct {
 	CheckCLIBuilders        bool     `yaml:"check_cli_builders"`
 	CheckRawGoroutines      bool     `yaml:"check_raw_goroutines"`
 	CheckReferenceIntegrity bool     `yaml:"check_reference_integrity"`
+	CheckMagicBuffers       bool     `yaml:"check_magic_buffers"`
 	GoroutineExemptions     []string `yaml:"goroutine_exemptions"`
 	ForbiddenPathLiterals   []string `yaml:"forbidden_path_literals"`
 	GoScanDirs              []string `yaml:"go_scan_dirs"`
