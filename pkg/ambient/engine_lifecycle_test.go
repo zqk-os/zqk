@@ -101,6 +101,24 @@ func TestAmbientEngine_OperationalDynamicProof(t *testing.T) {
 			t.Fatalf("expected positive capacity, got %d", telem.CurrentCapacity)
 		}
 
+		// Verify TelemetryReport() constructs full telemetry report from live engine.
+		report := engine.TelemetryReport()
+		if report == nil {
+			t.Fatal("expected non-nil telemetry report from running engine")
+		}
+		if report.GetActiveHolonsCount() != 4 {
+			t.Fatalf("expected 4 active holons in report, got %d", report.GetActiveHolonsCount())
+		}
+		if report.GetCircuitBreakerStatus() != StateClosed.String() {
+			t.Fatalf("expected circuit breaker %s, got %s", StateClosed, report.GetCircuitBreakerStatus())
+		}
+		if report.GetRunwayWatermark() != 1 {
+			t.Fatalf("expected runway watermark 1, got %d", report.GetRunwayWatermark())
+		}
+		if !report.IsHealthy() {
+			t.Fatal("expected running engine telemetry report to be healthy")
+		}
+
 		// 4. Calling Start() on already running engine returns ErrEngineAlreadyRunning.
 		if err := engine.Start(ctx); !errors.Is(err, ErrEngineAlreadyRunning) {
 			t.Fatalf("expected ErrEngineAlreadyRunning on duplicate Start(), got %v", err)
@@ -141,6 +159,11 @@ func TestAmbientEngine_OperationalDynamicProof(t *testing.T) {
 		telem := nilEngine.Telemetry()
 		if telem != (EngineTelemetry{}) {
 			t.Fatalf("expected zero EngineTelemetry on nil receiver, got %+v", telem)
+		}
+
+		nilReport := nilEngine.TelemetryReport()
+		if nilReport == nil || nilReport.GetStatus() != TelemetryStatusStopped {
+			t.Fatalf("expected stopped report on nil TelemetryReport(), got %+v", nilReport)
 		}
 	})
 

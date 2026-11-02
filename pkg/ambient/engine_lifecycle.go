@@ -253,3 +253,94 @@ func (e *AmbientEngine) Telemetry() EngineTelemetry {
 
 	return telem
 }
+
+// TelemetryReport aggregates comprehensive runtime metrics into an AmbientTelemetryReport.
+// Returns a stopped status report if the receiver is nil or stopped.
+func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
+	if e == nil {
+		return NewAmbientTelemetryReport(WithStatus(TelemetryStatusStopped))
+	}
+
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	status := TelemetryStatusHealthy
+	if e.state == EngineStateStopped {
+		status = TelemetryStatusStopped
+	} else if e.state == EngineStateDegraded || (e.faultIsolator != nil && e.faultIsolator.State() == StateOpen) {
+		status = TelemetryStatusDegraded
+	}
+
+	uptime := time.Duration(0)
+	if !e.startedAt.IsZero() && e.state == EngineStateRunning {
+		uptime = time.Since(e.startedAt)
+	}
+
+	activeHolons := 0
+	components := make(map[string]ComponentHealth)
+
+	if e.intentStream != nil {
+		activeHolons++
+		components["intent_stream"] = ComponentHealth{
+			Name:          "intent_stream",
+			Status:        TelemetryStatusHealthy,
+			LastHeartbeat: time.Now().UTC(),
+		}
+	}
+	if e.epochSynchronizer != nil {
+		activeHolons++
+		components["epoch_synchronizer"] = ComponentHealth{
+			Name:          "epoch_synchronizer",
+			Status:        TelemetryStatusHealthy,
+			LastHeartbeat: time.Now().UTC(),
+		}
+	}
+	if e.backpressureRegulator != nil {
+		activeHolons++
+		components["backpressure_regulator"] = ComponentHealth{
+			Name:          "backpressure_regulator",
+			Status:        TelemetryStatusHealthy,
+			LastHeartbeat: time.Now().UTC(),
+		}
+	}
+	if e.faultIsolator != nil {
+		activeHolons++
+		fiStatus := TelemetryStatusHealthy
+		if e.faultIsolator.State() == StateOpen {
+			fiStatus = TelemetryStatusDegraded
+		}
+		components["fault_isolator"] = ComponentHealth{
+			Name:          "fault_isolator",
+			Status:        fiStatus,
+			LastHeartbeat: time.Now().UTC(),
+		}
+	}
+
+	cbStatus := CircuitBreakerStatusClosed
+	if e.faultIsolator != nil {
+		cbStatus = e.faultIsolator.State().String()
+	}
+
+	var runwayWatermark int64
+	if e.intentStream != nil {
+		runwayWatermark = int64(e.intentStream.Size())
+	}
+
+	meshMetrics := HolonMeshMetrics{
+		EventThroughput:  float64(atomic.LoadUint64(&e.ticksExecuted)),
+		ConvergenceScore: 100.0,
+	}
+	if e.faultIsolator != nil {
+		meshMetrics.DivergenceCount = int64(e.faultIsolator.FailureCount())
+	}
+
+	return NewAmbientTelemetryReport(
+		WithStatus(status),
+		WithUptime(uptime),
+		WithActiveHolonsCount(activeHolons),
+		WithComponents(components),
+		WithCircuitBreakerStatus(cbStatus),
+		WithRunwayWatermark(runwayWatermark),
+		WithMeshMetrics(meshMetrics),
+	)
+}
