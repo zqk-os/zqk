@@ -86,6 +86,7 @@ Available Commands:
   sync-cas-index                 Sync CAS index from an existing hash-addressed file
   sync-git-hooks                 Sync git hook templates to a git hooks directory
   telemetry                      View telemetry from running agent tasks
+  test-drive                     Guided interactive developer test-drive of ZQK autonomous swarms
   truth-sentinel                 Run the Truth Sentinel daemon or a one-shot audit
   update-specs                   Bulk update object specifications
   validate                       Validate object(s) against schema
