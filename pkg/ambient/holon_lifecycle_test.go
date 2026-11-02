@@ -78,7 +78,9 @@ func TestHolonLifecycleRegistry_TransitionFailClosed(t *testing.T) {
 // Operational Dynamic Proof: concurrency supervisor tracks managed goroutines and
 // AssertZeroUnmanaged fails closed while work is outstanding.
 func TestInvariantConcurrencySupervisor_ZeroUnmanaged(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	// IgnoreCurrent: sibling ambient/storage tests leave labeled workers; this
+	// case only asserts no *new* leaks from the lifecycle supervisor path.
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 
 	reg := NewHolonLifecycleRegistry()
 	if err := reg.Register("hub", "event hub holon"); err != nil {
@@ -137,7 +139,7 @@ func TestInvariantConcurrencySupervisor_ZeroUnmanaged(t *testing.T) {
 }
 
 func TestInvariantConcurrencySupervisor_FailClosedWhenNotRunning(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 
 	reg := NewHolonLifecycleRegistry()
 	if err := reg.Register("hygiene", "branch hygiene holon"); err != nil {
