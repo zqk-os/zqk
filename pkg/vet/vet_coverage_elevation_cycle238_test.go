@@ -1347,6 +1347,7 @@ func TestRunner_MoreHygieneErrorPaths_Cycle238(t *testing.T) {
 
 	// Test CheckDups error propagation in runHygiene
 	r.Config.Hygiene.CheckRawGoroutines = false
+	r.Config.Hygiene.CheckFormatting = false
 	r.Config.Hygiene.CheckDups = true
 	_, err = r.Run(RunOptions{
 		Suites: []string{"hygiene"},
@@ -1448,6 +1449,7 @@ func Check(a string) bool {
 	r.Config.Hygiene.CheckCLIBuilders = false
 	r.Config.Hygiene.CheckReferenceIntegrity = false
 	r.Config.Hygiene.CheckRawGoroutines = false
+	r.Config.Hygiene.CheckFormatting = false
 	r.Config.Hygiene.CheckDups = true
 
 	rep, err := r.Run(RunOptions{Suites: []string{"hygiene"}})

@@ -46,6 +46,10 @@ hygiene:
   check_raw_goroutines: true
   check_reference_integrity: true
   check_magic_buffers: true
+  check_formatting: true
+  formatting_exemptions:
+    - "vendor/*"
+    - "*/testdata/*"
   goroutine_exemptions:
     - "*_test.go"
     - "vendor/*"

@@ -15,6 +15,7 @@ import (
 
 func NewAgentLockdownCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemAgentLockdownCommandBuilder(), &cobra.Command{Use: "agent-lockdown"})
+	cmd.Flags().Bool("unlock", false, "Unlock agent directories")
 	cli.BindAsyncProgress(cmd, func(c *cobra.Command, args []string) error {
 		unlock, err := c.Flags().GetBool("unlock")
 		if err != nil {

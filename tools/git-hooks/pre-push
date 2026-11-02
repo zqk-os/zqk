@@ -159,6 +159,24 @@ if [ -d "$REPO_ROOT/.zqk" ]; then
 			exit 1
 		fi
 	fi
+	# ---------------------------------------------------------------------------
+	# Package Statement Coverage Fail-Closed Gate (CRIT-1793575234342413000-3f31bee6)
+	# ---------------------------------------------------------------------------
+	if [ "${ZQK_ENFORCE_COVERAGE_FLOOR:-}" = "1" ]; then
+		COVERAGE_PROFILE="${ZQK_COVERAGE_PROFILE:-$REPO_ROOT/coverage.out}"
+		if [ -f "$COVERAGE_PROFILE" ]; then
+			echo "🛡️  [ZQK PRE-PUSH] Verifying package statement coverage threshold (>= 85%)..."
+			if ! go run "$REPO_ROOT/scripts/open-core/coverage-rollup/main.go" --in "$COVERAGE_PROFILE" --threshold 85.0 --fail-below-threshold; then
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "❌ [ZQK PRE-PUSH] FAIL-CLOSED COVERAGE FLOOR REGRESSION VIOLATION" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "Package statement coverage is below the 85% threshold." >&2
+				echo "Resolve coverage gaps before pushing to remote." >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				exit 1
+			fi
+		fi
+	fi
 fi
 
 exit 0
