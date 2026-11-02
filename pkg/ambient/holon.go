@@ -100,9 +100,10 @@ func (s *HolonSupervisor) Register(h Holon) error {
 	return nil
 }
 
-func (s *HolonSupervisor) getHolonLocked(id string) (Holon, error) {
+func (s *HolonSupervisor) findHolonAndUnlockOnError(id string) (Holon, error) {
 	h, exists := s.holons[id]
 	if !exists {
+		s.mu.Unlock()
 		return nil, fmt.Errorf("holon %q not found", id)
 	}
 	return h, nil
@@ -115,9 +116,8 @@ func (s *HolonSupervisor) Start(id string) error {
 		s.mu.Unlock()
 		return errors.New("supervisor has been stopped")
 	}
-	h, err := s.getHolonLocked(id)
+	h, err := s.findHolonAndUnlockOnError(id)
 	if err != nil {
-		s.mu.Unlock()
 		return err
 	}
 	if _, running := s.cancelFns[id]; running {
@@ -160,9 +160,8 @@ func (s *HolonSupervisor) handleHolonCrash(id string, err error) {
 // Stop terminates an individual running holon gracefully.
 func (s *HolonSupervisor) Stop(id string) error {
 	s.mu.Lock()
-	h, err := s.getHolonLocked(id)
+	h, err := s.findHolonAndUnlockOnError(id)
 	if err != nil {
-		s.mu.Unlock()
 		return err
 	}
 	cancelFn, running := s.cancelFns[id]
