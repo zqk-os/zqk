@@ -8,7 +8,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-// Traceability: BLI-1793578884304291000-a921fdea, CRIT-1793578818089397000-f11a5a3e
 // Negative Boundary Guardrails for Intent Signals & Verification Fail-Closes —
 // corrupt or unanchored intent seeds are rejected without mutating kernel state.
 

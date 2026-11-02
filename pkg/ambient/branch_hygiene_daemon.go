@@ -8,7 +8,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-// Traceability: BLI-1793578878406936000-670dab43, CRIT-1793578812700305000-d188af82
 // Autonomous Branch Hygiene Daemon — middle-brain holon that periodically prunes
 // merged integration branches via an injected BranchPruner (typically gitplumbing).
 

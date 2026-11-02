@@ -8,7 +8,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
-// Traceability: BLI-1793578872469959000-db3a0ac8, CRIT-1793578805152323000-a6cb2a07
 // Ambient Holon Lifecycle Registry & Invariant Concurrency Supervisor — middle-brain
 // units register, transition under a fail-closed FSM, and spawn only managed goroutines.
 

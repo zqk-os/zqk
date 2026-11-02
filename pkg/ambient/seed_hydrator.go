@@ -8,8 +8,6 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
-// Traceability: BLI-1793578878406936000-670dab43, CRIT-1793578812700305000-d188af82,
-// CRIT-1793578818089397000-f11a5a3e
 // Seed-to-Stream Intent Hydrator — pools anchored intent seeds into structured
 // priority-plan streams without prompt drift. Corrupt/unanchored signals fail closed.
 
