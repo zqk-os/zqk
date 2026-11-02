@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
 
 func TestAmbientEngine_OperationalDynamicProof(t *testing.T) {
@@ -242,4 +243,27 @@ func TestAmbientEngine_OperationalDynamicProof(t *testing.T) {
 			t.Fatalf("failed to stop: %v", err)
 		}
 	})
+}
+
+// TestAmbientEngine_ASTAudit verifies zero swallowed errors or other medium/high AST violations
+// in engine core, lifecycle, and resilience implementation files.
+func TestAmbientEngine_ASTAudit(t *testing.T) {
+	auditor := qa.NewASTAuditor()
+	targetFiles := []string{
+		"engine.go",
+		"engine_lifecycle.go",
+		"engine_resilience.go",
+	}
+
+	for _, file := range targetFiles {
+		violations, err := auditor.AuditFile(file)
+		if err != nil {
+			t.Fatalf("failed to audit %s: %v", file, err)
+		}
+		for _, v := range violations {
+			if v.Severity == "high" || v.Severity == "medium" || v.Severity == "error" {
+				t.Errorf("AST violation [%s] in %s at %s: %s", v.Severity, file, v.Pos, v.Message)
+			}
+		}
+	}
 }

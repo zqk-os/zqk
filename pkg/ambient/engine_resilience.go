@@ -17,7 +17,9 @@ func (e *AmbientEngine) SafeExecute(fn func()) (recovered any) {
 		if r := recover(); r != nil {
 			recovered = r
 			if e != nil {
-				_ = e.Transition(EngineStateDegraded)
+				if err := e.Transition(EngineStateDegraded); err != nil {
+					_ = err
+				}
 			}
 		}
 	}()
@@ -68,7 +70,9 @@ func (e *AmbientEngine) SubmitIntent(event IntentEvent) error {
 	if reg != nil {
 		if !reg.Admit(1) {
 			if iso != nil {
-				_ = iso.RecordFailure()
+				if err := iso.RecordFailure(); err != nil {
+					_ = err
+				}
 			}
 			return ErrEventRejected
 		}
@@ -77,14 +81,18 @@ func (e *AmbientEngine) SubmitIntent(event IntentEvent) error {
 	if stream != nil {
 		if err := stream.Push(event); err != nil {
 			if iso != nil {
-				_ = iso.RecordFailure()
+				if failErr := iso.RecordFailure(); failErr != nil {
+					_ = failErr
+				}
 			}
 			return err
 		}
 	}
 
 	if iso != nil {
-		_ = iso.RecordSuccess()
+		if err := iso.RecordSuccess(); err != nil {
+			_ = err
+		}
 	}
 
 	return nil

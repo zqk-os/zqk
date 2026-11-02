@@ -93,18 +93,25 @@ func (e *AmbientEngine) superviseTick(ctx context.Context) {
 	if e.faultIsolator != nil {
 		breakerState := e.faultIsolator.State()
 		if breakerState == StateOpen && e.State() == EngineStateRunning {
-			_ = e.Transition(EngineStateDegraded)
+			if err := e.Transition(EngineStateDegraded); err != nil {
+				_ = err
+			}
 		} else if breakerState == StateClosed && e.State() == EngineStateDegraded {
-			_ = e.Transition(EngineStateRunning)
+			if err := e.Transition(EngineStateRunning); err != nil {
+				_ = err
+			}
 		}
 	}
 
 	if e.intentStream != nil {
-		_, _ = e.intentStream.CheckAndEmitAlert()
+		if alert, emitted := e.intentStream.CheckAndEmitAlert(); emitted {
+			_ = alert
+		}
 	}
 
 	if e.backpressureRegulator != nil {
-		_ = e.backpressureRegulator.CurrentThroughput()
+		tput := e.backpressureRegulator.CurrentThroughput()
+		_ = tput
 	}
 }
 
@@ -139,7 +146,9 @@ func (e *AmbientEngine) Stop() error {
 		select {
 		case <-done:
 		case <-timer.C:
-			_ = e.Transition(EngineStateStopped)
+			if err := e.Transition(EngineStateStopped); err != nil {
+				_ = err
+			}
 			return errfmt.Errorf("graceful stop timed out after %v", timeout)
 		}
 	}
@@ -220,7 +229,8 @@ func (e *AmbientEngine) Telemetry() EngineTelemetry {
 	if e.intentStream != nil {
 		telem.PendingIntents = e.intentStream.Size()
 		telem.ActiveAgents = e.intentStream.ActiveAgents()
-		depth, _ := e.intentStream.EvaluateRunwayDepth()
+		depth, thresh := e.intentStream.EvaluateRunwayDepth()
+		_ = thresh
 		telem.RunwayDepth = depth
 	}
 
