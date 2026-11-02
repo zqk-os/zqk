@@ -99,3 +99,43 @@ func TestRefreshPeerSeatsFromLivePIDs_SeatWorkerAliveHeartbeats(t *testing.T) {
 		t.Fatalf("PeerSeatsLive=%d", doc.PeerSeatsLive)
 	}
 }
+
+func TestRefreshPeerSeatsFromLivePIDs_HeartbeatReplacesStickyLivePID(t *testing.T) {
+	// TRACK: tpm-seat-pid-sticky — heartbeat must win over a still-live superseded agy pid.
+	root := t.TempDir()
+	self := os.Getpid()
+	sticky := 1 // init is almost always alive on unix; treat as superseded agy stickiness
+	if !IsPIDAlive(sticky) {
+		t.Skip("pid 1 not alive; cannot assert sticky-live replacement")
+	}
+	prevExec := listPeerExecutablePIDsFn
+	listPeerExecutablePIDsFn = func() ([]int, error) { return []int{sticky}, nil }
+	t.Cleanup(func() { listPeerExecutablePIDsFn = prevExec })
+
+	if err := SavePeerSeats(root, PeerSeatsFile{Seats: map[string]PeerSeatRecord{
+		"peer-agent-1": {PID: sticky, Note: "sticky live agy"},
+	}}); err != nil {
+		t.Fatalf("seed seats: %v", err)
+	}
+	if _, err := WriteSeatWorkerAlive(root, "peer-agent-1", "sess-sticky", time.Now().UTC()); err != nil {
+		t.Fatalf("alive: %v", err)
+	}
+
+	res, err := RefreshPeerSeatsFromLivePIDs(root, false)
+	if err != nil {
+		t.Fatalf("refresh: %v", err)
+	}
+	if res.Assigned["peer-agent-1"] != self {
+		t.Fatalf("assigned=%v want heartbeat self=%d (not sticky %d)", res.Assigned, self, sticky)
+	}
+	cleared := false
+	for _, id := range res.StaleCleared {
+		if id == "peer-agent-1" {
+			cleared = true
+			break
+		}
+	}
+	if !cleared {
+		t.Fatalf("expected peer-agent-1 in StaleCleared, got %v", res.StaleCleared)
+	}
+}
