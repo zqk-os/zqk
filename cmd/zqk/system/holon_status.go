@@ -12,6 +12,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/ambient"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 )
 
 const (
@@ -82,8 +83,14 @@ func addHolonStatusFlags(cmd *cobra.Command) {
 }
 
 func runHolonStatusFromCommand(cmd *cobra.Command) error {
-	jsonFlag, _ := cmd.Flags().GetBool("json")
-	formatFlag, _ := cmd.Flags().GetString("format")
+	jsonFlag, err := cmd.Flags().GetBool("json")
+	if err != nil {
+		return errfmt.Newf("holon status: parse json flag").Wrap(err)
+	}
+	formatFlag, err := cmd.Flags().GetString("format")
+	if err != nil {
+		return errfmt.Newf("holon status: parse format flag").Wrap(err)
+	}
 	isJSON := jsonFlag || strings.EqualFold(formatFlag, "json")
 	return runHolonStatus(cmd.OutOrStdout(), isJSON)
 }
