@@ -154,6 +154,8 @@ func (v *StrategicReadinessView) ApplyEvent(ev *lifecycle.LifecycleEvent) bool {
 
 // BuildPayload satisfies accumulator.Accumulator interface.
 func (v *StrategicReadinessView) BuildPayload() *StrategicReadinessLitePayload {
+	v.mu.RLock()
+	defer v.mu.RUnlock()
 	return v.buildPayloadLocked()
 }
 
@@ -354,7 +356,10 @@ func (v *StrategicReadinessView) LoadFromLiteFile() (bool, error) {
 // SaveToLiteFile atomically flushes the current in-memory view to .zqk/state/strategic_readiness_lite.json via accumulator Engine.
 func (v *StrategicReadinessView) SaveToLiteFile() error {
 	if v.engine != nil {
-		v.engine.SetLastUpdated(v.lastUpdated)
+		v.mu.RLock()
+		lastUpdated := v.lastUpdated
+		v.mu.RUnlock()
+		v.engine.SetLastUpdated(lastUpdated)
 		return v.engine.SaveToLiteFile()
 	}
 
@@ -386,7 +391,12 @@ func (v *StrategicReadinessView) buildPayloadLocked() *StrategicReadinessLitePay
 	aligned := 0
 	gapCount := 0
 
-	for _, req := range v.requirements {
+	copiedRequirements := make(map[string]*RequirementReadinessNode, len(v.requirements))
+	nodeMap := make(map[*RequirementReadinessNode]*RequirementReadinessNode, len(v.requirements))
+	for k, req := range v.requirements {
+		cp := *req
+		copiedRequirements[k] = &cp
+		nodeMap[req] = &cp
 		if strings.EqualFold(req.Status, objects.ObjectStatusActive) {
 			totalActive++
 			if req.IsFullyAligned {
@@ -397,6 +407,38 @@ func (v *StrategicReadinessView) buildPayloadLocked() *StrategicReadinessLitePay
 		}
 	}
 
+	copiedPlanStatuses := make(map[string]string, len(v.planStatuses))
+	for k, st := range v.planStatuses {
+		copiedPlanStatuses[k] = st
+	}
+
+	copiedRecentEvents := make([]StrategicLifecycleEventSummary, len(v.recentEvents))
+	copy(copiedRecentEvents, v.recentEvents)
+
+	copiedDomainClusters := make(map[string]*DomainCluster, len(v.domainClusters))
+	for k, cl := range v.domainClusters {
+		cp := *cl
+		if cl.Requirements != nil {
+			cpReqs := make([]*RequirementReadinessNode, len(cl.Requirements))
+			for i, r := range cl.Requirements {
+				if mapped, ok := nodeMap[r]; ok {
+					cpReqs[i] = mapped
+				} else {
+					rCopy := *r
+					cpReqs[i] = &rCopy
+				}
+			}
+			cp.Requirements = cpReqs
+		}
+		copiedDomainClusters[k] = &cp
+	}
+
+	copiedSynthesis := make([]*SynthesisCandidate, len(v.synthesisCandidates))
+	for i, cand := range v.synthesisCandidates {
+		cp := *cand
+		copiedSynthesis[i] = &cp
+	}
+
 	return &StrategicReadinessLitePayload{
 		SchemaVersion:           "1.0.0",
 		MaterializedAt:          time.Now().UTC(),
@@ -405,11 +447,11 @@ func (v *StrategicReadinessView) buildPayloadLocked() *StrategicReadinessLitePay
 		TotalActiveRequirements: totalActive,
 		AlignedRequirements:     aligned,
 		GapRequirementsCount:    gapCount,
-		DomainClusters:          v.domainClusters,
-		SynthesisCandidates:     v.synthesisCandidates,
-		Requirements:            v.requirements,
-		RecentEvents:            v.recentEvents,
-		PlanStatuses:            v.planStatuses,
+		DomainClusters:          copiedDomainClusters,
+		SynthesisCandidates:     copiedSynthesis,
+		Requirements:            copiedRequirements,
+		RecentEvents:            copiedRecentEvents,
+		PlanStatuses:            copiedPlanStatuses,
 	}
 }
 
