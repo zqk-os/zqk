@@ -230,12 +230,9 @@ func RefreshPeerSeatsFromLivePIDs(projectRoot string, dryRun bool) (RefreshPeerS
 			continue
 		}
 		rec := f.Seats[id]
-		if rec.PID > 0 && rec.PID != pid && IsPIDAlive(rec.PID) {
-			// Keep existing live assignment; heartbeat still proves liveness via live set.
-			used[rec.PID] = true
-			res.Assigned[id] = rec.PID
-			continue
-		}
+		// Seat-worker heartbeat is authoritative for this seat id. A still-live
+		// superseded agy PID must not stick and block the heartbeat assignment.
+		// TRACK: tpm-seat-pid-sticky
 		if rec.PID > 0 && rec.PID != pid {
 			res.StaleCleared = append(res.StaleCleared, id)
 		}
