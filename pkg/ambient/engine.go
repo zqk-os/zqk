@@ -64,6 +64,8 @@ type AmbientEngineConfig struct {
 	ConsensusArbiterConfig *ConsensusArbiterConfig  `json:"consensus_arbiter_config,omitempty"`
 	ReflexConfig           *ReflexLoopConfig        `json:"reflex_config,omitempty"`
 	ReflexLoopConfig       *ReflexLoopConfig        `json:"reflex_loop_config,omitempty"`
+	SwarmDispatchConfig    *SwarmDispatchConfig     `json:"swarm_dispatch_config,omitempty"`
+	SwarmDispatcherConfig  *SwarmDispatcherConfig   `json:"swarm_dispatcher_config,omitempty"`
 	StatePath              string                   `json:"state_path,omitempty"`
 }
 
@@ -75,6 +77,7 @@ func DefaultAmbientEngineConfig() AmbientEngineConfig {
 	faultCfg := DefaultFaultIsolatorConfig()
 	consensusCfg := DefaultConsensusArbiterConfig()
 	reflexCfg := DefaultReflexConfig()
+	swarmCfg := DefaultSwarmDispatchConfig()
 
 	return AmbientEngineConfig{
 		TickInterval:           DefaultTickInterval,
@@ -87,6 +90,8 @@ func DefaultAmbientEngineConfig() AmbientEngineConfig {
 		ConsensusArbiterConfig: &consensusCfg,
 		ReflexConfig:           &reflexCfg,
 		ReflexLoopConfig:       &reflexCfg,
+		SwarmDispatchConfig:    &swarmCfg,
+		SwarmDispatcherConfig:  &swarmCfg,
 	}
 }
 
@@ -133,12 +138,22 @@ func (c AmbientEngineConfig) Validate() error {
 			return err
 		}
 	}
+	if c.SwarmDispatchConfig != nil {
+		if err := c.SwarmDispatchConfig.Validate(); err != nil {
+			return err
+		}
+	}
+	if c.SwarmDispatcherConfig != nil {
+		if err := c.SwarmDispatcherConfig.Validate(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
 // AmbientEngine coordinates the autonomous runtime microkernel loops, orchestrating
 // the AmbientIntentStream, EpochSynchronizer, BackpressureRegulator, FaultIsolator,
-// ConsensusArbiter, and ReflexLoop.
+// ConsensusArbiter, ReflexLoop, and SwarmDispatcher.
 type AmbientEngine struct {
 	mu                    sync.RWMutex
 	config                AmbientEngineConfig
@@ -150,6 +165,7 @@ type AmbientEngine struct {
 	faultIsolator         *FaultIsolator
 	consensusArbiter      *ConsensusArbiter
 	reflexLoop            *ReflexLoop
+	swarmDispatcher       *SwarmDispatcher
 
 	startedAt      time.Time
 	ticksExecuted  uint64
@@ -193,6 +209,19 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 		return nil, err
 	}
 
+	swarmCfg := cfg.SwarmDispatchConfig
+	if swarmCfg == nil {
+		swarmCfg = cfg.SwarmDispatcherConfig
+	}
+	if swarmCfg == nil {
+		defaultCfg := DefaultSwarmDispatchConfig()
+		swarmCfg = &defaultCfg
+	}
+	dispatcher, err := NewSwarmDispatcher(arbiter, *swarmCfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &AmbientEngine{
 		config:                cfg,
 		state:                 EngineStateStopped,
@@ -203,6 +232,7 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 		faultIsolator:         isolator,
 		consensusArbiter:      arbiter,
 		reflexLoop:            reflex,
+		swarmDispatcher:       dispatcher,
 	}, nil
 }
 
@@ -310,6 +340,87 @@ func (e *AmbientEngine) ReflexLoop() *ReflexLoop {
 	return withEngineRLock(e, func(eng *AmbientEngine) *ReflexLoop {
 		return eng.reflexLoop
 	})
+}
+
+// SwarmDispatcher returns the sub-component SwarmDispatcher. Returns nil if receiver is nil.
+func (e *AmbientEngine) SwarmDispatcher() *SwarmDispatcher {
+	return withEngineRLock(e, func(eng *AmbientEngine) *SwarmDispatcher {
+		return eng.swarmDispatcher
+	})
+}
+
+// BacklogObserver returns the bound BacklogObserver. Returns nil if receiver is nil.
+func (e *AmbientEngine) BacklogObserver() *BacklogObserver {
+	return e.SwarmDispatcher()
+}
+
+// TaskLeaseChannel returns the receive-only channel for published swarm task leases. Returns nil if receiver or observer is nil.
+func (e *AmbientEngine) TaskLeaseChannel() <-chan SwarmTaskLease {
+	if e == nil {
+		return nil
+	}
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	if e.swarmDispatcher != nil {
+		return e.swarmDispatcher.LeaseChannel()
+	}
+	return nil
+}
+
+func withSwarmDispatcher(e *AmbientEngine, action func(*SwarmDispatcher) error) error {
+	if e == nil {
+		return ErrNilEngine
+	}
+	disp := e.SwarmDispatcher()
+	if disp == nil {
+		return ErrNilSwarmDispatcher
+	}
+	return action(disp)
+}
+
+// DispatchWorkClaim delegates dynamic work-claiming to the engine's SwarmDispatcher.
+func (e *AmbientEngine) DispatchWorkClaim(seatID, bliID string) (*SwarmTaskLease, error) {
+	if e == nil {
+		return nil, ErrNilEngine
+	}
+	disp := e.SwarmDispatcher()
+	if disp == nil {
+		return nil, ErrNilSwarmDispatcher
+	}
+	return disp.DispatchWorkClaim(seatID, bliID)
+}
+
+// RegisterPeerSeat registers a peer seat in the engine's SwarmDispatcher.
+func (e *AmbientEngine) RegisterPeerSeat(seat PeerSeat) error {
+	return withSwarmDispatcher(e, func(disp *SwarmDispatcher) error {
+		return disp.RegisterSeat(seat)
+	})
+}
+
+// RecordSeatHeartbeat updates a peer seat heartbeat in the engine's SwarmDispatcher.
+func (e *AmbientEngine) RecordSeatHeartbeat(seatID string) error {
+	return withSwarmDispatcher(e, func(disp *SwarmDispatcher) error {
+		return disp.RecordHeartbeat(seatID)
+	})
+}
+
+// EnqueuePlannedBLI adds a planned backlog item to the engine's SwarmDispatcher.
+func (e *AmbientEngine) EnqueuePlannedBLI(bliID string) error {
+	return withSwarmDispatcher(e, func(disp *SwarmDispatcher) error {
+		return disp.EnqueuePlannedBLI(bliID)
+	})
+}
+
+// GetActiveLease returns the active lease for a given task/BLI from the SwarmDispatcher.
+func (e *AmbientEngine) GetActiveLease(taskID string) (*SwarmTaskLease, bool) {
+	if e == nil {
+		return nil, false
+	}
+	disp := e.SwarmDispatcher()
+	if disp == nil {
+		return nil, false
+	}
+	return disp.GetTaskLease(taskID)
 }
 
 // Transition attempts to transition the engine to a new lifecycle state following valid FSM paths.

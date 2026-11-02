@@ -78,6 +78,12 @@ func (e *AmbientEngine) Start(ctx context.Context) error {
 			return err
 		}
 	}
+	if e.swarmDispatcher != nil {
+		if err := e.swarmDispatcher.Start(supCtx); err != nil {
+			e.mu.Unlock()
+			return err
+		}
+	}
 	e.mu.Unlock()
 
 	return e.Transition(EngineStateRunning)
@@ -132,6 +138,10 @@ func (e *AmbientEngine) superviseTick(ctx context.Context) {
 	if e.consensusArbiter != nil {
 		e.consensusArbiter.ReapExpiredLeases()
 	}
+
+	if e.swarmDispatcher != nil {
+		e.swarmDispatcher.EvictExpiredLeases()
+	}
 }
 
 // Stop gracefully halts background supervisor loops and transitions to EngineStateStopped.
@@ -182,6 +192,11 @@ func (e *AmbientEngine) Stop() error {
 	}
 	if e.reflexLoop != nil {
 		if stopErr := e.reflexLoop.Stop(); stopErr != nil {
+			stopErrs = append(stopErrs, stopErr)
+		}
+	}
+	if e.swarmDispatcher != nil {
+		if stopErr := e.swarmDispatcher.Stop(); stopErr != nil {
 			stopErrs = append(stopErrs, stopErr)
 		}
 	}
