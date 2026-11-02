@@ -2,13 +2,15 @@ package system
 
 import (
 	"github.com/spf13/cobra"
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/testdrive"
 )
 
 // NewTestDriveCmd creates the 'zqk test-drive' (and 'zqk system test-drive') guided developer walkthrough command.
 func NewTestDriveCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemTestDriveCommandBuilder(), &cobra.Command{
 		Use:     "test-drive",
 		Aliases: []string{"td", "testdrive"},
 		Short:   "Guided interactive developer test-drive of ZQK autonomous swarms",
@@ -30,7 +32,7 @@ Examples:
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			return runTestDrive(cmd)
 		},
-	}
+	})
 
 	cmd.Flags().String("intent", "", "Developer intent prompt or feature brief to simulate")
 	cmd.Flags().String("scenario", testdrive.ScenarioAPIService, "Preset scenario (api-service, cli-tool, stream-pipeline, custom)")
