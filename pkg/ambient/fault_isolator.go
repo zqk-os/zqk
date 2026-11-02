@@ -543,6 +543,14 @@ func (f *FaultIsolator) TotalSamples() int64 {
 	return f.tracker.TotalSamples()
 }
 
+// FailureCount returns the count of failures recorded in the sliding window tracker.
+func (f *FaultIsolator) FailureCount() int64 {
+	if f == nil || f.tracker == nil {
+		return 0
+	}
+	return f.tracker.FailureCount()
+}
+
 // RateTracker returns the underlying SlidingWindowRateTracker.
 func (f *FaultIsolator) RateTracker() *SlidingWindowRateTracker {
 	if f == nil {

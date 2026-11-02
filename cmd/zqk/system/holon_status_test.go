@@ -70,6 +70,15 @@ func TestNewHolonStatusCmd(t *testing.T) {
 	}
 }
 
+func executeHolonStatusSubCmd(args ...string) (*bytes.Buffer, error) {
+	cmd := NewHolonStatusSubCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetArgs(args)
+	err := cmd.Execute()
+	return &buf, err
+}
+
 // TestHolonStatus_TableDrivenOutputFormats satisfies CRIT-1793589814624126000-aa123817
 // by verifying table-driven format flags across both human-readable tabular and structured JSON.
 func TestHolonStatus_TableDrivenOutputFormats(t *testing.T) {
@@ -119,12 +128,8 @@ func TestHolonStatus_TableDrivenOutputFormats(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cmd := NewHolonStatusSubCmd()
-			var buf bytes.Buffer
-			cmd.SetOut(&buf)
-			cmd.SetArgs(tc.args)
-
-			if err := cmd.Execute(); err != nil {
+			buf, err := executeHolonStatusSubCmd(tc.args...)
+			if err != nil {
 				t.Fatalf("unexpected execute error: %v", err)
 			}
 
@@ -411,6 +416,144 @@ func TestNewSystemCmd_HolonRegistration(t *testing.T) {
 	compatCmd, _, err := sysCmd.Find([]string{"holon-status"})
 	if err != nil || compatCmd == nil {
 		t.Fatalf("expected to resolve 'system holon-status', got err: %v", err)
+	}
+}
+
+// TestHolonStatus_OperationalProof_AmbientTelemetryReport satisfies REQ-1793619495851164000-2ffc306d
+// and CRIT-1793619529893485000-ef59301b by verifying table and JSON rendering of AmbientTelemetryReport.
+func TestHolonStatus_OperationalProof_AmbientTelemetryReport(t *testing.T) {
+	now := time.Date(2026, 11, 2, 12, 0, 0, 0, time.UTC)
+	report := ambient.NewAmbientTelemetryReport(
+		ambient.WithTimestamp(now),
+		ambient.WithStatus(ambient.TelemetryStatusHealthy),
+		ambient.WithUptime(10*time.Second),
+		ambient.WithActiveHolonsCount(4),
+		ambient.WithCircuitBreakerStatus(ambient.CircuitBreakerStatusClosed),
+		ambient.WithRunwayWatermark(12),
+		ambient.WithMeshMetrics(ambient.HolonMeshMetrics{
+			IngestRate:       120.5,
+			ConvergenceScore: 100.0,
+			DivergenceCount:  0,
+			EventThroughput:  350.0,
+			StreamLatencyMs:  1.2,
+		}),
+		ambient.WithComponent(ambient.ComponentHealth{
+			Name:          "intent_stream",
+			Status:        ambient.TelemetryStatusHealthy,
+			LastHeartbeat: now,
+		}),
+	)
+
+	// 1. Tabular output
+	var bufTable bytes.Buffer
+	if err := RenderAmbientTelemetryReport(&bufTable, report, false); err != nil {
+		t.Fatalf("unexpected error rendering table: %v", err)
+	}
+	tableOut := bufTable.String()
+	if !strings.Contains(tableOut, "AMBIENT RUNTIME TELEMETRY REPORT") {
+		t.Fatalf("expected banner in table output, got: %s", tableOut)
+	}
+	if !strings.Contains(tableOut, "Active Holons:          4") {
+		t.Fatalf("expected active holons count in table output, got: %s", tableOut)
+	}
+	if !strings.Contains(tableOut, "Runway Watermark:       12") {
+		t.Fatalf("expected runway watermark in table output, got: %s", tableOut)
+	}
+
+	// 2. JSON output
+	var bufJSON bytes.Buffer
+	if err := RenderAmbientTelemetryReport(&bufJSON, report, true); err != nil {
+		t.Fatalf("unexpected error rendering JSON: %v", err)
+	}
+	var decoded ambient.AmbientTelemetryReport
+	if err := json.Unmarshal(bufJSON.Bytes(), &decoded); err != nil {
+		t.Fatalf("failed to decode JSON output: %v", err)
+	}
+	if decoded.ActiveHolonsCount != 4 {
+		t.Fatalf("expected 4 active holons, got %d", decoded.ActiveHolonsCount)
+	}
+	if decoded.RunwayWatermark != 12 {
+		t.Fatalf("expected runway watermark 12, got %d", decoded.RunwayWatermark)
+	}
+	if decoded.CircuitBreakerStatus != ambient.CircuitBreakerStatusClosed {
+		t.Fatalf("expected circuit breaker closed, got %s", decoded.CircuitBreakerStatus)
+	}
+
+	// 3. Nil-safety on RenderAmbientTelemetryReport
+	var bufNilTable bytes.Buffer
+	if err := RenderAmbientTelemetryReport(&bufNilTable, nil, false); err != nil {
+		t.Fatalf("unexpected error on nil table report: %v", err)
+	}
+	if !strings.Contains(bufNilTable.String(), "stopped") {
+		t.Fatalf("expected stopped status on nil report, got: %s", bufNilTable.String())
+	}
+
+	var bufNilJSON bytes.Buffer
+	if err := RenderAmbientTelemetryReport(&bufNilJSON, nil, true); err != nil {
+		t.Fatalf("unexpected error on nil JSON report: %v", err)
+	}
+	var nilDecoded ambient.AmbientTelemetryReport
+	if err := json.Unmarshal(bufNilJSON.Bytes(), &nilDecoded); err != nil {
+		t.Fatalf("failed to decode nil JSON report: %v", err)
+	}
+	if nilDecoded.Status != ambient.TelemetryStatusStopped {
+		t.Fatalf("expected stopped status for nil report, got %s", nilDecoded.Status)
+	}
+}
+
+// TestHolonStatus_OperationalProof_RenderHolonTelemetryPayload verifies unified polymorphic rendering.
+func TestHolonStatus_OperationalProof_RenderHolonTelemetryPayload(t *testing.T) {
+	// 1. Payload with AmbientTelemetryReport
+	report := ambient.NewAmbientTelemetryReport(
+		ambient.WithStatus(ambient.TelemetryStatusHealthy),
+		ambient.WithActiveHolonsCount(3),
+	)
+	var bufReport bytes.Buffer
+	if err := RenderHolonTelemetryPayload(&bufReport, report, true); err != nil {
+		t.Fatalf("failed to render report payload: %v", err)
+	}
+	var repDecoded ambient.AmbientTelemetryReport
+	if err := json.Unmarshal(bufReport.Bytes(), &repDecoded); err != nil {
+		t.Fatalf("failed to unmarshal report json: %v", err)
+	}
+	if repDecoded.ActiveHolonsCount != 3 {
+		t.Fatalf("expected 3 active holons, got %d", repDecoded.ActiveHolonsCount)
+	}
+
+	// 2. Payload with MiddleBrainTelemetrySnapshot
+	snapshot := &ambient.MiddleBrainTelemetrySnapshot{
+		HealthStatus:     ambient.TelemetryHealthHealthy,
+		ActiveHolonCount: 5,
+	}
+	var bufSnap bytes.Buffer
+	if err := RenderHolonTelemetryPayload(&bufSnap, snapshot, true); err != nil {
+		t.Fatalf("failed to render snapshot payload: %v", err)
+	}
+	var snapDecoded ambient.MiddleBrainTelemetrySnapshot
+	if err := json.Unmarshal(bufSnap.Bytes(), &snapDecoded); err != nil {
+		t.Fatalf("failed to unmarshal snapshot json: %v", err)
+	}
+	if snapDecoded.ActiveHolonCount != 5 {
+		t.Fatalf("expected 5 active holons, got %d", snapDecoded.ActiveHolonCount)
+	}
+}
+
+// TestHolonStatus_OperationalProof_EngineFlag verifies zqk system holon status --engine.
+func TestHolonStatus_OperationalProof_EngineFlag(t *testing.T) {
+	buf, err := executeHolonStatusSubCmd("--engine", "--format", "json")
+	if err != nil {
+		t.Fatalf("unexpected execute error: %v", err)
+	}
+
+	var report ambient.AmbientTelemetryReport
+	if err := json.Unmarshal(buf.Bytes(), &report); err != nil {
+		t.Fatalf("failed to decode engine telemetry report json: %v", err)
+	}
+	if report.ActiveHolonsCount != defaultRuntimeHolonCount {
+		t.Fatalf("expected %d active holons, got %d", defaultRuntimeHolonCount, report.ActiveHolonsCount)
+	}
+	if report.CircuitBreakerStatus != ambient.CircuitBreakerStatusClosed {
+		t.Fatalf("expected circuit breaker closed, got %s", report.CircuitBreakerStatus)
 	}
 }
 
