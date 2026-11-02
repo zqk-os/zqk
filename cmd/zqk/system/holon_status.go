@@ -178,17 +178,25 @@ func RenderHolonTelemetry(w io.Writer, snapshot *ambient.MiddleBrainTelemetrySna
 	return nil
 }
 
+func registerRunningHolon(reg *ambient.HolonLifecycleRegistry, name, desc string) {
+	if reg == nil {
+		return
+	}
+	if err := reg.Register(name, desc); err != nil {
+		return
+	}
+	if err := reg.Transition(name, ambient.HolonPhaseStarting); err != nil {
+		return
+	}
+	if err := reg.Transition(name, ambient.HolonPhaseRunning); err != nil {
+		return
+	}
+}
+
 func defaultTelemetryAggregator(ctx context.Context) *ambient.HolonTelemetryAggregator {
 	reg := ambient.NewHolonLifecycleRegistry()
-	if reg != nil {
-		_ = reg.Register("ambient-stream-hydrator", "Pool intent raindrops into streams")
-		_ = reg.Transition("ambient-stream-hydrator", ambient.HolonPhaseStarting)
-		_ = reg.Transition("ambient-stream-hydrator", ambient.HolonPhaseRunning)
-
-		_ = reg.Register("ambient-river-convergence", "Converge preference streams into intent rivers")
-		_ = reg.Transition("ambient-river-convergence", ambient.HolonPhaseStarting)
-		_ = reg.Transition("ambient-river-convergence", ambient.HolonPhaseRunning)
-	}
+	registerRunningHolon(reg, "ambient-stream-hydrator", "Pool intent raindrops into streams")
+	registerRunningHolon(reg, "ambient-river-convergence", "Converge preference streams into intent rivers")
 
 	hydrator := ambient.NewStreamHydrator(ambient.DefaultStreamCapacity, ambient.DefaultMinWeightFloor)
 	engine, err := ambient.NewRiverConvergenceEngine(ctx, ambient.RiverConfig{
