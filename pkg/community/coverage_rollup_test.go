@@ -14,6 +14,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+// Stable non-CAS persona label for session wiring tests (payload gate forbids studio nanos-hex IDs in pkg/).
+const coverageRollupTestPersonaID = "PER-repo-resolver"
+
 func setupTestProfile(t *testing.T, profile string) (string, string, *community.CoverageRollupReport) {
 	t.Helper()
 	dir := t.TempDir()
@@ -135,7 +138,7 @@ func TestCoverageRollup_IngestIntoPipelineTelemetry(t *testing.T) {
 
 	session, err := community.NewRepoResolverConvergenceSession(
 		"cov-sess-1",
-		community.RepoResolverPersonaID,
+		coverageRollupTestPersonaID,
 		nil,
 	)
 	require.NoError(t, err)
@@ -204,7 +207,7 @@ func TestCoverageRollup_WriteAndVerifyEdgeCases(t *testing.T) {
 	require.NotEmpty(t, artPath)
 	require.NotEmpty(t, chkPath)
 
-	sess, err := community.NewRepoResolverConvergenceSession("cov-sess-2", community.RepoResolverPersonaID, nil)
+	sess, err := community.NewRepoResolverConvergenceSession("cov-sess-2", coverageRollupTestPersonaID, nil)
 	require.NoError(t, err)
 	require.NoError(t, sess.IngestCoverageRollup(report, "job-3", "pipe-3", artPath))
 	require.ErrorIs(t, sess.IngestCoverageRollup(nil, "job-3", "pipe-3", artPath), community.ErrNilCoverageReport)

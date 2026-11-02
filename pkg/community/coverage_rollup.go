@@ -25,7 +25,6 @@ const (
 	CoverageRollupStepName      = "package_coverage_rollup"
 	DefaultCoverageThresholdPct = 85.0
 	CoverageModulePrefix        = "github.com/zqk-os/zqk/"
-	RepoResolverPersonaID       = "PER-1793541871378023000-273387ff"
 
 	// Scanner buffer allocation bounds for coverprofile parsing.
 	CoverProfileInitialBufferSize = 64 * 1024   // 64 KiB initial scan buffer
