@@ -223,8 +223,6 @@ func TestObjectIDCache_IsPopulatedForProject(t *testing.T) {
 	}
 	t.Cleanup(func() {
 		_ = WaitProjectCacheBackgroundWork(context.Background(), projectRoot)
-		_ = testkit.RunStandardTeardown(testkit.TempProjectTeardown(projectRoot, proj.FileStorage))
-		_ = fileutil.RemoveAll(projectRoot)
 	})
 
 	cache := NewObjectIDCache()
@@ -433,8 +431,6 @@ func TestObjectIDCache_BuildExcludesHighVolumeKinds(t *testing.T) {
 	}
 	t.Cleanup(func() {
 		_ = WaitProjectCacheBackgroundWork(context.Background(), projectRoot)
-		_ = testkit.RunStandardTeardown(testkit.TempProjectTeardown(projectRoot, proj.FileStorage))
-		_ = fileutil.RemoveAll(projectRoot)
 	})
 
 	criteriaDir := datacell.CellCASPrimaryDir(projectRoot, "criteria")

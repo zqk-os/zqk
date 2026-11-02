@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"path/filepath"
@@ -40,6 +41,7 @@ func findModuleRootForTestPkg() (string, error) {
 func setupTestProject(t *testing.T) (string, func()) {
 	t.Helper()
 	testRoot := t.TempDir()
+	testkit.RegisterStorageTestCleanup(t, testRoot, nil)
 	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
 	repoRoot := zqkenv.ProjectRoot().Get()
 	if repoRoot == "" {
@@ -51,6 +53,8 @@ func setupTestProject(t *testing.T) (string, func()) {
 		t.Fatalf("BootstrapRoot: %v", err)
 	}
 	cleanup := func() {
+		storage.ShutdownAllAuditBuffersForTesting()
+		storage.GetGlobalStorageProviderCache().Delete(testRoot)
 		_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil))
 	}
 	return testRoot, cleanup
