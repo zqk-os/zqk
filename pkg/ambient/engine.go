@@ -1,3 +1,4 @@
+// Package ambient provides the autonomous holon runtime engine and conscious swarm coordination.
 package ambient
 
 import (
