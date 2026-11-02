@@ -325,7 +325,6 @@ func DefaultAmbientIntentStreamConfig() AmbientIntentStreamConfig {
 
 // AmbientIntentStream manages real-time ingestion of agent intent events into an ambient ring buffer,
 // continuously evaluates swarm runway depth against replenishment watermarks, and broadcasts alerts.
-// Implements REQ-1793597212444417000-c9f17c58 (Ambient Intent Stream Aggregator & Continuous Swarm Runway Depth Arbiter).
 type AmbientIntentStream struct {
 	mu                sync.RWMutex
 	ring              *RingBuffer
