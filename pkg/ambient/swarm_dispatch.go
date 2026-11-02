@@ -97,6 +97,10 @@ type SwarmDispatcherConfig struct {
 	MaxConcurrentLeases int           `json:"max_concurrent_leases"`
 	HeartbeatTimeout    time.Duration `json:"heartbeat_timeout,omitempty"`
 	ChannelBufferSize   int           `json:"channel_buffer_size,omitempty"`
+	AutoClaimEnabled    bool          `json:"auto_claim_enabled,omitempty"`
+	MaxRetries          int           `json:"max_retries,omitempty"`
+	MaxClaimsPerSeat    int           `json:"max_claims_per_seat,omitempty"`
+	EventBufferSize     int           `json:"event_buffer_size,omitempty"`
 }
 
 // SwarmDispatchConfig is an alias for SwarmDispatcherConfig.
@@ -110,6 +114,10 @@ func DefaultSwarmDispatcherConfig() SwarmDispatcherConfig {
 		MaxConcurrentLeases: DefaultSwarmMaxConcurrentLeases,
 		HeartbeatTimeout:    DefaultSwarmHeartbeatTimeout,
 		ChannelBufferSize:   DefaultSwarmChannelBufferSize,
+		AutoClaimEnabled:    true,
+		MaxRetries:          DefaultSwarmMaxRetries,
+		MaxClaimsPerSeat:    DefaultSwarmMaxClaimsPerSeat,
+		EventBufferSize:     DefaultSwarmEventBufferSize,
 	}
 }
 
@@ -128,6 +136,12 @@ func (c SwarmDispatcherConfig) Validate() error {
 	}
 	if c.MaxConcurrentLeases <= 0 {
 		return ErrInvalidMaxConcurrentLeases
+	}
+	if c.MaxRetries < 0 {
+		return ErrInvalidMaxRetries
+	}
+	if c.MaxClaimsPerSeat < 0 {
+		return ErrInvalidClaimsPerSeat
 	}
 	return nil
 }
@@ -153,6 +167,7 @@ type BacklogObserver struct {
 	cancelFn  context.CancelFunc
 	wg        sync.WaitGroup
 	ticksSeen uint64
+	loopState *SwarmLoopState
 }
 
 // SwarmDispatcher is an alias for BacklogObserver.
@@ -172,11 +187,12 @@ func NewBacklogObserver(cfg SwarmDispatcherConfig, arbiter *ConsensusArbiter) (*
 	}
 
 	return &BacklogObserver{
-		config:  cfg,
-		arbiter: arbiter,
-		leaseCh: make(chan SwarmTaskLease, bufSize),
-		leases:  make(map[string]*SwarmTaskLease),
-		seats:   make(map[string]*PeerSeat),
+		config:    cfg,
+		arbiter:   arbiter,
+		leaseCh:   make(chan SwarmTaskLease, bufSize),
+		leases:    make(map[string]*SwarmTaskLease),
+		seats:     make(map[string]*PeerSeat),
+		loopState: NewSwarmLoopState(cfg.EventBufferSize),
 	}, nil
 }
 
@@ -397,6 +413,9 @@ func (o *BacklogObserver) ObserveTick(ctx context.Context) {
 	o.mu.Unlock()
 
 	o.EvictExpiredLeases()
+	if o.config.AutoClaimEnabled {
+		o.AutoClaimTick(ctx)
+	}
 }
 
 // ActiveLeases returns copies of all currently active task leases. Returns nil if receiver is nil.
