@@ -70,14 +70,14 @@ type DivergenceHandler func(riverID, missionID string, alignmentScore float64)
 
 // RiverConfig provides configurable parameters for river convergence.
 type RiverConfig struct {
-	RootVisionID        string
-	RootVisionVector    []float64
-	QueueCapacity       int
-	RiverCapacity       int
-	ConvergenceWindow   time.Duration
-	MinConsensusDrops   int
-	AlignmentThreshold  float64
-	OnDivergence        DivergenceHandler
+	RootVisionID       string
+	RootVisionVector   []float64
+	QueueCapacity      int
+	RiverCapacity      int
+	ConvergenceWindow  time.Duration
+	MinConsensusDrops  int
+	AlignmentThreshold float64
+	OnDivergence       DivergenceHandler
 }
 
 // DefaultRiverConfig returns a production-ready default configuration.
@@ -95,20 +95,20 @@ func DefaultRiverConfig(rootVisionID string, rootVisionVector []float64) RiverCo
 
 // RiverConvergenceEngine coordinates discrete raindrops and streams into pooled rivers of intention.
 type RiverConvergenceEngine struct {
-	cfg        RiverConfig
-	inbox      chan IntentDrop
-	rivers     map[string]*IntentRiver
-	mu         sync.RWMutex
-	ctx        context.Context
-	cancel     context.CancelFunc
-	wg         sync.WaitGroup
-	closed     atomic.Bool
+	cfg    RiverConfig
+	inbox  chan IntentDrop
+	rivers map[string]*IntentRiver
+	mu     sync.RWMutex
+	ctx    context.Context
+	cancel context.CancelFunc
+	wg     sync.WaitGroup
+	closed atomic.Bool
 
 	// Metrics
-	dropsIngested      atomic.Int64
-	riversFormed       atomic.Int64
-	divergenceWarnings atomic.Int64
-	totalAlignmentSum  float64
+	dropsIngested        atomic.Int64
+	riversFormed         atomic.Int64
+	divergenceWarnings   atomic.Int64
+	totalAlignmentSum    float64
 	alignmentEvaluations int64
 }
 
