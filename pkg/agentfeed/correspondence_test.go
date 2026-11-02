@@ -118,6 +118,61 @@ func TestCorrespondence_inboxOutboxPeerAck(t *testing.T) {
 	}
 }
 
+func TestCorrespondence_expiredPeerAckAwaitClearsOutbox(t *testing.T) {
+	// TRACK: POL-AGENT-ORCH-HOURGLASS-001 — expire must unblock await_peer_ack_keep_working.
+	root := t.TempDir()
+	if err := datacell.WriteAgentChatChannelConfig(root, datacell.AgentChatChannelConfig{
+		SchemaVersion: datacell.AgentChatChannelSchemaVersion,
+		Enabled:       true,
+		DeliveryMode:  datacell.DeliveryModeLog,
+		FeedID:        "AGF-expire-outbox",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	tpm := Seat{AgentID: "peer-tpm-01", RoleHints: []string{"tpm"}}
+	agy := Seat{AgentID: "peer-agent-01", PersonaRef: "PER-coder", RoleHints: []string{"agy"}}
+	steer, err := AppendEvent(AppendEventInput{
+		ProjectRoot: root,
+		Message:     "ATTN AGY — expire-clear work",
+		AgentID:     tpm.AgentID,
+		ToAgentID:   agy.AgentID,
+		Sender:      FeedSenderHumanSteer,
+		EventType:   FeedEventTypeSteering,
+		SelfACK:     true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     steer.EventID,
+		FromAgentID: tpm.AgentID,
+		ToAgentID:   agy.AgentID,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	snap, err := LoadCorrespondence(root, tpm, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(snap.OutboxAwaitingPeerAck) != 1 {
+		t.Fatalf("pre-expire outbox=%+v", snap.OutboxAwaitingPeerAck)
+	}
+	expired, err := ExpirePeerAckAwaits(root, 0)
+	if err != nil || len(expired) != 1 {
+		t.Fatalf("expire: n=%d err=%v", len(expired), err)
+	}
+	snap2, err := LoadCorrespondence(root, tpm, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(snap2.OutboxAwaitingPeerAck) != 0 {
+		t.Fatalf("outbox should clear after await expire: %+v", snap2.OutboxAwaitingPeerAck)
+	}
+	if snap2.NextActionHint == HintAwaitPeerAckKeepWorking {
+		t.Fatalf("hint should not stay await_peer_ack_keep_working after expire, got %s", snap2.NextActionHint)
+	}
+}
+
 func TestCorrespondence_untargetedSchedulerWakeDoesNotFillInbox(t *testing.T) {
 	root := t.TempDir()
 	if err := datacell.WriteAgentChatChannelConfig(root, datacell.AgentChatChannelConfig{

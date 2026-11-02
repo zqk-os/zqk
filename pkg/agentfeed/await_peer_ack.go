@@ -196,6 +196,34 @@ func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, err
 }
 
 // ExpirePeerAckAwaits marks open awaits expired if older than maxAge.
+// PeerAckAwaitRelievesOutbox reports whether a registered await for eventID has
+// reached a terminal status that should stop blocking outbox_awaiting_peer_ack
+// (expired / cancelled). Completed normally pairs with a peer_ack on the feed;
+// expired means the hourglass flipped without a peer receipt (e.g. CSRF-blocked
+// AGY) and must not strand PROCESS-ADMIN with await_peer_ack_keep_working forever.
+// TRACK: POL-AGENT-ORCH-HOURGLASS-001
+func PeerAckAwaitRelievesOutbox(projectRoot, eventID string) bool {
+	eventID = strings.TrimSpace(eventID)
+	if eventID == "" || strings.TrimSpace(projectRoot) == "" {
+		return false
+	}
+	f, err := loadPeerAckAwaitFile(projectRoot)
+	if err != nil {
+		return false
+	}
+	for i := range f.Awaits {
+		a := f.Awaits[i]
+		if a.EventID != eventID {
+			continue
+		}
+		switch a.Status {
+		case AwaitStatusExpired, AwaitStatusCancelled:
+			return true
+		}
+	}
+	return false
+}
+
 func ExpirePeerAckAwaits(projectRoot string, maxAge time.Duration) ([]PeerAckAwait, error) {
 	now := time.Now().UTC()
 	var expired []PeerAckAwait
