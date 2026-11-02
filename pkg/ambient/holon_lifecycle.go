@@ -109,6 +109,17 @@ func (r *HolonLifecycleRegistry) Count() int {
 	return len(r.holon)
 }
 
+// List returns a snapshot slice of all registered holon records.
+func (r *HolonLifecycleRegistry) List() []HolonRecord {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	records := make([]HolonRecord, 0, len(r.holon))
+	for _, e := range r.holon {
+		records = append(records, HolonRecord{ID: e.id, Purpose: e.purpose, Phase: e.phase})
+	}
+	return records
+}
+
 // Transition applies a fail-closed FSM edge for the named holon.
 func (r *HolonLifecycleRegistry) Transition(id string, to HolonPhase) error {
 	r.mu.Lock()

@@ -139,6 +139,18 @@ func (h *StreamHydrator) GetStream(streamID string) (*IntentStream, bool) {
 	return copyStreamSnapshot(st), true
 }
 
+// ListStreams returns a snapshot of all tracked intent streams.
+func (h *StreamHydrator) ListStreams() []*IntentStream {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+
+	out := make([]*IntentStream, 0, len(h.streams))
+	for _, st := range h.streams {
+		out = append(out, copyStreamSnapshot(st))
+	}
+	return out
+}
+
 // MergeStream merges all pooled raindrops in a stream into a unified preference summary and flips status to merged.
 func (h *StreamHydrator) MergeStream(streamID string) (*IntentStream, error) {
 	h.mu.Lock()

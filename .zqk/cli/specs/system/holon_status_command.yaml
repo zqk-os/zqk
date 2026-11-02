@@ -1,0 +1,17 @@
+$schema: ../schemas/command_spec.schema.json
+name: holon-status
+short: Display middle-brain holon vitality, stream hydrator capacities, and river convergence metrics
+description: |-
+    Renders real-time telemetry across middle-brain holons, intent stream hydrators,
+    and river convergence pipelines, evaluating alignment scores and system vitality.
+flags:
+    - name: json
+      type: bool
+      default: "false"
+      description: Output telemetry snapshot as JSON
+help:
+    examples:
+        - comment: View middle-brain holon vitality and convergence metrics
+          command: zqk system holon-status
+        - comment: Emit JSON telemetry
+          command: zqk system holon-status --json
