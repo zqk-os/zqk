@@ -76,7 +76,39 @@ var (
 	ErrNoPendingTasks        = errfmt.Errorf("no pending tasks available for leasing")
 	ErrArbiterClosed         = errfmt.Errorf("consensus arbiter is closed")
 	ErrArbiterAlreadyRun     = errfmt.Errorf("consensus arbiter is already running")
+	ErrInvalidReapInterval   = errfmt.Errorf("reap interval must be strictly positive")
+	ErrInvalidMaxTasks       = errfmt.Errorf("max tasks must be strictly positive")
 )
+
+// ConsensusArbiterConfig configures an AmbientConsensusArbiter instance.
+type ConsensusArbiterConfig struct {
+	DefaultLeaseTTL time.Duration `json:"default_lease_ttl"`
+	ReapInterval    time.Duration `json:"reap_interval"`
+	MaxTasks        int           `json:"max_tasks"`
+}
+
+// DefaultConsensusArbiterConfig returns safe default configuration for the consensus arbiter.
+func DefaultConsensusArbiterConfig() ConsensusArbiterConfig {
+	return ConsensusArbiterConfig{
+		DefaultLeaseTTL: DefaultLeaseDuration,
+		ReapInterval:    DefaultReapInterval,
+		MaxTasks:        DefaultMaxConsensusTasks,
+	}
+}
+
+// Validate validates that the consensus arbiter configuration satisfies floor invariants.
+func (c ConsensusArbiterConfig) Validate() error {
+	if c.DefaultLeaseTTL <= 0 {
+		return ErrInvalidLeaseDuration
+	}
+	if c.ReapInterval <= 0 {
+		return ErrInvalidReapInterval
+	}
+	if c.MaxTasks <= 0 {
+		return ErrInvalidMaxTasks
+	}
+	return nil
+}
 
 // TaskLease captures the exclusive assignment and commitment contract for a distributed task.
 type TaskLease struct {
@@ -217,6 +249,18 @@ func NewConsensusArbiter(opts ...ArbiterOption) *AmbientConsensusArbiter {
 		opt(arbiter)
 	}
 	return arbiter
+}
+
+// NewConsensusArbiterWithConfig creates an initialized, thread-safe AmbientConsensusArbiter from a configuration struct.
+func NewConsensusArbiterWithConfig(cfg ConsensusArbiterConfig, opts ...ArbiterOption) (*AmbientConsensusArbiter, error) {
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+	arbiter := NewConsensusArbiter(opts...)
+	arbiter.defaultLeaseDuration = cfg.DefaultLeaseTTL
+	arbiter.reapInterval = cfg.ReapInterval
+	arbiter.maxTasks = cfg.MaxTasks
+	return arbiter, nil
 }
 
 func validateIdentifier(val string, errIfEmpty error) (string, error) {

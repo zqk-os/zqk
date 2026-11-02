@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	defaultRunningActiveHolonCount = 4
+	defaultRunningActiveHolonCount = 6
 	ambientStatusRunning           = "running"
 	ambientStatusStopped           = "stopped"
 )
@@ -121,6 +121,11 @@ func buildStoppedStatus() (map[string]any, *ambient.AmbientTelemetryReport) {
 	statusPayload := map[string]any{
 		objects.FieldKeyComponent: "ambient",
 		objects.FieldKeyStatus:    ambientStatusStopped,
+		"consensus_leases_active": 0,
+		"consensus_committed":     uint64(0),
+		"consensus_revoked":       uint64(0),
+		"reflex_actions_total":    uint64(0),
+		"reflex_realign_count":    uint64(0),
 	}
 	report := ambient.NewAmbientTelemetryReport(
 		ambient.WithStatus(ambient.TelemetryStatusStopped),
@@ -153,6 +158,11 @@ func buildRunningStatus(projectRoot string, pid int) (map[string]any, *ambient.A
 		"active_holons":           report.ActiveHolonsCount,
 		"runway_watermark":        report.RunwayWatermark,
 		"circuit_breaker_status":  report.CircuitBreakerStatus,
+		"consensus_leases_active": report.GetConsensusLeasesActive(),
+		"consensus_committed":     report.GetConsensusCommitted(),
+		"consensus_revoked":       report.GetConsensusRevoked(),
+		"reflex_actions_total":    report.GetReflexActionsTotal(),
+		"reflex_realign_count":    report.GetReflexRealignCount(),
 		"mesh_metrics":            report.MeshMetrics,
 		"components":              report.Components,
 		"telemetry":               report,
@@ -209,6 +219,16 @@ func buildDefaultRunningReport(uptime time.Duration) *ambient.AmbientTelemetryRe
 		}),
 		ambient.WithComponent(ambient.ComponentHealth{
 			Name:          "fault_isolator",
+			Status:        ambient.TelemetryStatusHealthy,
+			LastHeartbeat: now,
+		}),
+		ambient.WithComponent(ambient.ComponentHealth{
+			Name:          "consensus_arbiter",
+			Status:        ambient.TelemetryStatusHealthy,
+			LastHeartbeat: now,
+		}),
+		ambient.WithComponent(ambient.ComponentHealth{
+			Name:          "reflex_loop",
 			Status:        ambient.TelemetryStatusHealthy,
 			LastHeartbeat: now,
 		}),

@@ -7,6 +7,9 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // Named constants enforcing bounded resource allocation and deterministic execution.
@@ -59,12 +62,14 @@ const (
 
 // ReflexAction represents an actionable restorative intervention.
 type ReflexAction struct {
-	ID        string           `json:"id"`
-	Type      ReflexActionType `json:"type"`
-	Target    string           `json:"target"`
-	Reason    string           `json:"reason"`
-	Payload   map[string]any   `json:"payload,omitempty"`
-	Timestamp time.Time        `json:"timestamp"`
+	ID           string           `json:"id"`
+	Type         ReflexActionType `json:"type"`
+	Target       string           `json:"target"`
+	TargetHolon  string           `json:"target_holon,omitempty"`
+	Reason       string           `json:"reason"`
+	Payload      map[string]any   `json:"payload,omitempty"`
+	Timestamp    time.Time        `json:"timestamp"`
+	DispatchedAt time.Time        `json:"dispatched_at,omitempty"`
 }
 
 // EvaluationResult captures the outcome of evaluating a telemetry snapshot against reflex rules.
@@ -141,6 +146,9 @@ type SpinalCordReflexEngine struct {
 	history      []ReflexAction
 	maxHistory   int
 	closed       bool
+	running      bool
+	stopCh       chan struct{}
+	doneCh       chan struct{}
 	evalCount    atomic.Int64
 	actionCount  atomic.Int64
 	handledCount atomic.Int64
@@ -377,8 +385,89 @@ func (e *SpinalCordReflexEngine) Close() error {
 		return nil
 	}
 	e.closed = true
+	if e.running {
+		e.running = false
+		if e.stopCh != nil {
+			close(e.stopCh)
+		}
+	}
 	close(e.actionQueue)
 	return nil
+}
+
+// Start initiates background execution of the reflex action queue until ctx is canceled.
+func (e *SpinalCordReflexEngine) Start(ctx context.Context) error {
+	if e == nil {
+		return nil
+	}
+	var stopCh, doneCh chan struct{}
+	err := e.withMutationLock(func() error {
+		if e.running {
+			return nil
+		}
+		e.running = true
+		stopCh = make(chan struct{})
+		doneCh = make(chan struct{})
+		e.stopCh = stopCh
+		e.doneCh = doneCh
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	if stopCh == nil {
+		return nil
+	}
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	goroutinelabels.NewGoroutine("ambient.reflex_loop.worker", "process reflex action queue").
+		StartSimple(func() {
+			defer close(doneCh)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-stopCh:
+					return
+				case _, ok := <-e.actionQueue:
+					if !ok {
+						return
+					}
+				}
+			}
+		})
+
+	return nil
+}
+
+// Stop gracefully stops the reflex loop background worker and closes the action queue.
+func (e *SpinalCordReflexEngine) Stop() error {
+	if e == nil {
+		return nil
+	}
+	e.mu.Lock()
+	if e.closed {
+		e.mu.Unlock()
+		return nil
+	}
+	if !e.running {
+		e.mu.Unlock()
+		return e.Close()
+	}
+	e.running = false
+	if e.stopCh != nil {
+		close(e.stopCh)
+	}
+	done := e.doneCh
+	e.mu.Unlock()
+
+	if done != nil {
+		<-done
+	}
+	return e.Close()
 }
 
 // HolonTelemetrySnapshot captures instantaneous metrics across the middle-brain.
@@ -413,6 +502,12 @@ type CompensatingActionResult struct {
 	RecoveredState string           `json:"recovered_state,omitempty"`
 }
 
+// ReflexLoop is a type alias for SpinalCordReflexEngine.
+type ReflexLoop = SpinalCordReflexEngine
+
+// ReflexLoopConfig is a type alias for SpinalCordReflexConfig.
+type ReflexLoopConfig = SpinalCordReflexConfig
+
 // SpinalCordReflexConfig sets threshold invariants for the reflex arbiter.
 type SpinalCordReflexConfig struct {
 	MaxAllowedLatency     time.Duration
@@ -420,6 +515,23 @@ type SpinalCordReflexConfig struct {
 	MinAlignmentScore     float64
 	MaxAllowedDivergences int64
 	MinHealthyHolonCount  int
+}
+
+// Validate verifies that the reflex config thresholds satisfy static invariants.
+func (c SpinalCordReflexConfig) Validate() error {
+	if c.MaxAllowedLatency <= 0 {
+		return errfmt.Errorf("max allowed latency must be strictly positive")
+	}
+	if c.MaxAllowedDrops < 0 {
+		return errfmt.Errorf("max allowed drops cannot be negative")
+	}
+	if c.MinAlignmentScore < 0 || c.MinAlignmentScore > 1.0 {
+		return errfmt.Errorf("min alignment score must be between 0.0 and 1.0")
+	}
+	if c.MinHealthyHolonCount < 0 {
+		return errfmt.Errorf("min healthy holons cannot be negative")
+	}
+	return nil
 }
 
 // DefaultReflexConfig returns nominal default thresholds.
@@ -431,6 +543,24 @@ func DefaultReflexConfig() SpinalCordReflexConfig {
 		MaxAllowedDivergences: DefaultReflexMaxDivergences,
 		MinHealthyHolonCount:  DefaultReflexMinHolons,
 	}
+}
+
+// DefaultReflexLoopConfig returns nominal default thresholds.
+func DefaultReflexLoopConfig() ReflexLoopConfig {
+	return DefaultReflexConfig()
+}
+
+// NewReflexLoop creates an initialized ReflexLoop with safe capacity floors.
+func NewReflexLoop(opts ...ReflexOption) *ReflexLoop {
+	return NewSpinalCordReflexEngine(opts...)
+}
+
+// NewReflexLoopWithConfig creates an initialized ReflexLoop from a configuration struct.
+func NewReflexLoopWithConfig(cfg ReflexLoopConfig, opts ...ReflexOption) (*ReflexLoop, error) {
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+	return NewReflexLoop(opts...), nil
 }
 
 // EvaluateSnapshot performs autonomous drift detection and decisioning on a telemetry snapshot.

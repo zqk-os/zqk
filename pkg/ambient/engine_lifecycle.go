@@ -2,6 +2,8 @@ package ambient
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"sync/atomic"
 	"time"
 
@@ -63,6 +65,19 @@ func (e *AmbientEngine) Start(ctx context.Context) error {
 			defer close(e.supervisorDone)
 			e.runSupervisor(supCtx, interval)
 		})
+
+	if e.consensusArbiter != nil {
+		if err := e.consensusArbiter.Start(supCtx); err != nil {
+			e.mu.Unlock()
+			return err
+		}
+	}
+	if e.reflexLoop != nil {
+		if err := e.reflexLoop.Start(supCtx); err != nil {
+			e.mu.Unlock()
+			return err
+		}
+	}
 	e.mu.Unlock()
 
 	return e.Transition(EngineStateRunning)
@@ -113,6 +128,10 @@ func (e *AmbientEngine) superviseTick(ctx context.Context) {
 		tput := e.backpressureRegulator.CurrentThroughput()
 		_ = tput
 	}
+
+	if e.consensusArbiter != nil {
+		e.consensusArbiter.ReapExpiredLeases()
+	}
 }
 
 // Stop gracefully halts background supervisor loops and transitions to EngineStateStopped.
@@ -154,6 +173,21 @@ func (e *AmbientEngine) Stop() error {
 	}
 
 	e.supervisorWg.Wait()
+
+	var stopErrs []error
+	if e.consensusArbiter != nil {
+		if stopErr := e.consensusArbiter.Stop(); stopErr != nil {
+			stopErrs = append(stopErrs, stopErr)
+		}
+	}
+	if e.reflexLoop != nil {
+		if stopErr := e.reflexLoop.Stop(); stopErr != nil {
+			stopErrs = append(stopErrs, stopErr)
+		}
+	}
+	if len(stopErrs) > 0 {
+		return errors.Join(stopErrs...)
+	}
 
 	e.mu.Lock()
 	e.cancelFn = nil
@@ -254,28 +288,8 @@ func (e *AmbientEngine) Telemetry() EngineTelemetry {
 	return telem
 }
 
-// TelemetryReport aggregates comprehensive runtime metrics into an AmbientTelemetryReport.
-// Returns a stopped status report if the receiver is nil or stopped.
-func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
-	if e == nil {
-		return NewAmbientTelemetryReport(WithStatus(TelemetryStatusStopped))
-	}
-
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-
-	status := TelemetryStatusHealthy
-	if e.state == EngineStateStopped {
-		status = TelemetryStatusStopped
-	} else if e.state == EngineStateDegraded || (e.faultIsolator != nil && e.faultIsolator.State() == StateOpen) {
-		status = TelemetryStatusDegraded
-	}
-
-	uptime := time.Duration(0)
-	if !e.startedAt.IsZero() && e.state == EngineStateRunning {
-		uptime = time.Since(e.startedAt)
-	}
-
+// collectComponentHealth enumerates health status across all active engine holons.
+func (e *AmbientEngine) collectComponentHealth() (map[string]ComponentHealth, int) {
 	activeHolons := 0
 	components := make(map[string]ComponentHealth)
 
@@ -315,6 +329,61 @@ func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
 			LastHeartbeat: time.Now().UTC(),
 		}
 	}
+	if e.consensusArbiter != nil {
+		activeHolons++
+		msg := fmt.Sprintf("%d active leases, %d committed, %d revoked",
+			e.consensusArbiter.LeasedCount(),
+			e.consensusArbiter.CommittedCount(),
+			e.consensusArbiter.RevokedCount(),
+		)
+		components["consensus_arbiter"] = ComponentHealth{
+			Name:          "consensus_arbiter",
+			Status:        TelemetryStatusHealthy,
+			LastHeartbeat: time.Now().UTC(),
+			Message:       msg,
+		}
+	}
+	if e.reflexLoop != nil {
+		activeHolons++
+		rfMetrics := e.reflexLoop.Metrics()
+		msg := fmt.Sprintf("%d evaluations, %d actions triggered",
+			rfMetrics.EvaluationsCount,
+			rfMetrics.ActionsTriggered,
+		)
+		components["reflex_loop"] = ComponentHealth{
+			Name:          "reflex_loop",
+			Status:        TelemetryStatusHealthy,
+			LastHeartbeat: time.Now().UTC(),
+			Message:       msg,
+		}
+	}
+
+	return components, activeHolons
+}
+
+// TelemetryReport aggregates comprehensive runtime metrics into an AmbientTelemetryReport.
+// Returns a stopped status report if the receiver is nil or stopped.
+func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
+	if e == nil {
+		return NewAmbientTelemetryReport(WithStatus(TelemetryStatusStopped))
+	}
+
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	status := TelemetryStatusHealthy
+	if e.state == EngineStateStopped {
+		status = TelemetryStatusStopped
+	} else if e.state == EngineStateDegraded || (e.faultIsolator != nil && e.faultIsolator.State() == StateOpen) {
+		status = TelemetryStatusDegraded
+	}
+
+	uptime := time.Duration(0)
+	if !e.startedAt.IsZero() && e.state == EngineStateRunning {
+		uptime = time.Since(e.startedAt)
+	}
+
+	components, activeHolons := e.collectComponentHealth()
 
 	cbStatus := CircuitBreakerStatusClosed
 	if e.faultIsolator != nil {
@@ -332,6 +401,18 @@ func (e *AmbientEngine) TelemetryReport() *AmbientTelemetryReport {
 	}
 	if e.faultIsolator != nil {
 		meshMetrics.DivergenceCount = int64(e.faultIsolator.FailureCount())
+	}
+	if e.consensusArbiter != nil {
+		meshMetrics.ConsensusLeasesActive = e.consensusArbiter.LeasedCount()
+		meshMetrics.ConsensusCommitted = uint64(e.consensusArbiter.CommittedCount())
+		meshMetrics.ConsensusRevoked = uint64(e.consensusArbiter.RevokedCount())
+	}
+	if e.reflexLoop != nil {
+		rfMetrics := e.reflexLoop.Metrics()
+		meshMetrics.ReflexActionsTotal = uint64(rfMetrics.ActionsTriggered)
+		if rfMetrics.ActionCounts != nil {
+			meshMetrics.ReflexRealignCount = uint64(rfMetrics.ActionCounts[string(ReflexActionRealignIntent)] + rfMetrics.ActionCounts[string(ActionIntentRealign)])
+		}
 	}
 
 	return NewAmbientTelemetryReport(

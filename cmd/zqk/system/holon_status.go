@@ -20,7 +20,7 @@ import (
 const (
 	defaultHolonFormatFlag   = "table"
 	minHealthyAlignment      = 0.70
-	defaultRuntimeHolonCount = 4
+	defaultRuntimeHolonCount = 6
 )
 
 // NewHolonCmd creates the 'zqk system holon' parent command group.
@@ -140,6 +140,16 @@ func runHolonStatusWithEngine(w io.Writer, jsonOut bool) error {
 			}),
 			ambient.WithComponent(ambient.ComponentHealth{
 				Name:          "fault_isolator",
+				Status:        ambient.TelemetryStatusHealthy,
+				LastHeartbeat: time.Now().UTC(),
+			}),
+			ambient.WithComponent(ambient.ComponentHealth{
+				Name:          "consensus_arbiter",
+				Status:        ambient.TelemetryStatusHealthy,
+				LastHeartbeat: time.Now().UTC(),
+			}),
+			ambient.WithComponent(ambient.ComponentHealth{
+				Name:          "reflex_loop",
 				Status:        ambient.TelemetryStatusHealthy,
 				LastHeartbeat: time.Now().UTC(),
 			}),
