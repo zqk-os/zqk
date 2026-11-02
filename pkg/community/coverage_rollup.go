@@ -26,6 +26,10 @@ const (
 	DefaultCoverageThresholdPct = 85.0
 	CoverageModulePrefix        = "github.com/zqk-os/zqk/"
 	RepoResolverPersonaID       = "PER-1793541871378023000-273387ff"
+
+	// Scanner buffer allocation bounds for coverprofile parsing.
+	CoverProfileInitialBufferSize = 64 * 1024   // 64 KiB initial scan buffer
+	CoverProfileMaxBufferSize     = 1024 * 1024 // 1 MiB maximum scan buffer (handles extra-long coverage lines)
 )
 
 // Coverage band thresholds mirror scripts/open-core/generate-coverage-summary.py.
@@ -114,7 +118,7 @@ func scanCoverProfile(data []byte) (map[string]*packageCounters, int, int, error
 	coveredStmts := 0
 
 	scanner := bufio.NewScanner(bytes.NewReader(data))
-	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	scanner.Buffer(make([]byte, 0, CoverProfileInitialBufferSize), CoverProfileMaxBufferSize)
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
