@@ -46,6 +46,7 @@ func TestNewUICmd_Metadata(t *testing.T) {
 
 func TestUICmd_StructuredFormats(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	for _, fmtName := range []string{"json", "yaml", "jsonl"} {
 		out, err := execUI(t, proj.Root, nil, "--format", fmtName, "--tab", "state")
 		require.NoError(t, err)
@@ -59,6 +60,7 @@ func TestUICmd_StructuredFormats(t *testing.T) {
 
 func TestUICmd_TabVariations(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	for _, tab := range []string{"state", "audit", "swarm", "pm", "metrics", "scheduler", "health", "seismograph"} {
 		out, err := execUI(t, proj.Root, nil, "--format", "json", "--tab", tab)
 		require.NoError(t, err)
@@ -68,6 +70,7 @@ func TestUICmd_TabVariations(t *testing.T) {
 
 func TestUICmd_Web_ExplicitPortInUse(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 	defer l.Close()
@@ -78,6 +81,7 @@ func TestUICmd_Web_ExplicitPortInUse(t *testing.T) {
 
 func TestUICmd_Web_AllFallbackPortsInUse(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	var listeners []net.Listener
 	defer func() {
 		for _, l := range listeners {
@@ -99,6 +103,7 @@ func TestUICmd_Web_AllFallbackPortsInUse(t *testing.T) {
 
 func TestUICmd_Web_ExplicitPortSuccess(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 	port := l.Addr().(*net.TCPAddr).Port
@@ -116,6 +121,7 @@ func TestUICmd_Web_ExplicitPortSuccess(t *testing.T) {
 
 func TestUICmd_Web_AutoFallbackSuccess(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	l8080, err := net.Listen("tcp", "127.0.0.1:8080")
 	if err != nil {
 		t.Skipf("cannot bind 8080: %v", err)
@@ -135,6 +141,7 @@ func TestUICmd_Web_AutoFallbackSuccess(t *testing.T) {
 
 func TestUICmd_ProjectRoot_Fallback(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{SeedSchemaPlane: true})
+	defer cleanupIsolatedProject(t, proj.Root)
 	t.Chdir(proj.Root)
 	out, err := execUI(t, "", nil, "--format", "json", "--tab", "state")
 	require.NoError(t, err)

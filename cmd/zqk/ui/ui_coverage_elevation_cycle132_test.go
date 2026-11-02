@@ -16,19 +16,28 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/cas"
 	"github.com/zqk-os/zqk/pkg/testkit"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func cleanupIsolatedProject(t *testing.T, root string) {
 	t.Helper()
+	if root == "" {
+		return
+	}
 	if p, ok := storage.GetGlobalStorageProviderCache().Get(root); ok && p != nil {
+		if shutdowner, ok := p.(interface{ Shutdown(context.Context) error }); ok {
+			_ = shutdowner.Shutdown(context.Background())
+		}
 		if closer, ok := p.(io.Closer); ok {
-			if err := closer.Close(); err != nil {
-				t.Logf("cleanup storage error: %v", err)
-			}
+			_ = closer.Close()
 		}
 		storage.GetGlobalStorageProviderCache().Delete(root)
 	}
+	storage.GetGlobalBufferRegistry().Unregister(root)
+	cas.RemoveListingIndexWriteQueueForProjectRoot(root)
+	_ = fileutil.RemoveAll(root)
 }
 
 func execUIWithContext(t *testing.T, cliCtx *cli.Context, ctx context.Context, args ...string) (string, error) {
