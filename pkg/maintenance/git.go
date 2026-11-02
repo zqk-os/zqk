@@ -410,6 +410,10 @@ func (s *GitMaintenanceService) PruneQuarantinedRefs(ctx context.Context, ageThr
 	prunedCount := 0
 
 	for _, ref := range strings.Split(out, "\n") {
+		if err := ctx.Err(); err != nil {
+			logging.FluentEvent(logger).Info(fmt.Sprintf("Quarantined refs pruning stopped early (%v). Pruned count: %d", err, prunedCount)).Log()
+			return prunedCount, err
+		}
 		ref = strings.TrimSpace(ref)
 		if ref == "" {
 			continue

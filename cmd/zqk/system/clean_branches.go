@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -35,9 +36,12 @@ func NewCleanBranchesCmd() *cobra.Command {
 
 			cmd.Printf("Successfully pruned %d stale branches.\n", count)
 
-			// Purge ancient quarantined refs
+			// Purge ancient quarantined refs. Detach from the command deadline so a
+			// slow PruneStaleBranches that nearly exhausted ctx does not surface
+			// "context canceled" after the quarantine sweep already finished.
+			// TRACK: tpm-clean-branches-quarantine-ctx
 			qDur := time.Duration(quarantineDays) * 24 * time.Hour
-			qCount, qErr := svc.PruneQuarantinedRefs(ctx, qDur)
+			qCount, qErr := svc.PruneQuarantinedRefs(context.WithoutCancel(ctx), qDur)
 			if qErr != nil {
 				cmd.PrintErrln("Error in PruneQuarantinedRefs:", qErr)
 			} else if qCount > 0 {
