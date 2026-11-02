@@ -2,10 +2,14 @@ package scheduler
 
 import (
 	"context"
+	"errors"
+	"strings"
+	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
@@ -288,5 +292,214 @@ func (s *Scheduler) scanAdmissionTimeouts(ctx context.Context) {
 			continue
 		}
 		s.failJobAdmission(ctx, job, admissionReasonTimeout)
+	}
+}
+
+var (
+	ErrNilJobEnvelope          = errors.New("job envelope is nil")
+	ErrEmptyJobID              = errors.New("job ID cannot be empty")
+	ErrInvalidJobPriority      = errors.New("invalid job priority: must be normal, high, or critical")
+	ErrInvalidTriggerType      = errors.New("invalid trigger type")
+	ErrInvalidExecutionMode    = errors.New("invalid execution mode")
+	ErrMissingScheduleOption   = errors.New("missing required schedule option")
+	ErrAdmissionFilterRejected = errors.New("job admission filter rejected job")
+)
+
+// ValidateJobEnvelope validates the structural and semantic bounds of a ScheduledJob.
+func ValidateJobEnvelope(job *ScheduledJob) error {
+	if job == nil {
+		return ErrNilJobEnvelope
+	}
+	if strings.TrimSpace(job.ID) == "" {
+		return ErrEmptyJobID
+	}
+	if err := validateJobPriority(job.Priority); err != nil {
+		return err
+	}
+	if err := validateJobTrigger(job); err != nil {
+		return err
+	}
+	return validateJobExecutionMode(job.ExecutionMode)
+}
+
+func validateJobPriority(priority string) error {
+	if priority == "" {
+		return nil
+	}
+	switch priority {
+	case JobPriorityNormal, JobPriorityHigh, JobPriorityCritical:
+		return nil
+	default:
+		return errfmt.Errorf("%w: %s", ErrInvalidJobPriority, priority)
+	}
+}
+
+func validateJobTrigger(job *ScheduledJob) error {
+	switch job.TriggerType {
+	case TriggerTypeTimer:
+		if strings.TrimSpace(job.ScheduleExpr) == "" {
+			return errfmt.Errorf("%w: timer requires schedule_expr", ErrMissingScheduleOption)
+		}
+		if _, err := ParseCronSchedule(job.ScheduleExpr); err != nil {
+			return errfmt.Errorf("%w: %v", ErrInvalidCronSchedule, err)
+		}
+		return nil
+	case TriggerTypeManual, TriggerTypeImmediate:
+		return nil
+	case TriggerTypeWorkflow:
+		if strings.TrimSpace(job.WorkflowRef) == "" {
+			return errfmt.Errorf("%w: workflow trigger requires workflow_ref", ErrMissingScheduleOption)
+		}
+		return nil
+	case TriggerTypeEvent:
+		if strings.TrimSpace(job.EventFilter) == "" {
+			return errfmt.Errorf("%w: event trigger requires event_filter", ErrMissingScheduleOption)
+		}
+		return nil
+	case TriggerTypeLifecycle:
+		if strings.TrimSpace(job.LifecycleFilter) == "" {
+			return errfmt.Errorf("%w: lifecycle trigger requires lifecycle_filter", ErrMissingScheduleOption)
+		}
+		return nil
+	case "":
+		return errfmt.Errorf("%w: trigger type is empty", ErrInvalidTriggerType)
+	default:
+		return errfmt.Errorf("%w: %s", ErrInvalidTriggerType, job.TriggerType)
+	}
+}
+
+func validateJobExecutionMode(mode string) error {
+	if mode == "" {
+		return nil
+	}
+	switch mode {
+	case ExecutionModeReusable, ExecutionModeOneTime:
+		return nil
+	default:
+		return errfmt.Errorf("%w: %s", ErrInvalidExecutionMode, mode)
+	}
+}
+
+// JobAdmissionFilter defines a validation or admission policy hook for scheduled jobs.
+type JobAdmissionFilter func(ctx context.Context, job *ScheduledJob) error
+
+// JobAdmissionPipeline executes a sequence of admission filters for candidate jobs.
+type JobAdmissionPipeline struct {
+	mu      sync.RWMutex
+	filters []JobAdmissionFilter
+}
+
+// NewJobAdmissionPipeline creates a new admission pipeline.
+func NewJobAdmissionPipeline(filters ...JobAdmissionFilter) *JobAdmissionPipeline {
+	p := &JobAdmissionPipeline{
+		filters: make([]JobAdmissionFilter, 0, len(filters)),
+	}
+	for _, f := range filters {
+		if f != nil {
+			p.filters = append(p.filters, f)
+		}
+	}
+	return p
+}
+
+// AddFilter appends an admission filter to the pipeline.
+func (p *JobAdmissionPipeline) AddFilter(filter JobAdmissionFilter) *JobAdmissionPipeline {
+	if filter == nil {
+		return p
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.filters = append(p.filters, filter)
+	return p
+}
+
+// FilterCount returns the number of active filters.
+func (p *JobAdmissionPipeline) FilterCount() int {
+	if p == nil {
+		return 0
+	}
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+	return len(p.filters)
+}
+
+// Admit runs envelope validation and all pipeline filters.
+func (p *JobAdmissionPipeline) Admit(ctx context.Context, job *ScheduledJob) error {
+	if err := ValidateJobEnvelope(job); err != nil {
+		return err
+	}
+	if p == nil {
+		return nil
+	}
+	p.mu.RLock()
+	filters := make([]JobAdmissionFilter, len(p.filters))
+	copy(filters, p.filters)
+	p.mu.RUnlock()
+
+	for _, filter := range filters {
+		if err := filter(ctx, job); err != nil {
+			return errfmt.Errorf("%w: %v", ErrAdmissionFilterRejected, err)
+		}
+	}
+	return nil
+}
+
+// AdmissionFilterRequirePriority creates an admission filter enforcing allowed priorities.
+func AdmissionFilterRequirePriority(allowedPriorities ...string) JobAdmissionFilter {
+	allowed := make(map[string]struct{}, len(allowedPriorities))
+	for _, p := range allowedPriorities {
+		allowed[p] = struct{}{}
+	}
+	return func(_ context.Context, job *ScheduledJob) error {
+		if job == nil {
+			return ErrNilJobEnvelope
+		}
+		if _, ok := allowed[job.Priority]; !ok {
+			return errfmt.Errorf("priority %q not in allowed set", job.Priority)
+		}
+		return nil
+	}
+}
+
+// AdmissionFilterExecutionMode creates an admission filter restricting execution mode.
+func AdmissionFilterExecutionMode(allowedModes ...string) JobAdmissionFilter {
+	allowed := make(map[string]struct{}, len(allowedModes))
+	for _, m := range allowedModes {
+		allowed[m] = struct{}{}
+	}
+	return func(_ context.Context, job *ScheduledJob) error {
+		if job == nil {
+			return ErrNilJobEnvelope
+		}
+		if _, ok := allowed[job.ExecutionMode]; !ok {
+			return errfmt.Errorf("execution mode %q not in allowed set", job.ExecutionMode)
+		}
+		return nil
+	}
+}
+
+// AdmissionFilterNonArchived creates an admission filter rejecting archived jobs.
+func AdmissionFilterNonArchived() JobAdmissionFilter {
+	return func(_ context.Context, job *ScheduledJob) error {
+		if job == nil {
+			return ErrNilJobEnvelope
+		}
+		if job.Status == objects.ObjectStatusArchived {
+			return errfmt.Errorf("cannot admit archived job: status=%s", job.Status)
+		}
+		return nil
+	}
+}
+
+// AdmissionFilterEnabled creates an admission filter rejecting disabled jobs.
+func AdmissionFilterEnabled() JobAdmissionFilter {
+	return func(_ context.Context, job *ScheduledJob) error {
+		if job == nil {
+			return ErrNilJobEnvelope
+		}
+		if !job.Enabled || job.Status == StatusDisabled {
+			return errfmt.Errorf("cannot admit disabled job")
+		}
+		return nil
 	}
 }
