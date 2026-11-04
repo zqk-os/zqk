@@ -881,19 +881,56 @@ func hasTransitiveCycle(ctx context.Context, secCtx *pkgctx.SecurityContext, sto
 func cleanLegacyKeys(existingObj map[string]any, updates map[string]any) {
 	kind, _ := existingObj[objects.FieldKeyKind].(string)
 	legacyFields := []string{
-		"category", "phase", "date_captured", "group", "origin_project", "origin_system",
-		"acceptance_criteria", "spec_adherence", "context", "date", "spec_refs",
+		"phase", "date_captured", "group", "origin_project", "origin_system",
+		"spec_adherence", "date", "spec_refs",
 		"collection_count", "cron_restarts", "first_seen", "health_check_duration_ms",
 		"health_checks", "last_seen", "measurement_window_end", "measurement_window_start",
-		"metric_type", "missed_triggers", "recovered_jobs", "estimated_effort",
-		"event_type", "operation", "benefits", "components", "considerations",
+		"metric_type", "missed_triggers", "recovered_jobs", "event_type",
 	}
+
+	reg := objects.GetGlobalFieldRegistry()
+	var kindFields *objects.KindFields
+	if reg != nil && kind != "" {
+		kindFields, _ = reg.GetFieldsForKindIfLoaded(kind)
+		if kindFields == nil {
+			kindFields, _ = reg.GetFieldsForKind(kind)
+		}
+	}
+
+	isSchemaField := func(fieldName string) bool {
+		if kindFields == nil {
+			return false
+		}
+		for _, f := range kindFields.AllFields {
+			if f.Name == fieldName {
+				return true
+			}
+		}
+		for _, f := range kindFields.CommonFields {
+			if f.Name == fieldName {
+				return true
+			}
+		}
+		for _, f := range kindFields.SpecializedFields {
+			if f.Name == fieldName {
+				return true
+			}
+		}
+		return false
+	}
+
 	for _, f := range legacyFields {
-		if f == "category" && kind == objects.KindCriteria {
+		if isSchemaField(f) {
 			continue
 		}
 		if _, ok := existingObj[f]; ok {
 			updates[f] = storage.FieldUnset
+		}
+	}
+
+	if _, ok := existingObj["category"]; ok {
+		if !isSchemaField("category") && kind != objects.KindCriteria {
+			updates["category"] = storage.FieldUnset
 		}
 	}
 }

@@ -1,6 +1,9 @@
 package fileutil
 
-import "path/filepath"
+import (
+	"path/filepath"
+	"strings"
+)
 
 // FileMatch represents a successfully found file during a scan.
 type FileMatch struct {
@@ -21,6 +24,8 @@ func FindFiles(searchDirs []string, knownFiles map[string]string) []FileMatch {
 		".git": true, "node_modules": true, "vendor": true,
 		"Caches": true, "Cache": true, "Containers": true,
 		"tmp": true, "temp": true, ".npm": true, ".cache": true,
+		"workspaceStorage": true, "CachedData": true, "Crashpad": true,
+		"logs": true, "GPUCache": true, "blob_storage": true,
 	}
 
 	for _, dir := range searchDirs {
@@ -34,7 +39,7 @@ func FindFiles(searchDirs []string, knownFiles map[string]string) []FileMatch {
 		}
 		scannedDirs[cleanDir] = true
 
-		baseDepth := len(filepath.SplitList(cleanDir))
+		baseDepth := len(strings.Split(cleanDir, string(filepath.Separator)))
 
 		_ = filepath.WalkDir(cleanDir, func(path string, d DirEntry, err error) error {
 			if err != nil {
@@ -46,9 +51,9 @@ func FindFiles(searchDirs []string, knownFiles map[string]string) []FileMatch {
 				if skipDirs[d.Name()] {
 					return filepath.SkipDir
 				}
-				// Enforce depth limit (e.g., max 5 levels deep)
-				currentDepth := len(filepath.SplitList(path))
-				if currentDepth-baseDepth > 5 {
+				// Enforce depth limit (e.g., max 3 levels deep)
+				currentDepth := len(strings.Split(path, string(filepath.Separator)))
+				if currentDepth-baseDepth > 3 {
 					return filepath.SkipDir
 				}
 				return nil

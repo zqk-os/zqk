@@ -586,3 +586,56 @@ func verifyRefRemoveFilters(t *testing.T, tempDir string, provider storage.Objec
 		t.Fatalf("remove all failed: out=%s, err=%v", outAll, err)
 	}
 }
+
+func TestCleanLegacyKeys_PreservesEffortAndValidFields(t *testing.T) {
+	// 1. Backlog item with estimated_effort and legacy phase
+	bliObj := map[string]any{
+		objects.FieldKeyKind: "backlog_item",
+		"id":                 "BLI-TEST-001",
+		"estimated_effort":   8,
+		"phase":              "discovery", // legacy field
+		"cron_restarts":      3,           // legacy metric field
+	}
+	bliUpdates := make(map[string]any)
+	cleanLegacyKeys(bliObj, bliUpdates)
+
+	if _, ok := bliUpdates["estimated_effort"]; ok {
+		t.Errorf("cleanLegacyKeys unexpectedly unset estimated_effort on backlog_item")
+	}
+	if bliUpdates["phase"] != storage.FieldUnset {
+		t.Errorf("cleanLegacyKeys failed to unset legacy phase on backlog_item, got %v", bliUpdates["phase"])
+	}
+	if bliUpdates["cron_restarts"] != storage.FieldUnset {
+		t.Errorf("cleanLegacyKeys failed to unset legacy cron_restarts on backlog_item, got %v", bliUpdates["cron_restarts"])
+	}
+
+	// 2. Criteria with category
+	critObj := map[string]any{
+		objects.FieldKeyKind: "criteria",
+		"id":                 "CRIT-TEST-001",
+		"category":           "static_floor_invariant",
+	}
+	critUpdates := make(map[string]any)
+	cleanLegacyKeys(critObj, critUpdates)
+
+	if _, ok := critUpdates["category"]; ok {
+		t.Errorf("cleanLegacyKeys unexpectedly unset category on criteria")
+	}
+
+	// 3. Milestone with estimated_effort
+	msObj := map[string]any{
+		objects.FieldKeyKind: "milestone",
+		"id":                 "MIL-TEST-001",
+		"estimated_effort":   21,
+		"cron_restarts":      5, // legacy field
+	}
+	msUpdates := make(map[string]any)
+	cleanLegacyKeys(msObj, msUpdates)
+
+	if _, ok := msUpdates["estimated_effort"]; ok {
+		t.Errorf("cleanLegacyKeys unexpectedly unset estimated_effort on milestone")
+	}
+	if msUpdates["cron_restarts"] != storage.FieldUnset {
+		t.Errorf("cleanLegacyKeys failed to unset legacy cron_restarts on milestone, got %v", msUpdates["cron_restarts"])
+	}
+}
