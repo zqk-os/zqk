@@ -176,7 +176,18 @@ func runAgentSeatWorker(cmd *cobra.Command, _ []string) error {
 			Bool("execute_non_comms", executeNonComms).
 			Log()
 
+		// CAP seat hourglass: register liveness; clear on exit (miss → mesh wake).
+		if armErr := agentclaim.ArmSeatHeartbeat(root, agentID, agentclaim.DefaultSeatHeartbeatCadence); armErr != nil {
+			logging.Fluent(logger).Warn("seat-worker seat heartbeat arm failed").
+				WithError(errfmt.Newf("arm seat heartbeat").Wrap(armErr)).
+				Log()
+		}
+		defer func() {
+			_ = agentclaim.ClearSeatHeartbeat(root, agentID)
+		}()
+
 		runOnce := func(ctx context.Context) (map[string]any, error) {
+			_ = agentclaim.RenewSeatHeartbeat(root, agentID)
 			snap, err := agentfeed.LoadCorrespondence(root, agentfeed.Seat{
 				AgentID:    agentID,
 				PersonaRef: personaRef,

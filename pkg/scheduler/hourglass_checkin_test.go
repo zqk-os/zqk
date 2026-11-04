@@ -15,6 +15,9 @@ func TestActionForExpiredTimer_checkinNeverKills(t *testing.T) {
 	if got := actionForExpiredTimer(agentclaim.TimerTypeCheckin); got != actionWakeOrchestrator {
 		t.Fatalf("check-in routed to %v, want actionWakeOrchestrator; any other action kills or moves a task whose holder may be alive", got)
 	}
+	if got := actionForExpiredTimer(agentclaim.TimerTypeSeatHeartbeat); got != actionWakeOrchestrator {
+		t.Fatalf("seat heartbeat routed to %v, want actionWakeOrchestrator; Composer idle must wake, never SIGKILL", got)
+	}
 }
 
 func TestActionForExpiredTimer_routing(t *testing.T) {

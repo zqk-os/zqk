@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/agentclaim"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -59,7 +60,7 @@ const timerTypeDeadline = "deadline"
 
 func actionForExpiredTimer(timerType string) expiredTimerAction {
 	switch timerType {
-	case agentclaim.TimerTypeCheckin:
+	case agentclaim.TimerTypeCheckin, agentclaim.TimerTypeSeatHeartbeat:
 		return actionWakeOrchestrator
 	case timerTypeDeadline:
 		return actionEscalateDeadline
@@ -134,6 +135,11 @@ func (s *Scheduler) checkHourglassTimers(ctx context.Context) {
 		}
 
 		if time.Now().After(expiresAt) {
+			if info.Type == agentclaim.TimerTypeSeatHeartbeat || agentclaim.IsSeatHeartbeatPath(f.Name()) {
+				// Seat liveness (CAP/Composer): wake the silent seat, not TPM claim triage.
+				s.handleMissedSeatHeartbeat(ctx, filePath)
+				continue
+			}
 			if actionForExpiredTimer(info.Type) == actionWakeOrchestrator {
 				// A silent claim is not a stuck process: the seat may be gone, or merely
 				// not reporting. Killing a pid or moving the task would pre-empt the
@@ -225,6 +231,75 @@ const maxCheckinBackoff = 4 * time.Hour
 // risk_blocker in addition to the wake. One miss is a nudge; repeated silence is a fact
 // that should survive the orchestrator's session.
 const checkinBlockerMissThreshold = 3
+
+// seatHeartbeatWakeAuthor is the FromAgentID for miss wakes so WakePeerOpts does not
+// treat the silent seat as self-waking (author_excluded).
+const seatHeartbeatWakeAuthor = "hourglass"
+
+// handleMissedSeatHeartbeat wakes a CAP/Composer seat that stopped stamping heartbeats.
+//
+// Unlike claim check-in, there is no ATK object to validate: the timer is the contract.
+// Do not invent empty CAP pings — wake carries an ATTN + whats-next cue (CAP_LOOP_CONTRACT).
+func (s *Scheduler) handleMissedSeatHeartbeat(ctx context.Context, filePath string) {
+	timer, err := agentclaim.LoadCheckinFile(filePath)
+	if err != nil || timer == nil {
+		_ = fileutil.Remove(filePath)
+		return
+	}
+	seatID := strings.TrimSpace(timer.TaskID)
+	if seatID == "" {
+		seatID = strings.TrimSpace(timer.ClaimedBy)
+	}
+	if seatID == "" {
+		_ = fileutil.Remove(filePath)
+		return
+	}
+
+	timer.Misses++
+	silentFor := "unknown"
+	if last := timer.LastCheckinAt; last != "" {
+		if parsed, perr := time.Parse(time.RFC3339, last); perr == nil {
+			silentFor = time.Since(parsed).Round(time.Minute).String()
+		}
+	} else if timer.ArmedAt != "" {
+		if parsed, perr := time.Parse(time.RFC3339, timer.ArmedAt); perr == nil {
+			silentFor = time.Since(parsed).Round(time.Minute).String()
+		}
+	}
+
+	SchedulerDaemonLog(s.logger).Warn("hourglass_seat_heartbeat_missed").
+		String("agent_id", seatID).
+		Int("misses", timer.Misses).
+		String("silent_for", silentFor).
+		Log()
+
+	resumeCmd := paths.CLIInvocation(fmt.Sprintf(
+		"zqk workflow whats-next --agent-id %s --format json", seatID))
+	msg := fmt.Sprintf(
+		"ATTN %s: seat heartbeat missed %d window(s) (cadence %s, silent %s). "+
+			"Resume: %s — do not idle on summary. "+
+			"Long orch/execute must renew via feed emit-status / seat-worker ticks (no empty CAP ping).",
+		seatID, timer.Misses, timer.Cadence(), silentFor, resumeCmd)
+
+	wakeRes := agentfeed.WakePeerOpts(ctx, agentfeed.WakePeerOptions{
+		ProjectRoot: s.projectRoot,
+		Message:     msg,
+		ToAgentID:   seatID,
+		FromAgentID: seatHeartbeatWakeAuthor,
+	})
+	SchedulerDaemonLog(s.logger).Info("hourglass_seat_heartbeat_wake").
+		String("agent_id", seatID).
+		String("transport", wakeRes.Transport).
+		Bool("live", wakeRes.Live).
+		String("skipped", wakeRes.Skipped).
+		Log()
+
+	if rearmErr := agentclaim.RearmSeatHeartbeat(s.projectRoot, timer, maxCheckinBackoff); rearmErr != nil {
+		SchedulerDaemonLog(s.logger).Error("hourglass_seat_heartbeat_rearm_failed", rearmErr).
+			String("agent_id", seatID).
+			Log()
+	}
+}
 
 // handleMissedCheckin wakes the primary orchestrator about a claim that has gone silent.
 //

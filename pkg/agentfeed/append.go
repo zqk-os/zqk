@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/agentclaim"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -271,6 +272,12 @@ func AppendEvent(in AppendEventInput) (AppendEventResult, error) {
 			objects.FieldKeyPriority: "high",
 			JSONFieldFields:          event,
 		})
+	}
+
+	// Seat progress stamp: renew CAP seat hourglass when armed (absent = no-op).
+	// Kernel/ack authors must not renew a human seat's window.
+	if agentID != "" && agentID != "unknown" && agentID != FeedKernelAgentID && sender != FeedSenderChatResponder {
+		_ = agentclaim.RenewSeatHeartbeat(root, agentID)
 	}
 
 	return AppendEventResult{
