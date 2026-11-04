@@ -147,15 +147,18 @@ func TestProvider_BasePool_LifecycleAndConcurrency(t *testing.T) {
 
 	// 7. GetConnection blocks then succeeds when connection returned concurrently
 	// POL-CONCURRENCY: Managed background goroutine
+	done := make(chan struct{})
 	goroutinelabels.NewGoroutine("test_base_pool_return_worker", "returns connection to pool after sleep").
 		StartSimple(func() {
-			time.Sleep(20 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 			_ = pool.ReturnConnection(c2)
+			close(done)
 		})
 
 	c3, errC3 := pool.GetConnection(context.Background(), createConn)
 	require.NoError(t, errC3)
 	require.NotNil(t, c3)
+	<-done
 
 	// 8. ReturnConnection overflow (channel full) triggers default branch
 	extraConn := &MockConnection{BaseConnection: BaseConnection{}, store: NewMockStore()}
