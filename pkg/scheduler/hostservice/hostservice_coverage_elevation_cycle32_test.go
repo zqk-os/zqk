@@ -47,9 +47,17 @@ func TestHostServiceCycle32_Functional_InstallRebindUninstallLifecycle(t *testin
 	launchctlRunner = func(args ...string) ([]byte, error) {
 		return nil, assert.AnError
 	}
+	systemctlRunner = func(args ...string) ([]byte, error) {
+		return nil, assert.AnError
+	}
+	defer func() {
+		launchctlRunner = nil
+		systemctlRunner = nil
+	}()
 	_, installFailErr := InstallRoot(tempRoot)
 	require.Error(t, installFailErr)
 	launchctlRunner = nil
+	systemctlRunner = nil
 }
 
 func TestHostServiceCycle32_Functional_WranglerStartAndStatus(t *testing.T) {
