@@ -12,23 +12,28 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// TestTestNormalizationCycle38_StaticFloorInvariant asserts:
-// 1. docs/reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md exists and is non-empty.
-// 2. scripts/open-core/test-normalization/normalize_cycle_test_names.sh exists and is executable.
-// 3. The canonical target naming standard is enforced: zero target files contain ephemeral cycle tags.
-func TestTestNormalizationCycle38_StaticFloorInvariant(t *testing.T) {
+func findRepoRoot(t *testing.T) string {
+	t.Helper()
 	cwd, err := fileutil.Getwd()
 	require.NoError(t, err)
 
 	repoRoot := cwd
 	for {
 		if _, err := fileutil.Stat(filepath.Join(repoRoot, "go.mod")); err == nil {
-			break
+			return repoRoot
 		}
 		parent := filepath.Dir(repoRoot)
 		require.NotEqual(t, repoRoot, parent, "could not find repo root")
 		repoRoot = parent
 	}
+}
+
+// TestTestNormalizationCycle38_StaticFloorInvariant asserts:
+// 1. docs/reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md exists and is non-empty.
+// 2. scripts/open-core/test-normalization/normalize_cycle_test_names.sh exists and is executable.
+// 3. The canonical target naming standard is enforced: zero target files contain ephemeral cycle tags.
+func TestTestNormalizationCycle38_StaticFloorInvariant(t *testing.T) {
+	repoRoot := findRepoRoot(t)
 
 	mapPath := filepath.Join(repoRoot, "docs", "reports", "REPO_HYGIENE_TEST_NORMALIZATION_MAP.md")
 	content, err := fileutil.ReadFile(mapPath)
@@ -63,19 +68,7 @@ func TestTestNormalizationCycle38_StaticFloorInvariant(t *testing.T) {
 // 1. normalize_cycle_test_names.sh --check-collisions succeeds with 0 collisions.
 // 2. normalize_cycle_test_names.sh --dry-run completes cleanly without file mutations.
 func TestTestNormalizationCycle38_OperationalDynamicProof(t *testing.T) {
-	cwd, err := fileutil.Getwd()
-	require.NoError(t, err)
-
-	repoRoot := cwd
-	for {
-		if _, err := fileutil.Stat(filepath.Join(repoRoot, "go.mod")); err == nil {
-			break
-		}
-		parent := filepath.Dir(repoRoot)
-		require.NotEqual(t, repoRoot, parent, "could not find repo root")
-		repoRoot = parent
-	}
-
+	repoRoot := findRepoRoot(t)
 	scriptPath := filepath.Join(repoRoot, "scripts", "open-core", "test-normalization", "normalize_cycle_test_names.sh")
 
 	// 1. Collision check
@@ -97,19 +90,7 @@ func TestTestNormalizationCycle38_OperationalDynamicProof(t *testing.T) {
 // 1. Script rejects invalid or unsupported CLI flags fail-closed.
 // 2. Excluded in-flight Cycle 37 paths are never touched during normalization.
 func TestTestNormalizationCycle38_NegativeAdversarialBoundary(t *testing.T) {
-	cwd, err := fileutil.Getwd()
-	require.NoError(t, err)
-
-	repoRoot := cwd
-	for {
-		if _, err := fileutil.Stat(filepath.Join(repoRoot, "go.mod")); err == nil {
-			break
-		}
-		parent := filepath.Dir(repoRoot)
-		require.NotEqual(t, repoRoot, parent, "could not find repo root")
-		repoRoot = parent
-	}
-
+	repoRoot := findRepoRoot(t)
 	scriptPath := filepath.Join(repoRoot, "scripts", "open-core", "test-normalization", "normalize_cycle_test_names.sh")
 
 	// 1. Invalid flag rejected
