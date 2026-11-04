@@ -1,5 +1,13 @@
 # ZQK Agent Boot Protocol
 
+## Strict Anti-Vendor-Brain & Kernel-Native Artifact Mandate
+- **Zero Vendor-Specific Brain Directories:** Under NO circumstances should architectural artifacts, ADRs, design specifications, execution plans, triage scripts, or state be created or stored in harness-specific brain directories (e.g. `.gemini/`, `<appDataDir>/brain/`, memory caches, or transient assistant tempdirs).
+- **If it is not an object in the Knowledge Kernel CAS or checked into the repository (`docs/`, `pkg/`, `cmd/`), it does NOT exist.**
+- **Mandatory Objectification of Architectural Decisions & Artifacts:**
+  - Any architectural proposal, ADR, analysis, or design decision MUST be authored directly in the repo under `docs/architecture/` (or `docs/guides/`, `docs/specs/`).
+  - It MUST immediately be registered into the Knowledge Kernel CAS via `zqk new decision --cas` and indexed via `zqk docman register`.
+  - Harness artifacts (such as Antigravity `.md` artifacts) are ephemeral UI display mirrors ONLY; they must never serve as the canonical or sole repository of any analysis, plan, or specification.
+
 ## Orchestration & State Management
 - **Context-Bound Subagent Orchestration:** Do not use any subagent tools for orchestration without ensuring proper initialization context is included. ZQK makes this easy with tooling targeting lean, adequate context provision for prompt generation (e.g. zqk agent orchestrate, zqk agent prepare-context)—attempting to orchestrate with inadequate or irrelevant context is where execution fails.
 - All multi-agent workflows, task generation, and background processes must be executed natively using the Knowledge Kernel (e.g. zqk agent orchestrate, zqk scheduler).
