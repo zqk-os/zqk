@@ -206,7 +206,6 @@ schema_version: 2.0.0
 namespace_id: zqk:kernel
 title: Automated verification of user onboarding and starter execution graph
 description: Verify that greenfield init seeds the user familiarization graph and whats-next resolves PRI-STARTER-COMMUNITY-001 as the active lead plan.
-category: Integration
 status: active
 priority: critical
 path_or_id: cmd/zqk/system/init_starter_graph_test.go:TestInit_Greenfield_StarterKernelGraph

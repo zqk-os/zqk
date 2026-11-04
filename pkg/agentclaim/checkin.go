@@ -1,6 +1,8 @@
 package agentclaim
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -60,8 +62,17 @@ type CheckinTimer struct {
 
 var walCache sync.Map
 
-func fallbackWALPath(taskID string) string {
-	return filepath.Join(os.TempDir(), "zqk-agentclaim-wal", taskID+".json")
+// walCacheKey scopes in-memory / fallback WAL entries by project root so parallel
+// tests (and multi-root processes) with the same taskID cannot resurrect each
+// other's timers after ClearCheckin.
+func walCacheKey(projectRoot, taskID string) string {
+	return projectRoot + "|" + taskID
+}
+
+func fallbackWALPath(projectRoot, taskID string) string {
+	// Hash the root so path length stays bounded and taskIDs stay readable.
+	sum := sha256.Sum256([]byte(projectRoot))
+	return filepath.Join(os.TempDir(), "zqk-agentclaim-wal", hex.EncodeToString(sum[:8]), taskID+".json")
 }
 
 // Cadence returns the configured interval, falling back to the default when the record
@@ -103,9 +114,9 @@ func ArmCheckin(projectRoot, taskID, holder, kind string, cadence time.Duration)
 		CadenceSeconds: int(cadence.Seconds()),
 		ArmedAt:        now.Format(time.RFC3339),
 	}
-	walCache.Store(taskID, timer)
+	walCache.Store(walCacheKey(projectRoot, taskID), timer)
 	if data, err := json.Marshal(timer); err == nil {
-		walPath := fallbackWALPath(taskID)
+		walPath := fallbackWALPath(projectRoot, taskID)
 		_ = fileutil.MkdirAll(filepath.Dir(walPath), paths.DirPerm755)
 		_ = fileutil.WriteFile(walPath, data, paths.FilePerm644)
 	}
@@ -124,10 +135,10 @@ func RenewCheckin(projectRoot, taskID string) error {
 		// Explicit graceful degradation path ()
 		// If kernel storage is unresponsive, back off, read from local WAL/cache, and flag degraded mode.
 		var cachedTimer *CheckinTimer
-		if cachedRaw, ok := walCache.Load(taskID); ok {
+		if cachedRaw, ok := walCache.Load(walCacheKey(projectRoot, taskID)); ok {
 			cachedTimer = cachedRaw.(*CheckinTimer)
 		} else {
-			if walData, walErr := fileutil.ReadFile(fallbackWALPath(taskID)); walErr == nil {
+			if walData, walErr := fileutil.ReadFile(fallbackWALPath(projectRoot, taskID)); walErr == nil {
 				var wTimer CheckinTimer
 				if json.Unmarshal(walData, &wTimer) == nil {
 					cachedTimer = &wTimer
@@ -162,9 +173,9 @@ func RenewCheckin(projectRoot, taskID string) error {
 	timer.Misses = 0
 
 	// Save to WAL cache (memory and disk)
-	walCache.Store(taskID, timer)
+	walCache.Store(walCacheKey(projectRoot, taskID), timer)
 	if data, mErr := json.Marshal(timer); mErr == nil {
-		walPath := fallbackWALPath(taskID)
+		walPath := fallbackWALPath(projectRoot, taskID)
 		_ = fileutil.MkdirAll(filepath.Dir(walPath), paths.DirPerm755)
 		_ = fileutil.WriteFile(walPath, data, paths.FilePerm644)
 	}
@@ -221,8 +232,8 @@ func ClearCheckin(projectRoot, taskID string) error {
 		q.Tombstone(path)
 	}
 
-	walCache.Delete(taskID)
-	_ = fileutil.Remove(fallbackWALPath(taskID))
+	walCache.Delete(walCacheKey(projectRoot, taskID))
+	_ = fileutil.Remove(fallbackWALPath(projectRoot, taskID))
 
 	err := fileutil.Remove(path)
 	if err != nil && !fileutil.IsNotExist(err) {
@@ -245,12 +256,17 @@ func LoadCheckin(projectRoot, taskID string) (*CheckinTimer, error) {
 	}
 	timer, err := LoadCheckinFile(path)
 	if err == nil && timer != nil {
+		// Queue flush can rewrite the file after ClearCheckin tombstones the path;
+		// honor the tombstone so a cleared timer never resurrects mid-race.
+		if q := globalQueue; q != nil && q.IsTombstoned(path) {
+			return nil, nil
+		}
 		return timer, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	if v, ok := walCache.Load(taskID); ok {
+	if v, ok := walCache.Load(walCacheKey(projectRoot, taskID)); ok {
 		if t, ok := v.(*CheckinTimer); ok {
 			cp := *t
 			return &cp, nil

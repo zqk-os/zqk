@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
+	"github.com/zqk-os/zqk/pkg/idebridge"
 	"github.com/zqk-os/zqk/pkg/logging"
 )
 
@@ -79,6 +80,24 @@ func (h *PeerAckTimeoutAuditHandler) Execute(ctx context.Context, job *Scheduled
 				Sender:      agentfeed.FeedSenderMeshStatus,
 				EventType:   agentfeed.FeedEventTypeWake,
 			})
+			// AppendEvent alone does not ring MCP/agentapi or queue zqk.wake.attn.
+			// Without WakePeerOpts, TPM Composer stays idle while feed shows ATTN wakes
+			// (2026-11-04 idle disconnect: seat-worker ack-theatre + no membrane).
+			// TRACK: POL-AGENT-MESH-WAKE-001 / POL-AGENT-ORCH-HOURGLASS-001
+			wakeRes := agentfeed.WakePeerOpts(ctx, agentfeed.WakePeerOptions{
+				ProjectRoot:  h.projectRoot,
+				Message:      msg,
+				ToAgentID:    ex.FromAgentID,
+				FromAgentID:  "hourglass-peer-ack-timeout",
+				DeliveryMode: "notify",
+			})
+			// WakePeerOpts only queues zqk.wake.attn when MCP ActionRequired is
+			// already Live. Timeout audits often lack subscriber probe fields, so
+			// Composer never injects. Always queue ATTN for the await author.
+			// TRACK: POL-AGENT-MESH-WAKE-001 (2026-11-04 idle disconnect)
+			if !wakeRes.IdeBridgeQueued {
+				_ = idebridge.QueueWakeAttn(h.projectRoot, msg)
+			}
 		}
 	}
 

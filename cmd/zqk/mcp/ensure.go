@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"net"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -49,6 +50,23 @@ func runEnsure(cmd *cobra.Command, _ []string) error {
 				Log()
 		}
 
+		// Fast non-blocking probe: if port already responds, verify PID without expensive OS process scans.
+		if conn, dialErr := net.DialTimeout("tcp", target.addr, 200*time.Millisecond); dialErr == nil {
+			_ = conn.Close()
+			pid, ok := readPIDFile(target.pidFile)
+			if !ok || !processAlive(pid) {
+				pid, ok = getDaemonPIDFromPort(target.port)
+				if ok {
+					_ = writePIDFile(target.pidFile, pid)
+				}
+			}
+			logging.Fluent(target.logger).Info("mcp-daemon already listening").
+				String("addr", target.addr).
+				Int("pid", pid).
+				Log()
+			return nil
+		}
+
 		if pid, ok := getDaemonPIDFromPort(target.port); ok {
 			_ = writePIDFile(target.pidFile, pid)
 			logging.Fluent(target.logger).Info("mcp-daemon already listening").
@@ -75,10 +93,20 @@ func runEnsure(cmd *cobra.Command, _ []string) error {
 		daemonCmd.Dir = target.projectRoot
 		setDetach(daemonCmd)
 
+		devNull, nullErr := os.OpenFile(os.DevNull, os.O_RDWR, 0)
+		if nullErr == nil {
+			daemonCmd.Stdin = devNull
+			defer devNull.Close()
+		}
+
 		logF, err := fileutil.OpenAppend(logFile)
 		if err == nil {
 			daemonCmd.Stdout = logF
 			daemonCmd.Stderr = logF
+			defer logF.Close()
+		} else if nullErr == nil {
+			daemonCmd.Stdout = devNull
+			daemonCmd.Stderr = devNull
 		}
 
 		if err := daemonCmd.Start(); err != nil {
