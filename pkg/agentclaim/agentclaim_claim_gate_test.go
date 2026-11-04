@@ -532,10 +532,10 @@ func TestCycle162_Checkin_RenewCheckin_DegradedMode(t *testing.T) {
 		ClaimedBy:      "seat-wal",
 		CadenceSeconds: 60,
 	}
-	walCache.Store(taskID, cachedTimer)
+	walCache.Store(walCacheKey(root, taskID), cachedTimer)
 	t.Cleanup(func() {
-		walCache.Delete(taskID)
-		if rmErr := fileutil.Remove(fallbackWALPath(taskID)); rmErr != nil && !os.IsNotExist(rmErr) {
+		walCache.Delete(walCacheKey(root, taskID))
+		if rmErr := fileutil.Remove(fallbackWALPath(root, taskID)); rmErr != nil && !os.IsNotExist(rmErr) {
 			t.Logf("cleanup remove wal: %v", rmErr)
 		}
 		GetGlobalCheckinWriteQueue().FlushWait()

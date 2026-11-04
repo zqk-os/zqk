@@ -173,6 +173,9 @@ func (q *CheckinWriteQueue) flush() {
 
 func (q *CheckinWriteQueue) writeDirect(projectRoot string, timer *CheckinTimer) error {
 	path := CheckinTimerPath(projectRoot, timer.TaskID)
+	if q.IsTombstoned(path) {
+		return nil
+	}
 	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
 		return err
 	}

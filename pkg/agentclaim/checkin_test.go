@@ -125,16 +125,17 @@ func TestRearm_backsOffAndCaps(t *testing.T) {
 func TestClearCheckin_removesTimerAndIsIdempotent(t *testing.T) {
 	t.Parallel()
 	root := tempDir(t)
-	if err := ArmCheckin(root, "ATK-5", "who", "agent_task", time.Minute); err != nil {
+	taskID := "ATK-clear-" + t.Name()
+	if err := ArmCheckin(root, taskID, "who", "agent_task", time.Minute); err != nil {
 		t.Fatalf("ArmCheckin: %v", err)
 	}
-	if err := ClearCheckin(root, "ATK-5"); err != nil {
+	if err := ClearCheckin(root, taskID); err != nil {
 		t.Fatalf("ClearCheckin: %v", err)
 	}
-	if timer, _ := LoadCheckin(root, "ATK-5"); timer != nil {
+	if timer, _ := LoadCheckin(root, taskID); timer != nil {
 		t.Fatal("cleared timer must not survive; it would wake the orchestrator about an unheld task")
 	}
-	if err := ClearCheckin(root, "ATK-5"); err != nil {
+	if err := ClearCheckin(root, taskID); err != nil {
 		t.Fatalf("second clear must be a no-op, got %v", err)
 	}
 }
