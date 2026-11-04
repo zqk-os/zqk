@@ -333,3 +333,81 @@ func TestGenerateTracePipelineBundle_Issue504_ReusesExistingRequirementsAndCompo
 		t.Errorf("expected 0 new BacklogItems (reuse existing), got %d", len(bundle.Objects.BacklogItems))
 	}
 }
+
+// TestGenerateTracePipelineBundle_Issue913_ReqInheritsGoalRefs guards against
+// Issue GH-913 where BLIs created for a requirement do not inherit goal_refs.
+func TestGenerateTracePipelineBundle_Issue913_ReqInheritsGoalRefs(t *testing.T) {
+	// 1. Requirement with goal_refs as []string
+	reqObjSlice := map[string]any{
+		"_kind":                  objects.KindRequirement,
+		objects.FieldKeyTitle:    "Hardened Ingestion Pipeline",
+		objects.FieldKeyGoalRefs: []string{"GOAL-INGEST-001"},
+	}
+
+	bundle, _, _ := generateTracePipelineBundle("REQ-INGEST-001", reqObjSlice, nil)
+	if bundle == nil {
+		t.Fatal("expected bundle for Requirement target")
+	}
+	if len(bundle.Objects.BacklogItems) != 3 {
+		t.Fatalf("expected 3 BacklogItems, got %d", len(bundle.Objects.BacklogItems))
+	}
+	for idx, bli := range bundle.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-INGEST-001" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-INGEST-001'], got %v", idx, bli.GoalRefs)
+		}
+	}
+
+	// 2. Requirement with goal_refs as []any
+	reqObjAny := map[string]any{
+		"_kind":                  objects.KindRequirement,
+		objects.FieldKeyTitle:    "Hardened Ingestion Pipeline Any",
+		objects.FieldKeyGoalRefs: []any{"GOAL-ANY-002"},
+	}
+	bundleAny, _, _ := generateTracePipelineBundle("REQ-INGEST-002", reqObjAny, nil)
+	if bundleAny == nil {
+		t.Fatal("expected bundle for Requirement target")
+	}
+	for idx, bli := range bundleAny.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-ANY-002" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-ANY-002'], got %v", idx, bli.GoalRefs)
+		}
+	}
+
+	// 3. Requirement with singular goal_ref string
+	reqObjSingle := map[string]any{
+		"_kind":               objects.KindRequirement,
+		objects.FieldKeyTitle: "Hardened Ingestion Pipeline Single",
+		"goal_ref":            "GOAL-SINGLE-003",
+	}
+	bundleSingle, _, _ := generateTracePipelineBundle("REQ-INGEST-003", reqObjSingle, nil)
+	if bundleSingle == nil {
+		t.Fatal("expected bundle for Requirement target")
+	}
+	for idx, bli := range bundleSingle.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-SINGLE-003" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-SINGLE-003'], got %v", idx, bli.GoalRefs)
+		}
+	}
+
+	// 4. Requirement with goal_refs found in criteriaNeighbors
+	reqObjNeighbor := map[string]any{
+		"_kind":               objects.KindRequirement,
+		objects.FieldKeyTitle: "Neighbor Pipeline Target",
+	}
+	reqNeighbors := []map[string]any{
+		{
+			"_kind":                  objects.KindRequirement,
+			objects.FieldKeyID:       "REQ-NEIGHBOR-004",
+			objects.FieldKeyGoalRefs: []string{"GOAL-FROM-REQ-004"},
+		},
+	}
+	bundleNeighbor, _, _ := generateTracePipelineBundle("REQ-NEIGHBOR-004", reqObjNeighbor, reqNeighbors)
+	if bundleNeighbor == nil {
+		t.Fatal("expected bundle for Requirement target")
+	}
+	for idx, bli := range bundleNeighbor.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-FROM-REQ-004" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-FROM-REQ-004'], got %v", idx, bli.GoalRefs)
+		}
+	}
+}

@@ -41,6 +41,7 @@ func NewObjectCountCommandBuilder() *cobra.Command {
 	builder.AddStringFlag("namespace", "", "", "Restrict counts to this namespace_id (when omitted, default kernel isolation applies)")
 	builder.AddBoolFlag("federated", "", false, "Disable namespace isolation and count across all namespaces")
 	builder.AddBoolFlag("all-namespaces", "", false, "Alias for --federated")
+	builder.AddStringFlag("kind", "", "", "Object kind to count (can also be specified as positional argument)")
 	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"format", "output", "verbose", "quiet", "timeout", "columns"})
 	cmd := builder.Build()
 	return cmd

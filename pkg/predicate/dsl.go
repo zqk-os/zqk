@@ -98,8 +98,11 @@ var prosePrefixToGate = []struct {
 		gate: GateCriteriaActiveTestCase,
 	},
 	{
-		prefixes: []string{"at least one ready backlog_item references this plan"},
-		gate:     GateReadyBacklogReferencesPlan,
+		prefixes: []string{
+			"at least one planned backlog_item references this plan",
+			"at least one ready backlog_item references this plan",
+		},
+		gate: GateReadyBacklogReferencesPlan,
 	},
 	{
 		prefixes: []string{"all linked backlog_items referencing this plan are ready or later"},

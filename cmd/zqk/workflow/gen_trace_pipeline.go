@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"fmt"
 	"strings"
@@ -15,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/scenario"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"gopkg.in/yaml.v3"
 )
 
@@ -256,11 +258,63 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 
 	// Generate atomic backlog items implementing criteria (Shift-Left 2-5 BLIs per plan mandate)
 	if needBLI {
-		atomicBLIs := generateAtomicBacklogItems(title, targetID, targetReqID, pipelineStatus, ts, allCriteria, allTestCases, obj)
+		atomicBLIs := generateAtomicBacklogItems(title, targetID, targetReqID, pipelineStatus, ts, allCriteria, allTestCases, obj, criteriaNeighbors)
 		bundle.Objects.BacklogItems = append(bundle.Objects.BacklogItems, atomicBLIs...)
 	}
 
 	return bundle, allCriteria, needCriteria
+}
+
+// GenerateTracePipelineBundle is the exported form of generateTracePipelineBundle for testing and community callers.
+func GenerateTracePipelineBundle(targetID string, obj map[string]any, criteriaNeighbors []map[string]any, targetCriteriaCount ...int) (*scenario.Bundle, []string, bool) {
+	return generateTracePipelineBundle(targetID, obj, criteriaNeighbors, targetCriteriaCount...)
+}
+
+// extractGoalRefs extracts goal references from an object map in a type-safe manner.
+func extractGoalRefs(obj map[string]any) []string {
+	if obj == nil {
+		return nil
+	}
+	var res []string
+	seen := make(map[string]bool)
+	add := func(val string) {
+		val = strings.TrimSpace(val)
+		if val != "" && val != "<nil>" && !seen[val] {
+			seen[val] = true
+			res = append(res, val)
+		}
+	}
+	parseAny := func(v any) {
+		switch val := v.(type) {
+		case string:
+			for _, part := range strings.Split(val, ",") {
+				add(part)
+			}
+		case []string:
+			for _, s := range val {
+				add(s)
+			}
+		case []any:
+			for _, item := range val {
+				add(fmt.Sprint(item))
+			}
+		}
+	}
+
+	if grefs, ok := obj[objects.FieldKeyGoalRefs]; ok && grefs != nil {
+		parseAny(grefs)
+	}
+	if len(res) == 0 {
+		if grefs, ok := obj["goal_refs"]; ok && grefs != nil {
+			parseAny(grefs)
+		}
+	}
+	if len(res) == 0 {
+		if gref, ok := obj["goal_ref"]; ok && gref != nil {
+			parseAny(gref)
+		}
+	}
+	return res
 }
 
 // generateAtomicBacklogItems slices criteria across discrete atomic units of effort.
@@ -273,6 +327,7 @@ func generateAtomicBacklogItems(
 	allCriteria []string,
 	allTestCases []string,
 	obj map[string]any,
+	criteriaNeighbors ...[]map[string]any,
 ) []scenario.BacklogTemplate {
 	var bliReqRefs []string
 	if strings.HasPrefix(targetReqID, "REQ-") {
@@ -285,11 +340,38 @@ func generateAtomicBacklogItems(
 	var bliGoalRefs []string
 	if strings.HasPrefix(targetID, "GOAL-") {
 		bliGoalRefs = []string{targetID}
-	} else if grefs, ok := obj[objects.FieldKeyGoalRefs].([]any); ok {
-		for _, g := range grefs {
-			s := strings.TrimSpace(fmt.Sprint(g))
-			if s != "" && s != "<nil>" {
-				bliGoalRefs = append(bliGoalRefs, s)
+	} else {
+		bliGoalRefs = extractGoalRefs(obj)
+	}
+	if len(bliGoalRefs) == 0 {
+		if len(criteriaNeighbors) > 0 {
+			for _, n := range criteriaNeighbors[0] {
+				k, _ := n["_kind"].(string)
+				id, _ := n[objects.FieldKeyID].(string)
+				if id == targetReqID || k == objects.KindRequirement || strings.HasPrefix(id, "REQ-") {
+					if g := extractGoalRefs(n); len(g) > 0 {
+						bliGoalRefs = g
+						break
+					}
+				}
+			}
+		}
+	}
+	if len(bliGoalRefs) == 0 && strings.HasPrefix(targetReqID, "REQ-") {
+		var sp storage.ObjectStorageProvider
+		if zqkenv.IsInTest() {
+			if testRoot := zqkenv.TestRoot().Get(); testRoot != "" {
+				sp, _ = storage.GetFileObjectStorageForTest(testRoot)
+			}
+		} else {
+			root := cli.ResolveProjectRoot(".")
+			if root != "" {
+				sp, _ = storage.GetFileObjectStorage(root)
+			}
+		}
+		if sp != nil {
+			if reqObj, rerr := sp.Read(context.Background(), nil, targetReqID); rerr == nil && reqObj != nil {
+				bliGoalRefs = extractGoalRefs(reqObj)
 			}
 		}
 	}

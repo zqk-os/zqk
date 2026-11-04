@@ -158,7 +158,7 @@ const (
 	PrecondPriorityPlanArchivedWhenSet = "linked priority_plan is archived when priority_plan_ref is set"
 	// PrecondReadyBacklogReferencesPlan is child-owned priority_plan membership:
 	// ≥1 backlog_item with priority_plan_ref=this plan and status planned (conversational "ready").
-	PrecondReadyBacklogReferencesPlan = "at least one ready backlog_item references this plan via priority_plan_ref"
+	PrecondReadyBacklogReferencesPlan = "at least one planned backlog_item references this plan via priority_plan_ref"
 	// PrecondTeamOrPersonaDispatchRefs gates priority_plan shovel-ready / execution-locked
 	// transitions so CAP cannot fall back to every persona. TRACK
 	PrecondTeamOrPersonaDispatchRefs = "at least one team_configuration_ref or persona_refs"

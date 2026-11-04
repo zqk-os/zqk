@@ -44,6 +44,7 @@ func NewObjectListCommandBuilder() *cobra.Command {
 	builder.AddStringFlag("namespace", "", "", "Restrict results to this namespace_id (when omitted, default kernel isolation applies)")
 	builder.AddBoolFlag("federated", "", false, "Disable namespace isolation and query across all namespaces")
 	builder.AddBoolFlag("all-namespaces", "", false, "Alias for --federated")
+	builder.AddStringFlag("kind", "", "", "Object kind to list (can also be specified as positional argument)")
 	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"format", "output", "verbose", "quiet", "timeout", "columns"})
 	builder.WithQueryFlags()
 	cmd := builder.Build()

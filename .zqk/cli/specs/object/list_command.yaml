@@ -32,6 +32,10 @@ flags:
     type: "bool"
     default: false
     description: "Alias for --federated"
+  - name: "kind"
+    type: "string"
+    default: ""
+    description: "Object kind to list (can also be specified as positional argument)"
 
 help:
   examples:

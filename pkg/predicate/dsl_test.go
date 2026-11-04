@@ -114,6 +114,7 @@ func TestCompilePrecondition(t *testing.T) {
 		{"shovel ready", "shovel_ready", true},
 		{"all linked criteria_refs bound to active test_case_refs (tdd red phase)", "tdd_test_red_phase", true},
 		{"at least one active test_case_ref linked", "criteria_active_test_case", true},
+		{"at least one planned backlog_item references this plan via priority_plan_ref", "ready_backlog_references_plan", true},
 		{"at least one ready backlog_item references this plan via priority_plan_ref", "ready_backlog_references_plan", true},
 		{"all linked backlog_items referencing this plan are ready or later", "linked_backlog_ready_or_later", true},
 		{"all linked backlog_items referencing this plan are terminal", "linked_backlog_all_terminal", true},

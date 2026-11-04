@@ -145,6 +145,7 @@ var precondDecideRules = []precondDecideRule{
 	}),
 	matchOverlayContains("shovel_ready", PrecondCRIShovelReady),
 	matchOverlayExact("ready_backlog_references_plan", PrecondReadyBacklogReferencesPlan),
+	matchOverlayExact("ready_backlog_references_plan", "at least one ready backlog_item references this plan via priority_plan_ref"),
 	matchOverlayExact("linked_backlog_ready_or_later", PrecondAllLinkedBacklogReadyOrLater),
 	matchOverlayExact("linked_backlog_all_terminal", PrecondLinkedBacklogAllTerminal),
 	matchOverlayExact("no_linked_backlog_in_progress_or_complete", PrecondNoLinkedBacklogInProgressOrComplete),

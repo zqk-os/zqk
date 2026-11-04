@@ -50,26 +50,35 @@ func NewGetCmd() *cobra.Command {
 	// resolved sidecar (not CAS)
 	cmd.Flags().Bool("write-resolved-sidecar", false, "Write hydration overlay to .zqk/resolved/… sidecar (CAS get stays raw when combined with --resolved-sidecar-only)")
 	cmd.Flags().Bool("resolved-sidecar-only", false, "After hydrating, write sidecar and emit raw CAS object (no resolved_* in stdout)")
+	cmd.Flags().String("kind", "", "Object kind (optional, inferred from ID)")
 	return cmd
 }
 
 func runGet(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var rawIDs []string
-		// Backwards compatibility for single get with kind and ID
-		if len(args) == 2 && !cmd.Flags().Changed("file") && !cmd.Flags().Changed("ids") {
-			var id string
-			if strings.Contains(args[1], "-") {
-				id = args[1]
-			} else if strings.Contains(args[0], "-") {
-				id = args[0]
-			} else {
-				id = args[1]
+		kindFlag, _ := cmd.Flags().GetString("kind")
+		kindFlag = strings.TrimSpace(kindFlag)
+		if kindFlag != "" {
+			if _, err := objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), kindFlag); err != nil {
+				return cli.Guard(cmd).Err(err).Return()
 			}
-			rawIDs = append(rawIDs, id)
-		} else {
-			rawIDs = expandObjectIDArgs(cmd, args)
 		}
+
+		idArgs := args
+		if kindFlag == "" && len(args) >= 2 {
+			if !strings.Contains(args[0], ",") && !strings.Contains(args[0], "-") {
+				if _, err := objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0]); err == nil {
+					idArgs = args[1:]
+				}
+			} else if len(args) == 2 && !strings.Contains(args[1], ",") && !strings.Contains(args[1], "-") {
+				// Backwards compatibility for single get with ID then kind
+				if _, err := objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[1]); err == nil {
+					idArgs = args[:1]
+				}
+			}
+		}
+
+		rawIDs := expandObjectIDArgs(cmd, idArgs)
 		// get --file is an ID YAML array
 		if cmd.Flags().Changed("file") && !cmd.Flags().Changed("ids") {
 			idsFromFlags, err := clipkg.LoadIDsFromFlags(cmd, proc.Logger())

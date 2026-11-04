@@ -81,7 +81,7 @@ func (b *PriorityPlanLifecycleBuilder) addPriorityPlanLifecycleData() {
 		Value:   "active",
 		Display: "Active (shovel-ready)",
 		Preconditions: []string{
-			"at least one ready backlog_item references this plan via priority_plan_ref",
+			"at least one planned backlog_item references this plan via priority_plan_ref",
 			"all linked backlog_items referencing this plan are ready or later",
 			"no linked backlog_items referencing this plan are in progress or complete",
 			"at least one team_configuration_ref or persona_refs",
@@ -159,7 +159,7 @@ func (b *PriorityPlanLifecycleBuilder) addPriorityPlanLifecycleData() {
 		Manual:      true,
 		Auto:        false,
 		Preconditions: []string{
-			"at least one ready backlog_item references this plan via priority_plan_ref",
+			"at least one planned backlog_item references this plan via priority_plan_ref",
 			"all linked backlog_items referencing this plan are ready or later",
 			"no linked backlog_items referencing this plan are in progress or complete",
 			"at least one team_configuration_ref or persona_refs",
