@@ -28,6 +28,16 @@ func findRepoRoot(t *testing.T) string {
 	}
 }
 
+func runNormalizationScript(t *testing.T, args ...string) ([]byte, error) {
+	t.Helper()
+	repoRoot := findRepoRoot(t)
+	scriptPath := filepath.Join(repoRoot, "scripts", "open-core", "test-normalization", "normalize_cycle_test_names.sh")
+	fullArgs := append([]string{scriptPath}, args...)
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", fullArgs...)
+	cmd.Dir = repoRoot
+	return cmd.CombinedOutput()
+}
+
 // TestTestNormalizationCycle38_StaticFloorInvariant asserts:
 // 1. docs/reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md exists and is non-empty.
 // 2. scripts/open-core/test-normalization/normalize_cycle_test_names.sh exists and is executable.
@@ -68,20 +78,13 @@ func TestTestNormalizationCycle38_StaticFloorInvariant(t *testing.T) {
 // 1. normalize_cycle_test_names.sh --check-collisions succeeds with 0 collisions.
 // 2. normalize_cycle_test_names.sh --dry-run completes cleanly without file mutations.
 func TestTestNormalizationCycle38_OperationalDynamicProof(t *testing.T) {
-	repoRoot := findRepoRoot(t)
-	scriptPath := filepath.Join(repoRoot, "scripts", "open-core", "test-normalization", "normalize_cycle_test_names.sh")
-
 	// 1. Collision check
-	cmdCol := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--check-collisions")
-	cmdCol.Dir = repoRoot
-	outCol, errCol := cmdCol.CombinedOutput()
+	outCol, errCol := runNormalizationScript(t, "--check-collisions")
 	require.NoError(t, errCol, "collision check must exit 0: %s", string(outCol))
 	assert.Contains(t, string(outCol), "0 collisions detected", "collision check must report zero collisions")
 
 	// 2. Dry run execution
-	cmdDry := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--dry-run")
-	cmdDry.Dir = repoRoot
-	outDry, errDry := cmdDry.CombinedOutput()
+	outDry, errDry := runNormalizationScript(t, "--dry-run")
 	require.NoError(t, errDry, "dry-run must exit 0: %s", string(outDry))
 	assert.Contains(t, string(outDry), "Dry-run complete", "dry-run must complete cleanly")
 }
@@ -90,20 +93,13 @@ func TestTestNormalizationCycle38_OperationalDynamicProof(t *testing.T) {
 // 1. Script rejects invalid or unsupported CLI flags fail-closed.
 // 2. Excluded in-flight Cycle 37 paths are never touched during normalization.
 func TestTestNormalizationCycle38_NegativeAdversarialBoundary(t *testing.T) {
-	repoRoot := findRepoRoot(t)
-	scriptPath := filepath.Join(repoRoot, "scripts", "open-core", "test-normalization", "normalize_cycle_test_names.sh")
-
 	// 1. Invalid flag rejected
-	cmdInvalid := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--invalid-dangerous-flag")
-	cmdInvalid.Dir = repoRoot
-	outInvalid, errInvalid := cmdInvalid.CombinedOutput()
+	outInvalid, errInvalid := runNormalizationScript(t, "--invalid-dangerous-flag")
 	assert.Error(t, errInvalid, "script must reject invalid flags with non-zero exit")
 	assert.Contains(t, string(outInvalid), "Usage:", "script must output usage on invalid option")
 
 	// 2. Verify Cycle 37 files are marked DEFERRED in dry-run
-	cmdDry := testkit.ManagedCommand(t, t.Context(), "bash", scriptPath, "--dry-run")
-	cmdDry.Dir = repoRoot
-	outDry, errDry := cmdDry.CombinedOutput()
+	outDry, errDry := runNormalizationScript(t, "--dry-run")
 	require.NoError(t, errDry)
 	assert.Contains(t, string(outDry), "DEFERRED (Cycle 37)", "must explicitly defer active Cycle 37 test files")
 }
