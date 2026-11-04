@@ -879,6 +879,7 @@ func hasTransitiveCycle(ctx context.Context, secCtx *pkgctx.SecurityContext, sto
 }
 
 func cleanLegacyKeys(existingObj map[string]any, updates map[string]any) {
+	kind, _ := existingObj[objects.FieldKeyKind].(string)
 	legacyFields := []string{
 		"category", "phase", "date_captured", "group", "origin_project", "origin_system",
 		"acceptance_criteria", "spec_adherence", "context", "date", "spec_refs",
@@ -888,6 +889,9 @@ func cleanLegacyKeys(existingObj map[string]any, updates map[string]any) {
 		"event_type", "operation", "benefits", "components", "considerations",
 	}
 	for _, f := range legacyFields {
+		if f == "category" && kind == objects.KindCriteria {
+			continue
+		}
 		if _, ok := existingObj[f]; ok {
 			updates[f] = storage.FieldUnset
 		}

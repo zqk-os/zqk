@@ -12,8 +12,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zqk-os/zqk/pkg/execwrap"
-
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -181,7 +179,7 @@ func (w *RuntimeWrangler) Stop() error {
 	_ = fileutil.Remove(mcpPidFile)
 
 	// 3. Stop LaunchAgents if darwin
-	if runtime.GOOS == "darwin" {
+	if (runtime.GOOS == "darwin" || launchctlRunner != nil) && (!isHostServiceLiveDisabled() || launchctlRunner != nil) {
 		home, _ := fileutil.UserHomeDir()
 		labels := []string{
 			UnitLabel(rootID),
@@ -189,9 +187,14 @@ func (w *RuntimeWrangler) Stop() error {
 			"com.zqk.mesh.tpm-agy-watchdog",
 		}
 		for _, label := range labels {
+			if strings.TrimSpace(label) == "" {
+				continue
+			}
 			plist := filepath.Join(home, "Library", "LaunchAgents", label+".plist")
-			_ = execwrap.Command("launchctl", "bootout", "gui/"+strconv.Itoa(os.Getuid()), plist).Run()
-			_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
+			if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
+				_ = launchctlCmd("bootout", "gui/"+strconv.Itoa(os.Getuid()), plist)
+				_ = launchctlCmd("unload", "-w", plist)
+			}
 		}
 	}
 
@@ -221,10 +224,10 @@ func readPidFile(path string) (int, bool) {
 }
 
 func inspectLaunchAgent(label string) (int, bool, string) {
-	if runtime.GOOS != "darwin" {
+	if runtime.GOOS != "darwin" && launchctlRunner == nil {
 		return 0, false, "unsupported OS"
 	}
-	out, err := execwrap.Command("launchctl", "list").Output()
+	out, err := launchctlOutput("list")
 	if err != nil {
 		return 0, false, "launchctl error"
 	}
