@@ -18,6 +18,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 
+	"github.com/zqk-os/zqk/pkg/agentclaim"
+	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -124,6 +126,34 @@ func (h *CapOrchestratorHandler) wakeAgentAndScheduleHourglass(taskID, persona s
 	if data, err := json.Marshal(info); err == nil {
 		_ = fileutil.WriteFile(filePath, data, paths.FilePerm644)
 	}
+
+	// Seat liveness hourglass: Composer/CAP seats need heartbeat renewals, not only
+	// ATK deadline files. Arm (or reset) for the mesh seat bound to this persona.
+	if seatID := resolveCAPWakeSeatID(h.projectRoot, persona); seatID != "" {
+		if err := agentclaim.ArmSeatHeartbeat(h.projectRoot, seatID, agentclaim.DefaultSeatHeartbeatCadence); err != nil {
+			h.logger.Error("cap_orchestrator_seat_heartbeat_arm_failed", err,
+				logging.String("agent_id", seatID),
+				logging.String("persona", persona),
+			)
+		}
+	}
+}
+
+// resolveCAPWakeSeatID maps a CAP wake persona to a mesh seat agent_id.
+func resolveCAPWakeSeatID(projectRoot, persona string) string {
+	persona = strings.TrimSpace(persona)
+	if persona == "" {
+		return ""
+	}
+	if seat := agentfeed.WorkerSeatForPersona(projectRoot, persona); seat != "" {
+		return seat
+	}
+	// Persona labels like "tpm" often match coordinator seats via duty/wake membrane.
+	if seat := agentfeed.CoordinatorSeatID(projectRoot); seat != "" &&
+		(strings.EqualFold(persona, "tpm") || strings.Contains(strings.ToLower(persona), "tpm")) {
+		return seat
+	}
+	return ""
 }
 
 // resolveWakePlanID returns taskID when it is a PRI-*, else the first active priority_plan.
