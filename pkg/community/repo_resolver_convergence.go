@@ -127,15 +127,17 @@ type ConvergenceEvaluation struct {
 // RepoResolverConvergenceSession orchestrates pipeline convergence tracking and policy evaluation.
 type RepoResolverConvergenceSession struct {
 	mu              sync.RWMutex
-	SessionID       string                     `json:"session_id" yaml:"session_id"`
-	Schema          string                     `json:"schema" yaml:"schema"`
-	PersonaRef      string                     `json:"persona_ref" yaml:"persona_ref"`
-	CreatedAt       time.Time                  `json:"created_at" yaml:"created_at"`
-	Status          string                     `json:"status" yaml:"status"`
-	Policies        []ConvergencePolicyOption  `json:"policies" yaml:"policies"`
-	TelemetryEngine *PipelineTelemetryEngine   `json:"-" yaml:"-"`
-	TrackingMatrix  *ConvergenceTrackingMatrix `json:"tracking_matrix,omitempty" yaml:"tracking_matrix,omitempty"`
-	Evaluations     []ConvergenceEvaluation    `json:"evaluations,omitempty" yaml:"evaluations,omitempty"`
+	SessionID       string                        `json:"session_id" yaml:"session_id"`
+	Schema          string                        `json:"schema" yaml:"schema"`
+	PersonaRef      string                        `json:"persona_ref" yaml:"persona_ref"`
+	CreatedAt       time.Time                     `json:"created_at" yaml:"created_at"`
+	Status          string                        `json:"status" yaml:"status"`
+	Policies        []ConvergencePolicyOption     `json:"policies" yaml:"policies"`
+	TelemetryEngine *PipelineTelemetryEngine      `json:"-" yaml:"-"`
+	TrackingMatrix  *ConvergenceTrackingMatrix    `json:"tracking_matrix,omitempty" yaml:"tracking_matrix,omitempty"`
+	Evaluations     []ConvergenceEvaluation       `json:"evaluations,omitempty" yaml:"evaluations,omitempty"`
+	Issues          map[int]GitHubIssue           `json:"issues,omitempty" yaml:"issues,omitempty"`
+	Resolutions     map[int]GitHubIssueResolution `json:"resolutions,omitempty" yaml:"resolutions,omitempty"`
 }
 
 // DefaultConvergencePolicies returns canonical baseline convergence policies.
@@ -230,6 +232,8 @@ func NewRepoResolverConvergenceSession(sessionID, personaRef string, policies []
 		Policies:        policies,
 		TelemetryEngine: NewPipelineTelemetryEngine(DefaultMaxDiagnosticBatchSize),
 		Evaluations:     make([]ConvergenceEvaluation, 0),
+		Issues:          make(map[int]GitHubIssue),
+		Resolutions:     make(map[int]GitHubIssueResolution),
 	}, nil
 }
 
@@ -319,17 +323,26 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 	evalID := fmt.Sprintf("eval-%s-%d", s.SessionID, len(s.Evaluations)+1)
 
 	// Boundary condition: No telemetry metrics recorded yet
+	pendingCrit := s.countPendingCriticalIssuesLocked()
 	if matrix.TotalSteps == 0 {
+		status := ConvergenceStatusPending
+		action := PolicyActionNone
+		rationale := "No pipeline telemetry records available; awaiting execution metrics"
+		if pendingCrit > 0 {
+			status = ConvergenceStatusActionRequired
+			action = PolicyActionTriageFailures
+			rationale = fmt.Sprintf("No pipeline telemetry records available, but %d critical GitHub issue(s) require triage", pendingCrit)
+		}
 		evaluation := ConvergenceEvaluation{
 			EvaluationID:      evalID,
 			SessionID:         s.SessionID,
 			Timestamp:         now,
-			Status:            ConvergenceStatusPending,
+			Status:            status,
 			ConvergenceScore:  0.0,
-			Rationale:         "No pipeline telemetry records available; awaiting execution metrics",
-			RecommendedAction: PolicyActionNone,
+			Rationale:         rationale,
+			RecommendedAction: action,
 		}
-		s.Status = ConvergenceStatusPending
+		s.Status = status
 		s.Evaluations = append(s.Evaluations, evaluation)
 		return &evaluation, nil
 	}
@@ -366,7 +379,10 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 
 		switch policy.Action {
 		case PolicyActionAdvanceCycle:
-			if matrix.ConvergenceScore >= 1.0 && matrix.FailureCount == 0 {
+			if pendingCrit > 0 {
+				decision.Applicable = false
+				decision.DecisionReason = fmt.Sprintf("Pipeline succeeded but convergence blocked by %d pending critical GitHub issue(s)", pendingCrit)
+			} else if matrix.ConvergenceScore >= 1.0 && matrix.FailureCount == 0 {
 				decision.Applicable = true
 				if len(bottlenecks) > 0 {
 					decision.MatchScore = policy.Weight * 0.5
@@ -382,6 +398,14 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 
 		case PolicyActionTriageFailures:
 			switch {
+			case pendingCrit > 0:
+				decision.Applicable = true
+				deficit := 0.0
+				if matrix.ConvergenceScore < 1.0 {
+					deficit = 1.0 - matrix.ConvergenceScore
+				}
+				decision.MatchScore = policy.Weight * (1.0 + float64(pendingCrit)*0.25 + deficit)
+				decision.DecisionReason = fmt.Sprintf("Critical failure triage required: %d pending critical GitHub issue(s) detected", pendingCrit)
 			case policy.ThresholdScore > 0 && matrix.ConvergenceScore < policy.ThresholdScore:
 				decision.Applicable = true
 				deficit := policy.ThresholdScore - matrix.ConvergenceScore
@@ -515,6 +539,10 @@ func (s *RepoResolverConvergenceSession) EvaluateConvergence() (*ConvergenceEval
 		sessionStatus = ConvergenceStatusDegraded
 		recommendedAction = PolicyActionTriageFailures
 		rationale = fmt.Sprintf("Pipeline has %d failures across %d steps", matrix.FailureCount, matrix.TotalSteps)
+	case pendingCrit > 0:
+		sessionStatus = ConvergenceStatusActionRequired
+		recommendedAction = PolicyActionTriageFailures
+		rationale = fmt.Sprintf("Pipeline passed but %d critical GitHub issue(s) require triage", pendingCrit)
 	}
 
 	evaluation := ConvergenceEvaluation{
@@ -550,13 +578,16 @@ func (s *RepoResolverConvergenceSession) ExportSessionSummary() map[string]any {
 	defer s.mu.RUnlock()
 
 	summary := map[string]any{
-		"session_id":        s.SessionID,
-		"schema":            s.Schema,
-		"persona_ref":       s.PersonaRef,
-		"status":            s.Status,
-		"created_at":        s.CreatedAt.Format(time.RFC3339),
-		"policies_count":    len(s.Policies),
-		"evaluations_count": len(s.Evaluations),
+		"session_id":                    s.SessionID,
+		"schema":                        s.Schema,
+		"persona_ref":                   s.PersonaRef,
+		"status":                        s.Status,
+		"created_at":                    s.CreatedAt.Format(time.RFC3339),
+		"policies_count":                len(s.Policies),
+		"evaluations_count":             len(s.Evaluations),
+		"pending_issues_count":          len(s.listPendingGitHubIssuesLocked()),
+		"resolved_issues_count":         len(s.Resolutions),
+		"pending_critical_issues_count": s.countPendingCriticalIssuesLocked(),
 	}
 	if s.TrackingMatrix != nil {
 		summary["total_steps"] = s.TrackingMatrix.TotalSteps
