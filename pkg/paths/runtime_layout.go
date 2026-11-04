@@ -82,6 +82,11 @@ func SessionStatePath(projectRoot string) string {
 	return filepath.Join(StateDirPath(projectRoot), SessionStateFile)
 }
 
+// LivenessSocketPath returns the absolute path to the ambient liveness datagram socket (.zqk/state/liveness.sock).
+func LivenessSocketPath(projectRoot string) string {
+	return filepath.Join(StateDirPath(projectRoot), LivenessSocketFile)
+}
+
 // ObserverTipsPath returns the AST observer coach cache file under state/.
 func ObserverTipsPath(projectRoot string) string {
 	return filepath.Join(StateDirPath(projectRoot), ObserverTipsFile)

@@ -89,6 +89,8 @@ const (
 	StateDir        = "state"
 	// SessionStateFile is the persisted CLI session id under StateDir.
 	SessionStateFile = "session"
+	// LivenessSocketFile is the connectionless datagram pulse bus socket under StateDir.
+	LivenessSocketFile = "liveness.sock"
 	// CredentialsFile is the home-dir session token filename under ProjectDataDir.
 	CredentialsFile       = "credentials"
 	StreamCurrentSubdir   = "stream_current" // Runtime deltas for stream-backed kinds (no CAS hash); see HIGH_VOLUME_STORAGE_DEPRECATION.md
@@ -352,11 +354,12 @@ const (
 // Default POSIX permissions for directories and files created under the project tree.
 // Use these instead of raw octal literals so linters and code search stay consistent.
 const (
-	DirPerm700  fs.FileMode = 0o700 // e.g. .zqk/process/keystore (credential material)
-	DirPerm750  fs.FileMode = 0o750 // e.g. scheduler health artifacts (owner + group r-x)
-	DirPerm755  fs.FileMode = 0o755
-	FilePerm600 fs.FileMode = 0o600
-	FilePerm644 fs.FileMode = 0o644
-	FilePerm755 fs.FileMode = 0o755 // e.g. executable scripts, binaries, test runners
-	FilePerm700 fs.FileMode = 0o700 // e.g. private executable scripts, key material
+	DirPerm700    fs.FileMode = 0o700 // e.g. .zqk/process/keystore (credential material)
+	DirPerm750    fs.FileMode = 0o750 // e.g. scheduler health artifacts (owner + group r-x)
+	DirPerm755    fs.FileMode = 0o755
+	FilePerm600   fs.FileMode = 0o600
+	FilePerm644   fs.FileMode = 0o644
+	FilePerm755   fs.FileMode = 0o755 // e.g. executable scripts, binaries, test runners
+	FilePerm700   fs.FileMode = 0o700 // e.g. private executable scripts, key material
+	SocketPerm666 fs.FileMode = 0o666 // e.g. unix domain socket readable and writable by peer processes
 )
