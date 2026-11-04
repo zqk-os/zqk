@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
@@ -13,6 +14,19 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// isHostServiceLiveDisabled returns true if live host launchctl operations
+// should be suppressed (e.g. during automated test execution or explicit env disable)
+// to prevent tearing down the operator's active desktop/GUI session.
+func isHostServiceLiveDisabled() bool {
+	if testing.Testing() {
+		return true
+	}
+	if os.Getenv("ZQK_DISABLE_HOSTSERVICE_MUTATION") != "" {
+		return true
+	}
+	return false
+}
 
 // DarwinAdapter manages LaunchAgents for per-root scheduler daemons.
 type DarwinAdapter struct{}
@@ -89,6 +103,9 @@ func (a DarwinAdapter) Install(e Entry) error {
 	if err := fileutil.WriteFile(plist, []byte(body), paths.FilePerm644); err != nil {
 		return errfmt.Newf("write LaunchAgent plist").Wrap(err)
 	}
+	if isHostServiceLiveDisabled() {
+		return nil
+	}
 	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid(), plist).Run()
 	if err := execwrap.Command("launchctl", "bootstrap", "gui/"+uid(), plist).Run(); err != nil {
 		// Older macOS: load
@@ -100,14 +117,26 @@ func (a DarwinAdapter) Install(e Entry) error {
 }
 
 func (a DarwinAdapter) Uninstall(e Entry) error {
+	if strings.TrimSpace(e.UnitLabel) == "" {
+		return nil
+	}
 	plist := a.plistPath(e)
-	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid(), plist).Run()
-	_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
+	if isHostServiceLiveDisabled() {
+		_ = fileutil.Remove(plist)
+		return nil
+	}
+	if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
+		_ = execwrap.Command("launchctl", "bootout", "gui/"+uid(), plist).Run()
+		_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
+	}
 	_ = fileutil.Remove(plist)
 	return nil
 }
 
 func (a DarwinAdapter) prepareUnitControl(e Entry) (plist, domain string, err error) {
+	if strings.TrimSpace(e.UnitLabel) == "" {
+		return "", "", errfmt.Errorf("empty unit label")
+	}
 	if err := refuseIfCallerDescendsFromUnit(e); err != nil {
 		return "", "", err
 	}
@@ -118,6 +147,9 @@ func (a DarwinAdapter) Start(e Entry) error {
 	plist, domain, err := a.prepareUnitControl(e)
 	if err != nil {
 		return err
+	}
+	if isHostServiceLiveDisabled() {
+		return nil
 	}
 	// Stop boots the job out of the domain; Start must bootstrap again.
 	if err := execwrap.Command("launchctl", "bootstrap", domain, plist).Run(); err != nil {
@@ -137,15 +169,22 @@ func (a DarwinAdapter) Stop(e Entry) error {
 	if err != nil {
 		return err
 	}
+	if isHostServiceLiveDisabled() {
+		return nil
+	}
 	target := domain + "/" + e.UnitLabel
 	// Graceful signal first when the job is still in the domain.
 	_ = execwrap.Command("launchctl", "kill", "SIGTERM", target).Run()
 	// bootout (not launchctl stop): KeepAlive SuccessfulExit=false respawns after
 	// non-zero signal exits, so plain stop looks successful then immediately runs again.
 	// intentional disable vs crash-only KeepAlive.
-	if err := execwrap.Command("launchctl", "bootout", domain, plist).Run(); err != nil {
+	if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
+		if err := execwrap.Command("launchctl", "bootout", domain, plist).Run(); err != nil {
+			_ = execwrap.Command("launchctl", "bootout", target).Run()
+			_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
+		}
+	} else {
 		_ = execwrap.Command("launchctl", "bootout", target).Run()
-		_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
 	}
 	st, _ := a.Status(e)
 	if st == "running" {
@@ -155,6 +194,9 @@ func (a DarwinAdapter) Stop(e Entry) error {
 }
 
 func (a DarwinAdapter) Status(e Entry) (string, error) {
+	if strings.TrimSpace(e.UnitLabel) == "" || isHostServiceLiveDisabled() {
+		return "stopped", nil
+	}
 	out, err := execwrap.Command("launchctl", "print", "gui/"+uid()+"/"+e.UnitLabel).CombinedOutput()
 	if err != nil {
 		return "stopped", nil
