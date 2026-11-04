@@ -79,13 +79,21 @@ func runList(cmd *cobra.Command, args []string) error {
 		}
 
 		kind, ok := kindCanonicalFromPRERun(cmd)
-		if !ok && len(args) > 0 {
-			var err error
-			kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-			if err != nil {
-				return cli.Guard(cmd).Err(err).Return()
+		if !ok {
+			rawKind := ""
+			if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
+				rawKind = strings.TrimSpace(args[0])
+			} else if k, err := cmd.Flags().GetString("kind"); err == nil && strings.TrimSpace(k) != "" {
+				rawKind = strings.TrimSpace(k)
 			}
-			ok = true
+			if rawKind != "" {
+				var err error
+				kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), rawKind)
+				if err != nil {
+					return cli.Guard(cmd).Err(err).Return()
+				}
+				ok = true
+			}
 		}
 
 		if ok && kind != "" {

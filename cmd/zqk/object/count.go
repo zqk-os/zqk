@@ -48,8 +48,12 @@ func runCount(cmd *cobra.Command, args []string) error {
 		var multiKinds []string
 		var singleKind string
 		kindArg := ""
-		if len(args) > 0 {
-			kindArg = args[0]
+		if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
+			kindArg = strings.TrimSpace(args[0])
+		} else if k, err := cmd.Flags().GetString("kind"); err == nil && strings.TrimSpace(k) != "" {
+			kindArg = strings.TrimSpace(k)
+		}
+		if kindArg != "" {
 			if list, ok := kindsListFromPRERun(cmd); ok {
 				if len(list) > 1 {
 					multiKinds = list
@@ -84,7 +88,7 @@ func runCount(cmd *cobra.Command, args []string) error {
 		includeZeroCount, _ := cmd.Flags().GetBool("include-zero-count") //nolint:errcheck
 
 		// If no kind specified or wildcard, count all discoverable kinds
-		if len(args) == 0 || (len(args) > 0 && (args[0] == "*" || args[0] == "all")) {
+		if kindArg == "" || kindArg == "*" || kindArg == "all" {
 			return cli.EnhanceError(cmd, countAllKinds(cmd, proc, filters, groupBy, includeZeroCount, nsScope))
 		}
 

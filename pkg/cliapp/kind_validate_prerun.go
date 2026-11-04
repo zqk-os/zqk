@@ -107,10 +107,16 @@ func ValidateAnnotatedKind(keys KindAnnotKeys, cmd *cobra.Command, args []string
 
 	switch mode {
 	case KindValidatePositional0, KindValidatePositional0Opt:
-		if len(args) < 1 || strings.TrimSpace(args[0]) == "" {
+		raw := ""
+		if len(args) >= 1 && strings.TrimSpace(args[0]) != "" {
+			raw = strings.TrimSpace(args[0])
+		} else if mode == KindValidatePositional0Opt {
+			raw = getTrimmedKindFlag(cmd)
+		}
+		if raw == "" {
 			return nil
 		}
-		k, err := objects.ResolveAndValidateKindForProject(projectRoot, args[0])
+		k, err := objects.ResolveAndValidateKindForProject(projectRoot, raw)
 		if err != nil {
 			return err
 		}
@@ -125,7 +131,7 @@ func ValidateAnnotatedKind(keys KindAnnotKeys, cmd *cobra.Command, args []string
 		return validateFlagKind(keys, cmd, projectRoot)
 
 	case KindValidateUpdateAllKindFlag:
-		return validateUpdateAllKindFlag(keys, cmd, projectRoot)
+		return validateUpdateAllKindFlag(keys, cmd, projectRoot, args)
 
 	case KindValidateInternalListOptional:
 		return validateInternalListOptional(keys, cmd, projectRoot, args, internalListHook)
@@ -145,10 +151,15 @@ func ValidateAnnotatedKind(keys KindAnnotKeys, cmd *cobra.Command, args []string
 }
 
 func validateCountArg0(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string, args []string) error {
-	if len(args) < 1 || strings.TrimSpace(args[0]) == "" {
+	arg := ""
+	if len(args) >= 1 && strings.TrimSpace(args[0]) != "" {
+		arg = strings.TrimSpace(args[0])
+	} else {
+		arg = getTrimmedKindFlag(cmd)
+	}
+	if arg == "" {
 		return nil
 	}
-	arg := args[0]
 	var list []string
 	var err error
 	if strings.Contains(arg, ",") {
@@ -199,12 +210,16 @@ func validateFlagKind(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string
 	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, getTrimmedKindFlag(cmd))
 }
 
-func validateUpdateAllKindFlag(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string) error {
+func validateUpdateAllKindFlag(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string, args []string) error {
 	all, err := cmd.Flags().GetBool("all")
 	if err != nil || !all {
 		return nil
 	}
-	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, getTrimmedKindFlag(cmd))
+	raw := getTrimmedKindFlag(cmd)
+	if raw == "" && len(args) >= 1 && strings.TrimSpace(args[0]) != "" {
+		raw = strings.TrimSpace(args[0])
+	}
+	return resolveAndAnnotateCanonicalKind(keys, cmd, projectRoot, raw)
 }
 
 func validateInternalListOptional(keys KindAnnotKeys, cmd *cobra.Command, projectRoot string, args []string, hook InternalListOptionalHook) error {

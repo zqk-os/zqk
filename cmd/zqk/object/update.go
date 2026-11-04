@@ -42,8 +42,16 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			return runUpdateAll(cmd, args)
 		}
 
+		// Positional kind before ID(s) can be provided symmetrically
+		idArgs := args
+		if len(args) >= 2 && !strings.Contains(args[0], ",") && !strings.Contains(args[0], "-") {
+			if _, err := objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0]); err == nil {
+				idArgs = args[1:]
+			}
+		}
+
 		// positional comma lists must expand like delete.
-		rawIDs := expandObjectIDArgs(cmd, args)
+		rawIDs := expandObjectIDArgs(cmd, idArgs)
 
 		if len(rawIDs) == 0 {
 			return cli.Guard(cmd).Require(false, "object ID is required (or use --all --kind <kind> to update all objects of a kind)").Return()

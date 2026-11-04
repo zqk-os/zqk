@@ -43,7 +43,7 @@ statuses:
       children on an active plan mean closeout failed (promote to complete), not a
       valid parked state. TRACK: kernel-backlog"
     preconditions:
-      - at least one ready backlog_item references this plan via priority_plan_ref
+      - at least one planned backlog_item references this plan via priority_plan_ref
       - all linked backlog_items referencing this plan are ready or later
       - no linked backlog_items referencing this plan are in progress or complete
       - at least one team_configuration_ref or persona_refs
@@ -114,7 +114,7 @@ transitions:
     manual: true
     auto: false
     preconditions:
-      - at least one ready backlog_item references this plan via priority_plan_ref
+      - at least one planned backlog_item references this plan via priority_plan_ref
       - all linked backlog_items referencing this plan are ready or later
       - no linked backlog_items referencing this plan are in progress or complete
       - at least one team_configuration_ref or persona_refs

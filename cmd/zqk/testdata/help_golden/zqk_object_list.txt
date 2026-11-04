@@ -57,6 +57,7 @@ Flags:
       --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
       --group-by string      Field to group results by
       --group-limit int      Maximum items per group when using --group-by (0 = no limit)
+      --kind string          Object kind to list (can also be specified as positional argument)
       --limit int            Pagination limit
       --namespace string     Restrict results to this namespace_id (when omitted, default kernel isolation applies)
       --offset int           Pagination offset

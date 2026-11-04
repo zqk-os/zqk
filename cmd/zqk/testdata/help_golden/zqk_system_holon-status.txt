@@ -1,0 +1,16 @@
+Renders real-time telemetry across middle-brain holons, intent stream hydrators,
+and river convergence pipelines, evaluating alignment scores and system vitality.
+
+Usage:
+  zqk system holon-status [flags]
+
+Aliases:
+  holon-status, holons-status
+
+Flags:
+      --engine          Output ambient engine runtime telemetry report
+  -f, --format string   Output format (table, json) (default "table")
+      --json            Output telemetry snapshot as JSON
+
+Global Flags:
+      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running

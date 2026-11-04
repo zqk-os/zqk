@@ -437,6 +437,8 @@
 ./cli_specs/system/git/query_command.yaml
 ./cli_specs/system/git_command.yaml
 ./cli_specs/system/health_data_command.yaml
+./cli_specs/system/holon_command.yaml
+./cli_specs/system/holon_status_command.yaml
 ./cli_specs/system/improvement_report_command.yaml
 ./cli_specs/system/init_command.yaml
 ./cli_specs/system/kernel_integrity/
@@ -947,6 +949,7 @@
 ./objects/workflow/workflow.yaml
 ./objects/workstream.yaml
 ./objects/workstream_transition.yaml
+./profile_specs/
 ./scripts/
 ./scripts/default_agent_skills/
 ./scripts/default_agent_skills/arch_design.yaml

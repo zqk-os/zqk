@@ -31,7 +31,7 @@ transitions:
     to: active
     manual: true
     preconditions:
-      - at least one ready backlog_item references this plan via priority_plan_ref
+      - at least one planned backlog_item references this plan via priority_plan_ref
 `
 	if err := fileutil.WriteFile(filepath.Join(lifecyclesDir, "priority_plan_lifecycle.yaml"), []byte(lifecycleContent), paths.FilePerm644); err != nil {
 		t.Fatal(err)

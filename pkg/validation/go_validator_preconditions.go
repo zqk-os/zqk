@@ -38,6 +38,11 @@ func (gv *GoValidator) dispatchPrecondition(precondition string, obj map[string]
 	return met
 }
 
+// EvaluatePrecondition evaluates a single precondition string against obj and returns whether it was met and recognized.
+func (gv *GoValidator) EvaluatePrecondition(precondition string, obj map[string]any, options *ValidationOptions) (met bool, recognized bool) {
+	return gv.evaluatePrecondition(precondition, obj, options)
+}
+
 func (gv *GoValidator) evaluatePrecondition(precondition string, obj map[string]any, options *ValidationOptions) (met bool, recognized bool) {
 	if precondition == "" {
 		return true, false

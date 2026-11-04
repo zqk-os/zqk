@@ -31,6 +31,7 @@ Aliases:
 
 Flags:
       --fields stringArray       Top-level keys to include in output (repeat or comma-separated); same hybrid projection as list. Omit for full object after overlays. Put -h before --fields if you need help so '-h' is not parsed as a field name.
+      --kind string              Object kind (optional, inferred from ID)
       --link-hydration string    Reference overlay: none/omit/raw (default) = no embeds; lazy = one hop; default = depth 2; eager = deeper.
       --resolved-sidecar-only    After hydrating, write sidecar and emit raw CAS object (no resolved_* in stdout)
       --view string              Optional view name to scope output fields (default: full object with reference-resolver overlay).

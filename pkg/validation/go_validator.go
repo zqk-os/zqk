@@ -698,6 +698,11 @@ func (gv *GoValidator) validateSemanticTypeItem(_ string, value any, semanticTyp
 	return nil
 }
 
+// ValidateLifecycleState validates lifecycle state, transitions, and preconditions (exported for tests and subsystems).
+func (gv *GoValidator) ValidateLifecycleState(ctx context.Context, kind, status, currentState string, obj map[string]any, options *ValidationOptions) ([]ValidationError, []ValidationWarning) {
+	return gv.validateLifecycleState(ctx, kind, status, currentState, obj, options)
+}
+
 // validateLifecycleState validates lifecycle state and transitions
 func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status, currentState string, obj map[string]any, options *ValidationOptions) ([]ValidationError, []ValidationWarning) {
 	var errors []ValidationError

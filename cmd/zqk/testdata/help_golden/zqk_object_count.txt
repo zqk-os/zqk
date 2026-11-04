@@ -42,6 +42,7 @@ Flags:
       --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
       --group-by string      Field to group counts by (returns count per group)
       --include-zero-count   Include kinds with 0 objects (default omits them to reduce noise)
+      --kind string          Object kind to count (can also be specified as positional argument)
       --namespace string     Restrict counts to this namespace_id (when omitted, default kernel isolation applies)
 
 Global Flags:

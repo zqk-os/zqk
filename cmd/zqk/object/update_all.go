@@ -23,15 +23,21 @@ func runUpdateAll(cmd *cobra.Command, args []string) error {
 		var err error
 		_ = err
 
-		// Get kind flag
-		kind, err := cmd.Flags().GetString("kind")
-		if err != nil || kind == emptyValue {
-			return cli.Guard(cmd).Require(false, "--kind is required when using --all").Return()
-		}
-
-		if nk, ok := kindCanonicalFromPRERun(cmd); ok {
+		// Get kind flag or positional argument
+		kind := ""
+		if nk, ok := kindCanonicalFromPRERun(cmd); ok && nk != "" {
 			kind = nk
 		} else {
+			kindFlag, _ := cmd.Flags().GetString("kind")
+			if strings.TrimSpace(kindFlag) != "" {
+				kind = strings.TrimSpace(kindFlag)
+			} else if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
+				kind = strings.TrimSpace(args[0])
+			}
+			if kind == emptyValue {
+				return cli.Guard(cmd).Require(false, "--kind is required when using --all").Return()
+			}
+			var err error
 			kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), kind)
 			if err != nil {
 				return cli.Guard(cmd).Err(err).Return()
