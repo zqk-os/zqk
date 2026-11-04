@@ -18,9 +18,7 @@ import (
 // Seat heartbeats are keyed by mesh agent_id under .zqk/scheduler/hourglass/seat-*.seat.json.
 // Progress stamps (feed append, seat-worker ticks, CAP wake) renew the window; silence
 // within the cadence wakes that seat via mesh notify (not SIGKILL, not empty CAP pings).
-//
-// TRACK: BLI-1793775604015031000-9fb714ca — remove when: POL-AGENT-ORCH-HOURGLASS-001
-// documents seat heartbeat applicability and studio pin includes this core surface.
+// Applicability: POL-AGENT-ORCH-HOURGLASS-001 (seat heartbeat section).
 const (
 	// TimerTypeSeatHeartbeat marks a seat liveness timer. Must stay registered in
 	// pkg/scheduler/hourglass.go actionForExpiredTimer (wake path, never kill).
