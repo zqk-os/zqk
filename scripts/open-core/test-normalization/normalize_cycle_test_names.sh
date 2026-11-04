@@ -260,7 +260,7 @@ for item in "${MAPPINGS[@]}"; do
     continue
   fi
   ((CANDIDATES++))
-  if [[ -e "$DST" && "$SRC" != "$DST" ]]; then
+  if [[ -e "$SRC" && -e "$DST" && "$SRC" != "$DST" ]]; then
     echo "ERROR: Target already exists on disk: $DST (from $SRC)"
     ((COLLISIONS++))
   fi
