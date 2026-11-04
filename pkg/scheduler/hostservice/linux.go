@@ -3,6 +3,7 @@ package hostservice
 import (
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -15,6 +16,29 @@ import (
 
 // LinuxAdapter manages systemd --user units for per-root scheduler daemons.
 type LinuxAdapter struct{}
+
+var systemctlRunner func(args ...string) ([]byte, error)
+
+var systemctlCmd = func(args ...string) error {
+	if systemctlRunner != nil {
+		_, err := systemctlRunner(args...)
+		return err
+	}
+	if isHostServiceLiveDisabled() || runtime.GOOS != "linux" {
+		return nil
+	}
+	return execwrap.Command("systemctl", args...).Run()
+}
+
+var systemctlOutput = func(args ...string) ([]byte, error) {
+	if systemctlRunner != nil {
+		return systemctlRunner(args...)
+	}
+	if isHostServiceLiveDisabled() || runtime.GOOS != "linux" {
+		return []byte("inactive"), nil
+	}
+	return execwrap.Command("systemctl", args...).CombinedOutput()
+}
 
 func (LinuxAdapter) unitPath(e Entry) string {
 	home, _ := fileutil.UserHomeDir()
@@ -44,24 +68,34 @@ WantedBy=default.target
 	if err := fileutil.WriteFile(path, []byte(body), paths.FilePerm644); err != nil {
 		return errfmt.Newf("write systemd unit").Wrap(err)
 	}
-	_ = execwrap.Command("systemctl", "--user", "daemon-reload").Run()
-	if err := execwrap.Command("systemctl", "--user", "enable", "--now", e.UnitLabel+".service").Run(); err != nil {
+	if (isHostServiceLiveDisabled() || runtime.GOOS != "linux") && systemctlRunner == nil {
+		return nil
+	}
+	_ = systemctlCmd("--user", "daemon-reload")
+	if err := systemctlCmd("--user", "enable", "--now", e.UnitLabel+".service"); err != nil {
 		return errfmt.Newf("systemctl enable --now").Wrap(err)
 	}
 	return nil
 }
 
 func (a LinuxAdapter) Uninstall(e Entry) error {
-	_ = execwrap.Command("systemctl", "--user", "disable", "--now", e.UnitLabel+".service").Run()
+	if (isHostServiceLiveDisabled() || runtime.GOOS != "linux") && systemctlRunner == nil {
+		_ = fileutil.Remove(a.unitPath(e))
+		return nil
+	}
+	_ = systemctlCmd("--user", "disable", "--now", e.UnitLabel+".service")
 	_ = fileutil.Remove(a.unitPath(e))
-	_ = execwrap.Command("systemctl", "--user", "daemon-reload").Run()
+	_ = systemctlCmd("--user", "daemon-reload")
 	return nil
 }
 
 func (a LinuxAdapter) Start(e Entry) error {
+	if (isHostServiceLiveDisabled() || runtime.GOOS != "linux") && systemctlRunner == nil {
+		return nil
+	}
 	// Match desired_state=enabled: re-enable unit then start.
-	if err := execwrap.Command("systemctl", "--user", "enable", "--now", e.UnitLabel+".service").Run(); err != nil {
-		if err2 := execwrap.Command("systemctl", "--user", "start", e.UnitLabel+".service").Run(); err2 != nil {
+	if err := systemctlCmd("--user", "enable", "--now", e.UnitLabel+".service"); err != nil {
+		if err2 := systemctlCmd("--user", "start", e.UnitLabel+".service"); err2 != nil {
 			return errfmt.Newf("systemctl enable --now / start").Wrap(err)
 		}
 	}
@@ -69,16 +103,22 @@ func (a LinuxAdapter) Start(e Entry) error {
 }
 
 func (a LinuxAdapter) Stop(e Entry) error {
+	if (isHostServiceLiveDisabled() || runtime.GOOS != "linux") && systemctlRunner == nil {
+		return nil
+	}
 	// stop + disable so Restart=on-failure cannot race and desired_state=disabled sticks.
-	_ = execwrap.Command("systemctl", "--user", "stop", e.UnitLabel+".service").Run()
-	if err := execwrap.Command("systemctl", "--user", "disable", e.UnitLabel+".service").Run(); err != nil {
+	_ = systemctlCmd("--user", "stop", e.UnitLabel+".service")
+	if err := systemctlCmd("--user", "disable", e.UnitLabel+".service"); err != nil {
 		return errfmt.Newf("systemctl disable").Wrap(err)
 	}
 	return nil
 }
 
 func (a LinuxAdapter) Status(e Entry) (string, error) {
-	out, err := execwrap.Command("systemctl", "--user", "is-active", e.UnitLabel+".service").CombinedOutput()
+	if (isHostServiceLiveDisabled() || runtime.GOOS != "linux") && systemctlRunner == nil {
+		return "inactive", nil
+	}
+	out, err := systemctlOutput("--user", "is-active", e.UnitLabel+".service")
 	s := strings.TrimSpace(string(out))
 	if err != nil {
 		if s == "" {

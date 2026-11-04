@@ -28,6 +28,29 @@ func isHostServiceLiveDisabled() bool {
 	return false
 }
 
+var launchctlRunner func(args ...string) ([]byte, error)
+
+var launchctlCmd = func(args ...string) error {
+	if launchctlRunner != nil {
+		_, err := launchctlRunner(args...)
+		return err
+	}
+	if isHostServiceLiveDisabled() {
+		return nil
+	}
+	return execwrap.Command("launchctl", args...).Run()
+}
+
+var launchctlOutput = func(args ...string) ([]byte, error) {
+	if launchctlRunner != nil {
+		return launchctlRunner(args...)
+	}
+	if isHostServiceLiveDisabled() {
+		return []byte{}, nil
+	}
+	return execwrap.Command("launchctl", args...).CombinedOutput()
+}
+
 // DarwinAdapter manages LaunchAgents for per-root scheduler daemons.
 type DarwinAdapter struct{}
 
@@ -103,13 +126,13 @@ func (a DarwinAdapter) Install(e Entry) error {
 	if err := fileutil.WriteFile(plist, []byte(body), paths.FilePerm644); err != nil {
 		return errfmt.Newf("write LaunchAgent plist").Wrap(err)
 	}
-	if isHostServiceLiveDisabled() {
+	if isHostServiceLiveDisabled() && launchctlRunner == nil {
 		return nil
 	}
-	_ = execwrap.Command("launchctl", "bootout", "gui/"+uid(), plist).Run()
-	if err := execwrap.Command("launchctl", "bootstrap", "gui/"+uid(), plist).Run(); err != nil {
+	_ = launchctlCmd("bootout", "gui/"+uid(), plist)
+	if err := launchctlCmd("bootstrap", "gui/"+uid(), plist); err != nil {
 		// Older macOS: load
-		if err2 := execwrap.Command("launchctl", "load", "-w", plist).Run(); err2 != nil {
+		if err2 := launchctlCmd("load", "-w", plist); err2 != nil {
 			return errfmt.Newf("launchctl bootstrap/load").Wrap(err)
 		}
 	}
@@ -121,13 +144,13 @@ func (a DarwinAdapter) Uninstall(e Entry) error {
 		return nil
 	}
 	plist := a.plistPath(e)
-	if isHostServiceLiveDisabled() {
+	if isHostServiceLiveDisabled() && launchctlRunner == nil {
 		_ = fileutil.Remove(plist)
 		return nil
 	}
 	if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
-		_ = execwrap.Command("launchctl", "bootout", "gui/"+uid(), plist).Run()
-		_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
+		_ = launchctlCmd("bootout", "gui/"+uid(), plist)
+		_ = launchctlCmd("unload", "-w", plist)
 	}
 	_ = fileutil.Remove(plist)
 	return nil
@@ -148,16 +171,16 @@ func (a DarwinAdapter) Start(e Entry) error {
 	if err != nil {
 		return err
 	}
-	if isHostServiceLiveDisabled() {
+	if isHostServiceLiveDisabled() && launchctlRunner == nil {
 		return nil
 	}
 	// Stop boots the job out of the domain; Start must bootstrap again.
-	if err := execwrap.Command("launchctl", "bootstrap", domain, plist).Run(); err != nil {
+	if err := launchctlCmd("bootstrap", domain, plist); err != nil {
 		// Already loaded, or older macOS load path.
-		_ = execwrap.Command("launchctl", "load", "-w", plist).Run()
+		_ = launchctlCmd("load", "-w", plist)
 	}
-	if err := execwrap.Command("launchctl", "kickstart", "-k", domain+"/"+e.UnitLabel).Run(); err != nil {
-		if err2 := execwrap.Command("launchctl", "start", e.UnitLabel).Run(); err2 != nil {
+	if err := launchctlCmd("kickstart", "-k", domain+"/"+e.UnitLabel); err != nil {
+		if err2 := launchctlCmd("start", e.UnitLabel); err2 != nil {
 			return errfmt.Newf("launchctl kickstart/start").Wrap(err)
 		}
 	}
@@ -169,22 +192,22 @@ func (a DarwinAdapter) Stop(e Entry) error {
 	if err != nil {
 		return err
 	}
-	if isHostServiceLiveDisabled() {
+	if isHostServiceLiveDisabled() && launchctlRunner == nil {
 		return nil
 	}
 	target := domain + "/" + e.UnitLabel
 	// Graceful signal first when the job is still in the domain.
-	_ = execwrap.Command("launchctl", "kill", "SIGTERM", target).Run()
+	_ = launchctlCmd("kill", "SIGTERM", target)
 	// bootout (not launchctl stop): KeepAlive SuccessfulExit=false respawns after
 	// non-zero signal exits, so plain stop looks successful then immediately runs again.
 	// intentional disable vs crash-only KeepAlive.
 	if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
-		if err := execwrap.Command("launchctl", "bootout", domain, plist).Run(); err != nil {
-			_ = execwrap.Command("launchctl", "bootout", target).Run()
-			_ = execwrap.Command("launchctl", "unload", "-w", plist).Run()
+		if err := launchctlCmd("bootout", domain, plist); err != nil {
+			_ = launchctlCmd("bootout", target)
+			_ = launchctlCmd("unload", "-w", plist)
 		}
 	} else {
-		_ = execwrap.Command("launchctl", "bootout", target).Run()
+		_ = launchctlCmd("bootout", target)
 	}
 	st, _ := a.Status(e)
 	if st == "running" {
@@ -194,10 +217,10 @@ func (a DarwinAdapter) Stop(e Entry) error {
 }
 
 func (a DarwinAdapter) Status(e Entry) (string, error) {
-	if strings.TrimSpace(e.UnitLabel) == "" || isHostServiceLiveDisabled() {
+	if strings.TrimSpace(e.UnitLabel) == "" || (isHostServiceLiveDisabled() && launchctlRunner == nil) {
 		return "stopped", nil
 	}
-	out, err := execwrap.Command("launchctl", "print", "gui/"+uid()+"/"+e.UnitLabel).CombinedOutput()
+	out, err := launchctlOutput("print", "gui/"+uid()+"/"+e.UnitLabel)
 	if err != nil {
 		return "stopped", nil
 	}
