@@ -249,20 +249,20 @@ done | sort | uniq -d)
 if [[ -n "$DUPLICATE_TARGETS" ]]; then
   echo "ERROR: Duplicate rename targets detected:"
   echo "$DUPLICATE_TARGETS"
-  ((COLLISIONS++))
+  COLLISIONS=$((COLLISIONS + 1))
 fi
 
 # 2. Check if target destination file already exists on disk
 for item in "${MAPPINGS[@]}"; do
   IFS="|" read -r SRC DST IS_EX <<< "$item"
   if [[ "$IS_EX" == "1" ]]; then
-    ((EXCLUDED++))
+    EXCLUDED=$((EXCLUDED + 1))
     continue
   fi
-  ((CANDIDATES++))
+  CANDIDATES=$((CANDIDATES + 1))
   if [[ -e "$SRC" && -e "$DST" && "$SRC" != "$DST" ]]; then
     echo "ERROR: Target already exists on disk: $DST (from $SRC)"
-    ((COLLISIONS++))
+    COLLISIONS=$((COLLISIONS + 1))
   fi
 done
 
@@ -330,7 +330,7 @@ if [[ "$MODE" == "apply" ]]; then
     fi
     if [[ -f "$SRC" ]]; then
       git mv "$SRC" "$DST"
-      ((MOVED++))
+      MOVED=$((MOVED + 1))
     fi
   done
   echo "[3/3] Successfully renamed $MOVED test files!"
