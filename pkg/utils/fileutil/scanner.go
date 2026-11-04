@@ -41,7 +41,7 @@ func FindFiles(searchDirs []string, knownFiles map[string]string) []FileMatch {
 
 		baseDepth := len(strings.Split(cleanDir, string(filepath.Separator)))
 
-		_ = filepath.WalkDir(cleanDir, func(path string, d DirEntry, err error) error {
+		if walkErr := filepath.WalkDir(cleanDir, func(path string, d DirEntry, err error) error {
 			if err != nil {
 				return nil
 			}
@@ -66,7 +66,9 @@ func FindFiles(searchDirs []string, knownFiles map[string]string) []FileMatch {
 				})
 			}
 			return nil
-		})
+		}); walkErr != nil {
+			continue
+		}
 	}
 
 	return matches
