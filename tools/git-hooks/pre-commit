@@ -13,6 +13,7 @@ set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 cd "$REPO_ROOT" || exit 1
+export ZQK_PROJECT_ROOT="$REPO_ROOT"
 
 # If this repository does not contain a .zqk directory, nothing to enforce
 if [ ! -d "$REPO_ROOT/.zqk" ]; then
