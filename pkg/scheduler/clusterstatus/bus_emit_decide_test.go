@@ -53,8 +53,9 @@ func TestBus_Emit_ZeroAndExplicitTimestamp(t *testing.T) {
 	assert.Equal(t, PhaseRunning, phase1)
 	assert.False(t, latest1.UpdatedAt.IsZero())
 
-	// Emit with explicit UpdatedAt
-	explicitTime := time.Date(2026, 11, 4, 12, 0, 0, 0, time.UTC)
+	// Emit with explicit UpdatedAt inside freshness window (Bus TTL is time.Minute).
+	// A fixed wall calendar instant ages into PhaseStale as CI clocks move.
+	explicitTime := time.Now().UTC().Add(-2 * time.Second).Truncate(time.Millisecond)
 	evt2 := Event{
 		NodeID:    "node-2",
 		RootID:    "root-2",
