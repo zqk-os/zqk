@@ -62,6 +62,10 @@ PRI-SCHEDULER-REORG-001
 
 ## 4. Verification & Testing Gates
 
+Before opening a pull request, ensure all validation gates and release checks pass cleanly.
+
+**Agents / autonomous seats:** before every `git push`, run the failing or touched packages locally with an explicit `-timeout` (see `.cursor/skills/community-code-craftsman/SKILL.md`). Do not use CI as the first compiler. Heavy packages such as `./pkg/storage` may need `-timeout 180s` for suites like `TestUpdateAllFields`.
+
 Before opening a pull request, ensure all validation gates and release checks pass cleanly:
 
 ```bash
