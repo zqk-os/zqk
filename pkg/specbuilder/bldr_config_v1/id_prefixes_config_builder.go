@@ -430,6 +430,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 				},
 				"workstream": []any{
 					"WS-",
+					"WRK-",
 				},
 				"workstream_transition": []any{
 					"WST-",
@@ -546,6 +547,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 				"workstream": []any{
 					"ws",
 					"work",
+					"wrk",
 				},
 			},
 			"version": ConfigYAMLVersionV1,

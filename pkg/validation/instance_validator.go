@@ -344,6 +344,13 @@ func (iv *InstanceValidator) validateFieldSemanticType(fieldName string, fieldVa
 		return nil
 	}
 
+	// Optional fields: empty string means unset, not invalid.
+	if str, ok := fieldValue.(string); ok && strings.TrimSpace(str) == emptyValue {
+		if !IsFieldRequired(fieldDef) {
+			return nil
+		}
+	}
+
 	if err := iv.validateSemanticType(fieldName, fieldValue, semanticType); err != nil {
 		return &ValidationWarning{
 			Field:   fieldName,

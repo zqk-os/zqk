@@ -141,6 +141,10 @@ func generateTemplate(kind string, kindFields *objects.KindFields, _ *logging.Ev
 		when.When(func() bool { return field.Required }).Then(func() {
 			requiredFields = append(requiredFields, *field)
 		}).OrElse(func() {
+			// Omit empty reference fields from the YAML template when unset
+			if isOptionalRefField(field) {
+				return
+			}
 			optionalFields = append(optionalFields, *field)
 		}).Run()
 	}
@@ -247,6 +251,13 @@ func getPlaceholderValue(field *objects.FieldInfo, originStatus string) string {
 		return fmt.Sprintf("%q", pkgctx.SystemAccountID)
 	}
 
+	if isReferenceField(field) {
+		if field.SemanticType != emptyValue && field.SemanticType != "reference" {
+			return fmt.Sprintf("\"# %s reference (e.g., %s:ID-###)\"", field.SemanticType, field.SemanticType)
+		}
+		return "\"# reference (e.g., REF-ID-001)\""
+	}
+
 	switch field.Type {
 	case "string", "text":
 		return "\"\""
@@ -273,4 +284,18 @@ func getPlaceholderValue(field *objects.FieldInfo, originStatus string) string {
 	default:
 		return "\"\""
 	}
+}
+
+func isReferenceField(field *objects.FieldInfo) bool {
+	if field == nil {
+		return false
+	}
+	return field.Type == "reference" || field.SemanticType == "reference" || strings.HasSuffix(field.Name, "_ref")
+}
+
+func isOptionalRefField(field *objects.FieldInfo) bool {
+	if field == nil || field.Required {
+		return false
+	}
+	return isReferenceField(field)
 }

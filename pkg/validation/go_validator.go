@@ -601,6 +601,13 @@ func (gv *GoValidator) validateSemanticTypeConstraint(fieldName string, fieldVal
 		return nil
 	}
 
+	// Optional fields: empty string means unset, not invalid.
+	if str, ok := fieldValue.(string); ok && strings.TrimSpace(str) == emptyValue {
+		if !IsFieldRequired(fieldDef) {
+			return nil
+		}
+	}
+
 	fieldType, _ := fieldDef[objects.FieldKeyType].(string)
 	val := reflect.ValueOf(fieldValue)
 	isListValue := val.Kind() == reflect.Slice || val.Kind() == reflect.Array
