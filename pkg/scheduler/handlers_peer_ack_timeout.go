@@ -52,8 +52,7 @@ func (h *PeerAckTimeoutAuditHandler) Execute(ctx context.Context, job *Scheduled
 	}
 
 	// Group wake-action expiries by await author so one audit tick cannot
-	// flood Composer with N identical ATTN injects (2026-11-05 spam).
-	// TRACK: BLI-1785905541906569000-074e24d7 — peer_ack_timeout batch wake
+	// flood Composer with N identical ATTN injects (batch peer_ack_timeout wake).
 	type wakeBatch struct {
 		eventIDs []string
 	}
