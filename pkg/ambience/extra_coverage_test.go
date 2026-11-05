@@ -78,6 +78,7 @@ func TestInMemoryEventMesh_CanceledAndSourcing(t *testing.T) {
 	if err := mesh.Publish(live, AmbientEvent{Type: EventTestFailed, URI: "x.yaml"}); err != nil {
 		t.Fatal(err)
 	}
+	mesh.WaitForAudits()
 }
 
 func TestFSEventsEngine_PredictGoSum(t *testing.T) {

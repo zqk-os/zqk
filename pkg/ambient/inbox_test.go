@@ -2,9 +2,12 @@ package ambient
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"sync"
 	"testing"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 // C1: Constructor Power-of-Two Rounding
@@ -144,12 +147,13 @@ func TestAutonomyInbox_C12_ConcurrentMultiProducer(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 8; i++ {
 		wg.Add(1)
-		go func() {
+		workerID := i
+		goroutinelabels.NewGoroutine("test_inbox_producer", fmt.Sprintf("producer worker %d", workerID)).StartSimple(func() {
 			defer wg.Done()
 			for j := 0; j < 500; j++ {
 				_ = inbox.Push(context.Background(), ContextEvent{})
 			}
-		}()
+		})
 	}
 	wg.Wait()
 	if inbox.Pushed()+inbox.Dropped() != 4000 {

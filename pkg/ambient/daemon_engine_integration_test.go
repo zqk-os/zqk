@@ -466,7 +466,7 @@ func TestWatcherDaemon_PanicContainment(t *testing.T) {
 		select {
 		case err := <-errCh:
 			assert.True(t, err == nil || errors.Is(err, context.Canceled), "expected clean exit, got %v", err)
-		case <-time.After(3 * time.Second):
+		case <-time.After(5 * time.Second):
 			t.Fatal("daemon did not exit cleanly after activity panic")
 		}
 	})

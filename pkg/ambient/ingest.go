@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/ambience"
@@ -20,13 +22,38 @@ import (
 type AmbientIngestService struct {
 	projectRoot string
 	secCtx      *pkgctx.SecurityContext
+
+	mu         sync.Mutex
+	ctx        context.Context
+	cancel     context.CancelFunc
+	loopWg     sync.WaitGroup
+	inFlight   atomic.Int64
+	ingestCond *sync.Cond
+	ingested   uint64
+	channels   []<-chan ambience.AmbientEvent
 }
 
 // NewAmbientIngestService creates a new AmbientIngestService.
 func NewAmbientIngestService(projectRoot string, secCtx *pkgctx.SecurityContext) *AmbientIngestService {
-	return &AmbientIngestService{
+	ctx, cancel := context.WithCancel(context.Background())
+	s := &AmbientIngestService{
 		projectRoot: projectRoot,
 		secCtx:      secCtx,
+		ctx:         ctx,
+		cancel:      cancel,
+	}
+	s.ingestCond = sync.NewCond(&s.mu)
+	return s
+}
+
+func (s *AmbientIngestService) initLifecycle() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.ctx == nil {
+		s.ctx, s.cancel = context.WithCancel(context.Background())
+	}
+	if s.ingestCond == nil {
+		s.ingestCond = sync.NewCond(&s.mu)
 	}
 }
 
@@ -91,6 +118,13 @@ func (s *AmbientIngestService) Ingest(ctx context.Context, event Event) error {
 		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)
 	}
 
+	s.mu.Lock()
+	s.ingested++
+	if s.ingestCond != nil {
+		s.ingestCond.Broadcast()
+	}
+	s.mu.Unlock()
+
 	return nil
 }
 
@@ -132,27 +166,160 @@ func (s *AmbientIngestService) IngestAmbientEvent(ctx context.Context, event amb
 		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)
 	}
 
+	s.mu.Lock()
+	s.ingested++
+	if s.ingestCond != nil {
+		s.ingestCond.Broadcast()
+	}
+	s.mu.Unlock()
+
 	return nil
 }
 
-// BindToMesh binds the service to an EventMesh to automatically ingest events.
+// BindToMesh binds the service to an EventMesh to automatically ingest events using internal lifecycle context.
 func (s *AmbientIngestService) BindToMesh(mesh ambience.EventMesh) {
+	_ = s.BindToMeshWithContext(context.Background(), mesh)
+}
+
+// BindToMeshWithContext binds the service to an EventMesh with an optional parent context.
+func (s *AmbientIngestService) BindToMeshWithContext(parentCtx context.Context, mesh ambience.EventMesh) error {
 	if mesh == nil {
-		return
+		return nil
 	}
-	ctx := context.Background()
-	ch, err := mesh.Subscribe(ctx, []ambience.EventType{
+	s.initLifecycle()
+
+	s.mu.Lock()
+	baseCtx := s.ctx
+	s.mu.Unlock()
+
+	loopCtx, loopCancel := context.WithCancel(baseCtx)
+
+	if parentCtx != nil && parentCtx.Done() != nil {
+		goroutinelabels.NewGoroutine("ambient_ingest_cancel_forwarder", "propagate parent context cancellation to ingest loop").StartSimple(func() {
+			select {
+			case <-parentCtx.Done():
+				loopCancel()
+			case <-loopCtx.Done():
+			}
+		})
+	}
+
+	ch, err := mesh.Subscribe(loopCtx, []ambience.EventType{
 		ambience.EventFileModified,
 		ambience.EventFocusChanged,
 		ambience.EventTestFailed,
 	})
 	if err != nil {
-		return
+		loopCancel()
+		return err
 	}
 
+	s.mu.Lock()
+	s.channels = append(s.channels, ch)
+	s.mu.Unlock()
+
+	s.loopWg.Add(1)
 	goroutinelabels.NewGoroutine("ambient_ingest_loop", "Process ambient events from EventMesh").StartSimple(func() {
-		for event := range ch {
-			_ = s.IngestAmbientEvent(ctx, event)
+		defer s.loopWg.Done()
+		defer loopCancel()
+
+		for {
+			select {
+			case <-loopCtx.Done():
+				return
+			case event, ok := <-ch:
+				if !ok {
+					return
+				}
+				s.inFlight.Add(1)
+				_ = s.IngestAmbientEvent(loopCtx, event)
+				s.inFlight.Add(-1)
+			}
 		}
 	})
+
+	return nil
+}
+
+// WaitForCount blocks until at least expectedCount events have been ingested, or timeout expires.
+// Returns true if expected count was reached, false on timeout.
+func (s *AmbientIngestService) WaitForCount(expectedCount uint64, timeout time.Duration) bool {
+	s.initLifecycle()
+	deadline := time.Now().Add(timeout)
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for s.ingested < expectedCount {
+		remaining := time.Until(deadline)
+		if remaining <= 0 {
+			return false
+		}
+
+		timer := time.AfterFunc(remaining, func() {
+			s.mu.Lock()
+			if s.ingestCond != nil {
+				s.ingestCond.Broadcast()
+			}
+			s.mu.Unlock()
+		})
+
+		s.ingestCond.Wait()
+		timer.Stop()
+	}
+
+	return true
+}
+
+// WaitForIdle blocks until all subscribed channels are drained and all in-flight ingests complete,
+// or timeout expires.
+func (s *AmbientIngestService) WaitForIdle(timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	for {
+		s.mu.Lock()
+		empty := true
+		for _, ch := range s.channels {
+			if len(ch) > 0 {
+				empty = false
+				break
+			}
+		}
+		s.mu.Unlock()
+
+		if empty && s.inFlight.Load() == 0 {
+			return true
+		}
+
+		if time.Now().After(deadline) {
+			return false
+		}
+		time.Sleep(2 * time.Millisecond)
+	}
+}
+
+// WaitForIngests waits for any currently in-flight disk audit write operations to finish.
+func (s *AmbientIngestService) WaitForIngests() {
+	deadline := time.Now().Add(10 * time.Second)
+	for s.inFlight.Load() > 0 && time.Now().Before(deadline) {
+		time.Sleep(1 * time.Millisecond)
+	}
+}
+
+// IngestedCount returns the count of completed event ingests.
+func (s *AmbientIngestService) IngestedCount() uint64 {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.ingested
+}
+
+// Stop cancels all background loops and waits for active loops and in-flight disk writes to complete.
+func (s *AmbientIngestService) Stop() {
+	s.mu.Lock()
+	if s.cancel != nil {
+		s.cancel()
+	}
+	s.mu.Unlock()
+
+	s.loopWg.Wait()
+	s.WaitForIngests()
 }

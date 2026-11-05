@@ -90,7 +90,8 @@ func (dt *DecayTracker) RecordPulse(p *PulsePacket) {
 	rec.Ischemic = false
 
 	if wasIschemic && dt.onReperfusion != nil {
-		goroutinelabels.NewGoroutine("liveness_reperfusion", "handle holon reperfusion").StartSimple(func() { dt.onReperfusion(rec) })
+		recCopy := *rec
+		goroutinelabels.NewGoroutine("liveness_reperfusion", "handle holon reperfusion").StartSimple(func() { dt.onReperfusion(&recCopy) })
 	}
 }
 
@@ -105,7 +106,8 @@ func (dt *DecayTracker) Sweep(now time.Time) []string {
 			rec.Ischemic = true
 			ischemicIDs = append(ischemicIDs, id)
 			if dt.onIschemia != nil {
-				goroutinelabels.NewGoroutine("liveness_ischemia", "handle holon ischemia").StartSimple(func() { dt.onIschemia(rec) })
+				recCopy := *rec
+				goroutinelabels.NewGoroutine("liveness_ischemia", "handle holon ischemia").StartSimple(func() { dt.onIschemia(&recCopy) })
 			}
 		}
 	}

@@ -19,6 +19,7 @@ type SignalAggregator struct {
 	cancel     context.CancelFunc
 	running    bool
 	flushCh    chan []AmbientEvent
+	wg         sync.WaitGroup
 }
 
 func NewSignalAggregator(mesh EventMesh, window time.Duration, flushCount int) *SignalAggregator {
@@ -49,7 +50,9 @@ func (s *SignalAggregator) Start(ctx context.Context) error {
 		return err
 	}
 
+	s.wg.Add(1)
 	goroutinelabels.NewGoroutine("ambience.aggregator_loop", "aggregating ambient signals").StartSimple(func() {
+		defer s.wg.Done()
 		s.loop(ctx, ch)
 	})
 	return nil
@@ -63,7 +66,10 @@ func (s *SignalAggregator) loop(ctx context.Context, ch <-chan AmbientEvent) {
 		select {
 		case <-ctx.Done():
 			return
-		case ev := <-ch:
+		case ev, ok := <-ch:
+			if !ok {
+				return
+			}
 			s.mu.Lock()
 			s.events = append(s.events, ev)
 			if len(s.events) >= s.flushCount {
@@ -97,11 +103,12 @@ func (s *SignalAggregator) flush(events []AmbientEvent) {
 
 func (s *SignalAggregator) Stop() error {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 	if s.running && s.cancel != nil {
 		s.cancel()
 		s.running = false
 	}
+	s.mu.Unlock()
+	s.wg.Wait()
 	return nil
 }
 
