@@ -177,6 +177,12 @@ func openSystemStorageWithContext(cmd *cobra.Command) (*cli.Context, storage.Obj
 		return nil, nil, nil, nil, nil, errfmt.Errorf("failed to get context")
 	}
 
+	if p := cli.GetStorageProvider(cmd.Context()); p != nil {
+		if sp, ok := p.(storage.ObjectStorageProvider); ok {
+			return ctx, sp, pkgctx.NewSystemSecurityContext(), pkgctx.NewStorageContext(), func() {}, nil
+		}
+	}
+
 	projectRoot := ProjectRootOrResolveDot(ctx.ProjectRoot)
 	if projectRoot == emptyValue {
 		return nil, nil, nil, nil, nil, errfmt.Errorf("not a ZQK project (no project root found)")
@@ -324,6 +330,11 @@ type SystemStorageSession struct {
 // List executes a list query using the session's security and storage contexts.
 func (s *SystemStorageSession) List(ctx context.Context, filter storage.ListFilter) (*storage.QueryResult, error) {
 	return s.StorageProvider.List(ctx, s.SecCtx, s.StorageCtx, filter)
+}
+
+// Read executes a read using the session's security context.
+func (s *SystemStorageSession) Read(ctx context.Context, id string) (map[string]any, error) {
+	return s.StorageProvider.Read(ctx, s.SecCtx, id)
 }
 
 // Update executes an update using the session's security context.

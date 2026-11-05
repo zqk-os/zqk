@@ -193,6 +193,20 @@ func generateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 				DocEntryRefs: []string{},
 			})
 		}
+	} else if strings.HasPrefix(targetID, "MIL-") {
+		for _, n := range criteriaNeighbors {
+			if k, _ := n["_kind"].(string); k == objects.KindRequirement {
+				if id, ok := n[objects.FieldKeyID].(string); ok && id != "" {
+					targetReqID = id
+					break
+				}
+			}
+		}
+		if targetReqID == targetID {
+			if rrefs, ok := obj[objects.FieldKeyRequirementRefs].([]any); ok && len(rrefs) > 0 {
+				targetReqID = strings.TrimSpace(fmt.Sprint(rrefs[0]))
+			}
+		}
 	}
 
 	// Generate supplemental or full base criteria
@@ -272,49 +286,23 @@ func GenerateTracePipelineBundle(targetID string, obj map[string]any, criteriaNe
 
 // extractGoalRefs extracts goal references from an object map in a type-safe manner.
 func extractGoalRefs(obj map[string]any) []string {
-	if obj == nil {
+	return objects.ExtractGoalRefs(obj)
+}
+
+func deduplicateStrings(items []string) []string {
+	if len(items) == 0 {
 		return nil
 	}
-	var res []string
+	var out []string
 	seen := make(map[string]bool)
-	add := func(val string) {
-		val = strings.TrimSpace(val)
-		if val != "" && val != "<nil>" && !seen[val] {
-			seen[val] = true
-			res = append(res, val)
+	for _, it := range items {
+		it = strings.TrimSpace(it)
+		if it != "" && !seen[it] {
+			seen[it] = true
+			out = append(out, it)
 		}
 	}
-	parseAny := func(v any) {
-		switch val := v.(type) {
-		case string:
-			for _, part := range strings.Split(val, ",") {
-				add(part)
-			}
-		case []string:
-			for _, s := range val {
-				add(s)
-			}
-		case []any:
-			for _, item := range val {
-				add(fmt.Sprint(item))
-			}
-		}
-	}
-
-	if grefs, ok := obj[objects.FieldKeyGoalRefs]; ok && grefs != nil {
-		parseAny(grefs)
-	}
-	if len(res) == 0 {
-		if grefs, ok := obj["goal_refs"]; ok && grefs != nil {
-			parseAny(grefs)
-		}
-	}
-	if len(res) == 0 {
-		if gref, ok := obj["goal_ref"]; ok && gref != nil {
-			parseAny(gref)
-		}
-	}
-	return res
+	return out
 }
 
 // generateAtomicBacklogItems slices criteria across discrete atomic units of effort.
@@ -344,14 +332,18 @@ func generateAtomicBacklogItems(
 		bliGoalRefs = extractGoalRefs(obj)
 	}
 	if len(bliGoalRefs) == 0 {
-		if len(criteriaNeighbors) > 0 {
-			for _, n := range criteriaNeighbors[0] {
+		for _, list := range criteriaNeighbors {
+			for _, n := range list {
 				k, _ := n["_kind"].(string)
 				id, _ := n[objects.FieldKeyID].(string)
-				if id == targetReqID || k == objects.KindRequirement || strings.HasPrefix(id, "REQ-") {
+				if strings.HasPrefix(id, "GOAL-") || k == objects.KindGoal {
+					gid := strings.TrimPrefix(id, "goal:")
+					if gid != "" {
+						bliGoalRefs = append(bliGoalRefs, gid)
+					}
+				} else if id == targetReqID || k == objects.KindRequirement || strings.HasPrefix(id, "REQ-") {
 					if g := extractGoalRefs(n); len(g) > 0 {
-						bliGoalRefs = g
-						break
+						bliGoalRefs = append(bliGoalRefs, g...)
 					}
 				}
 			}
@@ -371,10 +363,11 @@ func generateAtomicBacklogItems(
 		}
 		if sp != nil {
 			if reqObj, rerr := sp.Read(context.Background(), nil, targetReqID); rerr == nil && reqObj != nil {
-				bliGoalRefs = extractGoalRefs(reqObj)
+				bliGoalRefs = append(bliGoalRefs, extractGoalRefs(reqObj)...)
 			}
 		}
 	}
+	bliGoalRefs = deduplicateStrings(bliGoalRefs)
 
 	if len(allCriteria) <= 1 {
 		randomBytes := make([]byte, 4)
@@ -501,14 +494,47 @@ func applyGeneratedTracePipelineForID(cmd *cobra.Command, proc *cli.Processor, t
 		}
 	}
 
-	// 1. Direct incoming neighbors pointing to targetID (e.g. BLIs, TestCases, Requirements)
-	if neighbors, nerr := storageProvider.GetNeighbors(ctx, secCtx, targetID, "incoming"); nerr == nil {
+	// 1. Direct incoming & outgoing neighbors for targetID (e.g. BLIs, TestCases, Goals, Requirements)
+	if neighbors, nerr := storageProvider.GetNeighbors(ctx, secCtx, targetID, "both"); nerr == nil {
 		for _, n := range neighbors {
 			appendNeighbor(n)
 		}
+	} else {
+		if inNeighbors, inErr := storageProvider.GetNeighbors(ctx, secCtx, targetID, "incoming"); inErr == nil {
+			for _, n := range inNeighbors {
+				appendNeighbor(n)
+			}
+		}
+		if outNeighbors, outErr := storageProvider.GetNeighbors(ctx, secCtx, targetID, "outgoing"); outErr == nil {
+			for _, n := range outNeighbors {
+				appendNeighbor(n)
+			}
+		}
 	}
 
-	// 2. If target is a Goal, inspect linked requirements and their incoming neighbors
+	// 2. If target is a Milestone, inspect linked requirements and their outgoing neighbors
+	if strings.HasPrefix(targetID, "MIL-") {
+		var reqIDs []string
+		if rrefs, ok := obj[objects.FieldKeyRequirementRefs].([]any); ok {
+			for _, r := range rrefs {
+				reqIDs = append(reqIDs, fmt.Sprint(r))
+			}
+		} else if rrefs, ok := obj[objects.FieldKeyRequirementRefs].([]string); ok {
+			reqIDs = append(reqIDs, rrefs...)
+		}
+		for _, rID := range reqIDs {
+			if reqObj, rerr := storageProvider.Read(ctx, secCtx, rID); rerr == nil && reqObj != nil {
+				appendNeighbor(reqObj)
+				if reqNeighbors, rnErr := storageProvider.GetNeighbors(ctx, secCtx, rID, "outgoing"); rnErr == nil {
+					for _, rn := range reqNeighbors {
+						appendNeighbor(rn)
+					}
+				}
+			}
+		}
+	}
+
+	// 3. If target is a Goal, inspect linked requirements and their incoming neighbors
 	if strings.HasPrefix(targetID, "GOAL-") {
 		for _, n := range criteriaNeighbors {
 			if k, _ := n["_kind"].(string); k == objects.KindRequirement {

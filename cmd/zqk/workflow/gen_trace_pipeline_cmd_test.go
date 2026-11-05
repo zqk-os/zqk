@@ -249,3 +249,120 @@ func TestApplyGeneratedTracePipelineForID_GoalBranch(t *testing.T) {
 	cmd.SetOut(&outBuf)
 	_ = applyGeneratedTracePipelineForID(cmd, proc, goalID, 3)
 }
+
+func TestApplyGeneratedTracePipelineForID_RequirementGoalInheritance(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	reqID := "REQ-HARDEN-001"
+	goalID := "GOAL-STRAT-001"
+	reqObj := map[string]any{
+		objects.FieldKeyID:       reqID,
+		"_kind":                  objects.KindRequirement,
+		objects.FieldKeyTitle:    "Strategic Hardening",
+		objects.FieldKeyStatus:   objects.ObjectStatusOriginated,
+		objects.FieldKeyGoalRefs: []string{goalID},
+		objects.FieldKeyPriority: "p1",
+	}
+
+	store := &mockPipelineStorage{
+		data: map[string]map[string]any{
+			reqID: reqObj,
+		},
+		neighbors: make(map[string][]map[string]any),
+	}
+
+	cmd := NewGenTracePipelineCmd()
+	var outBuf bytes.Buffer
+	cmd.SetOut(&outBuf)
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	proc, err := cli.NewProcessor(cmd)
+	require.NoError(t, err)
+
+	err = applyGeneratedTracePipelineForID(cmd, proc, reqID, 3)
+	require.NoError(t, err)
+
+	// Verify all created backlog items inherited parent requirement's goal_refs
+	bliCount := 0
+	for id, obj := range store.data {
+		if id != reqID && len(id) > 4 && id[:4] == "BLI-" {
+			bliCount++
+			grefs := objects.ExtractGoalRefs(obj)
+			assert.Contains(t, grefs, goalID, "backlog item %s must inherit goal %s", id, goalID)
+			reqRefs, ok := obj[objects.FieldKeyRequirementRefs].([]string)
+			if !ok {
+				if anyRefs, okAny := obj[objects.FieldKeyRequirementRefs].([]any); okAny {
+					for _, r := range anyRefs {
+						reqRefs = append(reqRefs, fmt.Sprint(r))
+					}
+				}
+			}
+			assert.Contains(t, reqRefs, reqID, "backlog item %s must reference parent requirement %s", id, reqID)
+		}
+	}
+	assert.Equal(t, 3, bliCount, "expected 3 child backlog items to be created")
+}
+
+func TestApplyGeneratedTracePipelineForID_MilestoneInheritsRequirementGoals(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	milID := "MIL-RELEASE-001"
+	reqID := "REQ-HARDEN-002"
+	goalID := "GOAL-STRAT-002"
+
+	milObj := map[string]any{
+		objects.FieldKeyID:              milID,
+		"_kind":                         objects.KindMilestone,
+		objects.FieldKeyTitle:           "Release Gate",
+		objects.FieldKeyStatus:          objects.ObjectStatusOriginated,
+		objects.FieldKeyRequirementRefs: []string{reqID},
+	}
+	reqObj := map[string]any{
+		objects.FieldKeyID:       reqID,
+		"_kind":                  objects.KindRequirement,
+		objects.FieldKeyTitle:    "Hardened Release Requirement",
+		objects.FieldKeyStatus:   objects.ObjectStatusOriginated,
+		objects.FieldKeyGoalRefs: []string{goalID},
+		objects.FieldKeyPriority: "p1",
+	}
+
+	store := &mockPipelineStorage{
+		data: map[string]map[string]any{
+			milID: milObj,
+			reqID: reqObj,
+		},
+		neighbors: make(map[string][]map[string]any),
+	}
+
+	cmd := NewGenTracePipelineCmd()
+	var outBuf bytes.Buffer
+	cmd.SetOut(&outBuf)
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	proc, err := cli.NewProcessor(cmd)
+	require.NoError(t, err)
+
+	err = applyGeneratedTracePipelineForID(cmd, proc, milID, 3)
+	require.NoError(t, err)
+
+	bliCount := 0
+	for id, obj := range store.data {
+		if id != milID && id != reqID && len(id) > 4 && id[:4] == "BLI-" {
+			bliCount++
+			grefs := objects.ExtractGoalRefs(obj)
+			assert.Contains(t, grefs, goalID, "milestone child backlog item %s must inherit goal %s", id, goalID)
+			milRefs, ok := obj[objects.FieldKeyMilestoneRefs].([]string)
+			if !ok {
+				if anyRefs, okAny := obj[objects.FieldKeyMilestoneRefs].([]any); okAny {
+					for _, r := range anyRefs {
+						milRefs = append(milRefs, fmt.Sprint(r))
+					}
+				}
+			}
+			assert.Contains(t, milRefs, milID, "backlog item %s must reference parent milestone %s", id, milID)
+		}
+	}
+	assert.Equal(t, 3, bliCount, "expected 3 child backlog items to be created")
+}

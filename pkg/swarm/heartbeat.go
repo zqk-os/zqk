@@ -263,7 +263,7 @@ func RunAlignmentPulse(ctx context.Context, projectRoot string, store storage.Ob
 				"$ne": objects.ObjectStatusArchived,
 			},
 		},
-		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyGoalRefs, "goal_ref"},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyStatus, objects.FieldKeyGoalRefs, "goal_ref", objects.FieldKeyRequirementRefs, "requirement_ref"},
 		Limit:  10000,
 	})
 	if err != nil {
@@ -286,10 +286,46 @@ func RunAlignmentPulse(ctx context.Context, projectRoot string, store storage.Ob
 		goalsCount = len(goalList.Objects)
 	}
 
+	// 2b. Pre-fetch requirements for transitive goal resolution (GH-981)
+	reqList, _ := store.List(ctx, sec, nil, storage.ListFilter{
+		Kind: objects.KindRequirement,
+		Filters: map[string]any{
+			objects.FieldKeyStatus: map[string]any{
+				"$ne": objects.ObjectStatusArchived,
+			},
+		},
+		Fields: []string{objects.FieldKeyID, objects.FieldKeyGoalRefs, "goal_ref"},
+		Limit:  10000,
+	})
+	reqToGoalRefs := make(map[string][]string)
+	if reqList != nil {
+		for _, robj := range reqList.Objects {
+			if rid, ok := robj[objects.FieldKeyID].(string); ok && rid != "" {
+				g := objects.ExtractGoalRefs(robj)
+				if len(g) > 0 {
+					reqToGoalRefs[rid] = g
+				}
+			}
+		}
+	}
+
 	total := len(listResult.Objects)
 	withCount := 0
 	for _, obj := range listResult.Objects {
-		if len(extractGoalRefs(obj)) > 0 {
+		grefs := objects.ExtractGoalRefs(obj)
+		if len(grefs) == 0 {
+			reqRefs := parseStringSlice(obj[objects.FieldKeyRequirementRefs])
+			if singleReq, ok := obj["requirement_ref"].(string); ok && strings.TrimSpace(singleReq) != "" {
+				reqRefs = append(reqRefs, strings.TrimSpace(singleReq))
+			}
+			for _, rID := range reqRefs {
+				if parentGoals, ok := reqToGoalRefs[rID]; ok && len(parentGoals) > 0 {
+					grefs = parentGoals
+					break
+				}
+			}
+		}
+		if len(grefs) > 0 {
 			withCount++
 		}
 	}
@@ -520,31 +556,7 @@ func RunHeartbeatLoop(ctx context.Context, opts HeartbeatOptions, onPulse func(*
 }
 
 func extractGoalRefs(obj map[string]any) []string {
-	var out []string
-	if ref, ok := obj["goal_ref"].(string); ok && strings.TrimSpace(ref) != "" {
-		out = append(out, strings.TrimSpace(ref))
-	}
-	if raw, ok := obj[objects.FieldKeyGoalRefs]; ok {
-		switch v := raw.(type) {
-		case string:
-			if strings.TrimSpace(v) != "" {
-				out = append(out, strings.TrimSpace(v))
-			}
-		case []string:
-			for _, s := range v {
-				if strings.TrimSpace(s) != "" {
-					out = append(out, strings.TrimSpace(s))
-				}
-			}
-		case []any:
-			for _, item := range v {
-				if s, ok := item.(string); ok && strings.TrimSpace(s) != "" {
-					out = append(out, strings.TrimSpace(s))
-				}
-			}
-		}
-	}
-	return out
+	return objects.ExtractGoalRefs(obj)
 }
 
 func parseStringSlice(v any) []string {
