@@ -58,6 +58,7 @@ fields:
       - performance
       - security
       - compliance
+      - refactor
       required: true
   goal_refs:
     access:

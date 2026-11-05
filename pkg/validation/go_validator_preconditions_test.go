@@ -282,3 +282,163 @@ func indexOfStage(names []string, want string) int {
 	}
 	return -1
 }
+
+func TestFormatUnmetPreconditionDetail_PriorityPlanValidated(t *testing.T) {
+	t.Parallel()
+
+	// 1. Missing title and description, has workstream lane
+	objNoTitle := map[string]any{
+		objects.FieldKeyWorkstreamRefs: []string{"WS-ARCH"},
+	}
+	detail := FormatUnmetPreconditionDetail(PrecondPriorityPlanValidated, objNoTitle)
+	expected := "priority plan validated: 'title' or 'description' written identity must be specified"
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+
+	// 2. Has title, missing workstream lane
+	objNoLane := map[string]any{
+		objects.FieldKeyTitle: "My Priority Plan",
+	}
+	detail = FormatUnmetPreconditionDetail(PrecondPriorityPlanValidated, objNoLane)
+	expected = "priority plan validated: 'workstream_refs' or 'workstream_ref' must be specified"
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+
+	// 3. Missing both written identity and workstream lane
+	objEmpty := map[string]any{}
+	detail = FormatUnmetPreconditionDetail(PrecondPriorityPlanValidated, objEmpty)
+	expected = "priority plan validated: 'title' or 'description' written identity must be specified; 'workstream_refs' or 'workstream_ref' must be specified"
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+
+	// 4. nil object
+	detail = FormatUnmetPreconditionDetail(PrecondPriorityPlanValidated, nil)
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+}
+
+func TestFormatUnmetPreconditionDetail_GitMutationEvidence(t *testing.T) {
+	t.Parallel()
+
+	// 1. With BLI ID
+	objWithID := map[string]any{
+		objects.FieldKeyID: "BLI-1234",
+	}
+	detail := FormatUnmetPreconditionDetail(PrecondCommitHashesGitMutationEvidence, objWithID)
+	expected := "commit_hashes have git mutation evidence for this backlog_item (ensure at least one commit touches code_location and mentions [BLI-1234] in its commit message)"
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+
+	// 2. Without BLI ID (empty map)
+	detail = FormatUnmetPreconditionDetail(PrecondCommitHashesGitMutationEvidence, map[string]any{})
+	expected = "commit_hashes have git mutation evidence for this backlog_item (ensure at least one commit touches code_location and mentions [BLI-xxx] in its commit message)"
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+
+	// 3. nil object
+	detail = FormatUnmetPreconditionDetail(PrecondCommitHashesGitMutationEvidence, nil)
+	if detail != expected {
+		t.Fatalf("got %q, want %q", detail, expected)
+	}
+}
+
+func TestValidateLifecycleState_DetailedPreconditionErrors(t *testing.T) {
+	t.Parallel()
+	gv := NewGoValidator()
+
+	t.Run("PriorityPlanMissingWorkstreamLane", func(t *testing.T) {
+		obj := map[string]any{
+			objects.FieldKeyID:     "PRI-LIFECYCLE-1",
+			objects.FieldKeyKind:   objects.KindPriorityPlan,
+			objects.FieldKeyStatus: objects.ObjectStatusActive,
+			objects.FieldKeyTitle:  "Valid Plan Title",
+			"persona_refs":         []string{"PER-ENG"},
+		}
+		opts := &ValidationOptions{
+			CurrentState:      objects.ObjectStatusGrooming,
+			ValidateLifecycle: true,
+			DependentsLookup: func(string) []string {
+				return []string{"BLI-CHILD-1"}
+			},
+			ObjectStatusLookup: func(string) (string, error) {
+				return objects.ObjectStatusPlanned, nil
+			},
+		}
+		errs, _ := gv.validateLifecycleState(t.Context(), objects.KindPriorityPlan, objects.ObjectStatusActive, objects.ObjectStatusGrooming, obj, opts)
+		var found bool
+		for _, e := range errs {
+			if strings.Contains(e.Message, "priority plan validated: 'workstream_refs' or 'workstream_ref' must be specified") {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("expected detailed workstream lane error, got errs: %v", errs)
+		}
+	})
+
+	t.Run("PriorityPlanMissingWrittenIdentity", func(t *testing.T) {
+		obj := map[string]any{
+			objects.FieldKeyID:             "PRI-LIFECYCLE-2",
+			objects.FieldKeyKind:           objects.KindPriorityPlan,
+			objects.FieldKeyStatus:         objects.ObjectStatusActive,
+			objects.FieldKeyWorkstreamRefs: []string{"WS-ENG"},
+			"persona_refs":                 []string{"PER-ENG"},
+		}
+		opts := &ValidationOptions{
+			CurrentState:      objects.ObjectStatusGrooming,
+			ValidateLifecycle: true,
+			DependentsLookup: func(string) []string {
+				return []string{"BLI-CHILD-1"}
+			},
+			ObjectStatusLookup: func(string) (string, error) {
+				return objects.ObjectStatusPlanned, nil
+			},
+		}
+		errs, _ := gv.validateLifecycleState(t.Context(), objects.KindPriorityPlan, objects.ObjectStatusActive, objects.ObjectStatusGrooming, obj, opts)
+		var found bool
+		for _, e := range errs {
+			if strings.Contains(e.Message, "priority plan validated: 'title' or 'description' written identity must be specified") {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("expected detailed written identity error, got errs: %v", errs)
+		}
+	})
+
+	t.Run("BacklogItemGitMutationEvidence", func(t *testing.T) {
+		obj := map[string]any{
+			objects.FieldKeyID:     "BLI-TEST-999",
+			objects.FieldKeyKind:   objects.KindBacklogItem,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+			"criteria_refs":        []string{"CRIT-1"},
+		}
+		opts := &ValidationOptions{
+			CurrentState:      objects.ObjectStatusInProgress,
+			ValidateLifecycle: true,
+			ObjectStatusLookup: func(string) (string, error) {
+				return objects.ObjectStatusValidated, nil
+			},
+		}
+		errs, _ := gv.validateLifecycleState(t.Context(), objects.KindBacklogItem, objects.ObjectStatusComplete, objects.ObjectStatusInProgress, obj, opts)
+		var found bool
+		wantSub := "commit_hashes have git mutation evidence for this backlog_item (ensure at least one commit touches code_location and mentions [BLI-TEST-999] in its commit message)"
+		for _, e := range errs {
+			if strings.Contains(e.Message, wantSub) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Fatalf("expected git mutation evidence error with tag format, got errs: %v", errs)
+		}
+	})
+}

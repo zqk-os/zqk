@@ -16,7 +16,7 @@ var (
 	ErrMissingDeliverables = errors.New(ReasonMissingArtifacts)
 )
 
-// ExtractArtifactList parses an arbitrary value (string, []string, []any) into a cleaned slice of strings.
+// ExtractArtifactList parses an arbitrary value (string, []string, []any, map) into a cleaned slice of strings.
 func ExtractArtifactList(value any) []string {
 	var paths []string
 	switch items := value.(type) {
@@ -24,6 +24,10 @@ func ExtractArtifactList(value any) []string {
 		for _, item := range items {
 			if s, ok := item.(string); ok && strings.TrimSpace(s) != "" {
 				paths = append(paths, strings.TrimSpace(s))
+			} else if m, ok := item.(map[string]any); ok {
+				paths = append(paths, extractPathsFromMap(m)...)
+			} else if m, ok := item.(map[any]any); ok {
+				paths = append(paths, extractPathsFromUntypedMap(m)...)
 			}
 		}
 	case []string:
@@ -36,8 +40,35 @@ func ExtractArtifactList(value any) []string {
 		if strings.TrimSpace(items) != "" {
 			paths = append(paths, strings.TrimSpace(items))
 		}
+	case map[string]any:
+		paths = append(paths, extractPathsFromMap(items)...)
+	case map[any]any:
+		paths = append(paths, extractPathsFromUntypedMap(items)...)
 	}
 	return paths
+}
+
+func extractPathsFromMap(m map[string]any) []string {
+	var paths []string
+	if cp, ok := m[objects.FieldKeyChangedPaths]; ok {
+		paths = append(paths, ExtractArtifactList(cp)...)
+	}
+	for _, key := range []string{"path", "artifact", "file"} {
+		if p, ok := m[key].(string); ok && strings.TrimSpace(p) != "" {
+			paths = append(paths, strings.TrimSpace(p))
+		}
+	}
+	return paths
+}
+
+func extractPathsFromUntypedMap(m map[any]any) []string {
+	strMap := make(map[string]any, len(m))
+	for k, v := range m {
+		if ks, ok := k.(string); ok {
+			strMap[ks] = v
+		}
+	}
+	return extractPathsFromMap(strMap)
 }
 
 // extractArtifactPaths is maintained for package-internal backward compatibility.
@@ -46,12 +77,15 @@ func extractArtifactPaths(value any) []string {
 }
 
 // ExtractObjectArtifacts extracts all declared artifact paths for an object,
-// falling back to code_location if artifacts is empty.
+// falling back to outputs and code_location if artifacts is empty.
 func ExtractObjectArtifacts(obj map[string]any) []string {
 	if obj == nil {
 		return nil
 	}
 	paths := ExtractArtifactList(obj[objects.FieldKeyArtifacts])
+	if len(paths) == 0 {
+		paths = ExtractArtifactList(obj[objects.FieldKeyOutputs])
+	}
 	if len(paths) == 0 {
 		paths = ExtractArtifactList(obj[objects.FieldKeyCodeLocation])
 	}

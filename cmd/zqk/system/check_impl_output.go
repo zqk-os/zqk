@@ -144,7 +144,7 @@ func outputResults(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, 
 	// If table format was handled, return early to avoid calling handleLegacyFormat
 	// which would also output table format
 	if outputCtx.Format == cli.FormatTable || outputCtx.FormatStr == "table" {
-		return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot)
+		return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot, outputResultsOptions(outputCtx))
 	}
 
 	// Handle streaming formats
@@ -153,7 +153,7 @@ func outputResults(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, 
 	}
 	// If streaming format was handled, return early
 	if outputCtx.Handler != nil && outputCtx.Handler.IsStreaming() {
-		return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot)
+		return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot, outputResultsOptions(outputCtx))
 	}
 
 	// Handle non-streaming formats with handlers
@@ -162,14 +162,14 @@ func outputResults(cmd *cobra.Command, ctx *cli.Context, results []CheckResult, 
 	}
 	// If non-streaming format handler was used, return early
 	if outputCtx.Handler != nil && !outputCtx.Handler.IsStreaming() {
-		return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot)
+		return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot, outputResultsOptions(outputCtx))
 	}
 
 	// Fallback to legacy format handlers (only if no handler was used)
 	if err := handleLegacyFormat(cmd, ctx, results, outputCtx); err != nil {
 		return err
 	}
-	return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot)
+	return evaluateSystemCheckPristine(results, outputCtx.RunIssues, ctx.ProjectRoot, outputResultsOptions(outputCtx))
 }
 
 // countUnprocessedAutofixBatches returns the number of AUTOFIX-*.json files under .zqk/autofix/
@@ -759,7 +759,23 @@ func isCompletedSystemCheckError(err error) bool {
 	return errors.As(err, &sc)
 }
 
-func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRunIssues, projectRoot string) error {
+// SystemCheckOptions configures evaluation of check results.
+type SystemCheckOptions struct {
+	IgnoreWarnings bool
+	FailLevel      string
+}
+
+func outputResultsOptions(outputCtx *OutputResultsContext) SystemCheckOptions {
+	if outputCtx == nil {
+		return SystemCheckOptions{}
+	}
+	return SystemCheckOptions{
+		IgnoreWarnings: outputCtx.IgnoreWarnings,
+		FailLevel:      outputCtx.FailLevel,
+	}
+}
+
+func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRunIssues, projectRoot string, opts ...SystemCheckOptions) error {
 	layer0Count := 0
 	tier1Count := 0
 	warningsCount := 0
@@ -847,7 +863,21 @@ func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRun
 		}
 	}
 
+	shouldIgnoreWarnings := false
+	if len(opts) > 0 {
+		if opts[0].IgnoreWarnings {
+			shouldIgnoreWarnings = true
+		}
+		fl := strings.ToLower(strings.TrimSpace(opts[0].FailLevel))
+		if fl == "error" || fl == "blocking" {
+			shouldIgnoreWarnings = true
+		}
+	}
+
 	if warningsCount > 0 {
+		if shouldIgnoreWarnings {
+			return nil
+		}
 		return &SystemCheckError{
 			ExitCodeVal:   3,
 			Message:       fmt.Sprintf("system check failed with exit code 3: %d non-blocking warning(s) found", warningsCount),
@@ -856,6 +886,12 @@ func evaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRun
 	}
 
 	return nil
+}
+
+// EvaluateSystemCheckPristine evaluates check results against integrity and compliance gates,
+// returning a SystemCheckError if thresholds are violated or nil if healthy.
+func EvaluateSystemCheckPristine(results []CheckResult, runIssues *ValidationRunIssues, projectRoot string, opts ...SystemCheckOptions) error {
+	return evaluateSystemCheckPristine(results, runIssues, projectRoot, opts...)
 }
 
 // writeLayeredSummary summarizes objects that are inside the CAS membrane:

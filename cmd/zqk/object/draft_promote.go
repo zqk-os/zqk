@@ -2,6 +2,7 @@ package object
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -9,6 +10,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation"
 )
 
 // Constants for resilient draft plane bulk promote batching.
@@ -25,6 +28,8 @@ type draftItemError struct {
 // NewDraftPromoteCmd creates `object draft promote`.
 func NewDraftPromoteCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectDraftPromoteCommandBuilder()
+	cmd.Flags().Bool("cascade", false, "Cascade promotion to all referenced draft-plane objects")
+	cmd.Flags().Bool("family", false, "Alias for --cascade: promote connected draft family in topological order")
 	cli.BindAsyncProgress(cmd, runObjectDraftPromote)
 	return cmd
 }
@@ -75,6 +80,12 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 			return cli.FormatOutput(cmd, out)
 		}
 
+		// Topologically sort draft plane IDs so dependencies precede dependents across batches.
+		sortedIDs, sortErr := sortObjectIDsForMembranePromotion(proc.OperationContext(), proc.SecurityContext(), proc, ids)
+		if sortErr == nil && len(sortedIDs) == len(ids) {
+			ids = sortedIDs
+		}
+
 		batchSize := defaultDraftPromoteBatchSize
 		if len(ids) <= batchSize {
 			batchSize = len(ids)
@@ -87,6 +98,43 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 			if cid, ok := c[objects.FieldKeyID].(string); ok {
 				candidateIndex[cid] = i
 			}
+		}
+
+		kindByID := make(map[string]string, len(matched))
+		pathByID := make(map[string]string, len(matched))
+		for _, m := range matched {
+			kindByID[m.ID] = m.Kind
+			pathByID[m.ID] = m.Path
+		}
+
+		resolveKind := func(id string) string {
+			if k, ok := kindByID[id]; ok && k != "" {
+				return k
+			}
+			return validation.GetIDValidator().InferKindFromID(id)
+		}
+
+		pruneDraftFile := func(id string) {
+			kind := resolveKind(id)
+			if kind != "" {
+				_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
+			}
+			if p, ok := pathByID[id]; ok && p != "" {
+				if _, err := fileutil.Stat(p); err == nil {
+					_ = fileutil.Remove(p)
+					shardDir := filepath.Dir(p)
+					_ = fileutil.Remove(shardDir)
+					_ = fileutil.Remove(filepath.Dir(shardDir))
+				}
+			}
+		}
+
+		isPromoted := func(id string) bool {
+			kind := resolveKind(id)
+			if kind != "" && storage.CasBackedObjectID(proc.ProjectRoot(), kind, id) {
+				return true
+			}
+			return false
 		}
 
 		for i := 0; i < len(ids); i += batchSize {
@@ -104,20 +152,32 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 					if idx, ok := candidateIndex[bid]; ok {
 						candidates[idx]["action"] = "promoted"
 					}
+					pruneDraftFile(bid)
 				}
 				continue
 			}
 
-			// If batch failed, fall back to one-item-at-a-time
-			// so individual stuck items or transient daemon delays do not block healthy drafts.
-			// (one-id promote remains documented fallback)
+			// If batch failed, inspect each item in the batch:
+			// items that successfully materialized into CAS during the batch promote
+			// must have their draft files pruned and marked as promoted immediately without re-promoting.
+			// Only items that did not promote should be retried individually.
 			for _, singleID := range batch {
-				singleErr := promoteObjectIDs(cmd, proc, []string{singleID})
-				if singleErr == nil {
+				if isPromoted(singleID) {
 					promotedIDs = append(promotedIDs, singleID)
 					if idx, ok := candidateIndex[singleID]; ok {
 						candidates[idx]["action"] = "promoted"
 					}
+					pruneDraftFile(singleID)
+					continue
+				}
+
+				singleErr := promoteObjectIDs(cmd, proc, []string{singleID})
+				if singleErr == nil || isPromoted(singleID) {
+					promotedIDs = append(promotedIDs, singleID)
+					if idx, ok := candidateIndex[singleID]; ok {
+						candidates[idx]["action"] = "promoted"
+					}
+					pruneDraftFile(singleID)
 				} else {
 					if idx, ok := candidateIndex[singleID]; ok {
 						candidates[idx]["action"] = "failed"

@@ -17,6 +17,7 @@ var ValidCriteriaCategories = []string{
 	"performance",
 	"security",
 	"compliance",
+	"refactor",
 }
 
 // ValidPriorityTiers lists canonical priority tier enum values (P0 through P5).

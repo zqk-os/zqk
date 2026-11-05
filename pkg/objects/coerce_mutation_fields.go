@@ -159,13 +159,13 @@ func RequireCriteriaCategory(kind string, obj map[string]any) error {
 	}
 	cat := strings.TrimSpace(GetString(obj, FieldKeyCategory))
 	if cat == "" {
-		return fmt.Errorf("criteria requires category (functional|non-functional|acceptance|test|performance|security|compliance)")
+		return fmt.Errorf("criteria requires category (functional|non-functional|acceptance|test|performance|security|compliance|refactor)")
 	}
 	switch cat {
-	case "functional", "non-functional", "acceptance", "test", "performance", "security", "compliance":
+	case "functional", "non-functional", "acceptance", "test", "performance", "security", "compliance", "refactor":
 		return nil
 	default:
-		return fmt.Errorf("criteria category %q is invalid; must be one of: functional, non-functional, acceptance, test, performance, security, compliance", cat)
+		return fmt.Errorf("criteria category %q is invalid; must be one of: functional, non-functional, acceptance, test, performance, security, compliance, refactor", cat)
 	}
 }
 

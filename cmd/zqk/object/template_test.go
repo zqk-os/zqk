@@ -217,3 +217,23 @@ func TestTemplate_OmitsEmptyOptionalReferenceFields(t *testing.T) {
 		t.Errorf("expected optional owner_ref to be omitted from template, got:\n%s", out)
 	}
 }
+
+func TestTemplate_AgentTaskIncludesArtifacts(t *testing.T) {
+	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	out, err := executeObjectCommand(t, tempDir, provider, "template", "agent_task")
+	if err != nil {
+		t.Fatalf("template agent_task failed: %v", err)
+	}
+
+	// Verify artifacts: [] appears uncommented under required fields for agent_task (Issue #935)
+	if !strings.Contains(out, "artifacts: []") {
+		t.Fatalf("expected template for agent_task to contain uncommented 'artifacts: []', got:\n%s", out)
+	}
+
+	// Verify artifacts is NOT commented out as optional
+	if strings.Contains(out, "artifacts: # []") {
+		t.Fatalf("expected artifacts not to be commented out as optional in agent_task template, got:\n%s", out)
+	}
+}

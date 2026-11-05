@@ -328,6 +328,12 @@ func handleClearCache(checkCtx *AsyncCheckContext) error {
 	}
 
 	if !clearCache {
+		if checkCtx.Cmd != nil {
+			if refreshCache, _ := checkCtx.Cmd.Flags().GetBool("refresh-cache"); refreshCache {
+				asyncValidator := GetAsyncValidator(checkCtx.Cmd.Context(), checkCtx.ProjectRoot, 0)
+				asyncValidator.InvalidateBlockingReferenceIssues()
+			}
+		}
 		return nil
 	}
 
@@ -992,7 +998,8 @@ func enqueueOrUseCache(
 		autoFix, _ := checkCtx.Cmd.Flags().GetBool("auto-fix")
 		force, _ := checkCtx.Cmd.Flags().GetBool("force")
 		clearCache, _ := checkCtx.Cmd.Flags().GetBool("clear-cache")
-		bypassCacheWithIssues = autoFix || force
+		refreshCache, _ := checkCtx.Cmd.Flags().GetBool("refresh-cache")
+		bypassCacheWithIssues = autoFix || force || refreshCache
 		// Explicit clear must revalidate even if Clear() raced with another writer
 		// that restored a poison on-disk snapshot.
 		forceMiss = clearCache

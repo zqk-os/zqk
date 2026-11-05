@@ -316,3 +316,45 @@ func TestWriteObjectToDraftPlane_PriorityPlanOmitsEmptyEpicRefs(t *testing.T) {
 		t.Fatalf("priority_plan draft must omit empty epic_refs; got %#v", parsed[objects.FieldKeyEpicRefs])
 	}
 }
+
+// Issue #935: agent_task draft plane must include artifacts: [] to satisfy deliverable latch.
+func TestWriteObjectToDraftPlane_AgentTaskIncludesArtifacts(t *testing.T) {
+	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+
+	id := "ATK-1777000000000000000-arttest01"
+	sparseObj := map[string]any{
+		objects.FieldKeyID:            id,
+		objects.FieldKeyKind:          objects.KindAgentTask,
+		objects.FieldKeyTitle:         "Agent task draft fill artifacts",
+		objects.FieldKeyStatus:        objects.ObjectStatusConceptual,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	sparseData, err := yaml.Marshal(sparseObj)
+	if err != nil {
+		t.Fatalf("marshal sparse object: %v", err)
+	}
+	if err := fileStorage.WriteObjectToDraftPlane(id, objects.KindAgentTask, sparseData); err != nil {
+		t.Fatalf("WriteObjectToDraftPlane failed: %v", err)
+	}
+
+	draftPath := fileStorage.objectDraftPlanePath(objects.KindAgentTask, id)
+	data, err := fileutil.ReadFile(draftPath)
+	if err != nil {
+		t.Fatalf("read draft file: %v", err)
+	}
+	var parsed map[string]any
+	if err := yaml.Unmarshal(data, &parsed); err != nil {
+		t.Fatalf("unmarshal draft YAML: %v", err)
+	}
+	val, exists := parsed[objects.FieldKeyArtifacts]
+	if !exists {
+		t.Fatalf("agent_task draft must contain artifacts field; got %#v", parsed)
+	}
+	artifactsSlice, ok := val.([]any)
+	if !ok {
+		t.Fatalf("expected artifacts to be a slice, got %T: %#v", val, val)
+	}
+	if len(artifactsSlice) != 0 {
+		t.Fatalf("expected initial artifacts slice to be empty, got %d items", len(artifactsSlice))
+	}
+}

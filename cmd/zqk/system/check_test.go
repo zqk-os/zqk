@@ -53,6 +53,21 @@ func TestCheckCommandFlags(t *testing.T) {
 		t.Error("Command should have --auto-fix flag")
 	}
 
+	// Test ignore-warnings flag
+	if cmd.Flags().Lookup("ignore-warnings") == nil {
+		t.Error("Command should have --ignore-warnings flag")
+	}
+
+	// Test fail-level flag
+	if cmd.Flags().Lookup("fail-level") == nil {
+		t.Error("Command should have --fail-level flag")
+	} else {
+		val, err := cmd.Flags().GetString("fail-level")
+		if err != nil || val != "warning" {
+			t.Errorf("fail-level default should be 'warning', got %q", val)
+		}
+	}
+
 	// Test background flag (default: wait for results; --background returns immediately with operation ID)
 	backgroundFlag := cmd.Flags().Lookup("background")
 	if backgroundFlag == nil {

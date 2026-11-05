@@ -138,7 +138,9 @@ func generateTemplate(kind string, kindFields *objects.KindFields, _ *logging.Ev
 			continue
 		}
 
-		when.When(func() bool { return field.Required }).Then(func() {
+		when.When(func() bool {
+			return field.Required || (kind == objects.KindAgentTask && field.Name == objects.FieldKeyArtifacts)
+		}).Then(func() {
 			requiredFields = append(requiredFields, *field)
 		}).OrElse(func() {
 			// Omit empty reference fields from the YAML template when unset
@@ -147,6 +149,24 @@ func generateTemplate(kind string, kindFields *objects.KindFields, _ *logging.Ev
 			}
 			optionalFields = append(optionalFields, *field)
 		}).Run()
+	}
+
+	if kind == objects.KindAgentTask {
+		hasArtifacts := false
+		for _, f := range requiredFields {
+			if f.Name == objects.FieldKeyArtifacts {
+				hasArtifacts = true
+				break
+			}
+		}
+		if !hasArtifacts {
+			requiredFields = append(requiredFields, objects.FieldInfo{
+				Name:        objects.FieldKeyArtifacts,
+				Type:        "list",
+				Description: "Files/components touched by this object.",
+				Required:    true,
+			})
+		}
 	}
 
 	// Write required fields

@@ -171,13 +171,18 @@ func (b *BaseInstanceBuilder) BuildRequiredTemplate() (map[string]any, error) {
 	for _, fieldName := range fieldNames {
 		raw := fields[fieldName]
 		fieldDef, ok := raw.(map[string]any)
-		if !ok || !fieldIsRequired(fieldDef) {
+		if !ok || (!fieldIsRequired(fieldDef) && !(b.kind == objects.KindAgentTask && fieldName == objects.FieldKeyArtifacts)) {
 			continue
 		}
 		if _, exists := out[fieldName]; exists {
 			continue
 		}
 		out[fieldName] = placeholderValueForField(fieldName, fieldDef)
+	}
+	if b.kind == objects.KindAgentTask {
+		if _, exists := out[objects.FieldKeyArtifacts]; !exists {
+			out[objects.FieldKeyArtifacts] = []any{}
+		}
 	}
 
 	return out, nil

@@ -28,6 +28,12 @@ func NewCheckCmd() *cobra.Command {
 		"  - Layer 2: Objects Ready for Promotion/Execution (Clean objects with 0 validation issues)",
 		"  - Layer 3: Completed & Validated Items (Terminal objects passing all validation gates)",
 		"",
+		"Exit codes:",
+		"  - 0: Healthy / Success (no blockers, or warnings ignored)",
+		"  - 1: Validation errors / Tier 1 blockers",
+		"  - 2: CAS corruption / Layer 0 integrity failures",
+		"  - 3: Advisory warnings present (default behavior when not ignoring warnings)",
+		"",
 		"--fast / --check-refs=false is a partial, read-only surface (skips reference integrity).",
 		"Combined with --auto-fix or --force, --fast is dropped and refs are enabled so mutation",
 		"uses the full surface. A green partial result does not mean the kernel is healthy.",
@@ -50,6 +56,8 @@ func NewCheckCmd() *cobra.Command {
 		AddExample("Check with JSON output", "%s system check all --format json").
 		AddExample("Partial check (refs skipped; not authoritative)", "%s system check all --fast").
 		AddExample("Fast iteration: write failing IDs then re-check only those", "%s system check all --write-failing-ids tier1.txt --fast; %s system check --ids-from-file tier1.txt --fast").
+		AddExample("Incremental check (staged/dirty objects only; sub-second)", "%s system check --incremental").
+		AddExample("Pre-commit incremental check (staged objects and invariants)", "%s system check --tier 1 --incremental").
 		AddExample("Run in background (return immediately; completion via coordinator)", "%s system check all --auto-fix --background").
 		AddExample("Full-project auto-fix with long timeout", "%s system check all --auto-fix --timeout 3600s --format json -o .zqk/logs/system-check.json").
 		AddExample("Wake primary agent if draft/error/blocking/warning/info thresholds trip", "%s system check all --notify").
@@ -77,6 +85,8 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("skip-if-locked", false, "Cleanly exit with code 0 if auto-fix lock is held by another process")
 	cmd.Flags().Bool("check-refs", true, "Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled")
 	cmd.Flags().Bool("fast", false, "Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped")
+	cmd.Flags().Bool("incremental", false, "Validate only dirty/staged objects under .zqk/process/ and immediate invariants (sub-second fast path)")
+	cmd.Flags().Bool("staged", false, "Validate only git-staged objects under .zqk/process/ (staged incremental mode)")
 	cmd.Flags().Int("tier", 0, "Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)")
 	cmd.Flags().Int("layer", -1, "Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all)")
 	cmd.Flags().String("surface", "", "Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class")
@@ -98,6 +108,8 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("unresolvable-only", false, "Filter output to only show unresolvable violations")
 	cmd.Flags().Bool("cache-only", false, "Show cached validation results only (do not run validation, trigger background scan)")
 	cmd.Flags().String("dispatch-to", "", "Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')")
+	cmd.Flags().Bool("ignore-warnings", false, "Ignore advisory warnings (exit code 3) and exit with code 0 if no blockers exist")
+	cmd.Flags().String("fail-level", "warning", "Failure level that triggers non-zero exit code ('error' or 'warning', default: 'warning')")
 	// Opt-in mesh wake when draft/error/blocking/warning/info thresholds trip (not automatic).
 	// Bare --notify → primary orchestrator agent_id; --notify <id> overrides.
 	cmd.Flags().String("notify", "", "Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)")

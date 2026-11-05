@@ -43,8 +43,8 @@ func (av *AsyncValidator) Enqueue(objectID, objectKind, filePath string, priorit
 						break
 					}
 				}
-				if !hasIntegrityIssues {
-					// File likely unchanged and no integrity issues - use cached state
+				if !hasIntegrityIssues && !hasBlockingReferenceIssues(state.Issues) {
+					// File likely unchanged and no integrity or blocking reference issues - use cached state
 					av.sendProgress(ValidationProgress{
 						Status:        objects.ObjectStatusCompleted,
 						CurrentObject: objectID,
@@ -60,7 +60,8 @@ func (av *AsyncValidator) Enqueue(objectID, objectKind, filePath string, priorit
 			// CRITICAL: Even if file checksum matches, we must re-validate if:
 			// 1. There are integrity issues (expected hash in registry may have been updated)
 			// 2. Hash registry file was updated more recently than cache entry
-			// This ensures cache stays in sync when hash registry is updated by auto-fix
+			// 3. There are blocking reference/relational issues that may have resolved externally
+			// This ensures cache stays in sync when hash registry is updated by auto-fix or dependencies resolve
 			hasIntegrityIssues := false
 			for _, issue := range state.Issues {
 				if issue.Category == "integrity" {
@@ -72,8 +73,8 @@ func (av *AsyncValidator) Enqueue(objectID, objectKind, filePath string, priorit
 			// Check if hash registry was updated more recently than cache entry
 			hashRegistryUpdated := av.checkHashRegistryUpdated(objectKind, filePath, state.LastValidated)
 
-			if !hasIntegrityIssues && !hashRegistryUpdated {
-				// File unchanged, no integrity issues, and hash registry hasn't been updated
+			if !hasIntegrityIssues && !hashRegistryUpdated && !hasBlockingReferenceIssues(state.Issues) {
+				// File unchanged, no integrity issues, hash registry hasn't been updated, and no blocking reference issues
 				// Cached state is valid - skip validation
 				// Send progress update for cached result (non-blocking - drop if channel full or closed)
 				av.sendProgress(ValidationProgress{
@@ -82,7 +83,7 @@ func (av *AsyncValidator) Enqueue(objectID, objectKind, filePath string, priorit
 				})
 				return true // Cache hit
 			}
-			// Has integrity issues or hash registry was updated - must re-validate
+			// Has integrity issues, blocking reference issues, or hash registry was updated - must re-validate
 		}
 	}
 

@@ -298,6 +298,11 @@ func performBlockingCheck(blockingCtx *pkgctx.BlockingCheckContext) *pkgctx.Bloc
 // Use --background to return immediately with an operation ID; completion is reported via coordinator.
 func runCheck(cmd *cobra.Command, args []string) error {
 	cli.TouchMeaningfulActivity() // idle watchdog: check command entered (avoids cancel during PreRun/setup when parent is not zqk)
+	incremental, _ := cmd.Flags().GetBool("incremental")
+	staged, _ := cmd.Flags().GetBool("staged")
+	if incremental || staged {
+		return runCheckIncremental(cmd, args)
+	}
 	if err := refuseFastWithMutatingFlags(cmd); err != nil {
 		return err
 	}

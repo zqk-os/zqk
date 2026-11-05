@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"time"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -56,14 +57,29 @@ func (av *AsyncValidator) InvalidateCache(objectID string) {
 	av.stateCache.Invalidate(objectID)
 }
 
+// InvalidateBlockingReferenceIssues invalidates all cached states that have Tier-1 reference or relational issues
+// Note: stateCache has its own internal mutex, so no additional synchronization needed
+func (av *AsyncValidator) InvalidateBlockingReferenceIssues() int {
+	return av.stateCache.InvalidateBlockingReferenceIssues()
+}
+
 // ValidateNow validates an object immediately (bypasses queue, uses cache if available)
 func (av *AsyncValidator) ValidateNow(ctx context.Context, objectID, objectKind, filePath string) (*ValidationState, error) {
 	// Check cache first
 	if state, ok := av.GetCachedState(objectID); ok {
-		// Verify file hasn't changed
+		// Verify file hasn't changed and has no integrity or blocking reference issues
 		currentChecksum := av.computeChecksum(filePath)
-		if state.Checksum == currentChecksum {
-			return state, nil
+		if state.Checksum == currentChecksum && !hasBlockingReferenceIssues(state.Issues) {
+			hasIntegrityIssues := false
+			for _, issue := range state.Issues {
+				if issue.Category == "integrity" {
+					hasIntegrityIssues = true
+					break
+				}
+			}
+			if !hasIntegrityIssues {
+				return state, nil
+			}
 		}
 	}
 
@@ -160,7 +176,10 @@ func hasBlockingReferenceIssues(issues []ValidationIssue) bool {
 		if issue.Tier > 1 {
 			continue
 		}
-		if issue.Category == "reference" || issue.Category == "GhostRef" {
+		if strings.EqualFold(issue.Category, CategoryReference) ||
+			strings.HasPrefix(strings.ToLower(issue.Category), "reference") ||
+			strings.EqualFold(issue.Category, CategoryGhostRef) ||
+			strings.EqualFold(issue.Category, "traceability") {
 			return true
 		}
 	}
