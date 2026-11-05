@@ -76,6 +76,26 @@ func CoerceMutationFields(kind string, obj map[string]any) {
 			obj[name] = CoerceToStringList(v)
 		}
 	}
+	pruneEmptyScalarRefFields(obj)
+}
+
+func isScalarRefField(name string) bool {
+	if name == "id" {
+		return false
+	}
+	return (strings.HasSuffix(name, "_ref") || strings.HasSuffix(name, "_id")) &&
+		!strings.HasSuffix(name, "_refs") &&
+		!strings.HasSuffix(name, "_ids")
+}
+
+func pruneEmptyScalarRefFields(obj map[string]any) {
+	for k, v := range obj {
+		if isScalarRefField(k) {
+			if s, ok := v.(string); ok && strings.TrimSpace(s) == "" {
+				delete(obj, k)
+			}
+		}
+	}
 }
 
 func dedupeStrings(items []string) []string {
@@ -139,13 +159,13 @@ func RequireCriteriaCategory(kind string, obj map[string]any) error {
 	}
 	cat := strings.TrimSpace(GetString(obj, FieldKeyCategory))
 	if cat == "" {
-		return fmt.Errorf("criteria requires category (functional|non-functional|acceptance|test|performance|security|compliance)")
+		return fmt.Errorf("criteria requires category (functional|non-functional|acceptance|test|performance|security|compliance|refactor)")
 	}
 	switch cat {
-	case "functional", "non-functional", "acceptance", "test", "performance", "security", "compliance":
+	case "functional", "non-functional", "acceptance", "test", "performance", "security", "compliance", "refactor":
 		return nil
 	default:
-		return fmt.Errorf("criteria category %q is invalid; must be one of: functional, non-functional, acceptance, test, performance, security, compliance", cat)
+		return fmt.Errorf("criteria category %q is invalid; must be one of: functional, non-functional, acceptance, test, performance, security, compliance, refactor", cat)
 	}
 }
 

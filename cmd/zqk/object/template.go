@@ -138,11 +138,35 @@ func generateTemplate(kind string, kindFields *objects.KindFields, _ *logging.Ev
 			continue
 		}
 
-		when.When(func() bool { return field.Required }).Then(func() {
+		when.When(func() bool {
+			return field.Required || (kind == objects.KindAgentTask && field.Name == objects.FieldKeyArtifacts)
+		}).Then(func() {
 			requiredFields = append(requiredFields, *field)
 		}).OrElse(func() {
+			// Omit empty reference fields from the YAML template when unset
+			if isOptionalRefField(field) {
+				return
+			}
 			optionalFields = append(optionalFields, *field)
 		}).Run()
+	}
+
+	if kind == objects.KindAgentTask {
+		hasArtifacts := false
+		for _, f := range requiredFields {
+			if f.Name == objects.FieldKeyArtifacts {
+				hasArtifacts = true
+				break
+			}
+		}
+		if !hasArtifacts {
+			requiredFields = append(requiredFields, objects.FieldInfo{
+				Name:        objects.FieldKeyArtifacts,
+				Type:        "list",
+				Description: "Files/components touched by this object.",
+				Required:    true,
+			})
+		}
 	}
 
 	// Write required fields
@@ -247,6 +271,13 @@ func getPlaceholderValue(field *objects.FieldInfo, originStatus string) string {
 		return fmt.Sprintf("%q", pkgctx.SystemAccountID)
 	}
 
+	if isReferenceField(field) {
+		if field.SemanticType != emptyValue && field.SemanticType != "reference" {
+			return fmt.Sprintf("\"# %s reference (e.g., %s:ID-###)\"", field.SemanticType, field.SemanticType)
+		}
+		return "\"# reference (e.g., REF-ID-001)\""
+	}
+
 	switch field.Type {
 	case "string", "text":
 		return "\"\""
@@ -265,12 +296,27 @@ func getPlaceholderValue(field *objects.FieldInfo, originStatus string) string {
 		}
 		return "\"\""
 	case "reference":
-		// For references, use the semantic type hint
-		if field.SemanticType != emptyValue {
+		// Unreachable for typed reference fields (isReferenceField above),
+		// but keep parity if call sites bypass that guard.
+		if field.SemanticType != emptyValue && field.SemanticType != "reference" {
 			return fmt.Sprintf("\"# %s reference (e.g., %s:ID-###)\"", field.SemanticType, field.SemanticType)
 		}
-		return "\"\""
+		return "\"# reference (e.g., REF-ID-001)\""
 	default:
 		return "\"\""
 	}
+}
+
+func isReferenceField(field *objects.FieldInfo) bool {
+	if field == nil {
+		return false
+	}
+	return field.Type == "reference" || field.SemanticType == "reference" || strings.HasSuffix(field.Name, "_ref")
+}
+
+func isOptionalRefField(field *objects.FieldInfo) bool {
+	if field == nil || field.Required {
+		return false
+	}
+	return isReferenceField(field)
 }

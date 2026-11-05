@@ -220,7 +220,7 @@ kind_to_prefixes:
     provider_profile:
         - PPRV-
     qa_success:
-        - QAS
+        - QAS-
     question:
         - QUE-
     release:
@@ -283,8 +283,8 @@ kind_to_prefixes:
         - TES-
         - TAM-
     test_case:
-        - TST
-        - TEST
+        - TST-
+        - TEST-
     test_command_rule:
         - TCR-
     validation_rule:
@@ -300,6 +300,7 @@ kind_to_prefixes:
         - WFL-
     workstream:
         - WS-
+        - WRK-
     workstream_transition:
         - WST-
     zqk_session:
@@ -386,4 +387,5 @@ kind_to_synonyms:
     workstream:
         - ws
         - work
+        - wrk
 version: 1.0.0

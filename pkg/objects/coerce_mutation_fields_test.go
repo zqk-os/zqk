@@ -191,3 +191,33 @@ func TestCoerceMutationFields_commitRefsScoping(t *testing.T) {
 		t.Errorf("expected commit_hashes to be populated on backlog_item, got %#v", bli[FieldKeyCommitHashes])
 	}
 }
+
+func TestCoerceMutationFields_PrunesEmptyScalarRefs(t *testing.T) {
+	t.Parallel()
+
+	obj := map[string]any{
+		FieldKeyKind:       KindBacklogItem,
+		FieldKeyID:         "BLI-TEST-EMPTY-REFS",
+		"milestone_ref":    "",
+		"release_ref":      "   ",
+		"owner_ref":        "",
+		"previous_plan_id": "",
+		"valid_ref":        "MIL-001",
+	}
+	CoerceMutationFields(KindBacklogItem, obj)
+	if _, ok := obj["milestone_ref"]; ok {
+		t.Error("expected empty milestone_ref to be pruned")
+	}
+	if _, ok := obj["release_ref"]; ok {
+		t.Error("expected whitespace release_ref to be pruned")
+	}
+	if _, ok := obj["owner_ref"]; ok {
+		t.Error("expected empty owner_ref to be pruned")
+	}
+	if _, ok := obj["previous_plan_id"]; ok {
+		t.Error("expected empty previous_plan_id to be pruned")
+	}
+	if val, ok := obj["valid_ref"]; !ok || val != "MIL-001" {
+		t.Errorf("expected valid_ref to be preserved, got %v", val)
+	}
+}

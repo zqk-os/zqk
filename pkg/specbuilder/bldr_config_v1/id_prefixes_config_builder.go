@@ -314,7 +314,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 					"PPRV-",
 				},
 				"qa_success": []any{
-					"QAS",
+					"QAS-",
 				},
 				"question": []any{
 					"QUE-",
@@ -406,8 +406,8 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 					"TAM-",
 				},
 				"test_case": []any{
-					"TST",
-					"TEST",
+					"TST-",
+					"TEST-",
 				},
 				"test_command_rule": []any{
 					"TCR-",
@@ -430,6 +430,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 				},
 				"workstream": []any{
 					"WS-",
+					"WRK-",
 				},
 				"workstream_transition": []any{
 					"WST-",
@@ -546,6 +547,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 				"workstream": []any{
 					"ws",
 					"work",
+					"wrk",
 				},
 			},
 			"version": ConfigYAMLVersionV1,

@@ -76,7 +76,7 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newKindConvenienceCmd(objects.KindPriorityPlan, "plan", "pri"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindRequirement, "req"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindCriteria, "crit"))
-	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tc", "tst"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tst", "tc"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindBacklogItem, "bli"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindMilestone, "mil"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindTechnicalDebt, "td", "techdebt"))
@@ -101,6 +101,9 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().String("file", "", "File to read title/description from")
 	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
 	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
+	if kind == objects.KindCriteria {
+		cmd.Flags().String("category", "functional", "Criteria category (default: functional)")
+	}
 	if cmd.Flags().Lookup("estimated-effort") == nil {
 		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
 	}
@@ -218,6 +221,20 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(
 			"backlog_item crossing CAS requires a hierarchical parent: pass --req <REQ-*> or --goal <GOAL-*> (GH#963)"))
 	}
+	if kind == objects.KindCriteria {
+		category := "functional"
+		if cmd.Flags().Lookup("category") != nil {
+			if flagCat, _ := cmd.Flags().GetString("category"); strings.TrimSpace(flagCat) != "" {
+				category = strings.TrimSpace(flagCat)
+			}
+		}
+		objData[objects.FieldKeyCategory] = category
+	}
+	if kind == objects.KindAgentTask {
+		if _, ok := objData[objects.FieldKeyArtifacts]; !ok {
+			objData[objects.FieldKeyArtifacts] = []any{}
+		}
+	}
 	applyRelationalFlags(cmd, kind, objData)
 	if err := object.RunCreateWithData(cmd, kind, objData); err != nil {
 		return err
@@ -235,6 +252,11 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 
 	emitJITGuidanceTip(cmd, kind)
 
+	return handleMintPromote(cmd, projectRoot, id, kind)
+}
+
+func handleMintPromote(cmd *cobra.Command, projectRoot, id, kind string) error {
+	wantPromote, _ := cmd.Flags().GetBool("promote")
 	if !wantPromote {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 			Info("minted onto draft plane; promote not enqueued (pass --promote to opt in)").

@@ -27,7 +27,15 @@ func parseTargetObjectIDs(cmd *cobra.Command, args []string) ([]string, error) {
 	if len(args) == 0 {
 		return nil, fmt.Errorf("at least one object ID is required (positional, comma-separated, and/or --ids)")
 	}
-	return args, nil
+	seen := make(map[string]bool, len(args))
+	deduped := make([]string, 0, len(args))
+	for _, id := range args {
+		if !seen[id] {
+			seen[id] = true
+			deduped = append(deduped, id)
+		}
+	}
+	return deduped, nil
 }
 
 type transitionContext struct {

@@ -601,6 +601,13 @@ func (gv *GoValidator) validateSemanticTypeConstraint(fieldName string, fieldVal
 		return nil
 	}
 
+	// Optional fields: empty string means unset, not invalid.
+	if str, ok := fieldValue.(string); ok && strings.TrimSpace(str) == emptyValue {
+		if !IsFieldRequired(fieldDef) {
+			return nil
+		}
+	}
+
 	fieldType, _ := fieldDef[objects.FieldKeyType].(string)
 	val := reflect.ValueOf(fieldValue)
 	isListValue := val.Kind() == reflect.Slice || val.Kind() == reflect.Array
@@ -812,9 +819,10 @@ func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 		if gv.checkPrecondition(precondition, obj, options) {
 			continue
 		}
+		detail := formatUnmetPreconditionDetail(precondition, obj)
 		errors = append(errors, ValidationError{
 			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf(msgFmt, status, precondition),
+			Message: fmt.Sprintf(msgFmt, status, detail),
 			Rule:    validationRuleLifecycle(),
 		})
 	}

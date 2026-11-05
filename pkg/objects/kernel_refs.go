@@ -29,13 +29,14 @@ func FieldChecklistSecurityIsSensitive(security string) bool {
 // object_specs; they remain here so list/filter do not treat git/file/token
 // leftovers as graph edges.
 var nonKernelRefFieldNames = map[string]struct{}{
-	"branch_ref":      {},
-	"commit_ref":      {},
-	"commit_refs":     {},
-	"lifecycle_ref":   {},
-	"lifecycle_refs":  {},
-	"capability_refs": {},
-	"document_refs":   {}, // leftover mixed path/ID list; kernel pointers are doc_entry_refs
+	"branch_ref":             {},
+	"commit_ref":             {},
+	"commit_refs":            {},
+	"lifecycle_ref":          {},
+	"lifecycle_refs":         {},
+	"capability_refs":        {},
+	"document_refs":          {}, // leftover mixed path/ID list; kernel pointers are doc_entry_refs
+	"verified_artifact_refs": {},
 }
 
 // IsObjectRefFieldName reports whether name uses the kernel-object pointer suffix.

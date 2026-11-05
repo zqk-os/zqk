@@ -66,6 +66,7 @@ func (b *CriteriaBuilder) addCriteriaFields() {
 				"performance",
 				"security",
 				"compliance",
+				"refactor",
 			}).
 			Required(true).
 			Build()).
