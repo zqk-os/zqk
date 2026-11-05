@@ -92,6 +92,22 @@ func TestEnqueueMintPromoteJob_UpdateExisting(t *testing.T) {
 	}
 }
 
+func TestRunNewObject_BacklogPromoteRequiresParentRef(t *testing.T) {
+	testRoot := setupTestProjectRoot(t)
+	if testRoot == "" {
+		t.Fatalf("expected non-empty test root")
+	}
+	cmd := NewNewCmd()
+	cmd.SetArgs([]string{"object", "backlog_item", "--title", "Orphan Promote", "--description", "Missing parent refs", "--promote"})
+	err := cmd.Execute()
+	if err == nil {
+		t.Fatal("expected promote without --req/--goal to fail closed (GH#963)")
+	}
+	if !strings.Contains(err.Error(), "--req") && !strings.Contains(err.Error(), "--goal") {
+		t.Fatalf("expected parent-ref guidance, got: %v", err)
+	}
+}
+
 func TestRunNewObject_WithPromoteFlag(t *testing.T) {
 	testRoot := setupTestProjectRoot(t)
 	if testRoot == "" {
@@ -103,7 +119,7 @@ func TestRunNewObject_WithPromoteFlag(t *testing.T) {
 
 	cmd := NewNewCmd()
 	cmd.SetContext(ctx)
-	cmd.SetArgs([]string{"object", "backlog_item", "--title", "Promote Opt-In Item", "--description", "Valid description for promote", "--promote"})
+	cmd.SetArgs([]string{"object", "backlog_item", "--title", "Promote Opt-In Item", "--description", "Valid description for promote", "--req", "REQ-PROMOTE-PARENT-001", "--promote"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("cmd.Execute() with --promote failed: %v", err)
 	}
@@ -115,7 +131,10 @@ func TestRunNewObject_DirectInvocation_UncoveredBranches(t *testing.T) {
 	cmd.Flags().String("file", "", "")
 	cmd.Flags().String("content", "", "")
 	cmd.Flags().String("description", "", "")
+	cmd.Flags().String("req", "", "")
+	cmd.Flags().String("goal", "", "")
 	cmd.Flags().Bool("promote", false, "")
+	cmd.Flags().Bool("cas", false, "")
 
 	// 1. Invalid kind directly without pre-run
 	if err := cmd.Flags().Set("title", "Some Title"); err != nil {

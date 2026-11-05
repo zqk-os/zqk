@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 )
 
@@ -217,4 +218,18 @@ func (m *mockStorageForTest) List(ctx context.Context, secCtx *storagepkg.Securi
 		}
 	}
 	return &storagepkg.QueryResult{Objects: results}, nil
+}
+
+func TestSelectBestCandidatePlan_SkipsComplete(t *testing.T) {
+	t.Parallel()
+	complete := map[string]any{objects.FieldKeyID: "PRI-DONE", objects.FieldKeyStatus: "complete"}
+	active := map[string]any{objects.FieldKeyID: "PRI-LIVE", objects.FieldKeyStatus: "active", objects.FieldKeyActiveOrder: 1}
+	got := SelectBestCandidatePlan(complete, 999, []map[string]any{complete, active})
+	if koi.ID(got) != "PRI-LIVE" {
+		t.Fatalf("expected PRI-LIVE over complete, got %#v", got)
+	}
+	got = SelectBestCandidatePlan(nil, 0, []map[string]any{complete, active})
+	if koi.ID(got) != "PRI-LIVE" {
+		t.Fatalf("fallback must skip complete, got %#v", got)
+	}
 }

@@ -166,6 +166,17 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 		return "", nil, nil
 	}
 
+	filtered := candidates[:0]
+	for _, obj := range candidates {
+		if planStatusEligible(koi.Status(obj)) {
+			filtered = append(filtered, obj)
+		}
+	}
+	candidates = filtered
+	if len(candidates) == 0 {
+		return "", nil, nil
+	}
+
 	candidates = preferSeatedPlansWithOpenWork(ctx, sp, candidates, personaIDs)
 
 	// 4. Score candidates: prefer shovel-ready execution plans over grooming megas.
@@ -225,12 +236,18 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 	return pID, pSumm, activePlans
 }
 
-// SelectBestCandidatePlan falls back to first candidate if bestPlan is nil or bestScore is non-positive.
+// SelectBestCandidatePlan falls back to first eligible candidate if bestPlan is nil or bestScore is non-positive.
+// Terminal plans (complete/archived) are never selected — GH#950.
 func SelectBestCandidatePlan(bestPlan map[string]any, bestScore int, candidates []map[string]any) map[string]any {
-	if (bestPlan == nil || bestScore <= 0) && len(candidates) > 0 {
-		return candidates[0]
+	if bestPlan != nil && bestScore > 0 && planStatusEligible(koi.Status(bestPlan)) {
+		return bestPlan
 	}
-	return bestPlan
+	for _, c := range candidates {
+		if c != nil && planStatusEligible(koi.Status(c)) {
+			return c
+		}
+	}
+	return nil
 }
 
 // planHasWork returns true if the plan has at least one open (non-terminal) linked BLI.

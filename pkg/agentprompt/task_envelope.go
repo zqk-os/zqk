@@ -102,7 +102,7 @@ func FormatTaskEnvelope(opts TaskPromptOptions, policyRefs, skillRefs []string) 
 	sb.WriteString(TaskEnvelopeMarker)
 	sb.WriteString("\n\n")
 	sb.WriteString("Static context lives in kernel objects. Do not treat this description as a copy of policy or skill bodies.\n")
-	sb.WriteString(paths.RewriteCanonicalCLIInvocations("Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context --task-id <ATK>`, or `zqk workflow whats-next`.\n\n"))
+	sb.WriteString(paths.RewriteCanonicalCLIInvocations("Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context <ATK>`, or `zqk workflow whats-next`.\n\n"))
 
 	sb.WriteString("## Dynamic\n")
 	if opts.PlanTitle != "" || opts.PlanID != "" {

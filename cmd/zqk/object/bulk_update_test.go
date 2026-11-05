@@ -48,6 +48,7 @@ func setupTestProject(t *testing.T) (tempDir string, cleanup func()) {
 		Kind:                     "cmd.object.bulk_update",
 		SkipSetupTestEnvironment: true,
 		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true, // CLI object cmds leave .zqk writers; avoid TempDir ENOTEMPTY
 		AppendStagesBeforeStorage: func(root string) []testkit.NamedTestStep {
 			return []testkit.NamedTestStep{{
 				Name: "bulk_update_kind_dirs",

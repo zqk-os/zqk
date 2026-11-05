@@ -167,3 +167,48 @@ func TestCoerceBacklogItemPriorityAndTier(t *testing.T) {
 	// 6. Nil object -> no panic
 	CoerceBacklogItemPriorityAndTier(nil)
 }
+
+func TestCoerceRequirementPriority(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"critical", "p0"},
+		{"Critical", "p0"},
+		{"CRITICAL", "p0"},
+		{"P0", "p0"},
+		{"p0", "p0"},
+		{"high", "p1"},
+		{"High", "p1"},
+		{"P1", "p1"},
+		{"p1", "p1"},
+		{"medium", "p2"},
+		{"Medium", "p2"},
+		{"P2", "p2"},
+		{"p2", "p2"},
+		{"low", "p3"},
+		{"Low", "p3"},
+		{"P3", "p3"},
+		{"p3", "p3"},
+	}
+
+	for _, tt := range tests {
+		obj := map[string]any{
+			FieldKeyPriority: tt.input,
+		}
+		CoerceRequirementPriority(obj)
+		if got := obj[FieldKeyPriority]; got != tt.want {
+			t.Errorf("CoerceRequirementPriority(%q) = %v, want %v", tt.input, got, tt.want)
+		}
+	}
+
+	// Unknown or missing priority preserved/no-op
+	objNone := map[string]any{FieldKeyTitle: "Req"}
+	CoerceRequirementPriority(objNone)
+	if _, ok := objNone[FieldKeyPriority]; ok {
+		t.Error("priority should not be set if missing")
+	}
+
+	// Nil object -> no panic
+	CoerceRequirementPriority(nil)
+}
