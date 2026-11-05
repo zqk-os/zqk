@@ -70,6 +70,7 @@ func runFeedDoctor(cmd *cobra.Command, _ []string) error {
 		out["peer_wake_live"] = res.PeerWakeLive
 		out["peer_seats_live"] = res.PeerSeatsLive
 		out["contract_paths_ok"] = res.ContractPathsOK
+		out["node_sovereignty"] = res.NodeSovereignty
 		if len(res.Issues) > 0 {
 			out["issues"] = res.Issues
 		}

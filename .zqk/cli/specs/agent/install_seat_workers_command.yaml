@@ -1,0 +1,47 @@
+$schema: "../schemas/command_spec.schema.json"
+
+name: "install-seat-workers"
+short: "Install root-scoped LaunchAgent/systemd units for mesh seat-workers"
+description: |
+  Writes OS supervisor units for agentapi/mcp seats under the seated kernel root.
+  Labels are com.<brand>.mesh.seat-worker.<root_id>.<seat_id> (node sovereignty).
+  Refuses worktrees, /tmp/ATK-*, and Go test TempDirs. Prefer this over shell
+  plist templates.
+
+flags:
+  - name: "seat"
+    type: "string"
+    default: ""
+    description: "Install only this seat id (default: all agentapi/mcp seats in peer_seats.json)"
+  - name: "persona-ref"
+    type: "string"
+    default: ""
+    description: "Override persona_ref for installed seats (default: seat record / PER-DEFAULT-OPERATOR)"
+  - name: "poll-seconds"
+    type: "int"
+    default: 30
+    description: "Seat-worker poll interval"
+  - name: "execute-non-comms"
+    type: "bool"
+    default: true
+    description: "Pass --execute-non-comms to supervised seat-workers"
+  - name: "write-only"
+    type: "bool"
+    default: false
+    description: "Write unit files without launchctl/systemctl (tests)"
+
+args:
+  type: "no_args"
+
+help:
+  examples:
+    - comment: "Install supervisor units for all agentapi/mcp seats"
+      command: "%s agent install-seat-workers"
+    - comment: "Install one seat write-only (tests)"
+      command: "%s agent install-seat-workers --seat peer-agent-1 --write-only"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runAgentInstallSeatWorkers"
+common_flags: true

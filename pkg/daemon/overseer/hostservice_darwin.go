@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -21,17 +22,15 @@ func currentUID() string {
 	return strconv.Itoa(os.Getuid())
 }
 
-// LaunchAgentsDir returns the path to ~/Library/LaunchAgents.
+// LaunchAgentsDir returns the path to ~/Library/LaunchAgents (or ZQK_LAUNCH_AGENTS_DIR).
 func LaunchAgentsDir() (string, error) {
-	home, err := fileutil.UserHomeDir()
-	if err != nil {
-		return "", errfmt.Newf("resolve user home dir").Wrap(err)
-	}
-	return filepath.Join(home, "Library", "LaunchAgents"), nil
+	return hostservice.LaunchAgentsDir()
 }
 
-// CleanLegacyLaunchAgents scans ~/Library/LaunchAgents, unloads, and removes all legacy
-// per-daemon LaunchAgents (com.zqk.scheduler.*, com.zqk.privileged-writer.*, com.zqk.mesh.*).
+// CleanLegacyLaunchAgents scans ~/Library/LaunchAgents, unloads, and removes superseded
+// per-daemon LaunchAgents (com.zqk.scheduler.*, com.zqk.privileged-writer.*, legacy mesh,
+// com.zqk.mcp*). Root-scoped mesh seat-workers for live foreign roots are preserved
+// (POL-AGENT-KERNEL-ROOT-BINDING-001 / node sovereignty).
 func CleanLegacyLaunchAgents() ([]string, error) {
 	dir, err := LaunchAgentsDir()
 	if err != nil {
@@ -66,17 +65,22 @@ func CleanLegacyLaunchAgents() ([]string, error) {
 				continue
 			}
 
-			// Clean legacy zqk daemon agents: scheduler, privileged-writer, mesh, mcp, etc.
+			plistPath := filepath.Join(d, name)
+			parsed := hostservice.ParseMeshSeatWorkerLabel(label)
 			isLegacy := strings.HasPrefix(label, "com.zqk.scheduler.") ||
 				strings.HasPrefix(label, "com.zqk.privileged-writer") ||
-				strings.HasPrefix(label, "com.zqk.mesh.") ||
 				strings.HasPrefix(label, "com.zqk.mcp")
+			if parsed.Valid {
+				wd := plistWorkingDirectoryHint(plistPath)
+				isLegacy = hostservice.ShouldCleanupLegacyMeshLabel(label, wd)
+			} else if strings.HasPrefix(label, "com.zqk.mesh.") {
+				isLegacy = hostservice.ShouldCleanupLegacyMeshLabel(label, "")
+			}
 
 			if !isLegacy {
 				continue
 			}
 
-			plistPath := filepath.Join(d, name)
 			_ = execwrap.Command("launchctl", "bootout", "gui/"+uid+"/"+label).Run()
 			_ = execwrap.Command("launchctl", "bootout", "gui/"+uid, plistPath).Run()
 			_ = execwrap.Command("launchctl", "unload", "-w", plistPath).Run()
@@ -88,7 +92,39 @@ func CleanLegacyLaunchAgents() ([]string, error) {
 	cleanInDir(dir)
 	cleanInDir(filepath.Join(dir, "disabled"))
 
+	// Quarantine ephemeral / legacy seat-worker leftovers without deleting live foreign roots.
+	if zombies, zerr := hostservice.GCMeshSeatWorkerZombies(); zerr == nil {
+		for _, z := range zombies {
+			cleaned = append(cleaned, z.Label)
+		}
+	}
+
 	return cleaned, nil
+}
+
+func plistWorkingDirectoryHint(plistPath string) string {
+	b, err := fileutil.ReadFile(plistPath)
+	if err != nil {
+		return ""
+	}
+	s := string(b)
+	const key = "<key>WorkingDirectory</key>"
+	i := strings.Index(s, key)
+	if i < 0 {
+		return ""
+	}
+	rest := s[i+len(key):]
+	const open = "<string>"
+	j := strings.Index(rest, open)
+	if j < 0 {
+		return ""
+	}
+	rest = rest[j+len(open):]
+	k := strings.Index(rest, "</string>")
+	if k < 0 {
+		return ""
+	}
+	return strings.TrimSpace(rest[:k])
 }
 
 // InstallOverseerLaunchAgent cleans legacy units, generates the com.zqk.overseer.plist,

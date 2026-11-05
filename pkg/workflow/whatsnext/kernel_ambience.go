@@ -13,6 +13,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/git"
 	"github.com/zqk-os/zqk/pkg/interactionpolicy"
+	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -73,6 +74,8 @@ type KernelAmbience struct {
 	StaleAgentTask    *StaleAgentTask        `json:"stale_agent_task,omitempty"`
 	RemedyHint        string                 `json:"remedy_hint,omitempty"`
 	RemedyRecipes     []string               `json:"remedy_recipes,omitempty"`
+	// NodeSovereignty surfaces seated-root vs MCP/env hijacks (multi-root LaunchAgents).
+	NodeSovereignty *nodesovereignty.Report `json:"node_sovereignty,omitempty"`
 }
 
 // StaleAgentTask holds information and command hints for stalled in-progress agent tasks.
@@ -255,6 +258,8 @@ func LoadKernelAmbience(projectRoot string) KernelAmbience {
 		amb.BranchBehind = n
 	}
 	amb.StewardFocus = ProjectStewardFocus(amb, "")
+	sov := nodesovereignty.Assess(projectRoot)
+	amb.NodeSovereignty = &sov
 	return amb
 }
 

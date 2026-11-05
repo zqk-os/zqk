@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/federation"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -134,6 +135,8 @@ func runInitiate(cmd *cobra.Command, args []string) error {
 				return errfmt.Newf("failed to persist federated node").Wrap(err)
 			}
 		}
+
+		_ = nodesovereignty.RecordHop(proc.ProjectRoot(), proc.ProjectRoot(), "federate_initiate:"+remoteEndpoint, "cli")
 
 		_ = cli.WriteOutput(cmd, []byte(fmt.Sprintf("✅ Federated session established with: %s\nRemote ID: %s\nCapabilities: %d shared\n",
 			remoteEndpoint, resp.KernelID, len(resp.Capabilities))))

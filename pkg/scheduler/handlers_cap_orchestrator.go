@@ -25,6 +25,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/primaryorch"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
@@ -404,6 +405,9 @@ func (h *CapOrchestratorHandler) prepareCmd(cmd *exec.Cmd) *exec.Cmd {
 }
 
 func (h *CapOrchestratorHandler) Execute(ctx context.Context, job *ScheduledJob) error {
+	if err := nodesovereignty.RefuseCrossRootMutate(h.projectRoot); err != nil {
+		return errfmt.Newf("cap orchestrator node sovereignty").Wrap(err)
+	}
 	exe, err := h.resolveCLIExecutable()
 	if err != nil {
 		return errfmt.Errorf("failed to resolve zqk executable: %w", err)
