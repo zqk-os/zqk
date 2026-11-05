@@ -37,6 +37,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/swarm"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/verification"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewSyncLoopCmd creates the agent sync-loop command
@@ -177,6 +178,9 @@ func getSyncLoopHeartbeat() time.Duration {
 		if d, err := time.ParseDuration(val); err == nil && d > 0 {
 			return d
 		}
+	}
+	if zqkenv.IsInTest() {
+		return 10 * time.Millisecond
 	}
 	return syncLoopHeartbeat
 }
@@ -324,24 +328,36 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 	}
 
+	firstIteration := true
 	for {
-		select {
-		case <-ctx.Done():
-			return fmt.Errorf("orchestrator timeout")
-		case <-cmd.Context().Done():
-			return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
-		case <-wakerCh:
-			// Reactive instant wake upon scheduler job completion or mutation event
-			draining := true
-			for draining {
-				select {
-				case <-wakerCh:
-				default:
-					draining = false
+		if !firstIteration {
+			select {
+			case <-ctx.Done():
+				return fmt.Errorf("orchestrator timeout")
+			case <-cmd.Context().Done():
+				return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
+			case <-wakerCh:
+				// Reactive instant wake upon scheduler job completion or mutation event
+				draining := true
+				for draining {
+					select {
+					case <-wakerCh:
+					default:
+						draining = false
+					}
 				}
+			case <-poller.C:
+				// Fallback heartbeat ticker to protect against dropped events
 			}
-		case <-poller.C:
-			// Fallback heartbeat ticker to protect against dropped events
+		} else {
+			firstIteration = false
+			select {
+			case <-ctx.Done():
+				return fmt.Errorf("orchestrator timeout")
+			case <-cmd.Context().Done():
+				return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
+			default:
+			}
 		}
 
 		loopCount++

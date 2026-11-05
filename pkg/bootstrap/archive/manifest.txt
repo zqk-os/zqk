@@ -64,7 +64,9 @@
 ./cli_specs/agent/status_command.yaml
 ./cli_specs/agent/swarm/
 ./cli_specs/agent/swarm/dispatch_command.yaml
+./cli_specs/agent/swarm/heartbeat_command.yaml
 ./cli_specs/agent/swarm/run_command.yaml
+./cli_specs/agent/swarm/spawn_command.yaml
 ./cli_specs/agent/swarm/status_command.yaml
 ./cli_specs/agent/swarm_command.yaml
 ./cli_specs/agent/swarm_init_command.yaml
@@ -149,6 +151,13 @@
 ./cli_specs/feed/wake_command.yaml
 ./cli_specs/feed/watch_command.yaml
 ./cli_specs/feed_command.yaml
+./cli_specs/gate/
+./cli_specs/gate/approve_command.yaml
+./cli_specs/gate/list_command.yaml
+./cli_specs/gate/reject_command.yaml
+./cli_specs/gate/review_command.yaml
+./cli_specs/gate/stage_command.yaml
+./cli_specs/gate_command.yaml
 ./cli_specs/graph/
 ./cli_specs/graph/discover_command.yaml
 ./cli_specs/graph/export_command.yaml
@@ -161,6 +170,9 @@
 ./cli_specs/init_command.yaml
 ./cli_specs/inspect_command.yaml
 ./cli_specs/intake_command.yaml
+./cli_specs/io/
+./cli_specs/io/fetch_command.yaml
+./cli_specs/io_command.yaml
 ./cli_specs/job/
 ./cli_specs/job/activity_command.yaml
 ./cli_specs/job/clear_issues_command.yaml
