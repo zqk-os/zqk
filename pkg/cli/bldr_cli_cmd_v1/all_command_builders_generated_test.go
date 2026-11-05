@@ -407,6 +407,7 @@ var allCommandBuilders = []struct {
 	{"NewStateTreeCommandBuilder", NewStateTreeCommandBuilder},
 	{"NewStateTsdbCommandBuilder", NewStateTsdbCommandBuilder},
 	{"NewStatusCommandBuilder", NewStatusCommandBuilder},
+	{"NewKernelSteerCommandBuilder", NewKernelSteerCommandBuilder},
 	{"NewSteerCommandBuilder", NewSteerCommandBuilder},
 	{"NewStopCommandBuilder", NewStopCommandBuilder},
 	{"NewSubmitCommandBuilder", NewSubmitCommandBuilder},

@@ -16,7 +16,7 @@ import (
 
 // NewSteerCmd creates the 'zqk steer' command group.
 func NewSteerCmd() *cobra.Command {
-	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSteerCommandBuilder(), &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewKernelSteerCommandBuilder(), &cobra.Command{
 		RunE: runSteer,
 	})
 

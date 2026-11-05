@@ -30,6 +30,8 @@ func NewFeedSteerCommandBuilder() *cobra.Command {
 	builder.AddBoolFlag("no-wake", "", false, "Do not wake the peer (stamp the feed only)")
 	builder.AddStringFlag("to-agent-id", "", "", "Optional peer seat id for inbox routing (to_agent_id)")
 	builder.AddBoolFlag("await-peer-ack", "", false, "Register a peer-ack await callback (rings From agent when peer feed-acks this event_id)")
+	builder.AddBoolFlag("non-interrupting", "", false, "Deliver non-interrupting steering guidance to active agents without process disruption")
+	builder.AddBoolFlag("reprime", "", false, "Tag steering guidance for in-flight agent context re-priming")
 	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"columns", "ignore-scheduler-down"})
 	cmd := builder.Build()
 	return cmd
