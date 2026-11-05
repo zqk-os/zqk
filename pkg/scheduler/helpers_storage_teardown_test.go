@@ -4,18 +4,18 @@ import (
 	"testing"
 
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
-// registerFileStorageTestTeardown registers [storagepkg.RunProjectTestTeardown] with
-// [storagepkg.TempProjectTeardown] after [storagepkg.NewFileObjectStorageForTest].
-// Register before other t.Cleanup callbacks that stop routers or handlers so those
-// run first (cleanups execute in reverse registration order; test defers run before cleanups).
+// registerFileStorageTestTeardown registers standard storage test teardown and
+// force-removes the projectRoot so t.TempDir cleanup never fails with unlinkat ENOTEMPTY.
 func registerFileStorageTestTeardown(t *testing.T, projectRoot string, st *storagepkg.FileObjectStorage) {
 	t.Helper()
 	t.Cleanup(func() {
-		opts := storagepkg.TempProjectTeardown(projectRoot, st)
-		if err := storagepkg.RunProjectTestTeardown(opts); err != nil {
-			t.Logf("project test teardown: %v", err)
+		if err := fileutil.RemoveAll(projectRoot); err != nil {
+			t.Logf("cleanup: %v", err)
 		}
 	})
+	testkit.RegisterStorageTestCleanup(t, projectRoot, st)
 }

@@ -555,7 +555,16 @@ func completeGetProjectFields(cmd *cobra.Command, args []string, toComplete stri
 // callback, using annotations (set in PersistentPreRunE) and, as a last resort, parsing the
 // command path (e.g. "object backlog_item list").
 func resolveCurrentKindForCompletion(cmd *cobra.Command, args []string) string {
+	// Flag --kind on this command.
+	if cmd != nil {
+		if k, err := cmd.Flags().GetString("kind"); err == nil && strings.TrimSpace(k) != "" {
+			return strings.TrimSpace(k)
+		}
+	}
 	// Annotation on this command.
+	if k, ok := cmd.Annotations[AnnotationKindCanonical]; ok && k != emptyValue {
+		return k
+	}
 	if k, ok := cmd.Annotations[objects.FieldKeyKind]; ok && k != emptyValue {
 		return k
 	}

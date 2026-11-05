@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -106,12 +107,10 @@ func ValidateAnnotatedKind(keys KindAnnotKeys, cmd *cobra.Command, args []string
 	projectRoot := ResolveProjectRoot(".")
 
 	switch mode {
-	case KindValidatePositional0, KindValidatePositional0Opt:
+	case KindValidatePositional0:
 		raw := ""
 		if len(args) >= 1 && strings.TrimSpace(args[0]) != "" {
 			raw = strings.TrimSpace(args[0])
-		} else if mode == KindValidatePositional0Opt {
-			raw = getTrimmedKindFlag(cmd)
 		}
 		if raw == "" {
 			return nil
@@ -122,6 +121,22 @@ func ValidateAnnotatedKind(keys KindAnnotKeys, cmd *cobra.Command, args []string
 		}
 		EnsureCmdAnnotations(cmd)
 		cmd.Annotations[keys.Canonical] = k
+		return nil
+
+	case KindValidatePositional0Opt:
+		pos := ""
+		if len(args) >= 1 {
+			pos = args[0]
+		}
+		flag := getTrimmedKindFlag(cmd)
+		k, err := ResolveKindFromPositionalAndFlag(projectRoot, pos, flag)
+		if err != nil {
+			return err
+		}
+		if k != "" {
+			EnsureCmdAnnotations(cmd)
+			cmd.Annotations[keys.Canonical] = k
+		}
 		return nil
 
 	case KindValidateCountArg0:
@@ -287,4 +302,37 @@ func KindsListFromPRERun(keys KindAnnotKeys, cmd *cobra.Command) ([]string, bool
 		return nil, false
 	}
 	return out, true
+}
+
+// ResolveKindFromPositionalAndFlag resolves and validates kind from optional positional and flag inputs.
+// If both are provided, both are validated against the schema registry and must resolve to the same canonical kind;
+// if they contradict, an error is returned. If neither is provided, it returns ("", nil).
+func ResolveKindFromPositionalAndFlag(projectRoot string, posArg string, flagVal string) (string, error) {
+	pos := strings.TrimSpace(posArg)
+	flag := strings.TrimSpace(flagVal)
+
+	if pos != "" && flag != "" {
+		posCanonical, err := objects.ResolveAndValidateKindForProject(projectRoot, pos)
+		if err != nil {
+			return "", err
+		}
+		flagCanonical, err := objects.ResolveAndValidateKindForProject(projectRoot, flag)
+		if err != nil {
+			return "", err
+		}
+		if posCanonical != flagCanonical {
+			return "", errfmt.Errorf("conflicting kinds specified: positional argument %q contradicts --kind flag %q", pos, flag)
+		}
+		return posCanonical, nil
+	}
+
+	if pos != "" {
+		return objects.ResolveAndValidateKindForProject(projectRoot, pos)
+	}
+
+	if flag != "" {
+		return objects.ResolveAndValidateKindForProject(projectRoot, flag)
+	}
+
+	return "", nil
 }

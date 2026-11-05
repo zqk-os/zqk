@@ -2,6 +2,7 @@ package system
 
 import (
 	"fmt"
+	"strings"
 
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -70,13 +71,36 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 					"$ne": objects.ObjectStatusArchived,
 				},
 			},
-			Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs},
+			Fields:  []string{objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "goal_ref", objects.FieldKeyGoalRefs, objects.FieldKeyRequirementRefs, "requirement_ref", objects.FieldKeyRelatedObjectRefs},
 			Limit:   10000,
 			SortBy:  "id",
 			SortAsc: true,
 		})
 		if err != nil {
 			return errfmt.Newf("list backlog_item").Wrap(err)
+		}
+
+		// Pre-fetch requirements for transitive goal resolution (GH-981)
+		reqList, _ := sess.List(cmd.Context(), storage.ListFilter{
+			Kind: objects.KindRequirement,
+			Filters: map[string]any{
+				objects.FieldKeyStatus: map[string]any{
+					"$ne": objects.ObjectStatusArchived,
+				},
+			},
+			Fields: []string{objects.FieldKeyID, objects.FieldKeyGoalRefs, "goal_ref", objects.FieldKeyRelatedObjectRefs},
+			Limit:  10000,
+		})
+		reqToGoalRefs := make(map[string]map[string]bool)
+		if reqList != nil {
+			for _, robj := range reqList.Objects {
+				if rid, ok := robj[objects.FieldKeyID].(string); ok && rid != "" {
+					grefs := GoalRefsFromObject(robj)
+					if len(grefs) > 0 {
+						reqToGoalRefs[rid] = grefs
+					}
+				}
+			}
 		}
 
 		// List goals if we need them for coverage (optional; align works without goals)
@@ -108,6 +132,43 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 		var withGoals, withoutGoals []map[string]any
 		for _, obj := range listResult.Objects {
 			refs := GoalRefsFromObject(obj)
+			// Transitive check: if no direct goal_refs, inherit from linked requirement(s)
+			if len(refs) == 0 {
+				var linkedReqs []string
+				if rList, ok := obj[objects.FieldKeyRequirementRefs].([]any); ok {
+					for _, item := range rList {
+						s := strings.TrimSpace(fmt.Sprint(item))
+						if s != "" && s != "<nil>" {
+							linkedReqs = append(linkedReqs, s)
+						}
+					}
+				} else if rList, ok := obj[objects.FieldKeyRequirementRefs].([]string); ok {
+					linkedReqs = append(linkedReqs, rList...)
+				}
+				if rRef, ok := obj["requirement_ref"].(string); ok && strings.TrimSpace(rRef) != "" {
+					linkedReqs = append(linkedReqs, strings.TrimSpace(rRef))
+				}
+
+				for _, reqID := range linkedReqs {
+					if parentGoals, found := reqToGoalRefs[reqID]; found {
+						for g := range parentGoals {
+							refs[g] = true
+						}
+					} else {
+						// Lazy read fallback if requirement was outside list batch
+						if reqObj, rerr := sess.Read(cmd.Context(), reqID); rerr == nil && reqObj != nil {
+							parentGoals := GoalRefsFromObject(reqObj)
+							if len(parentGoals) > 0 {
+								reqToGoalRefs[reqID] = parentGoals
+								for g := range parentGoals {
+									refs[g] = true
+								}
+							}
+						}
+					}
+				}
+			}
+
 			if goalID != emptyValue {
 				if refs[goalID] {
 					withGoals = append(withGoals, obj)
