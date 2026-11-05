@@ -99,11 +99,11 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().StringP("description", "d", "", "Object description")
 	cmd.Flags().StringP("content", "c", "", "Inline content/body for description")
 	cmd.Flags().String("file", "", "File to read title/description from")
-	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
-	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
 	if kind == objects.KindCriteria {
 		cmd.Flags().String("category", "functional", "Criteria category (default: functional)")
 	}
+	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
+	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
 	if cmd.Flags().Lookup("estimated-effort") == nil {
 		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
 	}
@@ -193,6 +193,15 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	}
 	if body != emptyValue {
 		objData[objects.FieldKeyDescription] = body
+	}
+	if kind == objects.KindCriteria {
+		category := "functional"
+		if cmd.Flags().Lookup("category") != nil {
+			if flagCat, _ := cmd.Flags().GetString("category"); strings.TrimSpace(flagCat) != "" {
+				category = strings.TrimSpace(flagCat)
+			}
+		}
+		objData[objects.FieldKeyCategory] = category
 	}
 	reqID, _ := cmd.Flags().GetString("req")
 	goalID, _ := cmd.Flags().GetString("goal")
