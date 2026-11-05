@@ -200,3 +200,20 @@ func TestWriteFieldTemplate_Variations(t *testing.T) {
 		t.Errorf("expected type and optional tag, got:\n%s", res)
 	}
 }
+
+func TestTemplate_OmitsEmptyOptionalReferenceFields(t *testing.T) {
+	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	out, err := executeObjectCommand(t, tempDir, provider, "template", "backlog_item")
+	if err != nil {
+		t.Fatalf("template backlog_item failed: %v", err)
+	}
+	// Verify optional reference fields are omitted from template when unset
+	if strings.Contains(out, "milestone_ref:") {
+		t.Errorf("expected optional milestone_ref to be omitted from template, got:\n%s", out)
+	}
+	if strings.Contains(out, "owner_ref:") {
+		t.Errorf("expected optional owner_ref to be omitted from template, got:\n%s", out)
+	}
+}

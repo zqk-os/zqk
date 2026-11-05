@@ -811,3 +811,28 @@ func TestInstanceValidator_checkPrecondition(t *testing.T) {
 		t.Errorf("expected false for field_cleared:priority_plan_ref when field is populated")
 	}
 }
+
+func TestValidateFieldSemanticType_OptionalEmptyReference(t *testing.T) {
+	t.Parallel()
+	iv := &InstanceValidator{}
+
+	optionalRefDef := map[string]any{
+		"semantic_type": "reference",
+		"type":          "string",
+		"required":      false,
+	}
+	warn := iv.validateFieldSemanticType("milestone_ref", "", optionalRefDef)
+	if warn != nil {
+		t.Errorf("expected nil warning for optional empty reference, got %v", warn)
+	}
+
+	requiredRefDef := map[string]any{
+		"semantic_type": "reference",
+		"type":          "string",
+		"required":      true,
+	}
+	warnRequired := iv.validateFieldSemanticType("milestone_ref", "", requiredRefDef)
+	if warnRequired == nil {
+		t.Errorf("expected warning for required empty reference, got nil")
+	}
+}

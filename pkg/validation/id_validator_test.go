@@ -24,7 +24,7 @@ func getTestIDPrefixesConfig() *IDPrefixesConfig {
 			"backlog_item":             {"BLI-"},
 			"milestone":                {"MIL-"},
 			"goal":                     {"GOAL-"},
-			"workstream":               {"WS-"},
+			"workstream":               {"WS-", "WRK-"},
 			"priority_plan":            {"PRI-", "PRIO-"},
 			"requirement":              {"REQ-", "REQU-"},
 			"test_case":                {"TEST-"},
@@ -194,6 +194,9 @@ func TestIDValidator_InferKindFromID(t *testing.T) {
 		{"REQU-001", "requirement"},
 		{"TEST-011", "test_case"},
 		{"CRIT-8193", "criteria"},
+		{"WS-001", "workstream"},
+		{"WRK-001", "workstream"},
+		{"wrk-001", "workstream"},
 		{"UNKNOWN-001", ""},
 	}
 

@@ -94,7 +94,14 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 				return nil
 			}
 			if info, errStat := d.Info(); errStat == nil {
-				if info.ModTime().Before(lockCutoff) {
+				staleCutoff := lockCutoff
+				if name == ".cas_sweep.lock" {
+					casSweepCutoff := now.Add(-15 * time.Second)
+					if casSweepCutoff.Before(staleCutoff) {
+						staleCutoff = casSweepCutoff
+					}
+				}
+				if info.ModTime().Before(staleCutoff) {
 					// Verify whether the lock is held by a live process before declaring it stale
 					file, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
 					if errOpen == nil {

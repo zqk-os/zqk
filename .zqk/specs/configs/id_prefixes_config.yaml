@@ -296,6 +296,7 @@ kind_to_prefixes:
         - WFL-
     workstream:
         - WS-
+        - WRK-
     workstream_transition:
         - WST-
     zqk_session:
@@ -382,4 +383,5 @@ kind_to_synonyms:
     workstream:
         - ws
         - work
+        - wrk
 version: 1.0.0

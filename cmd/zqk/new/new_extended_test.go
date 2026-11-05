@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"context"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -180,5 +182,77 @@ func TestNewObject_EdgeCases(t *testing.T) {
 	cmd.SetArgs([]string{"object", "backlog_item", "--content", "# Inline Title\nInline body"})
 	if err := cmd.Execute(); err != nil {
 		t.Fatalf("object with --content failed: %v", err)
+	}
+}
+
+func TestNewTestCase_Aliases(t *testing.T) {
+	cmd := NewNewCmd()
+	var tcCmd *cobra.Command
+	for _, sub := range cmd.Commands() {
+		if sub.Name() == objects.KindTestCase {
+			tcCmd = sub
+			break
+		}
+	}
+	if tcCmd == nil {
+		t.Fatalf("test_case command not found under new")
+	}
+	if !slices.Contains(tcCmd.Aliases, "tst") || !slices.Contains(tcCmd.Aliases, "tc") {
+		t.Fatalf("expected test_case aliases to contain 'tst' and 'tc', got %v", tcCmd.Aliases)
+	}
+}
+
+func TestNewCriteria_DefaultCategory(t *testing.T) {
+	testRoot := t.TempDir()
+	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
+	repoRoot := zqkenv.ProjectRoot().Get()
+	if repoRoot == "" {
+		if root, err := findModuleRoot(); err == nil {
+			repoRoot = root
+		}
+	}
+	if err := testenvroot.BootstrapRoot(testRoot, repoRoot); err != nil {
+		t.Fatalf("BootstrapRoot: %v", err)
+	}
+	t.Cleanup(func() {
+		if teardownErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil)); teardownErr != nil {
+			t.Logf("teardown error: %v", teardownErr)
+		}
+	})
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	// 1. Default category via "criteria"
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"criteria", "--title", "Default Category Crit"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("new criteria failed: %v", err)
+	}
+
+	draftFiles, err := storage.ListObjectDraftPlaneIDs(testRoot, objects.KindCriteria)
+	if err != nil || len(draftFiles) == 0 {
+		t.Fatalf("expected drafted criteria on draft plane, got err=%v count=%d", err, len(draftFiles))
+	}
+	data, err := fileutil.ReadFile(storage.ObjectDraftPlanePath(testRoot, objects.KindCriteria, draftFiles[0]))
+	if err != nil {
+		t.Fatalf("failed to read drafted criteria: %v", err)
+	}
+	var critObj map[string]any
+	if err := yaml.Unmarshal(data, &critObj); err != nil {
+		t.Fatalf("unmarshal drafted criteria: %v", err)
+	}
+	if cat, _ := critObj[objects.FieldKeyCategory].(string); cat != "functional" {
+		t.Fatalf("expected category 'functional', got %q", cat)
+	}
+
+	// 2. Custom category via flag
+	buf.Reset()
+	cmd = NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"criteria", "--title", "Acceptance Crit", "--category", "acceptance"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("new criteria with --category failed: %v", err)
 	}
 }

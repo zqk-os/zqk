@@ -337,6 +337,19 @@ func ExtractValidationRules(fieldDef map[string]any) (map[string]any, bool) {
 	return validation, ok
 }
 
+// IsFieldRequired checks if a field is marked as required either at top level or in validation map.
+func IsFieldRequired(fieldDef map[string]any) bool {
+	if req, ok := fieldDef["required"].(bool); ok && req {
+		return true
+	}
+	if v, ok := fieldDef["validation"].(map[string]any); ok {
+		if req, ok := v["required"].(bool); ok && req {
+			return true
+		}
+	}
+	return false
+}
+
 // ExtractPatternAndString resolves the pattern string and normalized field value.
 func ExtractPatternAndString(fieldName string, fieldValue any, validation map[string]any) (string, string, bool) {
 	pattern, ok := validation["pattern"].(string)

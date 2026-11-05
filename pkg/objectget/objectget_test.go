@@ -102,3 +102,12 @@ func TestInferKindFromObjectID_withProjectRoot(t *testing.T) {
 		t.Fatal("empty id")
 	}
 }
+
+func TestInferKindFromObjectID_WorkstreamPrefixes(t *testing.T) {
+	for _, id := range []string{"WRK-123", "wrk-123", "WS-456", "ws-456"} {
+		k := InferKindFromObjectID(".", id)
+		if k != objects.KindWorkstream {
+			t.Fatalf("id %s: want workstream, got %q", id, k)
+		}
+	}
+}

@@ -76,7 +76,7 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newKindConvenienceCmd(objects.KindPriorityPlan, "plan", "pri"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindRequirement, "req"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindCriteria, "crit"))
-	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tc"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tst", "tc"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindBacklogItem, "bli"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindMilestone, "mil"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindTechnicalDebt, "td", "techdebt"))
@@ -99,6 +99,9 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().StringP("description", "d", "", "Object description")
 	cmd.Flags().StringP("content", "c", "", "Inline content/body for description")
 	cmd.Flags().String("file", "", "File to read title/description from")
+	if kind == objects.KindCriteria {
+		cmd.Flags().String("category", "functional", "Criteria category (default: functional)")
+	}
 	cmd.Flags().Bool("promote", false, "Enqueue background object promote after mint")
 	cmd.Flags().Bool("cas", false, "Directly materialize the object into CAS storage")
 	cmd.Flags().Bool("trace-pipeline", false, "Auto-run workflow gen-trace-pipeline after mint (opt-in)")
@@ -169,6 +172,15 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	if body != emptyValue {
 		objData[objects.FieldKeyDescription] = body
 	}
+	if kind == objects.KindCriteria {
+		category := "functional"
+		if cmd.Flags().Lookup("category") != nil {
+			if flagCat, _ := cmd.Flags().GetString("category"); strings.TrimSpace(flagCat) != "" {
+				category = strings.TrimSpace(flagCat)
+			}
+		}
+		objData[objects.FieldKeyCategory] = category
+	}
 	if err := object.RunCreateWithData(cmd, kind, objData); err != nil {
 		return err
 	}
@@ -185,6 +197,10 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 
 	emitJITGuidanceTip(cmd, kind)
 
+	return handleMintPromote(cmd, projectRoot, id, kind)
+}
+
+func handleMintPromote(cmd *cobra.Command, projectRoot, id, kind string) error {
 	wantPromote, _ := cmd.Flags().GetBool("promote")
 	if !wantPromote {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
