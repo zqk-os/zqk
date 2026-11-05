@@ -469,6 +469,11 @@ _place_binary() {
       xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
     fi
   fi
+  # Ad-hoc sign binary on macOS to satisfy Gatekeeper / arm64 code signing enforcement (GH-995)
+  if [ "$OS" = "darwin" ] && command -v codesign >/dev/null 2>&1; then
+    codesign -s - -f "${INSTALL_DIR}/zqk" 2>/dev/null || true
+    [ -f "${INSTALL_DIR}/zqk-mcp" ] && codesign -s - -f "${INSTALL_DIR}/zqk-mcp" 2>/dev/null || true
+  fi
 }
 
 # ---------------------------------------------------------------------------
