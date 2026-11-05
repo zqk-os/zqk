@@ -99,6 +99,8 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().StringP("description", "d", "", "Object description")
 	cmd.Flags().StringP("content", "c", "", "Inline content/body for description")
 	cmd.Flags().String("file", "", "File to read title/description from")
+	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
+	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
 	cmd.Flags().Bool("promote", false, "Enqueue background object promote after mint")
 	cmd.Flags().Bool("cas", false, "Directly materialize the object into CAS storage")
 	cmd.Flags().Bool("trace-pipeline", false, "Auto-run workflow gen-trace-pipeline after mint (opt-in)")
@@ -121,6 +123,12 @@ func newObjectCmd() *cobra.Command {
 	cli.BindAsyncProgress(cmd, runNewObject)
 	cli.EnsureCmdAnnotations(cmd)
 	cmd.Annotations[cli.AnnotationKeyObjectKindValidate] = cli.KindValidatePositional0
+	if cmd.Flags().Lookup("req") == nil {
+		cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
+	}
+	if cmd.Flags().Lookup("goal") == nil {
+		cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
+	}
 	return cmd
 }
 
@@ -169,6 +177,22 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	if body != emptyValue {
 		objData[objects.FieldKeyDescription] = body
 	}
+	reqID, _ := cmd.Flags().GetString("req")
+	goalID, _ := cmd.Flags().GetString("goal")
+	reqID = strings.TrimSpace(reqID)
+	goalID = strings.TrimSpace(goalID)
+	if reqID != emptyValue {
+		objData[objects.FieldKeyRequirementRefs] = []any{reqID}
+	}
+	if goalID != emptyValue {
+		objData[objects.FieldKeyGoalRefs] = []any{goalID}
+	}
+	wantPromote, _ := cmd.Flags().GetBool("promote")
+	wantCAS, _ := cmd.Flags().GetBool("cas")
+	if kind == objects.KindBacklogItem && (wantPromote || wantCAS) && reqID == emptyValue && goalID == emptyValue {
+		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(
+			"backlog_item crossing CAS requires a hierarchical parent: pass --req <REQ-*> or --goal <GOAL-*> (GH#963)"))
+	}
 	if err := object.RunCreateWithData(cmd, kind, objData); err != nil {
 		return err
 	}
@@ -185,7 +209,6 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 
 	emitJITGuidanceTip(cmd, kind)
 
-	wantPromote, _ := cmd.Flags().GetBool("promote")
 	if !wantPromote {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 			Info("minted onto draft plane; promote not enqueued (pass --promote to opt in)").

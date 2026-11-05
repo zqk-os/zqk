@@ -24,6 +24,8 @@ STANDALONE=0
 HEADLESS=0
 VERSION="latest"
 
+NO_SUDO=0
+PREFIX_SET=0
 for arg in "$@"; do
   case "$arg" in
     --fast|-f)
@@ -43,6 +45,17 @@ for arg in "$@"; do
     --yes|-y)
       MODE="fast"
       ;;
+    --no-sudo)
+      NO_SUDO=1
+      ;;
+    --prefix=*)
+      ZQK_INSTALL_DIR="${arg#--prefix=}"
+      PREFIX_SET=1
+      ;;
+    --prefix)
+      echo "--prefix requires a directory argument (use --prefix=/path)" >&2
+      exit 1
+      ;;
     -*)
       echo "Unknown flag: $arg" >&2
       exit 1
@@ -54,6 +67,10 @@ for arg in "$@"; do
       ;;
   esac
 done
+# Headless / non-TTY installs must never block on sudo password prompts (GH#961).
+if [ ! -t 0 ] || [ "$HEADLESS" = "1" ]; then
+  NO_SUDO=1
+fi
 
 # Resolve install directory: prefer user-specified ZQK_INSTALL_DIR,
 # otherwise /usr/local/bin if writable, else user-local $HOME/.local/bin for zero-dependency non-root install
@@ -411,6 +428,27 @@ install_source() {
 _place_binary() {
   local bin="$1" mcp_bin="$2"
   if [ ! -w "$INSTALL_DIR" ]; then
+    if [ "$NO_SUDO" = "1" ]; then
+      # Fail closed for agent/headless: never hang on interactive sudo (GH#961).
+      local fallback="${HOME}/.local/bin"
+      if [ -z "${HOME:-}" ]; then
+        fallback="$(pwd)/bin"
+      fi
+      echo "⚠️  ${INSTALL_DIR} is not writable and sudo is disabled (non-interactive/--no-sudo)." >&2
+      echo "    Falling back to ${fallback}. Override with --prefix=/path or ZQK_INSTALL_DIR." >&2
+      INSTALL_DIR="$fallback"
+      mkdir -p "$INSTALL_DIR" || {
+        echo "❌ Cannot create ${INSTALL_DIR}" >&2
+        exit 1
+      }
+    fi
+  fi
+  if [ ! -w "$INSTALL_DIR" ]; then
+    if [ "$NO_SUDO" = "1" ]; then
+      echo "❌ ${INSTALL_DIR} is not writable and interactive sudo is disabled." >&2
+      echo "   Re-run with --prefix=\$HOME/.local/bin or a writable ZQK_INSTALL_DIR." >&2
+      exit 1
+    fi
     echo "🔑 Installing to ${INSTALL_DIR} (requires sudo)..."
     sudo install -m 755 "$bin" "${INSTALL_DIR}/zqk"
     [ -f "$mcp_bin" ] && sudo install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
@@ -424,7 +462,9 @@ _place_binary() {
   # Remove macOS quarantine flag
   if [ "$OS" = "darwin" ] && command -v xattr >/dev/null 2>&1; then
     if [ ! -w "$INSTALL_DIR" ]; then
-      sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      if [ "$NO_SUDO" != "1" ]; then
+        sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      fi
     else
       xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
     fi
