@@ -31,7 +31,6 @@ func setupFileObjectStorageForFieldPreservationTest(t *testing.T) (*storage.File
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(tmpDir, fos)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {

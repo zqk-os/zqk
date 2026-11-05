@@ -4,7 +4,6 @@
 package storage_test
 
 import (
-	"context"
 	"errors"
 	"path/filepath"
 	"strings"
@@ -46,7 +45,6 @@ func setupStreamBackedObjectStorageTest(t *testing.T) (projectRoot string, str s
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	secCtx = pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	str = fos
 	t.Cleanup(func() {

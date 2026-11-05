@@ -92,7 +92,6 @@ func setupFileStorageForExportImport(t *testing.T) *storage.FileObjectStorage {
 		t.Fatalf("NewFileObjectStorage: %v", err)
 	}
 
-	defer func() { _ = st.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(testRoot, st)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {

@@ -34,7 +34,6 @@ func setupIOQueueTestEnv(t *testing.T) (testRoot string, fileStorage *FileObject
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := TempProjectTeardown(tmpDir, fos)
 		if err := RunProjectTestTeardown(opts); err != nil {
