@@ -30,6 +30,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/storage/migration"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/vds"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -191,6 +192,11 @@ func runInit(cmd *cobra.Command, projectName, template string, force bool, snaps
 		logging.Fluent(logger).Warn("Failed to write test-root config (config/zqk-test.yaml); scheduler may fail until it exists").
 			WithError(err).
 			Log()
+	}
+
+	// Seed default VDS spine profile if missing
+	if _, _, err := vds.EnsureSpineProfile(projectRoot); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed default VDS spine profile").WithError(err).Log()
 	}
 
 	// Seed curated default policy pack
@@ -1311,6 +1317,10 @@ func seedBundledSpecsAndDocs(projectRoot string, logger logging.Logger, progress
 			WithError(err).
 			String("note", paths.RewriteCanonicalCLIInvocations("Run from repo after fixing storage, or use zqk spec list (file fallback)")).
 			Log()
+	}
+
+	if _, _, err := vds.EnsureSpineProfile(projectRoot); err != nil {
+		logging.Fluent(logger).Warn("Failed to seed default VDS spine profile").WithError(err).Log()
 	}
 
 	if err := registerShippedDocsHelper(projectRoot, logger); err != nil {

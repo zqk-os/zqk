@@ -139,6 +139,8 @@ const (
 	// TRACK: follow-up in kernel backlog
 	PrecondCommitRefsGitMutationEvidence   = "commit_refs have git mutation evidence for this backlog_item"
 	PrecondCommitHashesGitMutationEvidence = "commit_hashes have git mutation evidence for this backlog_item"
+	// ExplanationGitMutationEvidenceFormat explains the expected git commit message tag format.
+	ExplanationGitMutationEvidenceFormat = "ensure at least one commit touches code_location and mentions [%s] in its commit message"
 	// PrecondBranchRefIsAncestorOfTrunk enforces that a plan cannot complete until its branch_name
 	// is an ancestor of trunk.
 	PrecondBranchRefIsAncestorOfTrunk  = "branch_ref is an ancestor of trunk"
@@ -188,6 +190,12 @@ const (
 	// inherited title or specialized description, plus workstream_refs or singular workstream_ref.
 	// Persona/team and planned-child are separate tokens.
 	PrecondPriorityPlanValidated = "priority plan validated"
+
+	// ReasonPriorityPlanWrittenIdentity is returned when a priority plan lacks title or description.
+	ReasonPriorityPlanWrittenIdentity = "'title' or 'description' written identity must be specified"
+
+	// ReasonPriorityPlanWorkstreamLane is returned when a priority plan lacks workstream_refs or workstream_ref.
+	ReasonPriorityPlanWorkstreamLane = "'workstream_refs' or 'workstream_ref' must be specified"
 )
 
 // Precondition sub-string constraints for generic pattern extraction.

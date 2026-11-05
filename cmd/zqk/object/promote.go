@@ -25,6 +25,8 @@ import (
 func NewPromoteCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectPromoteCommandBuilder()
 	cmd.Flags().String("to", "", "Target lifecycle status to advance through valid intermediate hops")
+	cmd.Flags().Bool("cascade", false, "Cascade promotion to all referenced draft-plane objects")
+	cmd.Flags().Bool("family", false, "Alias for --cascade: promote connected draft family in topological order")
 	cli.BindAsyncProgress(cmd, runPromote)
 	return cmd
 }
@@ -39,6 +41,12 @@ func runPromote(cmd *cobra.Command, args []string) error {
 // When --to <status> is specified, it advances across valid intermediate hops until reaching target status.
 // Shared by `object promote` and `object draft promote`.
 func promoteObjectIDs(cmd *cobra.Command, proc *cli.Processor, args []string) error {
+	sortedArgs, err := preparePromoteTargetObjectIDs(cmd, proc, args)
+	if err != nil {
+		return err
+	}
+	args = sortedArgs
+
 	toStatus, _ := cmd.Flags().GetString("to")
 	toStatus = strings.TrimSpace(strings.ToLower(toStatus))
 	if toStatus == "" {

@@ -11,7 +11,9 @@ Usage:
   zqk object promote <id>[,id...] [id...] [flags]
 
 Flags:
+      --cascade                 Cascade promotion to all referenced draft-plane objects
       --columns string          Override column widths for table output (format: field:width)
+      --family                  Alias for --cascade: promote connected draft family in topological order
   -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
       --ids string              Comma-separated list of object IDs (same as positional multi-ID / comma lists)
       --ignore-scheduler-down   Ignore scheduler down warning/lockdown
