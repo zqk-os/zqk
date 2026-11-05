@@ -18,7 +18,7 @@ import (
 // checkouts can both supervise peer-agent-1 without last-install-wins.
 // Shape: com.<brand>.mesh.seat-worker.<root_id>.<seat_id>
 // Legacy (unscoped): com.<brand>.mesh.seat-worker.<seat_id>
-// TRACK: BLI-NODE-SOVEREIGNTY-MESH-001 — global mcp-daemon / privileged-writer labels still host-global.
+// Follow-up: root-scope com.<brand>.mcp-daemon and privileged-writer host units the same way.
 
 var (
 	rootIDHexRe          = regexp.MustCompile(`^[0-9a-f]{16}$`)
