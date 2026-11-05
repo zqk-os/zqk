@@ -114,7 +114,7 @@ func TestSystem_Diagnose_CheckIssues_EdgeCases(t *testing.T) {
 	assert.False(t, fixCmdPlan.AutoApply)
 
 	require.NotNil(t, autoFixPlan)
-	assert.Contains(t, autoFixPlan.Command, "system check --auto-fix --ids OBJ-AUTO-FIX")
+	assert.Contains(t, autoFixPlan.Command, "system check --auto-fix OBJ-AUTO-FIX")
 	assert.False(t, autoFixPlan.AutoApply)
 }
 
