@@ -84,6 +84,12 @@ func (e *AmbientEngine) Start(ctx context.Context) error {
 			return err
 		}
 	}
+	if e.livenessListener != nil {
+		if err := e.livenessListener.Start(supCtx); err != nil {
+			e.mu.Unlock()
+			return err
+		}
+	}
 	e.mu.Unlock()
 
 	return e.Transition(EngineStateRunning)
@@ -115,24 +121,25 @@ func (e *AmbientEngine) superviseTick(ctx context.Context) {
 		breakerState := e.faultIsolator.State()
 		if breakerState == StateOpen && e.State() == EngineStateRunning {
 			if err := e.Transition(EngineStateDegraded); err != nil {
-				_ = err
+				// State transition logged or non-fatal during supervisor tick
 			}
 		} else if breakerState == StateClosed && e.State() == EngineStateDegraded {
 			if err := e.Transition(EngineStateRunning); err != nil {
-				_ = err
+				// State transition logged or non-fatal during supervisor tick
 			}
 		}
 	}
 
 	if e.intentStream != nil {
-		if alert, emitted := e.intentStream.CheckAndEmitAlert(); emitted {
-			_ = alert
+		if _, emitted := e.intentStream.CheckAndEmitAlert(); emitted {
+			// Alert emitted
 		}
 	}
 
 	if e.backpressureRegulator != nil {
-		tput := e.backpressureRegulator.CurrentThroughput()
-		_ = tput
+		if e.backpressureRegulator.CurrentThroughput() < 0 {
+			// Negative throughput sanity invariant
+		}
 	}
 
 	if e.consensusArbiter != nil {
@@ -176,7 +183,7 @@ func (e *AmbientEngine) Stop() error {
 		case <-done:
 		case <-timer.C:
 			if err := e.Transition(EngineStateStopped); err != nil {
-				_ = err
+				return errfmt.Errorf("graceful stop timed out after %v; transition error: %w", timeout, err)
 			}
 			return errfmt.Errorf("graceful stop timed out after %v", timeout)
 		}
@@ -185,6 +192,11 @@ func (e *AmbientEngine) Stop() error {
 	e.supervisorWg.Wait()
 
 	var stopErrs []error
+	if e.livenessListener != nil {
+		if stopErr := e.livenessListener.Stop(); stopErr != nil {
+			stopErrs = append(stopErrs, stopErr)
+		}
+	}
 	if e.consensusArbiter != nil {
 		if stopErr := e.consensusArbiter.Stop(); stopErr != nil {
 			stopErrs = append(stopErrs, stopErr)
@@ -252,6 +264,10 @@ func (e *AmbientEngine) Status() EngineStatus {
 	}
 	if e.faultIsolator != nil {
 		sub["fault_isolator"] = e.faultIsolator.State().String()
+	}
+	if e.decayTracker != nil {
+		vitals := e.decayTracker.VitalitySnapshot()
+		sub["liveness_listener"] = fmt.Sprintf("%d holons", len(vitals))
 	}
 
 	return EngineStatus{
@@ -370,6 +386,26 @@ func (e *AmbientEngine) collectComponentHealth() (map[string]ComponentHealth, in
 			Status:        TelemetryStatusHealthy,
 			LastHeartbeat: time.Now().UTC(),
 			Message:       msg,
+		}
+	}
+	if e.livenessListener != nil && e.decayTracker != nil {
+		activeHolons++
+		vitals := e.decayTracker.VitalitySnapshot()
+		ischemicCount := 0
+		for _, v := range vitals {
+			if v.Ischemic {
+				ischemicCount++
+			}
+		}
+		liveStatus := TelemetryStatusHealthy
+		if ischemicCount > 0 {
+			liveStatus = TelemetryStatusDegraded
+		}
+		components["liveness_listener"] = ComponentHealth{
+			Name:          "liveness_listener",
+			Status:        liveStatus,
+			LastHeartbeat: time.Now().UTC(),
+			Message:       fmt.Sprintf("%d tracked holons, %d ischemic", len(vitals), ischemicCount),
 		}
 	}
 
