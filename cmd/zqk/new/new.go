@@ -104,9 +104,6 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	}
 	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
 	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
-	if kind == objects.KindCriteria {
-		cmd.Flags().String("category", "functional", "Criteria category (default: functional)")
-	}
 	if cmd.Flags().Lookup("estimated-effort") == nil {
 		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
 	}
