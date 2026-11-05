@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/vds"
 )
 
 // NewAgentOnboardCmd wires system agent-onboard (Vector A/B first-contact sync).
@@ -72,6 +73,9 @@ func runAgentOnboard(cmd *cobra.Command, _ []string) error {
 			}
 			if err := ambient.EnsureDaemon(root, logger); err != nil {
 				logging.Fluent(logger).Warn("Failed to ensure ambient daemon during agent-onboard").WithError(err).Log()
+			}
+			if _, _, err := vds.EnsureSpineProfile(root); err != nil {
+				logging.Fluent(logger).Warn("Failed to seed default VDS spine profile during agent-onboard").WithError(err).Log()
 			}
 			if sp := proc.Storage(); sp != nil {
 				_ = WarmTestDashboard(context.Background(), root, sp)

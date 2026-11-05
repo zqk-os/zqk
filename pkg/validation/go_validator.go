@@ -812,9 +812,10 @@ func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 		if gv.checkPrecondition(precondition, obj, options) {
 			continue
 		}
+		detail := formatUnmetPreconditionDetail(precondition, obj)
 		errors = append(errors, ValidationError{
 			Field:   objects.FieldKeyStatus,
-			Message: fmt.Sprintf(msgFmt, status, precondition),
+			Message: fmt.Sprintf(msgFmt, status, detail),
 			Rule:    validationRuleLifecycle(),
 		})
 	}

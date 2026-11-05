@@ -2,6 +2,8 @@
 package vds
 
 import (
+	"errors"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -40,6 +42,44 @@ const (
 	// Glossary GLS-* CAS ids are project-local — pin them in customization.glossary or resolve by title.
 	PolicyID = "POL-WORKFLOW-VDS"
 )
+
+// DefaultEmbeddedSpineProfileYAML contains the canonical rigid spine profile template.
+const DefaultEmbeddedSpineProfileYAML = `# Dest first-run VDS spine (rigid stages). Project prefs live in the customization file.
+schema_version: 1
+profile_id: verifiable_decomposition_spine_v1
+customization_profile_path: docs/quality/verifiable_decomposition_customization.yaml
+stages:
+  - id: intent_capture
+    label: Intent capture
+    purpose: Persist goals, plans, and constraints.
+  - id: design
+    label: Design
+    purpose: Requirements, criteria, test cases, backlog items.
+  - id: implement
+    label: Implement
+    purpose: Code/docs change with re-runnable evidence.
+  - id: integrate_verify
+    label: Integrate and verify
+    purpose: Integration/smoke evidence.
+  - id: operate_release
+    label: Operate and release
+    purpose: First-run operate gates (not a public Helm/k8s install).
+completion:
+  done_values:
+    - "yes"
+    - "na"
+  hard_gates:
+    - independent_verify
+chunk_contract:
+  required_fields:
+    - chunk_id
+    - stage
+    - claim
+    - rubric_ref
+    - dsl_checks
+    - evidence_refs
+    - independent_verify
+`
 
 // StageIDs is the rigid ordered spine.
 var StageIDs = []string{
@@ -135,11 +175,19 @@ func LoadSpine(projectRoot, relPath string) (*SpineProfile, error) {
 	return spineProfiles.Load(path, stampmemo.Of(path), func() (*SpineProfile, error) {
 		b, err := fileutil.ReadFile(path)
 		if err != nil {
+			isDefault := strings.TrimSpace(relPath) == "" || strings.TrimSpace(relPath) == DefaultSpineProfileRel || path == resolveProfilePath(projectRoot, "", DefaultSpineProfileRel)
+			if isDefault && (errors.Is(err, os.ErrNotExist) || fileutil.IsNotExist(err) || strings.Contains(err.Error(), "no such file")) {
+				// Fall back to embedded default spine YAML!
+				var p SpineProfile
+				if unmarshalErr := yaml.Unmarshal([]byte(DefaultEmbeddedSpineProfileYAML), &p); unmarshalErr == nil {
+					return &p, nil
+				}
+			}
 			return nil, errfmt.Errorf("vds: read spine profile %s: %w", path, err)
 		}
 		var p SpineProfile
 		if err := yaml.Unmarshal(b, &p); err != nil {
-			return nil, errfmt.Errorf("vds: parse spine profile: %w", err)
+			return nil, errfmt.Errorf("vds: parse spine profile %s: %w", path, err)
 		}
 		if len(p.Stages) == 0 {
 			return nil, errfmt.Errorf("vds: spine profile has no stages: %s", path)
@@ -191,4 +239,26 @@ func ResolveProfiles(projectRoot, spineRel, customRel string) (*SpineProfile, *C
 // QualityDir returns docs/quality under project root.
 func QualityDir(projectRoot string) string {
 	return filepath.Join(projectRoot, paths.DocsQualityDir)
+}
+
+// EnsureSpineProfile writes the default spine profile if missing.
+func EnsureSpineProfile(projectRoot string) (string, bool, error) {
+	return InitSpineProfileFile(projectRoot, false)
+}
+
+// InitSpineProfileFile writes the default spine profile if missing (or force).
+func InitSpineProfileFile(projectRoot string, force bool) (path string, created bool, err error) {
+	path = filepath.Join(projectRoot, DefaultSpineProfileRel)
+	if !force {
+		if _, err := fileutil.Stat(path); err == nil {
+			return path, false, nil
+		}
+	}
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
+		return path, false, errfmt.Errorf("vds: mkdir: %w", err)
+	}
+	if err := fileutil.WriteFile(path, []byte(DefaultEmbeddedSpineProfileYAML), paths.FilePerm644); err != nil {
+		return path, false, errfmt.Errorf("vds: write spine profile: %w", err)
+	}
+	return path, true, nil
 }

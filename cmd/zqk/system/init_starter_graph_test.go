@@ -47,6 +47,12 @@ func TestInit_Greenfield_StarterKernelGraph(t *testing.T) {
 		t.Fatalf("Greenfield init failed: %v", err)
 	}
 
+	// Verify VDS spine profile is seeded
+	spinePath := filepath.Join(tmpDir, "docs", "quality", "verifiable_decomposition_spine_profile.yaml")
+	if _, err := fileutil.Stat(spinePath); err != nil {
+		t.Fatalf("expected VDS spine profile to be seeded at %s, got: %v", spinePath, err)
+	}
+
 	// Verify starter kernel objects exist in CAS
 	kinds := []string{
 		objects.KindOrganization,

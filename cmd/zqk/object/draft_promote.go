@@ -28,6 +28,8 @@ type draftItemError struct {
 // NewDraftPromoteCmd creates `object draft promote`.
 func NewDraftPromoteCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewObjectDraftPromoteCommandBuilder()
+	cmd.Flags().Bool("cascade", false, "Cascade promotion to all referenced draft-plane objects")
+	cmd.Flags().Bool("family", false, "Alias for --cascade: promote connected draft family in topological order")
 	cli.BindAsyncProgress(cmd, runObjectDraftPromote)
 	return cmd
 }
@@ -76,6 +78,12 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 
 		if dryRun || len(ids) == 0 {
 			return cli.FormatOutput(cmd, out)
+		}
+
+		// Topologically sort draft plane IDs so dependencies precede dependents across batches.
+		sortedIDs, sortErr := sortObjectIDsForMembranePromotion(proc.OperationContext(), proc.SecurityContext(), proc, ids)
+		if sortErr == nil && len(sortedIDs) == len(ids) {
+			ids = sortedIDs
 		}
 
 		batchSize := defaultDraftPromoteBatchSize
