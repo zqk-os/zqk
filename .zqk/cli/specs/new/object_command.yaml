@@ -39,6 +39,21 @@ flags:
       shorthand: c
       type: string
       description: 'Optional: inline content/body for description'
+    - name: plan
+      type: string
+      description: Link priority plan reference
+    - name: req
+      type: string
+      description: Link parent requirement
+    - name: goal
+      type: string
+      description: Link root goal
+    - name: bli
+      type: string
+      description: Link backlog item reference
+    - name: criteria
+      type: string
+      description: Link criteria reference
     - name: promote
       type: bool
       default: false

@@ -1,17 +1,23 @@
 package workflow
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/accumulator"
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestWhatsNextCommand_SyncSweepFlagRegistered(t *testing.T) {
@@ -142,4 +148,242 @@ func TestRunWhatsNextLite_ColdBootNonBlockingRecovery(t *testing.T) {
 	if !loaded.Recovering {
 		t.Error("expected Recovering=true on cold boot")
 	}
+}
+
+func TestRunWhatsNext_ActiveInProgressPlan_HotPathFast(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	payload := &whatsnext.WhatsNextLitePayload{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		LeadPlan: &whatsnext.WhatsNextPriorityPlan{
+			ID:     "PRI-ACTIVE",
+			Title:  "Active In Progress Plan",
+			Status: objects.ObjectStatusInProgress,
+		},
+		ActivePlans: []whatsnext.WhatsNextPriorityPlan{
+			{
+				ID:     "PRI-ACTIVE",
+				Title:  "Active In Progress Plan",
+				Status: objects.ObjectStatusInProgress,
+			},
+		},
+		BacklogCountsByPlan: map[string]map[string]int{
+			"PRI-ACTIVE": {"in_progress": 1},
+		},
+	}
+	env := accumulator.Envelope[*whatsnext.WhatsNextLitePayload]{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		Payload:        payload,
+	}
+	data, err := json.MarshalIndent(env, "", "  ")
+	require.NoError(t, err)
+	require.NoError(t, fileutil.WriteFile(litePath, data, paths.FilePerm644))
+
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{
+			"PRI-ACTIVE": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-ACTIVE",
+				objects.FieldKeyTitle:       "Active In Progress Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+				objects.FieldKeyActiveOrder: 1,
+			},
+		},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	// Verify GetOrRecoverPayload hot path is fast (< 100ms) for active in-progress plan
+	startPayload := time.Now()
+	loaded, errPayload := whatsnext.GetOrRecoverPayload(context.Background(), store, proj.Root, 2*time.Minute)
+	payloadDuration := time.Since(startPayload)
+	require.NoError(t, errPayload)
+	require.NotNil(t, loaded)
+	if payloadDuration > 100*time.Millisecond {
+		t.Errorf("GetOrRecoverPayload hot path took %v, expected <= 100ms", payloadDuration)
+	}
+	assert.False(t, loaded.Stale)
+	assert.Equal(t, "PRI-ACTIVE", loaded.LeadPlan.ID)
+
+	start := time.Now()
+	err = runWhatsNext(cmd, nil)
+	duration := time.Since(start)
+
+	require.NoError(t, err)
+	assert.Contains(t, buf.String(), "PRI-ACTIVE")
+	if duration > 15*time.Second {
+		t.Errorf("command took %v, expected <= 15s", duration)
+	}
+}
+
+func TestRunWhatsNext_CompletedPlan_AutoRefreshesAndDoesNotReturnCompletedPlan(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	// Pre-populate whats_next_lite.json with PRI-OLD as lead plan (stale cache)
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	payload := &whatsnext.WhatsNextLitePayload{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		LeadPlan: &whatsnext.WhatsNextPriorityPlan{
+			ID:     "PRI-OLD",
+			Title:  "Old Completed Plan",
+			Status: objects.ObjectStatusInProgress, // cache still says in_progress
+		},
+		ActivePlans: []whatsnext.WhatsNextPriorityPlan{
+			{
+				ID:     "PRI-OLD",
+				Title:  "Old Completed Plan",
+				Status: objects.ObjectStatusInProgress,
+			},
+		},
+		BacklogCountsByPlan: map[string]map[string]int{
+			"PRI-OLD": {"completed": 3},
+		},
+	}
+	env := accumulator.Envelope[*whatsnext.WhatsNextLitePayload]{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		Payload:        payload,
+	}
+	data, err := json.MarshalIndent(env, "", "  ")
+	require.NoError(t, err)
+	require.NoError(t, fileutil.WriteFile(litePath, data, paths.FilePerm644))
+
+	// In CAS / storage: PRI-OLD is now complete! And PRI-NEXT is active/in_progress.
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{
+			"PRI-OLD": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-OLD",
+				objects.FieldKeyTitle:       "Old Completed Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusComplete,
+				objects.FieldKeyActiveOrder: 1,
+			},
+			"PRI-NEXT": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-NEXT",
+				objects.FieldKeyTitle:       "Next Active Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+				objects.FieldKeyActiveOrder: 2,
+			},
+			"BLI-NEXT-01": {
+				objects.FieldKeyKind:            objects.KindBacklogItem,
+				objects.FieldKeyID:              "BLI-NEXT-01",
+				objects.FieldKeyTitle:           "Next BLI",
+				objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
+				objects.FieldKeyPriorityPlanRef: "PRI-NEXT",
+			},
+		},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	// Run whats-next WITHOUT --sync-sweep
+	err = runWhatsNext(cmd, nil)
+	require.NoError(t, err)
+
+	outStr := buf.String()
+	// Must NOT return the completed plan PRI-OLD as Priority plan
+	assert.NotContains(t, outStr, "Priority plan: PRI-OLD")
+	// Must automatically refresh and return PRI-NEXT
+	assert.Contains(t, outStr, "PRI-NEXT")
+
+	// Verify that whats_next_lite.json on disk was automatically updated
+	view := whatsnext.NewWhatsNextMaterializedView(proj.Root)
+	freshPayload, err := view.LoadFromLiteFile()
+	require.NoError(t, err)
+	require.NotNil(t, freshPayload)
+	if freshPayload.LeadPlan != nil {
+		assert.NotEqual(t, "PRI-OLD", freshPayload.LeadPlan.ID, "disk cache should not have PRI-OLD as lead plan")
+		assert.Equal(t, "PRI-NEXT", freshPayload.LeadPlan.ID, "disk cache should have PRI-NEXT as lead plan")
+	}
+}
+
+func TestRunWhatsNext_CachedStatusComplete_AutoRefreshes(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	// Pre-populate whats_next_lite.json with PRI-DONE where cached status is already "complete"
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	payload := &whatsnext.WhatsNextLitePayload{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		LeadPlan: &whatsnext.WhatsNextPriorityPlan{
+			ID:     "PRI-DONE",
+			Title:  "Done Plan",
+			Status: objects.ObjectStatusComplete,
+		},
+		ActivePlans: []whatsnext.WhatsNextPriorityPlan{
+			{
+				ID:     "PRI-DONE",
+				Title:  "Done Plan",
+				Status: objects.ObjectStatusComplete,
+			},
+		},
+	}
+	env := accumulator.Envelope[*whatsnext.WhatsNextLitePayload]{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		Payload:        payload,
+	}
+	data, err := json.MarshalIndent(env, "", "  ")
+	require.NoError(t, err)
+	require.NoError(t, fileutil.WriteFile(litePath, data, paths.FilePerm644))
+
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{
+			"PRI-DONE": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-DONE",
+				objects.FieldKeyTitle:       "Done Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusComplete,
+				objects.FieldKeyActiveOrder: 1,
+			},
+			"PRI-FRESH": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-FRESH",
+				objects.FieldKeyTitle:       "Fresh Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+				objects.FieldKeyActiveOrder: 2,
+			},
+		},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	err = runWhatsNext(cmd, nil)
+	require.NoError(t, err)
+
+	outStr := buf.String()
+	assert.NotContains(t, outStr, "Priority plan: PRI-DONE")
+	assert.Contains(t, outStr, "PRI-FRESH")
 }
