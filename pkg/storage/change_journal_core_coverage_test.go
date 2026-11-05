@@ -183,7 +183,11 @@ func TestCASIndexInvalidationSubscriber_NegativeBoundaries(t *testing.T) {
 
 	storage, err := NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() { _ = storage.Shutdown(context.Background()) })
+	t.Cleanup(func() {
+		if shutdownErr := storage.Shutdown(context.Background()); shutdownErr != nil {
+			t.Logf("cleanup storage shutdown error: %v", shutdownErr)
+		}
+	})
 
 	cas, err := storage.GetContentAddressableStorage("backlog_item")
 	require.NoError(t, err)
