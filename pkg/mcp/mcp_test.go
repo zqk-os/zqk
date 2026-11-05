@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -487,7 +488,7 @@ func TestMCPAuthentication_SessionLifecycle(t *testing.T) {
 	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create process dir: %v", err)
 	}
-	sessionsDir := datacell.CellCASPrimaryDir(tmpRoot, "mcp_sessions")
+	sessionsDir := paths.MCPSessionsDirPath(tmpRoot)
 	if err := fileutil.MkdirAll(sessionsDir, paths.DirPerm755); err != nil {
 		t.Fatalf("failed to create sessions dir: %v", err)
 	}
@@ -508,7 +509,7 @@ func TestMCPAuthentication_SessionLifecycle(t *testing.T) {
 		t.Fatal("expected non-empty session ID")
 	}
 
-	// Verify session file exists
+	// Verify session file exists in state dir
 	sessionFile := filepath.Join(sessionsDir, fmt.Sprintf("%s.yaml", sessionID))
 	content, err := fileutil.ReadFile(sessionFile)
 	if err != nil {
@@ -516,6 +517,17 @@ func TestMCPAuthentication_SessionLifecycle(t *testing.T) {
 	}
 	if !strings.Contains(string(content), "mcp_session") {
 		t.Errorf("expected session file to contain kind mcp_session, got: %s", string(content))
+	}
+
+	// Verify .next_MCP_seq exists in state directory (.zqk/state/mcp_sessions), NOT in .zqk/process/
+	stateSeqFile := filepath.Join(sessionsDir, ".next_MCP_seq")
+	if _, err := fileutil.Stat(stateSeqFile); err != nil {
+		t.Errorf("expected .next_MCP_seq in state dir %s, err: %v", sessionsDir, err)
+	}
+	legacyDir := datacell.CellCASPrimaryDir(tmpRoot, "mcp_sessions")
+	legacySeqFile := filepath.Join(legacyDir, ".next_MCP_seq")
+	if _, err := fileutil.Stat(legacySeqFile); err == nil {
+		t.Errorf("expected .next_MCP_seq NOT to exist in legacy process dir %s", legacyDir)
 	}
 
 	// 2. Update authentication session
@@ -542,6 +554,151 @@ func TestMCPAuthentication_SessionLifecycle(t *testing.T) {
 	_, err = serverInvalid.createAuthenticationSession(ctx, "c1", "name", "acc")
 	if err == nil {
 		t.Error("expected error with invalid project root inside pkg/mcp")
+	}
+}
+
+// TestMCPAuthentication_LegacyMigration_GH966 tests migration of sequence files and sessions from .zqk/process/ to .zqk/state/.
+func TestMCPAuthentication_LegacyMigration_GH966(t *testing.T) {
+	t.Parallel()
+
+	tmpRoot := t.TempDir()
+	processDir := datacell.ProcessPrimaryDir(tmpRoot)
+	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
+		t.Fatalf("failed to create process dir: %v", err)
+	}
+
+	// Seed legacy process mcp_sessions directory with .next_MCP_seq and an existing session YAML
+	legacyDir := datacell.CellCASPrimaryDir(tmpRoot, "mcp_sessions")
+	if err := fileutil.MkdirAll(legacyDir, paths.DirPerm755); err != nil {
+		t.Fatalf("failed to create legacy sessions dir: %v", err)
+	}
+	legacySeqFile := filepath.Join(legacyDir, ".next_MCP_seq")
+	if err := fileutil.WriteFile(legacySeqFile, []byte("42\n"), paths.FilePerm600); err != nil {
+		t.Fatalf("failed to write legacy seq file: %v", err)
+	}
+	legacySessionYAML := filepath.Join(legacyDir, "MCP-042.yaml")
+	if err := fileutil.WriteFile(legacySessionYAML, []byte("id: MCP-042\nkind: mcp_session\n"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write legacy session yaml: %v", err)
+	}
+
+	server := createTestServerWithoutRegistry()
+	server.initCtx = &pkgctx.CliInitializationContext{
+		ProjectRoot: tmpRoot,
+	}
+
+	ctx := context.Background()
+
+	// 1. Create next authentication session - should migrate legacy seq and start at 43
+	sessionID, err := server.createAuthenticationSession(ctx, "client-043", "worker", "ACC-1")
+	if err != nil {
+		t.Fatalf("createAuthenticationSession failed: %v", err)
+	}
+	if sessionID != "MCP-043" {
+		t.Fatalf("expected session ID MCP-043, got %s", sessionID)
+	}
+
+	// 2. Verify state directory has the new session and migrated seq & yaml
+	stateDir := paths.MCPSessionsDirPath(tmpRoot)
+	stateSeqFile := filepath.Join(stateDir, ".next_MCP_seq")
+	if _, err := fileutil.Stat(stateSeqFile); err != nil {
+		t.Fatalf("expected .next_MCP_seq in state dir %s: %v", stateDir, err)
+	}
+	newSessionFile := filepath.Join(stateDir, "MCP-043.yaml")
+	if _, err := fileutil.Stat(newSessionFile); err != nil {
+		t.Fatalf("expected MCP-043.yaml in state dir %s: %v", stateDir, err)
+	}
+	migratedSessionFile := filepath.Join(stateDir, "MCP-042.yaml")
+	if _, err := fileutil.Stat(migratedSessionFile); err != nil {
+		t.Fatalf("expected MCP-042.yaml migrated to state dir %s: %v", stateDir, err)
+	}
+
+	// 3. Verify legacy sequence file was removed from process dir so it doesn't block git checkout
+	if _, err := fileutil.Stat(legacySeqFile); err == nil {
+		t.Fatalf("legacy .next_MCP_seq should have been removed from %s", legacyDir)
+	}
+
+	// 4. Update the migrated session
+	secCtx := &pkgctx.SecurityContext{AccountID: "ACC-1"}
+	if err := server.updateAuthenticationSession(ctx, "MCP-042", secCtx, nil); err != nil {
+		t.Fatalf("updateAuthenticationSession on migrated session failed: %v", err)
+	}
+}
+
+// TestMCPAuthentication_GitClean_GH966 verifies that creating MCP sessions does not dirty tracked git paths.
+func TestMCPAuthentication_GitClean_GH966(t *testing.T) {
+	t.Parallel()
+
+	tmpRoot := t.TempDir()
+	ctx := t.Context()
+
+	// Initialize git repo in tmpRoot
+	initCmd := testkit.ManagedCommand(t, ctx, "git", "init")
+	initCmd.Dir = tmpRoot
+	if out, err := initCmd.CombinedOutput(); err != nil {
+		t.Skipf("git not available or init failed: %v, %s", err, string(out))
+	}
+
+	// Configure git author
+	for _, args := range [][]string{
+		{"config", "user.name", "test-agent"},
+		{"config", "user.email", "test@zqk.dev"},
+	} {
+		c := testkit.ManagedCommand(t, ctx, "git", args...)
+		c.Dir = tmpRoot
+		_ = c.Run()
+	}
+
+	// Create required directories and files
+	processDir := datacell.ProcessPrimaryDir(tmpRoot)
+	if err := fileutil.MkdirAll(processDir, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	// Add .gitignore matching repository configuration
+	gitignoreContent := ".zqk/state/\n.zqk/process/mcp_sessions/\n**/.next_*_seq\n**/.next_*\n"
+	if err := fileutil.WriteFile(filepath.Join(tmpRoot, ".gitignore"), []byte(gitignoreContent), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+	// Create a dummy tracked file in process
+	trackedFile := filepath.Join(processDir, "tracked.yaml")
+	if err := fileutil.WriteFile(trackedFile, []byte("tracked: true\n"), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Initial git commit
+	addCmd := testkit.ManagedCommand(t, ctx, "git", "add", ".gitignore", ".zqk/process/tracked.yaml")
+	addCmd.Dir = tmpRoot
+	if out, err := addCmd.CombinedOutput(); err != nil {
+		t.Fatalf("git add failed: %v\n%s", err, out)
+	}
+	commitCmd := testkit.ManagedCommand(t, ctx, "git", "commit", "-m", "initial commit")
+	commitCmd.Dir = tmpRoot
+	if out, err := commitCmd.CombinedOutput(); err != nil {
+		t.Fatalf("git commit failed: %v\n%s", err, out)
+	}
+
+	// Now run MCP session creation
+	server := createTestServerWithoutRegistry()
+	server.initCtx = &pkgctx.CliInitializationContext{
+		ProjectRoot: tmpRoot,
+	}
+
+	sessID, err := server.createAuthenticationSession(context.Background(), "git-client", "tester", "ACC-GIT")
+	if err != nil {
+		t.Fatalf("createAuthenticationSession failed: %v", err)
+	}
+	if sessID == "" {
+		t.Fatal("expected non-empty session ID")
+	}
+
+	// Verify git status is completely clean
+	statusCmd := testkit.ManagedCommand(t, ctx, "git", "status", "--porcelain")
+	statusCmd.Dir = tmpRoot
+	statusOut, err := statusCmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git status failed: %v\n%s", err, statusOut)
+	}
+	if len(strings.TrimSpace(string(statusOut))) > 0 {
+		t.Fatalf("expected git working directory to remain clean after MCP session creation, got dirty status:\n%s", string(statusOut))
 	}
 }
 

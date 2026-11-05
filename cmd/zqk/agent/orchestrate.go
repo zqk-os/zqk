@@ -39,21 +39,27 @@ type OrchestrateOptions struct {
 	AmbientContext string
 	PersonaID      string
 	Timeout        time.Duration
+	NoExecute      bool
 }
 
 // NewOrchestrateCmd creates the orchestrate command
 func NewOrchestrateCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentOrchestrateCommandBuilder()
+	if cmd.Flags().Lookup("no-execute") == nil {
+		cmd.Flags().Bool("no-execute", false, "Mint task envelopes and return JSON without launching agent execution processes")
+	}
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		sessionID, _ := cmd.Flags().GetString("session-id")
 		ambientContext, _ := cmd.Flags().GetString("ambient-context")
 		personaID, _ := cmd.Flags().GetString("persona-id")
+		noExecute, _ := cmd.Flags().GetBool("no-execute")
 		timeout := cli.GetTimeout(cmd)
 		opts := OrchestrateOptions{
 			SessionID:      sessionID,
 			AmbientContext: ambientContext,
 			PersonaID:      personaID,
 			Timeout:        timeout,
+			NoExecute:      noExecute,
 		}
 		var planArg string
 		if len(args) > 0 {

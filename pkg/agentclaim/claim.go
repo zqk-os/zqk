@@ -35,6 +35,9 @@ type ClaimOptions struct {
 
 	// CheckinCadence overrides DefaultCheckinCadence for this claim.
 	CheckinCadence time.Duration
+
+	// EstimatedEffort sets or overrides estimated effort on the claimed task.
+	EstimatedEffort string
 }
 
 func readOccupiableTask(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx.SecurityContext, taskID string) (map[string]any, string, Result, error) {
@@ -104,6 +107,16 @@ func TryClaim(ctx context.Context, sp storage.ObjectStorageProvider, sec *pkgctx
 	}
 	if status == objects.ObjectStatusApproved {
 		updates[objects.FieldKeyStatus] = objects.ObjectStatusInProgress
+	}
+	currentEffort := strings.TrimSpace(objects.StringField(task, objects.FieldKeyEstimatedEffort))
+	if currentEffort == "" {
+		effortVal := "2h"
+		if len(opts) > 0 && opts[0].EstimatedEffort != "" {
+			effortVal = opts[0].EstimatedEffort
+		}
+		updates[objects.FieldKeyEstimatedEffort] = effortVal
+	} else if len(opts) > 0 && opts[0].EstimatedEffort != "" {
+		updates[objects.FieldKeyEstimatedEffort] = opts[0].EstimatedEffort
 	}
 	if len(opts) > 0 {
 		opt := opts[0]

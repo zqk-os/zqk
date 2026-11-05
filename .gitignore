@@ -204,6 +204,9 @@ docs/process/scheduler_jobs/
 # MCP session dumps (runtime artifacts)
 .zqk/process/mcp_sessions/
 docs/process/mcp_sessions/
+.zqk/state/mcp_sessions/
+**/.zqk/process/mcp_sessions/
+**/.zqk/state/mcp_sessions/
 # Local .zqk used by cmd/zqk/internal (runtime)
 cmd/zqk/internal/.zqk/
 # Nested .zqk and docs under package dirs must not be used as project root; ignore if created by mistake
@@ -254,6 +257,10 @@ docs/process/
 .zqk/test-bundles/
 .zqk/runs/
 docs/process/**/.next_*_seq
+.zqk/process/**/.next_*_seq
+.zqk/**/.next_*_seq
+**/.next_*_seq
+**/.next_*
 docs/process/**/.*.index
 docs/process/**/.*.index.tmp*
 *.prof

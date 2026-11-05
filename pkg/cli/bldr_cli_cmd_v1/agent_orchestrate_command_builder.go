@@ -10,7 +10,7 @@ import (
 
 // NewAgentOrchestrateCommandBuilder creates a new agent_orchestrate command
 func NewAgentOrchestrateCommandBuilder() *cobra.Command {
-	builder := clipkg.NewCommandBuilder("orchestrate")
+	builder := clipkg.NewCommandBuilder("orchestrate [plan-id]")
 	builder.WithShort("Route tasks from a priority plan to specialized sub-agents")
 	help := clipkg.DynamicHelpBuilder("Route tasks from a priority plan to specialized sub-agents")
 	help.WithDescriptionLines("Reads an active or in-progress priority plan and routes shovel-ready backlog")
@@ -23,6 +23,7 @@ func NewAgentOrchestrateCommandBuilder() *cobra.Command {
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.MaximumNArgs(1))
 	builder.AddStringFlag("ambient-context", "", "", "Optional path to ambient context JSON or a raw JSON payload")
+	builder.AddBoolFlag("no-execute", "", false, "Mint task envelopes and return JSON without launching agent execution processes")
 	builder.AddStringFlag("persona-id", "", "", "Optional persona ID to filter work and define agent role")
 	builder.AddStringFlag("session-id", "", "", "Optional convergence session ID to isolate execution context")
 	builder.AddDurationFlag("timeout", "", "0s", "Timeout for the orchestration session (0 uses the default 4h)")

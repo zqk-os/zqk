@@ -55,6 +55,50 @@ func validateProjectRootForProcessData(projectRoot string) error {
 	return nil
 }
 
+// mcpSessionsDir returns the directory for transient MCP session files.
+// Transient MCP session traces and .next_MCP_seq are written under .zqk/state/mcp_sessions/
+// so they never dirty or block git checkout and branch switching in .zqk/process/ (GH-966).
+func mcpSessionsDir(projectRoot string) string {
+	return paths.MCPSessionsDirPath(projectRoot)
+}
+
+// migrateLegacyMCPSessionsIfPresent migrates any legacy .next_MCP_seq and session traces from
+// .zqk/process/mcp_sessions to .zqk/state/mcp_sessions and cleans up legacy files (GH-966).
+func migrateLegacyMCPSessionsIfPresent(projectRoot, stateDir string) {
+	legacyDir := datacell.CellCASPrimaryDir(projectRoot, "mcp_sessions")
+	if info, err := fileutil.Stat(legacyDir); err != nil || !info.IsDir() {
+		return
+	}
+
+	legacySeq := filepath.Join(legacyDir, ".next_MCP_seq")
+	stateSeq := filepath.Join(stateDir, ".next_MCP_seq")
+
+	if _, err := fileutil.Stat(legacySeq); err == nil {
+		if _, err := fileutil.Stat(stateSeq); fileutil.IsNotExist(err) {
+			if data, err := fileutil.ReadFile(legacySeq); err == nil {
+				_ = fileutil.WriteFile(stateSeq, data, paths.FilePerm600)
+			}
+		}
+		_ = fileutil.Remove(legacySeq)
+	}
+
+	entries, err := fileutil.ReadDir(legacyDir)
+	if err == nil {
+		for _, entry := range entries {
+			if strings.HasPrefix(entry.Name(), "MCP-") && strings.HasSuffix(entry.Name(), ".yaml") {
+				oldPath := filepath.Join(legacyDir, entry.Name())
+				newPath := filepath.Join(stateDir, entry.Name())
+				if _, err := fileutil.Stat(newPath); fileutil.IsNotExist(err) {
+					_ = fileutil.Rename(oldPath, newPath)
+				} else {
+					_ = fileutil.Remove(oldPath)
+				}
+			}
+		}
+		_ = fileutil.Remove(legacyDir)
+	}
+}
+
 // createAuthenticationSession creates an authentication session object for an unauthenticated client
 // Returns the session ID if successful, or empty string and error if creation fails
 // Uses direct file I/O to avoid import cycle with storage package
@@ -66,10 +110,14 @@ func (s *Server) createAuthenticationSession(ctx context.Context, clientID, clie
 	}
 
 	// Sessions directory (must exist before we allocate an ID so the sequence file can be created)
-	sessionsDir := datacell.CellCASPrimaryDir(projectRoot, "mcp_sessions")
+	// Stored under .zqk/state/mcp_sessions/ so it never dirties .zqk/process/ or blocks git checkout (GH-966).
+	sessionsDir := mcpSessionsDir(projectRoot)
 	if err := fileutil.MkdirAll(sessionsDir, paths.DirPerm755); err != nil {
 		return "", errfmt.Newf("failed to create sessions directory").Wrap(err)
 	}
+
+	// Migrate legacy sequence file and sessions from .zqk/process/mcp_sessions/ if present
+	migrateLegacyMCPSessionsIfPresent(projectRoot, sessionsDir)
 
 	// Generate session ID using the same sequential mechanism as other kinds (cross-process safe)
 	generator := id_generation.GetBatchIDGenerator(ctx, sessionsDir, objects.KindMcpSession, "MCP", 3, 1)
@@ -145,13 +193,19 @@ func (s *Server) updateAuthenticationSession(_ context.Context, sessionID string
 		return err
 	}
 
-	// Read existing session file
-	sessionsDir := datacell.CellCASPrimaryDir(projectRoot, "mcp_sessions")
+	// Read existing session file: prefer state directory, fallback to legacy process directory
+	sessionsDir := mcpSessionsDir(projectRoot)
 	sessionFile := filepath.Join(sessionsDir, fmt.Sprintf("%s.yaml", sessionID))
 
-	// Check if file exists
+	// Check if file exists in state dir, falling back to legacy process directory
 	if _, err := fileutil.Stat(sessionFile); fileutil.IsNotExist(err) {
-		return errfmt.Errorf("authentication session not found: %s", sessionID)
+		legacyDir := datacell.CellCASPrimaryDir(projectRoot, "mcp_sessions")
+		legacyFile := filepath.Join(legacyDir, fmt.Sprintf("%s.yaml", sessionID))
+		if _, lerr := fileutil.Stat(legacyFile); lerr == nil {
+			sessionFile = legacyFile
+		} else {
+			return errfmt.Errorf("authentication session not found: %s", sessionID)
+		}
 	}
 
 	// For now, just log the update - full YAML parsing/updating would require more complex logic

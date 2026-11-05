@@ -94,6 +94,19 @@ func (m *mockStorageProvider) List(ctx context.Context, sec *pkgctx.SecurityCont
 	return &storage.QueryResult{Objects: objs}, nil
 }
 
+func (m *mockStorageProvider) Read(ctx context.Context, sec *pkgctx.SecurityContext, id string) (map[string]any, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for _, objs := range m.objects {
+		for _, obj := range objs {
+			if obj[objects.FieldKeyID] == id {
+				return obj, nil
+			}
+		}
+	}
+	return nil, nil
+}
+
 func waitForReconcile(t *testing.T, timeout time.Duration) {
 	time.Sleep(10 * time.Millisecond) // yield to allow reconciler goroutine to start
 	deadline := time.Now().Add(timeout)
@@ -230,6 +243,63 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 		if payload.LeadPlan == nil || payload.LeadPlan.ID != "PRI-002" {
 			t.Errorf("expected lead plan PRI-002, got %+v", payload.LeadPlan)
 		}
+	}
+}
+
+func TestGetOrRecoverPayload_AutoInvalidationOnCompletedPlan(t *testing.T) {
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+
+	// 1. Initial scan and persistence where PRI-002 is in_progress lead plan
+	view := NewWhatsNextMaterializedView(tempDir)
+	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
+		t.Fatalf("initial scan failed: %v", err)
+	}
+	if err := view.SaveToLiteFile(); err != nil {
+		t.Fatalf("save lite file failed: %v", err)
+	}
+
+	// Verify cached payload has PRI-002 as lead plan
+	loaded, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+	if err != nil || loaded == nil || loaded.LeadPlan == nil || loaded.LeadPlan.ID != "PRI-002" {
+		t.Fatalf("expected initial lead plan PRI-002, got %+v", loaded)
+	}
+
+	// 2. Transition PRI-002 in storage to "complete"
+	mockSp.mu.Lock()
+	for _, p := range mockSp.objects[objects.KindPriorityPlan] {
+		if p[objects.FieldKeyID] == "PRI-002" {
+			p[objects.FieldKeyStatus] = objects.ObjectStatusComplete
+		}
+	}
+	mockSp.mu.Unlock()
+
+	// 3. Hot-path read should detect PRI-002 completion and auto-refresh from storage
+	refreshed, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+	if err != nil {
+		t.Fatalf("expected successful refresh, got error: %v", err)
+	}
+	if refreshed == nil {
+		t.Fatal("expected non-nil refreshed payload")
+	}
+	if refreshed.LeadPlan != nil && refreshed.LeadPlan.ID == "PRI-002" {
+		t.Errorf("refreshed payload must not have completed plan PRI-002 as lead plan, got %+v", refreshed.LeadPlan)
+	}
+	if refreshed.LeadPlan == nil || refreshed.LeadPlan.ID != "PRI-001" {
+		t.Errorf("expected lead plan to advance to PRI-001, got %+v", refreshed.LeadPlan)
+	}
+
+	// 4. Verify disk file was updated
+	diskView := NewWhatsNextMaterializedView(tempDir)
+	diskPayload, err := diskView.LoadFromLiteFile()
+	if err != nil || diskPayload == nil {
+		t.Fatalf("failed to load refreshed disk payload: %v", err)
+	}
+	if diskPayload.LeadPlan != nil && diskPayload.LeadPlan.ID == "PRI-002" {
+		t.Errorf("disk payload should not have PRI-002 as lead plan")
+	}
+	if diskPayload.LeadPlan == nil || diskPayload.LeadPlan.ID != "PRI-001" {
+		t.Errorf("expected disk lead plan to be PRI-001, got %+v", diskPayload.LeadPlan)
 	}
 }
 

@@ -256,3 +256,78 @@ func TestNewCriteria_DefaultCategory(t *testing.T) {
 		t.Fatalf("new criteria with --category failed: %v", err)
 	}
 }
+
+func TestNewObject_AgentTaskEstimatedEffort(t *testing.T) {
+	testRoot := t.TempDir()
+	t.Setenv(zqkenv.TestRoot().Name(), testRoot)
+	repoRoot := zqkenv.ProjectRoot().Get()
+	if repoRoot == "" {
+		if root, err := findModuleRoot(); err == nil {
+			repoRoot = root
+		}
+	}
+	if err := testenvroot.BootstrapRoot(testRoot, repoRoot); err != nil {
+		t.Fatalf("BootstrapRoot: %v", err)
+	}
+	t.Cleanup(func() {
+		if teardownErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil)); teardownErr != nil {
+			t.Logf("teardown error: %v", teardownErr)
+		}
+	})
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	// 1. Explicit --estimated-effort 4h
+	cmd1 := NewNewCmd()
+	cmd1.SetContext(ctx)
+	cmd1.SetArgs([]string{"object", "agent_task", "--title", "Explicit Effort Task", "-d", "Test agent task description 1", "--estimated-effort", "4h", "--cas"})
+	if err := cmd1.Execute(); err != nil {
+		t.Fatalf("agent_task with --estimated-effort failed: %v", err)
+	}
+
+	// 2. Explicit --effort 30m alias
+	buf.Reset()
+	cmd2 := NewNewCmd()
+	cmd2.SetContext(ctx)
+	cmd2.SetArgs([]string{"object", "agent_task", "--title", "Effort Alias Task", "-d", "Test agent task description 2", "--effort", "30m", "--cas"})
+	if err := cmd2.Execute(); err != nil {
+		t.Fatalf("agent_task with --effort failed: %v", err)
+	}
+
+	// 3. Default effort fallback for agent_task (2h)
+	buf.Reset()
+	cmd3 := NewNewCmd()
+	cmd3.SetContext(ctx)
+	cmd3.SetArgs([]string{"object", "agent_task", "--title", "Default Effort Task", "-d", "Test agent task description 3", "--cas"})
+	if err := cmd3.Execute(); err != nil {
+		t.Fatalf("agent_task with default effort failed: %v", err)
+	}
+
+	sp, err := storage.GetGlobalStorageProviderCache().GetOrCreate(ctx, testRoot)
+	if err != nil {
+		t.Fatalf("storage cache: %v", err)
+	}
+	sec := pkgctx.NewSystemSecurityContext()
+	res, err := sp.List(ctx, sec, nil, storage.ListFilter{Kind: objects.KindAgentTask})
+	if err != nil {
+		t.Fatalf("list agent tasks: %v", err)
+	}
+
+	effortByTitle := make(map[string]string)
+	for _, obj := range res.Objects {
+		title, _ := obj[objects.FieldKeyTitle].(string)
+		effort, _ := obj[objects.FieldKeyEstimatedEffort].(string)
+		effortByTitle[title] = effort
+	}
+
+	if effortByTitle["Explicit Effort Task"] != "4h" {
+		t.Errorf("expected 4h for Explicit Effort Task, got %q", effortByTitle["Explicit Effort Task"])
+	}
+	if effortByTitle["Effort Alias Task"] != "30m" {
+		t.Errorf("expected 30m for Effort Alias Task, got %q", effortByTitle["Effort Alias Task"])
+	}
+	if effortByTitle["Default Effort Task"] != "2h" {
+		t.Errorf("expected 2h for Default Effort Task, got %q", effortByTitle["Default Effort Task"])
+	}
+}

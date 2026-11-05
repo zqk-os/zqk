@@ -141,6 +141,69 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 
 	// Strict default hot path: read pre-computed zero-cost projection (<5ms SLA)
 	lite, _ := whatsnext.GetOrRecoverPayload(ctx, sp, projectRoot, whatsnext.DefaultStalenessTolerance)
+
+	// Auto-invalidation check: Inspect candidate plan status in CAS / index.
+	// If cached plan is complete, archived, or no longer exists, automatically trigger sync-sweep.
+	var candidatePlanID string
+	var candidatePlanStatus string
+	explicit := strings.TrimSpace(priFlag)
+	if explicit != emptyValue {
+		candidatePlanID = explicit
+		if lite != nil {
+			if lite.LeadPlan != nil && lite.LeadPlan.ID == explicit {
+				candidatePlanStatus = lite.LeadPlan.Status
+			} else {
+				for _, p := range lite.ActivePlans {
+					if p.ID == explicit {
+						candidatePlanStatus = p.Status
+						break
+					}
+				}
+			}
+		}
+	} else if lite != nil {
+		if lite.LeadPlan != nil && strings.TrimSpace(lite.LeadPlan.ID) != "" {
+			candidatePlanID = lite.LeadPlan.ID
+			candidatePlanStatus = lite.LeadPlan.Status
+		} else if len(lite.ActivePlans) > 0 {
+			candidatePlanID = lite.ActivePlans[0].ID
+			candidatePlanStatus = lite.ActivePlans[0].Status
+		}
+	}
+
+	if candidatePlanID != "" {
+		isStale := whatsnext.IsPlanStatusCompleted(candidatePlanStatus)
+		if !isStale && sp != nil {
+			secCtx := pkgctx.GetSecurityContext(ctx)
+			if secCtx == nil {
+				secCtx = pkgctx.NewSystemSecurityContext()
+			}
+			obj, err := sp.Read(ctx, secCtx, candidatePlanID)
+			if err == nil && obj != nil {
+				if whatsnext.IsPlanStatusCompleted(koi.Status(obj)) || koi.IsArchive(obj) {
+					isStale = true
+				}
+			} else {
+				// Object was not found via Read. Check if storage has other priority plans.
+				res, lErr := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindPriorityPlan).Limit(1).Build())
+				if lErr == nil && len(res.Objects) > 0 {
+					isStale = true
+				}
+			}
+		}
+		if isStale && sp != nil {
+			return runWhatsNextSyncSweep(cmd, args, proc, projectRoot, priFlag, cvsFlag, personaFlag, agentIDFlag, skipMeasure)
+		}
+	} else if lite != nil && lite.LeadPlan == nil && len(lite.ActivePlans) == 0 && sp != nil {
+		// If cache has no active plans, check if new plans were promoted in storage
+		personaIDs := resolveWhatsNextPersonaIDs(ctx, sp, projectRoot, personaFlag, agentIDFlag)
+		columnIDs := planPersonaFilter(ctx, sp, projectRoot, agentIDFlag, personaIDs)
+		_, summ, _ := resolvePriorityPlanForWhatsNext(ctx, sp, explicit, columnIDs)
+		if summ != nil {
+			return runWhatsNextSyncSweep(cmd, args, proc, projectRoot, priFlag, cvsFlag, personaFlag, agentIDFlag, skipMeasure)
+		}
+	}
+
 	if lite != nil {
 		out.MaterializedViewStale = lite.Stale
 		out.MaterializedViewRecovering = lite.Recovering
@@ -148,7 +211,7 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 		out.RunwayDepth = lite.RunwayDepth
 
 		for _, p := range lite.ActivePlans {
-			if strings.TrimSpace(p.Title) == "" {
+			if strings.TrimSpace(p.Title) == "" || whatsnext.IsPlanStatusCompleted(p.Status) {
 				continue
 			}
 			out.ActivePlans = append(out.ActivePlans, whatsNextPriorityPlan{
@@ -158,7 +221,6 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 			})
 		}
 
-		explicit := strings.TrimSpace(priFlag)
 		if explicit != emptyValue {
 			var matched *whatsNextPriorityPlan
 			if lite.LeadPlan != nil && lite.LeadPlan.ID == explicit && strings.TrimSpace(lite.LeadPlan.Title) != "" {
@@ -191,7 +253,7 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 			} else {
 				out.PriorityPlan = &whatsNextPriorityPlan{ID: explicit}
 			}
-		} else if lite.LeadPlan != nil && strings.TrimSpace(lite.LeadPlan.Title) != "" {
+		} else if lite.LeadPlan != nil && strings.TrimSpace(lite.LeadPlan.Title) != "" && !whatsnext.IsPlanStatusCompleted(lite.LeadPlan.Status) {
 			out.PriorityPlan = &whatsNextPriorityPlan{
 				ID:     lite.LeadPlan.ID,
 				Title:  lite.LeadPlan.Title,
@@ -219,13 +281,17 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 
 		if out.PriorityPlan == nil && len(lite.Plans) > 0 {
 			leadNode, _ := whatsnext.EvaluatePhiLead(lite.Plans, nil)
-			if leadNode != nil && strings.TrimSpace(leadNode.Title) != "" {
+			if leadNode != nil && strings.TrimSpace(leadNode.Title) != "" && !whatsnext.IsPlanStatusCompleted(leadNode.Status) {
 				out.PriorityPlan = &whatsNextPriorityPlan{
 					ID:     leadNode.ID,
 					Title:  leadNode.Title,
 					Status: leadNode.Status,
 				}
 			}
+		}
+
+		if out.PriorityPlan != nil && whatsnext.IsPlanStatusCompleted(out.PriorityPlan.Status) {
+			out.PriorityPlan = nil
 		}
 
 		if out.PriorityPlan != nil {

@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/lifecycle"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/objects/koi"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -902,6 +903,56 @@ func (v *WhatsNextMaterializedView) Tasks() []*TaskNode {
 // Zero-Cost Hot Path & Async Recovery Circuit Breaker
 // ---------------------------------------------------------------------------
 
+// IsPlanStatusCompleted reports whether a priority plan's status represents completion, archive, or cancellation.
+func IsPlanStatusCompleted(status string) bool {
+	st := strings.ToLower(strings.TrimSpace(status))
+	if st == "" {
+		return false
+	}
+	switch st {
+	case objects.ObjectStatusComplete, objects.ObjectStatusCompleted, objects.ObjectStatusArchived,
+		objects.ObjectStatusCancelled, objects.ObjectStatusRejected, "done":
+		return true
+	default:
+		return !objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, st) &&
+			st != objects.ObjectStatusPlanned &&
+			st != objects.ObjectStatusOriginated &&
+			st != "draft" &&
+			st != "proposed"
+	}
+}
+
+// IsCachedPlanStale checks whether the cached priority plan has transitioned to complete,
+// archived, or no longer exists in storage.
+func IsCachedPlanStale(ctx context.Context, sp storage.ObjectStorageProvider, plan *WhatsNextPriorityPlan) bool {
+	if plan == nil || strings.TrimSpace(plan.ID) == "" {
+		return false
+	}
+	if IsPlanStatusCompleted(plan.Status) {
+		return true
+	}
+	if sp == nil {
+		return false
+	}
+	secCtx := pkgctx.GetSecurityContext(ctx)
+	if secCtx == nil {
+		secCtx = pkgctx.NewSystemSecurityContext()
+	}
+	obj, err := sp.Read(ctx, secCtx, plan.ID)
+	if err == nil && obj != nil {
+		if IsPlanStatusCompleted(koi.Status(obj)) || koi.IsArchive(obj) {
+			return true
+		}
+		return false
+	}
+	// Object was not found via Read. If storage has other priority plans, this plan no longer exists.
+	res, lErr := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindPriorityPlan).Limit(1).Build())
+	if lErr == nil && len(res.Objects) > 0 {
+		return true
+	}
+	return false
+}
+
 // GetOrRecoverPayload implements the strict Zero-Hot-Path-Scan Invariant.
 // Hot path reads the pre-computed lite file in sub-5ms.
 // If missing or stale, it serves available state with degraded flags and dispatches
@@ -929,6 +980,44 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 		}
 		TriggerAsyncRebuild(projectRoot, sp)
 		return bootstrap, nil
+	}
+
+	// Auto-invalidation check: If the cached lead plan (or first active plan) has transitioned to complete,
+	// archived, or no longer exists in CAS, automatically trigger a synchronous refresh from storage so
+	// callers never receive a stale completed plan.
+	candidatePlan := payload.LeadPlan
+	if candidatePlan == nil && len(payload.ActivePlans) > 0 {
+		candidatePlan = &payload.ActivePlans[0]
+	}
+	if candidatePlan != nil && IsCachedPlanStale(ctx, sp, candidatePlan) {
+		if sp != nil {
+			secCtx := pkgctx.GetSecurityContext(ctx)
+			if secCtx == nil {
+				secCtx = pkgctx.NewSystemSecurityContext()
+			}
+			rebuildView := NewWhatsNextMaterializedView(projectRoot)
+			if scanErr := rebuildView.ScanFromStorageWithSecurity(ctx, sp, secCtx); scanErr == nil {
+				_ = rebuildView.SaveToLiteFile()
+				refreshed := rebuildView.BuildPayloadLocked()
+				refreshed.Stale = false
+				refreshed.Recovering = false
+				refreshed.DegradedReason = ""
+				return refreshed, nil
+			}
+		}
+		payload.Stale = true
+		payload.Recovering = true
+		payload.DegradedReason = fmt.Sprintf("cached priority plan %s is completed or inactive", candidatePlan.ID)
+		payload.LeadPlan = nil
+		active := make([]WhatsNextPriorityPlan, 0, len(payload.ActivePlans))
+		for _, p := range payload.ActivePlans {
+			if !IsPlanStatusCompleted(p.Status) {
+				active = append(active, p)
+			}
+		}
+		payload.ActivePlans = active
+		TriggerAsyncRebuild(projectRoot, sp)
+		return payload, nil
 	}
 
 	age := time.Since(payload.MaterializedAt)

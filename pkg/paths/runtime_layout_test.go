@@ -36,6 +36,9 @@ func TestRuntimeLayoutPaths_fallbackWithoutCache(t *testing.T) {
 	if got := StateDirPath(root); got != filepath.Join(root, ProjectDataDir, StateDir) {
 		t.Fatalf("StateDirPath=%q", got)
 	}
+	if got := MCPSessionsDirPath(root); got != filepath.Join(root, ProjectDataDir, StateDir, "mcp_sessions") {
+		t.Fatalf("MCPSessionsDirPath=%q", got)
+	}
 	if got := SessionStateRel(); got != filepath.ToSlash(filepath.Join(ProjectDataDir, StateDir, SessionStateFile)) {
 		t.Fatalf("SessionStateRel=%q", got)
 	}
