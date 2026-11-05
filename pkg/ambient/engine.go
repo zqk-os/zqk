@@ -4,11 +4,15 @@ package ambient
 import (
 	"context"
 	"errors"
+	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/liveness"
+	"github.com/zqk-os/zqk/pkg/paths"
 )
 
 // EngineState represents the lifecycle state automaton of an AmbientEngine.
@@ -67,6 +71,9 @@ type AmbientEngineConfig struct {
 	SwarmDispatchConfig    *SwarmDispatchConfig     `json:"swarm_dispatch_config,omitempty"`
 	SwarmDispatcherConfig  *SwarmDispatcherConfig   `json:"swarm_dispatcher_config,omitempty"`
 	StatePath              string                   `json:"state_path,omitempty"`
+	ProjectRoot            string                   `json:"project_root,omitempty"`
+	LivenessSocketPath     string                   `json:"liveness_socket_path,omitempty"`
+	EnableLiveness         bool                     `json:"enable_liveness,omitempty"`
 }
 
 // DefaultAmbientEngineConfig returns production defaults for AmbientEngine.
@@ -166,6 +173,8 @@ type AmbientEngine struct {
 	consensusArbiter      *ConsensusArbiter
 	reflexLoop            *ReflexLoop
 	swarmDispatcher       *SwarmDispatcher
+	livenessListener      *liveness.PulseListener
+	decayTracker          *liveness.DecayTracker
 
 	startedAt      time.Time
 	ticksExecuted  uint64
@@ -222,6 +231,8 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 		return nil, err
 	}
 
+	pulseListener, decayTracker := initLivenessSubsystem(cfg, reflex)
+
 	return &AmbientEngine{
 		config:                cfg,
 		state:                 EngineStateStopped,
@@ -233,7 +244,63 @@ func NewAmbientEngine(cfg AmbientEngineConfig) (*AmbientEngine, error) {
 		consensusArbiter:      arbiter,
 		reflexLoop:            reflex,
 		swarmDispatcher:       dispatcher,
+		livenessListener:      pulseListener,
+		decayTracker:          decayTracker,
 	}, nil
+}
+
+func resolveLivenessSocketPath(cfg AmbientEngineConfig) string {
+	if cfg.LivenessSocketPath != "" {
+		return cfg.LivenessSocketPath
+	}
+	if cfg.ProjectRoot != "" {
+		return paths.LivenessSocketPath(cfg.ProjectRoot)
+	}
+	if cfg.StatePath != "" {
+		return filepath.Join(cfg.StatePath, paths.LivenessSocketFile)
+	}
+	return paths.LivenessSocketPath("")
+}
+
+func initLivenessSubsystem(cfg AmbientEngineConfig, reflex *ReflexLoop) (*liveness.PulseListener, *liveness.DecayTracker) {
+	if !cfg.EnableLiveness && cfg.LivenessSocketPath == "" {
+		return nil, nil
+	}
+
+	tracker := liveness.NewDecayTracker(
+		func(rec *liveness.HolonRecord) {
+			handleIschemiaReflex(rec, reflex)
+		},
+		func(rec *liveness.HolonRecord) {
+			// Reperfusion recovery
+		},
+	)
+
+	socketPath := resolveLivenessSocketPath(cfg)
+	listener := liveness.NewPulseListener(socketPath, tracker)
+	return listener, tracker
+}
+
+func handleIschemiaReflex(rec *liveness.HolonRecord, reflex *ReflexLoop) {
+	if reflex == nil || rec == nil || rec.LastPacket == nil {
+		return
+	}
+	act := ReflexAction{
+		ID:          fmt.Sprintf("ischemia-%s-%d", rec.LastPacket.HolonID, time.Now().UnixNano()),
+		Type:        ReflexActionRestartHolon,
+		Target:      rec.LastPacket.HolonID,
+		TargetHolon: rec.LastPacket.HolonID,
+		Reason:      fmt.Sprintf("holon %s pulse deadline breached (ischemic)", rec.LastPacket.HolonID),
+		Payload: map[string]any{
+			"holon_id": rec.LastPacket.HolonID,
+			"pid":      rec.LastPacket.PID,
+			"cadence":  rec.LastPacket.CadenceMS,
+		},
+		Timestamp: time.Now(),
+	}
+	if trigErr := reflex.TriggerAction(context.Background(), act); trigErr != nil {
+		// Log or record action trigger error
+	}
 }
 
 // DefaultAmbientEngine initializes an AmbientEngine with default production configuration.
@@ -352,6 +419,62 @@ func (e *AmbientEngine) SwarmDispatcher() *SwarmDispatcher {
 // BacklogObserver returns the bound BacklogObserver. Returns nil if receiver is nil.
 func (e *AmbientEngine) BacklogObserver() *BacklogObserver {
 	return e.SwarmDispatcher()
+}
+
+// LivenessListener returns the pulse listener hosted by the engine, or nil if not enabled.
+func (e *AmbientEngine) LivenessListener() *liveness.PulseListener {
+	return withEngineRLock(e, func(eng *AmbientEngine) *liveness.PulseListener {
+		return eng.livenessListener
+	})
+}
+
+// DecayTracker returns the underlying decay tracker, or nil if liveness is not enabled.
+func (e *AmbientEngine) DecayTracker() *liveness.DecayTracker {
+	return withEngineRLock(e, func(eng *AmbientEngine) *liveness.DecayTracker {
+		return eng.decayTracker
+	})
+}
+
+// VitalitySnapshot returns a snapshot of active holon vitalities from the decay tracker.
+func (e *AmbientEngine) VitalitySnapshot() []liveness.HolonVitality {
+	dt := e.DecayTracker()
+	if dt == nil {
+		return nil
+	}
+	return dt.VitalitySnapshot()
+}
+
+// VitalityMap returns active holon vitalities keyed by holon ID.
+func (e *AmbientEngine) VitalityMap() map[string]liveness.HolonVitality {
+	vitals := e.VitalitySnapshot()
+	if vitals == nil {
+		return nil
+	}
+	res := make(map[string]liveness.HolonVitality, len(vitals))
+	for _, v := range vitals {
+		res[v.HolonID] = v
+	}
+	return res
+}
+
+// RemoveHolon purges a terminated or decommissioned holon from the liveness decay tracker.
+func (e *AmbientEngine) RemoveHolon(holonID string) bool {
+	dt := e.DecayTracker()
+	if dt == nil {
+		return false
+	}
+	dt.Remove(holonID)
+	return true
+}
+
+// HolonVitality returns point-in-time vitality status for a specific holon, or false if not tracked.
+func (e *AmbientEngine) HolonVitality(holonID string) (liveness.HolonVitality, bool) {
+	vitMap := e.VitalityMap()
+	if vitMap == nil {
+		return liveness.HolonVitality{}, false
+	}
+	v, ok := vitMap[holonID]
+	return v, ok
 }
 
 // TaskLeaseChannel returns the receive-only channel for published swarm task leases. Returns nil if receiver or observer is nil.
