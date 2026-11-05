@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // TRACK: / /
@@ -31,11 +32,12 @@ type LifecycleLookup interface {
 
 // MembraneMember is one object in a planned stage-membrane hop.
 type MembraneMember struct {
-	ID   string
-	Kind string
-	From string
-	To   string
-	Skip bool // already at target
+	ID          string
+	Kind        string
+	From        string
+	To          string
+	Skip        bool // already at target
+	ClearFields []string
 }
 
 // LineageParentRollup is the observable that a cluster hop stopped at a trunk:
@@ -275,6 +277,13 @@ func PlanStageMembraneHop(
 		}
 		if !TransitionAllowed(lc, from, toStatus) {
 			return nil, blocked(id, fmt.Sprintf("no lifecycle edge from %q to %q", from, toStatus))
+		}
+		member.ClearFields = objects.TransitionClearFields(lc, from, toStatus)
+		if kind == objects.KindPriorityPlan && (toStatus == objects.ObjectStatusArchived || toStatus == objects.ObjectStatusCancelled) {
+			if !slices.Contains(member.ClearFields, objects.FieldKeyActiveOrder) {
+				member.ClearFields = append(member.ClearFields, objects.FieldKeyActiveOrder)
+			}
+			delete(obj, objects.FieldKeyActiveOrder)
 		}
 		members = append(members, member)
 	}
@@ -607,9 +616,16 @@ func ApplyStageMembraneHop(
 			continue
 		}
 		process.TouchMeaningfulActivity()
-		if err := writer.Update(ctx, secCtx, m.ID, map[string]any{
+		updates := map[string]any{
 			objects.FieldKeyStatus: plan.To,
-		}); err != nil {
+		}
+		for _, field := range m.ClearFields {
+			updates[field] = storage.FieldUnset
+		}
+		if m.Kind == objects.KindPriorityPlan && (plan.To == objects.ObjectStatusArchived || plan.To == objects.ObjectStatusCancelled) {
+			updates[objects.FieldKeyActiveOrder] = storage.FieldUnset
+		}
+		if err := writer.Update(ctx, secCtx, m.ID, updates); err != nil {
 			cluster := make([]string, 0, len(plan.Members))
 			for _, x := range plan.Members {
 				cluster = append(cluster, x.ID)
