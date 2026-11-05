@@ -457,6 +457,26 @@ func (e *AmbientEngine) VitalityMap() map[string]liveness.HolonVitality {
 	return res
 }
 
+// RemoveHolon purges a terminated or decommissioned holon from the liveness decay tracker.
+func (e *AmbientEngine) RemoveHolon(holonID string) bool {
+	dt := e.DecayTracker()
+	if dt == nil {
+		return false
+	}
+	dt.Remove(holonID)
+	return true
+}
+
+// HolonVitality returns point-in-time vitality status for a specific holon, or false if not tracked.
+func (e *AmbientEngine) HolonVitality(holonID string) (liveness.HolonVitality, bool) {
+	vitMap := e.VitalityMap()
+	if vitMap == nil {
+		return liveness.HolonVitality{}, false
+	}
+	v, ok := vitMap[holonID]
+	return v, ok
+}
+
 // TaskLeaseChannel returns the receive-only channel for published swarm task leases. Returns nil if receiver or observer is nil.
 func (e *AmbientEngine) TaskLeaseChannel() <-chan SwarmTaskLease {
 	if e == nil {

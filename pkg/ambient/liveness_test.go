@@ -257,6 +257,7 @@ func testLivenessReperfusionRecovery(t *testing.T) {
 func TestAmbientEngine_LivenessBoundaryRejections(t *testing.T) {
 	t.Run("MalformedDatagramDiscard", testLivenessMalformedDiscard)
 	t.Run("SocketUnbindAndRecreate", testLivenessSocketRebind)
+	t.Run("PurgeAndQueryVitality", testLivenessPurgeAndQuery)
 }
 
 func testLivenessMalformedDiscard(t *testing.T) {
@@ -315,5 +316,46 @@ func testLivenessSocketRebind(t *testing.T) {
 	}
 	if stopErr := eng2.Stop(); stopErr != nil {
 		t.Fatalf("re-bound stop failed: %v", stopErr)
+	}
+}
+
+func testLivenessPurgeAndQuery(t *testing.T) {
+	eng, sockPath, cancel := startTestLivenessEngine(t)
+	defer cancel()
+
+	const targetHolon = "holon-purge-target"
+	emitTestPulse(t, sockPath, targetHolon, 250, "running")
+
+	deadline := time.Now().Add(testLivenessWaitTimeout)
+	for time.Now().Before(deadline) {
+		if _, ok := eng.HolonVitality(targetHolon); ok {
+			break
+		}
+		time.Sleep(testLivenessPollTick)
+	}
+
+	vit, ok := eng.HolonVitality(targetHolon)
+	if !ok || vit.HolonID != targetHolon {
+		t.Fatalf("expected holon %s to be tracked, got: %+v (ok=%v)", targetHolon, vit, ok)
+	}
+
+	if _, untrackedOk := eng.HolonVitality("holon-non-existent"); untrackedOk {
+		t.Fatal("expected untracked holon to return false")
+	}
+
+	if !eng.RemoveHolon(targetHolon) {
+		t.Fatal("expected RemoveHolon to succeed")
+	}
+
+	if _, purgedOk := eng.HolonVitality(targetHolon); purgedOk {
+		t.Fatal("expected purged holon to no longer be tracked")
+	}
+
+	var nilEng *AmbientEngine
+	if nilEng.RemoveHolon(targetHolon) {
+		t.Fatal("expected nil engine RemoveHolon to return false")
+	}
+	if _, nilOk := nilEng.HolonVitality(targetHolon); nilOk {
+		t.Fatal("expected nil engine HolonVitality to return false")
 	}
 }
