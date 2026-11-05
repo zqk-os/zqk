@@ -411,3 +411,71 @@ func TestGenerateTracePipelineBundle_Issue913_ReqInheritsGoalRefs(t *testing.T) 
 		}
 	}
 }
+
+// TestGenerateTracePipelineBundle_Issue981_RelatedObjectRefsAndMilestone verifies:
+// 1. Goal inheritance from related_object_refs
+// 2. Goal inheritance from outgoing goal neighbor
+// 3. Milestone target inheriting from linked requirement neighbor
+func TestGenerateTracePipelineBundle_Issue981_RelatedObjectRefsAndMilestone(t *testing.T) {
+	// 1. Requirement with goal in related_object_refs
+	reqObjRelated := map[string]any{
+		"_kind":                           objects.KindRequirement,
+		objects.FieldKeyTitle:             "Related Object Goal Ingestion",
+		objects.FieldKeyRelatedObjectRefs: []string{"DOC-1", "goal:GOAL-RELATED-101", "BLI-1"},
+	}
+	bundleRelated, _, _ := generateTracePipelineBundle("REQ-RELATED-101", reqObjRelated, nil)
+	if bundleRelated == nil {
+		t.Fatal("expected bundle for Requirement target")
+	}
+	for idx, bli := range bundleRelated.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-RELATED-101" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-RELATED-101'], got %v", idx, bli.GoalRefs)
+		}
+	}
+
+	// 2. Requirement with goal present as a direct goal neighbor
+	reqObjGoalNeighbor := map[string]any{
+		"_kind":               objects.KindRequirement,
+		objects.FieldKeyTitle: "Goal Neighbor Target",
+	}
+	goalNeighbors := []map[string]any{
+		{
+			"_kind":            objects.KindGoal,
+			objects.FieldKeyID: "GOAL-DIRECT-NEIGHBOR-202",
+		},
+	}
+	bundleGoalNeighbor, _, _ := generateTracePipelineBundle("REQ-GOAL-NEIGHBOR-202", reqObjGoalNeighbor, goalNeighbors)
+	if bundleGoalNeighbor == nil {
+		t.Fatal("expected bundle for Requirement target")
+	}
+	for idx, bli := range bundleGoalNeighbor.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-DIRECT-NEIGHBOR-202" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-DIRECT-NEIGHBOR-202'], got %v", idx, bli.GoalRefs)
+		}
+	}
+
+	// 3. Milestone target with linked requirement in neighbors
+	milObj := map[string]any{
+		"_kind":               objects.KindMilestone,
+		objects.FieldKeyTitle: "Sprint 42 Boundary",
+	}
+	milNeighbors := []map[string]any{
+		{
+			"_kind":                  objects.KindRequirement,
+			objects.FieldKeyID:       "REQ-UNDER-MIL-303",
+			objects.FieldKeyGoalRefs: []string{"GOAL-UNDER-MIL-303"},
+		},
+	}
+	bundleMil, _, _ := generateTracePipelineBundle("MIL-SPRINT-42", milObj, milNeighbors)
+	if bundleMil == nil {
+		t.Fatal("expected bundle for Milestone target")
+	}
+	for idx, bli := range bundleMil.Objects.BacklogItems {
+		if len(bli.GoalRefs) != 1 || bli.GoalRefs[0] != "GOAL-UNDER-MIL-303" {
+			t.Errorf("expected BacklogItem %d GoalRefs ['GOAL-UNDER-MIL-303'], got %v", idx, bli.GoalRefs)
+		}
+		if len(bli.MilestoneRefs) != 1 || bli.MilestoneRefs[0] != "MIL-SPRINT-42" {
+			t.Errorf("expected BacklogItem %d MilestoneRefs ['MIL-SPRINT-42'], got %v", idx, bli.MilestoneRefs)
+		}
+	}
+}

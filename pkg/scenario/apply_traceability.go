@@ -377,6 +377,20 @@ func applyBacklogItems(
 		tcRefs := resolveRefs(t.TestCaseRefs, summary.HintToID)
 		milRefs := resolveRefs(t.MilestoneRefs, summary.HintToID)
 		goalRefs := resolveRefs(t.GoalRefs, summary.HintToID)
+		// Inherit goal_refs from parent requirement(s) if not directly supplied (GH-981)
+		if len(goalRefs) == 0 && len(reqRefs) > 0 {
+			seenGoals := make(map[string]bool)
+			for _, reqID := range reqRefs {
+				if reqObj, rerr := storageProvider.Read(ctx, secCtx, reqID); rerr == nil && reqObj != nil {
+					for _, g := range objects.ExtractGoalRefs(reqObj) {
+						if !seenGoals[g] {
+							seenGoals[g] = true
+							goalRefs = append(goalRefs, g)
+						}
+					}
+				}
+			}
+		}
 		builder.SetID(id)
 		builder.SetField(objects.FieldKeyTitle, t.Title)
 		if t.Status != emptyValue {

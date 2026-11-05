@@ -7,34 +7,14 @@ import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/nildecode"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
 // GoalRefsFromObject extracts goal references from an object
 func GoalRefsFromObject(obj map[string]any) map[string]bool {
 	refs := make(map[string]bool)
-	v, ok := obj[objects.FieldKeyGoalRefs]
-	if !ok {
-		return refs
-	}
-	v, ok = nildecode.DecodeNonNilPayload[any](v)
-	if !ok {
-		return refs
-	}
-	switch t := v.(type) {
-	case []any:
-		for _, r := range t {
-			if s, ok := r.(string); ok && s != "" {
-				refs[s] = true
-			}
-		}
-	case []string:
-		for _, s := range t {
-			if s != "" {
-				refs[s] = true
-			}
-		}
+	for _, g := range objects.ExtractGoalRefs(obj) {
+		refs[g] = true
 	}
 	return refs
 }
