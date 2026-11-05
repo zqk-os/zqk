@@ -88,6 +88,11 @@ func (s *Scheduler) stopDaemon(stopTime time.Time) {
 		}
 	}
 
+	SchedulerDaemonLog(s.logger).Debug("Stop: stopping ambient ingest service").Log()
+	if s.ambientIngestSvc != nil {
+		s.ambientIngestSvc.Stop()
+	}
+
 	// Mark any currently running job as abandoned so events files have a final outcome (not just "started").
 	// Collect IDs under lock (no I/O); write log entries outside lock to avoid holding mutex during I/O.
 	SchedulerDaemonLog(s.logger).Debug("Stop: abandoning running jobs").Log()

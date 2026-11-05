@@ -171,6 +171,7 @@ func (extraErrMesh) Subscribe(context.Context, []ambience.EventType) (<-chan amb
 func TestExtraIngestAndHostDaemon(t *testing.T) {
 	root := t.TempDir()
 	svc := NewAmbientIngestService(root, pkgctx.NewSystemSecurityContext())
+	defer svc.Stop()
 	ctx := pkgctx.NewSystemContext()
 	_ = svc.Ingest(ctx, Event{Type: EventTypeFilesystem, Payload: map[string]any{objects.FieldKeyTargetID: root + "/.git/config"}, Timestamp: time.Now()})
 	_ = svc.IngestAmbientEvent(ctx, ambience.AmbientEvent{ID: "a1", Type: ambience.EventFileModified, URI: "doc.md", Timestamp: time.Now().Unix(), Payload: []byte(`not-json`)})

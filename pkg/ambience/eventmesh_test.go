@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
 func TestInMemoryEventMesh(t *testing.T) {
@@ -27,12 +29,12 @@ func TestInMemoryEventMesh(t *testing.T) {
 		Payload:   []byte("test"),
 	}
 
-	go func() {
+	goroutinelabels.NewGoroutine("test_eventmesh_publish", "publish expected event").StartSimple(func() {
 		err := mesh.Publish(context.Background(), expectedEvent)
 		if err != nil {
 			t.Errorf("publish error: %v", err)
 		}
-	}()
+	})
 
 	select {
 	case evt := <-ch:
@@ -52,12 +54,12 @@ func TestInMemoryEventMesh(t *testing.T) {
 		Payload:   []byte("test2"),
 	}
 
-	go func() {
+	goroutinelabels.NewGoroutine("test_eventmesh_publish_ignored", "publish ignored event").StartSimple(func() {
 		err := mesh.Publish(context.Background(), ignoredEvent)
 		if err != nil {
 			t.Errorf("publish error: %v", err)
 		}
-	}()
+	})
 
 	select {
 	case <-ch:
@@ -79,12 +81,17 @@ func TestInMemoryEventMesh_CancelSubscription(t *testing.T) {
 	// Cancel subscription
 	cancel()
 
-	// Give the goroutine a moment to clean up
-	time.Sleep(50 * time.Millisecond)
-
-	mesh.mu.RLock()
-	subs := len(mesh.subscribers[EventFileModified])
-	mesh.mu.RUnlock()
+	deadline := time.Now().Add(2 * time.Second)
+	var subs int
+	for time.Now().Before(deadline) {
+		mesh.mu.RLock()
+		subs = len(mesh.subscribers[EventFileModified])
+		mesh.mu.RUnlock()
+		if subs == 0 {
+			break
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
 
 	if subs != 0 {
 		t.Errorf("expected 0 subscribers, got %d", subs)

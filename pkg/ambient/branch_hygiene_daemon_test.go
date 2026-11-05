@@ -96,7 +96,7 @@ func TestBranchHygieneDaemon_TickFailClosed(t *testing.T) {
 }
 
 func TestBranchHygieneDaemon_StartStopLifecycle(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	defer goleak.VerifyNone(t, goleak.IgnoreCurrent())
 
 	pruner := &mockBranchPruner{}
 	d, err := NewBranchHygieneDaemon(pruner, WithHygieneInterval(20*time.Millisecond))

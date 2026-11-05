@@ -12,6 +12,7 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"github.com/zqk-os/zqk/pkg/ambience"
+	"github.com/zqk-os/zqk/pkg/ambient"
 	"github.com/zqk-os/zqk/pkg/circuitbreaker"
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	"github.com/zqk-os/zqk/pkg/config"
@@ -357,6 +358,7 @@ type Scheduler struct {
 	// Symbiotic Mesh Anticipatory Logic components
 	ambienceMesh                 ambience.EventMesh
 	anticipatoryEngine           ambience.AnticipatoryEngine
+	ambientIngestSvc             *ambient.AmbientIngestService
 	packageConcurrencyLimiter    circuitbreaker.ConcurrencyLimiter
 	globalTestConcurrencyLimiter circuitbreaker.ConcurrencyLimiter
 

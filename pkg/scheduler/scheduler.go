@@ -478,6 +478,7 @@ func NewSchedulerWithProjectRoot(storage storagepkg.ObjectStorageProvider, specL
 		objectIDCacheBuilder:         objectIDCacheBuilder,
 		ambienceMesh:                 ambienceMesh,
 		anticipatoryEngine:           fseventsEngine,
+		ambientIngestSvc:             ingestSvc,
 		packageConcurrencyLimiter:    circuitbreaker.NewConcurrencyLimiter(logger, getPackageConcurrencyMaxWait()),
 		globalTestConcurrencyLimiter: circuitbreaker.NewConcurrencyLimiter(logger, getSchedulerDispatchResourceWaitMax()),
 		lockFailureCountByJobID:      make(map[string]int),

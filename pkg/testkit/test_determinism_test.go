@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -55,12 +56,12 @@ func TestTestDeterminism_DeterministicSync_OperationalProof(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	doneCh := make(chan struct{})
 
-	go func(opCtx context.Context) {
+	goroutinelabels.NewGoroutine("test_determinism", "simulate work").StartSimple(func() {
 		// Simulate immediate work
 		time.Sleep(5 * time.Millisecond)
 		cancel()
 		close(doneCh)
-	}(ctx)
+	})
 
 	select {
 	case <-ctx.Done():

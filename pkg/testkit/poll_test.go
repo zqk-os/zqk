@@ -9,15 +9,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 func TestEventually(t *testing.T) {
 	var count int32
-	go func() {
+	goroutinelabels.NewGoroutine("test_eventually", "increment counter").StartSimple(func() {
 		time.Sleep(10 * time.Millisecond)
 		atomic.StoreInt32(&count, 5)
-	}()
+	})
 
 	testkit.Eventually(t, 200*time.Millisecond, 5*time.Millisecond, func() bool {
 		return atomic.LoadInt32(&count) == 5
@@ -29,10 +30,10 @@ func TestEventuallyWithContext(t *testing.T) {
 	defer cancel()
 
 	var counter int32
-	go func() {
+	goroutinelabels.NewGoroutine("test_eventually_ctx", "increment counter").StartSimple(func() {
 		time.Sleep(10 * time.Millisecond)
 		atomic.StoreInt32(&counter, 10)
-	}()
+	})
 
 	err := testkit.EventuallyWithContext(ctx, 5*time.Millisecond, func(ctx context.Context) (bool, error) {
 		return atomic.LoadInt32(&counter) == 10, nil

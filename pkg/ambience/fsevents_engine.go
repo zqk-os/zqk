@@ -3,6 +3,7 @@ package ambience
 import (
 	"context"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -13,6 +14,7 @@ type FSEventsEngine struct {
 	mesh    EventMesh
 	running atomic.Bool
 	cancel  context.CancelFunc
+	wg      sync.WaitGroup
 }
 
 // NewFSEventsEngine creates a new FSEventsEngine.
@@ -37,7 +39,9 @@ func (e *FSEventsEngine) Start(ctx context.Context) error {
 		return err
 	}
 
+	e.wg.Add(1)
 	goroutinelabels.NewGoroutine("ambience.fsevents_loop", "listening for fsevents").StartSimple(func() {
+		defer e.wg.Done()
 		e.loop(ctx, ch)
 	})
 	return nil
@@ -48,7 +52,10 @@ func (e *FSEventsEngine) loop(ctx context.Context, ch <-chan AmbientEvent) {
 		select {
 		case <-ctx.Done():
 			return
-		case ev := <-ch:
+		case ev, ok := <-ch:
+			if !ok {
+				return
+			}
 			// Just a simple prediction logic for now
 			// In a real system this would parse AST or update Semantic Graph
 			_, _ = e.PredictIntent(ev)
@@ -60,6 +67,7 @@ func (e *FSEventsEngine) loop(ctx context.Context, ch <-chan AmbientEvent) {
 func (e *FSEventsEngine) Stop() error {
 	if e.running.CompareAndSwap(true, false) && e.cancel != nil {
 		e.cancel()
+		e.wg.Wait()
 	}
 	return nil
 }

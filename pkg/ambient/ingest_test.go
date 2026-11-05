@@ -267,6 +267,7 @@ func TestAmbientIngest_OperationalDynamicProof(t *testing.T) {
 
 		secCtx := pkgctx.NewSystemSecurityContext()
 		svc := NewAmbientIngestService(tempDir, secCtx)
+		defer svc.Stop()
 
 		mesh := ambience.NewInMemoryEventMesh()
 		svc.BindToMesh(mesh)
@@ -304,8 +305,10 @@ func TestAmbientIngest_OperationalDynamicProof(t *testing.T) {
 			}
 		}
 
-		// Brief settling time for mesh goroutine to receive and ingest events
-		time.Sleep(30 * time.Millisecond)
+		// Wait deterministically for mesh goroutine to receive and ingest events
+		if !svc.WaitForCount(uint64(len(events)), 5*time.Second) {
+			t.Fatalf("timed out waiting for ambient events to be ingested (got %d, want %d)", svc.IngestedCount(), len(events))
+		}
 	})
 }
 
@@ -390,6 +393,7 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 
 	t.Run("nil EventMesh does not panic", func(t *testing.T) {
 		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		defer svc.Stop()
 		defer func() {
 			if r := recover(); r != nil {
 				t.Fatalf("BindToMesh(nil) panicked: %v", r)
@@ -401,6 +405,7 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 
 	t.Run("closed EventMesh channel completes loop cleanly without panic", func(t *testing.T) {
 		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		defer svc.Stop()
 		defer func() {
 			if r := recover(); r != nil {
 				t.Fatalf("BindToMesh(closedMesh) panicked: %v", r)
@@ -413,6 +418,42 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 
 	t.Run("subscribe error mesh returns gracefully", func(t *testing.T) {
 		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		defer svc.Stop()
 		svc.BindToMesh(subscribeErrorMesh{})
+	})
+
+	t.Run("BindToMeshWithContext cancellation and WaitForIdle", func(t *testing.T) {
+		tempDir := t.TempDir()
+		defer storage.ScrubProjectRootForTempCleanup(tempDir, 10, 10*time.Millisecond)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		svc := NewAmbientIngestService(tempDir, pkgctx.NewSystemSecurityContext())
+		defer svc.Stop()
+
+		mesh := ambience.NewInMemoryEventMesh()
+		if err := svc.BindToMeshWithContext(ctx, mesh); err != nil {
+			t.Fatalf("BindToMeshWithContext failed: %v", err)
+		}
+
+		ev := ambience.AmbientEvent{
+			ID:        "amb-cancel-test",
+			Type:      ambience.EventFileModified,
+			URI:       "docs/test.md",
+			Timestamp: time.Now().Unix(),
+			Payload:   []byte(`{"file":"docs/test.md"}`),
+		}
+		if err := mesh.Publish(context.Background(), ev); err != nil {
+			t.Fatalf("mesh.Publish failed: %v", err)
+		}
+
+		if !svc.WaitForIdle(3 * time.Second) {
+			t.Fatal("timed out waiting for ingest to idle")
+		}
+		if svc.IngestedCount() != 1 {
+			t.Fatalf("expected 1 ingested event, got %d", svc.IngestedCount())
+		}
+
+		cancel()
+		svc.Stop()
 	})
 }
