@@ -105,6 +105,7 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().Bool("cas", false, "Directly materialize the object into CAS storage")
 	cmd.Flags().Bool("trace-pipeline", false, "Auto-run workflow gen-trace-pipeline after mint (opt-in)")
 	cmd.Flags().Bool("skip-trace-pipeline", false, "Deprecated: auto-run is disabled by default; trace pipeline is opt-in via --trace-pipeline")
+	ensureRelationalFlags(cmd)
 	return cmd
 }
 
@@ -120,6 +121,7 @@ func runNewKindValidatePreRun(cmd *cobra.Command, args []string) error {
 
 func newObjectCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewNewObjectCommandBuilder()
+	ensureRelationalFlags(cmd)
 	cli.BindAsyncProgress(cmd, runNewObject)
 	cli.EnsureCmdAnnotations(cmd)
 	cmd.Annotations[cli.AnnotationKeyObjectKindValidate] = cli.KindValidatePositional0
@@ -193,6 +195,7 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(
 			"backlog_item crossing CAS requires a hierarchical parent: pass --req <REQ-*> or --goal <GOAL-*> (GH#963)"))
 	}
+	applyRelationalFlags(cmd, kind, objData)
 	if err := object.RunCreateWithData(cmd, kind, objData); err != nil {
 		return err
 	}
@@ -256,6 +259,383 @@ func emitJITGuidanceTip(cmd *cobra.Command, kind string) {
 	}
 	if tip != "" {
 		fmt.Fprintln(cmd.ErrOrStderr(), color.CyanString(tip))
+	}
+}
+
+func ensureRelationalFlags(cmd *cobra.Command) {
+	if cmd == nil || cmd.Flags() == nil {
+		return
+	}
+	flags := cmd.Flags()
+	if flags.Lookup("plan") == nil {
+		flags.String("plan", "", "Link priority plan reference")
+	}
+	if flags.Lookup("req") == nil {
+		flags.String("req", "", "Link parent requirement")
+	}
+	if flags.Lookup("goal") == nil {
+		flags.String("goal", "", "Link root goal")
+	}
+	if flags.Lookup("bli") == nil {
+		flags.String("bli", "", "Link backlog item reference")
+	}
+	if flags.Lookup("criteria") == nil {
+		flags.String("criteria", "", "Link criteria reference")
+	}
+}
+
+func parseRelationalRefs(raw string) []string {
+	if strings.TrimSpace(raw) == "" {
+		return nil
+	}
+	parts := strings.FieldsFunc(raw, func(r rune) bool {
+		return r == ',' || r == ';'
+	})
+	var result []string
+	for _, p := range parts {
+		if s := strings.TrimSpace(p); s != "" {
+			result = append(result, s)
+		}
+	}
+	return result
+}
+
+func appendUniqueStrings(slice []string, items ...string) []string {
+	seen := make(map[string]struct{}, len(slice)+len(items))
+	for _, s := range slice {
+		seen[s] = struct{}{}
+	}
+	for _, it := range items {
+		if _, ok := seen[it]; !ok && it != "" {
+			seen[it] = struct{}{}
+			slice = append(slice, it)
+		}
+	}
+	return slice
+}
+
+func appendRefToObjData(objData map[string]any, field string, refs ...string) {
+	if len(refs) == 0 {
+		return
+	}
+	existing, ok := objData[field]
+	if !ok || existing == nil {
+		objData[field] = refs
+		return
+	}
+	switch v := existing.(type) {
+	case []string:
+		objData[field] = appendUniqueStrings(v, refs...)
+	case []any:
+		var asStrings []string
+		for _, item := range v {
+			if s, ok := item.(string); ok && s != "" {
+				asStrings = append(asStrings, s)
+			}
+		}
+		objData[field] = appendUniqueStrings(asStrings, refs...)
+	default:
+		objData[field] = refs
+	}
+}
+
+var coreKindRefFields = map[string]map[string]struct{}{
+	objects.KindBacklogItem: {
+		objects.FieldKeyPriorityPlanRef: {},
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyGoalRefs:        {},
+		objects.FieldKeyCriteriaRefs:    {},
+		objects.FieldKeyWorkstreamRefs:  {},
+	},
+	objects.KindRequirement: {
+		objects.FieldKeyGoalRefs:     {},
+		objects.FieldKeyCriteriaRefs: {},
+	},
+	objects.KindTestCase: {
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyCriteriaRefs:    {},
+		objects.FieldKeyBacklogItemRefs: {},
+	},
+	objects.KindCriteria: {
+		objects.FieldKeyGoalRefs: {},
+	},
+	objects.KindPriorityPlan: {
+		objects.FieldKeyWorkstreamRefs: {},
+	},
+	objects.KindGoal: {},
+	objects.KindMilestone: {
+		objects.FieldKeyGoalRefs:     {},
+		objects.FieldKeyCriteriaRefs: {},
+	},
+	objects.KindEpic: {
+		objects.FieldKeyPriorityPlanRefs: {},
+		objects.FieldKeyRequirementRefs:  {},
+		objects.FieldKeyGoalRefs:         {},
+		objects.FieldKeyBacklogItemRefs:  {},
+	},
+	objects.KindTechnicalDebt: {
+		objects.FieldKeyGoalRefs: {},
+		"backlog_ref":            {},
+	},
+	objects.KindAgentTask: {
+		objects.FieldKeyPriorityPlanRef:        {},
+		objects.FieldKeyRequirementRefs:        {},
+		objects.FieldKeyValidationCriteriaRefs: {},
+	},
+	objects.KindDecision: {
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyGoalRefs:        {},
+	},
+	objects.KindQuestion: {
+		objects.FieldKeyBlockingGoalRefs: {},
+	},
+	objects.KindDocEntry: {
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyGoalRefs:        {},
+	},
+	objects.KindRelease: {
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyCriteriaRefs:    {},
+		objects.FieldKeyBacklogItemRefs: {},
+	},
+	objects.KindPipeline: {
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyGoalRefs:        {},
+	},
+	objects.KindCodeReference: {
+		objects.FieldKeyRequirementRefs: {},
+		objects.FieldKeyGoalRefs:        {},
+		objects.FieldKeyBacklogItemRefs: {},
+	},
+	objects.KindRoadmap: {
+		objects.FieldKeyGoalRefs: {},
+	},
+	objects.KindVision: {
+		objects.FieldKeyGoalRefs: {},
+	},
+	objects.KindMission: {
+		objects.FieldKeyGoalRefs: {},
+	},
+}
+
+func isForbiddenRelField(kind, field string) bool {
+	switch kind {
+	case objects.KindGoal:
+		if field == objects.FieldKeyCriteriaRefs || field == objects.FieldKeyPriorityPlanRef || field == objects.FieldKeyPriorityPlanRefs {
+			return true
+		}
+	case objects.KindRequirement:
+		if field == objects.FieldKeyPriorityPlanRef || field == objects.FieldKeyPriorityPlanRefs {
+			return true
+		}
+	case objects.KindPriorityPlan:
+		if field == objects.FieldKeyBacklogItemRefs || field == objects.FieldKeyBacklogItemRef {
+			return true
+		}
+	case objects.KindCriteria:
+		if field == objects.FieldKeyRequirementRefs || field == "requirement_ref" || field == objects.FieldKeyMilestoneRefs {
+			return true
+		}
+	}
+	return false
+}
+
+func kindSupportsField(kind, field string) bool {
+	if isForbiddenRelField(kind, field) {
+		return false
+	}
+	if fields, ok := coreKindRefFields[kind]; ok {
+		if _, has := fields[field]; has {
+			return true
+		}
+	}
+	if kf, ok := objects.GetGlobalFieldRegistry().GetFieldsForKindIfLoaded(kind); ok && kf != nil {
+		for _, f := range kf.AllFields {
+			if f.Name == field {
+				return true
+			}
+		}
+	}
+	specLoader := objects.GetGlobalSpecLoader()
+	if spec, err := specLoader.LoadSpecWithInheritance(kind + ".yaml"); err == nil && spec != nil {
+		if spec.ResolvedFields != nil {
+			if _, ok := spec.ResolvedFields[field]; ok {
+				return true
+			}
+		}
+		if spec.Fields != nil {
+			if _, ok := spec.Fields[field]; ok {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func inheritFromPriorityPlan(cmd *cobra.Command, kind, planID string, objData map[string]any) {
+	if planID == "" {
+		return
+	}
+	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return
+	}
+	resolvedPlanID, err := proc.ResolveSemanticArgument(proc.OperationContext(), objects.KindPriorityPlan, planID)
+	if err != nil || resolvedPlanID == "" {
+		resolvedPlanID = planID
+	}
+	planObj, err := proc.Storage().Read(proc.OperationContext(), proc.SecurityContext(), resolvedPlanID)
+	if err != nil || planObj == nil {
+		return
+	}
+
+	if kindSupportsField(kind, objects.FieldKeyGoalRefs) {
+		var goalRefs []string
+		if gRefs, ok := planObj[objects.FieldKeyGoalRefs].([]any); ok {
+			for _, g := range gRefs {
+				if s, ok := g.(string); ok && s != "" {
+					goalRefs = append(goalRefs, s)
+				}
+			}
+		} else if gRefs, ok := planObj[objects.FieldKeyGoalRefs].([]string); ok {
+			goalRefs = append(goalRefs, gRefs...)
+		}
+		if relRefs, ok := planObj[objects.FieldKeyRelatedObjectRefs].([]any); ok {
+			for _, r := range relRefs {
+				if s, ok := r.(string); ok && (strings.HasPrefix(strings.ToUpper(s), "GOAL-") || strings.HasPrefix(strings.ToLower(s), "goal:")) {
+					goalRefs = append(goalRefs, s)
+				}
+			}
+		} else if relRefs, ok := planObj[objects.FieldKeyRelatedObjectRefs].([]string); ok {
+			for _, s := range relRefs {
+				if strings.HasPrefix(strings.ToUpper(s), "GOAL-") || strings.HasPrefix(strings.ToLower(s), "goal:") {
+					goalRefs = append(goalRefs, s)
+				}
+			}
+		}
+		if len(goalRefs) > 0 {
+			appendRefToObjData(objData, objects.FieldKeyGoalRefs, goalRefs...)
+		}
+	}
+
+	if kindSupportsField(kind, objects.FieldKeyWorkstreamRefs) {
+		var wsRefs []string
+		if wRefs, ok := planObj[objects.FieldKeyWorkstreamRefs].([]any); ok {
+			for _, w := range wRefs {
+				if s, ok := w.(string); ok && s != "" {
+					wsRefs = append(wsRefs, s)
+				}
+			}
+		} else if wRefs, ok := planObj[objects.FieldKeyWorkstreamRefs].([]string); ok {
+			wsRefs = append(wsRefs, wRefs...)
+		}
+		if relRefs, ok := planObj[objects.FieldKeyRelatedObjectRefs].([]any); ok {
+			for _, r := range relRefs {
+				if s, ok := r.(string); ok && (strings.HasPrefix(strings.ToUpper(s), "WS-") || strings.HasPrefix(strings.ToLower(s), "workstream:")) {
+					wsRefs = append(wsRefs, s)
+				}
+			}
+		} else if relRefs, ok := planObj[objects.FieldKeyRelatedObjectRefs].([]string); ok {
+			for _, s := range relRefs {
+				if strings.HasPrefix(strings.ToUpper(s), "WS-") || strings.HasPrefix(strings.ToLower(s), "workstream:") {
+					wsRefs = append(wsRefs, s)
+				}
+			}
+		}
+		if len(wsRefs) > 0 {
+			appendRefToObjData(objData, objects.FieldKeyWorkstreamRefs, wsRefs...)
+		}
+	} else if kindSupportsField(kind, objects.FieldKeyWorkstreamRef) {
+		if wRefs, ok := planObj[objects.FieldKeyWorkstreamRefs].([]any); ok && len(wRefs) > 0 {
+			if s, ok := wRefs[0].(string); ok && s != "" {
+				if _, exists := objData[objects.FieldKeyWorkstreamRef]; !exists {
+					objData[objects.FieldKeyWorkstreamRef] = s
+				}
+			}
+		} else if wRefs, ok := planObj[objects.FieldKeyWorkstreamRefs].([]string); ok && len(wRefs) > 0 {
+			if _, exists := objData[objects.FieldKeyWorkstreamRef]; !exists {
+				objData[objects.FieldKeyWorkstreamRef] = wRefs[0]
+			}
+		}
+	}
+}
+
+func applyRelationalFlags(cmd *cobra.Command, kind string, objData map[string]any) {
+	if cmd == nil || cmd.Flags() == nil {
+		return
+	}
+
+	getFlag := func(name string) string {
+		if cmd.Flags().Lookup(name) != nil {
+			v, _ := cmd.Flags().GetString(name)
+			return v
+		}
+		return ""
+	}
+
+	planFlag := getFlag("plan")
+	reqFlag := getFlag("req")
+	goalFlag := getFlag("goal")
+	bliFlag := getFlag("bli")
+	critFlag := getFlag("criteria")
+
+	// 1. --plan (string): Link priority plan reference
+	planRefs := parseRelationalRefs(planFlag)
+	if len(planRefs) > 0 {
+		if kindSupportsField(kind, objects.FieldKeyPriorityPlanRef) {
+			objData[objects.FieldKeyPriorityPlanRef] = planRefs[0]
+		} else if kindSupportsField(kind, objects.FieldKeyPriorityPlanRefs) {
+			appendRefToObjData(objData, objects.FieldKeyPriorityPlanRefs, planRefs...)
+		}
+		inheritFromPriorityPlan(cmd, kind, planRefs[0], objData)
+	}
+
+	// 2. --req (string): Link parent requirement
+	reqRefs := parseRelationalRefs(reqFlag)
+	if len(reqRefs) > 0 {
+		if kindSupportsField(kind, objects.FieldKeyRequirementRefs) {
+			appendRefToObjData(objData, objects.FieldKeyRequirementRefs, reqRefs...)
+		} else if kindSupportsField(kind, "requirement_ref") {
+			objData["requirement_ref"] = reqRefs[0]
+		}
+	}
+
+	// 3. --goal (string): Link root goal
+	goalRefs := parseRelationalRefs(goalFlag)
+	if len(goalRefs) > 0 {
+		if kindSupportsField(kind, objects.FieldKeyGoalRefs) {
+			appendRefToObjData(objData, objects.FieldKeyGoalRefs, goalRefs...)
+		} else if kindSupportsField(kind, "goal_ref") {
+			objData["goal_ref"] = goalRefs[0]
+		} else if kindSupportsField(kind, objects.FieldKeyBlockingGoalRefs) {
+			appendRefToObjData(objData, objects.FieldKeyBlockingGoalRefs, goalRefs...)
+		} else if kindSupportsField(kind, objects.FieldKeyLinkedGoalRefs) {
+			appendRefToObjData(objData, objects.FieldKeyLinkedGoalRefs, goalRefs...)
+		}
+	}
+
+	// 4. --bli (string): Link backlog item reference
+	bliRefs := parseRelationalRefs(bliFlag)
+	if len(bliRefs) > 0 {
+		if kindSupportsField(kind, objects.FieldKeyBacklogItemRefs) {
+			appendRefToObjData(objData, objects.FieldKeyBacklogItemRefs, bliRefs...)
+		} else if kindSupportsField(kind, objects.FieldKeyBacklogItemRef) {
+			objData[objects.FieldKeyBacklogItemRef] = bliRefs[0]
+		} else if kindSupportsField(kind, "backlog_ref") {
+			objData["backlog_ref"] = bliRefs[0]
+		}
+	}
+
+	// 5. --criteria (string): Link criteria reference
+	critRefs := parseRelationalRefs(critFlag)
+	if len(critRefs) > 0 {
+		if kindSupportsField(kind, objects.FieldKeyCriteriaRefs) {
+			appendRefToObjData(objData, objects.FieldKeyCriteriaRefs, critRefs...)
+		} else if kindSupportsField(kind, "criteria_ref") {
+			objData["criteria_ref"] = critRefs[0]
+		} else if kindSupportsField(kind, objects.FieldKeyValidationCriteriaRefs) {
+			appendRefToObjData(objData, objects.FieldKeyValidationCriteriaRefs, critRefs...)
+		}
 	}
 }
 

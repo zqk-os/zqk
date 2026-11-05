@@ -72,6 +72,11 @@ func StateDirPath(projectRoot string) string {
 	return ResolvePathFromCacheOrConstant(projectRoot, "state", fallback)
 }
 
+// MCPSessionsDirPath returns the absolute path to the transient MCP sessions directory (.zqk/state/mcp_sessions).
+func MCPSessionsDirPath(projectRoot string) string {
+	return filepath.Join(StateDirPath(projectRoot), "mcp_sessions")
+}
+
 // SessionStateRel is the project-relative session file (brand data dir / state / session).
 func SessionStateRel() string {
 	return filepath.ToSlash(filepath.Join(ProjectDataDir, StateDir, SessionStateFile))
