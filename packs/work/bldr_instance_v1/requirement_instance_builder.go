@@ -180,6 +180,17 @@ func (b *RequirementInstanceBuilder) SetDescription(value any) *RequirementInsta
 	return b.Description(value)
 }
 
+// DocEntryRefs sets the doc_entry_refs field
+func (b *RequirementInstanceBuilder) DocEntryRefs(value []string) *RequirementInstanceBuilder {
+	b.SetField(objects.FieldKeyDocEntryRefs, value)
+	return b
+}
+
+// SetDocEntryRefs is a compatibility alias for DocEntryRefs.
+func (b *RequirementInstanceBuilder) SetDocEntryRefs(value []string) *RequirementInstanceBuilder {
+	return b.DocEntryRefs(value)
+}
+
 // EpicRefs sets the epic_refs field
 func (b *RequirementInstanceBuilder) EpicRefs(value []string) *RequirementInstanceBuilder {
 	b.SetField(objects.FieldKeyEpicRefs, value)

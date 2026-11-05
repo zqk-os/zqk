@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -386,6 +387,8 @@ func objectIDsFromPendingJournal(projectRoot string) []string {
 		seen[e.ID] = true
 		ids = append(ids, e.ID)
 	}
+	// Map-backed pending journal iteration is unordered; stabilize for callers/tests.
+	slices.Sort(ids)
 	return ids
 }
 

@@ -4,7 +4,7 @@
 package requirement
 
 import (
-	work_intervalenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/work_interval"
+	shared_requirementsenum "github.com/zqk-os/zqk/packs/work/bldr_enum_v1/shared_requirements"
 	base_objectenum "github.com/zqk-os/zqk/pkg/specbuilder/bldr_enum_v1/base_object"
 )
 
@@ -20,10 +20,14 @@ const (
 type Priority string
 
 const (
-	PriorityP0 Priority = "p0"
-	PriorityP1 Priority = "p1"
-	PriorityP2 Priority = "p2"
-	PriorityP3 Priority = "p3"
+	PriorityCritical Priority = "critical"
+	PriorityHigh     Priority = "high"
+	PriorityLow      Priority = "low"
+	PriorityMedium   Priority = "medium"
+	PriorityP0       Priority = "p0"
+	PriorityP1       Priority = "p1"
+	PriorityP2       Priority = "p2"
+	PriorityP3       Priority = "p3"
 )
 
 type PriorityTier = base_objectenum.PriorityTier
@@ -43,15 +47,15 @@ const (
 	SourceTypeInternal SourceType = base_objectenum.SourceTypeInternal
 )
 
-type Status = work_intervalenum.Status
+type Status = shared_requirementsenum.Status
 
 const (
-	StatusActive     Status = "active"
-	StatusArchived   Status = work_intervalenum.StatusArchived
-	StatusComplete   Status = "complete"
-	StatusConceptual Status = work_intervalenum.StatusConceptual
-	StatusDeferred   Status = "deferred"
-	StatusOriginated Status = work_intervalenum.StatusOriginated
-	StatusProposed   Status = work_intervalenum.StatusProposed
-	StatusRejected   Status = "rejected"
+	StatusActive     Status = shared_requirementsenum.StatusActive
+	StatusArchived   Status = shared_requirementsenum.StatusArchived
+	StatusComplete   Status = shared_requirementsenum.StatusComplete
+	StatusConceptual Status = shared_requirementsenum.StatusConceptual
+	StatusDeferred   Status = shared_requirementsenum.StatusDeferred
+	StatusOriginated Status = shared_requirementsenum.StatusOriginated
+	StatusProposed   Status = shared_requirementsenum.StatusProposed
+	StatusRejected   Status = shared_requirementsenum.StatusRejected
 )

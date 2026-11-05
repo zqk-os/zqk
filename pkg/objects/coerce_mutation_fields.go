@@ -38,6 +38,7 @@ func CoerceMutationFields(kind string, obj map[string]any) {
 		CoercePersonaTitleAndName(obj)
 	}
 	if kind == KindRequirement || (kind == "" && GetString(obj, FieldKeyKind) == KindRequirement) {
+		CoerceRequirementPriority(obj)
 		delete(obj, "type")
 		delete(obj, "requirement_type")
 		delete(obj, "requirement_refs-")

@@ -399,7 +399,8 @@ func TestOperationalDynamicProof_AsyncCheck_CRIT_1793632807358586000_4d0cf8e6_Ch
 	storage.NoteObjectIDCachePending(root, string(storage.ObjectIDCachePendingOpUpdate), "GOAL-B", "goal", "/path/b", "test")
 
 	pendingIDs := objectIDsFromPendingJournal(root)
-	assert.Equal(t, []string{"GOAL-A", "GOAL-B"}, pendingIDs, "pending IDs must be unique and non-empty")
+	assert.ElementsMatch(t, []string{"GOAL-A", "GOAL-B"}, pendingIDs, "pending IDs must be unique and non-empty")
+	assert.Equal(t, []string{"GOAL-A", "GOAL-B"}, pendingIDs, "pending IDs must be sorted for stable consumers")
 
 	// 3. Significant cache change detection via pending burst threshold
 	// Add remaining items to meet SignificantCacheChangePendingThreshold (5 items)

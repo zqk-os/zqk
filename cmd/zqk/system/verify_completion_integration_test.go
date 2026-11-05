@@ -19,8 +19,9 @@ import (
 
 func TestVerifyCompletionIntegration(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{
-		Kind:            "cmd.system.verify_completion",
-		SeedSchemaPlane: true,
+		Kind:                     "cmd.system.verify_completion",
+		SeedSchemaPlane:          true,
+		ForceRemoveRootOnCleanup: true, // scheduler handler may leave .zqk writers; avoid TempDir ENOTEMPTY
 	})
 	fs := proj.FileStorage
 
