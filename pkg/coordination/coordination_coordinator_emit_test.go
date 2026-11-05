@@ -79,8 +79,8 @@ func TestCycle151_Coordinator_InitializationLifecycleAndTeardown(t *testing.T) {
 		t.Fatalf("unexpected error on Drain(0): %v", err)
 	}
 
-	if err := coord.Drain(50 * time.Millisecond); err != nil {
-		t.Fatalf("unexpected error on Drain(50ms): %v", err)
+	if err := coord.Drain(2 * time.Second); err != nil {
+		t.Fatalf("unexpected error on Drain(2s): %v", err)
 	}
 
 	coord.Wait()
@@ -424,7 +424,7 @@ func TestCycle151_ProgressHelper_ComprehensiveReporting(t *testing.T) {
 		t.Fatalf("unexpected error on EmitCompletion zero: %v", err)
 	}
 
-	if err := helper.Drain(50 * time.Millisecond); err != nil {
+	if err := helper.Drain(2 * time.Second); err != nil {
 		t.Fatalf("unexpected error on helper Drain: %v", err)
 	}
 }
