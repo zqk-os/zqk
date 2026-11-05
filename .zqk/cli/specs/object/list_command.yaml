@@ -41,6 +41,8 @@ help:
   examples:
     - comment: "List all backlog items"
       command: "%s list backlog_item"
+    - comment: "List using --kind flag"
+      command: "%s list --kind backlog_item"
     - comment: "List with filtering"
       command: "%s list backlog_item --filter status=exploring"
     - comment: "List a specific namespace"

@@ -38,6 +38,21 @@ func ResolveAndValidateKindForProject(projectRoot, rawArg string) (string, error
 		if _, ok := idx.GetKindSummary(canonical); !ok {
 			return "", unknownKindError(raw, canonical)
 		}
+	} else if registry := GetGlobalFieldRegistry(); registry != nil {
+		if err := registry.LoadFields(); err == nil {
+			if kinds, err := registry.GetAllKinds(); err == nil && len(kinds) > 0 {
+				found := false
+				for _, k := range kinds {
+					if k == canonical {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return "", unknownKindError(raw, canonical)
+				}
+			}
+		}
 	}
 	return canonical, nil
 }
