@@ -46,6 +46,9 @@ func TestAsyncValidation_ValidationFunctionErrors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
 	projectRoot := tmpDir
+	t.Cleanup(func() {
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Test 1: File read error
 	t.Run("FileReadError", func(t *testing.T) {
@@ -210,11 +213,10 @@ func TestAsyncValidation_RetryLogic(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Create a test file so file read doesn't fail
 	testContent := "id: TEST-RETRY\nkind: backlog_item\ntitle: Test"
@@ -274,11 +276,10 @@ func TestAsyncValidation_MaxRetriesExceeded(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Monitor progress channel
 	progressChan := asyncValidator.GetProgress()
@@ -328,11 +329,10 @@ func TestAsyncValidation_ProgressReporting(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Create test files
 	tasks := []string{"TEST-001", "TEST-002", "TEST-003", "TEST-004", "TEST-005"}
@@ -403,11 +403,10 @@ func TestAsyncValidation_CompletionDetection(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Create test files and enqueue tasks
 	numTasks := 10
@@ -509,11 +508,10 @@ func TestAsyncValidation_EmptyQueue(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Check stats with empty queue
 	_, _, _, queueSize := asyncValidator.GetValidationStats()
@@ -544,11 +542,10 @@ func TestAsyncValidation_ValidationFunctionNotSet(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	asyncValidator.Enqueue("TEST-001", "backlog_item", testFile, 1)
 
@@ -601,11 +598,10 @@ func TestAsyncValidation_ConcurrentValidation(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Create test files and enqueue many tasks
 	numTasks := 20
@@ -658,11 +654,10 @@ func TestAsyncValidation_ProgressChannelFull(t *testing.T) {
 	if err := asyncValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := asyncValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = asyncValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Create test files and enqueue many tasks quickly to fill progress channel
 	// Progress channel has buffer of 100, so enqueue more than that
@@ -697,6 +692,9 @@ func TestAsyncValidation_ContextCancellation(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
 	projectRoot := tmpDir
+	t.Cleanup(func() {
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	asyncValidator := validation.NewAsyncValidator(pkgctx.NewSystemContext(), projectRoot, 2, time.Hour)
 
@@ -814,11 +812,10 @@ func TestAsyncValidation_ErrorHandling(t *testing.T) {
 	if err := testValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := testValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = testValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Try to start again - should return ErrAlreadyRunning
 	err := testValidator.Start()
@@ -847,11 +844,10 @@ func TestAsyncValidation_FailedValidationTracking(t *testing.T) {
 	if err := testValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := testValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = testValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Enqueue a task that will fail
 	testValidator.Enqueue("TEST-FAIL", "backlog_item", "test-fail.yaml", 1)
@@ -921,11 +917,10 @@ func TestAsyncValidation_MetricsCapture(t *testing.T) {
 	if err := testValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
-	defer func() {
-		if err := testValidator.Stop(); err != nil {
-			t.Logf("failed to stop validator: %v", err)
-		}
-	}()
+	t.Cleanup(func() {
+		_ = testValidator.Stop()
+		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
+	})
 
 	// Enqueue multiple tasks
 	for i := 0; i < 5; i++ {
