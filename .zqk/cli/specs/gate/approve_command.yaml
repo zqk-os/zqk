@@ -1,0 +1,25 @@
+$schema: ../_schemas/command_spec.schema.json
+name: approve <id>
+short: Approve a staged mutation request
+description: |
+  Validates existence and payload digest, marks status approved with reviewer and
+  timestamp, and records an immutable approval entry to the audit ledger.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: reviewer
+    type: string
+    required: true
+    description: "Reviewer identity"
+  - name: json
+    type: bool
+    description: "Output result in JSON format"
+help:
+  examples:
+    - comment: "Approve a staged mutation request"
+      command: "%s gate approve APR-1730000000-abcd1234 --reviewer operator-alice"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

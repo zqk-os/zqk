@@ -54,6 +54,8 @@ var legacyDirectoryToKind = map[string]string{
 	"lifecycles":                KindLifecycle,
 	"watchdog_registrations":    KindWatchdogRegistration,
 	"remote_kernels":            KindRemoteKernel,
+	"approval_requests":         KindApprovalRequest,
+	"io_caches":                 KindIoCache,
 	tdeEnvelopesObjectDirectory: KindTdeEnvelope,
 	kindSynonymsObjectDirectory: KindSynonym,
 }
@@ -128,6 +130,8 @@ var legacyKindToDirectory = map[string]string{
 	KindLifecycle:              "lifecycles",
 	KindWatchdogRegistration:   "watchdog_registrations",
 	KindRemoteKernel:           "remote_kernels",
+	KindApprovalRequest:        "approval_requests",
+	KindIoCache:                "io_caches",
 	KindTdeEnvelope:            tdeEnvelopesObjectDirectory,
 	KindSynonym:                kindSynonymsObjectDirectory,
 }

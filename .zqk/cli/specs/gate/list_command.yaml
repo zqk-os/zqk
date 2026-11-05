@@ -1,0 +1,22 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list
+short: List approval requests
+description: |
+  Lists staged, approved, or rejected approval requests in the Knowledge Kernel CAS.
+flags:
+  - name: status
+    type: string
+    description: "Filter by approval status (staged, approved, rejected)"
+  - name: json
+    type: bool
+    description: "Output result in JSON format"
+help:
+  examples:
+    - comment: "List all requests"
+      command: "%s gate list"
+    - comment: "List staged requests only"
+      command: "%s gate list --status staged"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

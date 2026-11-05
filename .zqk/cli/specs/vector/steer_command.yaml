@@ -1,0 +1,21 @@
+$schema: "../schemas/command_spec.schema.json"
+name: "steer"
+short: "Steer specific vectors by natural language or delta"
+description: |-
+  Adjusts weight, rank, or threshold for designated vectors and emits vector.steered events.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: format
+    shorthand: f
+    type: string
+    default: text
+    description: "Output format: text, json"
+help:
+  examples:
+    - comment: "Steer vector weight by delta"
+      command: "%s vector steer \"VEC-SECURITY=+0.1\""
+    - comment: "Steer vector with natural language"
+      command: "%s vector steer \"prioritize reliability strictly\""
+common_flags: false

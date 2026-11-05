@@ -10,6 +10,8 @@ backends:
             agent_onboarding_preparations: agent_onboarding_preparation
             agent_skills: agent_skill
             agent_tasks: agent_task
+            approval_requests: approval_request
+            io_caches: io_cache
             audit: audit_event
             audit_events: audit_event
             audit_event_aggregations: audit_event_aggregation
@@ -106,6 +108,8 @@ backends:
             agent_onboarding_preparation: agent_onboarding_preparations
             agent_skill: agent_skills
             agent_task: agent_tasks
+            approval_request: approval_requests
+            io_cache: io_caches
             audit_aggregation_metric: metrics
             audit_event: audit
             audit_event_aggregation: audit_event_aggregations
@@ -299,6 +303,8 @@ inference_rules:
           priority: 4
           replacement: $1y
 on_demand_kinds:
+    - approval_request
+    - io_cache
     - audit_event
     - change_journal_entry
     - organization

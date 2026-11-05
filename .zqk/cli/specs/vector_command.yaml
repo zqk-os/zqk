@@ -1,0 +1,22 @@
+$schema: "./schemas/command_spec.schema.json"
+name: "vector"
+short: "Native N-Vector evaluation registry and steering signal stream"
+description: |-
+  Inspect, evaluate, and steer first-class evaluation vectors (security, governance,
+  reliability, capability, readability, efficiency, portability).
+help:
+  examples:
+    - comment: "List registered vectors with priority rank"
+      command: "%s vector list --prioritized"
+    - comment: "Evaluate codebase against registered vectors"
+      command: "%s vector evaluate --all"
+    - comment: "Steer specific vector properties"
+      command: "%s vector steer \"VEC-SECURITY=+0.1\""
+common_flags: false
+subcommands:
+  - name: list
+    spec_ref: vector/list_command.yaml
+  - name: evaluate
+    spec_ref: vector/evaluate_command.yaml
+  - name: steer
+    spec_ref: vector/steer_command.yaml

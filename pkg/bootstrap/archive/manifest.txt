@@ -388,10 +388,15 @@
 ./cli_specs/state/tree_command.yaml
 ./cli_specs/state/tsdb_command.yaml
 ./cli_specs/state_command.yaml
+./cli_specs/steer/
+./cli_specs/steer/reset_command.yaml
+./cli_specs/steer_command.yaml
 ./cli_specs/swarm/
 ./cli_specs/swarm/dispatch_command.yaml
+./cli_specs/swarm/heartbeat_command.yaml
 ./cli_specs/swarm/init_command.yaml
 ./cli_specs/swarm/run_command.yaml
+./cli_specs/swarm/spawn_command.yaml
 ./cli_specs/swarm/status_command.yaml
 ./cli_specs/swarm_command.yaml
 ./cli_specs/sync/
@@ -544,6 +549,11 @@
 ./cli_specs/tray/
 ./cli_specs/tray/sign_command.yaml
 ./cli_specs/ui_command.yaml
+./cli_specs/vector/
+./cli_specs/vector/evaluate_command.yaml
+./cli_specs/vector/list_command.yaml
+./cli_specs/vector/steer_command.yaml
+./cli_specs/vector_command.yaml
 ./cli_specs/vendor/
 ./cli_specs/vendor/cursor/
 ./cli_specs/vendor/cursor/adapter_command.yaml
@@ -949,7 +959,6 @@
 ./objects/workflow/workflow.yaml
 ./objects/workstream.yaml
 ./objects/workstream_transition.yaml
-./profile_specs/
 ./scripts/
 ./scripts/default_agent_skills/
 ./scripts/default_agent_skills/arch_design.yaml
