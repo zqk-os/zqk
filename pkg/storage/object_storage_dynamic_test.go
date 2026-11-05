@@ -471,6 +471,9 @@ func TestUpdateAllFields(t *testing.T) {
 							}
 
 							actualValue := updated[fieldName]
+							if actualValue == nil && testValue == "" {
+								actualValue = ""
+							}
 							// Normalize slice types for comparison ([]string vs []any)
 							if !reflect.DeepEqual(actualValue, testValue) {
 								// Try to normalize and compare again

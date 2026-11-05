@@ -66,3 +66,30 @@ func TestPeerAckTimeoutAuditHandler_ExpiresWithShortMaxAge(t *testing.T) {
 		t.Fatalf("expected expiry, still open=%d", len(open))
 	}
 }
+
+func TestPeerAckTimeoutAuditHandler_BatchesWakeByCaller(t *testing.T) {
+	root := t.TempDir()
+	for _, eid := range []string{"AFE-a", "AFE-b", "AFE-c"} {
+		if _, err := agentfeed.RegisterPeerAckAwait(root, agentfeed.PeerAckAwaitInput{
+			EventID:     eid,
+			FromAgentID: "cursor-composer",
+			ToAgentID:   "peer-agent-1",
+			Action:      "wake",
+			WakeMessage: agentfeed.PeerAckPasteStub(eid),
+		}); err != nil {
+			t.Fatalf("register %s: %v", eid, err)
+		}
+	}
+	time.Sleep(15 * time.Millisecond)
+	h := NewPeerAckTimeoutAuditHandlerWithMaxAge(root, nil, time.Millisecond)
+	if err := h.Execute(context.Background(), &ScheduledJob{}); err != nil {
+		t.Fatalf("execute: %v", err)
+	}
+	open, err := agentfeed.ListOpenPeerAckAwaits(root, "cursor-composer")
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if len(open) != 0 {
+		t.Fatalf("expected all expired, open=%d", len(open))
+	}
+}

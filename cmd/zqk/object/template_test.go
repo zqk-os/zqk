@@ -144,7 +144,7 @@ func TestGetPlaceholderValue_Comprehensive(t *testing.T) {
 		{objects.FieldInfo{Type: "enum", EnumValues: []string{"val1", "val2"}}, "\"val1\""},
 		{objects.FieldInfo{Type: "enum"}, "\"\""},
 		{objects.FieldInfo{Type: "reference", SemanticType: "requirement"}, "\"# requirement reference (e.g., requirement:ID-###)\""},
-		{objects.FieldInfo{Type: "reference"}, "\"\""},
+		{objects.FieldInfo{Type: "reference"}, "\"# reference (e.g., REF-ID-001)\""},
 		{objects.FieldInfo{Type: "unknown_custom_type"}, "\"\""},
 	}
 

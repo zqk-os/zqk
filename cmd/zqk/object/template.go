@@ -276,11 +276,12 @@ func getPlaceholderValue(field *objects.FieldInfo, originStatus string) string {
 		}
 		return "\"\""
 	case "reference":
-		// For references, use the semantic type hint
-		if field.SemanticType != emptyValue {
+		// Unreachable for typed reference fields (isReferenceField above),
+		// but keep parity if call sites bypass that guard.
+		if field.SemanticType != emptyValue && field.SemanticType != "reference" {
 			return fmt.Sprintf("\"# %s reference (e.g., %s:ID-###)\"", field.SemanticType, field.SemanticType)
 		}
-		return "\"\""
+		return "\"# reference (e.g., REF-ID-001)\""
 	default:
 		return "\"\""
 	}
