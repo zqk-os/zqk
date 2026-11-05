@@ -160,6 +160,10 @@ fields:
         - p1
         - p2
         - p3
+        - critical
+        - high
+        - medium
+        - low
       required: false
   workstream_refs:
     access:

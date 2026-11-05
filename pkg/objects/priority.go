@@ -163,6 +163,30 @@ func CoerceBacklogItemPriorityAndTier(obj map[string]any) {
 	}
 }
 
+// CoerceRequirementPriority normalizes requirement priority to canonical lowercase tier aliases (p0, p1, p2, p3).
+// If a textual priority (critical, high, medium, low) or uppercase tier (P0, P1, P2, P3) is provided,
+// it is mapped to the corresponding requirement tier (p0, p1, p2, p3).
+func CoerceRequirementPriority(obj map[string]any) {
+	if obj == nil {
+		return
+	}
+	rawPri, hasPri := obj[FieldKeyPriority]
+	if !hasPri || rawPri == nil {
+		return
+	}
+	s, ok := rawPri.(string)
+	if !ok {
+		return
+	}
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return
+	}
+	if tier, ok := PriorityToTier(s); ok {
+		obj[FieldKeyPriority] = strings.ToLower(tier)
+	}
+}
+
 // ValidatePriorityAndTier validates that priority and priority_tier are legitimate values if present.
 func ValidatePriorityAndTier(obj map[string]any) error {
 	if obj == nil {

@@ -23,6 +23,10 @@ const (
 	PriorityHigh     Priority = "high"
 	PriorityLow      Priority = "low"
 	PriorityMedium   Priority = "medium"
+	PriorityP0       Priority = "p0"
+	PriorityP1       Priority = "p1"
+	PriorityP2       Priority = "p2"
+	PriorityP3       Priority = "p3"
 )
 
 type PriorityTier = base_objectenum.PriorityTier
