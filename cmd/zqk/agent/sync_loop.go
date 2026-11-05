@@ -37,6 +37,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/swarm"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/verification"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // NewSyncLoopCmd creates the agent sync-loop command
@@ -177,6 +178,13 @@ func getSyncLoopHeartbeat() time.Duration {
 		if d, err := time.ParseDuration(val); err == nil && d > 0 {
 			return d
 		}
+	}
+	// Tests need a shorter tick than prod (5s) but still long enough that
+	// reactive/cancellation suites can observe the loop blocked in select
+	// (they sleep ~300ms before cancel/wake). 10ms made the loop finish
+	// the task before those probes ran.
+	if zqkenv.IsInTest() {
+		return 500 * time.Millisecond
 	}
 	return syncLoopHeartbeat
 }
