@@ -314,7 +314,7 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 					"PPRV-",
 				},
 				"qa_success": []any{
-					"QAS",
+					"QAS-",
 				},
 				"question": []any{
 					"QUE-",
@@ -406,8 +406,8 @@ func NewIdPrefixesConfigBuilder() *IdPrefixesConfigBuilder {
 					"TAM-",
 				},
 				"test_case": []any{
-					"TST",
-					"TEST",
+					"TST-",
+					"TEST-",
 				},
 				"test_command_rule": []any{
 					"TCR-",

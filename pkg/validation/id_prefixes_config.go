@@ -161,7 +161,7 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			kindnames.Workstream:          {"WS-", "WRK-"},
 			kindnames.PriorityPlan:        {"PRI-", "PRIO-"},
 			kindnames.Requirement:         {"REQ-", "REQU-"},
-			kindnames.TestCase:            {"TEST-"},
+			kindnames.TestCase:            {"TEST-", "TST-"},
 			kindnames.Criteria:            {"CRIT-"},
 			kindnames.Decision:            {"DEC-"},
 			kindnames.Roadmap:             {"ROAD-"},
