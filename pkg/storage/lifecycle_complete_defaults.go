@@ -37,12 +37,18 @@ func applyCompleteTransitionDefaults(kind string, existing map[string]any, oldSt
 	if newStatus == emptyValue || strings.EqualFold(newStatus, oldStatus) {
 		return false
 	}
+	mutated := false
+	if kind == objects.KindPriorityPlan && (newStatus == objects.ObjectStatusArchived || newStatus == objects.ObjectStatusCancelled) {
+		if _, ok := existing[objects.FieldKeyActiveOrder]; ok {
+			delete(existing, objects.FieldKeyActiveOrder)
+			mutated = true
+		}
+	}
 	completable := kindHasNamedTrait(kind, "completable")
 	if !completable {
-		return false
+		return mutated
 	}
 	sc := kindStatusChecker()
-	mutated := false
 	if sc.Role(kind, newStatus) == objects.LifecycleRoleExecutionLocked {
 		if ensureStartedAt(existing, objects.FieldKeyUpdatedAt) {
 			mutated = true
