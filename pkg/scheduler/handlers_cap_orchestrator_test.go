@@ -141,8 +141,8 @@ exit 1
 }
 
 func TestWakeAgentAndScheduleHourglass_TriggersWakeAgyForTPM(t *testing.T) {
-	t.Parallel()
 	tempDir := t.TempDir()
+	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
 
 	// Bind primary orchestrator to a script adapter (agy-style vendor wake).
 	scriptsDir := filepath.Join(tempDir, "scripts")

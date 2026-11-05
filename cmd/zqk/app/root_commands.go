@@ -20,11 +20,13 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
 	"github.com/zqk-os/zqk/cmd/zqk/explain"
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
+	gatecmd "github.com/zqk-os/zqk/cmd/zqk/gate"
 	"github.com/zqk-os/zqk/cmd/zqk/graph"
 	"github.com/zqk-os/zqk/cmd/zqk/grep"
 	"github.com/zqk-os/zqk/cmd/zqk/healthchk"
 	"github.com/zqk-os/zqk/cmd/zqk/inbox"
 	"github.com/zqk-os/zqk/cmd/zqk/intake"
+	iocmd "github.com/zqk-os/zqk/cmd/zqk/io"
 	"github.com/zqk-os/zqk/cmd/zqk/job"
 	"github.com/zqk-os/zqk/cmd/zqk/kernel"
 	"github.com/zqk-os/zqk/cmd/zqk/keystore"
@@ -50,6 +52,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/semantic"
 	"github.com/zqk-os/zqk/cmd/zqk/spec"
 	"github.com/zqk-os/zqk/cmd/zqk/state"
+	steercmd "github.com/zqk-os/zqk/cmd/zqk/steer"
 	"github.com/zqk-os/zqk/cmd/zqk/swarm"
 	synccmd "github.com/zqk-os/zqk/cmd/zqk/sync"
 	"github.com/zqk-os/zqk/cmd/zqk/system"
@@ -58,6 +61,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/ui"
 	"github.com/zqk-os/zqk/cmd/zqk/utility"
 	"github.com/zqk-os/zqk/cmd/zqk/validate"
+	vectorcmd "github.com/zqk-os/zqk/cmd/zqk/vector"
 	"github.com/zqk-os/zqk/cmd/zqk/vendor"
 	"github.com/zqk-os/zqk/cmd/zqk/workflow"
 	bldr_cli_cmd_v1 "github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
@@ -248,6 +252,16 @@ func registerCommands() {
 	mcpCmdInst.GroupID = "integrations"
 	rootCmd.AddCommand(mcpCmdInst)
 
+	// Cryptographic Human-in-the-Loop Mutation Approval Gate (zqk gate)
+	gateCmdInst := gatecmd.NewGateCmd()
+	gateCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(gateCmdInst)
+
+	// Universal External Respiration Gateway and CAS Scraping Cache (zqk io)
+	ioCmdInst := iocmd.NewIOCmd()
+	ioCmdInst.GroupID = "integrations"
+	rootCmd.AddCommand(ioCmdInst)
+
 	// External issue tracker sync (GitHub, Linear)
 	syncCmdInst := synccmd.NewSyncCmd()
 	syncCmdInst.GroupID = "integrations"
@@ -436,6 +450,16 @@ func registerCommands() {
 	convergenceCmdInst := convergence.NewConvergenceCmd()
 	convergenceCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(convergenceCmdInst)
+
+	// Single-command natural language steering metabolizer (zqk steer)
+	steerCmdInst := steercmd.NewSteerCmd()
+	steerCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(steerCmdInst)
+
+	// Native N-Vector evaluation registry & steering signal stream (zqk vector)
+	vectorCmdInst := vectorcmd.NewVectorCmd()
+	vectorCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(vectorCmdInst)
 
 	// Only available in zqk-admin binary
 	isAdminBinary := false

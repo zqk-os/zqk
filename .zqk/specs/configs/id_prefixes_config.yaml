@@ -40,6 +40,8 @@ kind_to_prefixes:
         - ASK-
     agent_task:
         - ATK-
+    approval_request:
+        - APR-
     audit_aggregation_metric:
         - AAM-
         - CJA-
@@ -125,6 +127,8 @@ kind_to_prefixes:
         - IMPTRK-
     important_date:
         - DATE-
+    io_cache:
+        - IOC-
     integrity_manifest:
         - INT-
     keystore_entry:

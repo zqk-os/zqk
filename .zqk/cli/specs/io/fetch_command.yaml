@@ -1,0 +1,40 @@
+$schema: ../_schemas/command_spec.schema.json
+name: fetch <url>
+short: Fetch HTTP URL content and extract clean text
+description: |
+  Fetches HTTP URL content, extracts clean Markdown/plaintext (stripping scripts,
+  styles, nav, footers), and computes SHA256. When --cache-cas is specified,
+  stores raw and extracted content into CAS keyed by hash. When --diff is specified,
+  outputs semantic diff against previous cached fetch.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: cache-cas
+    type: bool
+    description: "Store raw and clean content into CAS keyed by hash"
+  - name: diff
+    type: bool
+    description: "Output semantic diff against previous cached fetch if available"
+  - name: raw
+    type: bool
+    description: "Output raw fetched response body instead of extracted clean text"
+  - name: json
+    type: bool
+    description: "Output result in JSON format"
+  - name: timeout
+    type: string
+    default: "30s"
+    description: "HTTP request timeout duration"
+help:
+  examples:
+    - comment: "Fetch and extract clean Markdown"
+      command: "%s io fetch https://example.com/docs"
+    - comment: "Fetch and cache into CAS"
+      command: "%s io fetch https://example.com/docs --cache-cas"
+    - comment: "Fetch and diff against cached version"
+      command: "%s io fetch https://example.com/docs --diff --cache-cas"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

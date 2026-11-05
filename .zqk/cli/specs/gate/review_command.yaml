@@ -1,0 +1,21 @@
+$schema: ../_schemas/command_spec.schema.json
+name: review <id>
+short: Review a staged approval request
+description: |
+  Displays the staged approval request, showing id, type, target, hash, and
+  payload preview before granting or rejecting execution.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: json
+    type: bool
+    description: "Output result in JSON format"
+help:
+  examples:
+    - comment: "Review an approval request"
+      command: "%s gate review APR-1730000000-abcd1234"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

@@ -1,0 +1,22 @@
+$schema: _schemas/command_spec.schema.json
+name: io
+short: Universal external respiration gateway and CAS scraping cache
+description: |
+  Universal External Respiration Gateway and CAS Scraping Cache for fetching
+  external content with rate limiting, HTML stripping into clean Markdown,
+  cryptographic SHA256 digest computation, and semantic diffing.
+help:
+  examples:
+    - comment: "Fetch URL and extract clean Markdown"
+      command: "%s io fetch https://example.com/api-docs"
+    - comment: "Fetch and cache into CAS"
+      command: "%s io fetch https://example.com/spec --cache-cas"
+    - comment: "Fetch and output semantic diff against previous cache"
+      command: "%s io fetch https://example.com/spec --diff --cache-cas"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: fetch
+    spec_ref: io/fetch_command.yaml

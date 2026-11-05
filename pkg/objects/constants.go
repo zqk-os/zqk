@@ -238,6 +238,8 @@ const (
 	KindSchedulerHealthMetric = kindnames.SchedulerHealthMetric
 
 	KindImportTracking       = kindnames.ImportTracking
+	KindApprovalRequest      = kindnames.ApprovalRequest
+	KindIoCache              = kindnames.IoCache
 	KindOrganization         = kindnames.Organization
 	KindDivision             = kindnames.Division
 	KindDepartment           = kindnames.Department

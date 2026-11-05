@@ -1,0 +1,29 @@
+$schema: ../_schemas/command_spec.schema.json
+name: reject <id>
+short: Reject a staged approval request
+description: |
+  Rejects the staged approval request, marking status rejected with reviewer,
+  timestamp, and rationale reason, recording an entry to the audit ledger.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: reviewer
+    type: string
+    required: true
+    description: "Reviewer identity"
+  - name: reason
+    type: string
+    required: true
+    description: "Rejection rationale"
+  - name: json
+    type: bool
+    description: "Output result in JSON format"
+help:
+  examples:
+    - comment: "Reject a staged mutation request"
+      command: "%s gate reject APR-1730000000-abcd1234 --reviewer operator-alice --reason \"Security check failed\""
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false

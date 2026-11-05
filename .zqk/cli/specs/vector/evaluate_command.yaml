@@ -1,0 +1,24 @@
+$schema: "../schemas/command_spec.schema.json"
+name: "evaluate"
+short: "Evaluate codebase and kernel against registered vectors"
+description: |-
+  Evaluates current code/kernel against registered vectors. Consumes Codebase
+  Evaluation Framework (CEF) evidence levels and dispatches vector.evaluated and
+  vector.threshold_breached events.
+flags:
+  - name: all
+    type: bool
+    default: "false"
+    description: "Evaluate all registered vectors"
+  - name: format
+    shorthand: f
+    type: string
+    default: text
+    description: "Output format: text, json"
+help:
+  examples:
+    - comment: "Evaluate vectors against current codebase"
+      command: "%s vector evaluate"
+    - comment: "Evaluate all vectors with JSON output"
+      command: "%s vector evaluate --all -f json"
+common_flags: false

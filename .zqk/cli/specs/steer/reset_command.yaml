@@ -1,0 +1,17 @@
+$schema: "../schemas/command_spec.schema.json"
+name: "reset"
+short: "Reset steering offsets back to defaults"
+description: |-
+  Resets all active steering offsets, vector weight adjustments, and scheduler
+  weights back to baseline kernel defaults.
+flags:
+  - name: format
+    shorthand: f
+    type: string
+    default: text
+    description: "Output format: text, json"
+help:
+  examples:
+    - comment: "Reset steering offsets back to defaults"
+      command: "%s steer reset"
+common_flags: false

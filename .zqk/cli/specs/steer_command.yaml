@@ -1,0 +1,34 @@
+$schema: "./schemas/command_spec.schema.json"
+name: "steer"
+short: "Natural language steering metabolizer"
+description: |-
+  Parses natural language steering directives, extracts intensity multipliers,
+  adjusts vector queues, priority plans, and scheduler weights, and dispatches
+  the steering.applied event.
+args:
+  type: maximum
+  count: 1
+flags:
+  - name: dry-run
+    type: bool
+    default: "false"
+    description: "Parse and metabolize intent without mutating persistent state"
+  - name: format
+    shorthand: f
+    type: string
+    default: text
+    description: "Output format: text, json"
+help:
+  examples:
+    - comment: "Steer kernel vectors with natural language intent"
+      command: "%s steer \"prioritize security urgently\""
+    - comment: "Steer reliability and tests with strict intensity"
+      command: "%s steer \"strictly harden reliability and tests\""
+    - comment: "Dry-run steering intent analysis"
+      command: "%s steer \"boost speed and tokens\" --dry-run"
+    - comment: "Reset steering offsets to defaults"
+      command: "%s steer reset"
+common_flags: false
+subcommands:
+  - name: reset
+    spec_ref: steer/reset_command.yaml

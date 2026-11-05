@@ -118,6 +118,8 @@ const (
 	ContextRefreshSchedule     = "context_refresh_schedule"
 	SamplerProfile             = "sampler_profile"
 	TdeEnvelope                = "tde_envelope"
+	ApprovalRequest            = "approval_request"
+	IoCache                    = "io_cache"
 	TechnicalDebt              = "technical_debt"
 	TestCommandRule            = "test_command_rule"
 	WorkstreamTransition       = "workstream_transition"

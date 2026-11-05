@@ -1,0 +1,35 @@
+$schema: _schemas/command_spec.schema.json
+name: gate
+short: Cryptographic human-in-the-loop mutation approval gate
+description: |
+  Cryptographic Human-in-the-Loop Mutation Approval Gate for staging, reviewing,
+  approving, and rejecting critical mutations. Guarantees zero unverified mutations
+  enter the Knowledge Kernel CAS by validating SHA256 content digests and recording
+  immutable audit ledger entries.
+help:
+  examples:
+    - comment: "Stage an approval request in CAS"
+      command: "%s gate stage --type mutation --target system --payload ./patch.json"
+    - comment: "Review a staged approval request"
+      command: "%s gate review APR-1730000000-abcd1234"
+    - comment: "Approve a staged mutation request"
+      command: "%s gate approve APR-1730000000-abcd1234 --reviewer operator-alice"
+    - comment: "Reject an approval request"
+      command: "%s gate reject APR-1730000000-abcd1234 --reviewer operator-alice --reason \"Security check failed\""
+    - comment: "List all staged approval requests"
+      command: "%s gate list --status staged"
+common_flags: true
+requires_storage: true
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: stage
+    spec_ref: gate/stage_command.yaml
+  - name: review
+    spec_ref: gate/review_command.yaml
+  - name: approve
+    spec_ref: gate/approve_command.yaml
+  - name: reject
+    spec_ref: gate/reject_command.yaml
+  - name: list
+    spec_ref: gate/list_command.yaml

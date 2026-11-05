@@ -21,6 +21,5 @@ func NewRulesGenerateCommandBuilder() *cobra.Command {
 	builder.AddBoolFlag("force", "", false, "Overwrite existing directive files")
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
-	cmd.RunE = RunRulesGenerate
 	return cmd
 }
