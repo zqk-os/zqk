@@ -42,6 +42,10 @@ Usage patterns:
   zqk system check all --fast
   Fast iteration: write failing IDs then re-check only those
   zqk system check all --write-failing-ids tier1.txt --fast; zqk system check --ids-from-file tier1.txt --fast
+  Incremental check (staged/dirty objects only; sub-second)
+  zqk system check --incremental
+  Pre-commit incremental check (staged objects and invariants)
+  zqk system check --tier 1 --incremental
   Run in background (return immediately; completion via coordinator)
   zqk system check all --auto-fix --background
   Full-project auto-fix with long timeout
@@ -75,6 +79,7 @@ Flags:
       --ids-from-file string         Read object IDs from file (one per line, # ignored) and validate only those objects (fast re-check after fixes)
       --ignore-scheduler-down        Ignore scheduler down warning/lockdown
       --include-ids                  Include individual object IDs in status breakdown tables
+      --incremental                  Validate only dirty/staged objects under .zqk/process/ and immediate invariants (sub-second fast path)
       --layer int                    Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all) (default -1)
       --metrics-file string          Write performance metrics to JSON file
       --notify string[="@primary"]   Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)
@@ -83,6 +88,7 @@ Flags:
       --refresh-cache                Rebuild object-id cache and validation-related caches; honored with --fast (fast still skips refs only). Also auto-applied when a significant CAS/cache change marker is present
       --skip-if-locked               Cleanly exit with code 0 if auto-fix lock is held by another process
       --snapshot string              Save check results as snapshot to test-scenario folder (e.g., 'test-scenarios/check-violations')
+      --staged                       Validate only git-staged objects under .zqk/process/ (staged incremental mode)
       --surface string               Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class
       --tier int                     Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)
       --timeout duration             Timeout for command execution (0 = auto-calculate)
