@@ -18,6 +18,8 @@ If no kind is specified, shows available object kinds.
 
   List all backlog items
   zqk list backlog_item
+  List using --kind flag
+  zqk list --kind backlog_item
   List with filtering
   zqk list backlog_item --filter status=exploring
   List a specific namespace
