@@ -233,3 +233,31 @@ func TestCompletedAtBackfillStamp(t *testing.T) {
 		t.Fatal("completable-without-effort is out of this backfill")
 	}
 }
+
+func TestApplyCompleteTransitionDefaults_UnsetsActiveOrderOnArchivedOrCancelledPriorityPlan(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name        string
+		targetState string
+	}{
+		{name: "archived", targetState: objects.ObjectStatusArchived},
+		{name: "cancelled", targetState: objects.ObjectStatusCancelled},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			obj := map[string]any{
+				objects.FieldKeyID:          "PRI-1",
+				objects.FieldKeyActiveOrder: 57,
+			}
+			if !applyCompleteTransitionDefaults(objects.KindPriorityPlan, obj, objects.ObjectStatusActive, tc.targetState) {
+				t.Fatalf("expected mutation when unsetting active_order on transition to %s", tc.targetState)
+			}
+			if _, has := obj[objects.FieldKeyActiveOrder]; has {
+				t.Fatalf("expected active_order to be deleted on transition to %s, got %v", tc.targetState, obj[objects.FieldKeyActiveOrder])
+			}
+		})
+	}
+}

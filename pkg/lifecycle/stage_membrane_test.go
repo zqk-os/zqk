@@ -8,6 +8,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 type memMembraneStore struct {
@@ -32,8 +33,12 @@ func (m *memMembraneStore) Update(_ context.Context, _ *pkgctx.SecurityContext, 
 	if !ok {
 		return fmt.Errorf("not found: %s", id)
 	}
-	if st, ok := updates[objects.FieldKeyStatus].(string); ok {
-		obj[objects.FieldKeyStatus] = st
+	for k, v := range updates {
+		if storage.IsFieldUnset(v) {
+			delete(obj, k)
+		} else {
+			obj[k] = v
+		}
 	}
 	m.updateCalls = append(m.updateCalls, id)
 	return nil
@@ -766,5 +771,89 @@ func TestPlanStageMembraneHop_SharedRoadmapFailOpenLeavesWorkstream(t *testing.T
 	}
 	if got["WS-1"] {
 		t.Fatal("roadmap is a view; archiving it must not prune workstream lanes")
+	}
+}
+
+func TestPlanStageMembraneHop_UnsetsActiveOrderOnArchivedPriorityPlan(t *testing.T) {
+	t.Parallel()
+	cases := []struct {
+		name        string
+		targetState string
+		activeOrder any
+	}{
+		{name: "archived with active_order 1", targetState: objects.ObjectStatusArchived, activeOrder: 1},
+		{name: "archived with active_order 57", targetState: objects.ObjectStatusArchived, activeOrder: 57},
+		{name: "cancelled with active_order 1", targetState: objects.ObjectStatusCancelled, activeOrder: 1},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			priObj := map[string]any{
+				objects.FieldKeyID:          "PRI-AO-1",
+				objects.FieldKeyKind:        kindPriorityPlan,
+				objects.FieldKeyStatus:      objects.ObjectStatusActive,
+				objects.FieldKeyActiveOrder: tc.activeOrder,
+			}
+			store := &memMembraneStore{objs: map[string]map[string]any{
+				"PRI-AO-1": priObj,
+			}}
+			lc := storyLifecycles()
+			if tc.targetState == objects.ObjectStatusCancelled {
+				lc[kindPriorityPlan] = &objects.Lifecycle{
+					Transitions: []objects.Transition{
+						{From: "*", To: objects.ObjectStatusCancelled, Manual: true},
+					},
+				}
+			}
+
+			plan, err := PlanStageMembraneHop(context.Background(), pkgctx.NewSystemSecurityContext(), store, lc, nil, []string{"PRI-AO-1"}, tc.targetState)
+			if err != nil {
+				t.Fatalf("PlanStageMembraneHop error: %v", err)
+			}
+
+			var priMember *MembraneMember
+			for i := range plan.Members {
+				if plan.Members[i].ID == "PRI-AO-1" {
+					priMember = &plan.Members[i]
+					break
+				}
+			}
+			if priMember == nil {
+				t.Fatal("expected PRI-AO-1 in plan members")
+			}
+			foundClearAO := false
+			for _, f := range priMember.ClearFields {
+				if f == objects.FieldKeyActiveOrder {
+					foundClearAO = true
+					break
+				}
+			}
+			if !foundClearAO {
+				t.Fatalf("expected active_order in ClearFields, got %v", priMember.ClearFields)
+			}
+
+			// In-memory obj in store/loaded must have active_order deleted during planning
+			if _, has := priObj[objects.FieldKeyActiveOrder]; has {
+				t.Fatalf("expected active_order removed from in-memory object during planning, got %v", priObj[objects.FieldKeyActiveOrder])
+			}
+
+			// Apply membrane hop
+			if err := ApplyStageMembraneHop(context.Background(), pkgctx.NewSystemSecurityContext(), store, nil, plan); err != nil {
+				t.Fatalf("ApplyStageMembraneHop error: %v", err)
+			}
+
+			resultingObj, err := store.Read(context.Background(), pkgctx.NewSystemSecurityContext(), "PRI-AO-1")
+			if err != nil {
+				t.Fatalf("read PRI-AO-1 error: %v", err)
+			}
+			if st, _ := resultingObj[objects.FieldKeyStatus].(string); st != tc.targetState {
+				t.Fatalf("status=%q want %q", st, tc.targetState)
+			}
+			if val, has := resultingObj[objects.FieldKeyActiveOrder]; has {
+				t.Fatalf("active_order should be unset/removed in resulting object, but found: %v", val)
+			}
+		})
 	}
 }
