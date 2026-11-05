@@ -21,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/pipeline"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -400,11 +401,10 @@ func TestActivityCache_Operations(t *testing.T) {
 func TestHandlerFactory_AllRegisteredJobTypes_AndTestHooks(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	sched := &Scheduler{projectRoot: tmpDir, storage: sp, logger: logger}
@@ -478,11 +478,10 @@ func TestHandlerFactory_AllRegisteredJobTypes_AndTestHooks(t *testing.T) {
 func TestScheduler_ForTestAccessors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	s := &Scheduler{
@@ -519,11 +518,10 @@ func TestScheduler_ForTestAccessors(t *testing.T) {
 func TestCapOrchestrator_ForTestAccessors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	h := NewCapOrchestratorHandler(sp, tmpDir, logger).(*CapOrchestratorHandler)
@@ -787,11 +785,10 @@ func TestCriteriaAutoValidate_Branches(t *testing.T) {
 	assert.NoError(t, err)
 
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	did, err = applyCriterionValidatedFromTestBundle(ctx, sp, "")
 	assert.False(t, did)
@@ -1257,11 +1254,10 @@ func TestAggregationMetricsCleanup_EdgeCases(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	handler := NewAggregationMetricsCleanupHandler(sp).(*AggregationMetricsCleanupHandler)
 	require.NotNil(t, handler)
@@ -1292,11 +1288,10 @@ func TestAggregationMetricsCleanup_EdgeCases(t *testing.T) {
 func TestCapOrchestrator_FailureTrackingAndEscalation(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	chain := defaultEscalationChain(tmpDir)
@@ -1360,11 +1355,10 @@ func TestPIDFile_KeepAliveAndProcessChecks(t *testing.T) {
 func TestScheduler_CheckAndRecoverMissedJobs(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	s := &Scheduler{
@@ -1396,11 +1390,10 @@ func TestScheduler_CheckAndRecoverMissedJobs(t *testing.T) {
 func TestRetentionTolerance_MergeStrategyTolerance(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	h := NewRetentionToleranceHandler(sp, tmpDir).(*RetentionToleranceHandler)
@@ -1415,6 +1408,7 @@ func TestRetentionTolerance_MergeStrategyTolerance(t *testing.T) {
 func TestJobStateRegistry_AccessorsAndMigrations(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
 	require.NotNil(t, reg)
 
@@ -1491,11 +1485,10 @@ func TestHourglass_HelpersAndMissedCheckin(t *testing.T) {
 
 	// 6. handleMissedCheckin
 	tmpDir := t.TempDir()
+	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
-	t.Cleanup(func() {
-		_ = sp.Shutdown(context.Background())
-	})
+	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	sched := &Scheduler{projectRoot: tmpDir, storage: sp, logger: logger}
