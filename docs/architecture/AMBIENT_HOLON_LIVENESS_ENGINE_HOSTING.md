@@ -1,9 +1,9 @@
 # Architecture Specification: Ambient Holon Liveness Engine Hosting & Reflex Loop Wiring
 
 ## Status: Accepted
-**Initiative**: Autonomous Holon Consciousness & Intent-Driven Continuous Swarms (`GOAL-1793582863506864000-54c3acc7`)  
-**Cycle**: 41 (`PRI-1793842155239994000-e8bdd9ad`)  
-**Requirement**: Ambient Holon Liveness Engine Hosting & Reflex Loop Wiring Contract (`REQ-1793842053007351000-8b469747`)  
+**Initiative**: Autonomous Holon Consciousness & Intent-Driven Continuous Swarms  
+**Cycle**: 41 (Ambient Holon Liveness Engine Hosting & Reflex Loop Wiring)  
+**Requirement**: Ambient Holon Liveness Engine Hosting & Reflex Loop Wiring Contract  
 **Authors**: TPM / Community Architecture Steward  
 **Date**: 2026-11-04  
 
