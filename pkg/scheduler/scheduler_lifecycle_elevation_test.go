@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -337,7 +338,8 @@ func TestSchedulerLifecycle_WatchdogRecoveryStalledCancellation(t *testing.T) {
 	// Ping restores healthy
 	err = tracker.Ping(workerID)
 	require.NoError(t, err)
-	wsHealthy, _ := tracker.GetWorker(workerID)
+	wsHealthy, found := tracker.GetWorker(workerID)
+	assert.True(t, found)
 	assert.Equal(t, WorkerStateHealthy, wsHealthy.State)
 
 	// Unregister removes worker
@@ -472,7 +474,9 @@ func TestSchedulerLifecycle_DriftCoordinationAndEventHandling(t *testing.T) {
 	monitorCtx, monitorCancel := context.WithCancel(context.Background())
 	defer monitorCancel()
 
-	go s.handleCoordinationEvents(monitorCtx)
+	goroutinelabels.NewGoroutine("test.drift_coordination", "handle coordination events").StartSimple(func() {
+		s.handleCoordinationEvents(monitorCtx)
+	})
 
 	// Publish drift detected
 	driftEvent := Event{
