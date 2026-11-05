@@ -286,3 +286,56 @@ func TestTryClaim_RefusesWhenParentBacklogComplete(t *testing.T) {
 		t.Fatalf("parent complete: %#v err=%v", res, err)
 	}
 }
+
+func TestTryClaim_EstimatedEffortDefaultAndOverride(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+	_ = objects.GetGlobalLifecycleLoader().EnsureReady(ctx)
+	sec := pkgctx.NewSystemSecurityContext()
+
+	// 1. Task without estimated_effort gets default "2h" on claim
+	store := newClaimMemStore(map[string]any{
+		objects.FieldKeyID:     "ATK-1",
+		objects.FieldKeyKind:   objects.KindAgentTask,
+		objects.FieldKeyStatus: objects.ObjectStatusApproved,
+	})
+	res, err := TryClaim(ctx, store, sec, "ATK-1", "agent-a")
+	if err != nil || !res.Claimed {
+		t.Fatalf("claim failed: %v", err)
+	}
+	task, _ := store.Read(ctx, sec, "ATK-1")
+	if task[objects.FieldKeyEstimatedEffort] != "2h" {
+		t.Fatalf("expected default estimated_effort 2h, got %v", task[objects.FieldKeyEstimatedEffort])
+	}
+
+	// 2. Task claimed with explicit EstimatedEffort option
+	store2 := newClaimMemStore(map[string]any{
+		objects.FieldKeyID:     "ATK-2",
+		objects.FieldKeyKind:   objects.KindAgentTask,
+		objects.FieldKeyStatus: objects.ObjectStatusApproved,
+	})
+	res2, err := TryClaim(ctx, store2, sec, "ATK-2", "agent-b", ClaimOptions{EstimatedEffort: "4h"})
+	if err != nil || !res2.Claimed {
+		t.Fatalf("claim failed: %v", err)
+	}
+	task2, _ := store2.Read(ctx, sec, "ATK-2")
+	if task2[objects.FieldKeyEstimatedEffort] != "4h" {
+		t.Fatalf("expected estimated_effort 4h, got %v", task2[objects.FieldKeyEstimatedEffort])
+	}
+
+	// 3. Task with existing effort preserves it if option is empty
+	store3 := newClaimMemStore(map[string]any{
+		objects.FieldKeyID:              "ATK-3",
+		objects.FieldKeyKind:            objects.KindAgentTask,
+		objects.FieldKeyStatus:          objects.ObjectStatusApproved,
+		objects.FieldKeyEstimatedEffort: "1d",
+	})
+	res3, err := TryClaim(ctx, store3, sec, "ATK-3", "agent-c")
+	if err != nil || !res3.Claimed {
+		t.Fatalf("claim failed: %v", err)
+	}
+	task3, _ := store3.Read(ctx, sec, "ATK-3")
+	if task3[objects.FieldKeyEstimatedEffort] != "1d" {
+		t.Fatalf("expected preserved estimated_effort 1d, got %v", task3[objects.FieldKeyEstimatedEffort])
+	}
+}
