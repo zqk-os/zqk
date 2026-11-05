@@ -101,6 +101,11 @@ func registerCommands() {
 	inspectCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(inspectCmdInst)
 
+	// Top-level get command (shortcut for object get)
+	getCmdInst := object.NewGetCmd()
+	getCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(getCmdInst)
+
 	// Progressive disclosure acronym and ontology explain command (zqk explain / zqk glossary)
 	explainCmdInst := explain.NewExplainCmd()
 	explainCmdInst.GroupID = "everyday"

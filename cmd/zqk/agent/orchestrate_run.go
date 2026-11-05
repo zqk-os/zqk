@@ -392,6 +392,35 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 	b.AddStage("dispatch_parallel", func(pctx *pipeline.Context, payload any) (any, error) {
 		state := payload.(*orchestratorState)
 		numItems := len(state.items)
+
+		if state.opts.NoExecute {
+			taskIDs := make([]string, 0, numItems)
+			for _, item := range state.items {
+				kItem := koi.Wrap(item)
+				title := kItem.Title()
+				state.processedItems = append(state.processedItems, title)
+
+				taskID, err := mintOrchestratedTaskEnvelope(pctx.Ctx, state, item)
+				if err != nil {
+					return nil, errfmt.Newf("failed to mint task envelope for %s", title).Wrap(err)
+				}
+				if taskID != "" {
+					taskIDs = append(taskIDs, taskID)
+				}
+			}
+
+			state.routingPlan = map[string]any{
+				objects.KindPriorityPlan:  state.planID,
+				objects.FieldKeyStatus:    string("routed"),
+				"items":                   taskIDs,
+				objects.FieldKeySessionID: state.opts.SessionID,
+				"dispatched_items":        len(taskIDs),
+				"candidate_items":         len(state.items),
+				"delivery_result":         "envelopes_minted",
+			}
+			return state, nil
+		}
+
 		errs := make([]error, numItems)
 
 		pool := goroutinelabels.NewPool(
@@ -1257,4 +1286,231 @@ func resolveVerifiedUpstreamDeliverables(ctx context.Context, sp storage.ObjectS
 		return ""
 	}
 	return sb.String()
+}
+
+func mintOrchestratedTaskEnvelope(ctx context.Context, state *orchestratorState, item map[string]any) (string, error) {
+	kItem := koi.Wrap(item)
+	title := kItem.Title()
+	capability := kItem.GetString(objects.FieldKeyCapabilityType)
+
+	subAgent := state.personaRole
+	if subAgentVal := kItem.GetString("sub_agent"); subAgentVal != "" {
+		subAgent = subAgentVal
+	}
+
+	skillEnforcement, _ := agentprompt.LoadRelevantSkills(ctx, state.sp, state.secCtx, fmt.Sprintf("Process task: %s on plan %s", title, title))
+
+	var meshSkillSection string
+	if skillEnforcement == nil || len(skillEnforcement.RelevantSkills) == 0 {
+		broker := meshbroker.NewSkillBroker(state.sp, nil, state.proc.ProjectRoot())
+		if subAgent == "coder_agent" {
+			if skillID := localSkillIDByTitle(ctx, state.sp, state.secCtx, "Go AST Expert"); skillID != "" {
+				remoteSkill, err := broker.EnsureSkill(ctx, skillID)
+				if err == nil {
+					meshSkillSection = fmt.Sprintf("\n## Leased Mesh Capability\n- Skill: %s\n- Provider: %s\n- Token: %s\n- Status: %s\n",
+						"Go AST Expert", remoteSkill.Provider, remoteSkill.Token, "Authenticated")
+				}
+			}
+		}
+	}
+
+	itemID := kItem.ID()
+	if itemID == "" {
+		itemID = fmt.Sprintf("generated-%d", time.Now().UnixNano())
+	}
+
+	personaID := state.opts.PersonaID
+	if personaID == "" {
+		if assignee := kItem.GetString(objects.FieldKeyAssigneePersonaRef); assignee != "" {
+			personaID = assignee
+		} else if pRef := kItem.GetString(objects.FieldKeyPersonaRef); pRef != "" {
+			personaID = pRef
+		} else {
+			refs := kItem.GetStringSlice(objects.FieldKeyPersonaRefs)
+			if len(refs) > 0 {
+				personaID = refs[0]
+			}
+		}
+	}
+
+	if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
+		prepared, preFlightErr := AssemblePreparedContext(ctx, state.secCtx, state.sp, PreparedContextInput{
+			TaskID:      itemID,
+			ProjectRoot: state.proc.ProjectRoot(),
+			Depth:       5,
+		})
+		if preFlightErr == nil && !prepared.HasSemanticContext() {
+			return "", errfmt.Errorf("traceability_gap: Task context for '%s' (ID: %s) lacks concrete semantic instructions (description or criteria). Ensure the graph is linked.", title, itemID)
+		}
+	}
+
+	if personaID == "" {
+		personaID = authcred.DefaultSwarmWorkerAccount
+	}
+
+	upstreamDeliverables, _ := kItem.Raw()["upstream_deliverables_section"].(string)
+	if upstreamDeliverables == "" {
+		upstreamDeliverables = resolveVerifiedUpstreamDeliverables(ctx, state.sp, state.secCtx, kItem.Raw())
+	}
+
+	titleStr := fmt.Sprintf("Execute Task: %s", title)
+	envelope := buildOrchestrationTaskEnvelope(
+		ctx,
+		state,
+		subAgent,
+		personaID,
+		capability,
+		title,
+		meshSkillSection,
+		upstreamDeliverables,
+	)
+
+	existingID, existingStatus, existingDisp, findErr := findExistingOrchestrationTask(ctx, state, title, itemID)
+	if findErr != nil {
+		return "", findErr
+	}
+	if existingDisp == orchDispositionSkipDone {
+		_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Skipping '%s': existing ATK %s is %s.\n", titleStr, existingID, existingStatus)))
+		return existingID, nil
+	}
+	if existingDisp == orchDispositionReplace && existingID != "" {
+		_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("ℹ️  Replacing '%s': existing ATK %s is %s (not reused).\n", titleStr, existingID, existingStatus)))
+	}
+
+	modelTier := "tier_2_simple"
+	if tVal := kItem.GetString(objects.FieldKeyModelTier); tVal != "" {
+		modelTier = tVal
+	}
+
+	var taskSteps []map[string]any
+	taskSteps = append(taskSteps, map[string]any{
+		objects.FieldKeyTitle:       "Implementation Phase",
+		objects.FieldKeyStatus:      objects.ObjectStatusPendingImplementation,
+		objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object."),
+	})
+
+	lowerPersona := strings.ToLower(personaID)
+	isTechnical := !strings.Contains(lowerPersona, "tpm") && !strings.Contains(lowerPersona, "design")
+
+	if !isTechnical || strings.Contains(lowerPersona, "architect") {
+		taskSteps = append(taskSteps, map[string]any{
+			objects.FieldKeyTitle:       "Kernel Graph Composition Context",
+			objects.FieldKeyStatus:      objects.ObjectStatusPending,
+			objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Kernel graph composition: use `zqk object get` for the onboarding policy, then `zqk intake` / `zqk object import`; do not script `zqk object create` loops."),
+		})
+	}
+
+	if isTechnical {
+		taskSteps = append(taskSteps, map[string]any{
+			objects.FieldKeyTitle:       "Validation Phase",
+			"verification_strategy":     "command_exit_code",
+			objects.FieldKeyStatus:      objects.ObjectStatusPending,
+			objects.FieldKeyDescription: "Must pass targeted validation script.",
+			objects.FieldKeyCommand:     paths.RewriteCanonicalCLIInvocations("./bin/zqk agent validate"),
+		})
+	}
+
+	agentTask := map[string]any{
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+		objects.FieldKeyTitle:              titleStr,
+		objects.FieldKeyDescription:        envelope.Description,
+		objects.FieldKeyEstimatedEffort:    "1d",
+		objects.FieldKeyAssigneePersonaRef: personaID,
+		objects.FieldKeyStatus:             orchestratedTaskStatus,
+		objects.FieldKeyModelTier:          modelTier,
+		objects.FieldKeyTaskSteps:          taskSteps,
+	}
+	if len(envelope.PolicyRefs) > 0 {
+		agentTask[objects.FieldKeyPolicyRefs] = envelope.PolicyRefs
+	}
+	var relatedRefs []string
+	if len(envelope.SkillRefs) > 0 {
+		relatedRefs = append(relatedRefs, envelope.SkillRefs...)
+	}
+	if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
+		relatedRefs = append(relatedRefs, itemID)
+	}
+	if len(relatedRefs) > 0 {
+		agentTask[objects.FieldKeyRelatedObjectRefs] = relatedRefs
+	}
+	if state.isPipeline {
+		agentTask[objects.FieldKeyPipelineRef] = state.planID
+	}
+	if !state.isPipeline && !state.isStrategicPlan {
+		agentTask[objects.FieldKeyPriorityPlanRef] = state.planID
+	}
+
+	var taskID string
+	if existingID != "" && existingDisp == orchDispositionReuse {
+		taskID = existingID
+		_ = cli.WriteOutput(state.cmd, []byte(fmt.Sprintf("♻️  Reusing ATK %s (status=%s) for '%s'\n", taskID, existingStatus, titleStr)))
+	} else {
+		startEvent := map[string]any{
+			objects.FieldKeyKind:          objects.KindAuditEvent,
+			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+			objects.FieldKeyEventType:     string(audit_event.EventTypePromptRunStart),
+			objects.FieldKeyTitle:         fmt.Sprintf("Prompt Run Start: %s", title),
+			objects.FieldKeyMetadata: map[string]any{
+				"run_id": state.opts.SessionID,
+				"item":   title,
+			},
+		}
+		_ = state.sp.Create(ctx, state.secCtx, startEvent)
+
+		err := state.sp.Create(pkgctx.WithPromoteOnCreate(ctx), state.secCtx, agentTask)
+		if err != nil {
+			errorEvent := map[string]any{
+				objects.FieldKeyKind:          objects.KindAuditEvent,
+				objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+				objects.FieldKeyEventType:     string(audit_event.EventTypePromptRunError),
+				objects.FieldKeyTitle:         fmt.Sprintf("Prompt Run Error: %s", title),
+				objects.FieldKeyMetadata: map[string]any{
+					"run_id": state.opts.SessionID,
+					"item":   title,
+					"error":  err.Error(),
+				},
+			}
+			_ = state.sp.Create(ctx, state.secCtx, errorEvent)
+			return "", err
+		}
+		createdID := koi.ID(agentTask)
+		if createdID == "" {
+			return "", errfmt.Errorf("created agent task has no id")
+		}
+		taskID = createdID
+	}
+
+	if taskID != "" {
+		if err := waitForAgentTaskReadable(ctx, state.sp, state.secCtx, taskID); err != nil {
+			return "", err
+		}
+
+		if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
+			if kItem.Status() != "in_progress" {
+				if verifyBLITDDReady(ctx, state.sp, state.secCtx, item) {
+					kItem.SetStatus("in_progress")
+					_ = state.sp.Update(ctx, state.secCtx, itemID, item)
+				} else {
+					logging.FluentEvent(logging.GetLoggerFromContext(ctx)).Warn("TDD Gate: Backlog item criteria not linked to ready test cases; in_progress transition held").
+						ItemID(itemID).Log()
+				}
+			}
+		}
+
+		completeEvent := map[string]any{
+			objects.FieldKeyKind:          objects.KindAuditEvent,
+			objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+			objects.FieldKeyEventType:     string(audit_event.EventTypePromptRunComplete),
+			objects.FieldKeyTitle:         fmt.Sprintf("Prompt Run Complete: %s", title),
+			objects.FieldKeyMetadata: map[string]any{
+				"run_id":      state.opts.SessionID,
+				"item":        title,
+				"delivery_to": "agent_task:graph",
+			},
+		}
+		_ = state.sp.Create(ctx, state.secCtx, completeEvent)
+	}
+
+	return taskID, nil
 }

@@ -236,6 +236,8 @@ func TestCommandSpec_EquivalentCommandIDs(t *testing.T) {
 		{"workflow_do", "do"},
 		{"inspect", "object_inspect"},
 		{"object_inspect", "inspect"},
+		{"get", "object_get"},
+		{"object_get", "get"},
 		{"mutate", "object_mutate"},
 		{"object_mutate", "mutate"},
 		{"query", "graph_query"},

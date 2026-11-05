@@ -101,6 +101,12 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().String("file", "", "File to read title/description from")
 	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
 	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
+	if cmd.Flags().Lookup("estimated-effort") == nil {
+		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
+	}
+	if cmd.Flags().Lookup("effort") == nil {
+		cmd.Flags().String("effort", "", "Alias for --estimated-effort")
+	}
 	cmd.Flags().Bool("promote", false, "Enqueue background object promote after mint")
 	cmd.Flags().Bool("cas", false, "Directly materialize the object into CAS storage")
 	cmd.Flags().Bool("trace-pipeline", false, "Auto-run workflow gen-trace-pipeline after mint (opt-in)")
@@ -130,6 +136,12 @@ func newObjectCmd() *cobra.Command {
 	}
 	if cmd.Flags().Lookup("goal") == nil {
 		cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
+	}
+	if cmd.Flags().Lookup("estimated-effort") == nil {
+		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
+	}
+	if cmd.Flags().Lookup("effort") == nil {
+		cmd.Flags().String("effort", "", "Alias for --estimated-effort")
 	}
 	return cmd
 }
@@ -188,6 +200,17 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	}
 	if goalID != emptyValue {
 		objData[objects.FieldKeyGoalRefs] = []any{goalID}
+	}
+	effort, _ := cmd.Flags().GetString("estimated-effort")
+	effort = strings.TrimSpace(effort)
+	if effort == emptyValue {
+		effort, _ = cmd.Flags().GetString("effort")
+		effort = strings.TrimSpace(effort)
+	}
+	if effort != emptyValue {
+		objData[objects.FieldKeyEstimatedEffort] = effort
+	} else if kind == objects.KindAgentTask {
+		objData[objects.FieldKeyEstimatedEffort] = "2h"
 	}
 	wantPromote, _ := cmd.Flags().GetBool("promote")
 	wantCAS, _ := cmd.Flags().GetBool("cas")

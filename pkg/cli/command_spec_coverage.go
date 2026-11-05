@@ -63,6 +63,10 @@ func AnalyzeCommandSpecCoverage(root *cobra.Command, specsDir string) (CommandSp
 		}
 		hasSpec := false
 		for _, cand := range EquivalentCommandIDs(id) {
+			if DynamicCommandGroup(cand) {
+				hasSpec = true
+				break
+			}
 			if _, ok := specs[cand]; ok {
 				hasSpec = true
 				break
@@ -265,6 +269,10 @@ func EquivalentCommandIDs(id string) []string {
 		cands = append(cands, "object_inspect")
 	case "object_inspect":
 		cands = append(cands, "inspect")
+	case "get":
+		cands = append(cands, "object_get")
+	case "object_get":
+		cands = append(cands, "get")
 	case "mutate":
 		cands = append(cands, "object_mutate")
 	case "object_mutate":

@@ -17,12 +17,29 @@ import (
 
 func NewClaimCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentClaimCommandBuilder()
+	byFlag := cmd.Flags().Lookup("by")
+	if byFlag != nil {
+		cmd.Flags().Var(byFlag.Value, "agent", "Alias for --by (claimant agent or account id)")
+		cmd.Flags().Var(byFlag.Value, "agent-id", "Alias for --by (claimant agent or account id)")
+	}
+	if cmd.Flags().Lookup("estimated-effort") == nil {
+		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
+	}
+	if cmd.Flags().Lookup("effort") == nil {
+		cmd.Flags().String("effort", "", "Alias for --estimated-effort")
+	}
 	cmd.RunE = cli.WithProcessor(runClaim)
 	return cmd
 }
 
 func parseClaimant(cmd *cobra.Command, proc *cli.Processor, flags *clipkg.FlagBag, fallbackIfEmpty bool) string {
 	claimant := strings.TrimSpace(flags.String(cmd, "by"))
+	if claimant == "" && cmd != nil && cmd.Flags().Lookup("agent") != nil {
+		claimant = strings.TrimSpace(flags.String(cmd, "agent"))
+	}
+	if claimant == "" && cmd != nil && cmd.Flags().Lookup("agent-id") != nil {
+		claimant = strings.TrimSpace(flags.String(cmd, "agent-id"))
+	}
 	if claimant == "" && fallbackIfEmpty {
 		return resolveClaimantIdentity(cmd, proc)
 	}
@@ -37,6 +54,13 @@ func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	exitWhenCVSCompleted := flags.Bool(cmd, "exit-when-cvs-completed")
 	hourglassOn := flags.Bool(cmd, "hourglass-on")
 	checkinCadence := flags.Duration(cmd, "checkin-cadence")
+	var estimatedEffort string
+	if cmd != nil && cmd.Flags().Lookup("estimated-effort") != nil {
+		estimatedEffort = flags.String(cmd, "estimated-effort")
+	}
+	if strings.TrimSpace(estimatedEffort) == "" && cmd != nil && cmd.Flags().Lookup("effort") != nil {
+		estimatedEffort = flags.String(cmd, "effort")
+	}
 	if err := flags.Err(); err != nil {
 		return err
 	}
@@ -48,6 +72,7 @@ func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		HourglassOn:          hourglassOn,
 		ProjectRoot:          proc.ProjectRoot(),
 		CheckinCadence:       checkinCadence,
+		EstimatedEffort:      strings.TrimSpace(estimatedEffort),
 	}
 
 	ctx, sec, sp := procStorageTuple(proc)
@@ -78,6 +103,11 @@ func checkinDue(projectRoot, taskID string) string {
 
 func NewReleaseCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentReleaseCommandBuilder()
+	byFlag := cmd.Flags().Lookup("by")
+	if byFlag != nil {
+		cmd.Flags().Var(byFlag.Value, "agent", "Alias for --by (claimant that must currently hold the claim)")
+		cmd.Flags().Var(byFlag.Value, "agent-id", "Alias for --by (claimant that must currently hold the claim)")
+	}
 	cmd.RunE = cli.WithProcessor(runRelease)
 	return cmd
 }
