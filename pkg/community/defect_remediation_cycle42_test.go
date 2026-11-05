@@ -16,6 +16,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // TestDefectRemediationCycle42_StaticFloorInvariant verifies:
@@ -138,7 +139,7 @@ func verifyGH944OperationalTemplateOmission(t *testing.T, repoRoot string) {
 	}
 
 	cmd := testkit.ManagedCommand(t, t.Context(), binZqk, "object", "template", "backlog_item")
-	cmd.Dir = repoRoot
+	zqkenv.WireExecForIsolatedProject(cmd, repoRoot)
 	out, err := cmd.CombinedOutput()
 	require.NoError(t, err, "object template backlog_item must succeed: %s", string(out))
 

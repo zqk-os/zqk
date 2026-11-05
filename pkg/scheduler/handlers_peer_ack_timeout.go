@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
@@ -50,6 +51,14 @@ func (h *PeerAckTimeoutAuditHandler) Execute(ctx context.Context, job *Scheduled
 		return err
 	}
 
+	// Group wake-action expiries by await author so one audit tick cannot
+	// flood Composer with N identical ATTN injects (2026-11-05 spam).
+	// TRACK: BLI-1785905541906569000-074e24d7 — peer_ack_timeout batch wake
+	type wakeBatch struct {
+		eventIDs []string
+	}
+	byCaller := map[string]*wakeBatch{}
+
 	for _, ex := range expired {
 		ackAgent := ex.ToAgentID
 		if ackAgent == "" {
@@ -68,36 +77,45 @@ func (h *PeerAckTimeoutAuditHandler) Execute(ctx context.Context, job *Scheduled
 		})
 
 		if ex.Action == agentfeed.AwaitActionWake && ex.FromAgentID != "" {
-			msg := "ATTN " + ex.FromAgentID + " — peer-ack timeout expired for " + ex.EventID
-			if ex.WakeMessage != "" {
-				msg = msg + ": " + ex.WakeMessage
+			b := byCaller[ex.FromAgentID]
+			if b == nil {
+				b = &wakeBatch{}
+				byCaller[ex.FromAgentID] = b
 			}
-			_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
-				ProjectRoot: h.projectRoot,
-				Message:     msg,
-				AgentID:     agentfeed.FeedKernelAgentID,
-				ToAgentID:   ex.FromAgentID,
-				Sender:      agentfeed.FeedSenderMeshStatus,
-				EventType:   agentfeed.FeedEventTypeWake,
-			})
-			// AppendEvent alone does not ring MCP/agentapi or queue zqk.wake.attn.
-			// Without WakePeerOpts, TPM Composer stays idle while feed shows ATTN wakes
-			// (2026-11-04 idle disconnect: seat-worker ack-theatre + no membrane).
-			// TRACK: POL-AGENT-MESH-WAKE-001 / POL-AGENT-ORCH-HOURGLASS-001
-			wakeRes := agentfeed.WakePeerOpts(ctx, agentfeed.WakePeerOptions{
-				ProjectRoot:  h.projectRoot,
-				Message:      msg,
-				ToAgentID:    ex.FromAgentID,
-				FromAgentID:  "hourglass-peer-ack-timeout",
-				DeliveryMode: "notify",
-			})
-			// WakePeerOpts only queues zqk.wake.attn when MCP ActionRequired is
-			// already Live. Timeout audits often lack subscriber probe fields, so
-			// Composer never injects. Always queue ATTN for the await author.
-			// TRACK: POL-AGENT-MESH-WAKE-001 (2026-11-04 idle disconnect)
-			if !wakeRes.IdeBridgeQueued {
-				_ = idebridge.QueueWakeAttn(h.projectRoot, msg)
-			}
+			b.eventIDs = append(b.eventIDs, ex.EventID)
+		}
+	}
+
+	for fromID, batch := range byCaller {
+		n := len(batch.eventIDs)
+		sample := batch.eventIDs[0]
+		var msg string
+		if n == 1 {
+			// Do NOT append stored WakeMessage — register-time stub is
+			// "peer_ack received", which makes timeout ATTNs self-contradictory.
+			msg = "ATTN " + fromID + " — peer-ack timeout expired for " + sample + " (1 await; check whats-next / open hourglasses)"
+		} else {
+			msg = "ATTN " + fromID + " — peer-ack timeout expired for " + fmt.Sprintf("%d", n) + " awaits (e.g. " + sample + "); ack inbox once, do not remint steers. Check whats-next."
+		}
+		_, _ = agentfeed.AppendEvent(agentfeed.AppendEventInput{
+			ProjectRoot: h.projectRoot,
+			Message:     msg,
+			AgentID:     agentfeed.FeedKernelAgentID,
+			ToAgentID:   fromID,
+			Sender:      agentfeed.FeedSenderMeshStatus,
+			EventType:   agentfeed.FeedEventTypeWake,
+		})
+		// One membrane wake + one IDE inject per caller per audit tick.
+		// TRACK: POL-AGENT-MESH-WAKE-001 / POL-AGENT-ORCH-HOURGLASS-001
+		wakeRes := agentfeed.WakePeerOpts(ctx, agentfeed.WakePeerOptions{
+			ProjectRoot:  h.projectRoot,
+			Message:      msg,
+			ToAgentID:    fromID,
+			FromAgentID:  "hourglass-peer-ack-timeout",
+			DeliveryMode: "notify",
+		})
+		if !wakeRes.IdeBridgeQueued {
+			_ = idebridge.QueueWakeAttn(h.projectRoot, msg)
 		}
 	}
 
