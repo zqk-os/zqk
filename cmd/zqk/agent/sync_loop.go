@@ -179,8 +179,12 @@ func getSyncLoopHeartbeat() time.Duration {
 			return d
 		}
 	}
+	// Tests need a shorter tick than prod (5s) but still long enough that
+	// reactive/cancellation suites can observe the loop blocked in select
+	// (they sleep ~300ms before cancel/wake). 10ms made the loop finish
+	// the task before those probes ran.
 	if zqkenv.IsInTest() {
-		return 10 * time.Millisecond
+		return 500 * time.Millisecond
 	}
 	return syncLoopHeartbeat
 }
@@ -328,36 +332,24 @@ func runSyncLoop(cmd *cobra.Command, taskID string) (runErr error) {
 		logging.FluentEvent(logging.GetLogger()).Error("WriteOutput failed", wErr).Log()
 	}
 
-	firstIteration := true
 	for {
-		if !firstIteration {
-			select {
-			case <-ctx.Done():
-				return fmt.Errorf("orchestrator timeout")
-			case <-cmd.Context().Done():
-				return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
-			case <-wakerCh:
-				// Reactive instant wake upon scheduler job completion or mutation event
-				draining := true
-				for draining {
-					select {
-					case <-wakerCh:
-					default:
-						draining = false
-					}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("orchestrator timeout")
+		case <-cmd.Context().Done():
+			return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
+		case <-wakerCh:
+			// Reactive instant wake upon scheduler job completion or mutation event
+			draining := true
+			for draining {
+				select {
+				case <-wakerCh:
+				default:
+					draining = false
 				}
-			case <-poller.C:
-				// Fallback heartbeat ticker to protect against dropped events
 			}
-		} else {
-			firstIteration = false
-			select {
-			case <-ctx.Done():
-				return fmt.Errorf("orchestrator timeout")
-			case <-cmd.Context().Done():
-				return fmt.Errorf("orchestrator timeout: %w", cmd.Context().Err())
-			default:
-			}
+		case <-poller.C:
+			// Fallback heartbeat ticker to protect against dropped events
 		}
 
 		loopCount++
