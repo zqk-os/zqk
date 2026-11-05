@@ -28,6 +28,9 @@ func (f *FileObjectStorage) authorizeDeleteAndGetKind(ctx context.Context, secCt
 }
 
 func (f *FileObjectStorage) Delete(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, cascade bool) error {
+	if f.closed.Load() {
+		return ErrStorageClosed
+	}
 	if err := f.CheckTestRepoWriteGuard(); err != nil {
 		return err
 	}

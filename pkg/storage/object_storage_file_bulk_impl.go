@@ -266,6 +266,9 @@ func (f *FileObjectStorage) BulkGet(ctx context.Context, secCtx *pkgctx.Security
 // Critical kinds always go through Delete → kernel.cas_object_erase (never batch CAS wipe).
 // TRACK: follow-up in kernel backlog
 func (f *FileObjectStorage) BulkDelete(ctx context.Context, secCtx *pkgctx.SecurityContext, ids []string, cascade bool) (*BulkResult, error) {
+	if f.closed.Load() {
+		return nil, ErrStorageClosed
+	}
 	if !IsCLIOperation(ctx, secCtx) {
 		return nil, errfmt.Errorf(ConstStreamDeleteOperationsMustBePerformedThroughCli)
 	}

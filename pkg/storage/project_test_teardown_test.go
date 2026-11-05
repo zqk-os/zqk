@@ -2,10 +2,12 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"path/filepath"
 	"testing"
 	"time"
 
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -115,5 +117,63 @@ func TestRunProjectTestTeardown_scrubsWhenStripWithoutAggressive(t *testing.T) {
 	}
 	if len(entries) != 0 {
 		t.Fatalf("expected empty temp root after strip+scrub, remaining: %v", entries)
+	}
+}
+
+func TestFileObjectStorage_RefusesMutationsAfterShutdown(t *testing.T) {
+	tmp := t.TempDir()
+	fs, err := NewFileObjectStorageForTest(tmp)
+	if err != nil {
+		t.Fatalf("NewFileObjectStorageForTest: %v", err)
+	}
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	if err := fs.Shutdown(ctx); err != nil {
+		t.Fatalf("Shutdown: %v", err)
+	}
+
+	dummyObj := map[string]any{
+		"id":   "CRIT-SHUTDOWN-TEST",
+		"kind": "criteria",
+	}
+
+	if err := fs.Create(ctx, secCtx, dummyObj); !errors.Is(err, ErrStorageClosed) {
+		t.Errorf("Create after shutdown: want ErrStorageClosed, got %v", err)
+	}
+
+	if err := fs.Update(ctx, secCtx, "CRIT-SHUTDOWN-TEST", map[string]any{"status": "active"}); !errors.Is(err, ErrStorageClosed) {
+		t.Errorf("Update after shutdown: want ErrStorageClosed, got %v", err)
+	}
+
+	if err := fs.Delete(ctx, secCtx, "CRIT-SHUTDOWN-TEST", false); !errors.Is(err, ErrStorageClosed) {
+		t.Errorf("Delete after shutdown: want ErrStorageClosed, got %v", err)
+	}
+}
+
+func TestRunProjectTestTeardown_DrainsAsyncAndDebounceTimers(t *testing.T) {
+	tmp := t.TempDir()
+	fs, err := NewFileObjectStorageForTest(tmp)
+	if err != nil {
+		t.Fatalf("NewFileObjectStorageForTest: %v", err)
+	}
+
+	scheduleReverseReferenceIndexPersist(tmp)
+	scheduleHighVolumeEventCachePersist(tmp)
+
+	opts := TempProjectTeardown(tmp, fs)
+	if err := RunProjectTestTeardown(opts); err != nil {
+		t.Fatalf("RunProjectTestTeardown: %v", err)
+	}
+
+	// Verify the directory remains completely clean and no background goroutine recreated anything
+	time.Sleep(300 * time.Millisecond) // exceeds 250ms debounce
+	entries, err := fileutil.ReadDir(tmp)
+	if err != nil {
+		t.Fatalf("ReadDir: %v", err)
+	}
+	if len(entries) != 0 {
+		t.Fatalf("expected empty temp root after teardown and debounce window, found: %v", entries)
 	}
 }

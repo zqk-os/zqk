@@ -202,6 +202,7 @@ type FileObjectStorage struct {
 	// shutdownOnce ensures Shutdown runs idempotently at most once per storage instance.
 	shutdownOnce      sync.Once
 	cachedShutdownErr error
+	closed            atomic.Bool
 }
 
 var fileObjectStorageForTestOnce sync.Once
@@ -324,6 +325,7 @@ func (f *FileObjectStorage) Close() error {
 }
 
 func (f *FileObjectStorage) shutdownInternal(ctx context.Context) error {
+	f.closed.Store(true)
 	if f.projectRoot != emptyValue {
 		pending := caspkg.GetCASPendingVisibilityCache(f.projectRoot)
 		pending.BeginOrderedShutdown()

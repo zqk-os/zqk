@@ -7,6 +7,9 @@ import (
 )
 
 func (f *FileObjectStorage) Update(ctx context.Context, secCtx *pkgctx.SecurityContext, id string, updates map[string]any) error {
+	if f.closed.Load() {
+		return ErrStorageClosed
+	}
 	if err := f.CheckTestRepoWriteGuard(); err != nil {
 		return err
 	}

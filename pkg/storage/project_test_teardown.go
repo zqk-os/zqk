@@ -180,6 +180,11 @@ func drainStorageAsyncComponents(projectRoot string) {
 	ShutdownHashRegistriesForProjectTesting(projectRoot)
 	ShutdownAllAuditBuffersForTesting()
 	logging.LogSwallowedError(filecas.DrainDarwinSyncQueue(2 * time.Second))
+	if projectRoot != emptyValue {
+		drainCtx, drainCancel := context.WithTimeout(pkgctx.NewSystemContext(), 3*time.Second)
+		logging.LogSwallowedError(DrainChangeJournalForRoot(drainCtx, projectRoot))
+		drainCancel()
+	}
 	runProjectTestTeardownHooks(projectRoot)
 }
 
@@ -190,17 +195,20 @@ func projectTeardownStageDrainAsyncStorageComponents(opts ProjectTestTeardownOpt
 	}
 }
 
+func drainAndStopDebounceForProjectTesting(projectRoot string) {
+	StopReverseReferenceIndexPersistForTest(projectRoot)
+	StopHighVolumeEventCachePersistForTest(projectRoot)
+	drainStorageAsyncComponents(projectRoot)
+}
+
 // RunProjectTestTeardown runs the standard pipeline once.
 func RunProjectTestTeardown(opts ProjectTestTeardownOptions) error {
 	opts = applyGitWorktreeTeardownGuard(opts.WithDefaults())
-	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
-	StopHighVolumeEventCachePersistForTest(opts.ProjectRoot)
-	drainStorageAsyncComponents(opts.ProjectRoot)
+	drainAndStopDebounceForProjectTesting(opts.ProjectRoot)
 	pl := StandardProjectTestTeardownPipeline(opts)
 	pctx := &pipeline.Context{Ctx: pkgctx.NewSystemContext(), Outcome: make(map[string]any)}
 	_, err := pl.Run(pctx, opts)
-	StopReverseReferenceIndexPersistForTest(opts.ProjectRoot)
-	StopHighVolumeEventCachePersistForTest(opts.ProjectRoot)
+	drainAndStopDebounceForProjectTesting(opts.ProjectRoot)
 	// Reset global singletons to prevent cross-test contamination when ZQK_TEST_ROOT changes
 	objects.ResetGlobalFieldRegistryForTesting()
 	objects.ResetGlobalKindMapperForTesting()
