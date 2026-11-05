@@ -342,7 +342,7 @@ func recordAuditLedger(
 		objects.FieldKeyOperation: operation,
 		objects.FieldKeyEventType: eventType,
 		objects.FieldKeySeverity:  audit.SeverityHigh,
-		objects.FieldKeyStatus:    "recorded",
+		objects.FieldKeyStatus:    objects.ObjectStatusCompleted,
 		objects.FieldKeyCreatedBy: actor,
 		objects.FieldKeyCreatedAt: CurrentTimestamp(),
 		objects.FieldKeyMetadata:  metadata,
