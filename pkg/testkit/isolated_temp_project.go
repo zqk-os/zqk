@@ -32,8 +32,9 @@ type IsolatedTempProject struct {
 type IsolatedTempProjectOptions struct {
 	// SkipSetupTestEnvironment skips [testenvroot.Setup] when tests lay out dirs manually.
 	SkipSetupTestEnvironment bool
-	// ForceRemoveRootOnCleanup registers os.RemoveAll(Root) in t.Cleanup before storage teardown
-	// (LIFO: storage teardown runs first) so t.TempDir() removal succeeds after heavy teardown.
+	// ForceRemoveRootOnCleanup is retained for call-site documentation; isolated temp roots
+	// always register RemoveAll after storage teardown (LIFO) so t.TempDir() cleanup does not
+	// FAIL with unlinkat ENOTEMPTY under CI coverage. Setting true/false is a no-op.
 	ForceRemoveRootOnCleanup bool
 	// Kind is a short suffix for pipeline observability (e.g. "reports", "scheduler"). Empty uses "default".
 	Kind string
@@ -114,9 +115,11 @@ func runIsolatedTempProjectPipeline(tb testing.TB, root string, opts *IsolatedTe
 		caspkg.SetListingIndexWriteQueueFactoryToPerProjectRoot()
 	})
 
-	if opts.ForceRemoveRootOnCleanup {
-		tb.Cleanup(func() { _ = fileutil.RemoveAll(root) })
-	}
+	// Always force-remove after storage teardown so t.TempDir() cleanup does not
+	// FAIL with unlinkat ENOTEMPTY under CI coverage (GOTMPDIR=RUNNER_TEMP, -cover -p 2).
+	// ForceRemoveRootOnCleanup remains for callers that set it explicitly; behavior is now default-on.
+	// TRACK: coverage gate after storage teardown #977 — system TempDir flakes.
+	tb.Cleanup(func() { _ = fileutil.RemoveAll(root) })
 
 	kind := opts.Kind
 	if kind == "" {
