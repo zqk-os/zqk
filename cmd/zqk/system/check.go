@@ -28,6 +28,12 @@ func NewCheckCmd() *cobra.Command {
 		"  - Layer 2: Objects Ready for Promotion/Execution (Clean objects with 0 validation issues)",
 		"  - Layer 3: Completed & Validated Items (Terminal objects passing all validation gates)",
 		"",
+		"Exit codes:",
+		"  - 0: Healthy / Success (no blockers, or warnings ignored)",
+		"  - 1: Validation errors / Tier 1 blockers",
+		"  - 2: CAS corruption / Layer 0 integrity failures",
+		"  - 3: Advisory warnings present (default behavior when not ignoring warnings)",
+		"",
 		"--fast / --check-refs=false is a partial, read-only surface (skips reference integrity).",
 		"Combined with --auto-fix or --force, --fast is dropped and refs are enabled so mutation",
 		"uses the full surface. A green partial result does not mean the kernel is healthy.",
@@ -102,6 +108,8 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("unresolvable-only", false, "Filter output to only show unresolvable violations")
 	cmd.Flags().Bool("cache-only", false, "Show cached validation results only (do not run validation, trigger background scan)")
 	cmd.Flags().String("dispatch-to", "", "Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')")
+	cmd.Flags().Bool("ignore-warnings", false, "Ignore advisory warnings (exit code 3) and exit with code 0 if no blockers exist")
+	cmd.Flags().String("fail-level", "warning", "Failure level that triggers non-zero exit code ('error' or 'warning', default: 'warning')")
 	// Opt-in mesh wake when draft/error/blocking/warning/info thresholds trip (not automatic).
 	// Bare --notify → primary orchestrator agent_id; --notify <id> overrides.
 	cmd.Flags().String("notify", "", "Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)")

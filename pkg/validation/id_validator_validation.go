@@ -256,9 +256,7 @@ func (v *IDValidator) GetValidPrefixes(kind string) []string {
 // InferKindFromID attempts to infer the object kind from an ID
 // Now supports namespaced IDs (e.g., "zqk:kernel:goal:GOAL-123")
 func (v *IDValidator) InferKindFromID(id string) string {
-	if err :=
-		// Ensure patterns are loaded (non-blocking - if already loading, will use what's available)
-		v.LoadPatterns(); err != nil {
+	if err := v.LoadPatterns(); err != nil {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
 	}
 
@@ -268,35 +266,26 @@ func (v *IDValidator) InferKindFromID(id string) string {
 		LockNameIdValidatorInferKind,
 		lockLoggerSystem(),
 		func() error {
-			// Copy patterns for processing outside lock
 			patternsCopy = make(map[string]*IDPatternConfig, len(v.patterns))
 			for kind, config := range v.patterns {
 				patternsCopy[kind] = config
 			}
 			return nil
 		},
-	); err !=
-
-		// Parse namespace if present
-		nil {
+	); err != nil {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
 	}
 
 	parsed := ParseNamespace(id)
 	if parsed != nil && parsed.ObjectType != emptyValue {
-		// Namespaced ID with object type - use the object type directly
 		return parsed.ObjectType
 	}
 
-	// Extract the actual ID to check (without namespace)
 	actualID := id
 	if parsed != nil && parsed.ObjectID != emptyValue {
 		actualID = parsed.ObjectID
 	}
 
-	// Check config-based patterns first (they take precedence)
-	// Then check spec-based patterns
-	// Use longest-prefix match so NAMESPACE-REGISTRY-001 maps to namespace_registry, not namespace
 	config := v.getIDPrefixesConfig()
 	configKinds := make(map[string]bool)
 	if config != nil {
@@ -316,7 +305,7 @@ func (v *IDValidator) InferKindFromID(id string) string {
 				continue
 			}
 			for _, prefix := range patternConfig.Prefixes {
-				if strings.HasPrefix(actualID, prefix) {
+				if strings.HasPrefix(strings.ToUpper(actualID), strings.ToUpper(prefix)) {
 					cands = append(cands, prefixKind{prefix: prefix, kind: kind})
 				}
 			}
@@ -326,11 +315,9 @@ func (v *IDValidator) InferKindFromID(id string) string {
 		})
 		return cands
 	}
-	// First pass: config-based (longest-prefix match)
 	if cands := collectCandidates(true); len(cands) > 0 {
 		return cands[0].kind
 	}
-	// Second pass: spec-based (longest-prefix match)
 	if cands := collectCandidates(false); len(cands) > 0 {
 		return cands[0].kind
 	}

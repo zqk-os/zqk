@@ -18,7 +18,7 @@ var (
 	aliasesTestCase = []string{"test", "tests", "testcase", "testcases", "tc", "tcs", "tst", "tsts"}
 	// Do not alias "roadmap" to priority_plan: roadmap is a distinct object kind (ontology roadmap).
 	aliasesPriority   = []string{"plan", "priority", "priorities", "pplan", "pplans", "pri", "pris"}
-	aliasesWorkstream = []string{"stream", "streams", "work_stream", "initiative"}
+	aliasesWorkstream = []string{"stream", "streams", "work_stream", "initiative", "wrk", "ws"}
 	// prompt_template: avoid "template" — conflicts with kindnames.Template (CAS template objects).
 	aliasesPromptTemplate = []string{"prompt", "prompts", "prompt_tpl"}
 	// Object CLI shortcut groups (object splan/pplan/…) must also resolve as list/count kinds.

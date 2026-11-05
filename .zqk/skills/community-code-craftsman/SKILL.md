@@ -25,3 +25,13 @@ Execute implementation tasks with high structural rigor, complete test coverage,
    - Leverage `zqk query` (ZPARQL) for cycle-safe topological queries across kernel dependencies rather than implementing custom graph search in Go scripts.
    - Leverage `zqk mutate` (ZQL) for batch object creation, ensuring all-or-nothing transactional atomicity and clean rollback.
 
+## Before every `git push` (fail closed)
+
+Do **not** push to burn CI minutes. CI failures on this repo are expensive and slow the release tag.
+
+1. Identify packages you changed (`git diff --name-only origin/main...HEAD` → map to `go list` packages).
+2. Run **narrow** probes with explicit timeouts:
+   - Fast: `go test <pkg> -timeout 60s -run '<TouchedTest>' -count=1`
+   - Heavy packages (`./pkg/storage`, full scheduler): raise timeout (e.g. `-timeout 180s`) or use the matching CI job package list — do not assume 60s is enough for `TestUpdateAllFields`.
+3. If CI already failed: reproduce the **exact** failing `-run` locally and fix **before** the next push.
+4. Prefer one green push over N red retries. Pushing untested commits is a protocol violation for agent seats.

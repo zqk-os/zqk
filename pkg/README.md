@@ -18,7 +18,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [acronyms](./acronyms/) | `github.com/zqk-os/zqk/pkg/acronyms` | 1+2 | 2 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |
 | [adapters](./adapters/) | `github.com/zqk-os/zqk/pkg/adapters` | 4+2 | 2 | antigravity, gemini, +6 more | ❌ - | The vendor-neutral factory for host/IDE message delivery. Kernel code depends on [MessageDelivery] and [Resolve] only. Concrete... |
 | [agent](./agent/) | `github.com/zqk-os/zqk/pkg/agent` | 1+1 | 1 | - | ❌ - | Cryptographic utilities, key management, and security identity primitives for agents. |
-| [agentclaim](./agentclaim/) | `github.com/zqk-os/zqk/pkg/agentclaim` | 6+9 | 9 | - | ❌ - | Agent work claiming, cadence check-ins, lease acquisition, and write gating. |
+| [agentclaim](./agentclaim/) | `github.com/zqk-os/zqk/pkg/agentclaim` | 7+10 | 10 | - | ❌ - | Agent work claiming, cadence check-ins, lease acquisition, and write gating. |
 | [agentdelivery](./agentdelivery/) | `github.com/zqk-os/zqk/pkg/agentdelivery` | 8+5 | 5 | adapter | ❌ - | Host-neutral delivery of messages, steers, and task notifications to agent environments. |
 | [agentfeed](./agentfeed/) | `github.com/zqk-os/zqk/pkg/agentfeed` | 21+21 | 21 | bridge, httpapi | ❌ - | Bidirectional agent message feed, event streaming, human-in-the-loop correspondence, and HTTP API. |
 | [agentidle](./agentidle/) | `github.com/zqk-os/zqk/pkg/agentidle` | 2+4 | 4 | - | ❌ - | Agent idle state detection, persistence, sleep management, and reactive wakeup triggers. |
@@ -28,7 +28,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [agentrules](./agentrules/) | `github.com/zqk-os/zqk/pkg/agentrules` | 1+6 | 6 | - | ❌ - | Parsing, validation, and enforcement of agent behavioral rules, directives, and constraints. |
 | [aliases](./aliases/) | `github.com/zqk-os/zqk/pkg/aliases` | 2+2 | 2 | - | ❌ - | Command and object alias resolution, shorthand mapping, and synonym expansion. |
 | [ambience](./ambience/) | `github.com/zqk-os/zqk/pkg/ambience` | 4+5 | 5 | - | ❌ - | Background ambient intelligence, contextual awareness, and environment state tracking. |
-| [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 37+40 | 40 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
+| [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 37+41 | 41 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
 | [appledouble](./appledouble/) | `github.com/zqk-os/zqk/pkg/appledouble` | 1+2 | 2 | - | ❌ - | Sanitization and handling of AppleDouble and macOS resource fork metadata files. |
 | [architecture](./architecture/) | `github.com/zqk-os/zqk/pkg/architecture` | 1+1 | 1 | - | ❌ - | Codebase architectural boundaries, layering rules, and static AST governance checks. |
 | [audit](./audit/) | `github.com/zqk-os/zqk/pkg/audit` | 2+3 | 3 | - | ❌ - | High-volume audit log streaming, event persistence, and validation policies. |
@@ -46,7 +46,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+2 | 2 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
-| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 20+56 | 56 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
+| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 20+59 | 59 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
 | [concurrency](./concurrency/) | `github.com/zqk-os/zqk/pkg/concurrency` | 11+12 | 12 | - | ✅ [README](./concurrency/README.md) | This package provides standardized concurrency primitives and patterns to ensure consistent, safe, and observable concurrent op... |
 | [config](./config/) | `github.com/zqk-os/zqk/pkg/config` | 10+8 | 8 | - | ❌ - | Kernel configuration loading, YAML parsing, environment overrides, and schema validation. |
 | [context](./context/) | `github.com/zqk-os/zqk/pkg/context` | 15+6 | 6 | - | ❌ - | Context management, security principal propagation, and request-scoped state. |
@@ -112,6 +112,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [librarypack](./librarypack/) | `github.com/zqk-os/zqk/pkg/librarypack` | 1+1 | 1 | - | ❌ - | Reusable component library pack registering shared traits and behaviors. |
 | [license](./license/) | `github.com/zqk-os/zqk/pkg/license` | 1+2 | 2 | - | ❌ - | Open-source license compliance, copyright header verification, and SPDX tracking. |
 | [lifecycle](./lifecycle/) | `github.com/zqk-os/zqk/pkg/lifecycle` | 14+21 | 21 | - | ❌ - | Kernel object lifecycle state machine, phase transitions, and validation rules. |
+| [liveness](./liveness/) | `github.com/zqk-os/zqk/pkg/liveness` | 3+1 | 1 | - | ❌ - | Liveness component and domain abstractions for ZQK Core. |
 | [llm](./llm/) | `github.com/zqk-os/zqk/pkg/llm` | 14+14 | 14 | semanticcache | ❌ - | LLM client abstractions, prompt completion handlers, and model provider routing. |
 | [loader](./loader/) | `github.com/zqk-os/zqk/pkg/loader` | 3+4 | 4 | - | ✅ [README](./loader/README.md) | Abstract **component loader** pattern: shared state as atomics, callback on state change, configurable timeouts (default config... |
 | [localci](./localci/) | `github.com/zqk-os/zqk/pkg/localci` | 4+3 | 3 | - | ❌ - | Local CI runner simulation, fast-fail checks, and pre-push verification. |
@@ -172,7 +173,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [runtime](./runtime/) | `github.com/zqk-os/zqk/pkg/runtime` | 3+5 | 5 | - | ❌ - | Runtime environment detection, OS capabilities, and hardware specs. |
 | [safepath](./safepath/) | `github.com/zqk-os/zqk/pkg/safepath` | 1+2 | 2 | - | ❌ - | Builds filesystem paths confined under a root directory to mitigate directory traversal when joining untrusted or external segm... |
 | [scenario](./scenario/) | `github.com/zqk-os/zqk/pkg/scenario` | 6+8 | 8 | - | ❌ - | Convergence lifecycle end-to-end tests (storage-backed CVS updates). Coverage: measure → BuildSuggestedConvergenceSessionFields... |
-| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 206+256 | 256 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
+| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 206+257 | 257 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
 | [screencap](./screencap/) | `github.com/zqk-os/zqk/pkg/screencap` | 2+4 | 4 | - | ✅ [README](./screencap/README.md) | pkg/screencap provides headless and interactive terminal automation coupled with native screen, window, and rectangular region... |
 | [search](./search/) | `github.com/zqk-os/zqk/pkg/search` | 6+2 | 2 | - | ✅ [README](./search/README.md) | pkg/search provides an in-process, pure-Go code search engine featuring trigram inverted indexing, Go AST structural queries, a... |
 | [seatworker](./seatworker/) | `github.com/zqk-os/zqk/pkg/seatworker` | 1+2 | 2 | - | ✅ [README](./seatworker/README.md) | pkg/seatworker provides OS supervisor installation and lifecycle management for persistent autonomous agent worker processes (z... |
@@ -388,6 +389,7 @@ pkg/
 ├── librarypack/          # Reusable component library pack registering shared traits an
 ├── license/          # Open-source license compliance, copyright header verificatio
 ├── lifecycle/          # Kernel object lifecycle state machine, phase transitions, an
+├── liveness/          # Liveness component and domain abstractions for ZQK Core.
 ├── llm/          # LLM client abstractions, prompt completion handlers, and mod
 │   └── semanticcache/
 ├── loader/          # Abstract **component loader** pattern: shared state as atomi

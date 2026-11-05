@@ -284,6 +284,7 @@ func inferKindFromObjectID(objectID string) string {
 		"MIL":  objects.KindMilestone,
 		"GOAL": objects.KindGoal,
 		"WS":   objects.KindWorkstream,
+		"WRK":  objects.KindWorkstream,
 		"PRIO": objects.KindPriorityPlan,
 		"ADR":  objects.KindDecision,
 		"AUTH": objects.KindAuthStrategy,

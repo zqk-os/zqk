@@ -734,6 +734,30 @@ func (c *ValidationStateCache) InvalidateByCategory(category string) int {
 	return count
 }
 
+// InvalidateBlockingReferenceIssues invalidates all cached states that have Tier-1 reference, GhostRef,
+// or traceability issues, ensuring cross-object dependency changes are re-evaluated.
+func (c *ValidationStateCache) InvalidateBlockingReferenceIssues() int {
+	var count int
+	if err := concurrency.RunInLockWithLogger(
+		&c.mu,
+		LockOpValidationCacheInvalidateCat,
+		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			count = 0
+			for id, state := range c.cache {
+				if hasBlockingReferenceIssues(state.Issues) {
+					delete(c.cache, id)
+					count++
+				}
+			}
+			return nil
+		},
+	); err != nil {
+		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgLockFailedInvalidate, err).Log()
+	}
+	return count
+}
+
 // InvalidateByPattern invalidates states matching a pattern
 func (c *ValidationStateCache) InvalidateByPattern(pattern string) {
 	if err := concurrency.RunInLockWithLogger(

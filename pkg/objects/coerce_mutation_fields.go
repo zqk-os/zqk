@@ -76,6 +76,26 @@ func CoerceMutationFields(kind string, obj map[string]any) {
 			obj[name] = CoerceToStringList(v)
 		}
 	}
+	pruneEmptyScalarRefFields(obj)
+}
+
+func isScalarRefField(name string) bool {
+	if name == "id" {
+		return false
+	}
+	return (strings.HasSuffix(name, "_ref") || strings.HasSuffix(name, "_id")) &&
+		!strings.HasSuffix(name, "_refs") &&
+		!strings.HasSuffix(name, "_ids")
+}
+
+func pruneEmptyScalarRefFields(obj map[string]any) {
+	for k, v := range obj {
+		if isScalarRefField(k) {
+			if s, ok := v.(string); ok && strings.TrimSpace(s) == "" {
+				delete(obj, k)
+			}
+		}
+	}
 }
 
 func dedupeStrings(items []string) []string {

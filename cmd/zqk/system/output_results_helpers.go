@@ -36,6 +36,8 @@ type OutputResultsContext struct {
 	OutputPath            string
 	StaleCASCleanupResult *StaleCASCleanupResult // When set, resolution summary is shown (check --auto-fix)
 	RunIssues             *ValidationRunIssues   // When set, "Validation run issues" section is shown (visibility without log diving)
+	IgnoreWarnings        bool
+	FailLevel             string
 }
 
 // initializeOutputResultsContext sets up the output results context
@@ -47,6 +49,13 @@ func initializeOutputResultsContext(cmd *cobra.Command, ctx *cli.Context, buffer
 	handler := cli.GetFormatHandler(format)
 	outputPath := cli.GetOutputPath(cmd)
 
+	var ignoreWarnings bool
+	var failLevel string
+	if cmd != nil {
+		ignoreWarnings, _ = cmd.Flags().GetBool("ignore-warnings")
+		failLevel, _ = cmd.Flags().GetString("fail-level")
+	}
+
 	var bufferCount int
 	var bufferSummary map[string]int
 	if buffer != nil {
@@ -57,13 +66,15 @@ func initializeOutputResultsContext(cmd *cobra.Command, ctx *cli.Context, buffer
 	}
 
 	return &OutputResultsContext{
-		Format:        format,
-		FormatStr:     formatStr,
-		SnapshotPath:  snapshotPath,
-		BufferCount:   bufferCount,
-		BufferSummary: bufferSummary,
-		Handler:       handler,
-		OutputPath:    outputPath,
+		Format:         format,
+		FormatStr:      formatStr,
+		SnapshotPath:   snapshotPath,
+		BufferCount:    bufferCount,
+		BufferSummary:  bufferSummary,
+		Handler:        handler,
+		OutputPath:     outputPath,
+		IgnoreWarnings: ignoreWarnings,
+		FailLevel:      failLevel,
 	}, nil
 }
 

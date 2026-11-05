@@ -824,7 +824,7 @@ func inferKindFromID(id string) string {
 	if strings.HasPrefix(id, "GOAL-") {
 		return objects.KindGoal
 	}
-	if strings.HasPrefix(id, "WS-") {
+	if strings.HasPrefix(id, "WS-") || strings.HasPrefix(id, "WRK-") {
 		return objects.KindWorkstream
 	}
 	if strings.HasPrefix(id, "PRI-") || strings.HasPrefix(id, "PRIO-") {

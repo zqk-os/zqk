@@ -144,7 +144,7 @@ func TestGetPlaceholderValue_Comprehensive(t *testing.T) {
 		{objects.FieldInfo{Type: "enum", EnumValues: []string{"val1", "val2"}}, "\"val1\""},
 		{objects.FieldInfo{Type: "enum"}, "\"\""},
 		{objects.FieldInfo{Type: "reference", SemanticType: "requirement"}, "\"# requirement reference (e.g., requirement:ID-###)\""},
-		{objects.FieldInfo{Type: "reference"}, "\"\""},
+		{objects.FieldInfo{Type: "reference"}, "\"# reference (e.g., REF-ID-001)\""},
 		{objects.FieldInfo{Type: "unknown_custom_type"}, "\"\""},
 	}
 
@@ -198,5 +198,42 @@ func TestWriteFieldTemplate_Variations(t *testing.T) {
 	res = b.String()
 	if !strings.Contains(res, "# (type: string) [optional]") {
 		t.Errorf("expected type and optional tag, got:\n%s", res)
+	}
+}
+
+func TestTemplate_OmitsEmptyOptionalReferenceFields(t *testing.T) {
+	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	out, err := executeObjectCommand(t, tempDir, provider, "template", "backlog_item")
+	if err != nil {
+		t.Fatalf("template backlog_item failed: %v", err)
+	}
+	// Verify optional reference fields are omitted from template when unset
+	if strings.Contains(out, "milestone_ref:") {
+		t.Errorf("expected optional milestone_ref to be omitted from template, got:\n%s", out)
+	}
+	if strings.Contains(out, "owner_ref:") {
+		t.Errorf("expected optional owner_ref to be omitted from template, got:\n%s", out)
+	}
+}
+
+func TestTemplate_AgentTaskIncludesArtifacts(t *testing.T) {
+	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	out, err := executeObjectCommand(t, tempDir, provider, "template", "agent_task")
+	if err != nil {
+		t.Fatalf("template agent_task failed: %v", err)
+	}
+
+	// Verify artifacts: [] appears uncommented under required fields for agent_task (Issue #935)
+	if !strings.Contains(out, "artifacts: []") {
+		t.Fatalf("expected template for agent_task to contain uncommented 'artifacts: []', got:\n%s", out)
+	}
+
+	// Verify artifacts is NOT commented out as optional
+	if strings.Contains(out, "artifacts: # []") {
+		t.Fatalf("expected artifacts not to be commented out as optional in agent_task template, got:\n%s", out)
 	}
 }

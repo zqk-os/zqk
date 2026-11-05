@@ -155,7 +155,14 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 		if errStat != nil {
 			return nil
 		}
-		if !info.ModTime().Before(target.cutoff) {
+		cutoff := target.cutoff
+		if d.Name() == ".cas_sweep.lock" {
+			casSweepCutoff := time.Now().Add(-15 * time.Second)
+			if casSweepCutoff.Before(cutoff) {
+				cutoff = casSweepCutoff
+			}
+		}
+		if !info.ModTime().Before(cutoff) {
 			return nil
 		}
 
