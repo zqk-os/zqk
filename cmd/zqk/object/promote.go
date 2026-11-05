@@ -386,7 +386,7 @@ func promoteTarget(cmd *cobra.Command, proc *cli.Processor, tc *transitionContex
 		}
 	}
 	// Sweep / unlink any preliminary draft file now that the object is promoted across the CAS membrane.
-	if isPrelim, _ := objects.GetGlobalLifecycleLoader().IsPreliminaryStatusForKind(kind, finalStatus); !isPrelim {
+	if isPrelim, _ := objects.GetGlobalLifecycleLoader().IsPreliminaryStatusForKind(kind, finalStatus); !isPrelim || storage.CasBackedObjectID(proc.ProjectRoot(), kind, id) {
 		_ = storage.DeleteObjectDraftFile(proc.ProjectRoot(), kind, id)
 	}
 	fmt.Fprintf(cmd.OutOrStdout(), "✓ Promoted %s from '%s' to '%s'\n", color.CyanString(id), color.YellowString(currentStatus), color.GreenString(finalStatus))

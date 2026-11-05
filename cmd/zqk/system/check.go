@@ -50,6 +50,8 @@ func NewCheckCmd() *cobra.Command {
 		AddExample("Check with JSON output", "%s system check all --format json").
 		AddExample("Partial check (refs skipped; not authoritative)", "%s system check all --fast").
 		AddExample("Fast iteration: write failing IDs then re-check only those", "%s system check all --write-failing-ids tier1.txt --fast; %s system check --ids-from-file tier1.txt --fast").
+		AddExample("Incremental check (staged/dirty objects only; sub-second)", "%s system check --incremental").
+		AddExample("Pre-commit incremental check (staged objects and invariants)", "%s system check --tier 1 --incremental").
 		AddExample("Run in background (return immediately; completion via coordinator)", "%s system check all --auto-fix --background").
 		AddExample("Full-project auto-fix with long timeout", "%s system check all --auto-fix --timeout 3600s --format json -o .zqk/logs/system-check.json").
 		AddExample("Wake primary agent if draft/error/blocking/warning/info thresholds trip", "%s system check all --notify").
@@ -77,6 +79,8 @@ func NewCheckCmd() *cobra.Command {
 	cmd.Flags().Bool("skip-if-locked", false, "Cleanly exit with code 0 if auto-fix lock is held by another process")
 	cmd.Flags().Bool("check-refs", true, "Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled")
 	cmd.Flags().Bool("fast", false, "Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped")
+	cmd.Flags().Bool("incremental", false, "Validate only dirty/staged objects under .zqk/process/ and immediate invariants (sub-second fast path)")
+	cmd.Flags().Bool("staged", false, "Validate only git-staged objects under .zqk/process/ (staged incremental mode)")
 	cmd.Flags().Int("tier", 0, "Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)")
 	cmd.Flags().Int("layer", -1, "Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all)")
 	cmd.Flags().String("surface", "", "Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class")
