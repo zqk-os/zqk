@@ -412,22 +412,30 @@ func renderTableWithTitle(title string, headers []string, rows [][]string) strin
 		widths[0] = 30
 		widths[1] = 63
 	} else if len(headers) == 3 {
-		if headers[0] == "ISSUE" || headers[0] == "Issue" {
+		h0 := ""
+		h1 := ""
+		if len(headers) > 0 {
+			h0 = headers[0]
+		}
+		if len(headers) > 1 {
+			h1 = headers[1]
+		}
+		if h0 == "ISSUE" || h0 == "Issue" {
 			// Layer 0 and Layer 1: Issue, Severity, Kind
 			widths[0] = 55 // Issue message
 			widths[1] = 10 // Severity icon
 			widths[2] = 25 // Kind (count, status)
-		} else if headers[1] == "READY COUNT" || headers[1] == "Ready Count" {
+		} else if h1 == "READY COUNT" || h1 == "Ready Count" {
 			// Layer 2
 			widths[0] = 30
 			widths[1] = 15
 			widths[2] = 45
-		} else if headers[1] == "COMPLETED COUNT" || headers[1] == "Completed Count" {
+		} else if h1 == "COMPLETED COUNT" || h1 == "Completed Count" {
 			// Layer 3
 			widths[0] = 30
 			widths[1] = 17
 			widths[2] = 43
-		} else if headers[0] == "METRIC" || headers[0] == "Metric" {
+		} else if h0 == "METRIC" || h0 == "Metric" {
 			// Layer 4: METRIC, VALUE, STATUS
 			widths[0] = 30
 			widths[1] = 20
