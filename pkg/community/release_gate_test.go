@@ -13,6 +13,9 @@ import (
 // TestReleaseGate_FunctionalAcceptance verifies cross-platform binary builds (darwin/amd64, darwin/arm64, linux/amd64, linux/arm64)
 // and dry-run community packaging pipeline (CRIT-1789615346258145000-5ef0c763).
 func TestReleaseGate_FunctionalAcceptance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
 	root := paths.ResolveProjectRoot(".")
 	pkgScript := filepath.Join(root, "scripts", "package-community.sh")
 	if !fileutil.Exists(pkgScript) {
@@ -67,6 +70,9 @@ func TestReleaseGate_BoundaryAndErrorHandling(t *testing.T) {
 
 // TestReleaseGate_IntegrationAndConformance verifies command spec baseline and release packaging integrity (CRIT-1789615346258147000-d8f2f258).
 func TestReleaseGate_IntegrationAndConformance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
 	root := paths.ResolveProjectRoot(".")
 
 	// Verify dist-community packaging artifacts can be created and checksums verified

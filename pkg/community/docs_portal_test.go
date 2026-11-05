@@ -1,7 +1,6 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -15,6 +14,9 @@ import (
 // generates static HTML portal pages and offline lunr-compatible search indexes
 // (CRIT-1789708521365161000-969fc6a6).
 func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
 	root := paths.ResolveProjectRoot(".")
 	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 	if !fileutil.Exists(scriptPath) {
@@ -41,7 +43,7 @@ func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
 		t.Fatalf("expected index.html at %s", indexPath)
 	}
 
-	indexContentBytes, err := os.ReadFile(indexPath)
+	indexContentBytes, err := fileutil.ReadFile(indexPath)
 	if err != nil {
 		t.Fatalf("failed to read index.html: %v", err)
 	}
@@ -61,7 +63,7 @@ func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
 	if !fileutil.Exists(searchPath) {
 		t.Fatalf("expected search-index.js at %s", searchPath)
 	}
-	searchBytes, err := os.ReadFile(searchPath)
+	searchBytes, err := fileutil.ReadFile(searchPath)
 	if err != nil {
 		t.Fatalf("failed to read search-index.js: %v", err)
 	}
@@ -73,6 +75,9 @@ func TestDocsPortal_FunctionalAcceptance(t *testing.T) {
 // TestDocsPortal_BoundaryAndErrorHandling verifies archive generation, verification mode,
 // and error handling for missing or invalid inputs (CRIT-1789708521365162000-933653ab).
 func TestDocsPortal_BoundaryAndErrorHandling(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
 	root := paths.ResolveProjectRoot(".")
 	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 
@@ -113,7 +118,7 @@ func TestDocsPortal_IntegrationAndConformance(t *testing.T) {
 	root := paths.ResolveProjectRoot(".")
 	scriptPath := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate-docs-portal.sh")
 
-	fi, err := os.Stat(scriptPath)
+	fi, err := fileutil.Stat(scriptPath)
 	if err != nil {
 		t.Fatalf("failed to stat generate-docs-portal.sh: %v", err)
 	}
@@ -122,7 +127,7 @@ func TestDocsPortal_IntegrationAndConformance(t *testing.T) {
 	}
 
 	pyScript := filepath.Join(root, "scripts", "open-core", "docs-portal", "generate_docs_portal.py")
-	contentBytes, err := os.ReadFile(pyScript)
+	contentBytes, err := fileutil.ReadFile(pyScript)
 	if err != nil {
 		t.Fatalf("failed to read generate_docs_portal.py: %v", err)
 	}
@@ -135,10 +140,13 @@ func TestDocsPortal_IntegrationAndConformance(t *testing.T) {
 // TestDocsPortal_DeployDryRunAndCoherency verifies that deploy-docs-portal.sh
 // compiles clean HTML pages with CNAME and .nojekyll markers (CRIT-DOC-DEPLOY-001, CRIT-WEB-COHERENCY-001).
 func TestDocsPortal_DeployDryRunAndCoherency(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
 	root := paths.ResolveProjectRoot(".")
 	deployScript := filepath.Join(root, "scripts", "open-core", "docs-portal", "deploy-docs-portal.sh")
 
-	fi, err := os.Stat(deployScript)
+	fi, err := fileutil.Stat(deployScript)
 	if err != nil {
 		t.Fatalf("failed to stat deploy-docs-portal.sh: %v", err)
 	}
@@ -160,7 +168,7 @@ func TestDocsPortal_DeployDryRunAndCoherency(t *testing.T) {
 	}
 
 	cnamePath := filepath.Join("/tmp", "zqk-docs-build", "CNAME")
-	cnameBytes, err := os.ReadFile(cnamePath)
+	cnameBytes, err := fileutil.ReadFile(cnamePath)
 	if err != nil {
 		t.Fatalf("failed to read CNAME marker: %v", err)
 	}
