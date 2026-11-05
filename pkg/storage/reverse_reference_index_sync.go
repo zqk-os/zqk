@@ -20,6 +20,7 @@ const reverseReferencePersistDebounce = 250 * time.Millisecond
 var (
 	revRefBoundRoot    atomic.Value // string
 	revRefPersistTimer atomic.Pointer[time.Timer]
+	revRefPersistWg    sync.WaitGroup
 
 	unboundTestRootsMu sync.RWMutex
 	unboundTestRoots   = make(map[string]struct{})
@@ -162,6 +163,9 @@ func scheduleReverseReferenceIndexPersist(projectRoot string) {
 	}
 	timerReady := make(chan *time.Timer, 1)
 	t := time.AfterFunc(reverseReferencePersistDebounce, func() {
+		revRefPersistWg.Add(1)
+		defer revRefPersistWg.Done()
+
 		readyT := <-timerReady
 		timerReady <- readyT // put it back for any other readers, though there should be none
 		// Only clear if we are still the scheduled timer; a newer AfterFunc must stay.
@@ -215,9 +219,6 @@ func afterReverseReferenceIndexMutation() {
 
 // StopReverseReferenceIndexPersistForTest cancels pending debounce timer and unbinds root for tests.
 func StopReverseReferenceIndexPersistForTest(projectRoot string) {
-	if old := revRefPersistTimer.Swap(nil); old != nil {
-		_ = old.Stop()
-	}
 	if projectRoot != emptyValue {
 		markTestProjectRootUnbound(projectRoot)
 		if reverseReferenceBoundProjectRoot() == projectRoot || isProjectRootEquivalent(reverseReferenceBoundProjectRoot(), projectRoot) {
@@ -227,4 +228,8 @@ func StopReverseReferenceIndexPersistForTest(projectRoot string) {
 		markTestProjectRootUnbound(bound)
 		revRefBoundRoot.Store(emptyValue)
 	}
+	if old := revRefPersistTimer.Swap(nil); old != nil {
+		_ = old.Stop()
+	}
+	revRefPersistWg.Wait()
 }

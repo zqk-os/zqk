@@ -15,6 +15,7 @@ const highVolumeEventPersistDebounce = 250 * time.Millisecond
 var (
 	hvePersistMu    sync.Mutex
 	hvePersistTimer *time.Timer
+	hvePersistWg    sync.WaitGroup
 )
 
 func resolveHighVolumeEventProjectRoot(projectRoot string) string {
@@ -45,6 +46,9 @@ func scheduleHighVolumeEventCachePersist(projectRoot string) {
 		hvePersistTimer.Stop()
 	}
 	hvePersistTimer = time.AfterFunc(highVolumeEventPersistDebounce, func() {
+		hvePersistWg.Add(1)
+		defer hvePersistWg.Done()
+
 		hvePersistMu.Lock()
 		timerActive := (hvePersistTimer != nil)
 		hvePersistTimer = nil
@@ -64,11 +68,12 @@ func StopHighVolumeEventCachePersistForTest(projectRoot string) {
 		markTestProjectRootUnbound(bound)
 	}
 	hvePersistMu.Lock()
-	defer hvePersistMu.Unlock()
 	if hvePersistTimer != nil {
 		hvePersistTimer.Stop()
 		hvePersistTimer = nil
 	}
+	hvePersistMu.Unlock()
+	hvePersistWg.Wait()
 }
 
 // updateHighVolumeEventCacheOnCreate updates the high-volume event cache when an audit event is created

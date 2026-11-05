@@ -250,7 +250,6 @@ func TestGetCriteriaIDForChecklistItem(t *testing.T) {
 		t.Fatalf("could not create file storage: %v", err)
 	}
 
-	defer func() { _ = storageProvider.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := TempProjectTeardown(testRoot, storageProvider)
 		if err := RunProjectTestTeardown(opts); err != nil {
@@ -275,10 +274,6 @@ func TestGetCriteriaIDForChecklistItem(t *testing.T) {
 		objects.FieldKeyStatus:        objects.ObjectStatusAwaitingVerification,
 	}
 	CreateCASVisible(t, storageProvider, cliCtx, secCtx, seedCriteria, objects.ObjectStatusInProgress)
-	t.Cleanup(func() {
-		//nolint:errcheck // test cleanup
-		_ = storageProvider.Delete(cliCtx, secCtx, seedID, false)
-	})
 
 	// Test checklist item lookup - should find the seeded criteria
 	criteriaID, err := GetCriteriaIDForChecklistItem(ctx, storageProvider, "purpose", true)

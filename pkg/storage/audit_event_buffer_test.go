@@ -67,8 +67,9 @@ func setupAuditBufferTest(t *testing.T, rules []AggregationRule) (string, *FileO
 
 	// Create buffer and wire it to FileObjectStorage
 	buffer := NewAuditEventBuffer(testRoot, secCtx, rules)
-	defer buffer.Shutdown()
-	defer buffer.Shutdown()
+	t.Cleanup(func() {
+		_ = buffer.Shutdown()
+	})
 	buffer.SetFileStorage(fileStorage)
 
 	return testRoot, fileStorage, buffer, secCtx

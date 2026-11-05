@@ -294,6 +294,7 @@ func GetListingIndexWriteQueueForProjectRoot(projectRoot string) *ListingIndexWr
 
 var perProjectRootQueuesMu sync.Mutex
 var perProjectRootQueues = make(map[string]*ListingIndexWriteQueue)
+var retiredProjectRoots = make(map[string]struct{})
 
 // SetListingIndexWriteQueueFactoryToPerProjectRoot sets the factory to one that returns a dedicated
 // queue per project root. Use in test setup so each test's storage has its own queue (no contention).
@@ -303,6 +304,12 @@ func SetListingIndexWriteQueueFactoryToPerProjectRoot() {
 		if err := concurrency.RunInLock(&perProjectRootQueuesMu, func() error {
 			if existing, ok := perProjectRootQueues[projectRoot]; ok {
 				q = existing
+				return nil
+			}
+			if _, retired := retiredProjectRoots[projectRoot]; retired {
+				newQ := NewListingIndexWriteQueueForTest()
+				_ = newQ.Shutdown()
+				q = newQ
 				return nil
 			}
 			newQ := NewListingIndexWriteQueueForTest()
@@ -327,10 +334,25 @@ func RemoveListingIndexWriteQueueForProjectRoot(projectRoot string) {
 			}
 			delete(perProjectRootQueues, projectRoot)
 		}
+		if projectRoot != "" {
+			retiredProjectRoots[projectRoot] = struct{}{}
+		}
 		return nil
 	}); err != nil {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(constErrFailedToRemoveQueue, err).Log()
 	}
+}
+
+// ResetListingIndexWriteQueuesForTesting drains and removes all queues and clears retired roots.
+func ResetListingIndexWriteQueuesForTesting() {
+	_ = concurrency.RunInLock(&perProjectRootQueuesMu, func() error {
+		for root, q := range perProjectRootQueues {
+			_ = q.Shutdown()
+			delete(perProjectRootQueues, root)
+		}
+		clear(retiredProjectRoots)
+		return nil
+	})
 }
 
 // NewListingIndexWriteQueue creates a new CAS index write queue (not registered with shutdown coordinator).

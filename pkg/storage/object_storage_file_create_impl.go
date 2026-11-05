@@ -17,6 +17,9 @@ import (
 
 //nolint:gocyclo
 func (f *FileObjectStorage) Create(ctx context.Context, secCtx *pkgctx.SecurityContext, obj map[string]any) error {
+	if f.closed.Load() {
+		return ErrStorageClosed
+	}
 	// Kernel Mutation Pipeline entry (COMMIT re-enters with kernelcas.WithCommit).
 	// TRACK: follow-up in kernel backlog
 	if !kernelcas.IsCommit(ctx) {

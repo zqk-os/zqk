@@ -22,6 +22,9 @@ func (f *FileObjectStorage) BulkDeleteOptimized(
 	cascade bool,
 	maxWorkers int,
 ) (*BulkDeleteResult, error) {
+	if f.closed.Load() {
+		return nil, ErrStorageClosed
+	}
 	if !IsCLIOperation(ctx, secCtx) {
 		return nil, errfmt.Errorf(ErrMsgDeleteRequiresCLI)
 	}

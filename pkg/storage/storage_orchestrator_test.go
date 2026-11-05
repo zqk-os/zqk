@@ -1,7 +1,6 @@
 package storage_test
 
 import (
-	"context"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -30,7 +29,6 @@ func setupFileObjectStorageForOrchestratorTest(t *testing.T) *storage.FileObject
 		t.Fatalf("failed to create storage: %v", err)
 	}
 
-	defer func() { _ = fos.Shutdown(context.Background()) }()
 	t.Cleanup(func() {
 		opts := storage.TempProjectTeardown(tmpDir, fos)
 		if err := storage.RunProjectTestTeardown(opts); err != nil {
