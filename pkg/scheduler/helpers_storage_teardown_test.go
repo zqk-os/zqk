@@ -13,7 +13,9 @@ import (
 func registerFileStorageTestTeardown(t *testing.T, projectRoot string, st *storagepkg.FileObjectStorage) {
 	t.Helper()
 	t.Cleanup(func() {
-		_ = fileutil.RemoveAll(projectRoot)
+		if err := fileutil.RemoveAll(projectRoot); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
 	})
 	testkit.RegisterStorageTestCleanup(t, projectRoot, st)
 }

@@ -401,7 +401,11 @@ func TestActivityCache_Operations(t *testing.T) {
 func TestHandlerFactory_AllRegisteredJobTypes_AndTestHooks(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -478,7 +482,11 @@ func TestHandlerFactory_AllRegisteredJobTypes_AndTestHooks(t *testing.T) {
 func TestScheduler_ForTestAccessors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -518,7 +526,11 @@ func TestScheduler_ForTestAccessors(t *testing.T) {
 func TestCapOrchestrator_ForTestAccessors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -785,7 +797,11 @@ func TestCriteriaAutoValidate_Branches(t *testing.T) {
 	assert.NoError(t, err)
 
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -1254,7 +1270,11 @@ func TestAggregationMetricsCleanup_EdgeCases(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -1288,7 +1308,11 @@ func TestAggregationMetricsCleanup_EdgeCases(t *testing.T) {
 func TestCapOrchestrator_FailureTrackingAndEscalation(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -1355,7 +1379,11 @@ func TestPIDFile_KeepAliveAndProcessChecks(t *testing.T) {
 func TestScheduler_CheckAndRecoverMissedJobs(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -1390,7 +1418,11 @@ func TestScheduler_CheckAndRecoverMissedJobs(t *testing.T) {
 func TestRetentionTolerance_MergeStrategyTolerance(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
@@ -1408,7 +1440,11 @@ func TestRetentionTolerance_MergeStrategyTolerance(t *testing.T) {
 func TestJobStateRegistry_AccessorsAndMigrations(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
 	require.NotNil(t, reg)
 
@@ -1485,7 +1521,11 @@ func TestHourglass_HelpersAndMissedCheckin(t *testing.T) {
 
 	// 6. handleMissedCheckin
 	tmpDir := t.TempDir()
-	t.Cleanup(func() { _ = fileutil.RemoveAll(tmpDir) })
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(tmpDir); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	require.NoError(t, err)
 	testkit.RegisterStorageTestCleanup(t, tmpDir, sp)
