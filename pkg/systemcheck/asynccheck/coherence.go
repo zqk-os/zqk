@@ -76,7 +76,11 @@ func isInvalidatingIssue(issue validation.ValidationIssue) bool {
 	if issue.Tier == 1 {
 		if issue.Category == validation.CategoryInstanceValidation ||
 			issue.Category == validation.CategoryValidationError ||
-			issue.Category == validation.CategoryValidationTimeout {
+			issue.Category == validation.CategoryValidationTimeout ||
+			issue.Category == validation.CategoryReference ||
+			strings.EqualFold(issue.Category, validation.CategoryReference) ||
+			strings.HasPrefix(strings.ToLower(issue.Category), "reference") ||
+			strings.EqualFold(issue.Category, "traceability") {
 			return true
 		}
 		if strings.Contains(issue.Message, msgValidationTimeoutPrefix) {

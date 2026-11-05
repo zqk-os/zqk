@@ -207,6 +207,11 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 		}
 		objData[objects.FieldKeyCategory] = category
 	}
+	if kind == objects.KindAgentTask {
+		if _, ok := objData[objects.FieldKeyArtifacts]; !ok {
+			objData[objects.FieldKeyArtifacts] = []any{}
+		}
+	}
 	applyRelationalFlags(cmd, kind, objData)
 	if err := object.RunCreateWithData(cmd, kind, objData); err != nil {
 		return err

@@ -293,6 +293,9 @@ var draftPlaneNextStatusFields = map[string]map[string]any{
 		objects.FieldKeyStakeholders:             []any{},
 		objects.FieldKeyEstimatedEffort:          "",
 	},
+	objects.KindAgentTask: {
+		objects.FieldKeyArtifacts: []any{},
+	},
 	objects.KindCriteria: {
 		objects.FieldKeyCategory:         "",
 		objects.FieldKeyDescription:      "",

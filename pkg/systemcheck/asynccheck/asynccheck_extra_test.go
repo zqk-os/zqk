@@ -90,6 +90,9 @@ func TestCoherence_Comprehensive(t *testing.T) {
 		{Tier: 1, Message: "validation timeout after 10s"},
 		{Tier: 1, Category: asynccheck.CategoryGhostRef},
 		{Tier: 1, Category: "GHOSTREF"},
+		{Tier: 1, Category: validation.CategoryReference},
+		{Tier: 1, Category: "reference_integrity"},
+		{Tier: 1, Category: "traceability"},
 		{Category: asynccheck.CategoryCacheLag},
 		{Category: asynccheck.CategoryCacheCoherence},
 	}
