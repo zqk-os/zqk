@@ -11,7 +11,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
-	"github.com/zqk-os/zqk/pkg/storage"
 	testkit "github.com/zqk-os/zqk/pkg/testkit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
@@ -25,8 +24,6 @@ import (
 func TestViolationResolution_Registration_MissingID(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
-	t.Cleanup(func() {
-	})
 
 	if _, err := setupSystemTestEnvironmentRoot(t, testRoot); err != nil {
 		t.Fatalf("Failed to setup test environment: %v", err)
@@ -87,11 +84,10 @@ priority_tier: P3
 	}
 
 	// Resolution: Add 'id' field via CLI update
-	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("Failed to create storage: %v", err)
+	fileStorage := proj.FileStorage
+	if fileStorage == nil {
+		t.Fatal("expected PrepareIsolatedTempProject to provide FileStorage")
 	}
-	testkit.RegisterStorageTestCleanup(t, testRoot, fileStorage)
 
 	secCtx := &pkgctx.SecurityContext{
 		AccountID: pkgctx.SystemAccountID,
@@ -145,8 +141,6 @@ priority_tier: P3
 func TestViolationResolution_Registration_MissingKind(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
-	t.Cleanup(func() {
-	})
 
 	if _, err := setupSystemTestEnvironmentRoot(t, testRoot); err != nil {
 		t.Fatalf("Failed to setup test environment: %v", err)
@@ -205,11 +199,10 @@ priority_tier: P3
 	}
 
 	// Resolution: Create object properly via CLI (object without kind can't be read/updated)
-	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("Failed to create storage: %v", err)
+	fileStorage := proj.FileStorage
+	if fileStorage == nil {
+		t.Fatal("expected PrepareIsolatedTempProject to provide FileStorage")
 	}
-	testkit.RegisterStorageTestCleanup(t, testRoot, fileStorage)
 
 	secCtx := &pkgctx.SecurityContext{
 		AccountID: pkgctx.SystemAccountID,
@@ -259,8 +252,6 @@ priority_tier: P3
 func TestViolationResolution_Registration_KindMismatch(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
-	t.Cleanup(func() {
-	})
 
 	if _, err := setupSystemTestEnvironmentRoot(t, testRoot); err != nil {
 		t.Fatalf("Failed to setup test environment: %v", err)
@@ -347,11 +338,10 @@ namespace_id: zqk:kernel
 
 	// Resolution Option 1: Move object to correct directory via CLI Move command
 	// Use test-scoped storage to avoid global wiring and cross-test pollution (audit/ID patterns use testRoot)
-	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("Failed to create storage: %v", err)
+	fileStorage := proj.FileStorage
+	if fileStorage == nil {
+		t.Fatal("expected PrepareIsolatedTempProject to provide FileStorage")
 	}
-	testkit.RegisterStorageTestCleanup(t, testRoot, fileStorage)
 
 	secCtx := &pkgctx.SecurityContext{
 		AccountID: pkgctx.SystemAccountID,
@@ -442,8 +432,6 @@ namespace_id: zqk:kernel
 func TestViolationResolution_Registration_IDFormatError(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
-	t.Cleanup(func() {
-	})
 
 	if _, err := setupSystemTestEnvironmentRoot(t, testRoot); err != nil {
 		t.Fatalf("Failed to setup test environment: %v", err)
@@ -503,11 +491,10 @@ priority_tier: P3
 	}
 
 	// Resolution: Update ID to correct format via CLI
-	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("Failed to create storage: %v", err)
+	fileStorage := proj.FileStorage
+	if fileStorage == nil {
+		t.Fatal("expected PrepareIsolatedTempProject to provide FileStorage")
 	}
-	testkit.RegisterStorageTestCleanup(t, testRoot, fileStorage)
 
 	secCtx := &pkgctx.SecurityContext{
 		AccountID: pkgctx.SystemAccountID,
@@ -558,8 +545,6 @@ priority_tier: P3
 func TestViolationResolution_Registration_FileParseError(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	testRoot := proj.Root
-	t.Cleanup(func() {
-	})
 
 	if _, err := setupSystemTestEnvironmentRoot(t, testRoot); err != nil {
 		t.Fatalf("Failed to setup test environment: %v", err)
@@ -585,12 +570,10 @@ created_at: "2026-01-02T00:00:00Z"
 		t.Fatalf("Failed to create object file: %v", err)
 	}
 
-	// Test-owned storage so cleanup can shut it down and release handles before t.TempDir() cleanup.
-	fileStorage, err := storage.NewFileObjectStorageForTest(testRoot)
-	if err != nil {
-		t.Fatalf("Failed to create test storage: %v", err)
+	fileStorage := proj.FileStorage
+	if fileStorage == nil {
+		t.Fatal("expected PrepareIsolatedTempProject to provide FileStorage")
 	}
-	testkit.RegisterStorageTestCleanup(t, testRoot, fileStorage)
 
 	cmd := &cobra.Command{}
 	cmd.SetContext(cli.WithStorageProvider(cmd.Context(), fileStorage))
