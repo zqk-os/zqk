@@ -44,6 +44,9 @@ func TestIsLeftoverNonKernelRefField(t *testing.T) {
 	if !IsLeftoverNonKernelRefField(FieldKeyDocumentRefs) {
 		t.Fatal("document_refs leftover")
 	}
+	if !IsLeftoverNonKernelRefField(FieldKeyVerifiedArtifactRefs) {
+		t.Fatal("verified_artifact_refs must be leftover non-kernel ref field")
+	}
 	if IsLeftoverNonKernelRefField(FieldKeyDocEntryRefs) {
 		t.Fatal("doc_entry_refs is live")
 	}
