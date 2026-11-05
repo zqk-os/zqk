@@ -335,7 +335,7 @@ func GetSpecEnumValues(kind, fieldName string) []string {
 	// Fallback for criteria category when spec directory is unavailable in isolated unit tests
 	if kind == objects.KindCriteria && fieldName == objects.FieldKeyCategory {
 		canonicalCriteriaCategories := []string{
-			"functional", "non-functional", "acceptance", "test", "performance", "security", "compliance",
+			"functional", "non-functional", "acceptance", "test", "performance", "security", "compliance", "refactor",
 		}
 		specEnumCache.Store(cacheKey, canonicalCriteriaCategories)
 		return canonicalCriteriaCategories
@@ -447,7 +447,7 @@ func (h *UniversalQualityValidationHandler) Validate(ctx context.Context, obj ma
 	// 4. Criteria completeness validation using unified Kernel Predicate DSL
 	if kind == objects.KindCriteria {
 		vals := stringSliceField(obj[objects.FieldKeyCompletenessValidation])
-		isRefactor := IsRefactorOrExtractionCriterion(title)
+		isRefactor := IsRefactorCriterion(obj)
 		hasMeasuredDelta := false
 
 		for _, v := range vals {

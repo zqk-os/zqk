@@ -503,4 +503,56 @@ func TestGoValidator_CriteriaRefactorMeasuredDeltas(t *testing.T) {
 	if hasErr {
 		t.Errorf("Expected no error for refactor criteria with measured deltas")
 	}
+
+	// 4. Functional criteria mentioning extraction or refactor in description passes without measured deltas
+	obj4 := map[string]any{
+		objects.FieldKeyTitle:       "AST symbol extraction from Python source",
+		objects.FieldKeyCategory:    "functional",
+		objects.FieldKeyDescription: "Implement symbol extraction for Python AST and refactor old parser utilities.",
+		objects.FieldKeyCompletenessValidation: []any{
+			"command_exit_code:0",
+		},
+	}
+	errs = gv.validateCustomRules(ctx, objects.KindCriteria, obj4, nil)
+	for _, e := range errs {
+		if e.Rule == "criteria_refactor_measured_deltas" {
+			t.Errorf("Unexpected criteria_refactor_measured_deltas error for functional criteria mentioning extraction/refactor: %v", e)
+		}
+	}
+
+	// 5. Explicit category 'refactor' without measured deltas fails
+	obj5 := map[string]any{
+		objects.FieldKeyTitle:       "Clean up query parser",
+		objects.FieldKeyCategory:    "refactor",
+		objects.FieldKeyDescription: "Refactor query parser to decouple grammar from execution.",
+		objects.FieldKeyCompletenessValidation: []any{
+			"check if file exists",
+		},
+	}
+	errs = gv.validateCustomRules(ctx, objects.KindCriteria, obj5, nil)
+	hasErr = false
+	for _, e := range errs {
+		if e.Rule == "criteria_refactor_measured_deltas" {
+			hasErr = true
+		}
+	}
+	if !hasErr {
+		t.Errorf("Expected criteria_refactor_measured_deltas error for category: refactor without measured deltas")
+	}
+
+	// 6. Explicit category 'refactor' with measured deltas passes
+	obj6 := map[string]any{
+		objects.FieldKeyTitle:       "Clean up query parser",
+		objects.FieldKeyCategory:    "refactor",
+		objects.FieldKeyDescription: "Refactor query parser to decouple grammar from execution.",
+		objects.FieldKeyCompletenessValidation: []any{
+			"measure package file count down by 2",
+		},
+	}
+	errs = gv.validateCustomRules(ctx, objects.KindCriteria, obj6, nil)
+	for _, e := range errs {
+		if e.Rule == "criteria_refactor_measured_deltas" {
+			t.Errorf("Unexpected criteria_refactor_measured_deltas error for category: refactor with measured deltas: %v", e)
+		}
+	}
 }

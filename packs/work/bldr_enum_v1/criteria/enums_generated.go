@@ -15,6 +15,7 @@ const (
 	CategoryFunctional    Category = "functional"
 	CategoryNonFunctional Category = "non-functional"
 	CategoryPerformance   Category = "performance"
+	CategoryRefactor      Category = "refactor"
 	CategorySecurity      Category = "security"
 	CategoryTest          Category = "test"
 )

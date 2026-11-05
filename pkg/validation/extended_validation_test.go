@@ -148,6 +148,65 @@ func TestUniversalQualityValidationHandler(t *testing.T) {
 	if len(errs) != 0 {
 		t.Errorf("expected 0 errors for valid refactor criteria, got %v", errs)
 	}
+
+	// 6. Functional criteria with description mentioning extraction/refactor passes without measured deltas
+	functionalObj := map[string]any{
+		objects.FieldKeyID:          "CRIT-FUNC-001",
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyTitle:       "AST symbol extraction from Python source",
+		objects.FieldKeyDescription: "Substantive description mentioning extraction and refactoring of symbols.",
+		objects.FieldKeyCategory:    "functional",
+		objects.FieldKeyCompletenessValidation: []string{
+			"code exists",
+		},
+	}
+	errs = handler.Validate(ctx, functionalObj, nil)
+	for _, e := range errs {
+		if e.Rule == "criteria_refactor_measured_deltas" {
+			t.Errorf("unexpected criteria_refactor_measured_deltas error for functional category: %v", e)
+		}
+	}
+
+	// 7. Explicit category 'refactor' without measured deltas fails closed
+	refactorCatObj := map[string]any{
+		objects.FieldKeyID:          "CRIT-REFACTOR-003",
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyTitle:       "Extract parser to isolated package",
+		objects.FieldKeyDescription: "Substantive description for refactoring the parser component.",
+		objects.FieldKeyCategory:    "refactor",
+		objects.FieldKeyCompletenessValidation: []string{
+			"code exists",
+		},
+	}
+	errs = handler.Validate(ctx, refactorCatObj, nil)
+	hasRefactorDeltaErr := false
+	for _, e := range errs {
+		if e.Rule == "criteria_refactor_measured_deltas" {
+			hasRefactorDeltaErr = true
+			break
+		}
+	}
+	if !hasRefactorDeltaErr {
+		t.Errorf("expected criteria_refactor_measured_deltas error for category: refactor without measured deltas, got %v", errs)
+	}
+
+	// 8. Explicit category 'refactor' with measured deltas passes
+	refactorCatValidObj := map[string]any{
+		objects.FieldKeyID:          "CRIT-REFACTOR-004",
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyTitle:       "Extract parser to isolated package",
+		objects.FieldKeyDescription: "Substantive description for refactoring the parser component.",
+		objects.FieldKeyCategory:    "refactor",
+		objects.FieldKeyCompletenessValidation: []string{
+			"measure package count down by 1",
+		},
+	}
+	errs = handler.Validate(ctx, refactorCatValidObj, nil)
+	for _, e := range errs {
+		if e.Rule == "criteria_refactor_measured_deltas" {
+			t.Errorf("unexpected criteria_refactor_measured_deltas error for category: refactor with measured deltas: %v", e)
+		}
+	}
 }
 
 // customMockHandler is a helper for concurrency testing
