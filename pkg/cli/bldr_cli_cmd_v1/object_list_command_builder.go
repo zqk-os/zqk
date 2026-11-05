@@ -21,6 +21,7 @@ func NewObjectListCommandBuilder() *cobra.Command {
 	help.WithDescriptionLines("")
 	help.WithDescriptionLines("If no kind is specified, shows available object kinds.")
 	help.AddExample("List all backlog items", "%s list backlog_item")
+	help.AddExample("List using --kind flag", "%s list --kind backlog_item")
 	help.AddExample("List with filtering", "%s list backlog_item --filter status=exploring")
 	help.AddExample("List a specific namespace", "%s list team --namespace tenant:acme")
 	help.AddExample("List across namespaces", "%s list team --federated")

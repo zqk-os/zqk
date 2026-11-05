@@ -41,6 +41,13 @@ func TestNewListCmd_Structure(t *testing.T) {
 	if cmd.Annotations[AnnotationKindValidate] != KindValidatePositional0Opt {
 		t.Errorf("expected KindValidatePositional0Opt annotation")
 	}
+	f := cmd.Flags().Lookup("kind")
+	if f == nil {
+		t.Fatal("expected --kind flag to be registered on list command")
+	}
+	if f.DefValue != "" {
+		t.Errorf("expected default value empty, got %q", f.DefValue)
+	}
 }
 
 func TestInProcess_List_SingleKind_Matrix(t *testing.T) {
@@ -221,5 +228,70 @@ func TestList_UnitHelpers(t *testing.T) {
 	}
 	if ShouldSkipInternalKind("backlog_item", false) {
 		t.Error("expected backlog_item never to be skipped")
+	}
+}
+
+func TestObjectList_KindFlagSymmetry(t *testing.T) {
+	tempDir, provider, secCtx, cleanup := setupInProcessTestContext(t)
+	defer cleanup()
+
+	b1 := plannedBLI("BLI-KND-001", "Kind Symmetry Item", map[string]any{objects.FieldKeyPriority: "medium"})
+	storage.CreateCASVisible(t, provider, stdctx.Background(), secCtx, b1, objectStatusPlanned)
+
+	// 1. Positional only: zqk object list backlog_item
+	outPos, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item")
+	if err != nil || !strings.Contains(outPos, "BLI-KND-001") {
+		t.Fatalf("positional list failed: err=%v, out=%s", err, outPos)
+	}
+
+	// 2. Flag only: zqk object list --kind backlog_item
+	outFlag, err := executeObjectCommand(t, tempDir, provider, "list", "--kind", "backlog_item")
+	if err != nil || !strings.Contains(outFlag, "BLI-KND-001") {
+		t.Fatalf("flag list failed: err=%v, out=%s", err, outFlag)
+	}
+
+	// 3. Matching both (identical): zqk object list backlog_item --kind backlog_item
+	outBoth, err := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--kind", "backlog_item")
+	if err != nil || !strings.Contains(outBoth, "BLI-KND-001") {
+		t.Fatalf("matching both list failed: err=%v, out=%s", err, outBoth)
+	}
+
+	// 4. Matching both (synonym alias + canonical): zqk object list bli --kind backlog_item
+	outSynonym, err := executeObjectCommand(t, tempDir, provider, "list", "bli", "--kind", "backlog_item")
+	if err != nil || !strings.Contains(outSynonym, "BLI-KND-001") {
+		t.Fatalf("matching synonym list failed: err=%v, out=%s", err, outSynonym)
+	}
+
+	// 5. Mismatching contradiction: zqk object list backlog_item --kind requirement
+	_, errMismatch := executeObjectCommand(t, tempDir, provider, "list", "backlog_item", "--kind", "requirement")
+	if errMismatch == nil {
+		t.Fatal("expected error for contradicting positional and --kind flag, got nil")
+	}
+	if !strings.Contains(errMismatch.Error(), "contradicts") {
+		t.Fatalf("expected error mentioning contradicts, got: %v", errMismatch)
+	}
+
+	// 6. Invalid kind in flag: zqk object list --kind nonexistent_kind_xyz
+	_, errInvalidFlag := executeObjectCommand(t, tempDir, provider, "list", "--kind", "nonexistent_kind_xyz")
+	if errInvalidFlag == nil {
+		t.Fatal("expected error for invalid kind flag, got nil")
+	}
+	if !strings.Contains(errInvalidFlag.Error(), "unknown kind") && !strings.Contains(errInvalidFlag.Error(), "invalid kind") {
+		t.Fatalf("expected unknown/invalid kind error, got: %v", errInvalidFlag)
+	}
+
+	// 7. Invalid kind in positional: zqk object list nonexistent_kind_xyz
+	_, errInvalidPos := executeObjectCommand(t, tempDir, provider, "list", "nonexistent_kind_xyz")
+	if errInvalidPos == nil {
+		t.Fatal("expected error for invalid positional kind, got nil")
+	}
+	if !strings.Contains(errInvalidPos.Error(), "unknown kind") && !strings.Contains(errInvalidPos.Error(), "invalid kind") {
+		t.Fatalf("expected unknown/invalid kind error, got: %v", errInvalidPos)
+	}
+
+	// 8. Neither provided: zqk object list (default lists all kinds)
+	outAll, errAll := executeObjectCommand(t, tempDir, provider, "list")
+	if errAll != nil || !strings.Contains(outAll, "BLI-KND-001") {
+		t.Fatalf("default list all kinds failed: err=%v, out=%s", errAll, outAll)
 	}
 }

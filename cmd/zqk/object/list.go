@@ -35,6 +35,7 @@ func NewListCmd() *cobra.Command {
 	_ = cmd.RegisterFlagCompletionFunc("sort-by", completeSortBy)
 	_ = cmd.RegisterFlagCompletionFunc("filter", completeFilterField)
 	_ = cmd.RegisterFlagCompletionFunc("fields", completeListProjectFields)
+	_ = cmd.RegisterFlagCompletionFunc("kind", kindCompletion)
 
 	ensureCmdAnnotations(cmd)
 	cmd.Annotations[AnnotationKindValidate] = KindValidatePositional0Opt
@@ -80,18 +81,20 @@ func runList(cmd *cobra.Command, args []string) error {
 
 		kind, ok := kindCanonicalFromPRERun(cmd)
 		if !ok {
-			rawKind := ""
-			if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
-				rawKind = strings.TrimSpace(args[0])
-			} else if k, err := cmd.Flags().GetString("kind"); err == nil && strings.TrimSpace(k) != "" {
-				rawKind = strings.TrimSpace(k)
+			pos := ""
+			if len(args) > 0 {
+				pos = args[0]
 			}
-			if rawKind != "" {
-				var err error
-				kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), rawKind)
-				if err != nil {
-					return cli.Guard(cmd).Err(err).Return()
-				}
+			flag := ""
+			if k, err := cmd.Flags().GetString("kind"); err == nil {
+				flag = k
+			}
+			var err error
+			kind, err = cli.ResolveKindFromPositionalAndFlag(proc.ProjectRoot(), pos, flag)
+			if err != nil {
+				return cli.Guard(cmd).Err(err).Return()
+			}
+			if kind != "" {
 				ok = true
 			}
 		}
