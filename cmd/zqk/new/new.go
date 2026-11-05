@@ -76,7 +76,7 @@ func NewNewCmd() *cobra.Command {
 	root.AddCommand(newKindConvenienceCmd(objects.KindPriorityPlan, "plan", "pri"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindRequirement, "req"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindCriteria, "crit"))
-	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tc"))
+	root.AddCommand(newKindConvenienceCmd(objects.KindTestCase, "tc", "tst"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindBacklogItem, "bli"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindMilestone, "mil"))
 	root.AddCommand(newKindConvenienceCmd(objects.KindTechnicalDebt, "td", "techdebt"))
@@ -301,7 +301,7 @@ func parseRelationalRefs(raw string) []string {
 }
 
 func appendUniqueStrings(slice []string, items ...string) []string {
-	seen := make(map[string]struct{}, len(slice)+len(items))
+	seen := make(map[string]struct{})
 	for _, s := range slice {
 		seen[s] = struct{}{}
 	}
