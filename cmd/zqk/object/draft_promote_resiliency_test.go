@@ -257,3 +257,89 @@ func TestDraftPromote_CrossPlaneRequirementPruned(t *testing.T) {
 		t.Fatalf("IsDraftPlaneOnly must report false for promoted requirement %s", idReq)
 	}
 }
+
+func TestDraftPromote_PartialBatchFailure_PrunesSucceededDrafts(t *testing.T) {
+	// Not t.Parallel(): SetupTestEnvironment sets process-global ZQK_TEST_ROOT.
+	env := SetupTestEnvironment(t)
+	projectRoot := env.TestRoot
+
+	stor, err := storage.NewFileObjectStorage(projectRoot)
+	if err != nil {
+		t.Fatalf("failed to init storage: %v", err)
+	}
+
+	secCtx := pkgctx.NewSystemSecurityContext()
+	ctx := context.Background()
+
+	// Draft A: Valid criteria draft that will succeed promotion and materialize to CAS.
+	idA := "CRIT-PARTIAL-SUCCEED-001"
+	objA := map[string]any{
+		objects.FieldKeyID:          idA,
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyTitle:       "Valid Resilient Draft Acceptance Criteria",
+		objects.FieldKeyDescription: "Substantive description for resilient acceptance criteria verification.",
+		"category":                  "functional",
+		objects.FieldKeyStatus:      "conceptual",
+	}
+	if err := stor.Create(ctx, secCtx, objA); err != nil {
+		t.Fatalf("failed to create draft item A: %v", err)
+	}
+
+	// Draft B: Invalid criteria draft failing schema/preconditions (missing category, short description)
+	idB := "CRIT-PARTIAL-FAIL-002"
+	objB := map[string]any{
+		objects.FieldKeyID:          idB,
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyTitle:       "Invalid Criteria Missing Category and Short Description",
+		objects.FieldKeyDescription: "Short",
+		"category":                  "",
+		objects.FieldKeyStatus:      "conceptual",
+	}
+	draftPathB := storage.ObjectDraftPlanePath(projectRoot, objects.KindCriteria, idB)
+	_ = fileutil.MkdirAll(filepath.Dir(draftPathB), 0755)
+	dataB, err := yaml.Marshal(objB)
+	if err != nil {
+		t.Fatalf("marshal objB: %v", err)
+	}
+	if err := fileutil.WriteFile(draftPathB, dataB, 0644); err != nil {
+		t.Fatalf("failed to write draft item B: %v", err)
+	}
+
+	draftPathA := storage.ObjectDraftPlanePath(projectRoot, objects.KindCriteria, idA)
+	if !storage.ObjectDraftPlaneExists(projectRoot, objects.KindCriteria, idA) {
+		t.Fatalf("expected draft A file to exist before promote: %s", draftPathA)
+	}
+	if !storage.ObjectDraftPlaneExists(projectRoot, objects.KindCriteria, idB) {
+		t.Fatalf("expected draft B file to exist before promote: %s", draftPathB)
+	}
+
+	// Execute draft promote across the batch
+	cmd := NewDraftPromoteCmd()
+	cmd.SetArgs([]string{"--all", "--dry-run=false"})
+	promoteErr := cmd.Execute()
+	if promoteErr == nil {
+		t.Fatal("expected draft promote to return error due to draft B failure, got nil")
+	}
+
+	// Assert Draft A succeeded: materialized in CAS, removed from draft plane disk
+	if !storage.CasBackedObjectID(projectRoot, objects.KindCriteria, idA) {
+		t.Fatalf("expected draft A (%s) to be materialized in CAS storage", idA)
+	}
+	if storage.ObjectDraftPlaneExists(projectRoot, objects.KindCriteria, idA) {
+		t.Fatalf("expected draft A (%s) to be pruned from draft plane", idA)
+	}
+	if _, statErr := fileutil.Stat(draftPathA); !fileutil.IsNotExist(statErr) {
+		t.Fatalf("expected draft A file at %s to be deleted from disk, but it still exists", draftPathA)
+	}
+
+	// Assert Draft B failed: not in CAS, remains on draft plane disk for repair
+	if storage.CasBackedObjectID(projectRoot, objects.KindCriteria, idB) {
+		t.Fatalf("expected draft B (%s) NOT to be materialized in CAS storage", idB)
+	}
+	if !storage.ObjectDraftPlaneExists(projectRoot, objects.KindCriteria, idB) {
+		t.Fatalf("expected draft B (%s) draft file to remain on draft plane for correction", idB)
+	}
+	if _, statErr := fileutil.Stat(draftPathB); statErr != nil {
+		t.Fatalf("expected draft B file to exist at %s, got error: %v", draftPathB, statErr)
+	}
+}

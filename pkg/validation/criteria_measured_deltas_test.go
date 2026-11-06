@@ -45,13 +45,22 @@ func TestIsRefactorCriterion(t *testing.T) {
 	// Nil object
 	assert.False(t, IsRefactorCriterion(nil))
 
-	// Explicit category 'refactor' is always a refactor criterion
+	// Explicit category 'refactor' is always a refactor criterion (case-insensitive)
 	assert.True(t, IsRefactorCriterion(map[string]any{
 		objects.FieldKeyCategory: "refactor",
 		objects.FieldKeyTitle:    "Any title whatsoever",
 	}))
+	assert.True(t, IsRefactorCriterion(map[string]any{
+		objects.FieldKeyCategory: "Refactor",
+		objects.FieldKeyTitle:    "Title with mixed case category",
+	}))
+	assert.True(t, IsRefactorCriterion(map[string]any{
+		objects.FieldKeyCategory: "  REFACTOR  ",
+		objects.FieldKeyTitle:    "Title with uppercase padded category",
+	}))
 
-	// Explicit category 'functional' is never a refactor criterion, even if title or description mentions refactor/extraction
+	// Explicit categories other than refactor (functional, performance, security, etc.)
+	// are never refactor criteria, even if title or description mentions refactor/extraction
 	assert.False(t, IsRefactorCriterion(map[string]any{
 		objects.FieldKeyCategory:    "functional",
 		objects.FieldKeyTitle:       "AST symbol extraction from Python source",
@@ -61,6 +70,21 @@ func TestIsRefactorCriterion(t *testing.T) {
 		objects.FieldKeyCategory:    "functional",
 		objects.FieldKeyTitle:       "Refactor storage layer",
 		objects.FieldKeyDescription: "Prose mentioning refactoring.",
+	}))
+	assert.False(t, IsRefactorCriterion(map[string]any{
+		objects.FieldKeyCategory:    "functional",
+		objects.FieldKeyTitle:       "Legacy helper wrapper",
+		objects.FieldKeyDescription: "Refactor legacy helper to integrate with new pipeline.",
+	}))
+	assert.False(t, IsRefactorCriterion(map[string]any{
+		objects.FieldKeyCategory:    "performance",
+		objects.FieldKeyTitle:       "Optimize legacy helper path",
+		objects.FieldKeyDescription: "Refactor legacy helper to eliminate allocs.",
+	}))
+	assert.False(t, IsRefactorCriterion(map[string]any{
+		objects.FieldKeyCategory:    "security",
+		objects.FieldKeyTitle:       "Sanitize credentials",
+		objects.FieldKeyDescription: "Refactor legacy helper to avoid logging secrets.",
 	}))
 	assert.False(t, IsRefactorCriterion(map[string]any{
 		objects.FieldKeyCategory: "acceptance",
@@ -120,4 +144,94 @@ func TestValidateCriteriaRefactorMeasuredDeltas_Scoping(t *testing.T) {
 	}
 	err = ValidateCriteriaRefactorMeasuredDeltas(refactorCritWithDelta)
 	assert.Nil(t, err, "Refactor criteria with measured delta assertions must pass")
+}
+
+func TestMeasuredDeltas_RefactorValidationPrecision(t *testing.T) {
+	t.Parallel()
+
+	// 1. Functional criterion with description containing "Refactor legacy helper" without measured deltas passes validation cleanly
+	functionalCrit := map[string]any{
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyCategory:    "functional",
+		objects.FieldKeyTitle:       "Execute legacy helper adapter",
+		objects.FieldKeyDescription: "Refactor legacy helper integration to support async context dispatch.",
+		objects.FieldKeyCompletenessValidation: []string{
+			"command_exit_code:0",
+		},
+	}
+	assert.Nil(t, ValidateCriteriaRefactorMeasuredDeltas(functionalCrit),
+		"Functional criterion with 'Refactor legacy helper' description must pass validation without measured deltas")
+
+	// Verify additional categories with refactor/extract prose in description pass cleanly
+	categories := []string{"performance", "security", "integration", "acceptance"}
+	for _, cat := range categories {
+		crit := map[string]any{
+			objects.FieldKeyKind:        objects.KindCriteria,
+			objects.FieldKeyCategory:    cat,
+			objects.FieldKeyTitle:       "Optimize legacy helper routines",
+			objects.FieldKeyDescription: "Refactor legacy helper methods to eliminate allocations under load.",
+			objects.FieldKeyCompletenessValidation: []string{
+				"command_exit_code:0",
+			},
+		}
+		assert.Nil(t, ValidateCriteriaRefactorMeasuredDeltas(crit),
+			"Criterion with category %q must pass validation without measured deltas", cat)
+	}
+
+	// 2. Criterion with category "refactor" without measured deltas is rejected as expected
+	refactorNoDelta := map[string]any{
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyCategory:    "refactor",
+		objects.FieldKeyTitle:       "Extract legacy helper to standalone package",
+		objects.FieldKeyDescription: "Refactor legacy helper to remove circular dependencies.",
+		objects.FieldKeyCompletenessValidation: []string{
+			"code exists in package",
+		},
+	}
+	err := ValidateCriteriaRefactorMeasuredDeltas(refactorNoDelta)
+	require.NotNil(t, err, "Refactor category criterion without measured deltas must fail")
+	assert.Equal(t, RuleCriteriaRefactorMeasuredDeltas, err.Rule)
+	assert.Equal(t, MsgCriteriaRefactorMeasuredDeltas, err.Message)
+
+	// Also check mixed-case category "Refactor"
+	refactorMixedCaseNoDelta := map[string]any{
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyCategory:    "Refactor",
+		objects.FieldKeyTitle:       "Extract legacy helper to standalone package",
+		objects.FieldKeyDescription: "Refactor legacy helper to remove circular dependencies.",
+		objects.FieldKeyCompletenessValidation: []string{
+			"code exists in package",
+		},
+	}
+	err = ValidateCriteriaRefactorMeasuredDeltas(refactorMixedCaseNoDelta)
+	require.NotNil(t, err, "Mixed-case category 'Refactor' without measured deltas must fail")
+	assert.Equal(t, RuleCriteriaRefactorMeasuredDeltas, err.Rule)
+	assert.Equal(t, MsgCriteriaRefactorMeasuredDeltas, err.Message)
+
+	// 3. Criterion with category "refactor" with valid measured deltas passes
+	refactorWithDelta := map[string]any{
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyCategory:    "refactor",
+		objects.FieldKeyTitle:       "Extract legacy helper to standalone package",
+		objects.FieldKeyDescription: "Refactor legacy helper to remove circular dependencies.",
+		objects.FieldKeyCompletenessValidation: []string{
+			"measure package file count down by 2",
+			"assert symbol LegacyHelper absent from old package",
+		},
+	}
+	assert.Nil(t, ValidateCriteriaRefactorMeasuredDeltas(refactorWithDelta),
+		"Refactor category criterion with valid measured deltas must pass")
+
+	// Mixed-case category "REFACTOR" with valid measured deltas passes
+	refactorMixedCaseWithDelta := map[string]any{
+		objects.FieldKeyKind:        objects.KindCriteria,
+		objects.FieldKeyCategory:    "REFACTOR",
+		objects.FieldKeyTitle:       "Extract legacy helper to standalone package",
+		objects.FieldKeyDescription: "Refactor legacy helper to remove circular dependencies.",
+		objects.FieldKeyCompletenessValidation: []string{
+			"ast_semantic_match:type LegacyHelper interface{}",
+		},
+	}
+	assert.Nil(t, ValidateCriteriaRefactorMeasuredDeltas(refactorMixedCaseWithDelta),
+		"Uppercase category 'REFACTOR' with valid measured deltas must pass")
 }
