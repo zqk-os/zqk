@@ -99,4 +99,5 @@ var (
 	ErrPathTraversalDetected = errfmt.Errorf("router: path traversal sequence detected")
 	ErrReadOnlyViolation     = errfmt.Errorf("router: write operation prohibited in read-only scope")
 	ErrNilHandler            = errfmt.Errorf("router: handler cannot be nil")
+	ErrNilRouteRequest       = errfmt.Errorf("router: route request cannot be nil")
 )

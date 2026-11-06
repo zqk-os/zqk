@@ -309,6 +309,9 @@ const SyncExternalAgentsJobID = "SCH-sync-agents"
 // The kernel steward (sentinel stage) runs under this job on its timer interval.
 const CapOrchestratorJobID = "SCH-cap-orchestrator"
 
+// ToolUtilizationAggregatorJobID is the canonical ID for ambient tool utilization aggregation (SCH-tool-util).
+const ToolUtilizationAggregatorJobID = "SCH-tool-util"
+
 // persistentMaintenanceJobIDs contains well-known IDs for jobs that run on their own timer schedules.
 // These jobs are never truly "missing" — if a trigger queue entry for one is found stale (job not in
 // cache after reload), it was likely already run by its cron timer or briefly absent during a reload
@@ -321,6 +324,7 @@ var persistentMaintenanceJobIDs = map[string]bool{
 	SchedulerEventsAggregationJobID: true, // SCH-evag: events aggregation
 	SyncExternalAgentsJobID:         true, // SCH-sync-agents: sync_external_agents (*/5 * * * *)
 	CapOrchestratorJobID:            true, // SCH-cap-orchestrator: CAP orchestrator + kernel steward (timer)
+	ToolUtilizationAggregatorJobID:  true, // SCH-tool-util: ambient tool utilization aggregation (*/15 * * * *)
 }
 
 // isPersistentMaintenanceJob returns true if the job ID is a known persistent timer-based

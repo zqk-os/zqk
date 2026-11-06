@@ -2,6 +2,7 @@ package coordination
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
@@ -24,16 +25,27 @@ func runCoordinatorRouterSync(emitCtx context.Context, work func(ctx context.Con
 // returns (e.g. defer cancel() in Emit), the async goroutine may observe an already-cancelled
 // context before running—router.Emit never runs. For async stages, cancel must be deferred inside
 // the callback passed to StartWithContext, not at Emit scope. This helper encodes that pairing.
-func runCoordinatorRouterAsync(emitCtx context.Context, goroutineName, goroutinePurpose string, work func(ctx context.Context)) {
+func runCoordinatorRouterAsync(emitCtx context.Context, goroutineName, goroutinePurpose string, work func(ctx context.Context)) bool {
 	var nilCoord *Coordinator
-	nilCoord.runRouterAsync(emitCtx, goroutineName, goroutinePurpose, work)
+	return nilCoord.runRouterAsync(emitCtx, goroutineName, goroutinePurpose, work)
 }
 
-// runRouterAsync schedules router work on a labeled goroutine tracked by c.wg.
-func (c *Coordinator) runRouterAsync(emitCtx context.Context, goroutineName, goroutinePurpose string, work func(ctx context.Context)) {
+// runRouterAsync schedules router work on a labeled goroutine tracked by c's active WaitGroup.
+// If the coordinator is draining, new async tasks are rejected without calling Add on a waiting WaitGroup,
+// avoiding "WaitGroup misuse: Add called concurrently with Wait" panics.
+func (c *Coordinator) runRouterAsync(emitCtx context.Context, goroutineName, goroutinePurpose string, work func(ctx context.Context)) bool {
+	var wg *sync.WaitGroup
 	if c != nil {
-		c.wg.Add(1)
+		c.lifecycleMu.RLock()
+		if c.draining.Load() {
+			c.lifecycleMu.RUnlock()
+			return false
+		}
+		wg = c.getWG()
+		wg.Add(1)
+		c.lifecycleMu.RUnlock()
 	}
+
 	routerCtx, cancel := context.WithTimeout(emitCtx, coordinatorRouterTimeout)
 	bud := goroutinelabels.DefaultBudget()
 	b := goroutinelabels.NewGoroutine(goroutineName, goroutinePurpose)
@@ -41,11 +53,12 @@ func (c *Coordinator) runRouterAsync(emitCtx context.Context, goroutineName, gor
 		b = b.WithBudget(bud)
 	}
 	b.StartWithContext(routerCtx, func(ctx context.Context) error {
-		if c != nil {
-			defer c.wg.Done()
+		if wg != nil {
+			defer wg.Done()
 		}
 		defer cancel()
 		work(ctx)
 		return nil
 	})
+	return true
 }

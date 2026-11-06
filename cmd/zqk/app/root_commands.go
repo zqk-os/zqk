@@ -48,6 +48,7 @@ import (
 	querycmd "github.com/zqk-os/zqk/cmd/zqk/query"
 	"github.com/zqk-os/zqk/cmd/zqk/reports"
 	rollbackcmd "github.com/zqk-os/zqk/cmd/zqk/rollback"
+	routercmd "github.com/zqk-os/zqk/cmd/zqk/router"
 	"github.com/zqk-os/zqk/cmd/zqk/scheduler"
 	"github.com/zqk-os/zqk/cmd/zqk/semantic"
 	"github.com/zqk-os/zqk/cmd/zqk/spec"
@@ -460,6 +461,11 @@ func registerCommands() {
 	vectorCmdInst := vectorcmd.NewVectorCmd()
 	vectorCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(vectorCmdInst)
+
+	// Universal Tool & Model Gradient Router (zqk router)
+	routerCmdInst := routercmd.NewRouterCmd()
+	routerCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(routerCmdInst)
 
 	// Only available in zqk-admin binary
 	isAdminBinary := false
