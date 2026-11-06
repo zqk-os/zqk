@@ -146,6 +146,13 @@ func TestCoverageExpansion_IsCachedPlanStale(t *testing.T) {
 	assert.True(t, IsCachedPlanStale(ctx, mock, &WhatsNextPriorityPlan{ID: "PRI-1", Status: "in_progress"}))
 }
 
+func writePayloadFile(t *testing.T, targetPath string, payload *WhatsNextLitePayload) {
+	t.Helper()
+	data, err := json.MarshalIndent(payload, "", "  ")
+	require.NoError(t, err)
+	require.NoError(t, fileutil.WriteFile(targetPath, data, paths.FilePerm644))
+}
+
 func TestCoverageExpansion_GetOrRecoverPayload_FreshAndInvalidation(t *testing.T) {
 	t.Parallel()
 
@@ -179,9 +186,7 @@ func TestCoverageExpansion_GetOrRecoverPayload_FreshAndInvalidation(t *testing.T
 			},
 		},
 	}
-	data, err := json.MarshalIndent(payload, "", "  ")
-	require.NoError(t, err)
-	require.NoError(t, fileutil.WriteFile(targetPath, data, paths.FilePerm644))
+	writePayloadFile(t, targetPath, payload)
 
 	freshPayload, err := GetOrRecoverPayload(ctx, nil, tempDir, 10*time.Minute)
 	require.NoError(t, err)
@@ -202,9 +207,7 @@ func TestCoverageExpansion_GetOrRecoverPayload_FreshAndInvalidation(t *testing.T
 			Status: "completed",
 		},
 	}
-	data, err = json.MarshalIndent(payload, "", "  ")
-	require.NoError(t, err)
-	require.NoError(t, fileutil.WriteFile(targetPath, data, paths.FilePerm644))
+	writePayloadFile(t, targetPath, payload)
 
 	stalePayload, err := GetOrRecoverPayload(ctx, nil, tempDir, 10*time.Minute)
 	require.NoError(t, err)
@@ -239,9 +242,7 @@ func TestCoverageExpansion_GetOrRecoverPayload_Fallback(t *testing.T) {
 			},
 		},
 	}
-	data, err := json.MarshalIndent(payload, "", "  ")
-	require.NoError(t, err)
-	require.NoError(t, fileutil.WriteFile(targetPath, data, paths.FilePerm644))
+	writePayloadFile(t, targetPath, payload)
 
 	// Create quiescent WAL file modified before MaterializedAt
 	walPath := filepath.Join(tempDir, paths.ProjectDataDir, paths.WalDir, "lifecycle_events.wal")
@@ -260,10 +261,7 @@ func TestCoverageExpansion_GetOrRecoverPayload_Fallback(t *testing.T) {
 	newTime := time.Now().Add(10 * time.Minute)
 	require.NoError(t, fileutil.Chtimes(walPath, newTime, newTime))
 	payload.MaterializedAt = time.Now().Add(-1 * time.Hour)
-	var marshalErr error
-	data, marshalErr = json.MarshalIndent(payload, "", "  ")
-	require.NoError(t, marshalErr)
-	require.NoError(t, fileutil.WriteFile(targetPath, data, paths.FilePerm644))
+	writePayloadFile(t, targetPath, payload)
 
 	staleWalPayload, err := GetOrRecoverPayload(ctx, nil, tempDir, 10*time.Minute)
 	require.NoError(t, err)
