@@ -16,6 +16,63 @@ var listFieldTypeNames = map[string]struct{}{
 	"list[str]": {},
 }
 
+// CoerceUpdateFields applies canonicalization and normalization to update payloads
+// before schema validation, without pruning empty scalar ref fields (which represent
+// intentional unlink operations).
+func CoerceUpdateFields(kind string, updates map[string]any) {
+	if updates == nil {
+		return
+	}
+	if kind == KindCriteria {
+		CanonicalizeCriteriaFieldKeys(updates)
+	}
+	NormalizePriority(kind, updates)
+	if kind == KindPersona || (kind == "" && GetString(updates, FieldKeyKind) == KindPersona) {
+		CoercePersonaTitleAndName(updates)
+	}
+	if kind == KindRequirement || (kind == "" && GetString(updates, FieldKeyKind) == KindRequirement) {
+		delete(updates, "type")
+		delete(updates, "requirement_type")
+		delete(updates, "requirement_refs-")
+		delete(updates, "estimated_effort")
+		delete(updates, "actual_effort")
+	}
+	if kind == KindTestCase || (kind == "" && GetString(updates, FieldKeyKind) == KindTestCase) {
+		delete(updates, "goal_refs")
+		delete(updates, "requirement_refs-")
+	}
+	if kind == KindPriorityPlan || (kind == "" && GetString(updates, FieldKeyKind) == KindPriorityPlan) {
+		CoercePriorityPlanRefs(updates)
+	}
+	if v, ok := updates["commit_refs"]; ok {
+		k := kind
+		if k == "" {
+			k = GetString(updates, FieldKeyKind)
+		}
+		if k == KindBacklogItem {
+			if _, hasHashes := updates[FieldKeyCommitHashes]; !hasHashes {
+				updates[FieldKeyCommitHashes] = v
+			}
+		}
+		delete(updates, "commit_refs")
+	}
+	names := refListFieldNames(updates)
+	if fr := GetGlobalFieldRegistry(); fr != nil {
+		if kf, ok := fr.GetFieldsForKindIfLoaded(kind); ok && kf != nil {
+			for i := range kf.AllFields {
+				if isListFieldType(kf.AllFields[i].Type) {
+					names[kf.AllFields[i].Name] = struct{}{}
+				}
+			}
+		}
+	}
+	for name := range names {
+		if v, ok := updates[name]; ok {
+			updates[name] = CoerceToStringList(v)
+		}
+	}
+}
+
 // CoerceMutationFields rewrites construction footguns before validate/persist:
 // a bare string on a *_refs (or spec list) field becomes a one-element list, and
 // criteria type= / criteria_type= is remapped onto category (CanonicalizeCriteriaFieldKeys).
@@ -28,57 +85,7 @@ func CoerceMutationFields(kind string, obj map[string]any) {
 	if obj == nil {
 		return
 	}
-	if kind == KindCriteria {
-		CanonicalizeCriteriaFieldKeys(obj)
-	}
-	if kind == KindBacklogItem || (kind == "" && GetString(obj, FieldKeyKind) == KindBacklogItem) {
-		CoerceBacklogItemPriorityAndTier(obj)
-	}
-	if kind == KindPersona || (kind == "" && GetString(obj, FieldKeyKind) == KindPersona) {
-		CoercePersonaTitleAndName(obj)
-	}
-	if kind == KindRequirement || (kind == "" && GetString(obj, FieldKeyKind) == KindRequirement) {
-		CoerceRequirementPriority(obj)
-		delete(obj, "type")
-		delete(obj, "requirement_type")
-		delete(obj, "requirement_refs-")
-		delete(obj, "estimated_effort")
-		delete(obj, "actual_effort")
-	}
-	if kind == KindTestCase || (kind == "" && GetString(obj, FieldKeyKind) == KindTestCase) {
-		delete(obj, "goal_refs")
-		delete(obj, "requirement_refs-")
-	}
-	if kind == KindPriorityPlan || (kind == "" && GetString(obj, FieldKeyKind) == KindPriorityPlan) {
-		CoercePriorityPlanRefs(obj)
-	}
-	if v, ok := obj["commit_refs"]; ok {
-		k := kind
-		if k == "" {
-			k = GetString(obj, FieldKeyKind)
-		}
-		if k == KindBacklogItem {
-			if _, hasHashes := obj[FieldKeyCommitHashes]; !hasHashes {
-				obj[FieldKeyCommitHashes] = v
-			}
-		}
-		delete(obj, "commit_refs")
-	}
-	names := refListFieldNames(obj)
-	if fr := GetGlobalFieldRegistry(); fr != nil {
-		if kf, ok := fr.GetFieldsForKindIfLoaded(kind); ok && kf != nil {
-			for i := range kf.AllFields {
-				if isListFieldType(kf.AllFields[i].Type) {
-					names[kf.AllFields[i].Name] = struct{}{}
-				}
-			}
-		}
-	}
-	for name := range names {
-		if v, ok := obj[name]; ok {
-			obj[name] = CoerceToStringList(v)
-		}
-	}
+	CoerceUpdateFields(kind, obj)
 	pruneEmptyScalarRefFields(obj)
 }
 

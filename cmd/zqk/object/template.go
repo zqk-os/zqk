@@ -272,6 +272,9 @@ func getPlaceholderValue(field *objects.FieldInfo, originStatus string) string {
 	}
 
 	if isReferenceField(field) {
+		if field.Type == "list" || field.Type == "array" || field.Type == "slice" {
+			return "[]"
+		}
 		if field.SemanticType != emptyValue && field.SemanticType != "reference" {
 			return fmt.Sprintf("\"# %s reference (e.g., %s:ID-###)\"", field.SemanticType, field.SemanticType)
 		}
@@ -311,7 +314,11 @@ func isReferenceField(field *objects.FieldInfo) bool {
 	if field == nil {
 		return false
 	}
-	return field.Type == "reference" || field.SemanticType == "reference" || strings.HasSuffix(field.Name, "_ref") || (strings.HasSuffix(field.Name, "_id") && field.Name != "id" && field.Name != "namespace_id")
+	return field.Type == "reference" ||
+		field.SemanticType == "reference" ||
+		strings.HasSuffix(field.Name, "_ref") ||
+		strings.HasSuffix(field.Name, "_refs") ||
+		((strings.HasSuffix(field.Name, "_id") || strings.HasSuffix(field.Name, "_ids")) && field.Name != "id" && field.Name != "namespace_id")
 }
 
 func isOptionalRefField(field *objects.FieldInfo) bool {

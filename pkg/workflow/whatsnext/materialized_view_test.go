@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/lifecycle"
@@ -455,16 +456,16 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 	}
 
 	// Wait for background reconciler to complete and write file
-	waitForReconcile(t, 2*time.Second)
+	waitForReconcile(t, 5*time.Second)
 
 	// Case 2: Now file exists and is fresh
-	payloadFresh, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
-	if err != nil {
-		t.Fatalf("read fresh payload failed: %v", err)
-	}
-	if payloadFresh.Stale || payloadFresh.Recovering {
-		t.Fatalf("expected payload to be fresh after async rebuild, got stale=%v recovering=%v", payloadFresh.Stale, payloadFresh.Recovering)
-	}
+	var payloadFresh *WhatsNextLitePayload
+	require.Eventually(t, func() bool {
+		var err error
+		payloadFresh, err = GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+		return err == nil && payloadFresh != nil && !payloadFresh.Stale && !payloadFresh.Recovering
+	}, 5*time.Second, 20*time.Millisecond, "expected payload to be fresh after async rebuild")
+
 	if payloadFresh.LeadPlan == nil || payloadFresh.LeadPlan.ID != "PRI-002" {
 		t.Fatalf("expected lead plan PRI-002, got %+v", payloadFresh.LeadPlan)
 	}

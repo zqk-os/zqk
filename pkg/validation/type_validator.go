@@ -3,6 +3,7 @@ package validation
 import (
 	"reflect"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -68,9 +69,24 @@ func ValidateType(value any, expectedType string) bool {
 	case "enum":
 		return true // Enum values are validated separately
 
+	case "reference":
+		return validateReferenceType(value)
+
 	default:
 		return true // Unknown type - permissive
 	}
+}
+
+// validateReferenceType validates reference type (must be a non-empty string when provided)
+func validateReferenceType(value any) bool {
+	if value == nil {
+		return true
+	}
+	s, ok := value.(string)
+	if !ok {
+		return false
+	}
+	return strings.TrimSpace(s) != ""
 }
 
 // validateStringType validates string type

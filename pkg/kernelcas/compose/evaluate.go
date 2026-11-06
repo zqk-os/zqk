@@ -987,7 +987,7 @@ func evalValidatePriorityValues(obj map[string]any, cfg map[string]any) []Valida
 		if !objects.IsLegitimatePriority(s) {
 			msg := koi.GetString(cfg, "priority_message")
 			if msg == "" {
-				msg = fmt.Sprintf("invalid priority %q: must be one of critical, high, medium, low", s)
+				msg = fmt.Sprintf("invalid priority %q: must be one of critical, high, medium, low, p0, p1, p2, p3", s)
 			}
 			errs = append(errs, ValidationError{
 				Field:   objects.FieldKeyPriority,

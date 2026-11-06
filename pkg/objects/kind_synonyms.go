@@ -264,12 +264,33 @@ func (ksr *KindSynonymResolver) initializeWithGeneratedSynonyms() error {
 		synonyms := ksr.generateSynonyms(kind)
 		kindToSynonyms[kind] = synonyms
 
-		// Map each synonym to the canonical kind (first one wins for conflicts)
+		// Collect explicit aliases for this kind to distinguish them from algorithmic fallbacks
+		explicitSet := make(map[string]struct{})
+		for _, a := range kindsynonyms.DefaultKindAliasesForKind(kind) {
+			explicitSet[strings.ToLower(a)] = struct{}{}
+		}
+		if ksr.synonymProvider != nil {
+			for _, a := range ksr.synonymProvider.GetSynonymsForKind(kind) {
+				explicitSet[strings.ToLower(a)] = struct{}{}
+			}
+		}
+
+		// Map each synonym to the canonical kind with priority-based conflict resolution
+		// - Canonical kind match (normalized == strings.ToLower(kind)): Priority 100
+		// - Explicit aliases (DefaultKindAliasesForKind or GetSynonymsForKind): Priority 50
+		// - Algorithmic fallback: Priority 10
 		for _, synonym := range synonyms {
 			normalized := strings.ToLower(synonym)
-			if _, exists := synonymToKind[normalized]; !exists {
+			priority := 10
+			if normalized == strings.ToLower(kind) {
+				priority = 100
+			} else if _, ok := explicitSet[normalized]; ok {
+				priority = 50
+			}
+
+			if existingPri, exists := synonymToPriority[normalized]; !exists || priority > existingPri {
 				synonymToKind[normalized] = kind
-				synonymToPriority[normalized] = 0 // Default priority
+				synonymToPriority[normalized] = priority
 			}
 		}
 	}

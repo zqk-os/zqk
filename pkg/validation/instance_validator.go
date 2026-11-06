@@ -233,6 +233,10 @@ func (iv *InstanceValidator) validateField(fieldName string, fieldValue any, fie
 		warnings = append(warnings, *warn)
 	}
 
+	if refErr := iv.validateReferenceConstraint(fieldName, fieldValue, fieldDef); refErr != nil {
+		errors = append(errors, *refErr)
+	}
+
 	return errors, warnings
 }
 
@@ -364,6 +368,47 @@ func (iv *InstanceValidator) validateFieldSemanticType(fieldName string, fieldVa
 		}
 	}
 
+	return nil
+}
+
+// validateReferenceConstraint strictly rejects empty string literals in reference fields.
+func (iv *InstanceValidator) validateReferenceConstraint(fieldName string, fieldValue any, fieldDef map[string]any) *ValidationError {
+	if !isReferenceFieldInfo(fieldName, fieldDef) {
+		return nil
+	}
+	if fieldValue == nil {
+		return nil
+	}
+	if str, ok := fieldValue.(string); ok {
+		if strings.TrimSpace(str) == emptyValue {
+			return &ValidationError{
+				Field:   fieldName,
+				Message: fmt.Sprintf("reference field %q cannot be an empty string", fieldName),
+				Rule:    "reference_not_empty",
+			}
+		}
+		return nil
+	}
+	val := reflect.ValueOf(fieldValue)
+	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+		for i := 0; i < val.Len(); i++ {
+			item := val.Index(i).Interface()
+			if item == nil {
+				return &ValidationError{
+					Field:   fieldName,
+					Message: fmt.Sprintf("reference field %q contains nil reference entry at index %d", fieldName, i),
+					Rule:    "reference_not_empty",
+				}
+			}
+			if str, ok := item.(string); ok && strings.TrimSpace(str) == emptyValue {
+				return &ValidationError{
+					Field:   fieldName,
+					Message: fmt.Sprintf("reference field %q contains empty string reference entry at index %d", fieldName, i),
+					Rule:    "reference_not_empty",
+				}
+			}
+		}
+	}
 	return nil
 }
 

@@ -355,6 +355,7 @@ kind_to_synonyms:
         - p-plan
         - plan
         - pp
+        - pri
     release:
         - rel
     requirement:
@@ -368,6 +369,8 @@ kind_to_synonyms:
     shockwave_router:
         - router
         - shockwave
+    team_configuration:
+        - tcfg
     template:
         - tpl
         - tmpl
@@ -375,6 +378,7 @@ kind_to_synonyms:
         - test
         - tc
         - testcase
+        - tst
     validation_rule:
         - vrule
         - val_rule

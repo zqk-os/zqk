@@ -239,7 +239,7 @@ func ValidateObjectFieldRestrictions(spec *Spec, kind string, updates map[string
 
 func matchesAnyEnum(candidate string, allowed []string) bool {
 	for _, a := range allowed {
-		if candidate == a {
+		if strings.EqualFold(candidate, a) {
 			return true
 		}
 	}

@@ -136,6 +136,9 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 
 	gv.applySpecDefaults(obj, spec)
 
+	// Cross-object priority enum coercion and parity (GH-928)
+	NormalizePriority(kind, obj)
+
 	if title, _ := obj[objects.FieldKeyTitle].(string); isDocumentationTitleProse(title) {
 		result.Errors = append(result.Errors, ValidationError{
 			Field:   objects.FieldKeyTitle,
@@ -176,6 +179,17 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 
 	if crossPlaneErrors := gv.validateCrossPlaneReferences(obj, kind, options); len(crossPlaneErrors) > 0 {
 		result.Errors = append(result.Errors, crossPlaneErrors...)
+	}
+
+	for fieldName, fieldValue := range obj {
+		if spec != nil && spec.ResolvedFields != nil {
+			if _, inSpec := spec.ResolvedFields[fieldName]; inSpec {
+				continue
+			}
+		}
+		if refErr := gv.validateReferenceConstraint(fieldName, fieldValue, nil); refErr != nil {
+			result.Errors = append(result.Errors, *refErr)
+		}
 	}
 
 	objectID, _ := obj[objects.FieldKeyID].(string)
@@ -381,6 +395,10 @@ func (gv *GoValidator) validatePropertyShape(
 
 	if warn := gv.validateSemanticTypeConstraint(fieldName, fieldValue, fieldDef, options); warn != nil {
 		warnings = append(warnings, *warn)
+	}
+
+	if refErr := gv.validateReferenceConstraint(fieldName, fieldValue, fieldDef); refErr != nil {
+		errors = append(errors, *refErr)
 	}
 
 	return errors, warnings
@@ -616,14 +634,14 @@ func (gv *GoValidator) validateSemanticTypeConstraint(fieldName string, fieldVal
 		return nil
 	}
 
-	// Optional fields: nil or empty string means unset, not invalid.
+	// Optional fields: nil or empty string means unset, not invalid (except reference fields where empty string is strictly rejected).
 	if fieldValue == nil {
 		if !IsFieldRequired(fieldDef) {
 			return nil
 		}
 	}
 	if str, ok := fieldValue.(string); ok && strings.TrimSpace(str) == emptyValue {
-		if !IsFieldRequired(fieldDef) {
+		if semanticType != "reference" && !isReferenceFieldInfo(fieldName, fieldDef) && !IsFieldRequired(fieldDef) {
 			return nil
 		}
 	}
@@ -722,6 +740,76 @@ func (gv *GoValidator) validateSemanticTypeItem(_ string, value any, semanticTyp
 		return errfmt.Newf("ontology validation failed").Wrap(err)
 	}
 
+	return nil
+}
+
+// isReferenceFieldInfo determines if a field represents an ontological reference.
+func isReferenceFieldInfo(fieldName string, fieldDef map[string]any) bool {
+	if fieldDef != nil {
+		if st, _ := fieldDef["semantic_type"].(string); st == "reference" {
+			return true
+		}
+		if t, _ := fieldDef[objects.FieldKeyType].(string); t == "reference" {
+			return true
+		}
+		if traits, ok := fieldDef["traits"].([]any); ok {
+			for _, tr := range traits {
+				if trStr, ok := tr.(string); ok && trStr == "field_reference_group" {
+					return true
+				}
+			}
+		}
+	}
+	if strings.HasSuffix(fieldName, "_ref") || strings.HasSuffix(fieldName, "_refs") {
+		return true
+	}
+	if (strings.HasSuffix(fieldName, "_id") || strings.HasSuffix(fieldName, "_ids")) &&
+		fieldName != "id" && fieldName != "namespace_id" {
+		return true
+	}
+	return false
+}
+
+// validateReferenceConstraint strictly rejects empty string literals in reference fields
+// (both scalar reference fields and slice/array reference entries), preventing downstream
+// CAS corrupted draft states (GH-944).
+func (gv *GoValidator) validateReferenceConstraint(fieldName string, fieldValue any, fieldDef map[string]any) *ValidationError {
+	if !isReferenceFieldInfo(fieldName, fieldDef) {
+		return nil
+	}
+	if fieldValue == nil {
+		return nil
+	}
+	if str, ok := fieldValue.(string); ok {
+		if strings.TrimSpace(str) == emptyValue {
+			return &ValidationError{
+				Field:   fieldName,
+				Message: fmt.Sprintf("reference field %q cannot be an empty string", fieldName),
+				Rule:    "reference_not_empty",
+			}
+		}
+		return nil
+	}
+	val := reflect.ValueOf(fieldValue)
+	if val.Kind() == reflect.Slice || val.Kind() == reflect.Array {
+		for i := 0; i < val.Len(); i++ {
+			item := val.Index(i).Interface()
+			if item == nil {
+				return &ValidationError{
+					Field:   fieldName,
+					Message: fmt.Sprintf("reference field %q contains nil reference entry at index %d", fieldName, i),
+					Rule:    "reference_not_empty",
+				}
+			}
+			if str, ok := item.(string); ok && strings.TrimSpace(str) == emptyValue {
+				return &ValidationError{
+					Field:   fieldName,
+					Message: fmt.Sprintf("reference field %q contains empty string reference entry at index %d", fieldName, i),
+					Rule:    "reference_not_empty",
+				}
+			}
+		}
+	}
 	return nil
 }
 

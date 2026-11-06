@@ -341,3 +341,57 @@ func TestKindSynonymResolver_GeneratedSynonyms_IncludeDefaultAliases(t *testing.
 		t.Fatalf("expected generated synonyms for prompt_template to include default alias %q; got %v", "prompt", synPT)
 	}
 }
+
+func TestGetCanonicalKind(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"tc", "test_case"},
+		{"tst", "test_case"},
+		{"test", "test_case"},
+		{"testcase", "test_case"},
+		{"test_case", "test_case"},
+		{"bli", "backlog_item"},
+		{"pri", "priority_plan"},
+		{"req", "requirement"},
+		{"crit", "criteria"},
+		{"mil", "milestone"},
+		{"goal", "goal"},
+		{"team_configuration", "team_configuration"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			got := GetCanonicalKind(tt.input)
+			if got != tt.expected {
+				t.Errorf("GetCanonicalKind(%q) = %q, want %q", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestKindSynonymResolver_ExplicitAliasOverridesAlgorithmicFallback(t *testing.T) {
+	ksr := NewKindSynonymResolver()
+
+	// Provider gives "tcfg" to team_configuration
+	provider := &mockSynonymProvider{
+		synonyms: map[string][]string{
+			"team_configuration": {"tcfg"},
+		},
+	}
+	ksr.SetSynonymProvider(provider)
+
+	if err := ksr.Initialize(); err != nil {
+		t.Fatalf("Initialize() failed: %v", err)
+	}
+
+	// tc must resolve to test_case (explicit alias Priority 50 overrides any fallback)
+	if got := ksr.ResolveKind("tc"); got != "test_case" {
+		t.Errorf("ResolveKind(\"tc\") = %q, want \"test_case\"", got)
+	}
+	// tcfg must resolve to team_configuration
+	if got := ksr.ResolveKind("tcfg"); got != "team_configuration" {
+		t.Errorf("ResolveKind(\"tcfg\") = %q, want \"team_configuration\"", got)
+	}
+}

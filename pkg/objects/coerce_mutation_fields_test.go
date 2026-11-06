@@ -221,3 +221,28 @@ func TestCoerceMutationFields_PrunesEmptyScalarRefs(t *testing.T) {
 		t.Errorf("expected valid_ref to be preserved, got %v", val)
 	}
 }
+
+func TestCoerceUpdateFields_PreservesEmptyScalarRefs(t *testing.T) {
+	t.Parallel()
+
+	obj := map[string]any{
+		FieldKeyKind:            KindBacklogItem,
+		FieldKeyPriority:        "p1",
+		FieldKeyPriorityPlanRef: "",
+		"milestone_ref":         "",
+	}
+	CoerceUpdateFields(KindBacklogItem, obj)
+
+	if val, ok := obj[FieldKeyPriorityPlanRef]; !ok || val != "" {
+		t.Errorf("expected priority_plan_ref empty string to be preserved for unlink, got %v", val)
+	}
+	if val, ok := obj["milestone_ref"]; !ok || val != "" {
+		t.Errorf("expected milestone_ref empty string to be preserved for unlink, got %v", val)
+	}
+	if val := obj[FieldKeyPriority]; val != "high" {
+		t.Errorf("expected priority p1 coerced to high, got %v", val)
+	}
+	if val := obj[FieldKeyPriorityTier]; val != "P1" {
+		t.Errorf("expected priority_tier synchronized to P1, got %v", val)
+	}
+}
