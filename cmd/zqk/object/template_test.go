@@ -205,6 +205,7 @@ func TestTemplate_OmitsEmptyOptionalReferenceFields(t *testing.T) {
 	tempDir, provider, _, cleanup := setupInProcessTestContext(t)
 	defer cleanup()
 
+	// 1. backlog_item: verify milestone_ref and owner_ref omitted
 	out, err := executeObjectCommand(t, tempDir, provider, "template", "backlog_item")
 	if err != nil {
 		t.Fatalf("template backlog_item failed: %v", err)
@@ -215,6 +216,24 @@ func TestTemplate_OmitsEmptyOptionalReferenceFields(t *testing.T) {
 	}
 	if strings.Contains(out, "owner_ref:") {
 		t.Errorf("expected optional owner_ref to be omitted from template, got:\n%s", out)
+	}
+
+	// 2. priority_plan: verify release_ref and team_configuration_ref omitted (CRIT-1793968589438914000-1a1e8231 / GH-944)
+	planOut, err := executeObjectCommand(t, tempDir, provider, "template", "priority_plan")
+	if err != nil {
+		t.Fatalf("template priority_plan failed: %v", err)
+	}
+	if strings.Contains(planOut, "release_ref:") {
+		t.Errorf("expected optional release_ref to be omitted from template, got:\n%s", planOut)
+	}
+	if strings.Contains(planOut, "team_configuration_ref:") {
+		t.Errorf("expected optional team_configuration_ref to be omitted from template, got:\n%s", planOut)
+	}
+	if strings.Contains(planOut, `release_ref: ""`) {
+		t.Errorf("release_ref must never scaffold as empty string: got:\n%s", planOut)
+	}
+	if strings.Contains(planOut, `team_configuration_ref: ""`) {
+		t.Errorf("team_configuration_ref must never scaffold as empty string: got:\n%s", planOut)
 	}
 }
 
