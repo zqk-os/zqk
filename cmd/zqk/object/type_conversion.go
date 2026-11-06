@@ -74,11 +74,13 @@ func NormalizeObjectValues(obj map[string]any, kind string) (map[string]any, err
 	normalizedObj := make(map[string]any)
 	maps.Copy(normalizedObj, obj)
 
+	objects.CoerceMutationFields(kind, normalizedObj)
+
 	fieldRegistry := objects.GetGlobalFieldRegistry()
 	kindFields, ok := fieldRegistry.GetFieldsForKindIfLoaded(kind)
 	if !ok {
 		// Registry not loaded — skip normalization rather than triggering LoadFields()
-		return obj, nil
+		return normalizedObj, nil
 	}
 
 	return normalizedObj, normalizeObjectValues(normalizedObj, kindFields)

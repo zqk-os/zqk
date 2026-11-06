@@ -52,20 +52,22 @@ func TierToPriority(tier string) (string, bool) {
 	}
 }
 
-// IsLegitimatePriority reports whether priority is a recognized priority level (critical, high, medium, low).
+// IsLegitimatePriority reports whether priority is a recognized priority level (critical, high, medium, low)
+// or p-tier alias (p0..p3).
 func IsLegitimatePriority(priority string) bool {
 	switch strings.ToLower(strings.TrimSpace(priority)) {
-	case PriorityCritical, PriorityHigh, PriorityMedium, PriorityLow:
+	case PriorityCritical, PriorityHigh, PriorityMedium, PriorityLow, "p0", "p1", "p2", "p3":
 		return true
 	default:
 		return false
 	}
 }
 
-// IsLegitimatePriorityTier reports whether tier is a recognized priority tier (P0, P1, P2, P3).
+// IsLegitimatePriorityTier reports whether tier is a recognized priority tier (P0, P1, P2, P3)
+// or word alias.
 func IsLegitimatePriorityTier(tier string) bool {
 	switch strings.ToUpper(strings.TrimSpace(tier)) {
-	case PriorityTierP0, PriorityTierP1, PriorityTierP2, PriorityTierP3:
+	case PriorityTierP0, PriorityTierP1, PriorityTierP2, PriorityTierP3, "CRITICAL", "HIGH", "MEDIUM", "LOW":
 		return true
 	default:
 		return false
@@ -106,7 +108,8 @@ func CanonicalPriorityTier(tier string) (string, bool) {
 
 // CoerceBacklogItemPriorityAndTier pairs priority and priority_tier on backlog items.
 // If one is provided, it sets the other.
-// If both are provided, it validates they are legitimate values and normalizes casing.
+// If both are provided, it validates they are legitimate values, coerces p-tier aliases
+// (p0..p3) to canonical words (critical..low), and synchronizes priority_tier (P0..P3).
 func CoerceBacklogItemPriorityAndTier(obj map[string]any) {
 	if obj == nil {
 		return
@@ -154,11 +157,13 @@ func CoerceBacklogItemPriorityAndTier(obj map[string]any) {
 		return
 	}
 
-	// Case 3: both provided - normalize casing if legitimate
-	if canonPri, ok := CanonicalPriority(priStr); ok && IsLegitimatePriority(canonPri) {
+	// Case 3: both provided - normalize casing and synchronize if legitimate
+	canonPri, okPri := CanonicalPriority(priStr)
+	canonTier, okTier := CanonicalPriorityTier(tierStr)
+	if okPri && IsLegitimatePriority(canonPri) {
 		obj[FieldKeyPriority] = canonPri
 	}
-	if canonTier, ok := CanonicalPriorityTier(tierStr); ok && IsLegitimatePriorityTier(canonTier) {
+	if okTier && IsLegitimatePriorityTier(canonTier) {
 		obj[FieldKeyPriorityTier] = canonTier
 	}
 }
@@ -171,7 +176,14 @@ func CoerceRequirementPriority(obj map[string]any) {
 		return
 	}
 	rawPri, hasPri := obj[FieldKeyPriority]
-	if !hasPri || rawPri == nil {
+	if !hasPri || rawPri == nil || rawPri == "" {
+		if rawTier, hasTier := obj[FieldKeyPriorityTier]; hasTier && rawTier != nil {
+			if s, ok := rawTier.(string); ok && strings.TrimSpace(s) != "" {
+				if tier, ok := PriorityToTier(strings.TrimSpace(s)); ok {
+					obj[FieldKeyPriority] = strings.ToLower(tier)
+				}
+			}
+		}
 		return
 	}
 	s, ok := rawPri.(string)
@@ -198,16 +210,75 @@ func ValidatePriorityAndTier(obj map[string]any) error {
 	if hasPri && rawPri != nil {
 		if s, ok := rawPri.(string); ok && strings.TrimSpace(s) != "" {
 			if !IsLegitimatePriority(s) {
-				return errfmt.Errorf("invalid priority %q: must be one of critical, high, medium, low", s)
+				return errfmt.Errorf("invalid priority %q: must be one of critical, high, medium, low, p0, p1, p2, p3", s)
 			}
 		}
 	}
 	if hasTier && rawTier != nil {
 		if s, ok := rawTier.(string); ok && strings.TrimSpace(s) != "" {
 			if !IsLegitimatePriorityTier(s) {
-				return errfmt.Errorf("invalid priority_tier %q: must be one of P0, P1, P2, P3", s)
+				return errfmt.Errorf("invalid priority_tier %q: must be one of P0, P1, P2, P3, critical, high, medium, low", s)
 			}
 		}
 	}
 	return nil
+}
+
+// ValidatePriority verifies that a priority string is a legitimate value (either word alias or p-tier).
+func ValidatePriority(priority string) error {
+	trimmed := strings.TrimSpace(priority)
+	if trimmed == "" {
+		return errfmt.Errorf("priority cannot be empty")
+	}
+	if !IsLegitimatePriority(trimmed) {
+		return errfmt.Errorf("invalid priority %q: must be one of critical, high, medium, low, p0, p1, p2, p3", trimmed)
+	}
+	return nil
+}
+
+// ValidatePriorityForKind validates priority value for a specific kind.
+func ValidatePriorityForKind(kind string, priority string) error {
+	trimmed := strings.TrimSpace(priority)
+	if trimmed == "" {
+		return errfmt.Errorf("priority cannot be empty for %s", kind)
+	}
+	if !IsLegitimatePriority(trimmed) {
+		return errfmt.Errorf("invalid priority %q for %s: must be one of critical, high, medium, low, p0, p1, p2, p3", trimmed, kind)
+	}
+	return nil
+}
+
+// NormalizePriority normalizes and coerces priority representations based on object kind.
+// For requirements: maps word aliases (critical, high, medium, low) to canonical p-tier (p0, p1, p2, p3).
+// For backlog_items: maps p-tier aliases (p0..p3) to canonical words (critical, high, medium, low) and synchronizes priority_tier (P0..P3).
+// For other objects: normalizes valid priority strings to their canonical casing.
+func NormalizePriority(kind string, obj map[string]any) {
+	if obj == nil {
+		return
+	}
+	k := kind
+	if k == "" {
+		k = GetString(obj, FieldKeyKind)
+	}
+	switch k {
+	case KindRequirement:
+		CoerceRequirementPriority(obj)
+	case KindBacklogItem:
+		CoerceBacklogItemPriorityAndTier(obj)
+	default:
+		// Generic normalization if priority is set
+		if rawPri, hasPri := obj[FieldKeyPriority]; hasPri && rawPri != nil {
+			if s, ok := rawPri.(string); ok {
+				trimmed := strings.TrimSpace(s)
+				if canon, ok := CanonicalPriority(trimmed); ok {
+					obj[FieldKeyPriority] = canon
+				}
+			}
+		}
+	}
+}
+
+// CoercePriority is an alias for NormalizePriority.
+func CoercePriority(kind string, obj map[string]any) {
+	NormalizePriority(kind, obj)
 }

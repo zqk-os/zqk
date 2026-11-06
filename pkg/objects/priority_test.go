@@ -212,3 +212,76 @@ func TestCoerceRequirementPriority(t *testing.T) {
 	// Nil object -> no panic
 	CoerceRequirementPriority(nil)
 }
+
+func TestNormalizePriority_Unified(t *testing.T) {
+	// 1. Requirement word alias to p-tier
+	req := map[string]any{
+		FieldKeyKind:     KindRequirement,
+		FieldKeyPriority: "medium",
+	}
+	NormalizePriority(KindRequirement, req)
+	if req[FieldKeyPriority] != "p2" {
+		t.Errorf("NormalizePriority requirement: got %v, want p2", req[FieldKeyPriority])
+	}
+
+	// 2. Backlog item p-tier to word label
+	bli := map[string]any{
+		FieldKeyKind:     KindBacklogItem,
+		FieldKeyPriority: "p2",
+	}
+	NormalizePriority(KindBacklogItem, bli)
+	if bli[FieldKeyPriority] != "medium" || bli[FieldKeyPriorityTier] != "P2" {
+		t.Errorf("NormalizePriority bli: got priority=%v tier=%v, want medium, P2", bli[FieldKeyPriority], bli[FieldKeyPriorityTier])
+	}
+
+	// 3. Generic kind normalization
+	gen := map[string]any{
+		FieldKeyPriority: "HIGH",
+	}
+	NormalizePriority("custom", gen)
+	if gen[FieldKeyPriority] != "high" {
+		t.Errorf("NormalizePriority generic: got %v, want high", gen[FieldKeyPriority])
+	}
+
+	// 4. Nil object -> no panic
+	NormalizePriority("", nil)
+	CoercePriority("", nil)
+}
+
+func TestValidatePriority_ValidationAndBounds(t *testing.T) {
+	valid := []string{"critical", "high", "medium", "low", "p0", "p1", "p2", "p3", "P0", "P1", "P2", "P3"}
+	for _, v := range valid {
+		if err := ValidatePriority(v); err != nil {
+			t.Errorf("ValidatePriority(%q) returned unexpected error: %v", v, err)
+		}
+		if err := ValidatePriorityForKind(KindRequirement, v); err != nil {
+			t.Errorf("ValidatePriorityForKind(requirement, %q) returned unexpected error: %v", v, err)
+		}
+	}
+
+	invalid := []string{"urgent", "p4", "unknown", "blocker", ""}
+	for _, inv := range invalid {
+		if err := ValidatePriority(inv); err == nil {
+			t.Errorf("ValidatePriority(%q) expected error, got nil", inv)
+		}
+		if err := ValidatePriorityForKind(KindRequirement, inv); err == nil {
+			t.Errorf("ValidatePriorityForKind(requirement, %q) expected error, got nil", inv)
+		}
+	}
+
+	// ValidatePriorityAndTier
+	errValid := ValidatePriorityAndTier(map[string]any{
+		FieldKeyPriority:     "medium",
+		FieldKeyPriorityTier: "P2",
+	})
+	if errValid != nil {
+		t.Errorf("ValidatePriorityAndTier expected nil, got %v", errValid)
+	}
+
+	errInvalid := ValidatePriorityAndTier(map[string]any{
+		FieldKeyPriority: "urgent",
+	})
+	if errInvalid == nil {
+		t.Errorf("ValidatePriorityAndTier with urgent expected error, got nil")
+	}
+}

@@ -144,7 +144,7 @@ func backlogItemOverlay() []Rule {
 			ID: "bli_legitimate_priority_values",
 			Op: OpValidatePriorityValues,
 			Config: map[string]any{
-				"priority_message": "priority must be one of (critical, high, medium, low)",
+				"priority_message": "priority must be one of (critical, high, medium, low, p0, p1, p2, p3)",
 				"tier_message":     "priority_tier must be one of (P0, P1, P2, P3)",
 			},
 		},
