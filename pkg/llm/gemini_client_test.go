@@ -22,7 +22,7 @@ func TestGeminiClient_GenerateCompletion_NoAPIKey(t *testing.T) {
 		t.Fatalf("expected no error, got %v. Config: APIKey=%q, BaseURL=%q, shouldMock=%v", err, client.config.APIKey, client.config.BaseURL, client.shouldMock())
 	}
 
-	if !strings.Contains(res, "APIKey missing") {
-		t.Errorf("expected fallback response for missing API key, got %q", res)
+	if strings.TrimSpace(res) != "[]" {
+		t.Errorf("expected quiet empty-tip mock for missing API key, got %q", res)
 	}
 }

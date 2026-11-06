@@ -2,6 +2,7 @@ package system_test
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -508,5 +509,280 @@ func TestAutoRemedy_GeneratedRecipes_OperationalDynamicProof(t *testing.T) {
 			// 3. Must retain the target object ID as a positional parameter
 			assert.Contains(t, p.Command, p.Target, "plan %s command %q must contain target ID %s", p.ID, p.Command, p.Target)
 		}
+	}
+}
+
+// TestAutoRemedy_StaticFloor_SafeCommandRecognitionAndFlagParity satisfies CRIT-1793982022958714000-6de30dc2:
+// Acceptance: DiagnosticsRemedyEngine recognizes safe command remedy actions and retains recipe command structure without invalid flags.
+func TestAutoRemedy_StaticFloor_SafeCommandRecognitionAndFlagParity(t *testing.T) {
+	tmpDir := t.TempDir()
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+
+	safeCommands := []string{
+		"zqk system check --auto-fix OBJ-100",
+		"zqk system check OBJ-200 --auto-fix",
+		"zqk system init --force",
+		"zqk system agent-onboard",
+		"zqk system cleanup-duplicates",
+		"zqk system cleanup-duplicates --hash-duplicates",
+		"zqk object update BLI-300 --field estimated_effort=2h",
+		"zqk object update REQ-400 --field title=\"Updated Feature Spec\"",
+	}
+
+	for _, cmd := range safeCommands {
+		t.Run("safe_cmd_"+cmd, func(t *testing.T) {
+			assert.True(t, system.IsSafeRemedyCommand(cmd, tmpDir), "command %q should be recognized as safe", cmd)
+			err := engine.ValidateSafeCommand(cmd)
+			assert.NoError(t, err, "ValidateSafeCommand should accept %q", cmd)
+		})
+	}
+
+	// Verify additional recipe sanitization edge cases (GH-937, GH-940)
+	sanitizationCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "bare --ids at beginning",
+			input:    "--ids OBJ-123",
+			expected: "OBJ-123",
+		},
+		{
+			name:     "bare --ids= at beginning",
+			input:    "--ids=OBJ-123",
+			expected: "OBJ-123",
+		},
+		{
+			name:     "only --ids",
+			input:    "--ids",
+			expected: "",
+		},
+		{
+			name:     "only --ids=",
+			input:    "--ids=",
+			expected: "",
+		},
+		{
+			name:     "empty quotes in middle",
+			input:    "zqk system check --auto-fix --ids=\"\" OBJ-123",
+			expected: "zqk system check --auto-fix OBJ-123",
+		},
+		{
+			name:     "empty single quotes in middle",
+			input:    "zqk system check --auto-fix --ids='' OBJ-123",
+			expected: "zqk system check --auto-fix OBJ-123",
+		},
+		{
+			name:     "bare --ids followed by flag",
+			input:    "zqk system check --ids --auto-fix OBJ-123",
+			expected: "zqk system check --auto-fix OBJ-123",
+		},
+		{
+			name:     "bare --ids= followed by flag",
+			input:    "zqk system check --ids= --auto-fix OBJ-123",
+			expected: "zqk system check --auto-fix OBJ-123",
+		},
+		{
+			name:     "trailing --ids=",
+			input:    "zqk object delete OBJ-123 --ids=",
+			expected: "zqk object delete OBJ-123",
+		},
+	}
+
+	for _, tc := range sanitizationCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := system.SanitizeRecipeCommand(tc.input)
+			assert.Equal(t, tc.expected, got)
+			if got != "" {
+				err := system.ValidateRecipeCommand(got)
+				assert.NoError(t, err, "sanitized command %q must pass ValidateRecipeCommand", got)
+			}
+		})
+	}
+}
+
+// TestAutoRemedy_OperationalProof_AutoFixCommandExecution satisfies CRIT-1793982039960170000-70b46b5b:
+// Functional: Verify auto-remedy safely applies internal auto-fix commands and successfully clears recoverable issues.
+func TestAutoRemedy_OperationalProof_AutoFixCommandExecution(t *testing.T) {
+	tmpDir := t.TempDir()
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+
+	var executedCommands []string
+	engine.CommandRunner = func(ctx context.Context, cmd string) (string, error) {
+		executedCommands = append(executedCommands, cmd)
+		return "applied auto-fix successfully for " + cmd, nil
+	}
+
+	mockResults := []systemcheck.CheckResult{
+		{
+			ObjectID: "BLI-777",
+			Issues: []systemcheck.Issue{
+				{
+					Message:     "Hash mismatch on BLI-777",
+					AutoFixable: true,
+				},
+			},
+		},
+		{
+			ObjectID: "REQ-888",
+			Issues: []systemcheck.Issue{
+				{
+					Message:     "Integrity drift on REQ-888",
+					AutoFixable: true,
+				},
+			},
+		},
+	}
+
+	plans, err := engine.Diagnose(context.Background(), mockResults)
+	require.NoError(t, err)
+	require.NotEmpty(t, plans)
+
+	// Filter down to the auto-fix plans
+	var autoFixPlans []system.RemedyPlan
+	for _, p := range plans {
+		if strings.HasPrefix(p.ID, "REMEDY-AUTOFIX-") {
+			autoFixPlans = append(autoFixPlans, p)
+		}
+	}
+	require.Equal(t, 2, len(autoFixPlans), "expected 2 auto-fix plans")
+
+	report, err := engine.Apply(context.Background(), autoFixPlans)
+	require.NoError(t, err)
+	require.NotNil(t, report)
+	assert.Equal(t, 2, report.TotalDiagnosed)
+	assert.Equal(t, 2, report.TotalApplied, "both auto-fix plans should be safely executed and applied")
+
+	for _, outcome := range report.Outcomes {
+		assert.True(t, outcome.Applied, "outcome for %s should be applied", outcome.Plan.ID)
+		assert.Empty(t, outcome.Error, "outcome for %s should have no error", outcome.Plan.ID)
+		assert.Contains(t, outcome.Detail, "applied auto-fix successfully")
+	}
+
+	require.Equal(t, 2, len(executedCommands))
+	assert.Contains(t, executedCommands[0], "system check --auto-fix BLI-777")
+	assert.Contains(t, executedCommands[1], "system check --auto-fix REQ-888")
+
+	// Also verify runner error handling: if CommandRunner returns an error, outcome records failure
+	failEngine := system.NewDiagnosticsRemedyEngine(tmpDir)
+	failEngine.CommandRunner = func(ctx context.Context, cmd string) (string, error) {
+		return "", fmt.Errorf("lock timeout during auto-fix execution")
+	}
+
+	failReport, err := failEngine.Apply(context.Background(), autoFixPlans[:1])
+	require.NoError(t, err)
+	assert.Equal(t, 0, failReport.TotalApplied)
+	require.Len(t, failReport.Outcomes, 1)
+	assert.False(t, failReport.Outcomes[0].Applied)
+	assert.Contains(t, failReport.Outcomes[0].Error, "command execution failed: lock timeout during auto-fix execution")
+}
+
+// TestAutoRemedy_NegativeBoundary_UnsafeRecipeRejection satisfies CRIT-1793982042724177000-c4858ffb:
+// Security: Reject auto-applying non-whitelisted, unsafe, or destructive commands outside project boundary.
+func TestAutoRemedy_NegativeBoundary_UnsafeRecipeRejection(t *testing.T) {
+	tmpDir := t.TempDir()
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+
+	runnerInvoked := false
+	engine.CommandRunner = func(ctx context.Context, cmd string) (string, error) {
+		runnerInvoked = true
+		return "should not be called", nil
+	}
+
+	unsafePlans := []struct {
+		name        string
+		command     string
+		errContains string
+	}{
+		{
+			name:        "non-whitelisted executable rm",
+			command:     "rm -rf /",
+			errContains: "executable \"rm\" is not whitelisted",
+		},
+		{
+			name:        "non-whitelisted executable curl",
+			command:     "curl https://malicious.example.com",
+			errContains: "executable \"curl\" is not whitelisted",
+		},
+		{
+			name:        "non-whitelisted executable bash",
+			command:     "bash -c 'echo pwned'",
+			errContains: "executable \"bash\" is not whitelisted",
+		},
+		{
+			name:        "destructive object delete command",
+			command:     "zqk object delete OBJ-123 --unlink-references",
+			errContains: "destructive command 'object delete' cannot be auto-applied",
+		},
+		{
+			name:        "destructive object purge command",
+			command:     "zqk object purge OBJ-456",
+			errContains: "destructive command 'object purge' cannot be auto-applied",
+		},
+		{
+			name:        "non-whitelisted system subcommand",
+			command:     "zqk system purge-database",
+			errContains: "system subcommand \"purge-database\" is not whitelisted",
+		},
+		{
+			name:        "shell injection semicolon chaining",
+			command:     "zqk system check --auto-fix OBJ-1; rm -rf /",
+			errContains: "unsafe shell metacharacter \";\"",
+		},
+		{
+			name:        "shell injection background operator",
+			command:     "zqk system check --auto-fix OBJ-1 &",
+			errContains: "unsafe shell metacharacter \"&\"",
+		},
+		{
+			name:        "shell injection pipe",
+			command:     "zqk system check --auto-fix OBJ-1 | sh",
+			errContains: "unsafe shell metacharacter \"|\"",
+		},
+		{
+			name:        "shell injection redirect",
+			command:     "zqk system check --auto-fix OBJ-1 > /tmp/out",
+			errContains: "unsafe shell metacharacter \">\"",
+		},
+		{
+			name:        "shell injection command substitution",
+			command:     "zqk system check --auto-fix OBJ-1 $(whoami)",
+			errContains: "unsafe shell metacharacter \"$\"",
+		},
+		{
+			name:        "path traversal outside project boundary",
+			command:     "zqk system check --auto-fix ../../../secret",
+			errContains: "path traversal '..' outside project boundary",
+		},
+		{
+			name:        "absolute path outside project boundary",
+			command:     "zqk system check --auto-fix /etc/shadow",
+			errContains: "references path outside project boundary",
+		},
+	}
+
+	for _, tc := range unsafePlans {
+		t.Run(tc.name, func(t *testing.T) {
+			runnerInvoked = false
+
+			plan := system.RemedyPlan{
+				ID:         "REMEDY-UNSAFE-TEST",
+				Title:      "Unsafe Test Plan",
+				ActionType: system.ActionRunCommand,
+				Target:     "OBJ-UNSAFE",
+				Command:    tc.command,
+				Confidence: 1.0,
+				AutoApply:  true, // Caller attempted to force auto-apply
+			}
+
+			report, err := engine.Apply(context.Background(), []system.RemedyPlan{plan})
+			require.NoError(t, err)
+			assert.Equal(t, 0, report.TotalApplied, "unsafe plan must never be applied")
+			require.Len(t, report.Outcomes, 1)
+			assert.False(t, report.Outcomes[0].Applied, "outcome must be applied=false")
+			assert.Contains(t, report.Outcomes[0].Error, tc.errContains, "outcome error should describe rejection reason")
+			assert.False(t, runnerInvoked, "CommandRunner must never be invoked for unsafe command")
+		})
 	}
 }

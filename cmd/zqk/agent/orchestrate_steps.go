@@ -84,7 +84,7 @@ func buildOrchestrationTaskSteps(cli string, boundary orchestrationTaskBoundary)
 		{
 			objects.FieldKeyTitle:       "Implementation Phase",
 			objects.FieldKeyStatus:      objects.ObjectStatusPendingImplementation,
-			objects.FieldKeyDescription: fmt.Sprintf("Resolve the task envelope refs (`%s object get`, `%s agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.", cli, cli),
+			objects.FieldKeyDescription: fmt.Sprintf("Resolve the task envelope refs (`%s object get`, `%s agent prepare-context <task-id>`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object.", cli, cli),
 		},
 	}
 	if boundary.GraphCompose {

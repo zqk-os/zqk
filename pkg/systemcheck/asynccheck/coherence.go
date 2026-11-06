@@ -90,6 +90,9 @@ func isInvalidatingIssue(issue validation.ValidationIssue) bool {
 			return true
 		}
 	}
+	if issue.Category == "policy_compliance" || strings.EqualFold(issue.Category, "policy_compliance") {
+		return true
+	}
 	if IsTransientCacheCoherenceIssue(issue.Category) {
 		return true
 	}

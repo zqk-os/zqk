@@ -617,7 +617,9 @@ func GenerateComparisonEmbeddings(ctx context.Context, embedFn func(context.Cont
 
 func SanitizeOrMockPrompt(shouldMock bool, prompt string) (string, bool, error) {
 	if shouldMock {
-		return `["ZQK Observer Tip: APIKey missing, cannot generate dynamic tips."]`, true, nil
+		// Quiet fallback: empty tip list so swarm/observer banners stay silent
+		// when no LLM API key is configured (instead of advertising the miss).
+		return `[]`, true, nil
 	}
 	sanitized, err := SanitizeUntrustedText(prompt)
 	if err != nil {

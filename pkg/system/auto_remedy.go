@@ -3,6 +3,8 @@ package system
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -34,6 +36,9 @@ const (
 	targetPolicies      = "policies"
 	targetPersonas      = "personas"
 )
+
+// CommandRunner defines a callback or executor function capable of running a recipe command.
+type CommandRunner func(ctx context.Context, cmd string) (string, error)
 
 // RemedyPlan defines a concrete, executable recovery step for a system check or precondition anomaly.
 type RemedyPlan struct {
@@ -68,6 +73,7 @@ type DiagnosticsRemedyEngine struct {
 	ProjectRoot   string
 	PolicySeeder  func(projectRoot string) (int, error)
 	PersonaSeeder func(projectRoot string) (int, error)
+	CommandRunner CommandRunner
 }
 
 // NewDiagnosticsRemedyEngine constructs a new remedy engine.
@@ -180,10 +186,14 @@ func (e *DiagnosticsRemedyEngine) diagnoseSeedingPreconditions() []RemedyPlan {
 }
 
 var (
-	reEmptyIDsEqualed = regexp.MustCompile(`\s+--ids=(?:""|''|\z)`)
-	reEmptyIDsSpaced  = regexp.MustCompile(`\s+--ids(?:\s+""|\s+''|\z)`)
-	reIDsFlagArg      = regexp.MustCompile(`\s+--ids(?:\s+|=)`)
-	reLeadingIDs      = regexp.MustCompile(`^--ids(?:\s+|=)`)
+	reEmptyIDsEqualed            = regexp.MustCompile(`(?:\A|\s+)--ids=(?:""|''|\z)`)
+	reEmptyIDsSpaced             = regexp.MustCompile(`(?:\A|\s+)--ids(?:\s+""|\s+''|\z)`)
+	reEmptyIDsQuotesMiddle       = regexp.MustCompile(`(?:\A|\s+)--ids=(?:""|'')(?:\s+)`)
+	reEmptyIDsSpacedQuotesMiddle = regexp.MustCompile(`(?:\A|\s+)--ids\s+(?:""|'')(?:\s+)`)
+	reEmptyIDsBareSpaced         = regexp.MustCompile(`(?:\A|\s+)--ids=(?:\s+)`)
+	reEmptyIDsBareSpaced2        = regexp.MustCompile(`(?:\A|\s+)--ids(?:\s+)--`)
+	reIDsFlagArg                 = regexp.MustCompile(`(?:\A|\s+)--ids(?:\s+|=)`)
+	reLeadingIDs                 = regexp.MustCompile(`^--ids(?:\s+|=|\z)`)
 )
 
 // SanitizeRecipeCommand ensures recipe commands use positional arguments instead of
@@ -198,6 +208,10 @@ func SanitizeRecipeCommand(cmd string) string {
 	// 1. Remove empty or trailing --ids flags
 	cmd = reEmptyIDsEqualed.ReplaceAllString(cmd, "")
 	cmd = reEmptyIDsSpaced.ReplaceAllString(cmd, "")
+	cmd = reEmptyIDsQuotesMiddle.ReplaceAllString(cmd, " ")
+	cmd = reEmptyIDsSpacedQuotesMiddle.ReplaceAllString(cmd, " ")
+	cmd = reEmptyIDsBareSpaced.ReplaceAllString(cmd, " ")
+	cmd = reEmptyIDsBareSpaced2.ReplaceAllString(cmd, " --")
 
 	// 2. Replace '--ids <arg>' or '--ids=<arg>' with ' <arg>'
 	cmd = reIDsFlagArg.ReplaceAllString(cmd, " ")
@@ -248,6 +262,102 @@ func ValidateRecipeCommand(cmd string) error {
 		}
 	}
 	return nil
+}
+
+// ValidateSafeCommand validates that a recipe command is whitelisted, non-destructive,
+// does not contain shell injection, and does not target paths outside the project root.
+func ValidateSafeCommand(cmd string, projectRoot string) error {
+	trimmed := strings.TrimSpace(cmd)
+	if trimmed == "" {
+		return fmt.Errorf("recipe command cannot be empty")
+	}
+
+	// 1. Guard against shell injection / chaining / piping
+	unsafeShellChars := []string{";", "&", "|", ">", "<", "`", "$", "\n", "\r"}
+	for _, ch := range unsafeShellChars {
+		if strings.Contains(cmd, ch) {
+			return fmt.Errorf("command contains unsafe shell metacharacter %q", ch)
+		}
+	}
+
+	tokens := splitCommandArgs(trimmed)
+	if len(tokens) == 0 {
+		return fmt.Errorf("recipe command contains no executable tokens")
+	}
+
+	// 2. Executable token must match canonical product CLI or relative bin
+	exe := filepath.Base(tokens[0])
+	if exe != paths.CLIName() && exe != paths.CLICommandName && exe != paths.CLICommandNameDefault {
+		return fmt.Errorf("executable %q is not whitelisted; only %s commands are permitted", tokens[0], paths.CLIName())
+	}
+
+	if len(tokens) < 2 {
+		return fmt.Errorf("command %q lacks a subcommand verb", cmd)
+	}
+
+	// 3. Subcommand whitelist & destructive action rejection
+	switch tokens[1] {
+	case "system":
+		if len(tokens) < 3 {
+			return fmt.Errorf("system command requires a subcommand (check, init, agent-onboard, cleanup-duplicates)")
+		}
+		subverb := tokens[2]
+		switch subverb {
+		case "check", "init", "agent-onboard", "cleanup-duplicates":
+			// Safe system verbs
+		default:
+			return fmt.Errorf("system subcommand %q is not whitelisted for auto-remedy", subverb)
+		}
+	case "object":
+		if len(tokens) < 3 {
+			return fmt.Errorf("object command requires a verb")
+		}
+		verb := tokens[2]
+		switch verb {
+		case "update":
+			// Safe object update
+		case "delete", "destroy", "purge", "rm":
+			return fmt.Errorf("destructive command 'object %s' cannot be auto-applied", verb)
+		default:
+			return fmt.Errorf("object verb %q is not whitelisted for auto-remedy", verb)
+		}
+	default:
+		return fmt.Errorf("command verb %q is not whitelisted for auto-remedy", tokens[1])
+	}
+
+	// 4. Project boundary enforcement and path traversal guards
+	cleanRoot := ""
+	if projectRoot != "" {
+		cleanRoot = filepath.Clean(projectRoot)
+	}
+
+	for _, token := range tokens {
+		if strings.Contains(token, "..") {
+			return fmt.Errorf("argument %q contains path traversal '..' outside project boundary", token)
+		}
+		if filepath.IsAbs(token) {
+			cleanToken := filepath.Clean(token)
+			if cleanRoot == "" || !strings.HasPrefix(cleanToken, cleanRoot) {
+				return fmt.Errorf("argument %q references path outside project boundary", token)
+			}
+		}
+	}
+
+	return nil
+}
+
+// IsSafeRemedyCommand reports whether a recipe command is whitelisted and safe to auto-apply.
+func IsSafeRemedyCommand(cmd string, projectRoot ...string) bool {
+	root := ""
+	if len(projectRoot) > 0 {
+		root = projectRoot[0]
+	}
+	return ValidateSafeCommand(cmd, root) == nil
+}
+
+// ValidateSafeCommand checks that a recipe command is whitelisted and safe within the engine's ProjectRoot.
+func (e *DiagnosticsRemedyEngine) ValidateSafeCommand(cmd string) error {
+	return ValidateSafeCommand(cmd, e.ProjectRoot)
 }
 
 func splitCommandArgs(cmd string) []string {
@@ -322,7 +432,12 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 	}
 
 	for _, plan := range plans {
-		if !plan.AutoApply {
+		canApply := plan.AutoApply
+		if !canApply && plan.ActionType == ActionRunCommand && plan.Command != "" && e.ValidateSafeCommand(plan.Command) == nil {
+			canApply = true
+		}
+
+		if !canApply {
 			report.Outcomes = append(report.Outcomes, RemedyOutcome{
 				Plan:    plan,
 				Applied: false,
@@ -331,7 +446,7 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 			continue
 		}
 
-		outcome := e.applyPlan(plan)
+		outcome := e.applyPlanContext(ctx, plan)
 		if outcome.Applied {
 			report.TotalApplied++
 		}
@@ -342,6 +457,10 @@ func (e *DiagnosticsRemedyEngine) Apply(ctx context.Context, plans []RemedyPlan)
 }
 
 func (e *DiagnosticsRemedyEngine) applyPlan(plan RemedyPlan) RemedyOutcome {
+	return e.applyPlanContext(context.Background(), plan)
+}
+
+func (e *DiagnosticsRemedyEngine) applyPlanContext(ctx context.Context, plan RemedyPlan) RemedyOutcome {
 	switch plan.ActionType {
 	case ActionRemoveFile:
 		return e.applyRemoveFile(plan)
@@ -352,14 +471,69 @@ func (e *DiagnosticsRemedyEngine) applyPlan(plan RemedyPlan) RemedyOutcome {
 	case ActionKillProcess:
 		return e.applyKillProcess(plan)
 	case ActionRunCommand:
-		if plan.Command != "" {
-			if err := ValidateRecipeCommand(plan.Command); err != nil {
-				return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("invalid remedy command: %v", err)}
-			}
-		}
-		return RemedyOutcome{Plan: plan, Applied: false, Error: msgCommandRequires}
+		return e.applyRunCommand(ctx, plan)
 	default:
 		return RemedyOutcome{Plan: plan, Applied: false, Error: "unrecognized action type"}
+	}
+}
+
+func (e *DiagnosticsRemedyEngine) applyRunCommand(ctx context.Context, plan RemedyPlan) RemedyOutcome {
+	if plan.Command == "" {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: msgCommandRequires}
+	}
+	if err := ValidateRecipeCommand(plan.Command); err != nil {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("invalid remedy command: %v", err)}
+	}
+	if err := e.ValidateSafeCommand(plan.Command); err != nil {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("unsafe command rejected: %v", err)}
+	}
+
+	runner := e.CommandRunner
+	if runner == nil {
+		runner = e.defaultRunner()
+	}
+
+	out, err := runner(ctx, plan.Command)
+	if err != nil {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("command execution failed: %v", err)}
+	}
+
+	detail := strings.TrimSpace(out)
+	if detail == "" {
+		detail = fmt.Sprintf("executed remedy command: %s", plan.Command)
+	}
+	return RemedyOutcome{
+		Plan:    plan,
+		Applied: true,
+		Detail:  detail,
+	}
+}
+
+func (e *DiagnosticsRemedyEngine) defaultRunner() CommandRunner {
+	return func(ctx context.Context, cmdStr string) (string, error) {
+		tokens := splitCommandArgs(cmdStr)
+		if len(tokens) == 0 {
+			return "", fmt.Errorf("no command tokens")
+		}
+		exe := tokens[0]
+		if exe == paths.CLICommandName || exe == paths.CLICommandNameDefault || exe == paths.CLIName() || exe == "bin/zqk" || exe == "./bin/zqk" {
+			projectBin := filepath.Join(e.ProjectRoot, "bin", paths.CLICommandName)
+			if fileutil.Exists(projectBin) {
+				exe = projectBin
+			} else if currentExe, err := os.Executable(); err == nil && strings.Contains(filepath.Base(currentExe), paths.CLICommandName) {
+				exe = currentExe
+			}
+		}
+
+		c := exec.CommandContext(ctx, exe, tokens[1:]...)
+		if e.ProjectRoot != "" {
+			c.Dir = e.ProjectRoot
+		}
+		out, err := c.CombinedOutput()
+		if err != nil {
+			return string(out), fmt.Errorf("%w: %s", err, string(out))
+		}
+		return string(out), nil
 	}
 }
 

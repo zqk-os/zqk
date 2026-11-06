@@ -60,7 +60,7 @@ Each `RemedyPlan` encapsulates an atomic action with an assigned `ActionType`:
 | `ActionTouchFile` | Updates timestamp or initializes required placeholder files | Safe for auto-apply (`AutoApply: true`), confined strictly to `.zqk/` |
 | `ActionSeed` | Executes registered in-process seeders for policies and personas | Safe for auto-apply when seeders are registered (`AutoApply: true`) |
 | `ActionKillProcess` | Reaps detached zombie processes under PID 1 matching project workspace | Safe for auto-apply (`AutoApply: true`) |
-| `ActionRunCommand` | Formulates an actionable CLI command string for manual or runner execution | Requires runner or operator execution (`AutoApply: false`) |
+| `ActionRunCommand` | Formulates an actionable CLI command string for manual or runner execution | Safe for auto-apply when matching whitelisted internal auto-fix commands (`AutoApply: true`); requires runner or callback execution |
 
 ### 2.2 Diagnostic Generation Pipeline
 
@@ -149,19 +149,69 @@ To satisfy **CRIT-1793961678251838000-c44a82a1**, recipe commands must not only 
 6. **Unsanitized `--ids` Rejection**: Any command retaining `--ids` or `--ids=` fails validation:
    `recipe command contains invalid flag '--ids': positional ID arguments must be used`
 
-### 4.2 Application Phase Protection
+### 4.2 Safe Command Whitelist & Adversarial Boundary Verification
 
-In `DiagnosticsRemedyEngine.Apply(ctx, plans)`, if any plan has `ActionType: ActionRunCommand`:
+Under **POL-DOC-001** and **CRIT-1793982042724177000-c4858ffb**, `ValidateSafeCommand(cmd, projectRoot)` enforces strict negative adversarial boundaries to guarantee that only safe internal commands are auto-applied, rejecting any foreign, dangerous, or boundary-violating operations:
+
+1. **Strict Executable Whitelist**: Only invocations of the canonical product executable (`zqk`, `paths.CLIName()`, `paths.CLICommandNameDefault`) are permitted. Invocations of external shell interpreters (`sh`, `bash`, `python`), system utilities (`rm`, `curl`, `wget`, `sudo`), or unknown binaries fail closed:
+   `executable "<bin>" is not whitelisted; only zqk commands are permitted`
+2. **Subcommand & Operation Whitelist**:
+   - `zqk system check` (specifically safe internal auto-fix recipes: `zqk system check --auto-fix <id>`)
+   - `zqk system init` (e.g. `zqk system init --force`)
+   - `zqk system agent-onboard`
+   - `zqk system cleanup-duplicates`
+   - `zqk object update` (controlled metadata field corrections)
+3. **Destructive Command Rejection**: Mutation commands that delete or destroy objects (`object delete`, `object destroy`, `object purge`, `rm`) are explicitly rejected from automatic application:
+   `destructive command 'object delete' cannot be auto-applied`
+4. **Shell Injection & Metacharacter Prevention**: Recipe command strings must not contain command-chaining or shell-injection metacharacters (`;`, `&`, `|`, `>`, `<`, `` ` ``, `$`, `\n`, `\r`):
+   `command contains unsafe shell metacharacter "<char>"`
+5. **Path Traversal & Project Boundary Confinement**:
+   - Commands containing relative directory navigation (`..`) are rejected:
+     `argument "<arg>" contains path traversal '..' outside project boundary`
+   - Absolute paths targeting outside `ProjectRoot` are rejected:
+     `argument "<arg>" references path outside project boundary`
+
+### 4.3 Application Phase Execution & Runner Abstraction
+
+In `DiagnosticsRemedyEngine.Apply(ctx, plans)`, `ActionRunCommand` plans undergo rigorous gate verification before dispatch:
+
 ```go
-case ActionRunCommand:
-    if plan.Command != "" {
-        if err := ValidateRecipeCommand(plan.Command); err != nil {
-            return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("invalid remedy command: %v", err)}
-        }
-    }
-    return RemedyOutcome{Plan: plan, Applied: false, Error: msgCommandRequires}
+func (e *DiagnosticsRemedyEngine) applyRunCommand(ctx context.Context, plan RemedyPlan) RemedyOutcome {
+	if plan.Command == "" {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: msgCommandRequires}
+	}
+	if err := ValidateRecipeCommand(plan.Command); err != nil {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("invalid remedy command: %v", err)}
+	}
+	if err := e.ValidateSafeCommand(plan.Command); err != nil {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("unsafe command rejected: %v", err)}
+	}
+
+	runner := e.CommandRunner
+	if runner == nil {
+		runner = e.defaultRunner()
+	}
+
+	out, err := runner(ctx, plan.Command)
+	if err != nil {
+		return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("command execution failed: %v", err)}
+	}
+
+	detail := strings.TrimSpace(out)
+	if detail == "" {
+		detail = fmt.Sprintf("executed remedy command: %s", plan.Command)
+	}
+	return RemedyOutcome{
+		Plan:    plan,
+		Applied: true,
+		Detail:  detail,
+	}
+}
 ```
-Any invalid recipe command is trapped and recorded in the diagnostic outcome with an explicit error, preventing bad commands from being dispatched.
+
+- **Pluggable `CommandRunner`**: Callers (such as test harnesses or orchestration environments) may inject a custom `CommandRunner func(ctx context.Context, cmd string) (string, error)` callback.
+- **Default In-Process Fallback**: When no custom runner is provided, `defaultRunner()` resolves `bin/zqk` or `os.Executable()`, executing the command under `cmd.Dir = e.ProjectRoot`.
+- **Automatic Execution in `system check --auto-remedy`**: When `zqk system check --auto-remedy` is invoked, diagnosed recoverable auto-fix issues (`REMEDY-AUTOFIX-<id>`) are automatically promoted to execution and safely applied, resolving recoverable issues end-to-end without leaving them unapplied.
 
 ---
 
@@ -260,6 +310,21 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test ./cmd/zqk -run TestHelpMenuParity
 ---
 
 ## 7. Traceability Matrix
+
+### Cycle 55: Auto-Remedy Execution & Flag Parity Subsystem
+
+| Artifact / Contract | Identifier | Verification Proof |
+| :--- | :--- | :--- |
+| **Backlog Item** | `BLI-1793982291304857000-db95a5cd` | Auto-Remedy Execution and Positional Flag Parity |
+| **Priority Plan** | `PRI-1793981968849263000-4288a3b0` | Execution Cycle 55 Work Plan |
+| **Requirement** | `REQ-1793981998623327000-d6da33e0` | Automated System Check Remedy Execution and Flag Parity |
+| **Test Case** | `TST-1793982163056152000-3dc6ac46` | Unified Auto-Remedy Test Suite (`pkg/system/auto_remedy_test.go`) |
+| **Static Floor Criteria** | `CRIT-1793982022958714000-6de30dc2` | `TestAutoRemedy_StaticFloor_SafeCommandRecognitionAndFlagParity` |
+| **Dynamic Operational Criteria** | `CRIT-1793982039960170000-70b46b5b` | `TestAutoRemedy_OperationalProof_AutoFixCommandExecution` |
+| **Negative Boundary Criteria** | `CRIT-1793982042724177000-c4858ffb` | `TestAutoRemedy_NegativeBoundary_UnsafeRecipeRejection` |
+| **Compliance Criteria** | `CRIT-1793982045112235000-37580fdc` | `docs/guides/CLI_AUTO_REMEDY_AND_PARITY.md` specification per POL-DOC-001 |
+
+### Cycle 52: Recipe Generation & Help Golden Parity Baseline
 
 | Artifact / Contract | Identifier | Verification Proof |
 | :--- | :--- | :--- |

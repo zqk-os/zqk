@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -24,6 +25,12 @@ import (
 	"github.com/zqk-os/zqk/pkg/swarminit"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
+)
+
+const (
+	swarmInitEnsureMCPTimeout      = 60 * time.Second
+	swarmInitMCPSubscribersTimeout = 15 * time.Second
+	swarmInitRunDetachTimeout      = 3 * time.Minute
 )
 
 // NewInitCmd creates zqk swarm init.
@@ -84,7 +91,7 @@ func runSwarmInit(cmd *cobra.Command, _ []string) error {
 				return sp.Read(ctx, sec, id)
 			},
 			Steer:              swarmInitSteer(root, strings.TrimSpace(agentID), strings.TrimSpace(personaRef), logger),
-			ProbeConversation:  swarminit.NewConversationProbe(swarminit.LookPathAgentAPI(), ""),
+			ProbeConversation:  swarmInitConversationProbe(),
 			InstallSeatWorkers: swarmInitInstallWorkers(root),
 			EnsureMCP:          swarmInitEnsureMCP(root),
 			MCPSubscribers:     swarmInitMCPSubscribers(logger),
@@ -92,7 +99,11 @@ func runSwarmInit(cmd *cobra.Command, _ []string) error {
 			InspectFeed:        agentfeed.InspectFeed,
 		}
 
-		art, runErr := swarminit.Run(proc.OperationContext(), swarminit.Options{
+		// Detach from CLI request cancel so ensure_mcp / bind_seats finish even if
+		// the IDE tears down the request mid-stage (empty stderr cancel trap).
+		runCtx, runCancel := context.WithTimeout(context.WithoutCancel(proc.OperationContext()), swarmInitRunDetachTimeout)
+		defer runCancel()
+		art, runErr := swarminit.Run(runCtx, swarminit.Options{
 			PipelineID: strings.TrimSpace(pipelineID),
 			WorkflowID: strings.TrimSpace(workflowID),
 			Env:        env,
@@ -201,24 +212,54 @@ func swarmInitSteer(root, fromAgentID, personaRef string, logger logging.Logger)
 	}
 }
 
+func swarmInitConversationProbe() swarminit.ConversationProbe {
+	return swarminit.NewConversationProbe(swarminit.LookPathAgentAPI(), "")
+}
+
 func swarmInitEnsureMCP(root string) swarminit.EnsureMCPFunc {
 	return func(ctx context.Context, tcp string) error {
 		bin := swarmInitCLIBin(root)
-		cmd := execwrap.CommandContext(ctx, bin, "mcp", "ensure", "--tcp", tcp)
+		ensureCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), swarmInitEnsureMCPTimeout)
+		defer cancel()
+		cmd := execwrap.CommandContext(ensureCtx, bin, "mcp", "ensure", "--tcp", tcp)
 		cmd.Dir = root
-		var stderr bytes.Buffer
+		var stdout, stderr bytes.Buffer
+		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr
 		if err := cmd.Run(); err != nil {
-			return errfmt.Errorf("mcp ensure: %s", strings.TrimSpace(stderr.String()))
+			detail := swarmInitCmdFailureDetail(err, ensureCtx.Err(), stdout.String(), stderr.String())
+			return errfmt.Errorf("mcp ensure (bin=%s tcp=%s): %s", bin, tcp, detail)
 		}
 		return nil
 	}
 }
 
+func swarmInitCmdFailureDetail(runErr, ctxErr error, stdout, stderr string) string {
+	parts := make([]string, 0, 4)
+	if s := strings.TrimSpace(stderr); s != "" {
+		parts = append(parts, "stderr="+s)
+	}
+	if s := strings.TrimSpace(stdout); s != "" {
+		parts = append(parts, "stdout="+s)
+	}
+	if runErr != nil {
+		parts = append(parts, "err="+runErr.Error())
+	}
+	if ctxErr != nil {
+		parts = append(parts, "ctx="+ctxErr.Error())
+	}
+	if len(parts) == 0 {
+		return "failed with empty stderr (context canceled or process killed)"
+	}
+	return strings.Join(parts, " | ")
+}
+
 func swarmInitMCPSubscribers(logger logging.Logger) swarminit.MCPSubscribersFunc {
 	return func(ctx context.Context) (int, error) {
+		subCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), swarmInitMCPSubscribersTimeout)
+		defer cancel()
 		pd := mcp.NewProxyDaemon(mcp.DefaultDaemonTCP, logger)
-		return pd.QueryEventsSubscriberCount(ctx)
+		return pd.QueryEventsSubscriberCount(subCtx)
 	}
 }
 
@@ -262,11 +303,16 @@ func swarmInitChatBootstrap(root string) swarminit.ChatBootstrapFunc {
 }
 
 func swarmInitCLIBin(root string) string {
-	if p := paths.RepoBinPath(root); fileutil.IsRegularFile(p) {
-		return p
+	// Prefer tip/stable names first so swarm-init does not re-exec a mid-build bin/zqk.
+	cands := []string{
+		paths.RepoStableBinaryPath(root),
+		filepath.Join(root, "bin", "zqk-tip"),
+		paths.RepoBinPath(root),
 	}
-	if p := paths.RepoStableBinaryPath(root); fileutil.IsRegularFile(p) {
-		return p
+	for _, p := range cands {
+		if fileutil.IsRegularFile(p) {
+			return p
+		}
 	}
 	return "zqk"
 }

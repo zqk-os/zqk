@@ -57,11 +57,16 @@ When invoking `zqk agent prepare-context`:
    - If `--task` is supplied, its value is used as the task ID.
    - If `--task-id` is supplied, its value is used as the task ID.
    - If both `--task` and `--task-id` are supplied with matching values, resolution succeeds.
-3. **Negative Adversarial Boundary (Conflicting Flags)**:
-   If both `--task` and `--task-id` are provided without a positional argument and their values differ (e.g. `zqk agent prepare-context --task ATK-1 --task-id ATK-2`), the command fails-closed immediately with a clear, actionable diagnostic:
-   ```text
-   conflicting flags: --task="ATK-1" and --task-id="ATK-2"; specify only one task flag or supply a single positional argument
-   ```
+3. **Negative Adversarial Boundary (Conflicting Flags & Malformed Identifiers)**:
+   - If both `--task` and `--task-id` are provided without a positional argument and their values differ (e.g. `zqk agent prepare-context --task ATK-1 --task-id ATK-2`), the command fails-closed immediately with a clear, actionable diagnostic:
+     ```text
+     conflicting flags: --task="ATK-1" and --task-id="ATK-2"; specify only one task flag or supply a single positional argument
+     ```
+   - If a malformed task identifier containing whitespace or invalid characters (e.g. path traversal `..` or forbidden symbols `/\"'<>|&;$`+"`") is provided in either positional arguments or flags (e.g. `zqk agent prepare-context "ATK 100"` or `--task "ATK/bad"`), the command fails-closed immediately with validation error diagnostics:
+     ```text
+     malformed task identifier "ATK 100": must not contain whitespace
+     malformed task identifier "ATK/bad": contains invalid characters
+     ```
 4. **Mandatory Input Gate**:
    If neither a task ID (positional or flag) nor an ad-hoc `--description` is supplied, the command refuses to execute:
    ```text
@@ -119,11 +124,12 @@ flowchart TD
 
 This specification satisfies the following Knowledge Kernel contracts:
 
-- **Requirement**: `REQ-1793961619513407000-0eccbd36` (Agent Task Envelope Context Command Instruction Parity)
+- **Requirement**: `REQ-1793982003787461000-df6b6627` (Agent Task Context Preparation Instruction Parity)
 - **Criteria**:
-  - `CRIT-1793961658265525000-8f9bd5b1`: Static Floor Invariant: Documentation and architectural guidelines in `docs/guides/AGENT_TASK_ENVELOPE_INSTRUCTIONS.md` define task envelope command syntax conventions.
-  - `CRIT-1793961661248526000-da09bbe4`: Operational Dynamic Proof: Verify newly minted agent task envelopes instruct valid command syntax `zqk agent prepare-context <ATK>` and support `--task` / `--task-id` flag aliases.
-  - `CRIT-1793961664652478000-e6df5de5`: Negative Adversarial Boundary: Erroneous flag invocation provides clear, actionable corrective guidance.
+  - `CRIT-1793982054170819000-c69772a1`: Static Floor Invariant: Task envelope template instructs valid CLI invocation for agent prepare-context (`zqk agent prepare-context <ATK>` / `<task-id>`).
+  - `CRIT-1793982057457048000-cb586dda`: Operational Dynamic Proof: Verify agent prepare-context successfully accepts both canonical positional syntax and --task aliases.
+  - `CRIT-1793982060215231000-fd3d7d94`: Negative Adversarial Boundary: Enforce validation failure when conflicting or malformed task identifiers are provided.
+  - `CRIT-1793982062768548000-ee156eec`: Compliance Documentation: Update and maintain AGENT_TASK_ENVELOPE_INSTRUCTIONS.md documenting canonical invocation conventions per POL-DOC-001.
 - **Policies**:
   - `POL-DOC-001` (Mandatory documentation clarity and completeness)
   - `POL-DEFAULT-f746cccc03ce5694` (Test-Driven Development and Continuous Verification)

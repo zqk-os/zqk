@@ -156,6 +156,48 @@ func TestPrepareContextCmd_PositionalAndFlagAliases(t *testing.T) {
 	assert.Contains(t, errConflict.Error(), "conflicting flags")
 	assert.Contains(t, errConflict.Error(), "--task")
 	assert.Contains(t, errConflict.Error(), "--task-id")
+
+	// 9. Negative Adversarial Boundary: Malformed task identifiers with whitespace
+	_, errWhitespacePos := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"ATK TEST BAD",
+		"--format", "json",
+	)
+	require.Error(t, errWhitespacePos)
+	assert.Contains(t, errWhitespacePos.Error(), "malformed task identifier")
+	assert.Contains(t, errWhitespacePos.Error(), "whitespace")
+
+	_, errWhitespaceTask := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task", "ATK BAD TASK",
+		"--format", "json",
+	)
+	require.Error(t, errWhitespaceTask)
+	assert.Contains(t, errWhitespaceTask.Error(), "malformed task identifier")
+	assert.Contains(t, errWhitespaceTask.Error(), "whitespace")
+
+	_, errWhitespaceTaskID := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task-id", "ATK BAD TASKID",
+		"--format", "json",
+	)
+	require.Error(t, errWhitespaceTaskID)
+	assert.Contains(t, errWhitespaceTaskID.Error(), "malformed task identifier")
+	assert.Contains(t, errWhitespaceTaskID.Error(), "whitespace")
+
+	// 10. Negative Adversarial Boundary: Malformed task identifiers with invalid characters
+	_, errInvalidCharPos := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"../ATK-TRAVERSAL",
+		"--format", "json",
+	)
+	require.Error(t, errInvalidCharPos)
+	assert.Contains(t, errInvalidCharPos.Error(), "malformed task identifier")
+	assert.Contains(t, errInvalidCharPos.Error(), "invalid characters")
+
+	_, errInvalidCharFlag := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task", "ATK/INVALID",
+		"--format", "json",
+	)
+	require.Error(t, errInvalidCharFlag)
+	assert.Contains(t, errInvalidCharFlag.Error(), "malformed task identifier")
+	assert.Contains(t, errInvalidCharFlag.Error(), "invalid characters")
 }
 
 func TestPreparedContext_HasSemanticPayload(t *testing.T) {
