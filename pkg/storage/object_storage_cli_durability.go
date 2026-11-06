@@ -72,8 +72,18 @@ func (f *FileObjectStorage) EnsureCLIObjectMutationVisible(ctx context.Context, 
 	// Buffer is empty, but worker might still be applying the very last item.
 	// Skip cross-process WAL checkpoint wait when this process had nothing buffered
 	// (e.g. CLI create with WithSkipWriteBehind already flushed CAS/index synchronously).
-	if hadBufferedWork {
-		if err := WaitForWALProcessingEventDriven(f.projectRoot, 15*time.Second); err != nil {
+	// If the scheduler daemon is not running, there is no WAL processing worker to wait for,
+	// so we bypass to prevent hanging.
+	if hadBufferedWork && isSchedulerRunning(f.projectRoot) {
+		waitTimeout := 15 * time.Second
+		if ctx != nil {
+			if dl, ok := ctx.Deadline(); ok {
+				if remaining := time.Until(dl); remaining > 0 && remaining < waitTimeout {
+					waitTimeout = remaining
+				}
+			}
+		}
+		if err := WaitForWALProcessingEventDriven(f.projectRoot, waitTimeout); err != nil {
 			return err
 		}
 	}

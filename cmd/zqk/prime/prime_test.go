@@ -67,3 +67,73 @@ func main() {}
 	assert.Contains(t, output, `"target_duration_met": true`)
 	assert.Contains(t, output, `"project_root"`)
 }
+
+func TestPrimeCmd_QuietAndForce(t *testing.T) {
+	tempDir := t.TempDir()
+
+	sourceFile := filepath.Join(tempDir, "sample.go")
+	code := `package sample
+func Hello() string { return "world" }
+`
+	require.NoError(t, fileutil.WriteFile(sourceFile, []byte(code), paths.FilePerm644))
+
+	cmd := NewPrimeCmd()
+	var outBuf bytes.Buffer
+	cmd.SetOut(&outBuf)
+	cmd.SetErr(&outBuf)
+	cmd.SetArgs([]string{tempDir, "--quiet", "--force", "--verify=false"})
+
+	err := cmd.Execute()
+	require.NoError(t, err)
+	assert.Empty(t, outBuf.String())
+}
+
+func TestPrimeCmd_PathFlag(t *testing.T) {
+	tempDir := t.TempDir()
+
+	sourceFile := filepath.Join(tempDir, "sample.go")
+	code := `package sample
+func Hello() string { return "world" }
+`
+	require.NoError(t, fileutil.WriteFile(sourceFile, []byte(code), paths.FilePerm644))
+
+	cmd := NewPrimeCmd()
+	var outBuf bytes.Buffer
+	cmd.SetOut(&outBuf)
+	cmd.SetErr(&outBuf)
+	cmd.SetArgs([]string{"--path", tempDir, "--verify=false"})
+
+	err := cmd.Execute()
+	require.NoError(t, err)
+	assert.Contains(t, outBuf.String(), "ZQK Brownfield Fast-Prime Engine")
+}
+
+func TestPrimeCmd_DefaultDir(t *testing.T) {
+	tempDir := t.TempDir()
+	origDir, err := fileutil.Getwd()
+	require.NoError(t, err)
+	defer func() { _ = fileutil.Chdir(origDir) }()
+
+	require.NoError(t, fileutil.Chdir(tempDir))
+
+	cmd := NewPrimeCmd()
+	var outBuf bytes.Buffer
+	cmd.SetOut(&outBuf)
+	cmd.SetErr(&outBuf)
+	cmd.SetArgs([]string{"--verify=false"})
+
+	err = cmd.Execute()
+	require.NoError(t, err)
+	assert.Contains(t, outBuf.String(), "ZQK Brownfield Fast-Prime Engine")
+}
+
+func TestPrimeCmd_ErrorOnInvalidDir(t *testing.T) {
+	cmd := NewPrimeCmd()
+	var outBuf bytes.Buffer
+	cmd.SetOut(&outBuf)
+	cmd.SetErr(&outBuf)
+	cmd.SetArgs([]string{"/nonexistent/path/xyz/123", "--verify=false"})
+
+	err := cmd.Execute()
+	assert.Error(t, err)
+}

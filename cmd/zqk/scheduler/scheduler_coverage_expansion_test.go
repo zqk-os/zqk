@@ -5556,3 +5556,144 @@ func TestDumpCmd_NotRunningDaemon(t *testing.T) {
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "scheduler daemon is not running")
 }
+
+func TestFlagDuration_AdditionalEdgeCases(t *testing.T) {
+	cmd := &cobra.Command{}
+	cmd.Flags().Int("int-flag", 42, "")
+	cmd.Flags().Bool("bool-flag", true, "")
+
+	// Flag is non-duration and non-string type (default branch, GetString fails)
+	assert.Equal(t, 7*time.Second, flagDuration(cmd, "int-flag", 7*time.Second))
+	assert.Equal(t, 8*time.Second, flagDuration(cmd, "bool-flag", 8*time.Second))
+}
+
+func TestDumpCmd_NilContextAndEdgePaths(t *testing.T) {
+	tempDir := t.TempDir()
+	t.Setenv(zqkenv.ProjectRoot().Name(), tempDir)
+	t.Setenv(zqkenv.TestRoot().Name(), tempDir)
+
+	cmd := NewDumpCmd()
+	err := runDump(nil, cmd)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "scheduler daemon is not running")
+}
+
+func TestDetachedDaemonStartArgs_Matrix(t *testing.T) {
+	// Case 1: Standalone zqk-scheduler
+	args1 := detachedDaemonStartArgs("zqk-scheduler")
+	assert.Equal(t, []string{schedulerArgStart, schedulerArgForeground}, args1)
+
+	args2 := detachedDaemonStartArgs("/usr/local/bin/zqk-scheduler")
+	assert.Equal(t, []string{schedulerArgStart, schedulerArgForeground}, args2)
+
+	// Case 2: Monolithic zqk binary
+	args3 := detachedDaemonStartArgs("zqk")
+	assert.Equal(t, []string{schedulerArgScheduler, schedulerArgStart, schedulerArgForeground}, args3)
+
+	args4 := detachedDaemonStartArgs("/opt/bin/zqk")
+	assert.Equal(t, []string{schedulerArgScheduler, schedulerArgStart, schedulerArgForeground}, args4)
+}
+
+func TestAuditEventFieldsHelper_AllFields(t *testing.T) {
+	assert.Equal(t, auditEventFieldTargetID, getAuditEventTargetIDField())
+	assert.Equal(t, auditEventFieldTargetKind, getAuditEventTargetKindField())
+	assert.Equal(t, auditEventFieldEventType, getAuditEventEventTypeField())
+	assert.Equal(t, auditEventFieldCreatedAt, getAuditEventCreatedAtField())
+	assert.Equal(t, auditEventFieldMetadata, getAuditEventMetadataField())
+
+	assert.Equal(t, "success", GetMetadataSuccessField())
+	assert.Equal(t, "duration_seconds", GetMetadataDurationField())
+	assert.Equal(t, "error", GetMetadataErrorField())
+
+	// Custom unknown field returns fallback
+	assert.Equal(t, "custom_field_xyz", getAuditEventFieldName("custom_field_xyz"))
+
+	fieldMap := auditEventFieldNames()
+	assert.NotEmpty(t, fieldMap)
+}
+
+func TestAutonomySyntheticTelemetry_Variants(t *testing.T) {
+	tmpDir := t.TempDir()
+	out1 := autonomyTelemetryJSON(tmpDir)
+	assert.Contains(t, out1, `"synthetic":false`)
+	assert.Contains(t, out1, `"available":true`)
+
+	out2 := autonomyUnavailableTelemetryJSON()
+	assert.Contains(t, out2, `"synthetic":false`)
+}
+
+func TestGetSchedulerJobKind(t *testing.T) {
+	kind := getSchedulerJobKind()
+	assert.NotEmpty(t, kind)
+}
+
+func TestPrintIDEPasteApplescript_Execution(t *testing.T) {
+	cmd := NewPrintIDEPasteApplescriptCmd()
+	var buf bytes.Buffer
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	err := cmd.RunE(cmd, nil)
+	require.NoError(t, err)
+	assert.NotEmpty(t, buf.String())
+	assert.Contains(t, cmd.Aliases, "print-cursor-paste-applescript")
+}
+
+func TestCaptureDiagnostics_Invocation(t *testing.T) {
+	tmpDir := t.TempDir()
+	err := captureDiagnostics(tmpDir, "test_prefix")
+	_ = err
+}
+
+func TestRequireSchedulerServiceControl(t *testing.T) {
+	cmd := &cobra.Command{}
+
+	// 1. With SystemAccountID in SecurityContext
+	secSystem := &pkgctx.SecurityContext{AccountID: pkgctx.SystemAccountID}
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), secSystem))
+	assert.NoError(t, requireSchedulerServiceControl(cmd))
+
+	// 2. With admin role in SecurityContext
+	secAdmin := &pkgctx.SecurityContext{Roles: []string{"admin"}}
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), secAdmin))
+	assert.NoError(t, requireSchedulerServiceControl(cmd))
+
+	// 3. With APIKey set to SystemAccountID
+	secNone := &pkgctx.SecurityContext{AccountID: "user-123"}
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), secNone))
+	t.Setenv(zqkenv.APIKey().Name(), pkgctx.SystemAccountID)
+	assert.NoError(t, requireSchedulerServiceControl(cmd))
+
+	// 4. With TestBypassAuth set
+	t.Setenv(zqkenv.APIKey().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "1")
+	assert.NoError(t, requireSchedulerServiceControl(cmd))
+
+	// 5. With TestRoot set
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "")
+	t.Setenv(zqkenv.TestRoot().Name(), t.TempDir())
+	assert.NoError(t, requireSchedulerServiceControl(cmd))
+
+	// 6. Denied when not privileged
+	t.Setenv(zqkenv.TestRoot().Name(), "")
+	t.Setenv(zqkenv.APIKey().Name(), "")
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "")
+	cmd.SetContext(pkgctx.WithSecurityContext(context.Background(), secNone))
+	assert.Error(t, requireSchedulerServiceControl(cmd))
+}
+
+func TestServiceRootOrCwd(t *testing.T) {
+	res1 := serviceRootOrCwd("")
+	assert.NotEmpty(t, res1)
+
+	res2 := serviceRootOrCwd("/some/nonexistent/path/for/unit/test")
+	assert.Contains(t, res2, "unit/test")
+}
+
+func TestRunSchedulerServiceRebind_MissingFlags(t *testing.T) {
+	t.Setenv(zqkenv.TestBypassAuth().Name(), "1")
+	cmd := NewServiceCmd()
+	cmd.SetArgs([]string{"rebind"})
+	err := cmd.Execute()
+	assert.Error(t, err)
+}
