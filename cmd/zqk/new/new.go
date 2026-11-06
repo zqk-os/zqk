@@ -207,11 +207,15 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	goalID, _ := cmd.Flags().GetString("goal")
 	reqID = strings.TrimSpace(reqID)
 	goalID = strings.TrimSpace(goalID)
-	if reqID != emptyValue {
-		objData[objects.FieldKeyRequirementRefs] = []any{reqID}
-	}
-	if goalID != emptyValue {
-		objData[objects.FieldKeyGoalRefs] = []any{goalID}
+	if kind == objects.KindPriorityPlan {
+		applyPriorityPlanRelationalFlags(objData, nil, parseRelationalRefs(reqID), parseRelationalRefs(goalID))
+	} else {
+		if reqID != emptyValue {
+			objData[objects.FieldKeyRequirementRefs] = []any{reqID}
+		}
+		if goalID != emptyValue {
+			objData[objects.FieldKeyGoalRefs] = []any{goalID}
+		}
 	}
 	effort, _ := cmd.Flags().GetString("estimated-effort")
 	effort = strings.TrimSpace(effort)
@@ -251,6 +255,10 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	id, _ := objData[objects.FieldKeyID].(string)
 	if id == emptyValue {
 		return errfmt.Errorf("mint succeeded but object id is empty")
+	}
+
+	if wantCAS || shouldAutoTracePipeline(cmd, kind) {
+		_ = FlushAndRefreshCASIndex(projectRoot, kind, id)
 	}
 
 	if shouldAutoTracePipeline(cmd, kind) {
@@ -414,7 +422,9 @@ var coreKindRefFields = map[string]map[string]struct{}{
 		objects.FieldKeyGoalRefs: {},
 	},
 	objects.KindPriorityPlan: {
-		objects.FieldKeyWorkstreamRefs: {},
+		objects.FieldKeyWorkstreamRefs:    {},
+		objects.FieldKeyRelatedObjectRefs: {},
+		objects.FieldKeyRequirementRefs:   {},
 	},
 	objects.KindGoal: {},
 	objects.KindMilestone: {
@@ -633,38 +643,42 @@ func applyRelationalFlags(cmd *cobra.Command, kind string, objData map[string]an
 	bliFlag := getFlag("bli")
 	critFlag := getFlag("criteria")
 
-	// 1. --plan (string): Link priority plan reference
-	planRefs := parseRelationalRefs(planFlag)
-	if len(planRefs) > 0 {
-		if kindSupportsField(kind, objects.FieldKeyPriorityPlanRef) {
-			objData[objects.FieldKeyPriorityPlanRef] = planRefs[0]
-		} else if kindSupportsField(kind, objects.FieldKeyPriorityPlanRefs) {
-			appendRefToObjData(objData, objects.FieldKeyPriorityPlanRefs, planRefs...)
+	if kind == objects.KindPriorityPlan {
+		applyPriorityPlanRelationalFlags(objData, parseRelationalRefs(planFlag), parseRelationalRefs(reqFlag), parseRelationalRefs(goalFlag))
+	} else {
+		// 1. --plan (string): Link priority plan reference
+		planRefs := parseRelationalRefs(planFlag)
+		if len(planRefs) > 0 {
+			if kindSupportsField(kind, objects.FieldKeyPriorityPlanRef) {
+				objData[objects.FieldKeyPriorityPlanRef] = planRefs[0]
+			} else if kindSupportsField(kind, objects.FieldKeyPriorityPlanRefs) {
+				appendRefToObjData(objData, objects.FieldKeyPriorityPlanRefs, planRefs...)
+			}
+			inheritFromPriorityPlan(cmd, kind, planRefs[0], objData)
 		}
-		inheritFromPriorityPlan(cmd, kind, planRefs[0], objData)
-	}
 
-	// 2. --req (string): Link parent requirement
-	reqRefs := parseRelationalRefs(reqFlag)
-	if len(reqRefs) > 0 {
-		if kindSupportsField(kind, objects.FieldKeyRequirementRefs) {
-			appendRefToObjData(objData, objects.FieldKeyRequirementRefs, reqRefs...)
-		} else if kindSupportsField(kind, "requirement_ref") {
-			objData["requirement_ref"] = reqRefs[0]
+		// 2. --req (string): Link parent requirement
+		reqRefs := parseRelationalRefs(reqFlag)
+		if len(reqRefs) > 0 {
+			if kindSupportsField(kind, objects.FieldKeyRequirementRefs) {
+				appendRefToObjData(objData, objects.FieldKeyRequirementRefs, reqRefs...)
+			} else if kindSupportsField(kind, "requirement_ref") {
+				objData["requirement_ref"] = reqRefs[0]
+			}
 		}
-	}
 
-	// 3. --goal (string): Link root goal
-	goalRefs := parseRelationalRefs(goalFlag)
-	if len(goalRefs) > 0 {
-		if kindSupportsField(kind, objects.FieldKeyGoalRefs) {
-			appendRefToObjData(objData, objects.FieldKeyGoalRefs, goalRefs...)
-		} else if kindSupportsField(kind, "goal_ref") {
-			objData["goal_ref"] = goalRefs[0]
-		} else if kindSupportsField(kind, objects.FieldKeyBlockingGoalRefs) {
-			appendRefToObjData(objData, objects.FieldKeyBlockingGoalRefs, goalRefs...)
-		} else if kindSupportsField(kind, objects.FieldKeyLinkedGoalRefs) {
-			appendRefToObjData(objData, objects.FieldKeyLinkedGoalRefs, goalRefs...)
+		// 3. --goal (string): Link root goal
+		goalRefs := parseRelationalRefs(goalFlag)
+		if len(goalRefs) > 0 {
+			if kindSupportsField(kind, objects.FieldKeyGoalRefs) {
+				appendRefToObjData(objData, objects.FieldKeyGoalRefs, goalRefs...)
+			} else if kindSupportsField(kind, "goal_ref") {
+				objData["goal_ref"] = goalRefs[0]
+			} else if kindSupportsField(kind, objects.FieldKeyBlockingGoalRefs) {
+				appendRefToObjData(objData, objects.FieldKeyBlockingGoalRefs, goalRefs...)
+			} else if kindSupportsField(kind, objects.FieldKeyLinkedGoalRefs) {
+				appendRefToObjData(objData, objects.FieldKeyLinkedGoalRefs, goalRefs...)
+			}
 		}
 	}
 

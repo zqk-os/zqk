@@ -63,7 +63,7 @@ func IsCompositionFieldAllowed(kind, field string, spec *Spec) bool {
 	}
 	if kind == KindPriorityPlan {
 		switch field {
-		case "commit_hashes", "commit_refs", "notes":
+		case "commit_hashes", "commit_refs", "notes", FieldKeyRequirementRefs, "requirement_ref":
 			return true
 		}
 	}

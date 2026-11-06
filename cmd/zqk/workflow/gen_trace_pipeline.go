@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -13,9 +14,11 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/scenario"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"gopkg.in/yaml.v3"
 )
@@ -631,7 +634,7 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 	}
 
 	if strings.HasPrefix(targetID, "REQ-") && needCriteria && len(summary.CreatedCriteriaIDs) > 0 {
-		// Ensure any newly generated criteria are in CAS before linking to a CAS requirement.
+		// Ensure any newly generated criteria and test cases are in CAS before linking to a CAS requirement.
 		if !storage.IsDraftPlaneOnly(proc.ProjectRoot(), objects.KindRequirement, targetID) {
 			for _, cid := range summary.CreatedCriteriaIDs {
 				if storage.IsDraftPlaneOnly(proc.ProjectRoot(), objects.KindCriteria, cid) {
@@ -641,6 +644,35 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 						_ = storageProvider.Update(ctx, secCtx, cid, critObj)
 					}
 				}
+			}
+			for _, tid := range summary.CreatedTestCaseIDs {
+				if storage.IsDraftPlaneOnly(proc.ProjectRoot(), objects.KindTestCase, tid) {
+					testObj, readErr := storageProvider.Read(ctx, secCtx, tid)
+					if readErr == nil {
+						testObj[objects.FieldKeyStatus] = objects.ObjectStatusOriginated
+						_ = storageProvider.Update(ctx, secCtx, tid, testObj)
+					}
+				}
+			}
+			_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), objects.KindCriteria)
+			_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), objects.KindTestCase)
+
+			critDir := filepath.Join(proc.ProjectRoot(), paths.ProcessDir, objects.GetDirectoryFromKind(objects.KindCriteria))
+			if critCas := filecas.NewContentAddressableStorage(critDir, objects.KindCriteria); critCas != nil {
+				_ = critCas.EnsureIndexPopulated()
+				for _, cid := range summary.CreatedCriteriaIDs {
+					_, _ = critCas.GetHashForID(cid)
+				}
+				_ = critCas.GetIndex().Save()
+			}
+
+			testDir := filepath.Join(proc.ProjectRoot(), paths.ProcessDir, objects.GetDirectoryFromKind(objects.KindTestCase))
+			if testCas := filecas.NewContentAddressableStorage(testDir, objects.KindTestCase); testCas != nil {
+				_ = testCas.EnsureIndexPopulated()
+				for _, tid := range summary.CreatedTestCaseIDs {
+					_, _ = testCas.GetHashForID(tid)
+				}
+				_ = testCas.GetIndex().Save()
 			}
 		}
 
