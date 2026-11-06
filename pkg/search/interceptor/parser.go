@@ -60,6 +60,7 @@ const (
 	flagLongKind         = "--kind"
 	flagLongRecv         = "--recv"
 	flagLongMaxTokens    = "--max-tokens" //nolint:gosec // G101: CLI flag name, not credential
+	flagLongFormat       = "--format"
 	flagLongExt          = "--ext"
 	flagExtGo            = ".go"
 )
@@ -117,21 +118,25 @@ type PipelineSegment struct {
 
 // ParsedSearchCommand holds normalized flags, search query, and target paths.
 type ParsedSearchCommand struct {
-	Tool            string
-	Pattern         string
-	TargetPaths     []string
-	IgnoreCase      bool
-	WordRegexp      bool
-	Regex           bool
-	ContextLines    int
-	MaxCount        int
-	TypeExtension   string
-	Hidden          bool
-	ASTMode         bool
-	ASTKind         string
-	ASTReceiver     string
-	HasStdinDash    bool
-	NoPathsProvided bool
+	Tool                string
+	Pattern             string
+	TargetPaths         []string
+	IgnoreCase          bool
+	WordRegexp          bool
+	Regex               bool
+	ContextLines        int
+	MaxCount            int
+	MaxTokens           int
+	Format              string
+	TypeExtension       string
+	Hidden              bool
+	ASTMode             bool
+	ASTKind             string
+	ASTReceiver         string
+	HasStdinDash        bool
+	NoPathsProvided     bool
+	HasUnsupportedFlags bool
+	UnsupportedFlag     string
 }
 
 // splitPipelineSegments partitions a shell command line by unquoted POSIX pipe '|' operators.
@@ -427,6 +432,34 @@ func parseLongFlag(arg string, args []string, i, n int, parsed *ParsedSearchComm
 		}
 		parsed.ASTReceiver = valStr
 		parsed.ASTMode = true
+	case flagLongExt:
+		valStr := flagValue
+		if !hasEq && i+1 < n {
+			i++
+			valStr = args[i]
+		}
+		parsed.TypeExtension = valStr
+	case flagLongMaxTokens:
+		valStr := flagValue
+		if !hasEq && i+1 < n {
+			i++
+			valStr = args[i]
+		}
+		if t, err := strconv.Atoi(valStr); err == nil {
+			parsed.MaxTokens = t
+		}
+	case flagLongFormat:
+		valStr := flagValue
+		if !hasEq && i+1 < n {
+			i++
+			valStr = args[i]
+		}
+		parsed.Format = valStr
+	case flagLongRecursive, flagLongLineNumber:
+		// Supported standard grep flags, handled implicitly by zqk grep
+	default:
+		parsed.HasUnsupportedFlags = true
+		parsed.UnsupportedFlag = flagName
 	}
 	return i
 }
@@ -444,6 +477,8 @@ func parseShortFlagCluster(arg string, args []string, i, n int, parsed *ParsedSe
 			parsed.Regex = true
 		case 'F':
 			parsed.Regex = false
+		case 'r', 'R', 'n':
+			// Supported standard grep recursive/line flags, handled implicitly by zqk grep
 		case 'e':
 			parsed.Regex = true
 			if j+1 < len(cluster) {
@@ -452,6 +487,17 @@ func parseShortFlagCluster(arg string, args []string, i, n int, parsed *ParsedSe
 			} else if i+1 < n {
 				i++
 				parsed.Pattern = args[i]
+				return i
+			}
+		case 'f':
+			valStr := ""
+			if j+1 < len(cluster) {
+				valStr = cluster[j+1:]
+				parsed.Format = valStr
+				return i
+			} else if i+1 < n {
+				i++
+				parsed.Format = args[i]
 				return i
 			}
 		case 'C':
@@ -495,9 +541,28 @@ func parseShortFlagCluster(arg string, args []string, i, n int, parsed *ParsedSe
 				parsed.TypeExtension = args[i]
 				return i
 			}
+		default:
+			parsed.HasUnsupportedFlags = true
+			parsed.UnsupportedFlag = string(ch)
 		}
 	}
 	return i
+}
+
+// isNonIndexedPath determines if targetPath targets directories or files excluded from repository indexing (e.g. .git/).
+func isNonIndexedPath(targetPath, cwd, projectRoot string) bool {
+	if targetPath == "" || targetPath == DotPath {
+		return false
+	}
+	clean := filepath.Clean(targetPath)
+	slashPath := filepath.ToSlash(clean)
+	parts := strings.Split(slashPath, "/")
+	for _, part := range parts {
+		if part == ".git" || part == ".gemini" || part == ".cursor" || part == ".claude" || part == ".idea" || part == ".vscode" || part == ".cache" {
+			return true
+		}
+	}
+	return false
 }
 
 // isExternalPath determines if targetPath resides outside the projectRoot directory.

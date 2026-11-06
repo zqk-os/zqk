@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/clihooks"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -27,6 +29,8 @@ type preCommandHookOutput struct {
 func NewPreCommandHookCmd() *cobra.Command {
 	var vendor string
 	var projectRoot string
+	var maxTokens int
+	var format string
 
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookPreCommandCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -40,18 +44,56 @@ func NewPreCommandHookCmd() *cobra.Command {
 			if err != nil || pr == "" {
 				pr = projectRoot
 			}
-			return runPreCommandHookWithDeps(cmd.Context(), nil, nil, pr, v, in, out)
+
+			var opts []interceptor.Option
+			if cmd.Flags().Changed("max-tokens") {
+				if mt, err := cmd.Flags().GetInt("max-tokens"); err == nil && mt > 0 {
+					opts = append(opts, interceptor.WithMaxTokens(mt))
+				}
+			} else if maxTokens > 0 {
+				opts = append(opts, interceptor.WithMaxTokens(maxTokens))
+			}
+
+			if cmd.Flags().Changed("format") {
+				if fmtFlag, err := cmd.Flags().GetString("format"); err == nil && fmtFlag != "" {
+					opts = append(opts, interceptor.WithFormat(fmtFlag))
+				}
+			} else if format != "" {
+				opts = append(opts, interceptor.WithFormat(format))
+			}
+
+			return runPreCommandHookWithDeps(cmd.Context(), nil, nil, pr, v, in, out, opts...)
 		},
 	})
+
+	if cmd.Flags().Lookup("max-tokens") == nil {
+		cmd.Flags().IntVar(&maxTokens, "max-tokens", 0, "Maximum token budget for rewritten code searches")
+	}
+	if cmd.Flags().Lookup("format") == nil {
+		cmd.Flags().StringVarP(&format, "format", "f", "", "Output format for rewritten searches (lines, json, yaml)")
+	}
 
 	return cmd
 }
 
 // runPreCommandHookWithDeps processes the hook input payload, invokes the interceptor, and writes the decision JSON.
-func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, vendor string, in io.Reader, out io.Writer) error {
+func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, projectRoot, vendor string, in io.Reader, out io.Writer, opts ...interceptor.Option) error {
 	_ = sec
 	_ = sp
 	_ = vendor
+
+	resolvedRoot := projectRoot
+	if resolvedRoot == "" {
+		resolvedRoot = paths.ResolveProjectRoot(".")
+	}
+	if resolvedRoot != "" {
+		prof := clihooks.NewProfile(resolvedRoot)
+		if err := prof.Load(); err == nil {
+			if !prof.IsEnabled(clihooks.HookAgentSearchInterceptor) {
+				return emitPreCommandDecision(out, "allow", "", nil)
+			}
+		}
+	}
 
 	inputBytes, err := safeDrainInput(in)
 	if err != nil || len(strings.TrimSpace(string(inputBytes))) == 0 {
@@ -76,11 +118,22 @@ func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext,
 
 	cwd := extractCwd(raw, projectRoot)
 
+	// Combine explicit options with any payload-specified settings
+	effectiveOpts := make([]interceptor.Option, len(opts))
+	copy(effectiveOpts, opts)
+
+	if payloadTokens := extractMaxTokens(raw); payloadTokens > 0 {
+		effectiveOpts = append(effectiveOpts, interceptor.WithMaxTokens(payloadTokens))
+	}
+	if payloadFormat := extractFormat(raw); payloadFormat != "" {
+		effectiveOpts = append(effectiveOpts, interceptor.WithFormat(payloadFormat))
+	}
+
 	res, err := interceptor.Intercept(ctx, interceptor.InterceptRequest{
 		CommandLine: commandLine,
 		Cwd:         cwd,
 		ProjectRoot: projectRoot,
-	})
+	}, effectiveOpts...)
 	if err != nil || res == nil || !res.Intercepted {
 		return emitPreCommandDecision(out, "allow", "", nil)
 	}
@@ -243,6 +296,86 @@ func extractCwd(raw map[string]any, projectRoot string) string {
 		return ""
 	}
 	return wd
+}
+
+// extractMaxTokens inspects top-level and nested tool arguments for max token budget.
+func extractMaxTokens(raw map[string]any) int {
+	keys := []string{"max_tokens", "maxTokens", "token_budget", "tokenBudget"}
+	for _, k := range keys {
+		if val, ok := raw[k]; ok {
+			switch v := val.(type) {
+			case float64:
+				if v > 0 {
+					return int(v)
+				}
+			case int:
+				if v > 0 {
+					return v
+				}
+			case string:
+				if n, err := strconv.Atoi(v); err == nil && n > 0 {
+					return n
+				}
+			}
+		}
+	}
+
+	containers := []map[string]any{
+		mapSubMap(raw, "tool_args"),
+		mapSubMap(mapSubMap(raw, "toolCall"), "args"),
+		mapSubMap(raw, "args"),
+	}
+	for _, container := range containers {
+		if container == nil {
+			continue
+		}
+		for _, k := range keys {
+			if val, ok := container[k]; ok {
+				switch v := val.(type) {
+				case float64:
+					if v > 0 {
+						return int(v)
+					}
+				case int:
+					if v > 0 {
+						return v
+					}
+				case string:
+					if n, err := strconv.Atoi(v); err == nil && n > 0 {
+						return n
+					}
+				}
+			}
+		}
+	}
+	return 0
+}
+
+// extractFormat inspects top-level and nested tool arguments for output format.
+func extractFormat(raw map[string]any) string {
+	keys := []string{"format", "output_format", "outputFormat"}
+	for _, k := range keys {
+		if s := strings.TrimSpace(mapString(raw, k)); s != "" {
+			return s
+		}
+	}
+
+	containers := []map[string]any{
+		mapSubMap(raw, "tool_args"),
+		mapSubMap(mapSubMap(raw, "toolCall"), "args"),
+		mapSubMap(raw, "args"),
+	}
+	for _, container := range containers {
+		if container == nil {
+			continue
+		}
+		for _, k := range keys {
+			if s := strings.TrimSpace(mapString(container, k)); s != "" {
+				return s
+			}
+		}
+	}
+	return ""
 }
 
 // emitPreCommandDecision writes the formatted JSON response to out.

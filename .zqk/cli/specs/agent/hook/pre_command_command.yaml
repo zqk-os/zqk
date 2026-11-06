@@ -13,6 +13,10 @@ flags:
     type: string
     default: ""
     description: "Project root directory"
+  - name: max-tokens
+    type: int
+    default: 0
+    description: "Maximum token budget for rewritten code searches"
 args:
   type: no_args
 help:

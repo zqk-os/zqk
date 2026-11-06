@@ -31,6 +31,8 @@ const (
 	ReasonStreamFilter        = "standard input pipe detected (stream filter)"
 	ReasonExternalPath        = "target path is outside repository root"
 	ReasonNonCodeFile         = "target path is a single non-code file"
+	ReasonNonIndexedPath      = "target path is not part of indexed repository tree"
+	ReasonUnsupportedFlags    = "command uses flags unsupported by zqk grep engine"
 	ReasonEmptyCommand        = "empty command line"
 )
 
@@ -94,6 +96,7 @@ type Interceptor interface {
 type Options struct {
 	BinaryName string
 	MaxTokens  int
+	Format     string
 }
 
 // Option modifies Options.
@@ -110,5 +113,12 @@ func WithBinaryName(name string) Option {
 func WithMaxTokens(tokens int) Option {
 	return func(o *Options) {
 		o.MaxTokens = tokens
+	}
+}
+
+// WithFormat configures the output format for the rewritten search command (e.g. "json", "lines").
+func WithFormat(format string) Option {
+	return func(o *Options) {
+		o.Format = format
 	}
 }

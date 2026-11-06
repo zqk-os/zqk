@@ -799,4 +799,66 @@ func TestAdditionalCoverage(t *testing.T) {
 	if err != nil || !resPkg.Intercepted {
 		t.Errorf("expected package-level Intercept to succeed")
 	}
+
+	// 13. Unsupported flags passthrough
+	unsupportedCmds := []string{
+		`grep -v "error" .`,
+		`grep -l "pattern" .`,
+		`grep -c "foo" .`,
+		`grep --invert-match "exclude" .`,
+		`grep --files-with-matches "bar" .`,
+	}
+	for _, cmd := range unsupportedCmds {
+		res, err := Intercept(context.Background(), InterceptRequest{
+			CommandLine: cmd,
+			ProjectRoot: tmpDir,
+		})
+		if err != nil {
+			t.Fatalf("unexpected error for %q: %v", cmd, err)
+		}
+		if res.Intercepted {
+			t.Errorf("expected unsupported flag command %q NOT to be intercepted, got: %s", cmd, res.RewrittenCommand)
+		}
+		if res.Reason != ReasonUnsupportedFlags {
+			t.Errorf("expected reason %q for %q, got %q", ReasonUnsupportedFlags, cmd, res.Reason)
+		}
+	}
+
+	// 14. Non-indexed path passthrough (.git)
+	nonIndexedCmds := []string{
+		`grep "commit" .git/config`,
+		`grep "ref" .git/HEAD`,
+		`grep "test" .git`,
+	}
+	for _, cmd := range nonIndexedCmds {
+		res, err := Intercept(context.Background(), InterceptRequest{
+			CommandLine: cmd,
+			ProjectRoot: tmpDir,
+		})
+		if err != nil {
+			t.Fatalf("unexpected error for %q: %v", cmd, err)
+		}
+		if res.Intercepted {
+			t.Errorf("expected non-indexed path command %q NOT to be intercepted, got: %s", cmd, res.RewrittenCommand)
+		}
+		if res.Reason != ReasonNonIndexedPath {
+			t.Errorf("expected reason %q for %q, got %q", ReasonNonIndexedPath, cmd, res.Reason)
+		}
+	}
+
+	// 15. Command-line --max-tokens and --format parsing with WithFormat option
+	resWithOpts, err := Intercept(context.Background(), InterceptRequest{
+		CommandLine: `grep -rn "foo" . --max-tokens 2000`,
+		ProjectRoot: tmpDir,
+	}, WithFormat("json"))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !resWithOpts.Intercepted {
+		t.Fatalf("expected command with max-tokens to be intercepted")
+	}
+	expectedSub := `--max-tokens 2000 -f json "foo"`
+	if !strings.Contains(resWithOpts.RewrittenCommand, expectedSub) {
+		t.Errorf("expected rewritten command to contain %q, got %q", expectedSub, resWithOpts.RewrittenCommand)
+	}
 }
