@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -249,7 +250,7 @@ func newStopCmd() *cobra.Command {
 		Short: "Stop the background ambient daemon",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			projectRoot := cli.ResolveProjectRoot(".")
-			return StopDaemon(projectRoot)
+			return StopDaemonWithOutput(projectRoot, cmd.OutOrStdout())
 		},
 	}
 	return cmd
@@ -327,10 +328,18 @@ func EnsureDaemon(projectRoot string, logger logging.Logger) error {
 
 // StopDaemon stops the running ambient daemon
 func StopDaemon(projectRoot string) error {
+	return StopDaemonWithOutput(projectRoot, nil)
+}
+
+// StopDaemonWithOutput stops the running ambient daemon and prints confirmation feedback to out.
+func StopDaemonWithOutput(projectRoot string, out io.Writer) error {
 	logger := logging.GetLoggerFromProfile("cli")
 	pids := findRunningAmbientPIDs(projectRoot)
 	if len(pids) == 0 {
 		logging.Fluent(logger).Info("Ambient daemon is not running.").Log()
+		if out != nil {
+			_, _ = fmt.Fprint(out, "Ambient daemon is not running.\n")
+		}
 		return nil
 	}
 
@@ -373,6 +382,9 @@ func StopDaemon(projectRoot string) error {
 
 	for _, pid := range pids {
 		logging.Fluent(logger).Info(fmt.Sprintf("Stopped ambient daemon (PID: %d).", pid)).Log()
+		if out != nil {
+			_, _ = fmt.Fprintf(out, "Stopped ambient daemon (PID: %d).\n", pid)
+		}
 	}
 	return nil
 }

@@ -236,6 +236,54 @@ func TestCycle131_StopDaemon_GracefulAndForced(t *testing.T) {
 	assert.False(t, running)
 }
 
+func TestStopCmd_FeedbackConfirmation(t *testing.T) {
+	tmpRoot := t.TempDir()
+	t.Cleanup(func() {
+		cli.UnregisterStorageForProjectRoot(tmpRoot)
+	})
+	t.Setenv("ZQK_PROJECT_ROOT", tmpRoot)
+
+	// Case 1: No daemon running -> "Ambient daemon is not running.\n"
+	cmd := newStopCmd()
+	require.NotNil(t, cmd)
+	buf := new(bytes.Buffer)
+	cmd.SetOut(buf)
+	cmd.SetErr(buf)
+
+	err := cmd.Execute()
+	require.NoError(t, err)
+	assert.Equal(t, "Ambient daemon is not running.\n", buf.String())
+
+	// Case 2: Daemon running -> "Stopped ambient daemon (PID: ...).\n"
+	shCmd := testkit.ManagedCommand(t, t.Context(), "bash", "-c", "sleep 3 & wait # ambient daemon "+tmpRoot)
+	err = shCmd.Start()
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		if shCmd.Process != nil {
+			_ = shCmd.Process.Kill()
+			_ = shCmd.Wait()
+		}
+	})
+
+	time.Sleep(100 * time.Millisecond)
+
+	pidPath := ambientPIDFilePath(tmpRoot)
+	err = fileutil.EnsureDir(filepath.Dir(pidPath))
+	require.NoError(t, err)
+	err = fileutil.WriteFile(pidPath, []byte(strconv.Itoa(shCmd.Process.Pid)), paths.FilePerm644)
+	require.NoError(t, err)
+
+	buf.Reset()
+	cmdRunning := newStopCmd()
+	cmdRunning.SetOut(buf)
+	cmdRunning.SetErr(buf)
+
+	err = cmdRunning.Execute()
+	require.NoError(t, err)
+	expectedMsg := "Stopped ambient daemon (PID: " + strconv.Itoa(shCmd.Process.Pid) + ").\n"
+	assert.Contains(t, buf.String(), expectedMsg)
+}
+
 func TestCycle131_WaveSubcommand_FullCoverage(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, nil)
 	tmpRoot := proj.Root
