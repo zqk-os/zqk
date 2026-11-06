@@ -53,7 +53,10 @@ func NewInterceptor(logger logging.Logger, opts ...Option) (*PipelineInterceptor
 
 // NewDefaultInterceptor returns a default PipelineInterceptor without extra options.
 func NewDefaultInterceptor() *PipelineInterceptor {
-	in, _ := NewInterceptor(nil)
+	in, err := NewInterceptor(nil)
+	if err != nil {
+		return nil
+	}
 	return in
 }
 

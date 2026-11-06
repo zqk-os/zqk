@@ -749,7 +749,10 @@ func TestAdditionalCoverage(t *testing.T) {
 	// 7. Context cancellation in PipelineInterceptor.Intercept
 	canceledCtx, cancel := context.WithCancel(context.Background())
 	cancel()
-	in, _ := NewInterceptor(nil)
+	in, err := NewInterceptor(nil)
+	if err != nil {
+		t.Fatalf("unexpected error creating interceptor: %v", err)
+	}
 	_, err = in.Intercept(canceledCtx, InterceptRequest{CommandLine: `grep "foo" .`})
 	if err == nil {
 		t.Errorf("expected error on canceled context")
