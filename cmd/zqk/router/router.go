@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	cliapp "github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -26,11 +27,11 @@ func NewRouterCmd() *cobra.Command {
 		AddExample("Evaluate route with token budget", paths.CLIUsage("router", "eval", "grep 'foo' pkg/", "--token-budget", "1500")).
 		AddExample("View router runtime statistics", paths.CLIUsage("router", "stats"))
 
-	cmd := &cobra.Command{
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewRouterCommandBuilder(), &cobra.Command{
 		Use:   "router",
 		Short: "Universal tool and model gradient router",
 		Long:  "Universal tool and model gradient router daemon and evaluator for L7 token budgeting and dispatch.",
-	}
+	})
 
 	helpBuilder.ApplyToCommand(cmd)
 
@@ -44,20 +45,16 @@ func NewRouterCmd() *cobra.Command {
 }
 
 func newEvalCmd() *cobra.Command {
-	var tokenBudget int
-	var format string
-	var cwd string
-
-	cmd := &cobra.Command{
-		Use:   "eval [command]",
-		Short: "Evaluate a command line or tool call through the gradient router pipeline",
-		Long:  "Evaluates a command line against the L7 gradient pipeline stages (funnel, in-repo boundary, token budget guard, specialized tool selector, and fallback).",
-		Args:  cobra.MinimumNArgs(1),
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewRouterEvalCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Context().Err(); err != nil {
 				return err
 			}
 			process.TouchMeaningfulActivity()
+
+			tokenBudget, _ := cmd.Flags().GetInt("token-budget")
+			format, _ := cmd.Flags().GetString("format")
+			cwd, _ := cmd.Flags().GetString("cwd")
 
 			cmdLine := strings.Join(args, " ")
 			gr := routerpkg.NewGradientRouter(nil, nil)
@@ -95,27 +92,20 @@ func newEvalCmd() *cobra.Command {
 			fmt.Fprintf(out, "Tokens:     %d\n", decision.TokenBudget)
 			return nil
 		},
-	}
-
-	cmd.Flags().IntVar(&tokenBudget, "token-budget", 2000, "Token budget ceiling for intercepted commands")
-	cmd.Flags().StringVarP(&format, "format", "f", "json", "Output format (json, text)")
-	cmd.Flags().StringVar(&cwd, "cwd", "", "Working directory context")
+	})
 
 	return cmd
 }
 
 func newStatsCmd() *cobra.Command {
-	var format string
-
-	cmd := &cobra.Command{
-		Use:   "stats",
-		Short: "Display ambient gradient router telemetry and statistics",
-		Long:  "Outputs point-in-time metrics on model gradient dispatch, tool calls, routes chosen, and bypass reasons.",
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewRouterStatsCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := cmd.Context().Err(); err != nil {
 				return err
 			}
 			process.TouchMeaningfulActivity()
+
+			format, _ := cmd.Flags().GetString("format")
 
 			gr := routerpkg.NewGradientRouter(nil, nil)
 			stats := gr.Stats()
@@ -135,9 +125,7 @@ func newStatsCmd() *cobra.Command {
 			enc.SetIndent("", "  ")
 			return enc.Encode(stats)
 		},
-	}
-
-	cmd.Flags().StringVarP(&format, "format", "f", "json", "Output format (json, text)")
+	})
 
 	return cmd
 }

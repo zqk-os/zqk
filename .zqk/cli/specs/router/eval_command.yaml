@@ -1,0 +1,33 @@
+$schema: ../_schemas/command_spec.schema.json
+name: eval [command]
+short: Evaluate a command line or tool call through the gradient router pipeline
+description: |
+  Evaluates a command line against the L7 gradient pipeline stages (funnel,
+  in-repo boundary, token budget guard, specialized tool selector, and fallback).
+args:
+  type: minimum
+  min: 1
+flags:
+  - name: token-budget
+    type: int
+    default: 2000
+    description: "Token budget ceiling for intercepted commands"
+  - name: format
+    shorthand: f
+    type: string
+    default: "json"
+    description: "Output format (json, text)"
+  - name: cwd
+    type: string
+    default: ""
+    description: "Working directory context"
+help:
+  examples:
+    - comment: "Evaluate a command route"
+      command: "%s router eval \"grep -rn 'foo' pkg/\""
+    - comment: "Evaluate route with token budget"
+      command: "%s router eval \"grep 'foo' pkg/\" --token-budget 1500"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
