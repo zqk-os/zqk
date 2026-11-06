@@ -80,6 +80,17 @@ func stageFunnelFilter(_ *pipeline.Context, payload any) (any, error) {
 		return state, nil
 	}
 
+	if state.ParsedCmd != nil && state.ParsedCmd.HasUnsupportedFlags {
+		state.Result.Intercepted = false
+		state.Result.Rewritten = false
+		state.Result.RewrittenCommand = state.Req.CommandLine
+		state.Result.Replacement = ""
+		state.Result.Reason = ReasonUnsupportedFlags
+		state.Result.Classification = ClassificationBypass
+		state.Halt = true
+		return state, nil
+	}
+
 	return state, nil
 }
 
@@ -159,6 +170,16 @@ func stagePathBoundaryDetector(_ *pipeline.Context, payload any) (any, error) {
 				state.Result.RewrittenCommand = state.Req.CommandLine
 				state.Result.Replacement = ""
 				state.Result.Reason = ReasonExternalPath
+				state.Result.Classification = ClassificationBypass
+				state.Halt = true
+				return state, nil
+			}
+			if isNonIndexedPath(tp, cwd, projectRoot) {
+				state.Result.Intercepted = false
+				state.Result.Rewritten = false
+				state.Result.RewrittenCommand = state.Req.CommandLine
+				state.Result.Replacement = ""
+				state.Result.Reason = ReasonNonIndexedPath
 				state.Result.Classification = ClassificationBypass
 				state.Halt = true
 				return state, nil
@@ -254,8 +275,20 @@ func stageRewriteTransformer(opts Options) pipeline.StageFunc {
 			}
 		}
 
-		if opts.MaxTokens > 0 {
-			parts = append(parts, flagLongMaxTokens, strconv.Itoa(opts.MaxTokens))
+		maxTokens := opts.MaxTokens
+		if state.ParsedCmd != nil && state.ParsedCmd.MaxTokens > 0 {
+			maxTokens = state.ParsedCmd.MaxTokens
+		}
+		if maxTokens > 0 {
+			parts = append(parts, flagLongMaxTokens, strconv.Itoa(maxTokens))
+		}
+
+		format := opts.Format
+		if state.ParsedCmd != nil && state.ParsedCmd.Format != "" {
+			format = state.ParsedCmd.Format
+		}
+		if format != "" {
+			parts = append(parts, "-f", format)
 		}
 
 		pattern := ""

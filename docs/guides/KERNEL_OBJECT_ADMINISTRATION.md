@@ -53,9 +53,14 @@ graph TD
    - Plans are strictly scope-locked upon transitioning to `in_progress`.
 5. **Requirements own `criteria_refs`:**
    Every requirement MUST define at least 3 criteria satisfying the Three-Fold Proof.
-6. **Test Cases are 1:1 with Requirements:**
+6. **Requirement Documentation Criteria Invariant (POL-DOC-001):**
+   Under `POL-DOC-001`, requirement contracts must guarantee documentation completeness alongside functional implementation:
+   - **Mandatory Documentation Criteria**: Every requirement contract MUST declare corresponding documentation criteria verifying that architecture docs, operator runbooks, user guides, or command specs are kept in sync with code evolution.
+   - **Knowledge Base Traceability (`doc_entry_refs`)**: Requirements and their documentation criteria must link directly to active `doc_entry` objects in the Knowledge Kernel CAS via `doc_entry_refs`.
+   - **Legacy Alignment**: Legacy originated requirements are aligned with active doc entries (e.g., `DOC-050` and `DOC-011` on `REQ-1793898238657099000-bde82996`; `DOC-010` and `DOC-063` on `REQ-1793913962558379000-fe73e24d`), ensuring `zqk system check` executes with zero Layer-1 warnings.
+7. **Test Cases are 1:1 with Requirements:**
    A test case wraps all criteria linked to a requirement. Running `zqk test run <tst_id>` evaluates the complete feature contract in one unified pass.
-7. **Backlog Items satisfy 1–3 Criteria (Never Monolithic 1:1 REQ):**
+8. **Backlog Items satisfy 1–3 Criteria (Never Monolithic 1:1 REQ):**
    A Backlog Item is an atomic slice of implementation effort. Never build an entire feature contract in a single monolithic BLI. Each plan must have 2 to 5 BLIs.
 
 ---
