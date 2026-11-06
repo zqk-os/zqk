@@ -72,6 +72,7 @@ Enables task routing, context delegation to specialized sub-agents, and shared s
 	cmd.AddCommand(NewValidateCmd())
 	cmd.AddCommand(NewScoreboardCmd())
 	cmd.AddCommand(NewSeatWorkerCmd())
+	cmd.AddCommand(NewInstallSeatWorkersCmd())
 	cmd.AddCommand(NewGuidingStepCmd())
 	cmd.AddCommand(swarm.NewAgentSwarmInitCmd())
 	cmd.AddCommand(swarm.NewSwarmCmd())

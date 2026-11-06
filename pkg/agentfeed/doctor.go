@@ -6,16 +6,18 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 type DoctorResult struct {
-	FeedHealth      string   `json:"feed_health"`
-	MCPSubscribers  int      `json:"mcp_subscribers"`
-	PeerWakeLive    bool     `json:"peer_wake_live"`
-	PeerSeatsLive   int      `json:"peer_seats_live"`
-	ContractPathsOK bool     `json:"contract_paths_ok"`
-	Issues          []string `json:"issues,omitempty"`
+	FeedHealth      string                 `json:"feed_health"`
+	MCPSubscribers  int                    `json:"mcp_subscribers"`
+	PeerWakeLive    bool                   `json:"peer_wake_live"`
+	PeerSeatsLive   int                    `json:"peer_seats_live"`
+	ContractPathsOK bool                   `json:"contract_paths_ok"`
+	Issues          []string               `json:"issues,omitempty"`
+	NodeSovereignty nodesovereignty.Report `json:"node_sovereignty"`
 }
 
 type DoctorOptions struct {
@@ -109,7 +111,31 @@ func InspectFeed(opts DoctorOptions) DoctorResult {
 		}
 	}
 
+	// 5. Node sovereignty (multi-root LaunchAgent / global MCP pin).
+	result.NodeSovereignty = nodesovereignty.Assess(opts.ProjectRoot)
+	if result.NodeSovereignty.Severity != nodesovereignty.SeverityOK {
+		result.Issues = append(result.Issues, result.NodeSovereignty.ATTN)
+		for _, c := range result.NodeSovereignty.Conflicts {
+			result.Issues = append(result.Issues, "node_sovereignty:"+c.Code+": "+c.Detail)
+		}
+		if result.FeedHealth == "healthy" {
+			result.FeedHealth = "degraded"
+		}
+	}
+
 	return result
+}
+
+func init() {
+	nodesovereignty.SetFeedNotifier(func(projectRoot, actor, msg string) {
+		_, _ = AppendEvent(AppendEventInput{
+			ProjectRoot: projectRoot,
+			Message:     msg,
+			EventType:   FeedEventTypeNodeHop,
+			AgentID:     actor,
+			Sender:      FeedSenderCoordinator,
+		})
+	})
 }
 
 func itoa(n int) string {

@@ -9,7 +9,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 )
 
 func NewPrepareContextCmd() *cobra.Command {
@@ -53,15 +55,23 @@ func runPrepareContext(cmd *cobra.Command, args []string, proc *cli.Processor) e
 		return cli.WriteOutput(cmd, []byte(prepared.Prompt+"\n"))
 	}
 
+	root := proc.ProjectRoot()
+	sov := nodesovereignty.Assess(root)
 	payload := map[string]any{
 		"prompt":                   prepared.Prompt,
 		objects.FieldKeyPersonaRef: prepared.Persona,
 		"task_id":                  prepared.TaskID,
 		"dependency_count":         prepared.DependencyCount,
 		"hint":                     "Paste prompt into subagent launch; do not cold-start without this context.",
+		"seated_root":              root,
+		"root_id":                  hostservice.RootID(root),
+		"node_sovereignty":         sov,
 	}
 	if prepared.Task != nil {
 		payload["task_kind"] = prepared.Task[objects.FieldKeyKind]
+	}
+	if sov.Severity != nodesovereignty.SeverityOK && sov.ATTN != "" {
+		payload["hint"] = sov.ATTN + " — " + payload["hint"].(string)
 	}
 	return cli.FormatOutput(cmd, payload)
 }

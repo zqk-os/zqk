@@ -42,6 +42,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/maintenance"
 	"github.com/zqk-os/zqk/pkg/migration/detector"
+	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	schedulerpkg "github.com/zqk-os/zqk/pkg/scheduler"
@@ -408,6 +409,8 @@ func init() {
 
 	// Notify coordinator when persisted current root is set (zqk use) so subscribers can react.
 	clicontext.OnCurrentRootSet = func(workspaceRoot, newProjectRoot, previousProjectRoot string) {
+		// Intentional hop: stamp feed + state so CAP/mutate can see the switch (node sovereignty).
+		_ = nodesovereignty.RecordHop(previousProjectRoot, newProjectRoot, "zqk_use", "cli")
 		coord := coordination.GetCoordinator()
 		if coord == nil {
 			return

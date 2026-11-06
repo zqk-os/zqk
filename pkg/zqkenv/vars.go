@@ -146,6 +146,7 @@ const _sfxSkipDeleteAudit = "SKIP_DELETE_AUDIT"
 const _sfxSkipSpecSchemaValidation = "SKIP_SPEC_SCHEMA_VALIDATION"
 const _sfxSpecializationTier = "SPECIALIZATION_TIER"
 const _sfxStableBinaryPath = "STABLE_BINARY_PATH"
+const _sfxLaunchAgentsDir = "LAUNCH_AGENTS_DIR"
 const _sfxStorageMode = "STORAGE_MODE"
 const _sfxStorageModeHybridLegacy = "STORAGE_MODE_HYBRID_LEGACY"
 const _sfxProjectionFailClosed = "PROJECTION_FAIL_CLOSED"
@@ -694,6 +695,9 @@ func SpecializationTier() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxSpecializ
 
 // StableBinaryPath returns the environment variable name for STABLE_BINARY_PATH (brand-prefixed).
 func StableBinaryPath() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxStableBinaryPath)} }
+
+// LaunchAgentsDir overrides ~/Library/LaunchAgents (tests / custom layouts).
+func LaunchAgentsDir() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLaunchAgentsDir)} }
 
 // StreamDeltaFieldsConfig returns the environment variable name for STREAM_DELTA_FIELDS_CONFIG (brand-prefixed).
 func StreamDeltaFieldsConfig() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxStreamDeltaFieldsConfig)} }

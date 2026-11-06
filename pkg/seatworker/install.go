@@ -20,6 +20,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -40,26 +41,19 @@ type InstallConfig struct {
 	WriteOnly       bool // skip launchctl/systemctl (tests)
 }
 
-// UnitLabel returns the OS unit label for a seat.
-func UnitLabel(seatID string) string {
-	return "com." + brand.ExecutableName() + ".mesh.seat-worker." + sanitizeSeat(seatID)
+// UnitLabel returns the root-scoped OS unit label for a seat (same scheme as hostservice).
+func UnitLabel(rootID, seatID string) string {
+	return hostservice.MeshSeatWorkerUnitLabel(rootID, seatID)
+}
+
+// LegacyUnitLabel is the pre-sovereignty seat-only label (GC / migration).
+func LegacyUnitLabel(seatID string) string {
+	return hostservice.LegacyMeshSeatWorkerUnitLabel(seatID)
 }
 
 func sanitizeSeat(seat string) string {
-	seat = strings.TrimSpace(seat)
-	if seat == "" {
-		return "seat"
-	}
-	var b strings.Builder
-	for _, r := range seat {
-		switch {
-		case r >= 'a' && r <= 'z', r >= 'A' && r <= 'Z', r >= '0' && r <= '9', r == '.', r == '_', r == '-':
-			b.WriteRune(r)
-		default:
-			b.WriteByte('_')
-		}
-	}
-	return b.String()
+	// Delegate to hostservice via round-trip on legacy label suffix.
+	return strings.TrimPrefix(hostservice.LegacyMeshSeatWorkerUnitLabel(seat), "com."+brand.ExecutableName()+".mesh.seat-worker.")
 }
 
 func xmlText(s string) string {
@@ -74,31 +68,40 @@ func Install(ctx context.Context, cfg InstallConfig) error {
 	if root == "" {
 		return errfmt.Errorf("project root not found")
 	}
-	if paths.IsAgentWorktreePath(root) {
-		return errfmt.Errorf("cannot install seat workers on worktree root %s (must bind to seated kernel)", root)
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return errfmt.Newf("abs project root").Wrap(err)
+	}
+	abs = filepath.Clean(abs)
+	if err := hostservice.RefuseMeshSeatWorkerRoot(abs); err != nil {
+		return err
 	}
 	poll := cfg.PollSeconds
 	if poll <= 0 {
 		poll = defaultPollSeconds
 	}
-	bin, err := resolveWorkerBinary(root, cfg.Binary)
+	bin, err := resolveWorkerBinary(abs, cfg.Binary)
 	if err != nil {
 		return err
 	}
-	seats, err := resolveSeats(root, cfg.Seats)
+	if err := hostservice.RefuseMeshSeatWorkerBinary(abs, bin); err != nil {
+		return err
+	}
+	seats, err := resolveSeats(abs, cfg.Seats)
 	if err != nil {
 		return err
 	}
+	rootID := hostservice.RootID(abs)
 	personaOverride := strings.TrimSpace(cfg.PersonaRef)
 	for _, seat := range seats {
 		persona := personaOverride
 		if persona == "" {
-			persona = personaForSeat(root, seat)
+			persona = personaForSeat(abs, seat)
 		}
-		if err := persistSeatPersona(root, seat, persona); err != nil {
+		if err := persistSeatPersona(abs, seat, persona); err != nil {
 			return err
 		}
-		if err := installOne(ctx, root, bin, seat, persona, poll, cfg.ExecuteNonComms, cfg.WriteOnly); err != nil {
+		if err := installOne(ctx, abs, rootID, bin, seat, persona, poll, cfg.ExecuteNonComms, cfg.WriteOnly); err != nil {
 			return err
 		}
 	}
@@ -186,15 +189,17 @@ func resolveWorkerBinary(root, override string) (string, error) {
 	return bin, nil
 }
 
-func installOne(ctx context.Context, root, bin, seat, persona string, poll int, execNC, writeOnly bool) error {
-	label := UnitLabel(seat)
+func installOne(ctx context.Context, root, rootID, bin, seat, persona string, poll int, execNC, writeOnly bool) error {
+	label := UnitLabel(rootID, seat)
 	logDir := filepath.Join(paths.LogsDirPath(root), paths.MeshStateSubdir)
 	if err := fileutil.MkdirAll(logDir, paths.DirPerm755); err != nil {
 		return errfmt.Newf("mesh log dir").Wrap(err)
 	}
+	// Migrate: boot out legacy seat-only label so last-install-wins zombies die.
+	_ = removeLegacySeatUnit(ctx, seat, writeOnly)
 	switch runtime.GOOS {
 	case "darwin":
-		plist := darwinPlist(root, bin, seat, persona, poll, execNC, logDir)
+		plist := darwinPlist(root, rootID, bin, seat, persona, poll, execNC, logDir)
 		path, err := darwinPlistPath(label)
 		if err != nil {
 			return err
@@ -210,7 +215,7 @@ func installOne(ctx context.Context, root, bin, seat, persona string, poll int, 
 		}
 		return loadDarwin(ctx, label, path)
 	case "linux":
-		body := linuxUnit(root, bin, seat, persona, poll, execNC)
+		body := linuxUnit(root, rootID, bin, seat, persona, poll, execNC)
 		path, err := linuxUnitPath(label)
 		if err != nil {
 			return err
@@ -234,12 +239,41 @@ func installOne(ctx context.Context, root, bin, seat, persona string, poll int, 
 	}
 }
 
+func removeLegacySeatUnit(ctx context.Context, seat string, writeOnly bool) error {
+	legacy := LegacyUnitLabel(seat)
+	switch runtime.GOOS {
+	case "darwin":
+		path, err := darwinPlistPath(legacy)
+		if err != nil {
+			return err
+		}
+		if writeOnly {
+			_ = fileutil.Remove(path)
+			return nil
+		}
+		domain := "gui/" + strconv.Itoa(os.Getuid())
+		_ = execwrap.CommandContext(ctx, "launchctl", "bootout", domain+"/"+legacy).Run()
+		_ = execwrap.CommandContext(ctx, "launchctl", "unload", path).Run()
+		_ = fileutil.Remove(path)
+	case "linux":
+		path, err := linuxUnitPath(legacy)
+		if err != nil {
+			return err
+		}
+		if !writeOnly {
+			_ = execwrap.CommandContext(ctx, "systemctl", "--user", "disable", "--now", legacy+".service").Run()
+		}
+		_ = fileutil.Remove(path)
+	}
+	return nil
+}
+
 func darwinPlistPath(label string) (string, error) {
-	home, err := fileutil.UserHomeDir()
+	dir, err := hostservice.LaunchAgentsDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, "Library", "LaunchAgents", label+".plist"), nil
+	return filepath.Join(dir, label+".plist"), nil
 }
 
 func linuxUnitPath(label string) (string, error) {
@@ -272,8 +306,8 @@ func programArgsXML(bin, seat, persona string, poll int, execNC bool) string {
 	return b.String()
 }
 
-func darwinPlist(root, bin, seat, persona string, poll int, execNC bool, logDir string) string {
-	label := UnitLabel(seat)
+func darwinPlist(root, rootID, bin, seat, persona string, poll int, execNC bool, logDir string) string {
+	label := UnitLabel(rootID, seat)
 	home, _ := fileutil.UserHomeDir()
 	pathEnv := zqkenv.OSPath().Get()
 	if pathEnv == "" {
@@ -319,11 +353,12 @@ func darwinPlist(root, bin, seat, persona string, poll int, execNC bool, logDir 
 		xmlText(stdout), xmlText(stderr))
 }
 
-func linuxUnit(root, bin, seat, persona string, poll int, execNC bool) string {
+func linuxUnit(root, rootID, bin, seat, persona string, poll int, execNC bool) string {
 	args := seatWorkerCommandArgs(bin, seat, persona, poll, execNC)
 	execStart := strings.Join(args, " ")
+	label := UnitLabel(rootID, seat)
 	return fmt.Sprintf(`[Unit]
-Description=%s seat-worker %s
+Description=%s seat-worker %s (%s)
 After=default.target
 
 [Service]
@@ -336,7 +371,7 @@ RestartSec=5
 
 [Install]
 WantedBy=default.target
-`, brand.ExecutableName(), seat, root, zqkenv.ProjectRoot().Name(), root, execStart)
+`, brand.ExecutableName(), seat, label, root, zqkenv.ProjectRoot().Name(), root, execStart)
 }
 
 func loadDarwin(ctx context.Context, label, plist string) error {

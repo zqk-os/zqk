@@ -9,8 +9,8 @@
 A **Seat Worker** is a dedicated, headless autonomous process bound to a specific seated persona defined in `.zqk/agent-runtime/peer_seats.json` (or `peer_seats.json`).
 
 While interactive agents operate within an IDE or single CLI session, a Seat Worker runs continuously in the background under the host OS supervisor:
-- **macOS**: `launchd` User Agent (`~/Library/LaunchAgents/com.zqk.mesh.seat-worker.<seat>.plist`)
-- **Linux**: `systemd` User Service (`~/.config/systemd/user/com.zqk.mesh.seat-worker.<seat>.service`)
+- **macOS**: `launchd` User Agent (`~/Library/LaunchAgents/com.zqk.mesh.seat-worker.<root_id>.<seat>.plist`)
+- **Linux**: `systemd` User Service (`~/.config/systemd/user/com.zqk.mesh.seat-worker.<root_id>.<seat>.service`)
 
 The worker daemon periodically polls its seat's inbox (`poll_seconds`, default 30s), dequeues steers and task assignments (`ATK-*`), prepares kernel context, executes the cognitive reasoning and action loop, and returns status updates to the Knowledge Kernel.
 
@@ -54,7 +54,7 @@ zqk agent seat-worker --agent-id craftsman --persona-ref community-code-craftsma
 ```
   ┌─────────────────────────────────────────────────────────────┐
   │ Host Supervisor (launchd / systemd)                         │
-  │ com.zqk.mesh.seat-worker.<seat_id>                          │
+  │ com.zqk.mesh.seat-worker.<root_id>.<seat_id>                │
   └───────────────┬─────────────────────────────────────────────┘
                   │ Spawns & Keeps Alive
                   ▼
@@ -76,7 +76,7 @@ zqk agent seat-worker --agent-id craftsman --persona-ref community-code-craftsma
 
 ## 5. Limitations & Operational Considerations
 
-1. **Root Kernel Binding**: Seat workers must be installed on the canonical project root containing the `.zqk/` kernel directory. Installing on isolated git worktrees is explicitly rejected (`cannot install seat workers on worktree root`).
+1. **Root Kernel Binding / node sovereignty**: Seat workers must be installed on the canonical project root containing the `.zqk/` kernel directory. Labels include `root_id` (same hash as scheduler host units) so two checkouts do not collide. Installing on isolated git worktrees, `/tmp/ATK-*`, or Go test TempDirs is refused. Legacy seat-only labels are removed on install / `daemon service cleanup-legacy`.
 2. **Execution Permissions (`--execute-non-comms`)**:
    - By default, seat workers only ingest correspondence and claim work.
    - When `--execute-non-comms` is enabled, the worker executes live bash commands, file modifications, and git operations. Ensure proper git credentials and branch protections are configured.

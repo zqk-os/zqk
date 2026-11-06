@@ -39,6 +39,7 @@ const (
 	FeedEventTypeCheckpoint      = "checkpoint"
 	FeedEventTypePromote         = "promote"
 	FeedEventTypeWake            = "wake"
+	FeedEventTypeNodeHop         = "node_hop" // intentional seated-root switch (node sovereignty)
 
 	FeedKernelAgentID = "kernel"
 

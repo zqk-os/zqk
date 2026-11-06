@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/scheduler/hostservice"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
@@ -29,7 +30,7 @@ func TestSanitizeAndUnitLabel(t *testing.T) {
 	if got := sanitizeSeat("peer/agent 1"); strings.Contains(got, "/") || strings.Contains(got, " ") {
 		t.Fatalf("sanitize %q", got)
 	}
-	if !strings.Contains(UnitLabel("peer-1"), "peer-1") {
+	if !strings.Contains(UnitLabel("deadbeefdeadbeef", "peer-1"), "peer-1") {
 		t.Fatal("label")
 	}
 }
@@ -47,7 +48,7 @@ func TestResolveSeats_Requested(t *testing.T) {
 
 func TestLinuxUnit_ExecuteNonComms(t *testing.T) {
 	t.Parallel()
-	body := linuxUnit("/proj", "/bin/zqk", "s1", objects.ConstPersonaDefaultOperator, 12, true)
+	body := linuxUnit("/proj", "deadbeefdeadbeef", "/bin/zqk", "s1", objects.ConstPersonaDefaultOperator, 12, true)
 	if !strings.Contains(body, "--execute-non-comms") {
 		t.Fatal(body)
 	}
@@ -137,9 +138,16 @@ func TestProgramArgsAndUnitPaths(t *testing.T) {
 }
 
 func TestExtraInstallWriteOnlyAndLoadDarwinCancel(t *testing.T) {
-	home := t.TempDir()
+	base := filepath.Join(fileutil.TempDir(), "zqk-seatworker-extra-cov")
+	_ = fileutil.RemoveAll(base)
+	t.Cleanup(func() { _ = fileutil.RemoveAll(base) })
+	home := filepath.Join(base, "home")
 	t.Setenv("HOME", home)
-	root := t.TempDir()
+	t.Setenv(zqkenv.LaunchAgentsDir().Name(), filepath.Join(home, "Library", "LaunchAgents"))
+	root := filepath.Join(base, "kernel")
+	if err := fileutil.MkdirAll(root, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
 	if paths.IsAgentWorktreePath(root) {
 		t.Skip("temp dir classified as worktree")
 	}
@@ -173,13 +181,14 @@ func TestExtraInstallWriteOnlyAndLoadDarwinCancel(t *testing.T) {
 		t.Fatal("dir is not binary")
 	}
 	_ = xmlText(`<>&"`)
-	_ = darwinPlist(root, bin, "peer-1", objects.ConstPersonaDefaultOperator, 5, true, t.TempDir())
-	_ = linuxUnit(root, bin, "peer-1", objects.ConstPersonaDefaultOperator, 5, true)
+	rootID := hostservice.RootID(root)
+	_ = darwinPlist(root, rootID, bin, "peer-1", objects.ConstPersonaDefaultOperator, 5, true, filepath.Join(root, "logs"))
+	_ = linuxUnit(root, rootID, bin, "peer-1", objects.ConstPersonaDefaultOperator, 5, true)
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
-	label := UnitLabel("extra-cov-061")
+	label := UnitLabel(rootID, "extra-cov-061")
 	_ = loadDarwin(ctx, label, filepath.Join(t.TempDir(), "missing.plist"))
-	_ = loadDarwin(context.Background(), UnitLabel("extra-cov-061-retry"), filepath.Join(t.TempDir(), "missing.plist"))
+	_ = loadDarwin(context.Background(), UnitLabel(rootID, "extra-cov-061-retry"), filepath.Join(t.TempDir(), "missing.plist"))
 	if err := Install(context.Background(), InstallConfig{
 		ProjectRoot: root,
 		Seats:       []string{"  "},
