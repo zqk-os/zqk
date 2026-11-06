@@ -136,7 +136,7 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 
 	gv.applySpecDefaults(obj, spec)
 
-	// Cross-object priority enum coercion and parity (CRIT-1793968601415990000-9fc4de65)
+	// Cross-object priority enum coercion and parity (GH-928)
 	NormalizePriority(kind, obj)
 
 	if title, _ := obj[objects.FieldKeyTitle].(string); isDocumentationTitleProse(title) {
@@ -772,7 +772,7 @@ func isReferenceFieldInfo(fieldName string, fieldDef map[string]any) bool {
 
 // validateReferenceConstraint strictly rejects empty string literals in reference fields
 // (both scalar reference fields and slice/array reference entries), preventing downstream
-// CAS corrupted draft states (CRIT-1793968592146590000-f6148ecf / GH-944).
+// CAS corrupted draft states (GH-944).
 func (gv *GoValidator) validateReferenceConstraint(fieldName string, fieldValue any, fieldDef map[string]any) *ValidationError {
 	if !isReferenceFieldInfo(fieldName, fieldDef) {
 		return nil
