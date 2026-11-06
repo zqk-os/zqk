@@ -146,8 +146,15 @@ func TestCoverageExpansion_IsCachedPlanStale(t *testing.T) {
 	assert.True(t, IsCachedPlanStale(ctx, mock, &WhatsNextPriorityPlan{ID: "PRI-1", Status: "in_progress"}))
 }
 
+func setupTestLiteDir(t *testing.T) (string, string) {
+	t.Helper()
+	tempDir := t.TempDir()
+	return tempDir, WhatsNextLiteFilePath(tempDir)
+}
+
 func writePayloadFile(t *testing.T, targetPath string, payload *WhatsNextLitePayload) {
 	t.Helper()
+	require.NoError(t, fileutil.EnsureDir(filepath.Dir(targetPath)))
 	data, err := json.MarshalIndent(payload, "", "  ")
 	require.NoError(t, err)
 	require.NoError(t, fileutil.WriteFile(targetPath, data, paths.FilePerm644))
@@ -157,7 +164,7 @@ func TestCoverageExpansion_GetOrRecoverPayload_FreshAndInvalidation(t *testing.T
 	t.Parallel()
 
 	ctx := context.Background()
-	tempDir := t.TempDir()
+	tempDir, targetPath := setupTestLiteDir(t)
 
 	// 1. Missing lite file -> returns bootstrap payload
 	bootstrap, err := GetOrRecoverPayload(ctx, nil, tempDir, 0)
@@ -167,9 +174,6 @@ func TestCoverageExpansion_GetOrRecoverPayload_FreshAndInvalidation(t *testing.T
 	assert.Equal(t, "cold_boot_materialized_projection_missing", bootstrap.DegradedReason)
 
 	// 2. Write a valid lite file directly
-	targetPath := WhatsNextLiteFilePath(tempDir)
-	require.NoError(t, fileutil.EnsureDir(filepath.Dir(targetPath)))
-
 	payload := &WhatsNextLitePayload{
 		SchemaVersion:  MaterializedViewSchemaVersion,
 		MaterializedAt: time.Now().UTC(),
@@ -221,10 +225,9 @@ func TestCoverageExpansion_GetOrRecoverPayload_FreshAndInvalidation(t *testing.T
 func TestCoverageExpansion_GetOrRecoverPayload_Fallback(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
-	tempDir := t.TempDir()
-	targetPath := WhatsNextLiteFilePath(tempDir)
-	require.NoError(t, fileutil.EnsureDir(filepath.Dir(targetPath)))
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	tempDir, targetPath := setupTestLiteDir(t)
 
 	payload := &WhatsNextLitePayload{
 		SchemaVersion:  MaterializedViewSchemaVersion,
