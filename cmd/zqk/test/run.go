@@ -28,6 +28,7 @@ func NewRunCmd() *cobra.Command {
 			verbose, _ := cmd.Flags().GetBool("verbose")
 			timeoutStr, _ := cmd.Flags().GetString("timeout")
 			criteriaFilter, _ := cmd.Flags().GetStringSlice("criteria")
+			batch, _ := cmd.Flags().GetBool("batch")
 
 			var timeout time.Duration
 			if timeoutStr != "" {
@@ -72,6 +73,8 @@ func NewRunCmd() *cobra.Command {
 				DryRun:         dryRun,
 				Timeout:        timeout,
 				CriteriaFilter: criteriaFilter,
+				Batch:          batch,
+				NoBatch:        !batch,
 			}
 
 			totalRun := 0
@@ -117,6 +120,9 @@ func NewRunCmd() *cobra.Command {
 				tcStatusBadge := "PENDING"
 				if result.TestCaseCompleted {
 					tcStatusBadge = "COMPLETE"
+				}
+				if result.FallbackTriggered {
+					fmt.Fprintf(out, "  ⚠️  Batch execution failed; fell back to isolated single-criterion execution.\n")
 				}
 				fmt.Fprintf(out, "  ⚡ Status: %s | Criteria: %d/%d passed | Test Case: [%s]\n",
 					strings.ToUpper(result.Status), result.PassedCriteria, result.TotalCriteria, tcStatusBadge,
