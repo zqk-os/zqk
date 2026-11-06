@@ -22,6 +22,12 @@ func TestNewPrepareContextCmd(t *testing.T) {
 	if cmd.Flags().Lookup("description") == nil {
 		t.Errorf("expected --description flag")
 	}
+	if cmd.Flags().Lookup("task") == nil {
+		t.Errorf("expected --task flag")
+	}
+	if cmd.Flags().Lookup("task-id") == nil {
+		t.Errorf("expected --task-id flag")
+	}
 }
 
 func TestPrepareContextCmd_Execution(t *testing.T) {
@@ -40,6 +46,116 @@ func TestPrepareContextCmd_Execution(t *testing.T) {
 	if !strings.Contains(out, "prompt") {
 		t.Errorf("expected output to contain prompt key, got: %s", out)
 	}
+}
+
+func TestPrepareContextCmd_PositionalAndFlagAliases(t *testing.T) {
+	tempDir, provider, cleanup := setupAgentInProcessProject(t)
+	defer cleanup()
+
+	ctx := context.Background()
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	taskObj := map[string]any{
+		objects.FieldKeyID:                 "ATK-TEST-PREPARE-100",
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Test Prepare Context Task",
+		objects.FieldKeyDescription:        "TASK_ENVELOPE\nDetailed task description for testing context hydration",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, taskObj))
+
+	// 1. Positional invocation: zqk agent prepare-context <ATK>
+	outPos, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"ATK-TEST-PREPARE-100",
+		"--format", "json",
+	)
+	require.NoError(t, err)
+	assert.Contains(t, outPos, "ATK-TEST-PREPARE-100")
+	assert.Contains(t, outPos, "prompt")
+
+	// 2. Flag invocation with --task-id: zqk agent prepare-context --task-id <ATK>
+	outTaskID, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task-id", "ATK-TEST-PREPARE-100",
+		"--format", "json",
+	)
+	require.NoError(t, err)
+	assert.Contains(t, outTaskID, "ATK-TEST-PREPARE-100")
+	assert.Equal(t, outPos, outTaskID)
+
+	// 3. Flag invocation with --task: zqk agent prepare-context --task <ATK>
+	outTask, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task", "ATK-TEST-PREPARE-100",
+		"--format", "json",
+	)
+	require.NoError(t, err)
+	assert.Contains(t, outTask, "ATK-TEST-PREPARE-100")
+	assert.Equal(t, outPos, outTask)
+
+	// 4. Positional and matching flag: zqk agent prepare-context <ATK> --task <ATK>
+	outMatch, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"ATK-TEST-PREPARE-100",
+		"--task", "ATK-TEST-PREPARE-100",
+		"--format", "json",
+	)
+	require.NoError(t, err)
+	assert.Equal(t, outPos, outMatch)
+
+	// 5. Positional takes precedence when flag differs
+	taskObj2 := map[string]any{
+		objects.FieldKeyID:                 "ATK-TEST-PREPARE-200",
+		objects.FieldKeyKind:               objects.KindAgentTask,
+		objects.FieldKeyTitle:              "Second Task for Precedence Check",
+		objects.FieldKeyDescription:        "TASK_ENVELOPE\nSecond task description",
+		objects.FieldKeyStatus:             objects.ObjectStatusInProgress,
+		objects.FieldKeyAssigneePersonaRef: objects.ConstPersonaDefaultOperator,
+		objects.FieldKeySchemaVersion:      objects.DefaultSchemaVersion,
+	}
+	require.NoError(t, provider.Create(pkgctx.WithPromoteOnCreate(ctx), secCtx, taskObj2))
+
+	outPrecedence, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"ATK-TEST-PREPARE-100",
+		"--task", "ATK-TEST-PREPARE-200",
+		"--format", "json",
+	)
+	require.NoError(t, err)
+	assert.Contains(t, outPrecedence, "ATK-TEST-PREPARE-100")
+	assert.NotContains(t, outPrecedence, "ATK-TEST-PREPARE-200")
+
+	// 6. Matching --task and --task-id flags work identically
+	outBothMatching, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task", "ATK-TEST-PREPARE-100",
+		"--task-id", "ATK-TEST-PREPARE-100",
+		"--format", "json",
+	)
+	require.NoError(t, err)
+	assert.Equal(t, outPos, outBothMatching)
+
+	// 7. Format agent-prompt works identically with flags
+	outPromptPos, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"ATK-TEST-PREPARE-100",
+		"--format", "agent-prompt",
+	)
+	require.NoError(t, err)
+
+	outPromptFlag, err := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task-id", "ATK-TEST-PREPARE-100",
+		"--format", "agent-prompt",
+	)
+	require.NoError(t, err)
+	assert.Equal(t, outPromptPos, outPromptFlag)
+
+	// 8. Negative Adversarial Boundary: Conflicting flags --task and --task-id
+	_, errConflict := executeAgentCommand(t, tempDir, provider, "prepare-context",
+		"--task", "ATK-TEST-PREPARE-100",
+		"--task-id", "ATK-TEST-PREPARE-200",
+		"--format", "json",
+	)
+	require.Error(t, errConflict)
+	assert.Contains(t, errConflict.Error(), "conflicting flags")
+	assert.Contains(t, errConflict.Error(), "--task")
+	assert.Contains(t, errConflict.Error(), "--task-id")
 }
 
 func TestPreparedContext_HasSemanticPayload(t *testing.T) {

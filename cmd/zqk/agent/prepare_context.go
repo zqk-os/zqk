@@ -31,6 +31,8 @@ func runPrepareContext(cmd *cobra.Command, args []string, proc *cli.Processor) e
 	taskDesc := flags.String(cmd, "description")
 	includeTDD := flags.Bool(cmd, "tdd")
 	depth := flags.Int(cmd, "depth")
+	taskFlag := flags.String(cmd, "task")
+	taskIDFlag := flags.String(cmd, "task-id")
 	if err := flags.Err(); err != nil {
 		return err
 	}
@@ -38,6 +40,22 @@ func runPrepareContext(cmd *cobra.Command, args []string, proc *cli.Processor) e
 	taskID := ""
 	if len(args) > 0 {
 		taskID = strings.TrimSpace(args[0])
+	}
+	taskFlag = strings.TrimSpace(taskFlag)
+	taskIDFlag = strings.TrimSpace(taskIDFlag)
+
+	// Negative adversarial boundary: detect conflicting flag invocations
+	if taskFlag != "" && taskIDFlag != "" && taskFlag != taskIDFlag {
+		return errfmt.Errorf("conflicting flags: --task=%q and --task-id=%q; specify only one task flag or supply a single positional argument", taskFlag, taskIDFlag)
+	}
+
+	// Positional argument takes precedence or matches; if positional is empty, resolve from flags.
+	if taskID == "" {
+		if taskFlag != "" {
+			taskID = taskFlag
+		} else if taskIDFlag != "" {
+			taskID = taskIDFlag
+		}
 	}
 	prepared, err := AssemblePreparedContext(ctx, sec, sp, PreparedContextInput{
 		TaskID:      taskID,

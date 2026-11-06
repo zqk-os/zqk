@@ -20,6 +20,14 @@ flags:
     type: "string"
     default: ""
     description: "Persona id (PER-*) for skill and prompt binding"
+  - name: "task"
+    type: "string"
+    default: ""
+    description: "Task ID alias (alternative to positional task_id or --task-id)"
+  - name: "task-id"
+    type: "string"
+    default: ""
+    description: "Task ID alias (alternative to positional task_id or --task)"
   - name: "tdd"
     type: "bool"
     default: true
@@ -33,6 +41,8 @@ help:
   examples:
     - comment: "Build context for a minted task"
       command: "%s agent prepare-context <task-id> --persona-ref PER-COMMUNITY-SOFTWARE-ENGINEER --format json"
+    - comment: "Build context using --task-id flag"
+      command: "%s agent prepare-context --task-id <task-id> --persona-ref PER-COMMUNITY-SOFTWARE-ENGINEER --format json"
     - comment: "Ad-hoc description with a persona"
       command: "%s agent prepare-context --persona-ref PER-COMMUNITY-SOFTWARE-ENGINEER --description \"Harden tray signing\""
   exclude_flags:
