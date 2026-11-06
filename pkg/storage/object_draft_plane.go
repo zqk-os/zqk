@@ -402,6 +402,9 @@ func isDraftPlaneMembraneField(fieldName string) bool {
 }
 
 func isDraftPlaneReferenceField(field objects.FieldInfo) bool {
+	if field.Type == "array" || field.Type == "slice" || field.Type == "list" {
+		return false
+	}
 	if field.Type == "reference" || field.SemanticType == "reference" {
 		return true
 	}
@@ -432,7 +435,7 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 		return 0
 	case "boolean", "bool":
 		return false
-	case "list", "array":
+	case "list", "array", "slice":
 		return []any{}
 	case "map", "object":
 		return map[string]any{}
