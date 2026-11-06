@@ -144,8 +144,11 @@ func (or *OntologyRegistry) registerDefaultMappings() {
 		ValidationRules: []OntologyValidationRule{
 			{
 				Name:        "reference_type",
-				Description: "Reference must be a non-empty string",
+				Description: "Reference must be a non-empty string or null",
 				Validator: func(value any) error {
+					if value == nil {
+						return nil
+					}
 					if str, ok := value.(string); ok {
 						if str == emptyValue {
 							return errfmt.Errorf("reference cannot be empty")

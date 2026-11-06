@@ -195,6 +195,16 @@ func SubstituteFixCommandPlaceholders(template, kind, category string, tier int,
 	for k, v := range repl {
 		out = strings.ReplaceAll(out, k, v)
 	}
+	for _, verb := range []string{"system check", "object delete", "object update"} {
+		if strings.Contains(out, verb) {
+			if strings.Contains(out, "--ids ") {
+				out = strings.ReplaceAll(out, "--ids ", "")
+			}
+			if strings.Contains(out, "--ids=") {
+				out = strings.ReplaceAll(out, "--ids=", "")
+			}
+		}
+	}
 	return out
 }
 

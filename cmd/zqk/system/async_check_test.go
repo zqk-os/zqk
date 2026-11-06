@@ -849,21 +849,17 @@ func TestAsyncValidation_FailedValidationTracking(t *testing.T) {
 		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
 	})
 
-	// Enqueue a task that will fail
-	testValidator.Enqueue("TEST-FAIL", "backlog_item", "test-fail.yaml", 1)
-
-	// Wait for processing and retries
-	time.Sleep(100 * time.Millisecond)
-
-	// Check that task was processed (failed after max retries)
-	_, _, _, queueSize := testValidator.GetValidationStats()
-	if queueSize > 0 {
-		t.Logf("Task may still be retrying: queueSize=%d", queueSize)
-	}
-
-	// Verify that progress channel received error status
+	// Get progress channel BEFORE enqueuing so we don't miss notifications
 	progressChan := testValidator.GetProgress()
-	timeout := time.After(2 * time.Second)
+
+	// Write standalone test file so readValidationInput succeeds and validationFunc executes
+	testFile := testkit.WriteTestObjectStandalone(t, projectRoot, "id: TEST-FAIL\nkind: backlog_item\ntitle: Test Fail")
+
+	// Enqueue a task that will fail validation
+	testValidator.Enqueue("TEST-FAIL", "backlog_item", testFile, 1)
+
+	// Wait for error progress with channel signaling and timeout
+	timeout := time.After(5 * time.Second)
 	errorReceived := false
 loop:
 	for {
@@ -882,8 +878,11 @@ loop:
 	}
 
 	if !errorReceived {
-		t.Log("Error progress not received (may have been consumed by retries)")
+		t.Error("Expected error progress for TEST-FAIL, but was not received within timeout")
 	}
+
+	// Verify that queue is eventually drained
+	testValidator.WaitForValidationCompletion(5 * time.Second)
 }
 
 // TestAsyncValidation_MetricsCapture tests that metrics are properly captured
@@ -914,6 +913,12 @@ func TestAsyncValidation_MetricsCapture(t *testing.T) {
 	}
 	testValidator.SetValidationFunc(validationFunc)
 
+	// Set result callback to signal completion of tasks deterministically
+	taskDone := make(chan struct{}, 5)
+	testValidator.SetResultCallback(func(state *validation.ValidationState, err error) {
+		taskDone <- struct{}{}
+	})
+
 	if err := testValidator.Start(); err != nil {
 		t.Fatalf("failed to start validator: %v", err)
 	}
@@ -922,36 +927,38 @@ func TestAsyncValidation_MetricsCapture(t *testing.T) {
 		testkit.ScrubProjectRootForTempCleanup(tmpDir, 40, 25*time.Millisecond)
 	})
 
-	// Enqueue multiple tasks
-	for i := 0; i < 5; i++ {
-		testValidator.Enqueue(fmt.Sprintf("TEST-%d", i), "backlog_item", fmt.Sprintf("test%d.yaml", i), 1)
+	// Create test files and enqueue multiple tasks
+	const numTasks = 5
+	for i := 0; i < numTasks; i++ {
+		testContent := fmt.Sprintf("id: TEST-%d\nkind: backlog_item\ntitle: Test %d", i, i)
+		testFile := testkit.WriteTestObjectStandalone(t, projectRoot, testContent)
+		testValidator.Enqueue(fmt.Sprintf("TEST-%d", i), "backlog_item", testFile, 1)
 	}
 
-	// Wait for processing - use a simple timeout approach
-	time.Sleep(100 * time.Millisecond)
+	// Wait for processing via channel signaling with resilient timeout
+	timeout := time.After(5 * time.Second)
+	for i := 0; i < numTasks; i++ {
+		select {
+		case <-taskDone:
+		case <-timeout:
+			t.Fatalf("timed out waiting for task %d to complete under runner load", i)
+		}
+	}
 
 	// Check that all tasks were processed
 	total, _, _, queueSize := testValidator.GetValidationStats()
 	t.Logf("Validation stats: total=%d, queueSize=%d", total, queueSize)
 
-	if queueSize > 0 {
-		t.Logf("Some tasks may still be processing: queueSize=%d", queueSize)
-		// Wait a bit more
-		time.Sleep(2 * time.Second)
-		_, _, _, finalQueueSize := testValidator.GetValidationStats()
-		t.Logf("After additional wait: queueSize=%d", finalQueueSize)
+	if queueSize != 0 {
+		t.Errorf("Expected queueSize=0, got %d", queueSize)
+	}
+	if total != numTasks {
+		t.Errorf("Expected total=%d, got %d", numTasks, total)
 	}
 
-	// Verify cached states - may take time to appear
+	// Verify cached states are present and populated
 	allStates := testValidator.GetAllCachedStates()
-	if len(allStates) == 0 {
-		// This might happen if cache hasn't been written yet - not a critical failure
-		// The important thing is that validation completed without errors
-		t.Log("No cached states found (may be timing issue or cache not persisted)")
-	} else {
-		t.Logf("Found %d cached states", len(allStates))
-		if len(allStates) < 5 {
-			t.Logf("Expected 5 cached states, got %d (some may not have been cached)", len(allStates))
-		}
+	if len(allStates) != numTasks {
+		t.Errorf("Expected %d cached states, got %d", numTasks, len(allStates))
 	}
 }

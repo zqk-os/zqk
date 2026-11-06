@@ -178,6 +178,22 @@ func (e *DiagnosticsRemedyEngine) diagnoseSeedingPreconditions() []RemedyPlan {
 	return plans
 }
 
+// sanitizeRecipeCommand ensures recipe commands use positional arguments instead of
+// invalid '--ids <ID>' flags for commands like 'system check', 'object delete', or 'object update' (GH-947, GH-940, GH-937).
+func sanitizeRecipeCommand(cmd string) string {
+	for _, verb := range []string{"system check", "object delete", "object update"} {
+		if strings.Contains(cmd, verb) {
+			if strings.Contains(cmd, "--ids ") {
+				cmd = strings.ReplaceAll(cmd, "--ids ", "")
+			}
+			if strings.Contains(cmd, "--ids=") {
+				cmd = strings.ReplaceAll(cmd, "--ids=", "")
+			}
+		}
+	}
+	return cmd
+}
+
 func (e *DiagnosticsRemedyEngine) diagnoseCheckIssues(checkResults []systemcheck.CheckResult) []RemedyPlan {
 	var plans []RemedyPlan
 	for _, cr := range checkResults {
@@ -189,7 +205,7 @@ func (e *DiagnosticsRemedyEngine) diagnoseCheckIssues(checkResults []systemcheck
 					Description: issue.Message,
 					ActionType:  ActionRunCommand,
 					Target:      cr.ObjectID,
-					Command:     issue.FixCommand,
+					Command:     sanitizeRecipeCommand(issue.FixCommand),
 					Confidence:  0.95,
 					AutoApply:   false,
 				})
@@ -200,7 +216,7 @@ func (e *DiagnosticsRemedyEngine) diagnoseCheckIssues(checkResults []systemcheck
 					Description: issue.Message,
 					ActionType:  ActionRunCommand,
 					Target:      cr.ObjectID,
-					Command:     paths.CLICommandName + " system check --auto-fix " + cr.ObjectID,
+					Command:     sanitizeRecipeCommand(paths.CLICommandName + " system check --auto-fix " + cr.ObjectID),
 					Confidence:  0.90,
 					AutoApply:   false,
 				})

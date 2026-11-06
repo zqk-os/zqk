@@ -35,6 +35,9 @@ func setupTestAmbientEngine(t *testing.T, tickInterval time.Duration) *AmbientEn
 	cfg.TickInterval = tickInterval
 	engine, err := NewAmbientEngine(cfg)
 	require.NoError(t, err)
+	t.Cleanup(func() {
+		_ = engine.Stop()
+	})
 	return engine
 }
 

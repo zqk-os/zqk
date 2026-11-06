@@ -164,33 +164,50 @@ func loadBaseRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, s
 }
 
 func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, planID string, reqMap map[string]*RequirementNode) {
+	seen := make(map[string]struct{})
+	var objectsList []map[string]any
+
 	blis, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		ForPlan(objects.KindBacklogItem, planID).
 		StatusNot(objects.ObjectStatusArchived).
-		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, "requirement_ref").
 		Build())
+	if err == nil && blis != nil {
+		for _, b := range blis.Objects {
+			id := getString(b, objects.FieldKeyID)
+			if id != "" {
+				seen[id] = struct{}{}
+				objectsList = append(objectsList, b)
+			}
+		}
+	}
 
-	var objectsList []map[string]any
-	if err == nil && blis != nil && len(blis.Objects) > 0 {
-		objectsList = blis.Objects
-	} else {
-		// Robust fallback: if index-based ForPlan returns empty or fails (e.g. unindexed files or reference index sync lag),
-		// query all non-archived backlog items and match plan reference directly.
-		fallbackBlis, fallbackErr := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
-			NotArchived(objects.KindBacklogItem).
-			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
-			Build())
-		if fallbackErr == nil && fallbackBlis != nil {
-			for _, b := range fallbackBlis.Objects {
-				if getString(b, objects.FieldKeyPriorityPlanRef) == planID {
+	// Robust fallback: if index-based ForPlan returns empty, fails, or returns partial results
+	// (e.g. unindexed files or reference index sync lag in rapid test execution),
+	// query all non-archived backlog items and merge any missing items matching the plan reference.
+	fallbackBlis, fallbackErr := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
+		NotArchived(objects.KindBacklogItem).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, "requirement_ref", objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
+		Build())
+	if fallbackErr == nil && fallbackBlis != nil {
+		for _, b := range fallbackBlis.Objects {
+			id := getString(b, objects.FieldKeyID)
+			if id == "" {
+				continue
+			}
+			if _, exists := seen[id]; exists {
+				continue
+			}
+			if getString(b, objects.FieldKeyPriorityPlanRef) == planID {
+				seen[id] = struct{}{}
+				objectsList = append(objectsList, b)
+				continue
+			}
+			for _, r := range extractStringSlice(b, objects.FieldKeyPriorityPlanRefs) {
+				if r == planID {
+					seen[id] = struct{}{}
 					objectsList = append(objectsList, b)
-					continue
-				}
-				for _, r := range extractStringSlice(b, objects.FieldKeyPriorityPlanRefs) {
-					if r == planID {
-						objectsList = append(objectsList, b)
-						break
-					}
+					break
 				}
 			}
 		}

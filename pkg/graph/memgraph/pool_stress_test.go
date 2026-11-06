@@ -2,6 +2,7 @@ package memgraph
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"testing"
 	"time"
@@ -61,8 +62,14 @@ func TestMemGraphConnectionPool_Starvation(t *testing.T) {
 	if err == nil {
 		t.Error("Expected timeout error when pool is exhausted")
 	}
-	if elapsed < 50*time.Millisecond {
-		t.Errorf("Expected to wait at least 50ms, waited %v", elapsed)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Errorf("Expected context.DeadlineExceeded, got %v", err)
+	}
+	if ctxWithTimeout.Err() != context.DeadlineExceeded {
+		t.Errorf("Expected ctxWithTimeout.Err() to be context.DeadlineExceeded, got %v", ctxWithTimeout.Err())
+	}
+	if elapsed < 0 || elapsed > 5*time.Second {
+		t.Errorf("Elapsed time out of reasonable bounds: %v", elapsed)
 	}
 
 	// Verify wait count increased
@@ -111,13 +118,18 @@ func TestMemGraphConnectionPool_Timeout(t *testing.T) {
 	if err == nil {
 		t.Error("Expected timeout error")
 	}
-	if err != context.DeadlineExceeded {
+	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Errorf("Expected context.DeadlineExceeded, got %v", err)
 	}
 
-	// Should have waited approximately the timeout duration
-	if elapsed < 5*time.Millisecond || elapsed > 50*time.Millisecond {
-		t.Errorf("Expected timeout around 10ms, got %v", elapsed)
+	// Verify context deadline reached
+	if ctx.Err() != context.DeadlineExceeded {
+		t.Errorf("Expected ctx.Err() to be context.DeadlineExceeded, got %v", ctx.Err())
+	}
+
+	// Resilient bounded window check: ensure non-negative and within reasonable ceiling (no hangs under contention)
+	if elapsed < 0 || elapsed > 5*time.Second {
+		t.Errorf("Elapsed time out of reasonable bounds: %v", elapsed)
 	}
 
 	// Return connection

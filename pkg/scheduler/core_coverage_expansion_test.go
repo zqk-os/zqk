@@ -241,6 +241,8 @@ func TestNoAutoRestart_Operations(t *testing.T) {
 	assert.False(t, IsNoAutoRestartSet(""))
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 
 	assert.False(t, IsNoAutoRestartSet(tmpDir))
 	markerPath := NoAutoRestartFilePath(tmpDir)
@@ -262,6 +264,8 @@ func TestHumanInTheLoomInterrupt_EdgeCases(t *testing.T) {
 
 	// Valid project root appends interrupt record
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 	err = EmitHumanInTheLoomInterrupt(context.Background(), tmpDir, "CVS-TEST-1", "Needs human signoff", "POL-SAFETY-01", 0.90, false, "integration/cycle-43")
 	assert.NoError(t, err)
 }
@@ -281,6 +285,8 @@ func TestSchedulerIssues_CoreCoverage(t *testing.T) {
 	assert.Error(t, err)
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 
 	// Read when missing returns status ok payload
 	payload, err := ReadIssues(tmpDir)
@@ -334,6 +340,8 @@ func TestCategoryLogs_NormalizationAndAppends(t *testing.T) {
 
 	// 3. Valid append
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 	job := &ScheduledJob{
 		ID:          "SCH-CAT-1",
 		Title:       "Test Category Job",
@@ -401,6 +409,7 @@ func TestActivityCache_Operations(t *testing.T) {
 func TestHandlerFactory_AllRegisteredJobTypes_AndTestHooks(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -482,6 +491,7 @@ func TestHandlerFactory_AllRegisteredJobTypes_AndTestHooks(t *testing.T) {
 func TestScheduler_ForTestAccessors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -526,6 +536,7 @@ func TestScheduler_ForTestAccessors(t *testing.T) {
 func TestCapOrchestrator_ForTestAccessors(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -645,6 +656,8 @@ func TestPackageConcurrencySync_EdgeCases(t *testing.T) {
 	nilSched.syncPackageConcurrencyLimits(rawJobs)
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 	sched := &Scheduler{
 		projectRoot: tmpDir,
 	}
@@ -684,6 +697,8 @@ func TestScheduledJobGuard_Combinations(t *testing.T) {
 	assert.True(t, IsSchedulerRunningForRoot("   "))
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 	assert.False(t, IsSchedulerRunningForRoot(tmpDir))
 
 	// scheduledJobEnvMissing
@@ -703,6 +718,8 @@ func TestStaleLockTTL_Comprehensive(t *testing.T) {
 
 	// 2. ReadLockMetadata and WriteLockMetadata
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 	lockPath := filepath.Join(tmpDir, "test.lock")
 
 	// Empty path
@@ -797,6 +814,7 @@ func TestCriteriaAutoValidate_Branches(t *testing.T) {
 	assert.NoError(t, err)
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -921,6 +939,8 @@ func TestJobTypeViewCache_PureAndAtomic(t *testing.T) {
 
 	// 4. Save and load atomic
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
+	registerProjectDirTestTeardown(t, tmpDir)
 	assert.NoError(t, SaveJobTypeViewCacheAtomic("", cache))
 	assert.NoError(t, SaveJobTypeViewCacheAtomic(tmpDir, nil))
 
@@ -1014,6 +1034,7 @@ func TestCoordinationChannel_PipelineAndLifecycle(t *testing.T) {
 	assert.NoError(t, migrateLegacyEventLog("same", "same"))
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	legacyFile := filepath.Join(tmpDir, "legacy.log")
 	newFile := filepath.Join(tmpDir, "new.jsonl")
 
@@ -1090,8 +1111,7 @@ func TestCoordinationChannel_PipelineAndLifecycle(t *testing.T) {
 }
 
 func TestJobTypeRegistry_RegistrationAndQueries(t *testing.T) {
-	t.Parallel()
-
+	// Not parallel: mutates global handler registry map
 	customJobType := "test_custom_job_type_dyn"
 	assert.False(t, HasJobTypeHandler(customJobType))
 
@@ -1147,6 +1167,7 @@ func TestCleanupConfigHandler_StepsAndParsers(t *testing.T) {
 
 	// 3. runStep with various step types
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	h := NewCleanupConfigHandler(tmpDir, logger).(*CleanupConfigHandler)
 	ctx := context.Background()
@@ -1270,6 +1291,7 @@ func TestAggregationMetricsCleanup_EdgeCases(t *testing.T) {
 	t.Parallel()
 
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -1308,6 +1330,7 @@ func TestAggregationMetricsCleanup_EdgeCases(t *testing.T) {
 func TestCapOrchestrator_FailureTrackingAndEscalation(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -1341,6 +1364,7 @@ func TestCapOrchestrator_FailureTrackingAndEscalation(t *testing.T) {
 func TestPIDFile_KeepAliveAndProcessChecks(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 
 	// 1. KeepAlive file operations
 	assert.NoError(t, writeKeepAlive(tmpDir))
@@ -1379,6 +1403,7 @@ func TestPIDFile_KeepAliveAndProcessChecks(t *testing.T) {
 func TestScheduler_CheckAndRecoverMissedJobs(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -1418,6 +1443,7 @@ func TestScheduler_CheckAndRecoverMissedJobs(t *testing.T) {
 func TestRetentionTolerance_MergeStrategyTolerance(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -1440,6 +1466,7 @@ func TestRetentionTolerance_MergeStrategyTolerance(t *testing.T) {
 func TestJobStateRegistry_AccessorsAndMigrations(t *testing.T) {
 	t.Parallel()
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)
@@ -1447,6 +1474,9 @@ func TestJobStateRegistry_AccessorsAndMigrations(t *testing.T) {
 	})
 	reg := NewJobStateRegistry(tmpDir).(*JobStateRegistry)
 	require.NotNil(t, reg)
+	t.Cleanup(func() {
+		reg.WaitForRetentionCleanup()
+	})
 
 	// 1. Accessors
 	assert.NotEmpty(t, reg.StateDirForTest())
@@ -1521,6 +1551,7 @@ func TestHourglass_HelpersAndMissedCheckin(t *testing.T) {
 
 	// 6. handleMissedCheckin
 	tmpDir := t.TempDir()
+	registerProjectDirTestTeardown(t, tmpDir)
 	t.Cleanup(func() {
 		if err := fileutil.RemoveAll(tmpDir); err != nil {
 			t.Logf("cleanup: %v", err)

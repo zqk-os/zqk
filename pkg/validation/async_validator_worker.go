@@ -306,9 +306,9 @@ func (av *AsyncValidator) worker(id int) {
 			// Use separate wait group so Stop() doesn't wait for validation goroutines
 			// PERFORMANCE: Use semaphore to limit concurrent validation goroutines
 			av.workerStates.Store(id, fmt.Sprintf("launching:%s", task.ObjectID))
-			taskCopy := task // Capture task for goroutine
-			validationGoroutineName := fmt.Sprintf("validation_task_%s", task.ObjectID)
-			validationGoroutinePurpose := fmt.Sprintf("validating %s (%s)", task.ObjectID, task.ObjectKind)
+			taskCopy := *task // Value copy of task for goroutine isolation
+			validationGoroutineName := fmt.Sprintf("validation_task_%s", taskCopy.ObjectID)
+			validationGoroutinePurpose := fmt.Sprintf("validating %s (%s)", taskCopy.ObjectID, taskCopy.ObjectKind)
 
 			// Acquire semaphore slot with timeout to prevent indefinite blocking.
 			// Foreign host CPU (AV, other tenants) can refuse extra slots; self-heat does not
@@ -354,7 +354,7 @@ func (av *AsyncValidator) worker(id int) {
 						}, "high")
 				}
 
-				av.priorityQueue.Enqueue(taskCopy)
+				av.priorityQueue.Enqueue(&taskCopy)
 				av.notifyWorkers() // Signal workers (might free up a slot)
 				failedCount++      // Track failed enqueue due to semaphore
 				continue           // Continue worker loop to process other tasks
@@ -576,12 +576,14 @@ func (av *AsyncValidator) worker(id int) {
 					// File read errors are permanent; timeout indicates stuck/slow work - retrying wastes resources
 					isFileReadError := readErr != nil
 					if !isFileReadError && !isTimeoutError && taskCopy.RetryCount < taskCopy.MaxRetries {
-						taskCopy.RetryCount++
-						av.priorityQueue.Enqueue(taskCopy)
+						retryCount := taskCopy.RetryCount + 1
+						retryTask := taskCopy
+						retryTask.RetryCount = retryCount
+						av.priorityQueue.Enqueue(&retryTask)
 						av.notifyWorkers() // Signal workers for retry
 						logging.Fluent(av.logger).Debug("Retrying validation").
 							String("object_id", taskCopy.ObjectID).
-							Int("retry_count", taskCopy.RetryCount).
+							Int("retry_count", retryCount).
 							Log()
 						return nil
 					}

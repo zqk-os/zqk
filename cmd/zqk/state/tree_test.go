@@ -1,8 +1,13 @@
 package state
 
 import (
+	"context"
 	"strings"
 	"testing"
+
+	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 func TestStateTree_RenderText(t *testing.T) {
@@ -118,5 +123,67 @@ func TestStateCommands_Structure(t *testing.T) {
 	}
 	if !foundJournal {
 		t.Error("expected 'journal' subcommand on stateCmd")
+	}
+}
+
+type mockStorageListProvider struct {
+	storage.ObjectStorageProvider
+	listFn func(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error)
+}
+
+func (m *mockStorageListProvider) List(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+	return m.listFn(ctx, secCtx, storageCtx, filter)
+}
+
+func TestAttachBacklogItemsToPlanRequirements_PartialIndexMerge(t *testing.T) {
+	t.Parallel()
+
+	planID := "PRI-TEST-001"
+	reqID := "REQ-TEST-001"
+	reqMap := map[string]*RequirementNode{
+		reqID: {
+			ID:    reqID,
+			Title: "Test Req",
+		},
+	}
+
+	bli1 := map[string]any{
+		objects.FieldKeyID:              "BLI-001",
+		objects.FieldKeyTitle:           "BLI 1",
+		objects.FieldKeyStatus:          "planned",
+		objects.FieldKeyRequirementRefs: []any{reqID},
+		objects.FieldKeyPriorityPlanRef: planID,
+	}
+	bli2 := map[string]any{
+		objects.FieldKeyID:              "BLI-002",
+		objects.FieldKeyTitle:           "BLI 2",
+		objects.FieldKeyStatus:          "planned",
+		objects.FieldKeyRequirementRefs: []any{reqID},
+		objects.FieldKeyPriorityPlanRef: planID,
+	}
+
+	mockStore := &mockStorageListProvider{
+		listFn: func(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, filter storage.ListFilter) (*storage.QueryResult, error) {
+			// If filter has PriorityPlanRef condition (ForPlan), simulate partial index returning only bli1
+			if _, hasFilter := filter.Filters[objects.FieldKeyPriorityPlanRef]; hasFilter {
+				return &storage.QueryResult{
+					Objects: []map[string]any{bli1},
+				}, nil
+			}
+			// Fallback scan without plan filter returns all backlog items
+			return &storage.QueryResult{
+				Objects: []map[string]any{bli1, bli2},
+			}, nil
+		},
+	}
+
+	attachBacklogItemsToPlanRequirements(context.Background(), nil, mockStore, planID, reqMap)
+
+	node := reqMap[reqID]
+	if len(node.BacklogItems) != 2 {
+		t.Fatalf("expected 2 backlog items after fallback merge, got %d", len(node.BacklogItems))
+	}
+	if node.BacklogItems[0].ID != "BLI-001" || node.BacklogItems[1].ID != "BLI-002" {
+		t.Fatalf("unexpected backlog item order or IDs: %+v", node.BacklogItems)
 	}
 }

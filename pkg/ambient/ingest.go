@@ -98,6 +98,9 @@ func (s *AmbientIngestService) MapToSystemObject(event Event) (string, string) {
 
 // Ingest ingests an ambient event into the Knowledge Kernel by mapping to discrete system objects and emitting an audit_event.
 func (s *AmbientIngestService) Ingest(ctx context.Context, event Event) error {
+	s.inFlight.Add(1)
+	defer s.inFlight.Add(-1)
+
 	if event.Type == EventTypeFilesystem {
 		if payloadMap, ok := event.Payload.(map[string]any); ok {
 			if target, ok := payloadMap[objects.FieldKeyTargetID].(string); ok {
@@ -142,6 +145,9 @@ func (s *AmbientIngestService) BindToHub(hub EventHub) {
 
 // IngestAmbientEvent ingests an ambience.AmbientEvent from EventMesh.
 func (s *AmbientIngestService) IngestAmbientEvent(ctx context.Context, event ambience.AmbientEvent) error {
+	s.inFlight.Add(1)
+	defer s.inFlight.Add(-1)
+
 	targetKind := objects.KindAuditEvent
 	targetURI := event.URI
 
@@ -195,7 +201,9 @@ func (s *AmbientIngestService) BindToMeshWithContext(parentCtx context.Context, 
 	loopCtx, loopCancel := context.WithCancel(baseCtx)
 
 	if parentCtx != nil && parentCtx.Done() != nil {
+		s.loopWg.Add(1)
 		goroutinelabels.NewGoroutine("ambient_ingest_cancel_forwarder", "propagate parent context cancellation to ingest loop").StartSimple(func() {
+			defer s.loopWg.Done()
 			select {
 			case <-parentCtx.Done():
 				loopCancel()
@@ -231,9 +239,7 @@ func (s *AmbientIngestService) BindToMeshWithContext(parentCtx context.Context, 
 				if !ok {
 					return
 				}
-				s.inFlight.Add(1)
 				_ = s.IngestAmbientEvent(loopCtx, event)
-				s.inFlight.Add(-1)
 			}
 		}
 	})
@@ -317,6 +323,7 @@ func (s *AmbientIngestService) Stop() {
 	s.mu.Lock()
 	if s.cancel != nil {
 		s.cancel()
+		s.cancel = nil
 	}
 	s.mu.Unlock()
 

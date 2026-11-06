@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 )
 
 // Static Floor Invariant: verify type mapping, default audit opts, and service construction.
@@ -113,10 +114,12 @@ func TestAmbientIngest_StaticFloorInvariant(t *testing.T) {
 func TestAmbientIngest_OperationalDynamicProof(t *testing.T) {
 	t.Run("Ingest emits audit events into storage for filesystem, session, and git", func(t *testing.T) {
 		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
 		defer storage.ScrubProjectRootForTempCleanup(tempDir, 10, 10*time.Millisecond)
 
 		secCtx := pkgctx.NewSystemSecurityContext()
 		svc := NewAmbientIngestService(tempDir, secCtx)
+		defer svc.Stop()
 		ctx := pkgctx.NewSystemContext()
 
 		// 1. Filesystem event with markdown file (.md -> KindDocEntry)
@@ -181,11 +184,14 @@ func TestAmbientIngest_OperationalDynamicProof(t *testing.T) {
 
 	t.Run("BindToHub event delivery for filesystem, session, and git events", func(t *testing.T) {
 		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
 		defer storage.ScrubProjectRootForTempCleanup(tempDir, 10, 10*time.Millisecond)
 
 		secCtx := pkgctx.NewSystemSecurityContext()
 		svc := NewAmbientIngestService(tempDir, secCtx)
+		defer svc.Stop()
 		hub := NewEventHub()
+		defer hub.WaitForAudits()
 
 		svc.BindToHub(hub)
 
@@ -227,10 +233,12 @@ func TestAmbientIngest_OperationalDynamicProof(t *testing.T) {
 
 	t.Run("IngestAmbientEvent emits audit events for various URIs", func(t *testing.T) {
 		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
 		defer storage.ScrubProjectRootForTempCleanup(tempDir, 10, 10*time.Millisecond)
 
 		secCtx := pkgctx.NewSystemSecurityContext()
 		svc := NewAmbientIngestService(tempDir, secCtx)
+		defer svc.Stop()
 		ctx := pkgctx.NewSystemContext()
 
 		tests := []struct {
@@ -263,6 +271,7 @@ func TestAmbientIngest_OperationalDynamicProof(t *testing.T) {
 
 	t.Run("BindToMesh subscribes and ingests ambience events", func(t *testing.T) {
 		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
 		defer storage.ScrubProjectRootForTempCleanup(tempDir, 10, 10*time.Millisecond)
 
 		secCtx := pkgctx.NewSystemSecurityContext()
@@ -333,7 +342,9 @@ func (subscribeErrorMesh) Subscribe(context.Context, []ambience.EventType) (<-ch
 func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 	t.Run("ignored filesystem paths return nil without error or side-effect", func(t *testing.T) {
 		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
 		svc := NewAmbientIngestService(tempDir, pkgctx.NewSystemSecurityContext())
+		defer svc.Stop()
 		ctx := context.Background()
 
 		ignoredTargets := []string{
@@ -362,7 +373,10 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 	})
 
 	t.Run("invalid JSON payload in IngestAmbientEvent returns error cleanly", func(t *testing.T) {
-		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
+		svc := NewAmbientIngestService(tempDir, pkgctx.NewSystemSecurityContext())
+		defer svc.Stop()
 		ctx := context.Background()
 
 		malformedPayloads := [][]byte{
@@ -392,7 +406,9 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 	})
 
 	t.Run("nil EventMesh does not panic", func(t *testing.T) {
-		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
+		svc := NewAmbientIngestService(tempDir, pkgctx.NewSystemSecurityContext())
 		defer svc.Stop()
 		defer func() {
 			if r := recover(); r != nil {
@@ -404,7 +420,9 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 	})
 
 	t.Run("closed EventMesh channel completes loop cleanly without panic", func(t *testing.T) {
-		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
+		svc := NewAmbientIngestService(tempDir, pkgctx.NewSystemSecurityContext())
 		defer svc.Stop()
 		defer func() {
 			if r := recover(); r != nil {
@@ -417,13 +435,16 @@ func TestAmbientIngest_NegativeAdversarialBoundary(t *testing.T) {
 	})
 
 	t.Run("subscribe error mesh returns gracefully", func(t *testing.T) {
-		svc := NewAmbientIngestService(t.TempDir(), pkgctx.NewSystemSecurityContext())
+		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
+		svc := NewAmbientIngestService(tempDir, pkgctx.NewSystemSecurityContext())
 		defer svc.Stop()
 		svc.BindToMesh(subscribeErrorMesh{})
 	})
 
 	t.Run("BindToMeshWithContext cancellation and WaitForIdle", func(t *testing.T) {
 		tempDir := t.TempDir()
+		testkit.RegisterStorageTestCleanup(t, tempDir, nil)
 		defer storage.ScrubProjectRootForTempCleanup(tempDir, 10, 10*time.Millisecond)
 
 		ctx, cancel := context.WithCancel(context.Background())

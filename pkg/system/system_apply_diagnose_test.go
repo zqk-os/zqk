@@ -118,6 +118,12 @@ func TestSystem_Diagnose_CheckIssues_EdgeCases(t *testing.T) {
 	assert.False(t, autoFixPlan.AutoApply)
 }
 
+func TestSanitizeRecipeCommand(t *testing.T) {
+	assert.Equal(t, "zqk system check --auto-fix OBJ-123", sanitizeRecipeCommand("zqk system check --auto-fix --ids OBJ-123"))
+	assert.Equal(t, "zqk object delete OBJ-456 --unlink-references", sanitizeRecipeCommand("zqk object delete --ids OBJ-456 --unlink-references"))
+	assert.Equal(t, "zqk object update OBJ-789 --field title=New", sanitizeRecipeCommand("zqk object update --ids=OBJ-789 --field title=New"))
+}
+
 func TestSystem_DirHasYAML(t *testing.T) {
 	tmpDir := t.TempDir()
 
