@@ -49,10 +49,6 @@ func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 		t.Fatalf("factory init failed: %v", err)
 	}
 	sp := factory.GetStorage()
-	if closer, ok := sp.(io.Closer); ok {
-		t.Cleanup(func() { _ = closer.Close() })
-	}
-	t.Cleanup(func() { _ = sp.Shutdown(sCtx) })
 	sec := pkgctx.NewSystemSecurityContext()
 
 	seedStateTreeEntities(t, sp, sCtx, sec)
@@ -80,6 +76,20 @@ func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 		objects.KindOrganization, objects.KindMission, objects.KindVision, objects.KindGoal,
 		objects.KindRequirement, objects.KindPriorityPlan, objects.KindBacklogItem,
 	}))
+
+	// Enforce lifecycle barrier: shut down and close provider & factory BEFORE returning
+	// so that all in-memory buffers, CAS indexes, and pending mutations are fully flushed to disk.
+	if err := sp.Shutdown(sCtx); err != nil {
+		t.Fatalf("sp shutdown failed: %v", err)
+	}
+	if closer, ok := sp.(io.Closer); ok {
+		if err := closer.Close(); err != nil {
+			t.Fatalf("sp close failed: %v", err)
+		}
+	}
+	if err := factory.Shutdown(sCtx); err != nil {
+		t.Fatalf("factory shutdown failed: %v", err)
+	}
 }
 
 func TestStateTree_WithPopulatedHierarchy(t *testing.T) {

@@ -166,10 +166,34 @@ func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.Se
 		StatusNot(objects.ObjectStatusArchived).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs).
 		Build())
-	if err != nil {
-		return
+
+	var objectsList []map[string]any
+	if err == nil && blis != nil && len(blis.Objects) > 0 {
+		objectsList = blis.Objects
+	} else {
+		// Robust fallback: if index-based ForPlan returns empty or fails (e.g. unindexed files or reference index sync lag),
+		// query all non-archived backlog items and match plan reference directly.
+		fallbackBlis, fallbackErr := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+			NotArchived(objects.KindBacklogItem).
+			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
+			Build())
+		if fallbackErr == nil && fallbackBlis != nil {
+			for _, b := range fallbackBlis.Objects {
+				if getString(b, objects.FieldKeyPriorityPlanRef) == planID {
+					objectsList = append(objectsList, b)
+					continue
+				}
+				for _, r := range extractStringSlice(b, objects.FieldKeyPriorityPlanRefs) {
+					if r == planID {
+						objectsList = append(objectsList, b)
+						break
+					}
+				}
+			}
+		}
 	}
-	for _, b := range blis.Objects {
+
+	for _, b := range objectsList {
 		bNode := BacklogItemNode{
 			ID:        getString(b, objects.FieldKeyID),
 			Title:     getString(b, objects.FieldKeyTitle),
@@ -178,6 +202,11 @@ func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.Se
 			ClaimedBy: getString(b, "claimed_by"),
 		}
 		reqRefs := extractStringSlice(b, objects.FieldKeyRequirementRefs)
+		if len(reqRefs) == 0 {
+			if singleReq := getString(b, "requirement_ref"); singleReq != "" {
+				reqRefs = []string{singleReq}
+			}
+		}
 		matched := false
 		for _, reqID := range reqRefs {
 			if rNode, exists := reqMap[reqID]; exists {
@@ -223,6 +252,9 @@ func buildPriorityPlanNode(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 	for _, rID := range sortedReqIDs {
 		rNode := reqMap[rID]
 		if len(rNode.BacklogItems) > 0 {
+			sort.Slice(rNode.BacklogItems, func(i, j int) bool {
+				return rNode.BacklogItems[i].ID < rNode.BacklogItems[j].ID
+			})
 			node.Requirements = append(node.Requirements, *rNode)
 		}
 	}
@@ -241,6 +273,9 @@ func loadActivePriorityPlans(ctx context.Context, secCtx *pkgctx.SecurityContext
 	for _, p := range plans.Objects {
 		planNodes = append(planNodes, buildPriorityPlanNode(ctx, secCtx, storageCtx, sp, p, baseReqMap))
 	}
+	sort.Slice(planNodes, func(i, j int) bool {
+		return planNodes[i].ID < planNodes[j].ID
+	})
 	return planNodes
 }
 
