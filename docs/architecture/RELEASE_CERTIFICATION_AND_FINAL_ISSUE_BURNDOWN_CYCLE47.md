@@ -1,11 +1,8 @@
 # Architecture & Execution Specification: Cycle 47 - Final GitHub Issue Burndown & v0.3.2 Release Certification
 
-**Document ID**: `DEC-1793917710000000000-CYCLE47`
-**Initiative**: Epic `EPC-1793917680245819000-30833ef1`
-**Milestone**: `MIL-1793917543528547000-3321f240` (*Cycle 47: Release Gate Readiness & Final GitHub Issue Burndown (GH-995, GH-996)*)
-**Priority Plan**: `PRI-1793917646299013000-cfbae369` (*Cycle 47 - Resolve GH-995 & GH-996 and Release Certification*)
-**Goal**: `GOAL-1793917550884663000-757e2dc0` (*Complete Final GitHub Issue Burndown and Harden CLI & Install Ergonomics*)
-**Requirement**: `REQ-1793917567624615000-0f5bbb50` (*Darwin Installation Codesigning and Ambient Stop Operational Feedback*)
+**Document ID**: `DEC-CYCLE47-RELEASE-CERTIFICATION`
+**Initiative**: Release Gate Readiness & Final GitHub Issue Burndown (GH-995, GH-996)
+**Scope**: Darwin Installation Codesigning, Ambient Stop Operational Feedback, and v0.3.2 Multi-Architecture Release Certification
 
 ---
 
