@@ -3,7 +3,9 @@ package whatsnext
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -300,6 +302,111 @@ func TestGetOrRecoverPayload_AutoInvalidationOnCompletedPlan(t *testing.T) {
 	}
 	if diskPayload.LeadPlan == nil || diskPayload.LeadPlan.ID != "PRI-001" {
 		t.Errorf("expected disk lead plan to be PRI-001, got %+v", diskPayload.LeadPlan)
+	}
+}
+
+func TestGetOrRecoverPayload_AutoInvalidationOnHigherActiveOrderPromotion(t *testing.T) {
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+
+	// Initial storage: PRI-001 (active, active_order=10)
+	mockSp.mu.Lock()
+	mockSp.objects[objects.KindPriorityPlan] = []map[string]any{
+		{
+			objects.FieldKeyID:          "PRI-001",
+			objects.FieldKeyTitle:       "Low Priority Plan",
+			objects.FieldKeyStatus:      objects.ObjectStatusActive,
+			objects.FieldKeyActiveOrder: 10,
+		},
+	}
+	mockSp.mu.Unlock()
+
+	view := NewWhatsNextMaterializedView(tempDir)
+	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
+		t.Fatalf("scan failed: %v", err)
+	}
+	if err := view.SaveToLiteFile(); err != nil {
+		t.Fatalf("save lite file failed: %v", err)
+	}
+
+	// Verify cached lead plan is PRI-001
+	loaded, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+	if err != nil || loaded == nil || loaded.LeadPlan == nil || loaded.LeadPlan.ID != "PRI-001" {
+		t.Fatalf("expected initial lead plan PRI-001, got %+v", loaded)
+	}
+
+	// Add PRI-TOP (active, active_order=1) to storage
+	mockSp.mu.Lock()
+	mockSp.objects[objects.KindPriorityPlan] = append(mockSp.objects[objects.KindPriorityPlan], map[string]any{
+		objects.FieldKeyID:          "PRI-TOP",
+		objects.FieldKeyTitle:       "Top Priority Plan",
+		objects.FieldKeyStatus:      objects.ObjectStatusActive,
+		objects.FieldKeyActiveOrder: 1,
+	})
+	mockSp.mu.Unlock()
+
+	// Hot path read must detect that PRI-001 is no longer the highest active_order plan and refresh to PRI-TOP
+	refreshed, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+	if err != nil {
+		t.Fatalf("refresh error: %v", err)
+	}
+	if refreshed == nil || refreshed.LeadPlan == nil || refreshed.LeadPlan.ID != "PRI-TOP" {
+		t.Fatalf("expected refreshed lead plan to be PRI-TOP, got %+v", refreshed)
+	}
+
+	// Check disk file is updated
+	diskView := NewWhatsNextMaterializedView(tempDir)
+	diskPayload, err := diskView.LoadFromLiteFile()
+	if err != nil || diskPayload == nil || diskPayload.LeadPlan == nil || diskPayload.LeadPlan.ID != "PRI-TOP" {
+		t.Fatalf("expected disk lead plan to be PRI-TOP, got %+v", diskPayload)
+	}
+}
+
+func TestGetOrRecoverPayload_CorruptedAndPermissionError(t *testing.T) {
+	tempDir := t.TempDir()
+	mockSp := newMockStorage()
+
+	stateDir := filepath.Join(tempDir, paths.ProjectDataDir, paths.StateDir)
+	if err := fileutil.MkdirAll(stateDir, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir failed: %v", err)
+	}
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+
+	// Case 1: Corrupted JSON
+	if err := fileutil.WriteFile(litePath, []byte("NOT-VALID-JSON{"), paths.FilePerm644); err != nil {
+		t.Fatalf("write corrupted file failed: %v", err)
+	}
+	corruptedPayload, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+	if err != nil {
+		t.Fatalf("expected no error on corrupted file, got: %v", err)
+	}
+	if corruptedPayload == nil || !corruptedPayload.Stale || !corruptedPayload.Recovering {
+		t.Fatalf("expected degraded payload on corrupted file, got: %+v", corruptedPayload)
+	}
+	if !strings.Contains(corruptedPayload.DegradedReason, "corrupted") {
+		t.Errorf("expected degraded reason to mention corrupted, got: %s", corruptedPayload.DegradedReason)
+	}
+
+	// Case 2: Permission denied
+	if err := fileutil.WriteFile(litePath, []byte("{}"), paths.FilePerm644); err != nil {
+		t.Fatalf("write file failed: %v", err)
+	}
+	if err := os.Chmod(litePath, 0000); err != nil {
+		t.Fatalf("chmod 0000 failed: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chmod(litePath, 0644)
+	})
+
+	permPayload, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
+	if err != nil {
+		t.Fatalf("expected no error on permission denied file, got: %v", err)
+	}
+	if permPayload == nil || !permPayload.Stale || !permPayload.Recovering {
+		t.Fatalf("expected degraded payload on permission denied file, got: %+v", permPayload)
+	}
+	if !strings.Contains(permPayload.DegradedReason, "permission_denied") {
+		t.Errorf("expected degraded reason to mention permission_denied, got: %s", permPayload.DegradedReason)
 	}
 }
 

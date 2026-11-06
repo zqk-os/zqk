@@ -174,31 +174,22 @@ func runWhatsNextLite(cmd *cobra.Command, args []string, proc *cli.Processor, pr
 	if candidatePlanID != "" {
 		isStale := whatsnext.IsPlanStatusCompleted(candidatePlanStatus)
 		if !isStale && sp != nil {
-			secCtx := pkgctx.GetSecurityContext(ctx)
-			if secCtx == nil {
-				secCtx = pkgctx.NewSystemSecurityContext()
-			}
-			obj, err := sp.Read(ctx, secCtx, candidatePlanID)
-			if err == nil && obj != nil {
-				if whatsnext.IsPlanStatusCompleted(koi.Status(obj)) || koi.IsArchive(obj) {
-					isStale = true
-				}
-			} else {
-				// Object was not found via Read. Check if storage has other priority plans.
-				res, lErr := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindPriorityPlan).Limit(1).Build())
-				if lErr == nil && len(res.Objects) > 0 {
-					isStale = true
-				}
-			}
+			isStale = whatsnext.IsCachedPlanStale(ctx, sp, &whatsnext.WhatsNextPriorityPlan{
+				ID:     candidatePlanID,
+				Status: candidatePlanStatus,
+			})
 		}
 		if isStale && sp != nil {
 			return runWhatsNextSyncSweep(cmd, args, proc, projectRoot, priFlag, cvsFlag, personaFlag, agentIDFlag, skipMeasure)
 		}
-	} else if lite != nil && lite.LeadPlan == nil && len(lite.ActivePlans) == 0 && sp != nil {
-		// If cache has no active plans, check if new plans were promoted in storage
+	} else if lite != nil && (lite.LeadPlan == nil || lite.Stale) && sp != nil {
+		// If cache has no active plans or is stale/recovering, check if plans exist in storage
 		personaIDs := resolveWhatsNextPersonaIDs(ctx, sp, projectRoot, personaFlag, agentIDFlag)
 		columnIDs := planPersonaFilter(ctx, sp, projectRoot, agentIDFlag, personaIDs)
 		_, summ, _ := resolvePriorityPlanForWhatsNext(ctx, sp, explicit, columnIDs)
+		if summ == nil && len(columnIDs) > 0 {
+			_, summ, _ = resolvePriorityPlanForWhatsNext(ctx, sp, explicit, nil)
+		}
 		if summ != nil {
 			return runWhatsNextSyncSweep(cmd, args, proc, projectRoot, priFlag, cvsFlag, personaFlag, agentIDFlag, skipMeasure)
 		}
