@@ -184,7 +184,8 @@ func splitPipelineSegments(cmdLine string) ([]PipelineSegment, error) {
 
 	for i := 0; i < n; i++ {
 		c := trimmed[i]
-		if handled, _ := qs.consumeEscapeOrQuote(c); handled {
+		handled, isEscaped := qs.consumeEscapeOrQuote(c)
+		if handled || isEscaped {
 			current.WriteByte(c)
 			continue
 		}
