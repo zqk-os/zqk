@@ -222,18 +222,14 @@ func isCommandTool(name string) bool {
 		strings.Contains(lower, "run")
 }
 
-// extractCommandLine inspects top-level and nested tool arguments for the command string.
-func extractCommandLine(raw map[string]any) string {
-	keys := []string{"command_line", "CommandLine", "command", "cmd"}
-
-	// Top level check
+// extractStringCandidate inspects top-level and nested tool arguments for the first non-empty value matching any of the candidate keys.
+func extractStringCandidate(raw map[string]any, keys ...string) string {
 	for _, k := range keys {
 		if s := strings.TrimSpace(mapString(raw, k)); s != "" {
 			return s
 		}
 	}
 
-	// In tool_args, toolCall.args, and args
 	containers := []map[string]any{
 		mapSubMap(raw, "tool_args"),
 		mapSubMap(mapSubMap(raw, "toolCall"), "args"),
@@ -252,6 +248,11 @@ func extractCommandLine(raw map[string]any) string {
 	}
 
 	return ""
+}
+
+// extractCommandLine inspects top-level and nested tool arguments for the command string.
+func extractCommandLine(raw map[string]any) string {
+	return extractStringCandidate(raw, "command_line", "CommandLine", "command", "cmd")
 }
 
 // extractCwd extracts working directory from payload or falls back to project root or current working dir.
@@ -353,29 +354,7 @@ func extractMaxTokens(raw map[string]any) int {
 
 // extractFormat inspects top-level and nested tool arguments for output format.
 func extractFormat(raw map[string]any) string {
-	keys := []string{"format", "output_format", "outputFormat"}
-	for _, k := range keys {
-		if s := strings.TrimSpace(mapString(raw, k)); s != "" {
-			return s
-		}
-	}
-
-	containers := []map[string]any{
-		mapSubMap(raw, "tool_args"),
-		mapSubMap(mapSubMap(raw, "toolCall"), "args"),
-		mapSubMap(raw, "args"),
-	}
-	for _, container := range containers {
-		if container == nil {
-			continue
-		}
-		for _, k := range keys {
-			if s := strings.TrimSpace(mapString(container, k)); s != "" {
-				return s
-			}
-		}
-	}
-	return ""
+	return extractStringCandidate(raw, "format", "output_format", "outputFormat")
 }
 
 // emitPreCommandDecision writes the formatted JSON response to out.
