@@ -170,7 +170,7 @@ func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.Se
 	blis, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		ForPlan(objects.KindBacklogItem, planID).
 		StatusNot(objects.ObjectStatusArchived).
-		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, "requirement_ref").
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, "requirement_ref", objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
 		Build())
 	if err == nil && blis != nil {
 		for _, b := range blis.Objects {

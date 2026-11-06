@@ -40,6 +40,14 @@ func TestExtractObjectArtifacts(t *testing.T) {
 	}
 	require.Equal(t, []string{"pkg/a.go"}, ExtractObjectArtifacts(obj1))
 
+	// fallback to outputs
+	objOutputs := map[string]any{
+		objects.FieldKeyKind:         objects.KindBacklogItem,
+		objects.FieldKeyOutputs:      []any{"pkg/output.go"},
+		objects.FieldKeyCodeLocation: "pkg/legacy.go",
+	}
+	require.Equal(t, []string{"pkg/output.go"}, ExtractObjectArtifacts(objOutputs))
+
 	// fallback to code_location
 	obj2 := map[string]any{
 		objects.FieldKeyCodeLocation: "pkg/legacy.go",
@@ -114,6 +122,16 @@ func TestValidateDeliverableArtifacts(t *testing.T) {
 		objects.FieldKeyArtifacts: []any{validFile},
 	}
 	paths, err = ValidateDeliverableArtifacts(bliValid, "")
+	require.NoError(t, err)
+	require.Equal(t, []string{validFile}, paths)
+
+	// BacklogItem with outputs alias
+	bliOutputs := map[string]any{
+		objects.FieldKeyID:      "BLI-OUTPUTS",
+		objects.FieldKeyKind:    objects.KindBacklogItem,
+		objects.FieldKeyOutputs: []any{validFile},
+	}
+	paths, err = ValidateDeliverableArtifacts(bliOutputs, "")
 	require.NoError(t, err)
 	require.Equal(t, []string{validFile}, paths)
 

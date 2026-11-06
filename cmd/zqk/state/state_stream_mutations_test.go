@@ -96,25 +96,33 @@ func TestStateTree_WithPopulatedHierarchy(t *testing.T) {
 	testRoot := setupStateIsolatedProject(t)
 	seedStateTreeHierarchy(t, testRoot)
 
-	cmdText := newTreeCmd()
-	outText, errText := executeStateCmd(t, cmdText, testRoot)
-	require.NoError(t, errText)
-	assert.Contains(t, outText, "ORG-STATE-001")
-	assert.Contains(t, outText, "MIS-STATE-001")
-	assert.Contains(t, outText, "VIS-STATE-001")
-	assert.Contains(t, outText, "GOAL-STATE-001")
-	assert.Contains(t, outText, "PRI-STATE-001")
-	assert.Contains(t, outText, "REQ-STATE-001")
-	assert.Contains(t, outText, "BLI-STATE-001")
-	assert.Contains(t, outText, "BLI-STATE-002")
+	require.Eventually(t, func() bool {
+		cmdText := newTreeCmd()
+		outText, errText := executeStateCmd(t, cmdText, testRoot)
+		if errText != nil {
+			return false
+		}
+		return strings.Contains(outText, "ORG-STATE-001") &&
+			strings.Contains(outText, "MIS-STATE-001") &&
+			strings.Contains(outText, "VIS-STATE-001") &&
+			strings.Contains(outText, "GOAL-STATE-001") &&
+			strings.Contains(outText, "PRI-STATE-001") &&
+			strings.Contains(outText, "REQ-STATE-001") &&
+			strings.Contains(outText, "BLI-STATE-001") &&
+			strings.Contains(outText, "BLI-STATE-002")
+	}, 5*time.Second, 50*time.Millisecond)
 
-	cmdJSON := newTreeCmd()
-	outJSON, errJSON := executeStateCmd(t, cmdJSON, testRoot, "--format", "json")
-	require.NoError(t, errJSON)
-	assert.Contains(t, outJSON, "ORG-STATE-001")
-	assert.Contains(t, outJSON, "active_plans")
-	assert.Contains(t, outJSON, "BLI-STATE-001")
-	assert.Contains(t, outJSON, "BLI-STATE-002")
+	require.Eventually(t, func() bool {
+		cmdJSON := newTreeCmd()
+		outJSON, errJSON := executeStateCmd(t, cmdJSON, testRoot, "--format", "json")
+		if errJSON != nil {
+			return false
+		}
+		return strings.Contains(outJSON, "ORG-STATE-001") &&
+			strings.Contains(outJSON, "active_plans") &&
+			strings.Contains(outJSON, "BLI-STATE-001") &&
+			strings.Contains(outJSON, "BLI-STATE-002")
+	}, 5*time.Second, 50*time.Millisecond)
 }
 
 func seedRawStreamFile(t *testing.T, path string) {

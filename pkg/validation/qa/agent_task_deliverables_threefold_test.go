@@ -77,6 +77,31 @@ func TestAgentTaskDeliverables_StaticFloorInvariant(t *testing.T) {
 		objects.FieldKeyCodeLocation: "pkg/legacy_code.go",
 	}
 	require.Equal(t, []string{"pkg/legacy_code.go"}, ExtractObjectArtifacts(taskWithLegacyOnly))
+
+	// backlog_item polymorphic outputs, artifacts, and code_location verification
+	bliWithArtifacts := map[string]any{
+		objects.FieldKeyKind:         objects.KindBacklogItem,
+		objects.FieldKeyArtifacts:    []any{"pkg/bli_primary.go"},
+		objects.FieldKeyOutputs:      []any{"pkg/bli_ignored_output.go"},
+		objects.FieldKeyCodeLocation: "pkg/bli_ignored_legacy.go",
+	}
+	require.Equal(t, []string{"pkg/bli_primary.go"}, ExtractObjectArtifacts(bliWithArtifacts))
+
+	bliWithOutputsOnly := map[string]any{
+		objects.FieldKeyKind:         objects.KindBacklogItem,
+		objects.FieldKeyArtifacts:    []any{},
+		objects.FieldKeyOutputs:      []any{"pkg/bli_output_alias.go"},
+		objects.FieldKeyCodeLocation: "pkg/bli_ignored_legacy.go",
+	}
+	require.Equal(t, []string{"pkg/bli_output_alias.go"}, ExtractObjectArtifacts(bliWithOutputsOnly))
+
+	bliWithLegacyOnly := map[string]any{
+		objects.FieldKeyKind:         objects.KindBacklogItem,
+		objects.FieldKeyArtifacts:    []any{},
+		objects.FieldKeyOutputs:      []any{},
+		objects.FieldKeyCodeLocation: "pkg/bli_legacy_code.go",
+	}
+	require.Equal(t, []string{"pkg/bli_legacy_code.go"}, ExtractObjectArtifacts(bliWithLegacyOnly))
 }
 
 func TestAgentTaskDeliverables_OperationalDynamicProof(t *testing.T) {
