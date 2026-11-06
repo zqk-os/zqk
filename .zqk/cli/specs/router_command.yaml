@@ -1,0 +1,24 @@
+$schema: _schemas/command_spec.schema.json
+name: router
+short: Universal tool and model gradient router
+description: |
+  Universal tool and model gradient router daemon and evaluator for L7 token budgeting and dispatch.
+  Evaluates tool invocations, shell commands, and model requests through the L7 gradient router pipeline.
+  Ensures token budgeting, in-repo interception, AST optimization, and graceful fallback.
+help:
+  examples:
+    - comment: "Evaluate a command route"
+      command: "%s router eval \"grep -rn 'foo' pkg/\""
+    - comment: "Evaluate route with token budget"
+      command: "%s router eval \"grep 'foo' pkg/\" --token-budget 1500"
+    - comment: "View router runtime statistics"
+      command: "%s router stats"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: eval
+    spec_ref: router/eval_command.yaml
+  - name: stats
+    spec_ref: router/stats_command.yaml

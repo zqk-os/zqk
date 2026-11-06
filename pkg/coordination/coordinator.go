@@ -38,8 +38,12 @@ type coordinatorState struct {
 
 type Coordinator struct {
 	state atomic.Pointer[coordinatorState]
-	mu    sync.Mutex     // For writing updates
-	wg    sync.WaitGroup // Tracks in-flight router and subscriber goroutines
+	mu    sync.Mutex // For writing updates
+
+	// Lifecycle and draining guard
+	lifecycleMu sync.RWMutex
+	activeWG    *sync.WaitGroup
+	draining    atomic.Bool
 
 	// Channel routers
 	loggingRouter     LoggingRouter
@@ -96,6 +100,7 @@ func NewCoordinator(config CoordinatorConfig) *Coordinator {
 		auditRouter:       config.AuditRouter,
 		metricsRouter:     config.MetricsRouter,
 		operationalRouter: config.OperationalRouter,
+		activeWG:          &sync.WaitGroup{},
 	}
 	if c.operationalRouter == nil {
 		c.operationalRouter = &DefaultOperationalRouter{coordinator: c}
@@ -110,28 +115,81 @@ func NewCoordinator(config CoordinatorConfig) *Coordinator {
 	return c
 }
 
+func (c *Coordinator) getWG() *sync.WaitGroup {
+	if c.activeWG == nil {
+		c.activeWG = &sync.WaitGroup{}
+	}
+	return c.activeWG
+}
+
+// IsDraining returns true if the coordinator is currently draining or shutting down.
+func (c *Coordinator) IsDraining() bool {
+	if c == nil {
+		return true
+	}
+	return c.draining.Load()
+}
+
+// Reset restores the coordinator to an active, non-draining state with a fresh WaitGroup.
+func (c *Coordinator) Reset() {
+	if c == nil {
+		return
+	}
+	c.lifecycleMu.Lock()
+	defer c.lifecycleMu.Unlock()
+
+	c.activeWG = &sync.WaitGroup{}
+	c.draining.Store(false)
+}
+
 // Wait blocks until all in-flight router and subscriber goroutines complete.
 func (c *Coordinator) Wait() {
-	c.wg.Wait()
+	_ = c.Drain(0)
 }
 
 // Drain waits up to timeout for all in-flight router and subscriber goroutines to complete.
+// Concurrent calls to runRouterAsync while draining are safely rejected to prevent WaitGroup misuse panics.
 func (c *Coordinator) Drain(timeout time.Duration) error {
+	if c == nil {
+		return nil
+	}
+
+	c.lifecycleMu.Lock()
+	c.draining.Store(true)
+	wg := c.getWG()
+	c.lifecycleMu.Unlock()
+
 	done := make(chan struct{})
 	goroutinelabels.NewGoroutine("coordinator_drain_wait", "wait for coordinator goroutines during drain").StartSimple(func() {
-		c.wg.Wait()
+		wg.Wait()
 		close(done)
 	})
+
+	var drainErr error
 	if timeout <= 0 {
 		<-done
-		return nil
+	} else {
+		select {
+		case <-done:
+		case <-time.After(timeout):
+			drainErr = errfmt.Errorf("coordinator drain timed out after %v", timeout)
+		}
 	}
-	select {
-	case <-done:
-		return nil
-	case <-time.After(timeout):
-		return errfmt.Errorf("coordinator drain timed out after %v", timeout)
+
+	c.lifecycleMu.Lock()
+	if drainErr == nil && c.activeWG == wg {
+		c.activeWG = &sync.WaitGroup{}
+		c.draining.Store(false)
 	}
+	c.lifecycleMu.Unlock()
+
+	return drainErr
+}
+
+// DispatchEvent routes an event to all appropriate channels based on the EventContext.
+// This is an alias for Emit.
+func (c *Coordinator) DispatchEvent(ctx context.Context, eventCtx *EventContext) error {
+	return c.Emit(ctx, eventCtx)
 }
 
 // Emit routes an event to all appropriate channels.
