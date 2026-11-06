@@ -286,7 +286,7 @@ var draftPlaneNextStatusFields = map[string]map[string]any{
 		objects.FieldKeyAcceptanceConsiderations: "",
 		objects.FieldKeyPriority:                 "medium",
 		objects.FieldKeyPriorityTier:             "P2",
-		objects.FieldKeyPriorityPlanRef:          "",
+		objects.FieldKeyPriorityPlanRef:          nil,
 		objects.FieldKeyMilestoneRefs:            []any{},
 		objects.FieldKeyCriteriaRefs:             []any{},
 		objects.FieldKeyRequirementRefs:          []any{},
@@ -356,6 +356,11 @@ func getDraftPlaneTemplateForKind(kind string) map[string]any {
 			if !field.Required && (field.Type == "enum" || len(field.EnumValues) > 0) {
 				continue
 			}
+			// GH-944: Omit optional reference fields from draft template scaffolding so they do
+			// not initialize as empty strings ("") and trigger ontology validation errors.
+			if !field.Required && isDraftPlaneReferenceField(field) {
+				continue
+			}
 			placeholder := draftFieldPlaceholder(field)
 			if placeholder != nil {
 				merged[field.Name] = placeholder
@@ -396,6 +401,19 @@ func isDraftPlaneMembraneField(fieldName string) bool {
 	}
 }
 
+func isDraftPlaneReferenceField(field objects.FieldInfo) bool {
+	if field.Type == "reference" || field.SemanticType == "reference" {
+		return true
+	}
+	if strings.HasSuffix(field.Name, "_ref") {
+		return true
+	}
+	if strings.HasSuffix(field.Name, "_id") && field.Name != "id" && field.Name != "namespace_id" {
+		return true
+	}
+	return false
+}
+
 func draftFieldPlaceholder(field objects.FieldInfo) any {
 	if len(field.EnumValues) > 0 {
 		return field.EnumValues[0]
@@ -403,7 +421,12 @@ func draftFieldPlaceholder(field objects.FieldInfo) any {
 	switch field.Type {
 	case "datetime", "date":
 		return nil // Dates/datetimes cannot be empty strings in schema validation; omit until provided
-	case "string", "text", "reference":
+	case "reference":
+		return nil // References cannot be empty strings; omit or scaffold as null
+	case "string", "text":
+		if field.SemanticType == "reference" || strings.HasSuffix(field.Name, "_ref") {
+			return nil
+		}
 		return ""
 	case "integer", "number":
 		return 0

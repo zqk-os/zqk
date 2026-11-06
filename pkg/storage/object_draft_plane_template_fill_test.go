@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/objects"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -356,5 +357,65 @@ func TestWriteObjectToDraftPlane_AgentTaskIncludesArtifacts(t *testing.T) {
 	}
 	if len(artifactsSlice) != 0 {
 		t.Fatalf("expected initial artifacts slice to be empty, got %d items", len(artifactsSlice))
+	}
+}
+
+// GH-944: Optional reference fields must not scaffold empty string ("") on draft plane.
+func TestWriteObjectToDraftPlane_GH944_OmitsOptionalReferenceEmptyStrings(t *testing.T) {
+	_, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)
+
+	// Test 1: priority_plan draft plane omits optional scalar references like release_ref & team_configuration_ref
+	planID := "PRI-1777000000000000000-gh944plan01"
+	sparsePlan := map[string]any{
+		objects.FieldKeyID:            planID,
+		objects.FieldKeyKind:          objects.KindPriorityPlan,
+		objects.FieldKeyTitle:         "GH-944 Plan draft",
+		objects.FieldKeyStatus:        objects.ObjectStatusConceptual,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	planBytes, err := yaml.Marshal(sparsePlan)
+	require.NoError(t, err)
+	err = fileStorage.WriteObjectToDraftPlane(planID, objects.KindPriorityPlan, planBytes)
+	require.NoError(t, err)
+
+	draftPlanPath := fileStorage.objectDraftPlanePath(objects.KindPriorityPlan, planID)
+	data, err := fileutil.ReadFile(draftPlanPath)
+	require.NoError(t, err)
+
+	var parsedPlan map[string]any
+	err = yaml.Unmarshal(data, &parsedPlan)
+	require.NoError(t, err)
+
+	if v, exists := parsedPlan["release_ref"]; exists && v == "" {
+		t.Errorf("release_ref must not scaffold empty string: got %v", v)
+	}
+	if v, exists := parsedPlan["team_configuration_ref"]; exists && v == "" {
+		t.Errorf("team_configuration_ref must not scaffold empty string: got %v", v)
+	}
+
+	// Test 2: backlog_item priority_plan_ref is null, not empty string
+	bliID := "BLI-1777000000000000000-gh944bli01"
+	sparseBli := map[string]any{
+		objects.FieldKeyID:            bliID,
+		objects.FieldKeyKind:          objects.KindBacklogItem,
+		objects.FieldKeyTitle:         "GH-944 BLI draft",
+		objects.FieldKeyStatus:        objects.ObjectStatusConceptual,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+	}
+	bliBytes, err := yaml.Marshal(sparseBli)
+	require.NoError(t, err)
+	err = fileStorage.WriteObjectToDraftPlane(bliID, objects.KindBacklogItem, bliBytes)
+	require.NoError(t, err)
+
+	draftBliPath := fileStorage.objectDraftPlanePath(objects.KindBacklogItem, bliID)
+	bliData, err := fileutil.ReadFile(draftBliPath)
+	require.NoError(t, err)
+
+	var parsedBli map[string]any
+	err = yaml.Unmarshal(bliData, &parsedBli)
+	require.NoError(t, err)
+
+	if v, exists := parsedBli[objects.FieldKeyPriorityPlanRef]; exists && v != nil {
+		t.Errorf("expected priority_plan_ref to be null (nil), got %#v", v)
 	}
 }

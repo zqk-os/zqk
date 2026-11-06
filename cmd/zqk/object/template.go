@@ -311,7 +311,7 @@ func isReferenceField(field *objects.FieldInfo) bool {
 	if field == nil {
 		return false
 	}
-	return field.Type == "reference" || field.SemanticType == "reference" || strings.HasSuffix(field.Name, "_ref")
+	return field.Type == "reference" || field.SemanticType == "reference" || strings.HasSuffix(field.Name, "_ref") || (strings.HasSuffix(field.Name, "_id") && field.Name != "id" && field.Name != "namespace_id")
 }
 
 func isOptionalRefField(field *objects.FieldInfo) bool {
