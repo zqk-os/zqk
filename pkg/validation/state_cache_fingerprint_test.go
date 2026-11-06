@@ -210,3 +210,166 @@ func TestValidationStateCache_EmptyCodeChecksumInvalidates(t *testing.T) {
 	}
 	assertCacheDroppedTest001(t, root)
 }
+
+// CRIT-1793982071695350000-09591d50: Static Floor Invariant
+// ValidationStateCache marks cache dirty or invalidates upon object mutations
+func TestValidationStateCache_MarksDirtyAndInvalidatesOnMutation(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	cache := NewValidationStateCache(root, time.Hour)
+	if cache.IsDirty() {
+		t.Fatal("expected newly initialized cache to not be dirty")
+	}
+
+	st := &ValidationState{
+		ObjectID:      "REQ-MUT-001",
+		ObjectKind:    "requirement",
+		FilePath:      "req.yaml",
+		LastValidated: time.Now(),
+		Checksum:      "init",
+	}
+	cache.Set(st)
+	if !cache.IsDirty() {
+		t.Fatal("expected cache to be dirty after Set")
+	}
+
+	if err := cache.Save(); err != nil {
+		t.Fatalf("Save: %v", err)
+	}
+	if cache.IsDirty() {
+		t.Fatal("expected cache to not be dirty after successful Save")
+	}
+
+	// Mutation: Invalidate object
+	if !cache.Invalidate("REQ-MUT-001") {
+		t.Fatal("expected Invalidate to return true for existing object")
+	}
+	if !cache.IsDirty() {
+		t.Fatal("expected cache to be marked dirty after Invalidate")
+	}
+
+	// MarkDirty with specific IDs
+	cache.Set(&ValidationState{
+		ObjectID:      "REQ-MUT-002",
+		ObjectKind:    "requirement",
+		FilePath:      "req2.yaml",
+		LastValidated: time.Now(),
+	})
+	_ = cache.Save()
+	if cache.IsDirty() {
+		t.Fatal("expected clean cache after Save")
+	}
+
+	cache.MarkDirty("REQ-MUT-002")
+	if !cache.IsDirty() {
+		t.Fatal("expected cache to be dirty after MarkDirty")
+	}
+	if _, ok := cache.Get("REQ-MUT-002"); ok {
+		t.Fatal("expected REQ-MUT-002 to be evicted after MarkDirty")
+	}
+}
+
+// CRIT-1793982074772837000-1b5ce73a: Operational Dynamic Proof
+// Verify system check reflects fresh object state after mutation without requiring --clear-cache
+func TestValidationStateCache_DetectsCASTimestampDivergence(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	cache := NewValidationStateCache(root, time.Hour)
+
+	casRelDir := filepath.Join(paths.ProcessDir, "requirements")
+	casDir := filepath.Join(root, casRelDir)
+	if err := fileutil.MkdirAll(casDir, paths.DirPerm755); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	objFile := filepath.Join(casDir, "initial_hash.yaml")
+	if err := fileutil.WriteFile(objFile, []byte("title: original\n"), paths.FilePerm644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+
+	past := time.Now().Add(-10 * time.Second)
+	if err := fileutil.Chtimes(objFile, past, past); err != nil {
+		t.Fatalf("chtimes past: %v", err)
+	}
+
+	// Set initial cached state with LastValidated after file mtime
+	vTime := time.Now().Add(-5 * time.Second)
+	cache.Set(&ValidationState{
+		ObjectID:      "REQ-CAS-001",
+		ObjectKind:    "requirement",
+		FilePath:      filepath.Join(casRelDir, "initial_hash.yaml"),
+		LastValidated: vTime,
+		Checksum:      "initial_hash",
+	})
+
+	// Before mutation, file mtime is older -> cache hit
+	st, ok := cache.Get("REQ-CAS-001")
+	if !ok || st == nil {
+		t.Fatal("expected cache hit prior to mutation")
+	}
+
+	// 1. Simulate in-place file mutation (timestamp divergence): touch file with future time relative to vTime
+	diverged := time.Now().Add(5 * time.Second)
+	if err := fileutil.Chtimes(objFile, diverged, diverged); err != nil {
+		t.Fatalf("chtimes diverged: %v", err)
+	}
+
+	// Get must detect timestamp divergence and invalidate without requiring --clear-cache
+	if _, ok := cache.Get("REQ-CAS-001"); ok {
+		t.Fatal("expected cache miss and eviction after file timestamp divergence")
+	}
+
+	// 2. Simulate CAS hash rotation upon mutation (old hash file removed, new hash created)
+	cache.Set(&ValidationState{
+		ObjectID:      "REQ-CAS-002",
+		ObjectKind:    "requirement",
+		FilePath:      filepath.Join(casRelDir, "rotated_hash.yaml"),
+		LastValidated: time.Now(),
+		Checksum:      "rotated_hash",
+	})
+	// File does not exist in casDir (rotated/removed)
+	if _, ok := cache.Get("REQ-CAS-002"); ok {
+		t.Fatal("expected cache miss and eviction when CAS file was replaced/removed upon mutation")
+	}
+}
+
+// CRIT-1793982077117459000-3f9e3ca7: Negative Adversarial Boundary
+// Prevent cache persistence of outdated validation records across concurrent modifications
+func TestValidationStateCache_StaleGenerationOverwritePrevention(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	cache := NewValidationStateCache(root, time.Hour)
+
+	tNewer := time.Now()
+	tOlder := tNewer.Add(-10 * time.Minute)
+
+	newerState := &ValidationState{
+		ObjectID:      "REQ-CONCURRENT-001",
+		ObjectKind:    "requirement",
+		FilePath:      "req.yaml",
+		LastValidated: tNewer,
+		Checksum:      "fresh_version",
+	}
+	cache.Set(newerState)
+
+	// Attempt to overwrite with older generation from a lagging concurrent worker
+	staleState := &ValidationState{
+		ObjectID:      "REQ-CONCURRENT-001",
+		ObjectKind:    "requirement",
+		FilePath:      "req.yaml",
+		LastValidated: tOlder,
+		Checksum:      "stale_version",
+	}
+	cache.Set(staleState)
+
+	// Verify the cache rejected the stale overwrite and retained the newer state
+	got, ok := cache.Get("REQ-CONCURRENT-001")
+	if !ok {
+		t.Fatal("expected entry to exist")
+	}
+	if got.Checksum != "fresh_version" {
+		t.Fatalf("expected newer version to be retained, got %q", got.Checksum)
+	}
+	if !got.LastValidated.Equal(tNewer) {
+		t.Fatalf("expected LastValidated %v, got %v", tNewer, got.LastValidated)
+	}
+}

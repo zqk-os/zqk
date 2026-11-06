@@ -84,6 +84,14 @@ func ShouldCacheValidationState(objectKind string) bool {
 	return !validationCacheExcludedKinds[objectKind]
 }
 
+func isCASOrProcessPath(p string) bool {
+	slash := filepath.ToSlash(p)
+	return strings.Contains(slash, "/"+paths.ProcessDir+"/") ||
+		strings.Contains(slash, "/"+paths.ObjectDraftsDir+"/") ||
+		strings.Contains(slash, "/.zqk/process/") ||
+		strings.Contains(slash, "/.zqk/object_drafts/")
+}
+
 // ValidationStateCache manages cached validation states
 type ValidationStateCache struct {
 	cache       map[string]*ValidationState // Key: objectID, Value: validation state
@@ -103,6 +111,8 @@ type ValidationStateCache struct {
 	suppressLoadUntilSave bool
 	// saveMu serializes Save() from the same process so overlapping flushers coalesce.
 	saveMu sync.Mutex
+	// dirty tracks whether the cache has unpersisted mutations or invalidations.
+	dirty bool
 }
 
 // NewValidationStateCache creates a new validation state cache
@@ -553,6 +563,7 @@ func (c *ValidationStateCache) Save() error {
 			c.loadedUpdated = cacheData.Updated
 			c.replaceDiskOnNextSave = false
 			c.suppressLoadUntilSave = false
+			c.dirty = false
 			return nil
 		},
 	)
@@ -600,6 +611,30 @@ func (c *ValidationStateCache) Get(objectID string) (*ValidationState, bool) {
 		return nil, false
 	}
 
+	// CAS timestamp divergence & freshness verification:
+	// If the file path exists on disk, ensure it has not been modified after LastValidated.
+	// For CAS objects whose hash file was retired upon mutation, evict the stale entry.
+	if state.FilePath != emptyValue {
+		fullPath := state.FilePath
+		if c.projectRoot != emptyValue && !filepath.IsAbs(fullPath) {
+			fullPath = filepath.Join(c.projectRoot, fullPath)
+		}
+		info, err := fileutil.Stat(fullPath)
+		if err == nil {
+			if info.ModTime().After(state.LastValidated) {
+				// File modified on disk after last validation (timestamp divergence)
+				c.Invalidate(objectID)
+				return nil, false
+			}
+		} else if fileutil.IsNotExist(err) && isCASOrProcessPath(fullPath) {
+			if fileutil.Exists(filepath.Dir(fullPath)) {
+				// CAS file was retired/renamed upon mutation
+				c.Invalidate(objectID)
+				return nil, false
+			}
+		}
+	}
+
 	return state, true
 }
 
@@ -640,7 +675,13 @@ func (c *ValidationStateCache) Set(state *ValidationState) {
 		LockOpValidationCacheSet,
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
-			_, updating := c.cache[state.ObjectID]
+			existing, updating := c.cache[state.ObjectID]
+			if updating && existing != nil {
+				// Prevent cache persistence of outdated validation records across concurrent modifications
+				if state.LastValidated.Before(existing.LastValidated) {
+					return nil
+				}
+			}
 			if !updating && len(c.cache) >= MaxValidationCacheEntries {
 				// Evict oldest by LastValidated to bound memory
 				var oldestID string
@@ -658,6 +699,7 @@ func (c *ValidationStateCache) Set(state *ValidationState) {
 				}
 			}
 			c.cache[state.ObjectID] = state
+			c.dirty = true
 			return nil
 		},
 	); err != nil {
@@ -666,6 +708,39 @@ func (c *ValidationStateCache) Set(state *ValidationState) {
 			// Invalidate marks validation state as invalid (forces revalidation)
 			Error(ErrMsgLockFailedSet, err).Log()
 	}
+}
+
+// IsDirty reports whether the cache has unsaved modifications (invalidations or updates).
+func (c *ValidationStateCache) IsDirty() bool {
+	var dirty bool
+	_ = concurrency.RunInRLockWithLogger(
+		&c.mu,
+		LockOpValidationCacheGet,
+		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			dirty = c.dirty
+			return nil
+		},
+	)
+	return dirty
+}
+
+// MarkDirty marks the cache dirty and optionally invalidates specific object IDs from memory.
+func (c *ValidationStateCache) MarkDirty(objectIDs ...string) {
+	_ = concurrency.RunInLockWithLogger(
+		&c.mu,
+		LockOpValidationCacheInvalidate,
+		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
+		func() error {
+			c.dirty = true
+			for _, id := range objectIDs {
+				if id != emptyValue {
+					delete(c.cache, id)
+				}
+			}
+			return nil
+		},
+	)
 }
 
 func (c *ValidationStateCache) Invalidate(objectID string) bool {
@@ -679,6 +754,7 @@ func (c *ValidationStateCache) Invalidate(objectID string) bool {
 				delete(c.cache, objectID)
 				removed = true
 			}
+			c.dirty = true
 			return nil
 		},
 	); err != nil {
@@ -699,6 +775,7 @@ func (c *ValidationStateCache) InvalidateByKind(kind string) {
 					delete(c.cache, id)
 				}
 			}
+			c.dirty = true
 			return nil
 		},
 	); err != nil {
@@ -726,6 +803,9 @@ func (c *ValidationStateCache) InvalidateByCategory(category string) int {
 					}
 				}
 			}
+			if count > 0 {
+				c.dirty = true
+			}
 			return nil
 		},
 	); err != nil {
@@ -750,6 +830,9 @@ func (c *ValidationStateCache) InvalidateBlockingReferenceIssues() int {
 					count++
 				}
 			}
+			if count > 0 {
+				c.dirty = true
+			}
 			return nil
 		},
 	); err != nil {
@@ -766,10 +849,15 @@ func (c *ValidationStateCache) InvalidateByPattern(pattern string) {
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			// Simple prefix matching for now
+			var removed bool
 			for id := range c.cache {
 				if strings.HasPrefix(id, pattern) {
 					delete(c.cache, id)
+					removed = true
 				}
+			}
+			if removed {
+				c.dirty = true
 			}
 			return nil
 		},
@@ -793,6 +881,7 @@ func (c *ValidationStateCache) Clear() error {
 			c.replaceDiskOnNextSave = true
 			c.suppressLoadUntilSave = true
 			c.loadedUpdated = time.Time{}
+			c.dirty = true
 			cacheFile = c.cacheFile
 			lockFile = c.cacheFile + paths.LockFileSuffix
 			return nil

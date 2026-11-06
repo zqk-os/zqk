@@ -580,7 +580,7 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					taskSteps = append(taskSteps, map[string]any{
 						objects.FieldKeyTitle:       "Implementation Phase",
 						objects.FieldKeyStatus:      objects.ObjectStatusPendingImplementation,
-						objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object."),
+						objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context <task-id>`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object."),
 					})
 
 					// Persona-Bound Task Boundary: Do not inject codebase validation for TPMs or Design personas
@@ -1386,7 +1386,7 @@ func mintOrchestratedTaskEnvelope(ctx context.Context, state *orchestratorState,
 	taskSteps = append(taskSteps, map[string]any{
 		objects.FieldKeyTitle:       "Implementation Phase",
 		objects.FieldKeyStatus:      objects.ObjectStatusPendingImplementation,
-		objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object."),
+		objects.FieldKeyDescription: paths.RewriteCanonicalCLIInvocations("Resolve the task envelope refs (`zqk object get`, `zqk agent prepare-context <task-id>`) and execute the dynamic task. Do not copy policy or skill bodies onto the task object."),
 	})
 
 	lowerPersona := strings.ToLower(personaID)

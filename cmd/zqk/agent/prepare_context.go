@@ -49,6 +49,18 @@ func runPrepareContext(cmd *cobra.Command, args []string, proc *cli.Processor) e
 		return errfmt.Errorf("conflicting flags: --task=%q and --task-id=%q; specify only one task flag or supply a single positional argument", taskFlag, taskIDFlag)
 	}
 
+	// Negative adversarial boundary: reject malformed task identifiers across positional and flags
+	for _, flagVal := range []string{taskFlag, taskIDFlag, taskID} {
+		if flagVal != "" {
+			if strings.ContainsAny(flagVal, " \t\r\n") {
+				return errfmt.Errorf("malformed task identifier %q: must not contain whitespace", flagVal)
+			}
+			if strings.Contains(flagVal, "..") || strings.ContainsAny(flagVal, `/\"'<>|&;$`+"`") {
+				return errfmt.Errorf("malformed task identifier %q: contains invalid characters", flagVal)
+			}
+		}
+	}
+
 	// Positional argument takes precedence or matches; if positional is empty, resolve from flags.
 	if taskID == "" {
 		if taskFlag != "" {
