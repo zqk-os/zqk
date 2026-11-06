@@ -19,3 +19,15 @@ func registerFileStorageTestTeardown(t *testing.T, projectRoot string, st *stora
 	})
 	testkit.RegisterStorageTestCleanup(t, projectRoot, st)
 }
+
+// registerProjectDirTestTeardown registers standard storage test teardown (for nil storage)
+// and force-removes the projectRoot so t.TempDir cleanup never fails with unlinkat ENOTEMPTY.
+func registerProjectDirTestTeardown(t *testing.T, projectRoot string) {
+	t.Helper()
+	t.Cleanup(func() {
+		if err := fileutil.RemoveAll(projectRoot); err != nil {
+			t.Logf("cleanup: %v", err)
+		}
+	})
+	testkit.RegisterStorageTestCleanup(t, projectRoot, nil)
+}

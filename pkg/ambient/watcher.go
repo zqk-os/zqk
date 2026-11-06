@@ -622,9 +622,16 @@ func RunWatcherDaemonWithConfig(ctx context.Context, cfg WatcherDaemonConfig) er
 	}
 
 	hub := NewEventHub()
-	if err := initWatcherAuxiliaries(hub, cfg.ProjectRoot, cfg.OnActivity); err != nil {
+	ingestSvc, err := initWatcherAuxiliaries(hub, cfg.ProjectRoot, cfg.OnActivity)
+	if err != nil {
 		return err
 	}
+	defer func() {
+		if ingestSvc != nil {
+			ingestSvc.Stop()
+		}
+		hub.WaitForAudits()
+	}()
 
 	watcher, err := setupFSWatcher(ctx, cfg.ProjectRoot, hub, cfg.WatcherConfig)
 	if err != nil {
@@ -677,18 +684,18 @@ func RunWatcherDaemonWithEngineAndConfig(ctx context.Context, projectRoot string
 	return RunWatcherDaemonWithConfig(ctx, cfg)
 }
 
-func initWatcherAuxiliaries(hub EventHub, projectRoot string, onActivity func()) error {
+func initWatcherAuxiliaries(hub EventHub, projectRoot string, onActivity func()) (*AmbientIngestService, error) {
 	if writer := NewArtifactWriter(hub); writer == nil {
-		return fmt.Errorf("failed to create artifact writer")
+		return nil, fmt.Errorf("failed to create artifact writer")
 	}
 	if coach := NewCoachHeuristicsWithRoot(hub, projectRoot); coach == nil {
-		return fmt.Errorf("failed to create coach heuristics")
+		return nil, fmt.Errorf("failed to create coach heuristics")
 	}
 	secCtx := pkgctx.NewSecurityContext(pkgctx.SystemAccountID, []string{"system"}, []string{"*"})
 	ingestService := NewAmbientIngestService(projectRoot, secCtx)
 	ingestService.BindToHub(hub)
 	BindProcessYAMLInvalidator(hub, onActivity)
-	return nil
+	return ingestService, nil
 }
 
 func resolveAmbientEngine(ctx context.Context, engine *AmbientEngine) (*AmbientEngine, bool, error) {
