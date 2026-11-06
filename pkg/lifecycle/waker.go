@@ -139,6 +139,13 @@ func (r *JobWakerRegistry) Unregister(jobID string, target <-chan *LifecycleEven
 	}
 }
 
+// HasSubscribers reports whether there is at least one active subscriber for jobID.
+func (r *JobWakerRegistry) HasSubscribers(jobID string) bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return len(r.subscribers[jobID]) > 0 || len(r.wildcardSubscribers) > 0
+}
+
 // Dispatch broadcasts a scheduler_callback or mutation event to all matching job wakers.
 // Delivery is non-blocking to protect the caller from lagging consumers.
 func (r *JobWakerRegistry) Dispatch(ev *LifecycleEvent) int {

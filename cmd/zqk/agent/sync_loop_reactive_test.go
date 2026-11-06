@@ -57,6 +57,7 @@ func setupBinaryCandidate(t *testing.T) {
 }
 
 func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
+	t.Setenv("ZQK_SYNC_LOOP_HEARTBEAT", "10s")
 	root, store := setupSyncLoopTestProject(t)
 	setupBinaryCandidate(t)
 
@@ -75,8 +76,10 @@ func TestSyncLoop_ReactiveInstantWake(t *testing.T) {
 		errChan <- cmd.ExecuteContext(loopCtx)
 	})
 
-	// Wait briefly to ensure the sync-loop enters its select block and registers the waker
-	time.Sleep(300 * time.Millisecond)
+	// Await the sync-loop entering its select block and registering the waker
+	require.Eventually(t, func() bool {
+		return lifecycle.GlobalJobWakerRegistry.HasSubscribers(taskID)
+	}, 5*time.Second, 10*time.Millisecond, "sync-loop did not register waker within timeout")
 
 	// Mutate task to terminal status in storage so when the loop wakes, it terminates immediately
 	updateCtx := pkgctx.WithBypassCache(context.Background())
