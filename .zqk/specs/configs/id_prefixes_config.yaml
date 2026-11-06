@@ -355,6 +355,7 @@ kind_to_synonyms:
         - p-plan
         - plan
         - pp
+        - pri
     release:
         - rel
     requirement:
@@ -375,6 +376,7 @@ kind_to_synonyms:
         - test
         - tc
         - testcase
+        - tst
     validation_rule:
         - vrule
         - val_rule

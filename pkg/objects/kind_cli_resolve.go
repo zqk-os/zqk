@@ -69,10 +69,11 @@ func unknownKindError(raw, canonical string) error {
 			"unknown kind %q: %q is an object subcommand group, not a schema kind. Tip: use %q object %s …",
 			raw, tip.ShortcutCmd, "zqk", tip.ShortcutCmd)
 	}
+	suggestions := "valid canonical kinds include: goal, requirement, test_case, criteria, priority_plan, backlog_item, milestone; valid aliases include: req, tst, tc, crit, pri, bli, mil, goal"
 	if strings.EqualFold(raw, canonical) {
-		return errfmt.Errorf("unknown kind %q: not in this project's object spec index (update specs or use a registered kind name)", canonical)
+		return errfmt.Errorf("unknown kind %q: not in this project's object spec index (update specs or use a registered kind name; %s)", canonical, suggestions)
 	}
-	return errfmt.Errorf("unknown kind %q (from %q): not in this project's object spec index (update specs or use a registered kind name)", canonical, raw)
+	return errfmt.Errorf("unknown kind %q (from %q): not in this project's object spec index (update specs or use a registered kind name; %s)", canonical, raw, suggestions)
 }
 
 // ResolveAndValidateKindsCommaSeparated splits a comma-separated kind argument, validates each
