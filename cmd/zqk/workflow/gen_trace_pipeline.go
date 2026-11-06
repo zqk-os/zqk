@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -14,11 +13,9 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/process"
 	"github.com/zqk-os/zqk/pkg/scenario"
 	"github.com/zqk-os/zqk/pkg/storage"
-	"github.com/zqk-os/zqk/pkg/storage/filecas"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"gopkg.in/yaml.v3"
 )
@@ -657,22 +654,11 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 			_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), objects.KindCriteria)
 			_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), objects.KindTestCase)
 
-			critDir := filepath.Join(proc.ProjectRoot(), paths.ProcessDir, objects.GetDirectoryFromKind(objects.KindCriteria))
-			if critCas := filecas.NewContentAddressableStorage(critDir, objects.KindCriteria); critCas != nil {
-				_ = critCas.EnsureIndexPopulated()
-				for _, cid := range summary.CreatedCriteriaIDs {
-					_, _ = critCas.GetHashForID(cid)
-				}
-				_ = critCas.GetIndex().Save()
+			for _, cid := range summary.CreatedCriteriaIDs {
+				_ = storage.SyncCASIndexMapping(proc.ProjectRoot(), objects.KindCriteria, cid)
 			}
-
-			testDir := filepath.Join(proc.ProjectRoot(), paths.ProcessDir, objects.GetDirectoryFromKind(objects.KindTestCase))
-			if testCas := filecas.NewContentAddressableStorage(testDir, objects.KindTestCase); testCas != nil {
-				_ = testCas.EnsureIndexPopulated()
-				for _, tid := range summary.CreatedTestCaseIDs {
-					_, _ = testCas.GetHashForID(tid)
-				}
-				_ = testCas.GetIndex().Save()
+			for _, tid := range summary.CreatedTestCaseIDs {
+				_ = storage.SyncCASIndexMapping(proc.ProjectRoot(), objects.KindTestCase, tid)
 			}
 		}
 
