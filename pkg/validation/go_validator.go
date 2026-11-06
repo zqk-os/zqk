@@ -146,6 +146,21 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 
 	gv.validatePropertyShapes(spec, obj, kind, options, result)
 
+	if kind == objects.KindPriorityPlan || (kind == "" && objects.GetString(obj, objects.FieldKeyKind) == objects.KindPriorityPlan) {
+		if reqRefsVal, hasReqRefs := obj[objects.FieldKeyRequirementRefs]; hasReqRefs && reqRefsVal != nil {
+			switch rv := reqRefsVal.(type) {
+			case []string, []any, string:
+				// valid reference list or single ref
+			default:
+				result.Errors = append(result.Errors, ValidationError{
+					Field:   objects.FieldKeyRequirementRefs,
+					Message: fmt.Sprintf("requirement_refs must be a list of references, got %T", rv),
+					Rule:    "invalid_type",
+				})
+			}
+		}
+	}
+
 	if options.StrictMode {
 		result.Errors = append(result.Errors, gv.validateUnknownFields(kind, obj, spec)...)
 		result.Errors = append(result.Errors, validateDuplicateRefs(obj)...)
@@ -1438,6 +1453,11 @@ func validateDuplicateRefs(obj map[string]any) []ValidationError {
 			seenInField[k][targetID] = true
 
 			if firstField, ok := refOccurrences[targetID]; ok {
+				if (firstField == objects.FieldKeyRequirementRefs && k == objects.FieldKeyRelatedObjectRefs) ||
+					(firstField == objects.FieldKeyRelatedObjectRefs && k == objects.FieldKeyRequirementRefs) {
+					// Accept requirement_refs as a valid alias for related_object_refs without flagging intra-object duplicate
+					continue
+				}
 				errs = append(errs, ValidationError{
 					Field:   k,
 					Message: fmt.Sprintf("duplicate reference %q: target ID appears in both %s and %s", targetID, firstField, k),

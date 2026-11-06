@@ -10,15 +10,18 @@ type RunOptions struct {
 	DryRun         bool
 	Timeout        time.Duration
 	CriteriaFilter []string
+	Batch          bool
+	NoBatch        bool
 }
 
 // CriterionInvocation represents a concrete command invocation tied to a criterion.
 type CriterionInvocation struct {
-	CriterionID string   `json:"criterion_id"`
-	Command     string   `json:"command"`
-	Args        []string `json:"args,omitempty"`
-	Env         []string `json:"env,omitempty"`
-	Dir         string   `json:"dir,omitempty"`
+	CriterionID      string   `json:"criterion_id"`
+	Command          string   `json:"command"`
+	RunnerExecutable string   `json:"runner_executable,omitempty"`
+	Args             []string `json:"args,omitempty"`
+	Env              []string `json:"env,omitempty"`
+	Dir              string   `json:"dir,omitempty"`
 }
 
 // CriterionRunResult represents the outcome of executing a test for one criterion.
@@ -31,6 +34,7 @@ type CriterionRunResult struct {
 	Stderr      string        `json:"stderr,omitempty"`
 	Duration    time.Duration `json:"duration_ms"`
 	Error       string        `json:"error,omitempty"`
+	Batched     bool          `json:"batched,omitempty"`
 }
 
 // TestRunResult holds the comprehensive result of executing a test case.
@@ -46,4 +50,6 @@ type TestRunResult struct {
 	RemainingOpenCount   int                  `json:"remaining_open_count"`
 	TestCaseCompleted    bool                 `json:"test_case_completed"`
 	RequirementCompleted bool                 `json:"requirement_completed"`
+	BatchedExecution     bool                 `json:"batched_execution,omitempty"`
+	FallbackTriggered    bool                 `json:"fallback_triggered,omitempty"`
 }

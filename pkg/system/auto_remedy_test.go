@@ -194,3 +194,81 @@ func TestAutoRemedy_ApplyKillProcess(t *testing.T) {
 		t.Errorf("expected 1 applied remedy, got %d", report.TotalApplied)
 	}
 }
+
+func TestAutoRemedy_OrphanedLockFilesCleaning(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	// Setup directories: .zqk/state, .zqk/lock, .zqk/scheduler/events
+	stateDir := filepath.Join(tmpDir, paths.ProjectDataDir, "state")
+	lockDir := filepath.Join(tmpDir, paths.ProjectDataDir, "lock")
+	eventsDir := filepath.Join(tmpDir, paths.ProjectDataDir, "scheduler", "events")
+
+	for _, d := range []string{stateDir, lockDir, eventsDir} {
+		if err := fileutil.MkdirAll(d, paths.DirPerm755); err != nil {
+			t.Fatalf("failed to create dir: %v", err)
+		}
+	}
+
+	sessionLock := filepath.Join(stateDir, "session.lock")
+	autofixLock := filepath.Join(lockDir, "autofix-processing.lock")
+	coordLock := filepath.Join(eventsDir, "coordination-bus.jsonl.lock")
+
+	// 1. session.lock with dead PID (created recently)
+	deadPIDContent := []byte(`{"pid": 9999999, "created_at": "` + time.Now().Add(-10*time.Second).Format(time.RFC3339) + `"}` + "\n")
+	if err := fileutil.WriteFile(sessionLock, deadPIDContent, paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write session.lock: %v", err)
+	}
+
+	// 2. autofix-processing.lock with dead PID
+	if err := fileutil.WriteFile(autofixLock, deadPIDContent, paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write autofix-processing.lock: %v", err)
+	}
+
+	// 3. coordination-bus.jsonl.lock (aged > 5m)
+	if err := fileutil.WriteFile(coordLock, []byte(""), paths.FilePerm644); err != nil {
+		t.Fatalf("failed to write coordination-bus.jsonl.lock: %v", err)
+	}
+	oldTime := time.Now().Add(-10 * time.Minute)
+	if err := fileutil.Chtimes(coordLock, oldTime, oldTime); err != nil {
+		t.Fatalf("failed to chtimes coordLock: %v", err)
+	}
+
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+	plans, err := engine.Diagnose(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("diagnose failed: %v", err)
+	}
+
+	remedyTargets := make(map[string]bool)
+	for _, p := range plans {
+		if p.ActionType == system.ActionRemoveFile {
+			remedyTargets[filepath.Base(p.Target)] = true
+		}
+	}
+
+	if !remedyTargets["session.lock"] {
+		t.Errorf("expected session.lock to be diagnosed for removal")
+	}
+	if !remedyTargets["autofix-processing.lock"] {
+		t.Errorf("expected autofix-processing.lock to be diagnosed for removal")
+	}
+	if !remedyTargets["coordination-bus.jsonl.lock"] {
+		t.Errorf("expected coordination-bus.jsonl.lock to be diagnosed for removal")
+	}
+
+	// Apply auto-remedy
+	report, err := engine.Apply(context.Background(), plans)
+	if err != nil {
+		t.Fatalf("apply failed: %v", err)
+	}
+	if report.TotalApplied < 3 {
+		t.Errorf("expected at least 3 applied lock remedies, got %d", report.TotalApplied)
+	}
+
+	// Verify all 3 files are removed
+	for _, f := range []string{sessionLock, autofixLock, coordLock} {
+		if fileutil.Exists(f) {
+			t.Errorf("expected %s to be removed by auto-remedy, but file still exists", filepath.Base(f))
+		}
+	}
+}

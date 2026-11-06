@@ -60,14 +60,23 @@ func ResolveInvocations(testCase map[string]any, projectRoot string) ([]Criterio
 	if len(critToCmd) > 0 {
 		for _, cid := range critRefs {
 			cmdStr, exists := critToCmd[cid]
+			runner := ""
 			if !exists {
 				// Fallback to pathOrID if available
 				cmdStr = buildDefaultCommand(pathOrID, cid, projectRoot)
+				if r, ok := resolveRunnerScript(pathOrID, projectRoot); ok {
+					runner = r
+				}
+			} else {
+				if r, ok := resolveRunnerFromCmd(cmdStr, cid, projectRoot); ok {
+					runner = r
+				}
 			}
 			invocations = append(invocations, CriterionInvocation{
-				CriterionID: cid,
-				Command:     cmdStr,
-				Dir:         projectRoot,
+				CriterionID:      cid,
+				Command:          cmdStr,
+				RunnerExecutable: runner,
+				Dir:              projectRoot,
 			})
 		}
 		return invocations, nil
@@ -75,12 +84,17 @@ func ResolveInvocations(testCase map[string]any, projectRoot string) ([]Criterio
 
 	// 3. Fallback to path_or_id for each linked criterion
 	if pathOrID != "" {
+		runner := ""
+		if r, ok := resolveRunnerScript(pathOrID, projectRoot); ok {
+			runner = r
+		}
 		for _, cid := range critRefs {
 			cmdStr := buildDefaultCommand(pathOrID, cid, projectRoot)
 			invocations = append(invocations, CriterionInvocation{
-				CriterionID: cid,
-				Command:     cmdStr,
-				Dir:         projectRoot,
+				CriterionID:      cid,
+				Command:          cmdStr,
+				RunnerExecutable: runner,
+				Dir:              projectRoot,
 			})
 		}
 		return invocations, nil
@@ -131,7 +145,7 @@ func buildDefaultCommand(pathOrID, critID, projectRoot string) string {
 				fullPath = base
 			}
 		}
-		if data, err := os.ReadFile(filepath.Clean(fullPath)); err == nil { //nolint:gosec // test file discovery within verified paths
+		if data, err := fileutil.ReadFile(filepath.Clean(fullPath)); err == nil { //nolint:gosec // test file discovery within verified paths
 			var funcs []string
 			lines := strings.Split(string(data), "\n")
 			for _, l := range lines {
@@ -178,6 +192,142 @@ func buildDefaultCommand(pathOrID, critID, projectRoot string) string {
 
 	// Otherwise treat as a raw shell command
 	return cleanPath
+}
+
+// resolveRunnerScript determines if a path points to an executable script file (not a Go package/test).
+func resolveRunnerScript(pathOrID, projectRoot string) (string, bool) {
+	cleanPath := strings.TrimSpace(pathOrID)
+	if cleanPath == "" {
+		return "", false
+	}
+	// Go tests and packages are handled through go test, not as standalone script runners
+	if strings.HasSuffix(cleanPath, "_test.go") || strings.HasSuffix(cleanPath, ".go") ||
+		strings.Contains(cleanPath, "/...") || strings.HasPrefix(cleanPath, "pkg/") ||
+		strings.HasPrefix(cleanPath, "cmd/") || strings.HasPrefix(cleanPath, "internal/") {
+		return "", false
+	}
+
+	fullPath := cleanPath
+	if !filepath.IsAbs(fullPath) && projectRoot != "" {
+		fullPath = filepath.Join(projectRoot, cleanPath)
+	}
+	if info, err := fileutil.Stat(fullPath); err == nil && !info.IsDir() {
+		return cleanPath, true
+	}
+	base := filepath.Base(cleanPath)
+	if info, err := fileutil.Stat(base); err == nil && !info.IsDir() {
+		return cleanPath, true
+	}
+	return "", false
+}
+
+// resolveRunnerFromCmd extracts runner script path from a command like "bash scripts/test.sh CRIT-1" or "scripts/test.sh CRIT-1".
+func resolveRunnerFromCmd(cmdStr, critID, projectRoot string) (string, bool) {
+	cmdStr = strings.TrimSpace(cmdStr)
+	if !strings.HasSuffix(cmdStr, critID) {
+		return "", false
+	}
+	candidate := strings.TrimSpace(strings.TrimSuffix(cmdStr, critID))
+	candidate = strings.TrimPrefix(candidate, "bash ")
+	candidate = strings.TrimPrefix(candidate, "sh ")
+	candidate = strings.TrimSpace(candidate)
+	return resolveRunnerScript(candidate, projectRoot)
+}
+
+// BuildBatchCommand constructs a batch execution command for a shared runner script and criterion IDs.
+func BuildBatchCommand(runner string, critIDs []string) string {
+	cleanPath := strings.TrimSpace(runner)
+	args := strings.Join(critIDs, " ")
+	if strings.HasPrefix(cleanPath, "bash ") || strings.HasPrefix(cleanPath, "sh ") {
+		return fmt.Sprintf("%s %s", cleanPath, args)
+	}
+	if strings.HasSuffix(cleanPath, ".sh") {
+		return fmt.Sprintf("bash %s %s", cleanPath, args)
+	}
+	return fmt.Sprintf("%s %s", cleanPath, args)
+}
+
+func getRunnerExecutable(inv CriterionInvocation, projectRoot string) string {
+	if inv.RunnerExecutable != "" {
+		return inv.RunnerExecutable
+	}
+	if r, ok := resolveRunnerFromCmd(inv.Command, inv.CriterionID, projectRoot); ok {
+		return r
+	}
+	return ""
+}
+
+type invocationBatch struct {
+	runner      string
+	invocations []CriterionInvocation
+}
+
+func groupInvocations(invocations []CriterionInvocation, projectRoot string) []invocationBatch {
+	var batches []invocationBatch
+	if len(invocations) == 0 {
+		return batches
+	}
+
+	runnerIndex := make(map[string]int)
+
+	for _, inv := range invocations {
+		runner := getRunnerExecutable(inv, projectRoot)
+		if runner == "" {
+			batches = append(batches, invocationBatch{
+				runner:      "",
+				invocations: []CriterionInvocation{inv},
+			})
+			continue
+		}
+
+		idx, exists := runnerIndex[runner]
+		if exists {
+			batches[idx].invocations = append(batches[idx].invocations, inv)
+		} else {
+			runnerIndex[runner] = len(batches)
+			batches = append(batches, invocationBatch{
+				runner:      runner,
+				invocations: []CriterionInvocation{inv},
+			})
+		}
+	}
+	return batches
+}
+
+func transitionCriterionSuccess(
+	ctx context.Context,
+	secCtx *pkgctx.SecurityContext,
+	sp storage.ObjectStorageProvider,
+	projectRoot, testCaseID, critID string,
+) error {
+	trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "test_runner green catalyst verified transition")
+	critObj, readErr := sp.Read(ctx, secCtx, critID)
+	if readErr != nil || critObj == nil {
+		return readErr
+	}
+	currentCritStatus, _ := critObj[objects.FieldKeyStatus].(string)
+	if currentCritStatus == objects.ObjectStatusComplete || currentCritStatus == objects.ObjectStatusArchived {
+		return nil
+	}
+	updates := map[string]any{
+		objects.FieldKeyStatus: objects.ObjectStatusComplete,
+	}
+	if updateErr := sp.Update(trustedCtx, secCtx, critID, updates); updateErr != nil {
+		return updateErr
+	}
+	if wal, walErr := lifecycle.GetOrCreateLifecycleWAL(projectRoot); walErr == nil && wal != nil {
+		_ = lifecycle.AppendCriterionSatisfied(wal, critID, map[string]string{
+			"test_case_id": testCaseID,
+		})
+		_ = wal.Sync()
+	}
+	getStorage := func(p string) (storage.ObjectStorageProvider, bool) {
+		return sp, true
+	}
+	lifecycle.TryEmitForTestCasesContainingCriterion(ctx, projectRoot, critID, getStorage)
+	lifecycle.TryEmitForMilestonesContainingCriterion(ctx, projectRoot, critID, getStorage)
+	lifecycle.TryEmitForBacklogItemsContainingCriterion(ctx, projectRoot, critID, getStorage)
+	return nil
 }
 
 // ExecuteSubprocess executes a test invocation in an isolated subprocess with PGID and TMPDIR sandboxing.
@@ -343,53 +493,91 @@ func RunTestCase(
 	// Seed remaining_open_count if unset
 	_ = lifecycle.SeedRemainingOpenCountFromMembers(ctx, sp, testCaseID, false)
 
-	for _, inv := range invocations {
-		perTestTimeout := opts.Timeout
-		if perTestTimeout <= 0 {
-			perTestTimeout = 5 * time.Minute
-		}
-		subCtx, cancel := context.WithTimeout(ctx, perTestTimeout)
+	batches := groupInvocations(invocations, projectRoot)
+	perTestTimeout := opts.Timeout
+	if perTestTimeout <= 0 {
+		perTestTimeout = 5 * time.Minute
+	}
 
-		runRes := ExecuteSubprocess(subCtx, inv)
-		cancel()
-		result.CriteriaResults = append(result.CriteriaResults, runRes)
+	for _, batch := range batches {
+		isBatchCandidate := len(batch.invocations) > 1 && batch.runner != "" && !opts.NoBatch
 
-		if runRes.Passed {
-			result.PassedCriteria++
-			// GREEN Catalyst: transition criterion to complete
-			trustedCtx := pkgctx.WithLifecycleBreakGlass(pkgctx.WithAllowCoreObjectDelete(ctx), "test_runner green catalyst verified transition")
-			critObj, readErr := sp.Read(ctx, secCtx, inv.CriterionID)
-			if readErr == nil && critObj != nil {
-				currentCritStatus, _ := critObj[objects.FieldKeyStatus].(string)
-				if currentCritStatus != objects.ObjectStatusComplete && currentCritStatus != objects.ObjectStatusArchived {
-					updates := map[string]any{
-						objects.FieldKeyStatus: objects.ObjectStatusComplete,
+		if isBatchCandidate {
+			critIDs := make([]string, len(batch.invocations))
+			for i, inv := range batch.invocations {
+				critIDs[i] = inv.CriterionID
+			}
+			batchCmd := BuildBatchCommand(batch.runner, critIDs)
+			batchInv := CriterionInvocation{
+				CriterionID:      strings.Join(critIDs, ","),
+				Command:          batchCmd,
+				RunnerExecutable: batch.runner,
+				Dir:              batch.invocations[0].Dir,
+				Env: append(batch.invocations[0].Env,
+					"ZQK_TEST_BATCH=1",
+					fmt.Sprintf("ZQK_TEST_CRITERIA=%s", strings.Join(critIDs, " ")),
+				),
+			}
+
+			subCtx, cancel := context.WithTimeout(ctx, perTestTimeout)
+			batchRes := ExecuteSubprocess(subCtx, batchInv)
+			cancel()
+
+			if batchRes.Passed {
+				result.BatchedExecution = true
+				for _, inv := range batch.invocations {
+					cr := CriterionRunResult{
+						CriterionID: inv.CriterionID,
+						Command:     batchCmd,
+						Passed:      true,
+						ExitCode:    batchRes.ExitCode,
+						Stdout:      batchRes.Stdout,
+						Stderr:      batchRes.Stderr,
+						Duration:    batchRes.Duration,
+						Batched:     true,
 					}
-					if updateErr := sp.Update(trustedCtx, secCtx, inv.CriterionID, updates); updateErr == nil {
-						if wal, walErr := lifecycle.GetOrCreateLifecycleWAL(projectRoot); walErr == nil && wal != nil {
-							_ = lifecycle.AppendCriterionSatisfied(wal, inv.CriterionID, map[string]string{
-								"test_case_id": testCaseID,
-							})
-							_ = wal.Sync()
-						}
-						// Trigger the Shockwave cascade!
-						getStorage := func(p string) (storage.ObjectStorageProvider, bool) {
-							return sp, true
-						}
-						lifecycle.TryEmitForTestCasesContainingCriterion(ctx, projectRoot, inv.CriterionID, getStorage)
-						lifecycle.TryEmitForMilestonesContainingCriterion(ctx, projectRoot, inv.CriterionID, getStorage)
-						lifecycle.TryEmitForBacklogItemsContainingCriterion(ctx, projectRoot, inv.CriterionID, getStorage)
-					} else {
-						runRes.Passed = false
-						runRes.Error = fmt.Sprintf("failed to update criterion status: %v", updateErr)
-						result.CriteriaResults[len(result.CriteriaResults)-1] = runRes
+					result.CriteriaResults = append(result.CriteriaResults, cr)
+					result.PassedCriteria++
+					if err := transitionCriterionSuccess(ctx, secCtx, sp, projectRoot, testCaseID, inv.CriterionID); err != nil {
+						cr.Passed = false
+						cr.Error = fmt.Sprintf("failed to update criterion status: %v", err)
+						result.CriteriaResults[len(result.CriteriaResults)-1] = cr
 						result.PassedCriteria--
 						result.FailedCriteria++
 					}
 				}
+				continue
 			}
-		} else {
-			result.FailedCriteria++
+
+			// Batch runner failed -> graceful fallback to isolated single-criterion execution
+			result.BatchedExecution = true
+			result.FallbackTriggered = true
+			logger := logging.GetLoggerFromProfile("system")
+			logging.Fluent(logger).Warn(fmt.Sprintf(
+				"Batch criteria execution failed for runner %s (exit code %d); falling back to isolated single-criterion execution",
+				batch.runner, batchRes.ExitCode,
+			)).Log()
+		}
+
+		// Isolated single-criterion execution (standalone invocations or fallback)
+		for _, inv := range batch.invocations {
+			subCtx, cancel := context.WithTimeout(ctx, perTestTimeout)
+			runRes := ExecuteSubprocess(subCtx, inv)
+			cancel()
+			result.CriteriaResults = append(result.CriteriaResults, runRes)
+
+			if runRes.Passed {
+				result.PassedCriteria++
+				if err := transitionCriterionSuccess(ctx, secCtx, sp, projectRoot, testCaseID, inv.CriterionID); err != nil {
+					runRes.Passed = false
+					runRes.Error = fmt.Sprintf("failed to update criterion status: %v", err)
+					result.CriteriaResults[len(result.CriteriaResults)-1] = runRes
+					result.PassedCriteria--
+					result.FailedCriteria++
+				}
+			} else {
+				result.FailedCriteria++
+			}
 		}
 	}
 

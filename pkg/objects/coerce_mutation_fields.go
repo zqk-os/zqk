@@ -49,6 +49,9 @@ func CoerceMutationFields(kind string, obj map[string]any) {
 		delete(obj, "goal_refs")
 		delete(obj, "requirement_refs-")
 	}
+	if kind == KindPriorityPlan || (kind == "" && GetString(obj, FieldKeyKind) == KindPriorityPlan) {
+		CoercePriorityPlanRefs(obj)
+	}
 	if v, ok := obj["commit_refs"]; ok {
 		k := kind
 		if k == "" {
@@ -285,4 +288,24 @@ func CoercePersonaTitleAndName(obj map[string]any) {
 		obj[FieldKeyTitle] = name
 	}
 	delete(obj, "name")
+}
+
+// CoercePriorityPlanRefs ensures requirement_refs and requirement_ref are mapped into
+// related_object_refs for priority_plan objects (GH-1001).
+func CoercePriorityPlanRefs(obj map[string]any) {
+	if obj == nil {
+		return
+	}
+	var refs []string
+	if reqRefs, ok := obj[FieldKeyRequirementRefs]; ok {
+		refs = append(refs, stringListFromAny(reqRefs)...)
+	}
+	if reqRef, ok := obj["requirement_ref"]; ok {
+		refs = append(refs, stringListFromAny(reqRef)...)
+	}
+	if len(refs) > 0 {
+		existing := stringListFromAny(obj[FieldKeyRelatedObjectRefs])
+		combined := appendUniqueStrings(existing, refs)
+		obj[FieldKeyRelatedObjectRefs] = combined
+	}
 }

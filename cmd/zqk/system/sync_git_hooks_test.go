@@ -981,3 +981,37 @@ func TestSyncGitHooks_ValidatesAndInstallsHookTemplates(t *testing.T) {
 		t.Fatalf("re-sync did not restore installed hook to match template")
 	}
 }
+
+func TestSyncGitHooks_PreCommitSupportsZQKPrecommitTimeout(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	gitDir := filepath.Join(root, ".git")
+	if err := fileutil.EnsureDir(gitDir); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := EnsureGitHooks(root, nil); err != nil {
+		t.Fatalf("EnsureGitHooks failed: %v", err)
+	}
+
+	preCommit := filepath.Join(gitDir, "hooks", "pre-commit")
+	content, err := fileutil.ReadFile(preCommit)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	requiredTokens := []string{
+		`PRECOMMIT_TIMEOUT="${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}"`,
+		`system check --tier 1 --timeout "$PRECOMMIT_TIMEOUT"`,
+		`DEFAULT_TIMEOUT="120s"`,
+		`if [ "$CAS_OBJ_COUNT" -gt 1500 ]; then`,
+		`DEFAULT_TIMEOUT="180s"`,
+	}
+
+	for _, token := range requiredTokens {
+		if !bytes.Contains(content, []byte(token)) {
+			t.Errorf("pre-commit hook missing expected timeout token %q", token)
+		}
+	}
+}

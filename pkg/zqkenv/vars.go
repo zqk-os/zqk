@@ -4,8 +4,10 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/brand"
 )
@@ -99,6 +101,7 @@ const _sfxLLMTrace = "LLM_TRACE"
 const _sfxLLMTraceDir = "LLM_TRACE_DIR"
 const _sfxLLMTemperature = "LLM_TEMPERATURE"
 const _sfxLLMTimeout = "LLM_TIMEOUT"
+const _sfxPrecommitTimeout = "PRECOMMIT_TIMEOUT"
 const _sfxLLMTopP = "LLM_TOP_P"
 const _sfxQwenBaseURL = "QWEN_BASE_URL"
 const _sfxQwenAPIKey = "QWEN_API_KEY" //nolint:gosec
@@ -528,6 +531,26 @@ func LLMTopP() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLLMTopP)} }
 
 // LLMTimeout returns the environment variable name for LLM_TIMEOUT (brand-prefixed).
 func LLMTimeout() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxLLMTimeout)} }
+
+// PrecommitTimeout returns the environment variable name for PRECOMMIT_TIMEOUT (brand-prefixed, e.g. ZQK_PRECOMMIT_TIMEOUT).
+func PrecommitTimeout() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxPrecommitTimeout)} }
+
+// ParsePrecommitTimeout parses ZQK_PRECOMMIT_TIMEOUT from the environment.
+// Supports standard duration strings (e.g., "120s", "3m") as well as plain integer seconds (e.g., "120", "180").
+// Returns (0, false) if the environment variable is not set, empty, or invalid.
+func ParsePrecommitTimeout() (time.Duration, bool) {
+	val := strings.TrimSpace(PrecommitTimeout().Get())
+	if val == "" {
+		return 0, false
+	}
+	if d, err := time.ParseDuration(val); err == nil && d > 0 {
+		return d, true
+	}
+	if sec, err := strconv.Atoi(val); err == nil && sec > 0 {
+		return time.Duration(sec) * time.Second, true
+	}
+	return 0, false
+}
 
 // MCPTimeout returns the environment variable name for MCP_TIMEOUT (brand-prefixed).
 func MCPTimeout() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxMCPTimeout)} }

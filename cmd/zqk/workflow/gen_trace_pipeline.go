@@ -631,7 +631,7 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 	}
 
 	if strings.HasPrefix(targetID, "REQ-") && needCriteria && len(summary.CreatedCriteriaIDs) > 0 {
-		// Ensure any newly generated criteria are in CAS before linking to a CAS requirement.
+		// Ensure any newly generated criteria and test cases are in CAS before linking to a CAS requirement.
 		if !storage.IsDraftPlaneOnly(proc.ProjectRoot(), objects.KindRequirement, targetID) {
 			for _, cid := range summary.CreatedCriteriaIDs {
 				if storage.IsDraftPlaneOnly(proc.ProjectRoot(), objects.KindCriteria, cid) {
@@ -641,6 +641,24 @@ func applyGeneratedTracePipeline(cmd *cobra.Command, proc *cli.Processor, target
 						_ = storageProvider.Update(ctx, secCtx, cid, critObj)
 					}
 				}
+			}
+			for _, tid := range summary.CreatedTestCaseIDs {
+				if storage.IsDraftPlaneOnly(proc.ProjectRoot(), objects.KindTestCase, tid) {
+					testObj, readErr := storageProvider.Read(ctx, secCtx, tid)
+					if readErr == nil {
+						testObj[objects.FieldKeyStatus] = objects.ObjectStatusOriginated
+						_ = storageProvider.Update(ctx, secCtx, tid, testObj)
+					}
+				}
+			}
+			_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), objects.KindCriteria)
+			_ = storage.FlushListingIndexForProjectRoot(proc.ProjectRoot(), objects.KindTestCase)
+
+			for _, cid := range summary.CreatedCriteriaIDs {
+				_ = storage.SyncCASIndexMapping(proc.ProjectRoot(), objects.KindCriteria, cid)
+			}
+			for _, tid := range summary.CreatedTestCaseIDs {
+				_ = storage.SyncCASIndexMapping(proc.ProjectRoot(), objects.KindTestCase, tid)
 			}
 		}
 

@@ -1,13 +1,11 @@
 package filecas
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -15,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage/file"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 const casSweepLockTTL = 15 * time.Second
@@ -36,18 +35,7 @@ func getKindSweepMutex(dir string) *sync.Mutex {
 }
 
 func isProcessAlive(pid int) bool {
-	if pid <= 0 {
-		return false
-	}
-	proc, err := os.FindProcess(pid)
-	if err != nil {
-		return false
-	}
-	err = proc.Signal(syscall.Signal(0))
-	if err == nil || errors.Is(err, syscall.EPERM) {
-		return true
-	}
-	return false
+	return syscallutil.IsProcessAlive(pid)
 }
 
 func readLockPID(path string) int {

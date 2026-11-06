@@ -28,6 +28,10 @@ flags:
   - name: "timeout"
     type: "string"
     description: "Maximum duration allowed per test invocation (e.g. '30s', '2m')"
+  - name: "batch"
+    type: "bool"
+    default: true
+    description: "Execute shared runner scripts in batch mode (default: true)"
 
 help:
   examples:

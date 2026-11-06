@@ -129,7 +129,15 @@ fi
 # 2. Knowledge Kernel CAS & Referential Integrity Gate
 if [ -d "$REPO_ROOT/.zqk/process" ]; then
 	echo "🔍 [ZQK PRE-COMMIT] Verifying Knowledge Kernel integrity..."
-	if ! "$ZQK_BIN" system check --tier 1; then
+	DEFAULT_TIMEOUT="120s"
+	if [ -d "$REPO_ROOT/.zqk/process" ]; then
+		CAS_OBJ_COUNT=$(find "$REPO_ROOT/.zqk/process" -type f \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | wc -l || echo "0")
+		if [ "$CAS_OBJ_COUNT" -gt 1500 ]; then
+			DEFAULT_TIMEOUT="180s"
+		fi
+	fi
+	PRECOMMIT_TIMEOUT="${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}"
+	if ! "$ZQK_BIN" system check --tier 1 --timeout "$PRECOMMIT_TIMEOUT"; then
 		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
 		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."
 		exit 1

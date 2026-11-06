@@ -27,6 +27,7 @@ func NewTestRunCommandBuilder() *cobra.Command {
 	builder.AddBoolFlag("verbose", "v", false, "Print verbose execution output including stdout")
 	builder.AddBoolFlag("dry-run", "", false, "Display test execution plan without executing commands")
 	builder.AddStringFlag("timeout", "", "", "Maximum duration allowed per test invocation (e.g. '30s', '2m')")
+	builder.AddBoolFlag("batch", "", true, "Execute shared runner scripts in batch mode (default: true)")
 	builder.WithCommonFlags(false, nil)
 	cmd := builder.Build()
 	return cmd

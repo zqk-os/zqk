@@ -16,7 +16,7 @@ func TestCRIT_CLIParityDiscoverAndRun(t *testing.T) {
 		t.Fatalf("expected NewRunCmd to return a valid command")
 	}
 
-	expectedFlags := []string{"all", "dry-run", "verbose", "timeout", "criteria"}
+	expectedFlags := []string{"all", "dry-run", "verbose", "timeout", "criteria", "batch"}
 	for _, flagName := range expectedFlags {
 		if runCmd.Flags().Lookup(flagName) == nil {
 			t.Errorf("expected flag --%s on zqk test run command", flagName)

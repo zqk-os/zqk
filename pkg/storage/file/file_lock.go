@@ -1,8 +1,12 @@
 package file
 
 import (
+	"encoding/json"
 	"errors"
+	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -18,6 +22,55 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
+// DefaultStaleLockTTL is the default duration after which an unattended lock is considered stale.
+const DefaultStaleLockTTL = 5 * time.Minute
+
+// LockMetadata captures provenance information stored inside a file lock.
+type LockMetadata struct {
+	PID       int       `json:"pid"`
+	CreatedAt time.Time `json:"created_at"`
+	JobID     string    `json:"job_id,omitempty"`
+}
+
+// ReadLockMetadata parses LockMetadata from a lock file, supporting both JSON and plaintext PID formats.
+func ReadLockMetadata(path string) (*LockMetadata, error) {
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	trimmed := strings.TrimSpace(string(data))
+	if trimmed == "" {
+		return &LockMetadata{}, nil
+	}
+
+	var meta LockMetadata
+	if jsonErr := json.Unmarshal(data, &meta); jsonErr == nil && meta.PID != 0 {
+		return &meta, nil
+	}
+
+	// Plain integer fallback
+	if pid, parseErr := strconv.Atoi(trimmed); parseErr == nil && pid > 0 {
+		return &LockMetadata{
+			PID: pid,
+		}, nil
+	}
+
+	return &LockMetadata{}, nil
+}
+
+// WriteLockMetadata writes metadata into the lock file.
+func WriteLockMetadata(path string, meta *LockMetadata) error {
+	if meta == nil {
+		return nil
+	}
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return err
+	}
+	data = append(data, '\n')
+	return fileutil.WriteFile(path, data, paths.FilePerm644)
+}
+
 // FileLockConfig allows configuring file lock behavior
 type FileLockConfig struct {
 	// EarlyBailoutThreshold is the maximum wait time before suggesting early bailout
@@ -26,15 +79,20 @@ type FileLockConfig struct {
 
 	// EnableMetrics enables metrics collection (default: true)
 	EnableMetrics bool
+
+	// StaleLockTTL is the duration after which an unattended lock is considered stale.
+	// Default is DefaultStaleLockTTL (5m).
+	StaleLockTTL time.Duration
 }
 
 // FileLock provides cross-process file locking using flock
 // This ensures atomic operations on shared file-based resources
 type FileLock struct {
-	file   *fileutil.File
-	mu     sync.Mutex // Protects file operations within this process
-	locked bool
-	config FileLockConfig
+	file     *fileutil.File
+	filePath string
+	mu       sync.Mutex // Protects file operations within this process
+	locked   bool
+	config   FileLockConfig
 }
 
 // NewFileLock creates a new file lock for the given file path
@@ -63,11 +121,15 @@ func NewFileLockWithConfig(filePath string, config FileLockConfig) (*FileLock, e
 	if config.EarlyBailoutThreshold == 0 {
 		config.EarlyBailoutThreshold = 0 // Disabled by default
 	}
+	if config.StaleLockTTL == 0 {
+		config.StaleLockTTL = DefaultStaleLockTTL
+	}
 
 	return &FileLock{
-		file:   file,
-		locked: false,
-		config: config,
+		file:     file,
+		filePath: filePath,
+		locked:   false,
+		config:   config,
 	}, nil
 }
 
@@ -97,8 +159,21 @@ func (fl *FileLock) Lock() error {
 				return errfmt.Errorf(ConstMiscFileLockAlreadyHeld)
 			}
 
+			// Try non-blocking acquisition first to allow stale lock reclamation
+			err := syscallutil.FileFlock(fl.file, unix.LOCK_EX|unix.LOCK_NB)
+			if err == nil {
+				fl.recordLockAcquired(start, metrics)
+				return nil
+			}
+			if errors.Is(err, unix.EWOULDBLOCK) {
+				if fl.config.StaleLockTTL > 0 && fl.reclaimIfStale() {
+					fl.recordLockAcquired(start, metrics)
+					return nil
+				}
+			}
+
 			// Use flock for advisory locking (works across processes)
-			err := syscallutil.FileFlock(fl.file, unix.LOCK_EX)
+			err = syscallutil.FileFlock(fl.file, unix.LOCK_EX)
 			if err != nil {
 				if fl.config.EnableMetrics {
 					metrics.RecordFailure()
@@ -112,12 +187,85 @@ func (fl *FileLock) Lock() error {
 	)
 }
 
+func (fl *FileLock) writeOwnershipMetadata() {
+	if fl.file == nil {
+		return
+	}
+	meta := LockMetadata{
+		PID:       os.Getpid(),
+		CreatedAt: time.Now().UTC(),
+	}
+	data, err := json.Marshal(&meta)
+	if err != nil {
+		return
+	}
+	data = append(data, '\n')
+	_ = fl.file.Truncate(0)
+	_, _ = fl.file.Seek(0, 0)
+	_, _ = fl.file.Write(data)
+	_ = fl.file.Sync()
+}
+
+func (fl *FileLock) clearOwnershipMetadata() {
+	if fl.file == nil {
+		return
+	}
+	_ = fl.file.Truncate(0)
+	_ = fl.file.Sync()
+}
+
 func (fl *FileLock) recordLockAcquired(start time.Time, metrics *FileLockMetrics) {
 	if fl.config.EnableMetrics {
 		metrics.RecordAcquisition(time.Since(start))
 		metrics.IncrementHolders()
 	}
 	fl.locked = true
+	fl.writeOwnershipMetadata()
+}
+
+// reclaimIfStale checks if the lock file at fl.filePath is stale (dead owning PID or age > StaleLockTTL)
+// and if so, breaks and reclaims the lock. Returns true if successfully reclaimed.
+func (fl *FileLock) reclaimIfStale() bool {
+	if fl.filePath == "" || fl.config.StaleLockTTL <= 0 {
+		return false
+	}
+
+	info, err := fileutil.Stat(fl.filePath)
+	if err != nil {
+		return false
+	}
+
+	meta, readErr := ReadLockMetadata(fl.filePath)
+	isDeadProcess := false
+	if readErr == nil && meta != nil && meta.PID > 0 {
+		if !syscallutil.IsProcessAlive(meta.PID) {
+			isDeadProcess = true
+		}
+	}
+
+	now := time.Now()
+	lockTime := info.ModTime()
+	if meta != nil && !meta.CreatedAt.IsZero() {
+		lockTime = meta.CreatedAt
+	}
+	isExpired := fl.config.StaleLockTTL > 0 && now.Sub(lockTime) > fl.config.StaleLockTTL
+
+	if !isDeadProcess && !isExpired {
+		return false
+	}
+
+	// Break and reclaim the lock by removing the stale lock file
+	_ = fileutil.Remove(fl.filePath)
+	_ = fl.file.Close()
+
+	newFile, err := fileutil.OpenFile(fl.filePath, fileutil.O_CREATE|fileutil.O_RDWR, paths.FilePerm644)
+	if err != nil {
+		return false
+	}
+	fl.file = newFile
+
+	lockErr := syscallutil.FileFlock(fl.file, unix.LOCK_EX|unix.LOCK_NB)
+	return lockErr == nil
 }
 
 // TryLock attempts to acquire an exclusive lock (non-blocking)
@@ -142,6 +290,11 @@ func (fl *FileLock) TryLock() (bool, error) {
 			err := syscallutil.FileFlock(fl.file, unix.LOCK_EX|unix.LOCK_NB)
 			if err != nil {
 				if errors.Is(err, unix.EWOULDBLOCK) {
+					if fl.config.StaleLockTTL > 0 && fl.reclaimIfStale() {
+						fl.recordLockAcquired(start, metrics)
+						acquired = true
+						return nil
+					}
 					if fl.config.EnableMetrics {
 						metrics.RecordContention()
 					}
@@ -234,6 +387,7 @@ func (fl *FileLock) Unlock() error {
 				return errfmt.Errorf(ConstMiscFileLockNotHeld)
 			}
 
+			fl.clearOwnershipMetadata()
 			unlockErr = syscallutil.FileFlock(fl.file, unix.LOCK_UN)
 			if unlockErr != nil {
 				return errfmt.Newf(ConstMiscFailedToReleaseFileLock).Wrap(unlockErr)
@@ -263,6 +417,7 @@ func (fl *FileLock) Close() error {
 		logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			if fl.locked {
+				fl.clearOwnershipMetadata()
 				var _err_82483302 = syscallutil.FileFlock(fl.file, unix.LOCK_UN)
 				if //nolint:errcheck // Lock cleanup errors are non-critical
 				_err_82483302 != nil {

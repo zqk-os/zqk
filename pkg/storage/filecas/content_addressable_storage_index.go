@@ -447,3 +447,22 @@ func (idx *IDIndex) RemoveMapping(objectID string) error {
 	metrics.RecordRemoveMapping(time.Since(start), saveErr)
 	return lockErr
 }
+
+// SyncKindIndex ensures the on-disk index for the specified kind contains the mapping for objectID (GH-1005).
+func SyncKindIndex(kindDir, kind, objectID string) error {
+	cas := NewContentAddressableStorage(kindDir, kind)
+	if cas == nil {
+		return nil
+	}
+	if err := cas.EnsureIndexPopulated(); err != nil {
+		return err
+	}
+	if objectID != "" {
+		if _, err := cas.GetHashForID(objectID); err == nil {
+			if err := cas.GetIndex().Save(); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}

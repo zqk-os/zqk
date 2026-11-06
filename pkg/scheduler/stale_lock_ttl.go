@@ -1,23 +1,20 @@
 package scheduler
 
 import (
-	"encoding/json"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
-	"github.com/zqk-os/zqk/pkg/paths"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 const (
 	// DefaultStaleLockTTL is the default duration after which an unattended lock is considered stale.
-	DefaultStaleLockTTL = 120 * time.Second
+	DefaultStaleLockTTL = storagepkg.DefaultStaleLockTTL
 
 	msgErrEmptyLockPath          = "lock path cannot be empty"
 	msgErrAcquireLockWithTimeout = "failed to acquire lock within timeout: %w"
@@ -30,73 +27,21 @@ const (
 )
 
 // LockMetadata captures provenance information stored inside a self-healing lock file.
-type LockMetadata struct {
-	PID       int       `json:"pid"`
-	CreatedAt time.Time `json:"created_at"`
-	JobID     string    `json:"job_id,omitempty"`
-}
+type LockMetadata = storagepkg.LockMetadata
 
 // IsProcessAlive checks whether the given PID represents a live running process.
 func IsProcessAlive(pid int) bool {
-	if pid <= 0 {
-		return false
-	}
-	proc, err := os.FindProcess(pid)
-	if err != nil {
-		return false
-	}
-	// On Unix/POSIX, Signal(0) tests whether the process exists without delivering a signal.
-	err = proc.Signal(syscall.Signal(0))
-	if err == nil {
-		return true
-	}
-	if err == syscall.EPERM {
-		// Process exists but we do not have permission to signal it. It is alive.
-		return true
-	}
-	return false
+	return syscallutil.IsProcessAlive(pid)
 }
 
 // ReadLockMetadata parses LockMetadata from a lock file, supporting both JSON and plaintext PID formats.
 func ReadLockMetadata(path string) (*LockMetadata, error) {
-	data, err := fileutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	trimmed := strings.TrimSpace(string(data))
-	if trimmed == emptyValue {
-		return &LockMetadata{}, nil
-	}
-
-	var meta LockMetadata
-	if jsonErr := json.Unmarshal(data, &meta); jsonErr == nil && meta.PID != 0 {
-		return &meta, nil
-	}
-
-	// Plain integer fallback
-	if pid, parseErr := strconv.Atoi(trimmed); parseErr == nil && pid > 0 {
-		return &LockMetadata{
-			PID: pid,
-		}, nil
-	}
-
-	return &LockMetadata{}, nil
+	return storagepkg.ReadLockMetadata(path)
 }
 
 // WriteLockMetadata writes metadata into the lock file.
 func WriteLockMetadata(path string, meta *LockMetadata) error {
-	if meta == nil {
-		return nil
-	}
-	data, err := json.Marshal(meta)
-	if err != nil {
-		return errfmt.Errorf(msgErrWriteLockMetadata, err)
-	}
-	writeErr := fileutil.WriteFile(path, data, paths.FilePerm644)
-	if writeErr != nil {
-		return errfmt.Errorf(msgErrWriteLockMetadata, writeErr)
-	}
-	return nil
+	return storagepkg.WriteLockMetadata(path, meta)
 }
 
 // ReconcileStaleLock checks whether the lock file at path is stale (older than TTL or dead PID)

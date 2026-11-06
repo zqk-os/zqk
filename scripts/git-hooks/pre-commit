@@ -1,0 +1,281 @@
+#!/bin/sh
+#
+# Pre-commit hook for ZQK
+# Fail-closed enforcement for projects initialized with ZQK:
+# 0. Branch Protection Gate: Direct commits to main/master prohibited (POL-WORKFLOW-002)
+# 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# 2. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
+# 3. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
+# 4. Secret & Credential Leak Scanning Gate (scripts/scan-secrets.sh)
+# 5. Codebase Verification Gate (zqk-vet hygiene & tree police)
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT" || exit 1
+export ZQK_PROJECT_ROOT="$REPO_ROOT"
+
+# If this repository does not contain a .zqk directory, nothing to enforce
+if [ ! -d "$REPO_ROOT/.zqk" ]; then
+	exit 0
+fi
+
+# Locate ZQK binary (local repo bin, or system PATH)
+ZQK_BIN=""
+if [ -x "$REPO_ROOT/bin/zqk" ]; then
+	ZQK_BIN="$REPO_ROOT/bin/zqk"
+elif [ -x "$REPO_ROOT/bin/zcom" ]; then
+	ZQK_BIN="$REPO_ROOT/bin/zcom"
+elif command -v zqk >/dev/null 2>&1; then
+	ZQK_BIN="$(command -v zqk)"
+elif command -v zcom >/dev/null 2>&1; then
+	ZQK_BIN="$(command -v zcom)"
+fi
+
+if [ -z "$ZQK_BIN" ]; then
+	# ZQK binary not installed or in PATH; allow commit to proceed cleanly
+	exit 0
+fi
+
+# 0. Branch Protection Gate (POL-WORKFLOW-002)
+# Committing directly to protected branches (main, master) is strictly prohibited.
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+if [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; then
+	if [ "${ZQK_ALLOW_MAIN_COMMIT}" != "1" ]; then
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "❌ [ZQK PRE-COMMIT] FAIL-CLOSED BRANCH PROTECTION VIOLATION" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		echo "Direct commit to protected branch '$CURRENT_BRANCH' is strictly forbidden." >&2
+		echo "" >&2
+		echo "All code changes MUST be committed on a topic/feature/integration branch" >&2
+		echo "and merged through a validated Pull Request (POL-WORKFLOW-002)." >&2
+		echo "" >&2
+		echo "Remediation:" >&2
+		echo "  1. Switch to a feature/integration branch:" >&2
+		echo "     git checkout -b <branch-name>" >&2
+		echo "  2. Commit your staged changes there:" >&2
+		echo "     git commit -m \"...\"" >&2
+		echo "  3. Open a Pull Request once tests and criteria pass:" >&2
+		echo "     gh pr create --fill" >&2
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+		exit 1
+	fi
+fi
+
+# 0b. Upstream Base-Synchronization Gate (POL-WORKFLOW-003)
+# Any integration/feature branch MUST be rooted on the latest tip of origin/main.
+if [ "$CURRENT_BRANCH" != "main" ] && [ "$CURRENT_BRANCH" != "master" ]; then
+	if git rev-parse --verify origin/main >/dev/null 2>&1; then
+		BEHIND_COUNT="$(git rev-list --count HEAD..origin/main 2>/dev/null || echo "0")"
+		if [ "$BEHIND_COUNT" -gt 0 ]; then
+			if [ "${ZQK_ALLOW_STALE_BASE}" != "1" ]; then
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "❌ [ZQK PRE-COMMIT] FAIL-CLOSED UPSTREAM SYNC VIOLATION (POL-WORKFLOW-003)" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				echo "Branch '$CURRENT_BRANCH' is behind 'origin/main' by $BEHIND_COUNT commit(s)." >&2
+				echo "Committing on a stale base causes PR merge conflicts and triggers redundant 40m CI builds." >&2
+				echo "" >&2
+				echo "Remediation:" >&2
+				echo "  1. git fetch origin" >&2
+				echo "  2. git checkout main && git merge --ff-only origin/main" >&2
+				echo "  3. git checkout $CURRENT_BRANCH && git rebase main" >&2
+				echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+				exit 1
+			fi
+		fi
+	fi
+fi
+
+# 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
+# Any staged file under .zqk/process/**/*.yaml must:
+# a) Have its filename match sha256 of its staged content (CAS content-addressable hash invariant)
+# b) Not be in a preliminary status (conceptual) - those must remain on the draft plane (.zqk/object_drafts/)
+STAGED_CAS_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^\.zqk/process/.*\.ya?ml$' || true)
+if [ -n "$STAGED_CAS_FILES" ]; then
+	SHASUM_CMD=""
+	if command -v sha256sum >/dev/null 2>&1; then
+		SHASUM_CMD="sha256sum"
+	elif command -v shasum >/dev/null 2>&1; then
+		SHASUM_CMD="shasum -a 256"
+	fi
+
+	for f in $STAGED_CAS_FILES; do
+		# Verify preliminary status (conceptual) is prohibited in .zqk/process/ (draft status may be valid in CAS)
+		if git show ":$f" 2>/dev/null | grep -E '^[[:space:]]*status:[[:space:]]*["'\'']?conceptual["'\'']?[[:space:]]*$' >/dev/null 2>&1; then
+			echo "❌ [ZQK PRE-COMMIT] CAS Membrane Violation: Preliminary status (conceptual) detected in $f"
+			echo "   Objects with preliminary status (conceptual) must remain on the draft plane (.zqk/object_drafts/)."
+			echo "   Promote the object via '$ZQK_BIN object promote' before committing to CAS."
+			exit 1
+		fi
+
+		# Verify filename equals sha256 hash of staged content
+		base=$(basename "$f" | sed -E 's/\.ya?ml$//')
+		if echo "$base" | grep -E '^[0-9a-fA-F]{64}$' >/dev/null 2>&1; then
+			if [ -n "$SHASUM_CMD" ]; then
+				actual_hash=$(git show ":$f" 2>/dev/null | $SHASUM_CMD | awk '{print $1}')
+				if [ "$base" != "$actual_hash" ]; then
+					echo "❌ [ZQK PRE-COMMIT] CAS Membrane Violation: Hash mismatch in $f"
+					echo "   Expected hash: $base"
+					echo "   Actual hash:   $actual_hash"
+					echo "   Direct hand-editing of objects past the CAS membrane (.zqk/process/) is strictly prohibited."
+					echo "   Use '$ZQK_BIN object update' or CLI mutation commands to update objects cleanly."
+					exit 1
+				fi
+			fi
+		fi
+	done
+fi
+
+# 2. Knowledge Kernel CAS & Referential Integrity Gate
+if [ -d "$REPO_ROOT/.zqk/process" ]; then
+	echo "🔍 [ZQK PRE-COMMIT] Verifying Knowledge Kernel integrity..."
+	DEFAULT_TIMEOUT="120s"
+	if [ -d "$REPO_ROOT/.zqk/process" ]; then
+		CAS_OBJ_COUNT=$(find "$REPO_ROOT/.zqk/process" -type f \( -name "*.yaml" -o -name "*.yml" \) 2>/dev/null | wc -l || echo "0")
+		if [ "$CAS_OBJ_COUNT" -gt 1500 ]; then
+			DEFAULT_TIMEOUT="180s"
+		fi
+	fi
+	PRECOMMIT_TIMEOUT="${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}"
+	if ! "$ZQK_BIN" system check --tier 1 --timeout "$PRECOMMIT_TIMEOUT"; then
+		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
+		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."
+		exit 1
+	fi
+fi
+
+# 3. Test-Driven Development (TDD) Definition of Done Verification
+if [ -d "$REPO_ROOT/.zqk/process/test_cases" ] || [ -f "$REPO_ROOT/.zqk/state/test_dashboard_lite.json" ]; then
+	echo "⚡ [ZQK PRE-COMMIT] Verifying Test Matrix Definition of Done..."
+	if ! "$ZQK_BIN" test dashboard --check-dod; then
+		echo "❌ [ZQK PRE-COMMIT] Definition of Done validation failed! Broken lineage detected."
+		echo "   Run '$ZQK_BIN test dashboard' to inspect broken bindings."
+		exit 1
+	fi
+fi
+
+# 4. Secret & Credential Leak Scanning Gate
+if [ -f "$REPO_ROOT/scripts/scan-secrets.sh" ]; then
+	echo "🔒 [ZQK PRE-COMMIT] Scanning repository for credentials and secrets..."
+	if ! /bin/sh "$REPO_ROOT/scripts/scan-secrets.sh" "$REPO_ROOT"; then
+		echo "❌ [ZQK PRE-COMMIT] Potential secrets detected! Commit aborted."
+		exit 1
+	fi
+fi
+
+export PATH="/usr/local/go/bin:/opt/homebrew/bin:$HOME/go/bin:$GOPATH/bin:$PATH"
+
+# 5. Codebase Verification Gate (zqk-vet) & Staged Go Source Hygiene
+# Enforces AST hygiene (paths, permissions, CLI names, raw goroutines), tree policing, and invariants.
+# NOTE: zqk-vet and internal Go source hygiene only apply to ZQK engine codebases
+# (identified by the presence of cmd/zqk-vet/main.go). In consumer/bare repos, this gate is cleanly skipped.
+if [ -f "$REPO_ROOT/cmd/zqk-vet/main.go" ]; then
+	ZQK_VET_BIN=""
+
+	# Rebuild zqk-vet if missing or if sources/config are newer than the binary
+	NEED_VET_BUILD=0
+	if [ ! -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		NEED_VET_BUILD=1
+	elif [ -n "$(find "$REPO_ROOT/cmd/zqk-vet" "$REPO_ROOT/pkg/vet" "$REPO_ROOT/config/gates.yaml" -newer "$REPO_ROOT/bin/zqk-vet" 2>/dev/null)" ]; then
+		NEED_VET_BUILD=1
+	fi
+
+	if [ "$NEED_VET_BUILD" -eq 1 ]; then
+		if command -v go >/dev/null 2>&1; then
+			echo "⚙️  [ZQK PRE-COMMIT] Compiling bin/zqk-vet..."
+			mkdir -p "$REPO_ROOT/bin"
+			go build -trimpath -o "$REPO_ROOT/bin/zqk-vet" "$REPO_ROOT/cmd/zqk-vet" 2>/dev/null || true
+		fi
+	fi
+
+	if [ -x "$REPO_ROOT/bin/zqk-vet" ]; then
+		ZQK_VET_BIN="$REPO_ROOT/bin/zqk-vet"
+	elif command -v zqk-vet >/dev/null 2>&1; then
+		ZQK_VET_BIN="$(command -v zqk-vet)"
+	fi
+
+	if [ -z "$ZQK_VET_BIN" ]; then
+		echo "❌ [ZQK PRE-COMMIT] Failed to find or compile zqk-vet verification engine! Aborting commit." >&2
+		echo "   Ensure 'go' is installed and available in PATH to compile bin/zqk-vet." >&2
+		exit 1
+	fi
+
+	echo "🛡️  [ZQK PRE-COMMIT] Running zqk-vet hygiene and tree police checks..."
+	VET_SUITES="${ZQK_VET_SUITE:-hygiene,tree_police}"
+	if ! "$ZQK_VET_BIN" --suite "$VET_SUITES"; then
+		echo "❌ [ZQK PRE-COMMIT] zqk-vet verification failed! Please resolve findings before committing." >&2
+		exit 1
+	fi
+
+	# 6. Staged Go Source Hygiene Ratchet Gate
+	# Enforces that all newly added or modified Go files strictly use:
+	# - goroutinelabels instead of raw 'go func('
+	# - pkg/utils/fileutil instead of raw os.WriteFile/ReadFile/MkdirAll
+	STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.go$' || true)
+	if [ -n "$STAGED_GO_FILES" ]; then
+		RAW_GOROUTINE_VIOLATIONS=0
+		FILEUTIL_VIOLATIONS=0
+		for gf in $STAGED_GO_FILES; do
+			# Skip exemptions (vendor, testdata, goroutinelabels itself, fileutil itself)
+			case "$gf" in
+				vendor/*|*/testdata/*|testdata/*|pkg/goroutinelabels/*|pkg/utils/fileutil/*)
+					continue
+					;;
+			esac
+
+			# Check for raw goroutines
+			if git show ":$gf" 2>/dev/null | grep -E '^[[:space:]]*go[[:space:]]+func\(' >/dev/null 2>&1; then
+				echo "❌ [ZQK PRE-COMMIT] Raw goroutine violation in staged file: $gf" >&2
+				echo "   Naked 'go func()' is strictly prohibited (POL-CONCURRENCY)." >&2
+				echo "   Use goroutinelabels.NewGoroutine(\"<name>\", \"<purpose>\").StartSimple(...) instead." >&2
+				RAW_GOROUTINE_VIOLATIONS=$((RAW_GOROUTINE_VIOLATIONS + 1))
+			fi
+
+			# Check for direct os filesystem calls instead of fileutil
+			if git show ":$gf" 2>/dev/null | grep -E '\bos\.(WriteFile|ReadFile|Mkdir|MkdirAll|RemoveAll)\(' >/dev/null 2>&1; then
+				echo "❌ [ZQK PRE-COMMIT] Filesystem abstraction violation in staged file: $gf" >&2
+				echo "   Direct standard library 'os.*' filesystem operations prohibited." >&2
+				echo "   Use 'github.com/zqk-os/zqk/pkg/utils/fileutil' (e.g. fileutil.WriteFile, fileutil.ReadFile, fileutil.MkdirAll)." >&2
+				FILEUTIL_VIOLATIONS=$((FILEUTIL_VIOLATIONS + 1))
+			fi
+		done
+
+		if [ "$RAW_GOROUTINE_VIOLATIONS" -gt 0 ] || [ "$FILEUTIL_VIOLATIONS" -gt 0 ]; then
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			echo "❌ [ZQK PRE-COMMIT] Staged Go source hygiene gate failed ($RAW_GOROUTINE_VIOLATIONS goroutine, $FILEUTIL_VIOLATIONS filesystem violations)." >&2
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" >&2
+			exit 1
+		fi
+	fi
+
+	# 7. Gofmt Formatting Ratchet Gate
+	# Enforces that all staged Go files are strictly formatted according to gofmt standards.
+	if [ -n "$STAGED_GO_FILES" ]; then
+		FORMAT_VIOLATIONS=0
+		for gf in $STAGED_GO_FILES; do
+			# Skip exemptions (vendor, testdata)
+			case "$gf" in
+				vendor/*|*/testdata/*|testdata/*)
+					continue
+					;;
+			esac
+
+			if [ -f "$gf" ]; then
+				if [ -n "$(gofmt -l "$gf" 2>/dev/null)" ]; then
+					echo "❌ [ZQK PRE-COMMIT] Formatting violation in staged file: $gf" >&2
+					echo "   File is not formatted according to gofmt standards." >&2
+					echo "   Remediation: run 'gofmt -w $gf' and stage the changes." >&2
+					FORMAT_VIOLATIONS=$((FORMAT_VIOLATIONS + 1))
+				fi
+			fi
+		done
+
+		if [ "$FORMAT_VIOLATIONS" -gt 0 ]; then
+			exit 1
+		fi
+	fi
+fi
+
+
+
+
