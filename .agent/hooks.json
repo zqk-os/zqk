@@ -13,6 +13,20 @@
       }
     ]
   },
+  "search-interceptor": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "for p in ./bin/zqk ../bin/zqk \"$HOME/.gemini/antigravity-cli/bin/zqk\"; do if [ -x \"$p\" ]; then exec \"$p\" agent hook pre-command --vendor antigravity; fi; done; exec zqk agent hook pre-command --vendor antigravity",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
   "cap-loop-anti-idle": {
     "Stop": [
       {
