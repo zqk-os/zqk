@@ -1,0 +1,23 @@
+$schema: ../../schemas/command_spec.schema.json
+name: pre-command
+aliases:
+  - intercept
+short: Pre-command interceptor hook
+description: Pre-command lifecycle hook intercepting shell commands and rewriting code searches to token-budgeted zqk grep.
+flags:
+  - name: vendor
+    type: string
+    default: "antigravity"
+    description: "Target agent host vendor format (antigravity, generic)"
+  - name: project-root
+    type: string
+    default: ""
+    description: "Project root directory"
+args:
+  type: no_args
+help:
+  examples:
+    - comment: Run agent hook pre-command
+      command: '%s agent hook pre-command --vendor antigravity'
+run_e: runPreCommandHook
+common_flags: true

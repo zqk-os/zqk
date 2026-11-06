@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -28,32 +28,21 @@ func NewPreCommandHookCmd() *cobra.Command {
 	var vendor string
 	var projectRoot string
 
-	builder := clipkg.NewCommandBuilder("pre-command")
-	builder.WithShort("Pre-command interceptor hook")
-	builder.WithAliases("intercept")
-	help := clipkg.DynamicHelpBuilder("Pre-command interceptor hook")
-	help.WithDescriptionLines(paths.RewriteCanonicalCLIInvocations("Pre-command lifecycle hook intercepting shell commands and rewriting code searches to token-budgeted zqk grep."))
-	help.AddExample("Run agent hook pre-command", "%s agent hook pre-command --vendor antigravity")
-	builder.WithHelpBuilder(help)
-	builder.WithArgs(cobra.NoArgs)
-	builder.AddStringFlag("vendor", "", "antigravity", "Target agent host vendor format (antigravity, generic)")
-	builder.AddStringFlag("project-root", "", "", "Project root directory")
-	builder.WithCommonFlagsDefault(cli.AddCommonFlags)
-	cmd := builder.Build()
-
-	cmd.RunE = func(cmd *cobra.Command, args []string) error {
-		_ = args
-		in, out := commandIO(cmd)
-		v, err := cmd.Flags().GetString("vendor")
-		if err != nil || v == "" {
-			v = vendor
-		}
-		pr, err := cmd.Flags().GetString("project-root")
-		if err != nil || pr == "" {
-			pr = projectRoot
-		}
-		return runPreCommandHookWithDeps(cmd.Context(), nil, nil, pr, v, in, out)
-	}
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookPreCommandCommandBuilder(), &cobra.Command{
+		RunE: func(cmd *cobra.Command, args []string) error {
+			_ = args
+			in, out := commandIO(cmd)
+			v, err := cmd.Flags().GetString("vendor")
+			if err != nil || v == "" {
+				v = vendor
+			}
+			pr, err := cmd.Flags().GetString("project-root")
+			if err != nil || pr == "" {
+				pr = projectRoot
+			}
+			return runPreCommandHookWithDeps(cmd.Context(), nil, nil, pr, v, in, out)
+		},
+	})
 
 	return cmd
 }
