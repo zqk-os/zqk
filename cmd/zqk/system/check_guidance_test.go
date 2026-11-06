@@ -101,6 +101,25 @@ func TestCalculateCheckProgressiveTimeout(t *testing.T) {
 	}
 }
 
+func TestCalculateCheckProgressiveTimeout_PrecommitTimeoutEnv(t *testing.T) {
+	t.Setenv("ZQK_PRECOMMIT_TIMEOUT", "150s")
+
+	cmd := &cobra.Command{Use: "check"}
+	cmd.Flags().Duration("timeout", 0, "")
+
+	got := CalculateCheckProgressiveTimeout(cmd, []string{"all"})
+	if got != 150*time.Second {
+		t.Errorf("expected 150s from ZQK_PRECOMMIT_TIMEOUT, got %v", got)
+	}
+
+	// Explicit flag should override env var
+	_ = cmd.Flags().Set("timeout", "45s")
+	gotExplicit := CalculateCheckProgressiveTimeout(cmd, []string{"all"})
+	if gotExplicit != 45*time.Second {
+		t.Errorf("expected explicit 45s to override env var, got %v", gotExplicit)
+	}
+}
+
 func TestFormatCheckTimeoutError(t *testing.T) {
 	cmd := &cobra.Command{Use: "check"}
 	cmd.Flags().Bool("fast", false, "")

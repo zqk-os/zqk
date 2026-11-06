@@ -8,6 +8,7 @@ import (
 
 type FileLockConfig = file.FileLockConfig
 type FileLock = file.FileLock
+type LockMetadata = file.LockMetadata
 type FileLockMetrics = file.FileLockMetrics
 type FileLockMetricsSnapshot = file.FileLockMetricsSnapshot
 type FileLockDerivedMetrics = file.FileLockDerivedMetrics
@@ -15,6 +16,16 @@ type FileLockStrategy = file.FileLockStrategy
 type FileLockStrategyMetrics = file.FileLockStrategyMetrics
 type LockHandle = file.LockHandle
 type AutoCleanupStrategy = file.AutoCleanupStrategy
+
+const DefaultStaleLockTTL = file.DefaultStaleLockTTL
+
+func ReadLockMetadata(path string) (*LockMetadata, error) {
+	return file.ReadLockMetadata(path)
+}
+
+func WriteLockMetadata(path string, meta *LockMetadata) error {
+	return file.WriteLockMetadata(path, meta)
+}
 
 func NewFileLock(filePath string) (*FileLock, error) {
 	return file.NewFileLock(filePath)

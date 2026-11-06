@@ -102,6 +102,14 @@ func (h *TimeoutHook) parseTimeoutFlag(cmdCtx *CommandContext, args []string) (t
 		}
 	}
 
+	// Check if ZQK_PRECOMMIT_TIMEOUT environment variable is set
+	if timeout == 0 && !explicitlySet {
+		if precommitTimeout, ok := zqkenv.ParsePrecommitTimeout(); ok {
+			timeout = precommitTimeout
+			explicitlySet = true
+		}
+	}
+
 	return timeout, explicitlySet
 }
 

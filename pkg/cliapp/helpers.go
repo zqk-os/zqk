@@ -23,6 +23,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/outputtypes"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // contextRegistry stores context for commands using command pointer as key
@@ -328,17 +329,20 @@ func isTrueFlagSet(cmd *cobra.Command, name string) bool {
 }
 
 // GetTimeout returns the timeout duration from command flags (root persistent or local).
+// If --timeout flag is not set or is 0, it falls back to ZQK_PRECOMMIT_TIMEOUT.
 // Returns 0 if not set or on error.
 func GetTimeout(cmd *cobra.Command) time.Duration {
 	f := GetFlagFromChain(cmd, FlagTimeout)
-	if f == nil {
-		return 0
+	if f != nil {
+		d, err := time.ParseDuration(f.Value.String())
+		if err == nil && d > 0 {
+			return d
+		}
 	}
-	d, err := time.ParseDuration(f.Value.String())
-	if err != nil || d <= 0 {
-		return 0
+	if precommitTimeout, ok := zqkenv.ParsePrecommitTimeout(); ok {
+		return precommitTimeout
 	}
-	return d
+	return 0
 }
 
 // CommandContextOr returns cmd.Context() when cmd is non-nil and that context is non-nil;

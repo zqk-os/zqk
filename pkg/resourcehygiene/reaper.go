@@ -17,6 +17,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/process"
+	"github.com/zqk-os/zqk/pkg/storage/file"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
@@ -54,11 +55,7 @@ var (
 		return syscall.Kill(pid, sig)
 	}
 	isProcessAliveHook = func(pid int) bool {
-		if runtime.GOOS == "windows" {
-			p, err := os.FindProcess(pid)
-			return err == nil && p != nil
-		}
-		return syscall.Kill(pid, 0) == nil
+		return syscallutil.IsProcessAlive(pid)
 	}
 )
 
@@ -162,27 +159,42 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 				cutoff = casSweepCutoff
 			}
 		}
-		if !info.ModTime().Before(cutoff) {
+
+		meta, readErr := file.ReadLockMetadata(path)
+		isDeadProcess := false
+		if readErr == nil && meta != nil && meta.PID > 0 {
+			if !isProcessAliveHook(meta.PID) {
+				isDeadProcess = true
+			}
+		}
+
+		lockTime := info.ModTime()
+		if meta != nil && !meta.CreatedAt.IsZero() {
+			lockTime = meta.CreatedAt
+		}
+		isAged := lockTime.Before(cutoff)
+
+		if !isDeadProcess && !isAged {
 			return nil
 		}
 
 		// Try non-blocking exclusive lock to guarantee no live holder
-		file, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
+		fileHandle, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
 		if errOpen != nil {
 			// If file cannot be opened (e.g. permission/disappeared), skip
 			return nil
 		}
 
-		flockErr := syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
-		if flockErr != nil {
+		flockErr := syscallutil.FileFlock(fileHandle, syscall.LOCK_EX|syscall.LOCK_NB)
+		if flockErr != nil && !isDeadProcess {
 			// Held by a live process: do not touch
-			_ = file.Close()
+			_ = fileHandle.Close()
 			return nil
 		}
 
-		// Lock acquired: safe to reap
-		_ = syscallutil.FileFlock(file, syscall.LOCK_UN)
-		_ = file.Close()
+		// Lock acquired or process dead: safe to reap
+		_ = syscallutil.FileFlock(fileHandle, syscall.LOCK_UN)
+		_ = fileHandle.Close()
 
 		count++
 		rel, relErr := filepath.Rel(projectRoot, path)

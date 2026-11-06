@@ -396,3 +396,117 @@ func TestFileLock_CreatesDirectory(t *testing.T) {
 		t.Fatalf("Lock directory should have been created: %v", err)
 	}
 }
+
+func TestFileLock_OwnershipMetadata(t *testing.T) {
+	tmpDir := t.TempDir()
+	lockFile := filepath.Join(tmpDir, "meta.lock")
+
+	fl, err := NewFileLock(lockFile)
+	if err != nil {
+		t.Fatalf("Failed to create lock: %v", err)
+	}
+	defer fl.Close()
+
+	if err := fl.Lock(); err != nil {
+		t.Fatalf("Failed to acquire lock: %v", err)
+	}
+
+	meta, err := ReadLockMetadata(lockFile)
+	if err != nil {
+		t.Fatalf("ReadLockMetadata failed: %v", err)
+	}
+	if meta.PID == 0 {
+		t.Errorf("expected non-zero PID in lock metadata, got 0")
+	}
+	if meta.CreatedAt.IsZero() {
+		t.Errorf("expected non-zero CreatedAt in lock metadata")
+	}
+
+	if err := fl.Unlock(); err != nil {
+		t.Fatalf("Failed to release lock: %v", err)
+	}
+
+	// After clean unlock, metadata should be cleared
+	clearedMeta, err := ReadLockMetadata(lockFile)
+	if err != nil {
+		t.Fatalf("ReadLockMetadata failed after unlock: %v", err)
+	}
+	if clearedMeta.PID != 0 {
+		t.Errorf("expected cleared PID after unlock, got %d", clearedMeta.PID)
+	}
+}
+
+func TestFileLock_StaleLockRecovery_DeadPID(t *testing.T) {
+	tmpDir := t.TempDir()
+	lockFile := filepath.Join(tmpDir, "dead_pid.lock")
+
+	// Simulate an abandoned lock from a dead process
+	deadMeta := &LockMetadata{
+		PID:       9999999, // Unlikely to be alive
+		CreatedAt: time.Now().Add(-10 * time.Second),
+	}
+	if err := WriteLockMetadata(lockFile, deadMeta); err != nil {
+		t.Fatalf("WriteLockMetadata failed: %v", err)
+	}
+
+	fl, err := NewFileLockWithConfig(lockFile, FileLockConfig{
+		StaleLockTTL: 5 * time.Minute,
+	})
+	if err != nil {
+		t.Fatalf("NewFileLock failed: %v", err)
+	}
+	defer fl.Close()
+
+	// TryLock should detect dead PID, reclaim the stale lock, and succeed
+	acquired, err := fl.TryLock()
+	if err != nil {
+		t.Fatalf("TryLock failed: %v", err)
+	}
+	if !acquired {
+		t.Fatalf("expected TryLock to reclaim stale lock with dead PID")
+	}
+
+	// Verify new lock has current PID
+	newMeta, err := ReadLockMetadata(lockFile)
+	if err != nil {
+		t.Fatalf("ReadLockMetadata failed: %v", err)
+	}
+	if newMeta.PID == 9999999 || newMeta.PID == 0 {
+		t.Errorf("expected reclaimed lock to have active process PID, got %d", newMeta.PID)
+	}
+
+	_ = fl.Unlock()
+}
+
+func TestFileLock_StaleLockRecovery_TTLExpired(t *testing.T) {
+	tmpDir := t.TempDir()
+	lockFile := filepath.Join(tmpDir, "expired.lock")
+
+	// Write lock metadata from 10 minutes ago
+	oldMeta := &LockMetadata{
+		PID:       1234,
+		CreatedAt: time.Now().Add(-10 * time.Minute),
+	}
+	if err := WriteLockMetadata(lockFile, oldMeta); err != nil {
+		t.Fatalf("WriteLockMetadata failed: %v", err)
+	}
+
+	// Configure 1 minute TTL
+	fl, err := NewFileLockWithConfig(lockFile, FileLockConfig{
+		StaleLockTTL: 1 * time.Minute,
+	})
+	if err != nil {
+		t.Fatalf("NewFileLock failed: %v", err)
+	}
+	defer fl.Close()
+
+	acquired, err := fl.TryLock()
+	if err != nil {
+		t.Fatalf("TryLock failed: %v", err)
+	}
+	if !acquired {
+		t.Fatalf("expected TryLock to reclaim TTL-expired stale lock")
+	}
+
+	_ = fl.Unlock()
+}

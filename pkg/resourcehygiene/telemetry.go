@@ -10,12 +10,13 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/operational"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage/file"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
 
 // DefaultLockStaleAge is the default age at which a lock file without a holder is considered stale.
-const DefaultLockStaleAge = 15 * time.Minute
+const DefaultLockStaleAge = 5 * time.Minute
 
 // DefaultTempOrphanAge is the default age at which a temporary file is considered orphaned.
 const DefaultTempOrphanAge = 30 * time.Minute
@@ -101,19 +102,36 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 						staleCutoff = casSweepCutoff
 					}
 				}
-				if info.ModTime().Before(staleCutoff) {
-					// Verify whether the lock is held by a live process before declaring it stale
-					file, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
-					if errOpen == nil {
-						flockErr := syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
-						if flockErr != nil {
-							// Actively held by a live process: not stale!
-							_ = file.Close()
-							return nil
-						}
-						_ = syscallutil.FileFlock(file, syscall.LOCK_UN)
-						_ = file.Close()
+
+				meta, readErr := file.ReadLockMetadata(path)
+				isDeadProcess := false
+				if readErr == nil && meta != nil && meta.PID > 0 {
+					if !syscallutil.IsProcessAlive(meta.PID) {
+						isDeadProcess = true
 					}
+				}
+
+				lockTime := info.ModTime()
+				if meta != nil && !meta.CreatedAt.IsZero() {
+					lockTime = meta.CreatedAt
+				}
+				isAged := lockTime.Before(staleCutoff)
+
+				if isDeadProcess || isAged {
+					// Verify whether the lock is held by a live process before declaring it stale
+					fileHandle, errOpen := fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)
+					if errOpen != nil {
+						return nil
+					}
+					flockErr := syscallutil.FileFlock(fileHandle, syscall.LOCK_EX|syscall.LOCK_NB)
+					if flockErr != nil && !isDeadProcess {
+						// Actively held by a live process: not stale!
+						_ = fileHandle.Close()
+						return nil
+					}
+					_ = syscallutil.FileFlock(fileHandle, syscall.LOCK_UN)
+					_ = fileHandle.Close()
+
 					rel, relErr := filepath.Rel(projectRoot, path)
 					if relErr == nil {
 						report.StaleLockPaths = append(report.StaleLockPaths, rel)

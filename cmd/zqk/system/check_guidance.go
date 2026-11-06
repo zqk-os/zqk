@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/strutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 const (
@@ -37,6 +38,10 @@ func CalculateCheckProgressiveTimeout(cmd *cobra.Command, args []string) time.Du
 				}
 			}
 		}
+	}
+
+	if precommitTimeout, ok := zqkenv.ParsePrecommitTimeout(); ok {
+		return precommitTimeout
 	}
 
 	// Determine based on flags
