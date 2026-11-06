@@ -211,6 +211,7 @@ func getDefaultIDPrefixesConfig() *IDPrefixesConfig {
 			kindnames.ChangeJournalEntry:  {"cje", "journal", "change_journal"},
 			kindnames.ObjectSpec:          {"spec", "ospec"},
 			kindnames.CorporateInitiative: {"ci", "initiative", "corp_init"},
+			"team_configuration":          {"tcfg"},
 			// Single-word kinds
 			kindnames.Component:     {"comp"},
 			kindnames.Criteria:      {"crit"},

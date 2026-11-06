@@ -369,6 +369,8 @@ kind_to_synonyms:
     shockwave_router:
         - router
         - shockwave
+    team_configuration:
+        - tcfg
     template:
         - tpl
         - tmpl
