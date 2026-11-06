@@ -95,7 +95,10 @@ func runStateTree(cmd *cobra.Command, proc *cli.Processor) error {
 
 	payload := buildStateTreePayload(ctx, sp, projectRoot)
 
-	format, _ := cmd.Flags().GetString("format")
+	format, err := cmd.Flags().GetString("format")
+	if err != nil {
+		return err
+	}
 	if format == "json" {
 		return cli.FormatOutputAs(cmd, cli.FormatJSON, payload)
 	}
@@ -103,8 +106,8 @@ func runStateTree(cmd *cobra.Command, proc *cli.Processor) error {
 	return renderStateTreeText(cmd, payload)
 }
 
-func loadStateCoreEntities(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, sp storage.ObjectStorageProvider, payload *StateTreePayload) {
-	if orgs, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindOrganization).Limit(1).Build()); err == nil && len(orgs.Objects) > 0 {
+func loadStateCoreEntities(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, payload *StateTreePayload) {
+	if orgs, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.IdTitle(objects.KindOrganization).Limit(1).Build()); err == nil && len(orgs.Objects) > 0 {
 		payload.Organization = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -113,7 +116,7 @@ func loadStateCoreEntities(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 			Title: getString(orgs.Objects[0], objects.FieldKeyTitle),
 		}
 	}
-	if missions, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindMission).Limit(1).Build()); err == nil && len(missions.Objects) > 0 {
+	if missions, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.IdTitle(objects.KindMission).Limit(1).Build()); err == nil && len(missions.Objects) > 0 {
 		payload.Mission = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -122,7 +125,7 @@ func loadStateCoreEntities(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 			Title: getString(missions.Objects[0], objects.FieldKeyTitle),
 		}
 	}
-	if visions, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindVision).Limit(1).Build()); err == nil && len(visions.Objects) > 0 {
+	if visions, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.IdTitle(objects.KindVision).Limit(1).Build()); err == nil && len(visions.Objects) > 0 {
 		payload.Vision = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -131,7 +134,7 @@ func loadStateCoreEntities(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 			Title: getString(visions.Objects[0], objects.FieldKeyTitle),
 		}
 	}
-	if goals, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.IdTitle(objects.KindGoal).Limit(1).Build()); err == nil && len(goals.Objects) > 0 {
+	if goals, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.IdTitle(objects.KindGoal).Limit(1).Build()); err == nil && len(goals.Objects) > 0 {
 		payload.Goal = &struct {
 			ID    string `json:"id"`
 			Title string `json:"title"`
@@ -142,9 +145,9 @@ func loadStateCoreEntities(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 	}
 }
 
-func loadBaseRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, sp storage.ObjectStorageProvider) map[string]RequirementNode {
+func loadBaseRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider) map[string]RequirementNode {
 	baseReqMap := make(map[string]RequirementNode)
-	if reqs, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+	if reqs, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		NotArchived(objects.KindRequirement).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus).
 		Build()); err == nil {
@@ -160,8 +163,8 @@ func loadBaseRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, s
 	return baseReqMap
 }
 
-func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, sp storage.ObjectStorageProvider, planID string, reqMap map[string]*RequirementNode) {
-	blis, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, planID string, reqMap map[string]*RequirementNode) {
+	blis, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		ForPlan(objects.KindBacklogItem, planID).
 		StatusNot(objects.ObjectStatusArchived).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs).
@@ -173,7 +176,7 @@ func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.Se
 	} else {
 		// Robust fallback: if index-based ForPlan returns empty or fails (e.g. unindexed files or reference index sync lag),
 		// query all non-archived backlog items and match plan reference directly.
-		fallbackBlis, fallbackErr := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+		fallbackBlis, fallbackErr := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 			NotArchived(objects.KindBacklogItem).
 			IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, "priority_tier", "claimed_by", objects.FieldKeyRequirementRefs, objects.FieldKeyPriorityPlanRef, objects.FieldKeyPriorityPlanRefs).
 			Build())
@@ -228,7 +231,7 @@ func attachBacklogItemsToPlanRequirements(ctx context.Context, secCtx *pkgctx.Se
 	}
 }
 
-func buildPriorityPlanNode(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, sp storage.ObjectStorageProvider, p map[string]any, baseReqMap map[string]RequirementNode) PriorityPlanNode {
+func buildPriorityPlanNode(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, p map[string]any, baseReqMap map[string]RequirementNode) PriorityPlanNode {
 	planID := getString(p, objects.FieldKeyID)
 	node := PriorityPlanNode{
 		ID:          planID,
@@ -241,7 +244,7 @@ func buildPriorityPlanNode(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 		rnCopy := rn
 		reqMap[rID] = &rnCopy
 	}
-	attachBacklogItemsToPlanRequirements(ctx, secCtx, storageCtx, sp, planID, reqMap)
+	attachBacklogItemsToPlanRequirements(ctx, secCtx, sp, planID, reqMap)
 
 	sortedReqIDs := make([]string, 0, len(reqMap))
 	for rID := range reqMap {
@@ -261,8 +264,8 @@ func buildPriorityPlanNode(ctx context.Context, secCtx *pkgctx.SecurityContext, 
 	return node
 }
 
-func loadActivePriorityPlans(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext, sp storage.ObjectStorageProvider, baseReqMap map[string]RequirementNode) []PriorityPlanNode {
-	plans, err := sp.List(ctx, secCtx, storageCtx, storage.DefaultQueryFactory.
+func loadActivePriorityPlans(ctx context.Context, secCtx *pkgctx.SecurityContext, sp storage.ObjectStorageProvider, baseReqMap map[string]RequirementNode) []PriorityPlanNode {
+	plans, err := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
 		ActiveNotComplete(objects.KindPriorityPlan).
 		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyWorkstreamRefs).
 		Build())
@@ -271,7 +274,7 @@ func loadActivePriorityPlans(ctx context.Context, secCtx *pkgctx.SecurityContext
 	}
 	planNodes := make([]PriorityPlanNode, 0, len(plans.Objects))
 	for _, p := range plans.Objects {
-		planNodes = append(planNodes, buildPriorityPlanNode(ctx, secCtx, storageCtx, sp, p, baseReqMap))
+		planNodes = append(planNodes, buildPriorityPlanNode(ctx, secCtx, sp, p, baseReqMap))
 	}
 	sort.Slice(planNodes, func(i, j int) bool {
 		return planNodes[i].ID < planNodes[j].ID
@@ -281,12 +284,11 @@ func loadActivePriorityPlans(ctx context.Context, secCtx *pkgctx.SecurityContext
 
 func buildStateTreePayload(ctx context.Context, sp storage.ObjectStorageProvider, projectRoot string) *StateTreePayload {
 	payload := &StateTreePayload{}
-	storageCtx := pkgctx.NewStorageContext()
 	secCtx := pkgctx.GetSecurityContext(ctx)
 
-	loadStateCoreEntities(ctx, secCtx, storageCtx, sp, payload)
-	baseReqMap := loadBaseRequirements(ctx, secCtx, storageCtx, sp)
-	payload.ActivePlans = loadActivePriorityPlans(ctx, secCtx, storageCtx, sp, baseReqMap)
+	loadStateCoreEntities(ctx, secCtx, sp, payload)
+	baseReqMap := loadBaseRequirements(ctx, secCtx, sp)
+	payload.ActivePlans = loadActivePriorityPlans(ctx, secCtx, sp, baseReqMap)
 	payload.RecentMutations = readRecentJournalMutations(projectRoot, 8)
 
 	return payload
@@ -363,33 +365,36 @@ func collectStreamFiles(projectRoot string, streamKinds []string) []streamFileRe
 func parseStreamMutationRecord(raw rawStreamRecord, streamKind string) JournalMutation {
 	cType := raw.ChangeType
 	if cType == "" {
-		if raw.EventType != "" {
+		switch {
+		case raw.EventType != "":
 			cType = raw.EventType
-		} else if raw.Kind != "" {
+		case raw.Kind != "":
 			cType = raw.Kind
-		} else {
+		default:
 			cType = "event"
 		}
 	}
 
 	ref := raw.ObjectRef
 	if ref == "" {
-		if raw.Kind != "" {
+		switch {
+		case raw.Kind != "":
 			ref = raw.Kind + ":" + raw.ID
-		} else {
+		default:
 			ref = raw.ID
 		}
 	}
 
 	summary := raw.DiffSummary
 	if summary == "" {
-		if raw.Operation != "" {
+		switch {
+		case raw.Operation != "":
 			summary = raw.Operation
-		} else if raw.Title != "" {
+		case raw.Title != "":
 			summary = raw.Title
-		} else if raw.Instruction != "" {
+		case raw.Instruction != "":
 			summary = raw.Instruction
-		} else {
+		default:
 			summary = cType
 		}
 	}
@@ -497,77 +502,103 @@ func ReadRecentStreamMutations(projectRoot string, limit int, streamKinds ...str
 	return allMutations
 }
 
+const (
+	treePrefixOrg         = "├── Organization: %s [%s]\n"
+	treePrefixMission     = "│   └── Mission: %s [%s]\n"
+	treePrefixVision      = "│       └── Vision: %s [%s]\n"
+	treePrefixGoal        = "│           └── Goal: %s [%s]\n"
+	treePrefixPlan        = "│               └── Priority Plan: %s [%s] (%s)\n"
+	treePrefixPlanEmpty   = "│               └── Priority Plan: (none active or in_progress)\n"
+	treePrefixWorkstream  = "│                   ├── Workstream: %s\n"
+	treePrefixRequirement = "│                   └── Requirement: %s [%s]\n"
+	treePrefixBLI         = "│                       └── BLI: %s [%s] (%s)%s\n"
+
+	treeHeaderMutations   = "└── Recent Journal Mutations:\n"
+	treeEmptyMutations    = "    └── (no recent stream journal entries)\n"
+	treePrefixMutationMid = "    ├──"
+	treePrefixMutationEnd = "    └──"
+
+	defaultOrgName     = "Default Organization"
+	defaultOrgID       = "ORG-DEFAULT"
+	defaultMissionName = "No Mission"
+	defaultMissionID   = "MIS-NONE"
+	defaultVisionName  = "No Vision"
+	defaultVisionID    = "VIS-NONE"
+	defaultGoalName    = "No Goal"
+	defaultGoalID      = "GOAL-NONE"
+)
+
 func renderStateTreeText(cmd *cobra.Command, payload *StateTreePayload) error {
 	return cli.WriteOutput(cmd, []byte(FormatStateTreeText(payload)))
 }
 
 func formatCoreEntities(buf *strings.Builder, payload *StateTreePayload) {
-	orgName := "Default Organization"
-	orgID := "ORG-DEFAULT"
+	orgName := defaultOrgName
+	orgID := defaultOrgID
 	if payload.Organization != nil {
 		orgName = payload.Organization.Title
 		orgID = payload.Organization.ID
 	}
-	fmt.Fprintf(buf, "├── Organization: %s [%s]\n", orgName, orgID)
+	fmt.Fprintf(buf, treePrefixOrg, orgName, orgID)
 
-	misName := "No Mission"
-	misID := "MIS-NONE"
+	misName := defaultMissionName
+	misID := defaultMissionID
 	if payload.Mission != nil {
 		misName = payload.Mission.Title
 		misID = payload.Mission.ID
 	}
-	fmt.Fprintf(buf, "│   └── Mission: %s [%s]\n", misName, misID)
+	fmt.Fprintf(buf, treePrefixMission, misName, misID)
 
-	visName := "No Vision"
-	visID := "VIS-NONE"
+	visName := defaultVisionName
+	visID := defaultVisionID
 	if payload.Vision != nil {
 		visName = payload.Vision.Title
 		visID = payload.Vision.ID
 	}
-	fmt.Fprintf(buf, "│       └── Vision: %s [%s]\n", visName, visID)
+	fmt.Fprintf(buf, treePrefixVision, visName, visID)
 
-	goalName := "No Goal"
-	goalID := "GOAL-NONE"
+	goalName := defaultGoalName
+	goalID := defaultGoalID
 	if payload.Goal != nil {
 		goalName = payload.Goal.Title
 		goalID = payload.Goal.ID
 	}
-	fmt.Fprintf(buf, "│           └── Goal: %s [%s]\n", goalName, goalID)
+	fmt.Fprintf(buf, treePrefixGoal, goalName, goalID)
 }
 
 func formatPriorityPlans(buf *strings.Builder, payload *StateTreePayload) {
 	if len(payload.ActivePlans) == 0 {
-		buf.WriteString("│               └── Priority Plan: (none active or in_progress)\n")
+		buf.WriteString(treePrefixPlanEmpty)
 		return
 	}
 	for _, plan := range payload.ActivePlans {
-		fmt.Fprintf(buf, "│               └── Priority Plan: %s [%s] (%s)\n", plan.Title, plan.ID, plan.Status)
+		fmt.Fprintf(buf, treePrefixPlan, plan.Title, plan.ID, plan.Status)
 		for _, ws := range plan.Workstreams {
-			fmt.Fprintf(buf, "│                   ├── Workstream: %s\n", ws)
+			fmt.Fprintf(buf, treePrefixWorkstream, ws)
 		}
 		for _, req := range plan.Requirements {
-			fmt.Fprintf(buf, "│                   └── Requirement: %s [%s]\n", req.Title, req.ID)
+			fmt.Fprintf(buf, treePrefixRequirement, req.Title, req.ID)
 			for _, bli := range req.BacklogItems {
 				claimed := ""
 				if bli.ClaimedBy != "" {
 					claimed = fmt.Sprintf(" (leased: %s)", bli.ClaimedBy)
 				}
-				fmt.Fprintf(buf, "│                       └── BLI: %s [%s] (%s)%s\n", bli.Title, bli.ID, bli.Status, claimed)
+				fmt.Fprintf(buf, treePrefixBLI, bli.Title, bli.ID, bli.Status, claimed)
 			}
 		}
 	}
 }
 
 func formatRecentMutations(buf *strings.Builder, payload *StateTreePayload) {
-	buf.WriteString("└── Recent Journal Mutations:\n")
+	buf.WriteString(treeHeaderMutations)
 	if len(payload.RecentMutations) == 0 {
-		buf.WriteString("    └── (no recent stream journal entries)\n")
+		buf.WriteString(treeEmptyMutations)
 		return
 	}
 	for i, m := range payload.RecentMutations {
-		prefix := "    ├──"
+		prefix := treePrefixMutationMid
 		if i == len(payload.RecentMutations)-1 {
-			prefix = "    └──"
+			prefix = treePrefixMutationEnd
 		}
 		diff := m.DiffSummary
 		if diff == "" {
