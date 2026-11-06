@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,47 +15,13 @@ import (
 )
 
 func TestBatchCriteriaExecution_CLI_Success(t *testing.T) {
-	testRoot, sp := setupCycle140TestProject(t)
-	var buf bytes.Buffer
-	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Create shared script
-	scriptRel := filepath.Join("scripts", "cli_batch_runner.sh")
-	scriptAbs := filepath.Join(testRoot, scriptRel)
-	require.NoError(t, fileutil.MkdirAll(filepath.Dir(scriptAbs), 0755))
-
-	logFile := filepath.Join(testRoot, "cli_invocations.log")
-	scriptBody := fmt.Sprintf(`#!/usr/bin/env bash
-echo "$@" >> '%s'
-exit 0
-`, logFile)
-	require.NoError(t, fileutil.WriteFile(scriptAbs, []byte(scriptBody), 0755))
-
-	crit1 := "CRIT-CLI-001"
-	crit2 := "CRIT-CLI-002"
-	for _, cid := range []string{crit1, crit2} {
-		require.NoError(t, sp.Create(stdctx, secCtx, map[string]any{
-			objects.FieldKeyID:          cid,
-			objects.FieldKeyKind:        objects.KindCriteria,
-			objects.FieldKeyTitle:       cid,
-			objects.FieldKeyDescription: cid + " Description",
-			objects.FieldKeyCategory:    "functional",
-			objects.FieldKeyStatus:      objects.ObjectStatusAwaitingVerification,
-		}))
-	}
-
+	scriptTmpl := "#!/usr/bin/env bash\necho \"$@\" >> '%s'\nexit 0\n"
+	critIDs := []string{"CRIT-CLI-001", "CRIT-CLI-002"}
 	tcID := "TST-CLI-BATCH-001"
-	require.NoError(t, sp.Create(stdctx, secCtx, map[string]any{
-		objects.FieldKeyID:           tcID,
-		objects.FieldKeyKind:         objects.KindTestCase,
-		objects.FieldKeyTitle:        "CLI Batch Test",
-		objects.FieldKeyDescription:  "CLI Batch Test Description",
-		objects.FieldKeyStatus:       objects.ObjectStatusActive,
-		objects.FieldKeyPathOrID:     scriptRel,
-		objects.FieldKeyCriteriaRefs: []string{crit1, crit2},
-	}))
+	testRoot, logPath := setupCLIBatchScenario(t, "cli_batch_runner.sh", scriptTmpl, tcID, critIDs)
+	_ = testRoot
 
+	var buf bytes.Buffer
 	cmd := NewRunCmd()
 	prepareCycle140Cmd(cmd, &buf)
 	cmd.SetArgs([]string{"--batch=true", tcID})
@@ -67,24 +34,13 @@ exit 0
 	assert.Contains(t, outStr, "2/2 passed")
 
 	// Verify only 1 batch invocation was logged
-	data, err := fileutil.ReadFile(logFile)
+	data, err := fileutil.ReadFile(logPath)
 	require.NoError(t, err)
-	assert.Equal(t, fmt.Sprintf("%s %s\n", crit1, crit2), string(data))
+	assert.Equal(t, fmt.Sprintf("%s %s\n", critIDs[0], critIDs[1]), string(data))
 }
 
 func TestBatchCriteriaExecution_CLI_FallbackOnFailure(t *testing.T) {
-	testRoot, sp := setupCycle140TestProject(t)
-	var buf bytes.Buffer
-	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
-	secCtx := pkgctx.NewSystemSecurityContext()
-
-	// Script that fails when given multiple arguments (batch),
-	// but passes for CRIT-FB-001 and fails for CRIT-FB-002 when called individually.
-	scriptRel := filepath.Join("scripts", "cli_fallback_runner.sh")
-	scriptAbs := filepath.Join(testRoot, scriptRel)
-	require.NoError(t, fileutil.MkdirAll(filepath.Dir(scriptAbs), 0755))
-
-	scriptBody := `#!/usr/bin/env bash
+	scriptTmpl := `#!/usr/bin/env bash
 if [ "$#" -gt 1 ]; then
     exit 1
 fi
@@ -93,11 +49,47 @@ if [ "$1" = "CRIT-FB-001" ]; then
 fi
 exit 2
 `
-	require.NoError(t, fileutil.WriteFile(scriptAbs, []byte(scriptBody), 0755))
+	critIDs := []string{"CRIT-FB-001", "CRIT-FB-002"}
+	tcID := "TST-CLI-FALLBACK-001"
+	setupCLIBatchScenario(t, "cli_fallback_runner.sh", scriptTmpl, tcID, critIDs)
 
-	crit1 := "CRIT-FB-001"
-	crit2 := "CRIT-FB-002"
-	for _, cid := range []string{crit1, crit2} {
+	var buf bytes.Buffer
+	cmd := NewRunCmd()
+	prepareCycle140Cmd(cmd, &buf)
+	cmd.SetArgs([]string{"--batch=true", tcID})
+
+	err := cmd.Execute()
+	require.Error(t, err)
+
+	outStr := buf.String()
+	assert.Contains(t, outStr, "Batch execution failed; fell back to isolated single-criterion execution")
+	assert.Contains(t, outStr, "[PASS] CRIT-FB-001")
+	assert.Contains(t, outStr, "[FAIL] CRIT-FB-002")
+	assert.Contains(t, outStr, "Criteria: 1/2 passed")
+}
+
+func setupCLIBatchScenario(
+	t *testing.T,
+	scriptName, scriptContent, tcID string,
+	critIDs []string,
+) (string, string) {
+	t.Helper()
+	testRoot, sp := setupCycle140TestProject(t)
+	stdctx := pkgctx.WithPromoteOnCreate(pkgctx.NewSystemContext())
+	secCtx := pkgctx.NewSystemSecurityContext()
+
+	scriptRel := filepath.Join("scripts", scriptName)
+	scriptAbs := filepath.Join(testRoot, scriptRel)
+	require.NoError(t, fileutil.MkdirAll(filepath.Dir(scriptAbs), 0755))
+
+	logPath := filepath.Join(testRoot, scriptName+".log")
+	body := scriptContent
+	if strings.Contains(scriptContent, "%s") {
+		body = fmt.Sprintf(scriptContent, logPath)
+	}
+	require.NoError(t, fileutil.WriteFile(scriptAbs, []byte(body), 0755))
+
+	for _, cid := range critIDs {
 		require.NoError(t, sp.Create(stdctx, secCtx, map[string]any{
 			objects.FieldKeyID:          cid,
 			objects.FieldKeyKind:        objects.KindCriteria,
@@ -108,29 +100,15 @@ exit 2
 		}))
 	}
 
-	tcID := "TST-CLI-FALLBACK-001"
 	require.NoError(t, sp.Create(stdctx, secCtx, map[string]any{
 		objects.FieldKeyID:           tcID,
 		objects.FieldKeyKind:         objects.KindTestCase,
-		objects.FieldKeyTitle:        "CLI Fallback Test",
-		objects.FieldKeyDescription:  "CLI Fallback Test Description",
+		objects.FieldKeyTitle:        tcID + " Title",
+		objects.FieldKeyDescription:  tcID + " Description",
 		objects.FieldKeyStatus:       objects.ObjectStatusActive,
 		objects.FieldKeyPathOrID:     scriptRel,
-		objects.FieldKeyCriteriaRefs: []string{crit1, crit2},
+		objects.FieldKeyCriteriaRefs: critIDs,
 	}))
 
-	cmd := NewRunCmd()
-	prepareCycle140Cmd(cmd, &buf)
-	cmd.SetArgs([]string{"--batch=true", tcID})
-
-	err := cmd.Execute()
-	require.Error(t, err)
-
-	outStr := buf.String()
-	// Should show fallback message
-	assert.Contains(t, outStr, "Batch execution failed; fell back to isolated single-criterion execution")
-	// Should show CRIT-FB-001 passed and CRIT-FB-002 failed
-	assert.Contains(t, outStr, "[PASS] CRIT-FB-001")
-	assert.Contains(t, outStr, "[FAIL] CRIT-FB-002")
-	assert.Contains(t, outStr, "Criteria: 1/2 passed")
+	return testRoot, logPath
 }

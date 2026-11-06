@@ -24,16 +24,22 @@ func FlushAndRefreshCASIndex(projectRoot, kind, id string) error {
 		return nil
 	}
 	// 1. Flush pending writes from the listing index queue to disk
-	_ = storage.FlushListingIndexForProjectRoot(projectRoot, kind)
+	if err := storage.FlushListingIndexForProjectRoot(projectRoot, kind); err != nil {
+		return err
+	}
 
 	// 2. Ensure the in-memory/on-disk index mapping is populated and persisted
 	kindDir := filepath.Join(projectRoot, paths.ProcessDir, objects.GetDirectoryFromKind(kind))
 	cas := filecas.NewContentAddressableStorage(kindDir, kind)
 	if cas != nil {
-		_ = cas.EnsureIndexPopulated()
+		if err := cas.EnsureIndexPopulated(); err != nil {
+			return err
+		}
 		if id != "" {
 			if _, err := cas.GetHashForID(id); err == nil {
-				_ = cas.GetIndex().Save()
+				if err := cas.GetIndex().Save(); err != nil {
+					return err
+				}
 			}
 		}
 	}

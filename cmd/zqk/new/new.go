@@ -258,7 +258,9 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	if wantCAS || shouldAutoTracePipeline(cmd, kind) {
-		_ = FlushAndRefreshCASIndex(projectRoot, kind, id)
+		if flushErr := FlushAndRefreshCASIndex(projectRoot, kind, id); flushErr != nil {
+			return errfmt.Newf("flush CAS index for %s failed", id).Wrap(flushErr)
+		}
 	}
 
 	if shouldAutoTracePipeline(cmd, kind) {
