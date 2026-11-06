@@ -670,6 +670,9 @@ func (c *ValidationStateCache) Set(state *ValidationState) {
 	if state == nil || state.ObjectID == emptyValue || len(state.ObjectID) > MaxObjectIDLength {
 		return
 	}
+	if state.LastValidated.IsZero() {
+		state.LastValidated = time.Now()
+	}
 	if err := concurrency.RunInLockWithLogger(
 		&c.mu,
 		LockOpValidationCacheSet,
@@ -677,8 +680,11 @@ func (c *ValidationStateCache) Set(state *ValidationState) {
 		func() error {
 			existing, updating := c.cache[state.ObjectID]
 			if updating && existing != nil {
-				// Prevent cache persistence of outdated validation records across concurrent modifications
-				if state.LastValidated.Before(existing.LastValidated) {
+				// Prevent cache persistence of outdated validation records across concurrent modifications.
+				// Robust timestamp ordering: newer records supersede older ones.
+				// However, if existing record has a future timestamp (e.g. clock skew), it must not permanently block fresh updates.
+				now := time.Now()
+				if state.LastValidated.Before(existing.LastValidated) && !existing.LastValidated.After(now) {
 					return nil
 				}
 			}

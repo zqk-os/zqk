@@ -22,6 +22,8 @@ func TestValidationCache_ResolvedReferenceBypassesStaleCachedError(t *testing.T)
 	if err := fileutil.WriteFile(filePath, fileContent, paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
+	fileTime := time.Now().Add(-10 * time.Second)
+	_ = fileutil.Chtimes(filePath, fileTime, fileTime)
 
 	av := NewAsyncValidator(pkgctx.NewSystemContext(), tempDir, 2, time.Hour)
 	defer av.Stop()
@@ -31,7 +33,7 @@ func TestValidationCache_ResolvedReferenceBypassesStaleCachedError(t *testing.T)
 		ObjectID:      "CRIT-001",
 		ObjectKind:    "criteria",
 		FilePath:      filePath,
-		LastValidated: time.Now().Add(1 * time.Minute),
+		LastValidated: time.Now().Add(-5 * time.Second),
 		Checksum:      av.computeChecksum(filePath),
 		Issues: []ValidationIssue{
 			{
@@ -97,6 +99,8 @@ func TestValidationCache_ReferenceCategoriesInvalidate(t *testing.T) {
 	if err := fileutil.WriteFile(filePath, fileContent, paths.FilePerm600); err != nil {
 		t.Fatalf("failed to write test file: %v", err)
 	}
+	fileTime := time.Now().Add(-10 * time.Second)
+	_ = fileutil.Chtimes(filePath, fileTime, fileTime)
 
 	av := NewAsyncValidator(pkgctx.NewSystemContext(), tempDir, 2, time.Hour)
 	defer av.Stop()
@@ -112,11 +116,12 @@ func TestValidationCache_ReferenceCategoriesInvalidate(t *testing.T) {
 
 	for _, cat := range testCategories {
 		t.Run(cat, func(t *testing.T) {
+			av.InvalidateCache("REQ-001")
 			st := &ValidationState{
 				ObjectID:      "REQ-001",
 				ObjectKind:    "requirement",
 				FilePath:      filePath,
-				LastValidated: time.Now().Add(1 * time.Minute),
+				LastValidated: time.Now(),
 				Checksum:      av.computeChecksum(filePath),
 				Issues: []ValidationIssue{
 					{Tier: 1, Category: cat, Message: "missing target reference"},
@@ -131,11 +136,12 @@ func TestValidationCache_ReferenceCategoriesInvalidate(t *testing.T) {
 	}
 
 	// Tier 2 or 3 reference issues should NOT invalidate the cache (they are warnings/info)
+	av.InvalidateCache("REQ-001")
 	nonBlocking := &ValidationState{
 		ObjectID:      "REQ-001",
 		ObjectKind:    "requirement",
 		FilePath:      filePath,
-		LastValidated: time.Now().Add(1 * time.Minute),
+		LastValidated: time.Now(),
 		Checksum:      av.computeChecksum(filePath),
 		Issues: []ValidationIssue{
 			{Tier: 2, Category: "reference", Message: "minor reference warning"},
