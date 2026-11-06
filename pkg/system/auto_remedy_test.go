@@ -3,9 +3,12 @@ package system_test
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/system"
 	"github.com/zqk-os/zqk/pkg/systemcheck"
@@ -269,6 +272,241 @@ func TestAutoRemedy_OrphanedLockFilesCleaning(t *testing.T) {
 	for _, f := range []string{sessionLock, autofixLock, coordLock} {
 		if fileutil.Exists(f) {
 			t.Errorf("expected %s to be removed by auto-remedy, but file still exists", filepath.Base(f))
+		}
+	}
+}
+
+// TestSanitizeRecipeCommand_RemovesIDsAcrossAllVerbsAndPreservesPositionalIDs verifies
+// that sanitizeRecipeCommand comprehensively handles recipe commands across all verbs,
+// eliminating invalid '--ids ' and '--ids=' flag usage while preserving positional arguments.
+func TestSanitizeRecipeCommand_RemovesIDsAcrossAllVerbsAndPreservesPositionalIDs(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "system check with auto-fix and --ids",
+			input:    "zqk system check --auto-fix --ids OBJ-123",
+			expected: "zqk system check --auto-fix OBJ-123",
+		},
+		{
+			name:     "system check with direct --ids",
+			input:    "zqk system check --ids OBJ-123",
+			expected: "zqk system check OBJ-123",
+		},
+		{
+			name:     "object delete with --ids and subsequent flag",
+			input:    "zqk object delete --ids OBJ-456 --unlink-references",
+			expected: "zqk object delete OBJ-456 --unlink-references",
+		},
+		{
+			name:     "object update with --ids= syntax",
+			input:    "zqk object update --ids=OBJ-789 --field title=New",
+			expected: "zqk object update OBJ-789 --field title=New",
+		},
+		{
+			name:     "object promote with --ids",
+			input:    "zqk object promote --ids OBJ-101",
+			expected: "zqk object promote OBJ-101",
+		},
+		{
+			name:     "object demote with --ids=",
+			input:    "zqk object demote --ids=OBJ-202",
+			expected: "zqk object demote OBJ-202",
+		},
+		{
+			name:     "object park with --ids",
+			input:    "zqk object park --ids OBJ-303",
+			expected: "zqk object park OBJ-303",
+		},
+		{
+			name:     "object get with --ids",
+			input:    "zqk object get --ids OBJ-404",
+			expected: "zqk object get OBJ-404",
+		},
+		{
+			name:     "object inspect with --ids",
+			input:    "zqk object inspect --ids OBJ-505",
+			expected: "zqk object inspect OBJ-505",
+		},
+		{
+			name:     "workflow gen-trace-pipeline with --ids",
+			input:    "zqk workflow gen-trace-pipeline --ids OBJ-606",
+			expected: "zqk workflow gen-trace-pipeline OBJ-606",
+		},
+		{
+			name:     "multiple consecutive spaces around --ids",
+			input:    "zqk system check   --ids   OBJ-707",
+			expected: "zqk system check OBJ-707",
+		},
+		{
+			name:     "empty --ids quotes at end",
+			input:    "zqk system check --auto-fix --ids=\"\"",
+			expected: "zqk system check --auto-fix",
+		},
+		{
+			name:     "trailing --ids without argument",
+			input:    "zqk object delete OBJ-123 --ids",
+			expected: "zqk object delete OBJ-123",
+		},
+		{
+			name:     "multiple --ids in single command",
+			input:    "zqk object delete --ids OBJ-1 --ids OBJ-2",
+			expected: "zqk object delete OBJ-1 OBJ-2",
+		},
+		{
+			name:     "preserving quoted values with whitespace",
+			input:    "zqk object update OBJ-123 --field \"title=Refined Title with Spaces\"",
+			expected: "zqk object update OBJ-123 --field \"title=Refined Title with Spaces\"",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := system.SanitizeRecipeCommand(tc.input)
+			assert.Equal(t, tc.expected, got)
+			// Ensure sanitized output passes validation when non-empty
+			if got != "" {
+				err := system.ValidateRecipeCommand(got)
+				assert.NoError(t, err, "sanitized command %q should pass ValidateRecipeCommand", got)
+			}
+		})
+	}
+}
+
+// TestValidateRecipeCommand_NegativeAdversarialBoundary satisfies CRIT-1793961678251838000-c44a82a1:
+// Negative Adversarial Boundary: Invalid flag arguments passed to auto-remedy recipes fail with explicit descriptive validation errors.
+func TestValidateRecipeCommand_NegativeAdversarialBoundary(t *testing.T) {
+	testCases := []struct {
+		name        string
+		command     string
+		expectedErr string
+	}{
+		{
+			name:        "empty command string",
+			command:     "",
+			expectedErr: "recipe command cannot be empty",
+		},
+		{
+			name:        "whitespace only command string",
+			command:     "    \t\n  ",
+			expectedErr: "recipe command cannot be empty",
+		},
+		{
+			name:        "bare double dash flag",
+			command:     "zqk system check -- OBJ-123",
+			expectedErr: "invalid bare flag '--' in recipe command",
+		},
+		{
+			name:        "triple dash flag prefix",
+			command:     "zqk system check ---auto-fix OBJ-123",
+			expectedErr: "malformed flag prefix \"---auto-fix\"",
+		},
+		{
+			name:        "malformed flag equals argument",
+			command:     "zqk system check --=auto-fix OBJ-123",
+			expectedErr: "malformed flag argument \"--=auto-fix\"",
+		},
+		{
+			name:        "unsanitized --ids flag",
+			command:     "zqk system check --ids OBJ-123",
+			expectedErr: "recipe command contains invalid flag '--ids': positional ID arguments must be used",
+		},
+		{
+			name:        "unsanitized --ids= flag",
+			command:     "zqk object update --ids=OBJ-123",
+			expectedErr: "recipe command contains invalid flag '--ids': positional ID arguments must be used",
+		},
+		{
+			name:        "flag with empty argument assignment",
+			command:     "zqk object update OBJ-123 --field=",
+			expectedErr: "flag \"--field\" requires a non-empty argument",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := system.ValidateRecipeCommand(tc.command)
+			require.Error(t, err, "expected validation failure for command: %q", tc.command)
+			assert.Contains(t, err.Error(), tc.expectedErr)
+		})
+	}
+
+	// In addition, verify that applyPlan returns the validation error when given a plan with an invalid command
+	tmpDir := t.TempDir()
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+
+	invalidPlan := system.RemedyPlan{
+		ID:         "REMEDY-INVALID-CMD",
+		Title:      "Test Invalid Command Boundary",
+		ActionType: system.ActionRunCommand,
+		Target:     "OBJ-999",
+		Command:    "zqk system check --ids OBJ-999",
+		Confidence: 1.0,
+		AutoApply:  true,
+	}
+
+	report, err := engine.Apply(context.Background(), []system.RemedyPlan{invalidPlan})
+	require.NoError(t, err)
+	require.Equal(t, 1, len(report.Outcomes))
+	assert.False(t, report.Outcomes[0].Applied)
+	assert.Contains(t, report.Outcomes[0].Error, "invalid remedy command: recipe command contains invalid flag '--ids'")
+}
+
+// TestAutoRemedy_GeneratedRecipes_OperationalDynamicProof satisfies CRIT-1793961675960953000-217f5c81:
+// Operational Dynamic Proof: Verify system check auto-remedy recipes output valid CLI flags and commands that execute cleanly.
+func TestAutoRemedy_GeneratedRecipes_OperationalDynamicProof(t *testing.T) {
+	tmpDir := t.TempDir()
+	engine := system.NewDiagnosticsRemedyEngine(tmpDir)
+
+	mockResults := []systemcheck.CheckResult{
+		{
+			ObjectID: "BLI-101",
+			Issues: []systemcheck.Issue{
+				{
+					Message:    "Precondition missing estimated_effort",
+					FixCommand: "zqk object update --ids BLI-101 --field estimated_effort=1d",
+				},
+				{
+					Message:     "Integrity hash mismatch",
+					AutoFixable: true,
+				},
+			},
+		},
+		{
+			ObjectID: "REQ-202",
+			Issues: []systemcheck.Issue{
+				{
+					Message:    "Orphaned requirement needing deletion",
+					FixCommand: "zqk object delete --ids=REQ-202 --unlink-references",
+				},
+				{
+					Message:    "Status transition needed",
+					FixCommand: "zqk object promote --ids REQ-202",
+				},
+			},
+		},
+	}
+
+	plans, err := engine.Diagnose(context.Background(), mockResults)
+	require.NoError(t, err)
+	require.True(t, len(plans) >= 4, "expected at least 4 recipe plans, got %d", len(plans))
+
+	for _, p := range plans {
+		if p.ActionType == system.ActionRunCommand {
+			assert.NotEmpty(t, p.Command, "recipe command should not be empty")
+
+			// 1. Must pass ValidateRecipeCommand
+			err := system.ValidateRecipeCommand(p.Command)
+			assert.NoError(t, err, "plan %s command %q must pass ValidateRecipeCommand", p.ID, p.Command)
+
+			// 2. Must not contain --ids or --ids=
+			assert.False(t, strings.Contains(p.Command, "--ids "), "plan %s command %q should not contain '--ids '", p.ID, p.Command)
+			assert.False(t, strings.Contains(p.Command, "--ids="), "plan %s command %q should not contain '--ids='", p.ID, p.Command)
+
+			// 3. Must retain the target object ID as a positional parameter
+			assert.Contains(t, p.Command, p.Target, "plan %s command %q must contain target ID %s", p.ID, p.Command, p.Target)
 		}
 	}
 }

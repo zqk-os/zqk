@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -178,20 +179,107 @@ func (e *DiagnosticsRemedyEngine) diagnoseSeedingPreconditions() []RemedyPlan {
 	return plans
 }
 
-// sanitizeRecipeCommand ensures recipe commands use positional arguments instead of
-// invalid '--ids <ID>' flags for commands like 'system check', 'object delete', or 'object update' (GH-947, GH-940, GH-937).
+var (
+	reEmptyIDsEqualed = regexp.MustCompile(`\s+--ids=(?:""|''|\z)`)
+	reEmptyIDsSpaced  = regexp.MustCompile(`\s+--ids(?:\s+""|\s+''|\z)`)
+	reIDsFlagArg      = regexp.MustCompile(`\s+--ids(?:\s+|=)`)
+	reLeadingIDs      = regexp.MustCompile(`^--ids(?:\s+|=)`)
+)
+
+// SanitizeRecipeCommand ensures recipe commands use positional arguments instead of
+// invalid '--ids <ID>' or '--ids=<ID>' flags across all CLI subcommands ('system check',
+// 'object delete', 'object update', 'object promote', 'object demote', 'object park', etc.).
+// It guarantees that generated remedy commands adhere to canonical CLI syntax and execute without flag errors (GH-947, GH-940, GH-937).
+func SanitizeRecipeCommand(cmd string) string {
+	if cmd == "" {
+		return ""
+	}
+
+	// 1. Remove empty or trailing --ids flags
+	cmd = reEmptyIDsEqualed.ReplaceAllString(cmd, "")
+	cmd = reEmptyIDsSpaced.ReplaceAllString(cmd, "")
+
+	// 2. Replace '--ids <arg>' or '--ids=<arg>' with ' <arg>'
+	cmd = reIDsFlagArg.ReplaceAllString(cmd, " ")
+
+	// 3. Handle leading '--ids ' or '--ids=' if at start of string
+	cmd = reLeadingIDs.ReplaceAllString(cmd, "")
+
+	return strings.TrimSpace(cmd)
+}
+
 func sanitizeRecipeCommand(cmd string) string {
-	for _, verb := range []string{"system check", "object delete", "object update"} {
-		if strings.Contains(cmd, verb) {
-			if strings.Contains(cmd, "--ids ") {
-				cmd = strings.ReplaceAll(cmd, "--ids ", "")
-			}
-			if strings.Contains(cmd, "--ids=") {
-				cmd = strings.ReplaceAll(cmd, "--ids=", "")
+	return SanitizeRecipeCommand(cmd)
+}
+
+// ValidateRecipeCommand validates that a remedy command has valid syntax, non-empty command/verb,
+// and does not contain malformed or illegal flag arguments. It enforces negative adversarial boundaries
+// to guarantee that defective commands fail closed with explicit descriptive error messages.
+func ValidateRecipeCommand(cmd string) error {
+	trimmed := strings.TrimSpace(cmd)
+	if trimmed == "" {
+		return fmt.Errorf("recipe command cannot be empty")
+	}
+
+	tokens := splitCommandArgs(trimmed)
+	if len(tokens) == 0 {
+		return fmt.Errorf("recipe command contains no executable tokens")
+	}
+
+	for _, token := range tokens {
+		if token == "--" {
+			return fmt.Errorf("invalid bare flag '--' in recipe command %q", cmd)
+		}
+		if strings.HasPrefix(token, "---") {
+			return fmt.Errorf("malformed flag prefix %q in recipe command", token)
+		}
+		if strings.HasPrefix(token, "--=") {
+			return fmt.Errorf("malformed flag argument %q in recipe command", token)
+		}
+		if token == "--ids" || strings.HasPrefix(token, "--ids=") {
+			return fmt.Errorf("recipe command contains invalid flag '--ids': positional ID arguments must be used")
+		}
+		if strings.HasPrefix(token, "--") {
+			parts := strings.SplitN(token, "=", 2)
+			flagName := parts[0]
+			if len(parts) == 2 && parts[1] == "" {
+				return fmt.Errorf("flag %q requires a non-empty argument", flagName)
 			}
 		}
 	}
-	return cmd
+	return nil
+}
+
+func splitCommandArgs(cmd string) []string {
+	var args []string
+	var current strings.Builder
+	inQuote := false
+	quoteChar := rune(0)
+
+	for _, r := range cmd {
+		switch {
+		case inQuote:
+			if r == quoteChar {
+				inQuote = false
+			} else {
+				current.WriteRune(r)
+			}
+		case r == '\'' || r == '"':
+			inQuote = true
+			quoteChar = r
+		case r == ' ' || r == '\t' || r == '\n':
+			if current.Len() > 0 {
+				args = append(args, current.String())
+				current.Reset()
+			}
+		default:
+			current.WriteRune(r)
+		}
+	}
+	if current.Len() > 0 {
+		args = append(args, current.String())
+	}
+	return args
 }
 
 func (e *DiagnosticsRemedyEngine) diagnoseCheckIssues(checkResults []systemcheck.CheckResult) []RemedyPlan {
@@ -264,6 +352,11 @@ func (e *DiagnosticsRemedyEngine) applyPlan(plan RemedyPlan) RemedyOutcome {
 	case ActionKillProcess:
 		return e.applyKillProcess(plan)
 	case ActionRunCommand:
+		if plan.Command != "" {
+			if err := ValidateRecipeCommand(plan.Command); err != nil {
+				return RemedyOutcome{Plan: plan, Applied: false, Error: fmt.Sprintf("invalid remedy command: %v", err)}
+			}
+		}
 		return RemedyOutcome{Plan: plan, Applied: false, Error: msgCommandRequires}
 	default:
 		return RemedyOutcome{Plan: plan, Applied: false, Error: "unrecognized action type"}
