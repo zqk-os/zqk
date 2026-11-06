@@ -59,7 +59,7 @@ const (
 	flagLongAst          = "--ast"
 	flagLongKind         = "--kind"
 	flagLongRecv         = "--recv"
-	flagLongMaxTokens    = "--max-tokens"
+	flagLongMaxTokens    = "--max-tokens" //nolint:gosec // G101: CLI flag name, not credential
 	flagLongExt          = "--ext"
 	flagExtGo            = ".go"
 )
