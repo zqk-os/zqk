@@ -3,7 +3,9 @@ package whatsnext
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -923,7 +925,7 @@ func IsPlanStatusCompleted(status string) bool {
 }
 
 // IsCachedPlanStale checks whether the cached priority plan has transitioned to complete,
-// archived, or no longer exists in storage.
+// archived, or no longer exists in storage, or is no longer the highest active_order / execution lead plan.
 func IsCachedPlanStale(ctx context.Context, sp storage.ObjectStorageProvider, plan *WhatsNextPriorityPlan) bool {
 	if plan == nil || strings.TrimSpace(plan.ID) == "" {
 		return false
@@ -939,17 +941,70 @@ func IsCachedPlanStale(ctx context.Context, sp storage.ObjectStorageProvider, pl
 		secCtx = pkgctx.NewSystemSecurityContext()
 	}
 	obj, err := sp.Read(ctx, secCtx, plan.ID)
-	if err == nil && obj != nil {
-		if IsPlanStatusCompleted(koi.Status(obj)) || koi.IsArchive(obj) {
+	if err != nil || obj == nil {
+		// Object was not found via Read. If storage has other priority plans, this plan no longer exists.
+		res, lErr := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindPriorityPlan).Limit(1).Build())
+		if lErr == nil && len(res.Objects) > 0 {
 			return true
 		}
 		return false
 	}
-	// Object was not found via Read. If storage has other priority plans, this plan no longer exists.
-	res, lErr := sp.List(ctx, secCtx, nil, storage.NewQueryBuilder(objects.KindPriorityPlan).Limit(1).Build())
-	if lErr == nil && len(res.Objects) > 0 {
+
+	st := koi.Status(obj)
+	if IsPlanStatusCompleted(st) || koi.IsArchive(obj) {
 		return true
 	}
+	if !objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, st) &&
+		st != objects.ObjectStatusPlanned &&
+		st != objects.ObjectStatusOriginated &&
+		st != "draft" &&
+		st != "proposed" {
+		return true
+	}
+
+	// An in_progress plan confirmed in storage is at the top of the execution stack (rank 1).
+	// Avoid redundant storage scans on the hot path when an in_progress lead plan is active.
+	if st == objects.ObjectStatusInProgress && plan.Status == objects.ObjectStatusInProgress {
+		return false
+	}
+
+	// Verify if plan is no longer the highest active_order / execution lead plan in storage
+	res, lErr := sp.List(ctx, secCtx, nil, storage.DefaultQueryFactory.
+		NotArchived(objects.KindPriorityPlan).
+		IncludeFields(objects.FieldKeyID, objects.FieldKeyTitle, objects.FieldKeyStatus, objects.FieldKeyActiveOrder, objects.FieldKeyPersonaRefs).
+		Build())
+	if lErr == nil && len(res.Objects) > 0 {
+		plansList := make([]*PlanNode, 0, len(res.Objects))
+		for _, pObj := range res.Objects {
+			id, _ := pObj[objects.FieldKeyID].(string)
+			if id == "" {
+				continue
+			}
+			title, _ := pObj[objects.FieldKeyTitle].(string)
+			pStatus, _ := pObj[objects.FieldKeyStatus].(string)
+			order := 0
+			if oVal, ok := pObj[objects.FieldKeyActiveOrder].(int); ok {
+				order = oVal
+			} else if oVal, ok := pObj[objects.FieldKeyActiveOrder].(float64); ok {
+				order = int(oVal)
+			}
+			personaRefs := lifecycle.StringRefsFromAny(pObj[objects.FieldKeyPersonaRefs])
+			plansList = append(plansList, &PlanNode{
+				ID:          id,
+				Title:       title,
+				Status:      pStatus,
+				ActiveOrder: order,
+				PersonaRefs: personaRefs,
+			})
+		}
+		if len(plansList) > 0 {
+			lead, _ := EvaluatePhiLead(plansList, nil)
+			if lead != nil && lead.ID != plan.ID {
+				return true
+			}
+		}
+	}
+
 	return false
 }
 
@@ -965,12 +1020,18 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 	view := NewWhatsNextMaterializedView(projectRoot)
 	payload, err := view.LoadFromLiteFile()
 	if err != nil || payload == nil {
+		reason := "cold_boot_materialized_projection_missing"
+		if errors.Is(err, os.ErrPermission) {
+			reason = "materialized_projection_permission_denied"
+		} else if err != nil && !os.IsNotExist(err) {
+			reason = fmt.Sprintf("materialized_projection_corrupted: %v", err)
+		}
 		bootstrap := &WhatsNextLitePayload{
 			SchemaVersion:       MaterializedViewSchemaVersion,
 			MaterializedAt:      time.Now(),
 			Stale:               true,
 			Recovering:          true,
-			DegradedReason:      "cold_boot_materialized_projection_missing",
+			DegradedReason:      reason,
 			BacklogCountsByPlan: make(map[string]map[string]int),
 			TotalBacklogCounts:  make(map[string]int),
 			ActivePlans:         make([]WhatsNextPriorityPlan, 0),

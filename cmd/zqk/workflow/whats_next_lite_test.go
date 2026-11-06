@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -386,4 +387,212 @@ func TestRunWhatsNext_CachedStatusComplete_AutoRefreshes(t *testing.T) {
 	outStr := buf.String()
 	assert.NotContains(t, outStr, "Priority plan: PRI-DONE")
 	assert.Contains(t, outStr, "PRI-FRESH")
+}
+
+func TestRunWhatsNext_HigherActiveOrderPromotion_AutoRefreshes(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	// Pre-populate whats_next_lite.json with PRI-LOWER (active_order: 10) as lead plan
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	payload := &whatsnext.WhatsNextLitePayload{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		LeadPlan: &whatsnext.WhatsNextPriorityPlan{
+			ID:     "PRI-LOWER",
+			Title:  "Lower Priority Plan",
+			Status: objects.ObjectStatusActive,
+		},
+		ActivePlans: []whatsnext.WhatsNextPriorityPlan{
+			{
+				ID:     "PRI-LOWER",
+				Title:  "Lower Priority Plan",
+				Status: objects.ObjectStatusActive,
+			},
+		},
+	}
+	env := accumulator.Envelope[*whatsnext.WhatsNextLitePayload]{
+		SchemaVersion:  whatsnext.MaterializedViewSchemaVersion,
+		MaterializedAt: time.Now().UTC(),
+		Payload:        payload,
+	}
+	data, err := json.MarshalIndent(env, "", "  ")
+	require.NoError(t, err)
+	require.NoError(t, fileutil.WriteFile(litePath, data, paths.FilePerm644))
+
+	// In CAS storage: PRI-HIGHER was promoted with active_order=1, superseding PRI-LOWER (active_order=10)
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{
+			"PRI-LOWER": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-LOWER",
+				objects.FieldKeyTitle:       "Lower Priority Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusActive,
+				objects.FieldKeyActiveOrder: 10,
+			},
+			"PRI-HIGHER": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-HIGHER",
+				objects.FieldKeyTitle:       "Higher Priority Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusActive,
+				objects.FieldKeyActiveOrder: 1,
+			},
+			"BLI-HIGH-1": {
+				objects.FieldKeyKind:            objects.KindBacklogItem,
+				objects.FieldKeyID:              "BLI-HIGH-1",
+				objects.FieldKeyTitle:           "Top BLI",
+				objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
+				objects.FieldKeyPriorityPlanRef: "PRI-HIGHER",
+			},
+		},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	// Execute whats-next on hot-path (WITHOUT --sync-sweep)
+	err = runWhatsNext(cmd, nil)
+	require.NoError(t, err)
+
+	outStr := buf.String()
+	assert.NotContains(t, outStr, "Priority plan: PRI-LOWER")
+	assert.Contains(t, outStr, "PRI-HIGHER")
+
+	// Verify disk cache was automatically updated to PRI-HIGHER
+	view := whatsnext.NewWhatsNextMaterializedView(proj.Root)
+	freshPayload, err := view.LoadFromLiteFile()
+	require.NoError(t, err)
+	require.NotNil(t, freshPayload)
+	require.NotNil(t, freshPayload.LeadPlan)
+	assert.Equal(t, "PRI-HIGHER", freshPayload.LeadPlan.ID)
+}
+
+func TestRunWhatsNext_CorruptedCacheFallback(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	// Write malformed/corrupted JSON to whats_next_lite.json
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	corruptedData := []byte(`{"schema_version": "whats_next_lite_v1", "materialized_at": "invalid-time", "lead_plan": {broken_json`)
+	require.NoError(t, fileutil.WriteFile(litePath, corruptedData, paths.FilePerm644))
+
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{
+			"PRI-RESILIENT": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-RESILIENT",
+				objects.FieldKeyTitle:       "Resilient Live Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+				objects.FieldKeyActiveOrder: 1,
+			},
+			"BLI-RES-1": {
+				objects.FieldKeyKind:            objects.KindBacklogItem,
+				objects.FieldKeyID:              "BLI-RES-1",
+				objects.FieldKeyTitle:           "Live BLI",
+				objects.FieldKeyStatus:          objects.ObjectStatusPlanned,
+				objects.FieldKeyPriorityPlanRef: "PRI-RESILIENT",
+			},
+		},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	// Must not panic or return error despite corrupted cache
+	err := runWhatsNext(cmd, nil)
+	require.NoError(t, err)
+
+	outStr := buf.String()
+	assert.Contains(t, outStr, "PRI-RESILIENT")
+
+	// Disk cache must be repaired with valid JSON
+	view := whatsnext.NewWhatsNextMaterializedView(proj.Root)
+	repairedPayload, err := view.LoadFromLiteFile()
+	require.NoError(t, err, "corrupted lite file should have been repaired")
+	require.NotNil(t, repairedPayload)
+	if repairedPayload.LeadPlan != nil {
+		assert.Equal(t, "PRI-RESILIENT", repairedPayload.LeadPlan.ID)
+	}
+}
+
+func TestRunWhatsNext_PermissionDeniedFallback(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	require.NoError(t, fileutil.WriteFile(litePath, []byte("{}"), paths.FilePerm644))
+
+	// Remove read permissions from the cache file
+	require.NoError(t, os.Chmod(litePath, 0000))
+	t.Cleanup(func() {
+		_ = os.Chmod(litePath, 0644)
+	})
+
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{
+			"PRI-PERM": {
+				objects.FieldKeyKind:        objects.KindPriorityPlan,
+				objects.FieldKeyID:          "PRI-PERM",
+				objects.FieldKeyTitle:       "Permission Test Plan",
+				objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+				objects.FieldKeyActiveOrder: 1,
+			},
+		},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	// Graceful execution without panic or hard error
+	err := runWhatsNext(cmd, nil)
+	require.NoError(t, err)
+
+	outStr := buf.String()
+	assert.Contains(t, outStr, "PRI-PERM")
+}
+
+func TestRunWhatsNext_EmptyStorage_CorruptedCacheGraceful(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+
+	stateDir := filepath.Join(proj.Root, paths.ProjectDataDir, paths.StateDir)
+	require.NoError(t, fileutil.MkdirAll(stateDir, paths.DirPerm755))
+
+	litePath := filepath.Join(stateDir, "whats_next_lite.json")
+	require.NoError(t, fileutil.WriteFile(litePath, []byte("NOT-JSON-AT-ALL"), paths.FilePerm644))
+
+	store := &mockWhatsNextStorage{
+		data: map[string]map[string]any{},
+	}
+
+	cmd := NewWhatsNextCmd()
+	require.NoError(t, cmd.Flags().Set("skip-measure", "true"))
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetContext(pkgctx.WithCommandOutputWriter(context.Background(), &buf))
+	initTestCmdContext(t, cmd, proj.Root, store)
+
+	err := runWhatsNext(cmd, nil)
+	require.NoError(t, err)
 }

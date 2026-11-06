@@ -38,6 +38,9 @@ func TestFormatTaskEnvelope_refsNotBodies(t *testing.T) {
 			t.Fatalf("persist envelope must not contain %q:\n%s", banned, out)
 		}
 	}
+	if !strings.Contains(out, "Resolve at execute: `zqk object get <id>`, `zqk agent prepare-context <ATK>`, or `zqk workflow whats-next`.") {
+		t.Fatalf("missing valid prepare-context instruction in task envelope:\n%s", out)
+	}
 }
 
 func TestBuildTaskEnvelope_policyAndSkillRefs(t *testing.T) {
