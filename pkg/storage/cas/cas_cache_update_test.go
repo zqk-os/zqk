@@ -54,6 +54,8 @@ func TestCASPostSyncCallback_CacheUpdate(t *testing.T) {
 	var goalCacheUpdateReceived bool
 	var cachedObjectID, cachedKind, cachedFilePath string
 
+	prevHandler1 := storage.GetCacheOperationHandler()
+	t.Cleanup(func() { storage.SetCacheOperationHandler(prevHandler1) })
 	storage.SetCacheOperationHandler(func(cacheCtx *pkgctx.CacheContext) error {
 		// Only track updates for goal objects (filter out audit events, etc.)
 		if cacheCtx.Operation == pkgctx.CacheOperationUpdate && cacheCtx.Kind == "goal" {
@@ -153,6 +155,8 @@ func TestCASPostSyncCallback_UpdateRefreshesHashPath(t *testing.T) {
 
 	var lastPath string
 	var updateCalls int
+	prevHandler2 := storage.GetCacheOperationHandler()
+	t.Cleanup(func() { storage.SetCacheOperationHandler(prevHandler2) })
 	storage.SetCacheOperationHandler(func(cacheCtx *pkgctx.CacheContext) error {
 		if cacheCtx.Operation == pkgctx.CacheOperationUpdate && cacheCtx.Kind == "goal" {
 			updateCalls++
@@ -160,7 +164,6 @@ func TestCASPostSyncCallback_UpdateRefreshesHashPath(t *testing.T) {
 		}
 		return nil
 	})
-	t.Cleanup(func() { storage.SetCacheOperationHandler(nil) })
 
 	secCtx := pkgctx.NewSecurityContext("ACC-TEST", []string{"admin"}, []string{"read:*", "write:*"})
 	ctx := context.Background()
