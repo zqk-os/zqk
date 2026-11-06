@@ -297,8 +297,8 @@ func (f *FileObjectStorage) prepareFileObjectUpdate(ctx context.Context, secCtx 
 		}
 	}
 
-	// Apply mutation field coercions (e.g. priority enum parity, criteria category alias) before restriction validation
-	objects.CoerceMutationFields(kind, updates)
+	// Apply update field coercions (e.g. priority enum parity, criteria category alias) before restriction validation
+	objects.CoerceUpdateFields(kind, updates)
 
 	// Validate value-restricted spec fields (enums, format regex, numeric range bounds)
 	if err := objects.ValidateObjectFieldRestrictions(spec, kind, updates); err != nil {

@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
@@ -22,7 +23,7 @@ func TestScheduler_CrashRecoveryJobStateReplay(t *testing.T) {
 	createTestJob(t, sched.storage, job1ID, "run_wrapper", "timer", "*/5 * * * *")
 	createTestJob(t, sched.storage, job2ID, "run_wrapper", "timer", "0 * * * *")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	errCh1 := make(chan error, 1)
@@ -30,9 +31,14 @@ func TestScheduler_CrashRecoveryJobStateReplay(t *testing.T) {
 		StartSimple(func() {
 			errCh1 <- sched.Start(ctx)
 		})
-	time.Sleep(100 * time.Millisecond)
 
 	// Verify jobs are registered in running scheduler
+	require.Eventually(t, func() bool {
+		j1, exists1 := sched.GetJob(job1ID)
+		j2, exists2 := sched.GetJob(job2ID)
+		return exists1 && j1 != nil && exists2 && j2 != nil
+	}, 5*time.Second, 20*time.Millisecond, "pre-crash scheduler timed out waiting for jobs to register")
+
 	j1, exists1 := sched.GetJob(job1ID)
 	if !exists1 || j1 == nil {
 		t.Fatalf("job 1 not found in running scheduler")
@@ -57,7 +63,7 @@ func TestScheduler_CrashRecoveryJobStateReplay(t *testing.T) {
 	restartedSched.SetSecurityContext(secCtx)
 
 	// Start restarted scheduler - loads jobs from durable storage replay
-	ctx2, cancel2 := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx2, cancel2 := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel2()
 
 	errCh2 := make(chan error, 1)
@@ -65,10 +71,15 @@ func TestScheduler_CrashRecoveryJobStateReplay(t *testing.T) {
 		StartSimple(func() {
 			errCh2 <- restartedSched.Start(ctx2)
 		})
-	time.Sleep(100 * time.Millisecond)
 	defer restartedSched.Stop()
 
 	// 4. Assert durable job definitions survived crash and are active
+	require.Eventually(t, func() bool {
+		r1, ok1 := restartedSched.GetJob(job1ID)
+		r2, ok2 := restartedSched.GetJob(job2ID)
+		return ok1 && r1 != nil && ok2 && r2 != nil
+	}, 5*time.Second, 20*time.Millisecond, "CRIT-CEF-R14-RCV-CRASH-REPLAY-001: timed out waiting for jobs to recover after restart")
+
 	recovered1, recExists1 := restartedSched.GetJob(job1ID)
 	if !recExists1 || recovered1 == nil {
 		t.Fatalf("CRIT-CEF-R14-RCV-CRASH-REPLAY-001: job 1 lost after crash recovery restart")

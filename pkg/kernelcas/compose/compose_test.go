@@ -769,7 +769,7 @@ func TestValidateObject_BacklogItemPriorityPairingAndValidation(t *testing.T) {
 	errs = ValidateObject(t.Context(), Default(), objects.KindBacklogItem, objInvalidPri, nil)
 	foundInvalidPri := false
 	for _, e := range errs {
-		if e.Field == objects.FieldKeyPriority && e.Message == "priority must be one of (critical, high, medium, low)" {
+		if e.Field == objects.FieldKeyPriority && e.Message == "priority must be one of (critical, high, medium, low, p0, p1, p2, p3)" {
 			foundInvalidPri = true
 			break
 		}

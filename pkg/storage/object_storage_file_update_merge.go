@@ -2,6 +2,7 @@ package storage
 
 import (
 	"math"
+	"reflect"
 	"strings"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -83,9 +84,22 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 			var newEntries []any
 			if ne, ok := v.([]any); ok {
 				newEntries = ne
+			} else if strList, ok := v.([]string); ok {
+				newEntries = make([]any, len(strList))
+				for i, s := range strList {
+					newEntries[i] = s
+				}
 			} else {
-				// Single item append
-				newEntries = []any{v}
+				rv := reflect.ValueOf(v)
+				if rv.IsValid() && rv.Kind() == reflect.Slice {
+					newEntries = make([]any, rv.Len())
+					for i := 0; i < rv.Len(); i++ {
+						newEntries[i] = rv.Index(i).Interface()
+					}
+				} else {
+					// Single item append
+					newEntries = []any{v}
+				}
 			}
 
 			if len(newEntries) > 0 {
@@ -97,6 +111,16 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 					}
 					merged = make([]any, 0, allocCap)
 					merged = append(merged, el...)
+					merged = append(merged, newEntries...)
+				} else if strList, ok := existing[k].([]string); ok {
+					allocCap := len(strList)
+					if allocCap <= math.MaxInt-len(newEntries) {
+						allocCap += len(newEntries)
+					}
+					merged = make([]any, 0, allocCap)
+					for _, s := range strList {
+						merged = append(merged, s)
+					}
 					merged = append(merged, newEntries...)
 				} else {
 					merged = newEntries
