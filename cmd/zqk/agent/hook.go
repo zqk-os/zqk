@@ -29,6 +29,7 @@ func NewAgentHookCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewAgentHookCommandBuilder(), &cobra.Command{})
 	cmd.AddCommand(newPreSubagentHookCmd())
 	cmd.AddCommand(newContinuationHookCmd())
+	cmd.AddCommand(NewPreCommandHookCmd())
 	return cmd
 }
 

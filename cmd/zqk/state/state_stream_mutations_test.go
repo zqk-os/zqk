@@ -50,8 +50,9 @@ func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 	}
 	sp := factory.GetStorage()
 	if closer, ok := sp.(io.Closer); ok {
-		defer func() { _ = closer.Close() }()
+		t.Cleanup(func() { _ = closer.Close() })
 	}
+	t.Cleanup(func() { _ = sp.Shutdown(sCtx) })
 	sec := pkgctx.NewSystemSecurityContext()
 
 	seedStateTreeEntities(t, sp, sCtx, sec)
@@ -75,11 +76,10 @@ func seedStateTreeHierarchy(t *testing.T, testRoot string) {
 
 	flushCtx, cancel := storage.DurabilityFlushContext()
 	defer cancel()
-	_ = storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, sp, testRoot, []string{
+	require.NoError(t, storage.EnsureCLIObjectMutationVisibleForProvider(flushCtx, sp, testRoot, []string{
 		objects.KindOrganization, objects.KindMission, objects.KindVision, objects.KindGoal,
 		objects.KindRequirement, objects.KindPriorityPlan, objects.KindBacklogItem,
-	})
-	_ = sp.Shutdown(sCtx)
+	}))
 }
 
 func TestStateTree_WithPopulatedHierarchy(t *testing.T) {
