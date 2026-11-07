@@ -19,6 +19,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/do"
 	"github.com/zqk-os/zqk/cmd/zqk/docman"
 	"github.com/zqk-os/zqk/cmd/zqk/domain"
+	evalcmd "github.com/zqk-os/zqk/cmd/zqk/eval"
 	"github.com/zqk-os/zqk/cmd/zqk/explain"
 	"github.com/zqk-os/zqk/cmd/zqk/feed"
 	gatecmd "github.com/zqk-os/zqk/cmd/zqk/gate"
@@ -386,6 +387,11 @@ func registerCommands() {
 	bundleCmdInst := bundlecmd.NewBundleCmd()
 	bundleCmdInst.GroupID = "advanced"
 	rootCmd.AddCommand(bundleCmdInst)
+
+	// Core Generic Scenario Evaluation Framework (zqk eval)
+	evalCmdInst := evalcmd.NewEvalCmd()
+	evalCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(evalCmdInst)
 
 	// Semantic Intake Pipeline
 	intakeCmdInst := intake.NewIntakeCmd()

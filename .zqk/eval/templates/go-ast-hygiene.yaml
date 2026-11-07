@@ -1,0 +1,44 @@
+schema_version: 1
+kind: eval_template
+template_id: EVAL-GO-AST-HYGIENE-V1
+title: Go AST Hygiene and Structural Boundary Verification
+description: |
+  Evaluates Go source files for zero-magic-literals, filesystem abstraction compliance (POL-CODE-006),
+  cyclomatic complexity boundaries, and package layering integrity.
+target:
+  kind: file_glob
+  patterns:
+    - "pkg/**/*.go"
+    - "cmd/**/*.go"
+  exclude:
+    - "**/*_test.go"
+
+fast_path:
+  enabled: true
+  max_complexity: 25
+  rules:
+    - no_raw_os_calls
+
+dimensions:
+  HCODE:
+    weight: 0.35
+    threshold: 4.0
+    rubric: docs/quality/dimensions/HCODE.md
+  EFFPERF:
+    weight: 0.25
+    threshold: 3.5
+    rubric: docs/quality/dimensions/EFFPERF.md
+  ERRHYG:
+    weight: 0.25
+    threshold: 4.0
+    rubric: docs/quality/dimensions/ERRHYG.md
+  DOCSIG:
+    weight: 0.15
+    threshold: 3.0
+    rubric: docs/quality/dimensions/DOCSIG.md
+
+remediation:
+  auto_mint: true
+  persona: PER-COMMUNITY-SOFTWARE-ENGINEER
+  priority: P1
+  link_convergence_session: true

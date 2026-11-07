@@ -383,7 +383,8 @@ func (e *MCPExecutor) ExecuteToolCall(ctx context.Context, call llm.ToolCall) (s
 			return "", errfmt.Newf("failed to parse arguments").Wrap(err)
 		}
 		toolName, _ := args["tool_name"].(string)
-		if t, ok := e.allTools[toolName]; ok {
+		if resolved, ok := e.resolveRegisteredToolName(toolName); ok {
+			t := e.allTools[resolved]
 			b, _ := json.MarshalIndent(t, "", "  ")
 			return string(b), nil
 		}
@@ -400,12 +401,13 @@ func (e *MCPExecutor) ExecuteToolCall(ctx context.Context, call llm.ToolCall) (s
 		if toolName == "" || strings.ContainsAny(toolName, " \t") {
 			return "", errfmt.Errorf("not a tool name: %q. Use an exact Available Tools name.", toolName)
 		}
-		if _, ok := e.allTools[toolName]; !ok {
+		resolved, ok := e.resolveRegisteredToolName(toolName)
+		if !ok {
 			return "", errfmt.Errorf("lazy tool %q is not registered. Use an exact Available Tools name.", toolName)
 		}
 		innerArgs, _ := args["arguments"].(map[string]any)
 		innerArgsBytes, _ := json.Marshal(innerArgs)
-		call.Name = toolName
+		call.Name = resolved
 		call.Arguments = string(innerArgsBytes)
 	}
 
@@ -456,11 +458,41 @@ func levenshteinDistance(s1, s2 string) int {
 	return strutil.LevenshteinDistance(s1, s2)
 }
 
+// resolveRegisteredToolName maps IDE/channel-prefixed names (zqk-tip_observer_search)
+// onto the registered MCP serve name (zqk_observer_search) by tool suffix identity.
+func (e *MCPExecutor) resolveRegisteredToolName(name string) (string, bool) {
+	name = strings.TrimSpace(name)
+	if name == "" || e.allTools == nil {
+		return "", false
+	}
+	if _, ok := e.allTools[name]; ok {
+		return name, true
+	}
+	want := mcpToolSuffix(name)
+	if want == "" {
+		return "", false
+	}
+	for registered := range e.allTools {
+		if mcpToolSuffix(registered) == want {
+			return registered, true
+		}
+	}
+	return "", false
+}
+
+func mcpToolSuffix(name string) string {
+	n := strings.ToLower(strings.TrimSpace(name))
+	if i := strings.Index(n, "_"); i >= 0 && i+1 < len(n) {
+		return n[i+1:]
+	}
+	return n
+}
+
 // normalizeToolName attempts to find the correct tool name, using exact match,
 // underscore replacement, and fuzzy matching as fallbacks.
 func (e *MCPExecutor) normalizeToolName(callName string) (string, error) {
-	if _, ok := e.allTools[callName]; ok {
-		return callName, nil
+	if resolved, ok := e.resolveRegisteredToolName(callName); ok {
+		return resolved, nil
 	}
 	// First, check for exact match
 	for _, t := range e.tools {
