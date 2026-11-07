@@ -1,0 +1,21 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list
+short: List installed language bundles
+description: |
+  List all language bundles installed in the active workspace.
+flags:
+  - name: format
+    shorthand: f
+    type: string
+    default: table
+    description: "Output format (table, json, yaml)"
+help:
+  examples:
+    - comment: List installed bundles in table format
+      command: "%s bundle list"
+    - comment: List installed bundles as JSON
+      command: "%s bundle list -f json"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

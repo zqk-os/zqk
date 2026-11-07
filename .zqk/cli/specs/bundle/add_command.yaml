@@ -1,0 +1,20 @@
+$schema: ../_schemas/command_spec.schema.json
+name: add
+short: Install a language bundle from a manifest file
+description: |
+  Validate and install a modular language bundle manifest into the workspace registry.
+flags:
+  - name: file
+    shorthand: b
+    type: string
+    default: ""
+    required: true
+    description: "Path to language bundle manifest (YAML/JSON)"
+help:
+  examples:
+    - comment: Install a language bundle from file
+      command: "%s bundle add --file ./bundle.yaml"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

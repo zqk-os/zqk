@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/agent"
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/cmd/zqk/automation"
+	bundlecmd "github.com/zqk-os/zqk/cmd/zqk/bundle"
 	"github.com/zqk-os/zqk/cmd/zqk/callback"
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
@@ -380,6 +381,11 @@ func registerCommands() {
 	kindPackCmd := kindpack.NewKindPackCmd()
 	kindPackCmd.GroupID = "advanced"
 	rootCmd.AddCommand(kindPackCmd)
+
+	// Modular Language Bundles & Dynamic Process Packs (zqk bundle)
+	bundleCmdInst := bundlecmd.NewBundleCmd()
+	bundleCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(bundleCmdInst)
 
 	// Semantic Intake Pipeline
 	intakeCmdInst := intake.NewIntakeCmd()

@@ -1,0 +1,22 @@
+$schema: ../_schemas/command_spec.schema.json
+name: info
+short: Inspect an installed language bundle manifest
+description: |
+  Inspect the full manifest and verification pack metadata for an installed language bundle.
+args:
+  type: exact
+  count: 1
+flags:
+  - name: format
+    shorthand: f
+    type: string
+    default: json
+    description: "Output format (json, yaml)"
+help:
+  examples:
+    - comment: Inspect a bundle in JSON format
+      command: "%s bundle info go"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
