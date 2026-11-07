@@ -273,13 +273,22 @@ func calculateValidationTimeout(cmd *cobra.Command, totalTasks int) (time.Durati
 	timeout := cli.GetTimeout(cmd)
 
 	if timeout == 0 {
+		// Dynamic auto-calculated timeout scaled to object graph volume: max(30s, totalTasks * 10ms) (GH-1018)
+		volumeScaled := time.Duration(totalTasks) * 10 * time.Millisecond
+		if volumeScaled < 30*time.Second {
+			volumeScaled = 30 * time.Second
+		}
+
 		baseTimePerObject := 100 * time.Millisecond
 		workerCount := 4
 		estimatedTime := time.Duration(totalTasks) * baseTimePerObject / time.Duration(workerCount)
 		timeout = estimatedTime*2 + 30*time.Second
 
-		if timeout < 1*time.Minute {
-			timeout = 1 * time.Minute
+		if volumeScaled > timeout {
+			timeout = volumeScaled
+		}
+		if timeout < 30*time.Second {
+			timeout = 30 * time.Second
 		}
 		if timeout > 30*time.Minute {
 			timeout = 30 * time.Minute

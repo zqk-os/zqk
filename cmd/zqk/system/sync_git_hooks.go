@@ -430,7 +430,7 @@ if [ -d "$REPO_ROOT/.zqk/process" ]; then
 			DEFAULT_TIMEOUT="180s"
 		fi
 	fi
-	PRECOMMIT_TIMEOUT="${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}"
+	PRECOMMIT_TIMEOUT="${ZQK_SYSTEM_CHECK_TIMEOUT:-${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}}"
 	if ! "$ZQK_BIN" system check --tier 1 --timeout "$PRECOMMIT_TIMEOUT"; then
 		echo "❌ [ZQK PRE-COMMIT] System check failed! Blocking violations found in kernel graph."
 		echo "   Run '$ZQK_BIN system check --details' to inspect and resolve."

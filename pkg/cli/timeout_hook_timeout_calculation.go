@@ -124,11 +124,20 @@ func (h *TimeoutHook) getTimeoutForCommand(normalizedCmd string, args []string) 
 			// Estimate object count from command args
 			estimatedObjectCount := h.estimateObjectCountForSystemCheck(args)
 
+			// Scale default timeout proportionally to discovered object volume: max(30s, object_count * 10ms) (GH-1018)
+			volumeScaledTimeout := time.Duration(estimatedObjectCount) * 10 * time.Millisecond
+			if volumeScaledTimeout < 30*time.Second {
+				volumeScaledTimeout = 30 * time.Second
+			}
+
 			// Use same calculation as async_check.go with config values
 			config := h.getTimeoutConfig()
 			estimatedTime := time.Duration(estimatedObjectCount) * config.SystemCheckTimeoutConfig.BaseTimePerObject / time.Duration(config.SystemCheckTimeoutConfig.WorkerCount)
 			// Add safety margin + overhead for enqueueing and result collection
 			dynamicTimeout := time.Duration(float64(estimatedTime)*config.SystemCheckTimeoutConfig.SafetyMargin) + config.SystemCheckTimeoutConfig.Overhead
+			if volumeScaledTimeout > dynamicTimeout {
+				dynamicTimeout = volumeScaledTimeout
+			}
 
 			// Use the larger of: baseline-based timeout or dynamic calculation
 			// This ensures we don't timeout prematurely for bulk operations
@@ -193,8 +202,18 @@ func (h *TimeoutHook) getTimeoutForCommand(normalizedCmd string, args []string) 
 	if strings.Contains(normalizedCmd, "system check") {
 		config := h.getTimeoutConfig()
 		estimatedObjectCount := h.estimateObjectCountForSystemCheck(args)
+
+		// Scale default timeout proportionally to discovered object volume: max(30s, object_count * 10ms) (GH-1018)
+		volumeScaledTimeout := time.Duration(estimatedObjectCount) * 10 * time.Millisecond
+		if volumeScaledTimeout < 30*time.Second {
+			volumeScaledTimeout = 30 * time.Second
+		}
+
 		estimatedTime := time.Duration(estimatedObjectCount) * config.SystemCheckTimeoutConfig.BaseTimePerObject / time.Duration(config.SystemCheckTimeoutConfig.WorkerCount)
 		timeout := time.Duration(float64(estimatedTime)*config.SystemCheckTimeoutConfig.SafetyMargin) + config.SystemCheckTimeoutConfig.Overhead
+		if volumeScaledTimeout > timeout {
+			timeout = volumeScaledTimeout
+		}
 
 		if timeout < config.SystemCheckTimeoutConfig.MinTimeout {
 			timeout = config.SystemCheckTimeoutConfig.MinTimeout

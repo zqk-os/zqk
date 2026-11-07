@@ -166,6 +166,7 @@ rules:
   # window so silent warm/merge does not trip the idle watchdog mid-phase.
   # TRACK: TDE-SYSCHECK-COLD-REBUILD-IDLE-001
   - pattern: "system check"
+    timeout: 120s
     child_max_timeout_exempt: true
     idle_shutdown_duration: 5m
 
