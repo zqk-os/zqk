@@ -208,12 +208,12 @@ func appendUniqueStrings(a, b []string) []string {
 	if len(b) == 0 {
 		return append([]string{}, a...)
 	}
-	capHint := len(a) + len(b)
+	capHint := len(a)
 	if capHint < 0 || capHint > maxUniqueStringsAllocation {
-		capHint = len(a)
-		if capHint < 0 || capHint > maxUniqueStringsAllocation {
-			capHint = 0
-		}
+		capHint = 0
+	}
+	if len(b) > 0 && len(b) <= maxUniqueStringsAllocation-capHint {
+		capHint += len(b)
 	}
 	seen := make(map[string]struct{}, capHint)
 	out := make([]string, 0, capHint)

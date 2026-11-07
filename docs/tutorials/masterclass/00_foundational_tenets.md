@@ -67,7 +67,7 @@ Swarm execution isolates each agent seat into its own private Git worktree with 
 
 ```bash
 # Dispatch an AST-verified multi-agent swarm across a priority plan
-zqk agent orchestrate PRI-1793959074191907000-fc210840
+zqk agent orchestrate PRI-STARTER-COMMUNITY-001
 ```
 
 ---

@@ -37,8 +37,8 @@ zqk workflow whats-next --format json
 {
   "schema": "zqk_whats_next_v1",
   "priority_plan": {
-    "id": "PRI-1793959074191907000-fc210840",
-    "title": "ASMM Go Media Studio Dynamic Stereo Multiband Resonant Body & Acoustic Formant Filter Studio Engine",
+    "id": "PRI-STARTER-COMMUNITY-001",
+    "title": "Community Starter Engine Initialization",
     "status": "grooming",
     "backlog_counts": {
       "originated": 1,
@@ -47,7 +47,7 @@ zqk workflow whats-next --format json
     }
   },
   "kernel_steward": {
-    "lead_priority_plan": "PRI-1793959074191907000-fc210840",
+    "lead_priority_plan": "PRI-STARTER-COMMUNITY-001",
     "align_score": 98.2,
     "next_action": "execute whats-next priority_plan"
   }
