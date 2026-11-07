@@ -7,7 +7,6 @@ import (
 
 // TurnContinue is the vendor-agnostic "seat turn ended → keep going?" decision.
 // Host adapters (Cursor stop hook, Claude block, etc.) only specialize delivery.
-// TRACK: BLI-1787035087372193000-c022117d — CAP/composer anti-idle via generic continue drive.
 type TurnContinue struct {
 	Continue bool   `json:"continue"`
 	Message  string `json:"message,omitempty"`
