@@ -140,7 +140,22 @@ const (
 	PrecondCommitRefsGitMutationEvidence   = "commit_refs have git mutation evidence for this backlog_item"
 	PrecondCommitHashesGitMutationEvidence = "commit_hashes have git mutation evidence for this backlog_item"
 	// ExplanationGitMutationEvidenceFormat explains the expected git commit message tag format.
-	ExplanationGitMutationEvidenceFormat = "ensure at least one commit touches code_location and mentions [%s] in its commit message"
+	// Args: backlog item id (bare), accepted-ids clause, bracketed tag example.
+	// Mirrors pkg/gitevidence.validateOne: non-merge, reachable from branch_name, changes a
+	// product path (anything outside .zqk/process/ and .zqk/specs/), message mentions the id.
+	ExplanationGitMutationEvidenceFormat = ExplanationGitMutationEvidencePrefix +
+		" is a non-merge commit reachable from branch_name, changes at least one file outside .zqk/process/," +
+		" and mentions %s in its commit message (recommended subject tag: \"%s <summary>\")"
+	// ExplanationGitMutationEvidencePrefix is the stable lead-in used to detect an already-enriched message.
+	ExplanationGitMutationEvidencePrefix = "ensure at least one cited commit"
+	// ExplanationGitMutationEvidencePlanAltFormat names the priority_plan_ref id as an accepted alternative mention.
+	ExplanationGitMutationEvidencePlanAltFormat = "%s (or its priority_plan_ref %s)"
+	// ExplanationGitMutationEvidenceTagFormat renders the canonical bracketed commit tag.
+	ExplanationGitMutationEvidenceTagFormat = "[%s]"
+	// ExplanationGitMutationEvidenceRejectedFormat appends the concrete gitevidence rejection reason.
+	ExplanationGitMutationEvidenceRejectedFormat = "%s; rejected: %v"
+	// ExplanationGitMutationEvidencePlaceholderID is used when the object has no id yet.
+	ExplanationGitMutationEvidencePlaceholderID = "BLI-xxx"
 	// PrecondBranchRefIsAncestorOfTrunk enforces that a plan cannot complete until its branch_name
 	// is an ancestor of trunk.
 	PrecondBranchRefIsAncestorOfTrunk  = "branch_ref is an ancestor of trunk"

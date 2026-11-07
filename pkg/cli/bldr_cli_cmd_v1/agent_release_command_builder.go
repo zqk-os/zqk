@@ -20,6 +20,8 @@ func NewAgentReleaseCommandBuilder() *cobra.Command {
 	help.ExcludeFlag("columns")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.ExactArgs(1))
+	builder.AddStringFlag("agent", "", "", "Alias for --by (claimant that must currently hold the claim)")
+	builder.AddStringFlag("agent-id", "", "", "Alias for --by (claimant that must currently hold the claim)")
 	builder.AddStringFlag("by", "", "", "Claimant that must currently hold the claim")
 	builder.AddBoolFlag("force", "", false, "Clear the claim regardless of holder")
 	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"columns"})

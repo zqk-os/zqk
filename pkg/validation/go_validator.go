@@ -927,7 +927,7 @@ func (gv *GoValidator) appendUnmetLifecyclePreconditions(
 		if gv.checkPrecondition(precondition, obj, options) {
 			continue
 		}
-		detail := formatUnmetPreconditionDetail(precondition, obj)
+		detail := gv.formatUnmetPreconditionDetailForOptions(precondition, obj, options)
 		errors = append(errors, ValidationError{
 			Field:   objects.FieldKeyStatus,
 			Message: fmt.Sprintf(msgFmt, status, detail),
@@ -1142,12 +1142,18 @@ func (gv *GoValidator) isRefActive(refID string, obj map[string]any, options *Va
 // mention this BLI id. When already holding status=complete, skip (grandfather
 // historical completes); transitions into complete always enforce.
 func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, options *ValidationOptions) bool {
+	return gv.commitHashesGitMutationEvidenceErr(obj, options) == nil
+}
+
+// commitHashesGitMutationEvidenceErr returns the concrete gitevidence rejection
+// (which SHA, and why) or nil when evidence is satisfied or grandfathered.
+func (gv *GoValidator) commitHashesGitMutationEvidenceErr(obj map[string]any, options *ValidationOptions) error {
 	if options != nil {
 		cur := strings.ToLower(strings.TrimSpace(options.CurrentState))
 		st, _ := obj[objects.FieldKeyStatus].(string)
 		st = strings.ToLower(strings.TrimSpace(st))
 		if cur == objects.ObjectStatusComplete && st == objects.ObjectStatusComplete {
-			return true
+			return nil
 		}
 	}
 	id, _ := obj[objects.FieldKeyID].(string)
@@ -1159,9 +1165,9 @@ func (gv *GoValidator) checkCommitHashesGitMutationEvidence(obj map[string]any, 
 	}
 	root := resolveValidationProjectRoot(options)
 	if root == "" {
-		return false
+		return errGitEvidenceNoProjectRoot
 	}
-	return gitevidence.ValidateBacklogCommitHashesWithPlan(root, id, planRef, branchName, hashes) == nil
+	return gitevidence.ValidateBacklogCommitHashesWithPlan(root, id, planRef, branchName, hashes)
 }
 
 func resolveValidationProjectRoot(options *ValidationOptions) string {

@@ -331,3 +331,46 @@ func TestNewObject_AgentTaskEstimatedEffort(t *testing.T) {
 		t.Errorf("expected 2h for Default Effort Task, got %q", effortByTitle["Default Effort Task"])
 	}
 }
+
+const explicitCriteriaCategoryName = "performance"
+
+// `zqk new object criteria` (generic path, no --category flag bound) must
+// also default category to functional.
+func TestNewObjectCriteria_DefaultsCategory(t *testing.T) {
+	testRoot := setupRelationalFlagsTestEnv(t)
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"object", objects.KindCriteria, "--title", "Generic Path Crit"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("new object criteria failed: %v", err)
+	}
+
+	obj := readLatestDraft(t, testRoot, objects.KindCriteria)
+	if cat, _ := obj[objects.FieldKeyCategory].(string); cat != defaultCriteriaCategory {
+		t.Fatalf("expected category %q, got %q", defaultCriteriaCategory, cat)
+	}
+}
+
+// Explicit --category values are respected (whitespace-trimmed).
+func TestNewCriteria_ExplicitCategoryTrimmedAndRespected(t *testing.T) {
+	testRoot := setupRelationalFlagsTestEnv(t)
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{objects.KindCriteria, "--title", "Explicit Category Crit", "--category", "  " + explicitCriteriaCategoryName + "  "})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("new criteria failed: %v", err)
+	}
+
+	obj := readLatestDraft(t, testRoot, objects.KindCriteria)
+	if cat, _ := obj[objects.FieldKeyCategory].(string); cat != explicitCriteriaCategoryName {
+		t.Fatalf("expected category %q, got %q", explicitCriteriaCategoryName, cat)
+	}
+}

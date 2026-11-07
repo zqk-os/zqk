@@ -7,6 +7,14 @@ description: |
   the holder cannot release the claim themselves.
 
 flags:
+  - name: "agent"
+    type: "string"
+    default: ""
+    description: "Alias for --by (claimant that must currently hold the claim)"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    description: "Alias for --by (claimant that must currently hold the claim)"
   - name: "by"
     type: "string"
     default: ""

@@ -7,6 +7,14 @@ description: |
   another agent already holds the claim. Hourglass deadline wake is opt-in.
 
 flags:
+  - name: "agent"
+    type: "string"
+    default: ""
+    description: "Alias for --by (claimant agent or account id)"
+  - name: "agent-id"
+    type: "string"
+    default: ""
+    description: "Alias for --by (claimant agent or account id)"
   - name: "by"
     type: "string"
     default: ""

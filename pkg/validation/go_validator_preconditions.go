@@ -1,10 +1,12 @@
 package validation
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/objects"
+	"github.com/zqk-os/zqk/pkg/predicate"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -64,6 +66,52 @@ func FormatUnmetPreconditionDetail(precondition string, obj map[string]any) stri
 }
 
 func formatUnmetPreconditionDetail(precondition string, obj map[string]any) string {
+	return formatUnmetPreconditionDetailWithReason(precondition, obj, nil)
+}
+
+// errGitEvidenceNoProjectRoot is reported when no git project root can be resolved for evidence checks.
+var errGitEvidenceNoProjectRoot = errors.New("no git project root resolved for commit_hashes evidence")
+
+// formatUnmetPreconditionDetailForOptions enriches an unmet precondition and, for the git
+// mutation evidence gate, re-derives the concrete per-commit rejection reason so operators
+// see which SHA failed and why (SHA not found, merge commit, missing id mention, process-only paths).
+func (gv *GoValidator) formatUnmetPreconditionDetailForOptions(precondition string, obj map[string]any, options *ValidationOptions) string {
+	var reason error
+	if gv != nil && isGitMutationEvidencePrecondition(precondition) {
+		reason = gv.commitHashesGitMutationEvidenceErr(obj, options)
+	}
+	return formatUnmetPreconditionDetailWithReason(precondition, obj, reason)
+}
+
+// isGitMutationEvidencePrecondition reports whether precondition is the (un-enriched) git mutation evidence gate.
+func isGitMutationEvidencePrecondition(precondition string) bool {
+	normPre := strings.ToLower(strings.TrimSpace(precondition))
+	return (strings.Contains(normPre, "git mutation evidence") || strings.Contains(normPre, predicate.GateGitMutationEvidencePresent)) &&
+		!strings.Contains(normPre, ExplanationGitMutationEvidencePrefix)
+}
+
+// formatGitMutationEvidenceExplanation is the single formatter for the git mutation
+// evidence hint: accepted id mentions, canonical [BLI-<id>] tag, and (when known) the
+// concrete per-commit rejection reason from pkg/gitevidence.
+func formatGitMutationEvidenceExplanation(obj map[string]any, reason error) string {
+	bliID, _ := obj[objects.FieldKeyID].(string)
+	bliID = strings.TrimSpace(bliID)
+	if bliID == "" {
+		bliID = ExplanationGitMutationEvidencePlaceholderID
+	}
+	accepted := bliID
+	if planRef, _ := obj[objects.FieldKeyPriorityPlanRef].(string); strings.TrimSpace(planRef) != "" {
+		accepted = fmt.Sprintf(ExplanationGitMutationEvidencePlanAltFormat, bliID, strings.TrimSpace(planRef))
+	}
+	tag := fmt.Sprintf(ExplanationGitMutationEvidenceTagFormat, bliID)
+	explanation := fmt.Sprintf(ExplanationGitMutationEvidenceFormat, accepted, tag)
+	if reason != nil {
+		explanation = fmt.Sprintf(ExplanationGitMutationEvidenceRejectedFormat, explanation, reason)
+	}
+	return explanation
+}
+
+func formatUnmetPreconditionDetailWithReason(precondition string, obj map[string]any, gitEvidenceReason error) string {
 	normPre := strings.ToLower(strings.TrimSpace(precondition))
 	if (normPre == strings.ToLower(PrecondPriorityPlanValidated) || strings.Contains(normPre, "priority plan validated") || strings.Contains(normPre, "priority_plan_validated")) &&
 		!strings.Contains(normPre, ReasonPriorityPlanWrittenIdentity) && !strings.Contains(normPre, ReasonPriorityPlanWorkstreamLane) {
@@ -77,14 +125,8 @@ func formatUnmetPreconditionDetail(precondition string, obj map[string]any) stri
 		if len(reasons) > 0 {
 			return fmt.Sprintf("%s: %s", precondition, strings.Join(reasons, "; "))
 		}
-	} else if (strings.Contains(normPre, "git mutation evidence") || strings.Contains(normPre, "git_mutation_evidence")) &&
-		!strings.Contains(normPre, "ensure at least one commit touches code_location") {
-		bliID, _ := obj[objects.FieldKeyID].(string)
-		bliID = strings.TrimSpace(bliID)
-		if bliID == "" {
-			bliID = "BLI-xxx"
-		}
-		return fmt.Sprintf("%s (%s)", precondition, fmt.Sprintf(ExplanationGitMutationEvidenceFormat, bliID))
+	} else if isGitMutationEvidencePrecondition(precondition) {
+		return fmt.Sprintf("%s (%s)", precondition, formatGitMutationEvidenceExplanation(obj, gitEvidenceReason))
 	}
 	return precondition
 }
