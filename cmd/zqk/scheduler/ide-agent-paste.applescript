@@ -4,8 +4,23 @@
 --
 
 log "zqk agent_prompt: step=activate_ide"
-tell application "Cursor" to activate
-delay 0.5
+log "zqk agent_prompt: step=acquire_ide_frontmost"
+set zqkGotFront to false
+repeat 30 times
+	tell application "Cursor" to activate
+	delay 0.08
+	tell application "System Events"
+		set zqkFM to name of first application process whose frontmost is true
+	end tell
+	if zqkFM is "Cursor" then
+		set zqkGotFront to true
+		exit repeat
+	end if
+end repeat
+if zqkGotFront is false then
+	tell application "System Events" to set zqkFM to name of first application process whose frontmost is true
+	error "zqk agent_prompt: could not make " & "Cursor" & " frontmost (still " & zqkFM & "); refuse paste"
+end if
 tell application "System Events"
 	set zqkCP to missing value
 	try
@@ -22,15 +37,45 @@ tell application "System Events"
 	try
 		log "zqk agent_prompt: step=resolved_process unix_id=" & (unix id of zqkCP)
 	end try
+	set zqkFM to name of first application process whose frontmost is true
+	if zqkFM is not "Cursor" then
+		error "zqk agent_prompt: refuse paste at before_prefix — frontmost is " & zqkFM & " (want " & "Cursor" & "); refusing Terminal/non-IDE mistarget"
+	end if
+	set zqkTermDeny to {"Terminal", "iTerm2", "iTerm", "Alacritty", "Warp", "Ghostty", "kitty", "Hyper", "WezTerm"}
+	if zqkTermDeny contains zqkFM then
+		error "zqk agent_prompt: refuse paste at before_prefix — frontmost terminal " & zqkFM
+	end if
 	tell zqkCP
 		set frontmost to true
-		delay 0.25
+		delay 0.2
 		log "zqk agent_prompt: step=focus_ide_chat_cmd_y"
 		keystroke "y" using command down
 		delay 0.4
+	end tell
+	set zqkFM to name of first application process whose frontmost is true
+	if zqkFM is not "Cursor" then
+		error "zqk agent_prompt: refuse paste at before_cmd_v — frontmost is " & zqkFM & " (want " & "Cursor" & "); refusing Terminal/non-IDE mistarget"
+	end if
+	set zqkTermDeny to {"Terminal", "iTerm2", "iTerm", "Alacritty", "Warp", "Ghostty", "kitty", "Hyper", "WezTerm"}
+	if zqkTermDeny contains zqkFM then
+		error "zqk agent_prompt: refuse paste at before_cmd_v — frontmost terminal " & zqkFM
+	end if
+	tell zqkCP
+		set frontmost to true
 		log "zqk agent_prompt: step=keystroke_cmd_v_paste"
 		keystroke "v" using command down
 		delay 0.3
+	end tell
+	set zqkFM to name of first application process whose frontmost is true
+	if zqkFM is not "Cursor" then
+		error "zqk agent_prompt: refuse paste at before_return — frontmost is " & zqkFM & " (want " & "Cursor" & "); refusing Terminal/non-IDE mistarget"
+	end if
+	set zqkTermDeny to {"Terminal", "iTerm2", "iTerm", "Alacritty", "Warp", "Ghostty", "kitty", "Hyper", "WezTerm"}
+	if zqkTermDeny contains zqkFM then
+		error "zqk agent_prompt: refuse paste at before_return — frontmost terminal " & zqkFM
+	end if
+	tell zqkCP
+		set frontmost to true
 		log "zqk agent_prompt: step=key_code_36_return_submit"
 		key code 36
 	end tell
