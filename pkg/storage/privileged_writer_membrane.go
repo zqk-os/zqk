@@ -98,6 +98,45 @@ func privilegedWriterSocketExists(projectRoots ...string) bool {
 	return true
 }
 
+// PrivilegedWriterSocketReachable reports whether a PrivilegedWriter UNIX socket is
+// dialable for this project. Prefers env override / current-brand default (CAS path),
+// then any `.zqk/run/*-privileged-writer.sock` (tip brand vs stable daemon coexistence).
+func PrivilegedWriterSocketReachable(projectRoots ...string) bool {
+	if privilegedWriterSocketExists(projectRoots...) {
+		return true
+	}
+	root := ""
+	if len(projectRoots) > 0 {
+		root = projectRoots[0]
+	}
+	if root == "" {
+		root = paths.ResolveProjectRoot(".")
+	}
+	if root == "" {
+		return false
+	}
+	pattern := filepath.Join(root, paths.ProjectDataDir, "run", "*-"+privilegedWriterSocketBasename+socketFileExtension)
+	matches, err := filepath.Glob(pattern)
+	if err != nil {
+		return false
+	}
+	for _, p := range matches {
+		conn, dialErr := net.DialTimeout("unix", p, 50*time.Millisecond)
+		if dialErr != nil {
+			continue
+		}
+		_ = conn.Close()
+		return true
+	}
+	return false
+}
+
+// PrivilegedWriterSocketPathForProject returns the resolved PrivilegedWriter socket path
+// for doctor/ops surfaces (env override, else project-scoped default for this brand).
+func PrivilegedWriterSocketPathForProject(projectRoot string) string {
+	return resolvePrivilegedWriterSocketPath(projectRoot)
+}
+
 // privilegedWriterLocalWriteAllowed reports whether CAS may write locally when the
 // PrivilegedWriter daemon is down. Production stays fail-closed; tests opt in via
 // ZQK_TEST_ALLOW_CAS_FALLTHROUGH=1 (see pkg/testing test setup).
