@@ -53,3 +53,18 @@ In earlier iterations, object templates and draft-plane merges populated optiona
 1. **Omission on Draft Land**: Optional reference fields (`field.Type == "reference"` or `field.SemanticType == "reference"`, and scalar `*_ref` / `*_id`) are omitted from initial draft skeletons unless explicitly provided by the operator.
 2. **Explicit Nullability (`null`)**: Where placeholders are required for lifecycle progression (such as `priority_plan_ref` on `backlog_item`), templates scaffold explicit `null` (`nil`) rather than empty strings `""`.
 3. **Validator Permissiveness**: Core schema and ontology validators (`GoValidator`, `InstanceValidator`, and `OntologyRegistry`) treat `null` and omitted attributes as valid unpopulated states for optional reference fields, eliminating false-positive validation rejections.
+
+---
+
+## 4. Object Discovery Symmetry & Traceability Alignment
+
+### Object List Flag and Argument Parity
+`zqk object list` supports both positional kinds and the `--kind` flag interchangeably:
+- Positional kind: `zqk object list requirement`
+- Flag kind: `zqk object list --kind requirement`
+
+The CLI validates kinds strictly against the ontology registry before dispatching storage queries, ensuring early, helpful errors on typos.
+
+### Strategic Traceability Propagation
+When generating execution spines via `zqk workflow gen-trace-pipeline <REQ-ID>`, the generator automatically extracts all `goal_refs` from the parent requirement and propagates them to all child `backlog_item` objects. This guarantees end-to-end strategic alignment across the 5-layer cascade without manual reference linking.
+
