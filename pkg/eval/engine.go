@@ -138,7 +138,7 @@ func (e *Engine) resolveTargetFiles(tmpl *EvalTemplate, targetOverride string) (
 			return []string{searchTarget}, nil
 		}
 		// Walk target directory
-		_ = filepath.WalkDir(fullPath, func(path string, d fileutil.DirEntry, err error) error {
+		if walkErr := filepath.WalkDir(fullPath, func(path string, d fileutil.DirEntry, err error) error {
 			if err != nil || d == nil || d.IsDir() {
 				return nil
 			}
@@ -147,7 +147,9 @@ func (e *Engine) resolveTargetFiles(tmpl *EvalTemplate, targetOverride string) (
 				files = append(files, rel)
 			}
 			return nil
-		})
+		}); walkErr != nil {
+			return nil, walkErr
+		}
 		return files, nil
 	}
 

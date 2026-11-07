@@ -10,7 +10,22 @@ import (
 	"github.com/zqk-os/zqk/pkg/eval"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/validation/qa"
 )
+
+func TestASTCompliance(t *testing.T) {
+	auditor := qa.NewASTAuditor()
+	files := []string{"engine.go", "template.go", "types.go", "../../cmd/zqk/eval/eval.go"}
+	for _, f := range files {
+		v, err := auditor.AuditFile(f)
+		require.NoError(t, err)
+		for _, item := range v {
+			if item.Severity == "high" || item.Severity == "medium" {
+				t.Errorf("[%s] %s:%d: %s (%s)", item.Severity, f, item.Pos.Line, item.Message, item.Type)
+			}
+		}
+	}
+}
 
 func TestEvalTemplate_StaticInvariants(t *testing.T) {
 	t.Parallel()

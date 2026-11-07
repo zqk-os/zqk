@@ -29,8 +29,8 @@ func NewEvalCmd() *cobra.Command {
 }
 
 func resolveRoot(cmd *cobra.Command) string {
-	root, _ := cliapp.ResolveCommandProjectRoot(cmd)
-	if root == "" {
+	root, projRootErr := cliapp.ResolveCommandProjectRoot(cmd)
+	if projRootErr != nil || root == "" {
 		root = cliapp.ResolveProjectRoot(".")
 	}
 	if root == "" {
@@ -43,10 +43,13 @@ func newRunCmd() *cobra.Command {
 	return clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewEvalRunCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
 			root := resolveRoot(cmd)
-			tmplFlag, _ := cmd.Flags().GetString("template")
-			targetFlag, _ := cmd.Flags().GetString("target")
-			autoMint, _ := cmd.Flags().GetBool("auto-mint")
-			outputJSON, _ := cmd.Flags().GetBool("json")
+			tmplFlag, tmplErr := cmd.Flags().GetString("template")
+			targetFlag, targetErr := cmd.Flags().GetString("target")
+			autoMint, autoMintErr := cmd.Flags().GetBool("auto-mint")
+			outputJSON, jsonErr := cmd.Flags().GetBool("json")
+			if tmplErr != nil || targetErr != nil || autoMintErr != nil || jsonErr != nil {
+				return errfmt.Errorf("failed to parse evaluation flags")
+			}
 
 			if strings.TrimSpace(tmplFlag) == "" {
 				return errfmt.Errorf("--template is required")
@@ -125,8 +128,8 @@ func newRunCmd() *cobra.Command {
 func newValidateCmd() *cobra.Command {
 	return clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewEvalValidateCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
-			filePath, _ := cmd.Flags().GetString("file")
-			if strings.TrimSpace(filePath) == "" {
+			filePath, fileErr := cmd.Flags().GetString("file")
+			if fileErr != nil || strings.TrimSpace(filePath) == "" {
 				return errfmt.Errorf("--file is required")
 			}
 
@@ -144,9 +147,12 @@ func newValidateCmd() *cobra.Command {
 func newMatrixCmd() *cobra.Command {
 	return clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewEvalMatrixCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
-			sessionID, _ := cmd.Flags().GetString("session-id")
-			tmplFlag, _ := cmd.Flags().GetString("template")
-			outputJSON, _ := cmd.Flags().GetBool("json")
+			sessionID, sErr := cmd.Flags().GetString("session-id")
+			tmplFlag, tErr := cmd.Flags().GetString("template")
+			outputJSON, jErr := cmd.Flags().GetBool("json")
+			if sErr != nil || tErr != nil || jErr != nil {
+				return errfmt.Errorf("failed to parse matrix flags")
+			}
 
 			if strings.TrimSpace(sessionID) == "" {
 				return errfmt.Errorf("--session-id is required")
