@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// TRACK: BLI-1794075198197653000-dc625b46 — CAS-resident updates must not demote to draft_plane
+// TRACK: https://github.com/zqk-os/zqk/pull/1027 — CAS-resident updates must not demote to draft_plane
 // when description membrane park would otherwise fire (MIL-008 complete-milestone hazard).
 func TestUpdate_CASResidentWithoutDescriptionDoesNotDemote(t *testing.T) {
 	tmpDir, fileStorage, _ := SetupTestingFactoryCompleteTestEnvironmentForTest(t)

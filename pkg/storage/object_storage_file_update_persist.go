@@ -38,7 +38,7 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 	// Description/category membrane parks apply while an object is still on the draft plane
 	// (or is lifecycle-preliminary). They must NOT yank a CAS-resident object back onto
 	// draft — that deletes the CAS blob (MIL-008 / complete-milestone demotion hazard).
-	// TRACK: BLI-1794075198197653000-dc625b46 — CAS rename only; refuse demotion.
+	// TRACK: https://github.com/zqk-os/zqk/pull/1027 — CAS rename only; refuse demotion.
 	membranePark := caspkg.ParkCriteriaWithoutCategory(kind, existing) || caspkg.ParkObjectWithoutDescription(kind, existing)
 	stayOnDraftPlane := shouldUseObjectDraftPlane(kind, effectiveStatus)
 	if onDraftPlane && membranePark {
