@@ -34,7 +34,6 @@ type CommandFactory func(ctx context.Context, name string, arg ...string) *exec.
 // Fail-closed: activates a named target app and refuses to emit keystrokes when
 // a terminal (or any other process) is frontmost. Blind frontmost paste mistargets
 // Terminal when daemons run paste while the human is in a shell.
-// TRACK: BLI-1787035087372193000-c022117d
 type ClipboardPasteAdapter struct {
 	NewCommand CommandFactory
 	// TargetApp overrides renderDetails / env when non-empty (tests / explicit callers).

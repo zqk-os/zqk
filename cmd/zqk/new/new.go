@@ -106,7 +106,7 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	cmd.Flags().StringP("content", "c", "", "Inline content/body for description")
 	cmd.Flags().String("file", "", "File to read title/description from")
 	if kind == objects.KindCriteria {
-		cmd.Flags().String(criteriaCategoryFlag, defaultCriteriaCategory, "Criteria category")
+		cmd.Flags().String("category", "functional", "Criteria category (default: functional)")
 	}
 	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
 	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")

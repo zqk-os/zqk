@@ -156,7 +156,6 @@ func writeAppleScriptPreamble(b *strings.Builder, tokens []string) {
 // idePasteTerminalFrontmostNames are host processes that must never receive IDE
 // chat paste keystrokes. System Events keystroke targets the frontmost app even
 // inside `tell process` — so we fail closed when a terminal stole focus.
-// TRACK: BLI-1787035087372193000-c022117d — Cursor CAP paste mistargets Terminal.
 func idePasteTerminalFrontmostNames() []string {
 	return []string{
 		"Terminal", "iTerm2", "iTerm", "Alacritty", "Warp", "Ghostty", "kitty", "Hyper", "WezTerm",
