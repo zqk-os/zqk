@@ -242,9 +242,9 @@ func TestHandleNonCommsWithAgentX_OrchestrateDirective_Flow(t *testing.T) {
 	ctx := context.Background()
 	secCtx := pkgctx.NewSystemSecurityContext()
 
-	// 1. Invalid directive format returns error
+	// 1. Invalid directive format returns nil error because permanent parse failure is handled by peer_ack skip
 	err := handleNonCommsWithAgentX(ctx, nil, provider, secCtx, tempDir, "agent-1", "operator", "session-1", agentfeed.CorrespondenceItem{EventID: "EVT-1"}, "ORCHESTRATE_PLAN INVALID@!")
-	assert.Error(t, err)
+	require.NoError(t, err)
 
 	// 2. Directive with inactive plan triggers ackSeatWorkerSkip
 	planPlanned := map[string]any{
