@@ -282,3 +282,56 @@ func TestNew_RelationalFlags_InvariantsForbiddenFieldsFiltered(t *testing.T) {
 		t.Fatalf("requirement must not declare priority_plan_ref")
 	}
 }
+
+const (
+	relFlagsTestReqID  = "REQ-RELFLAGS-001"
+	relFlagsTestGoalID = "GOAL-RELFLAGS-001"
+)
+
+// Negative boundary: the --req/--goal lineage flags must not bypass the
+// per-kind forbidden-field filter. Criteria refuse requirement_refs
+// (requirements own criteria_refs), so `zqk new criteria --req` must not
+// persist requirement_refs onto the draft.
+func TestNewCriteria_ReqFlagDoesNotPersistForbiddenRequirementRefs(t *testing.T) {
+	testRoot := setupRelationalFlagsTestEnv(t)
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{objects.KindCriteria, "--title", "Forbidden Ref Crit", "--req", relFlagsTestReqID, "--goal", relFlagsTestGoalID})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("new criteria failed: %v", err)
+	}
+
+	obj := readLatestDraft(t, testRoot, objects.KindCriteria)
+	if refs, has := obj[objects.FieldKeyRequirementRefs]; has {
+		t.Fatalf("criteria must not declare requirement_refs, got %v", refs)
+	}
+	if goalRefs := toStringSlice(obj[objects.FieldKeyGoalRefs]); !slices.Contains(goalRefs, relFlagsTestGoalID) {
+		t.Fatalf("expected criteria goal_refs to contain %s, got %v", relFlagsTestGoalID, goalRefs)
+	}
+}
+
+// Operational proof: lineage flags persist on test_case drafts via the
+// generic `new object` path, without duplicate refs.
+func TestNewObjectTestCase_ReqFlagPersistsRequirementRefs(t *testing.T) {
+	testRoot := setupRelationalFlagsTestEnv(t)
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	cmd := NewNewCmd()
+	cmd.SetContext(ctx)
+	cmd.SetArgs([]string{"object", objects.KindTestCase, "--title", "Lineage TC", "--req", relFlagsTestReqID})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("new object test_case failed: %v", err)
+	}
+
+	obj := readLatestDraft(t, testRoot, objects.KindTestCase)
+	reqRefs := toStringSlice(obj[objects.FieldKeyRequirementRefs])
+	if len(reqRefs) != 1 || reqRefs[0] != relFlagsTestReqID {
+		t.Fatalf("expected requirement_refs=[%s] (no duplicates), got %v", relFlagsTestReqID, reqRefs)
+	}
+}

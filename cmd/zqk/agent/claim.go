@@ -15,13 +15,19 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
+// Claimant flag names: --by is canonical; --agent and --agent-id are spec-declared
+// aliases (GH-932) matching the vocabulary of the rest of the `zqk agent` family.
+const (
+	claimantFlagBy      = "by"
+	claimantFlagAgent   = "agent"
+	claimantFlagAgentID = "agent-id"
+)
+
+// claimantFlagNames is the resolution order for the claimant identity flags.
+var claimantFlagNames = []string{claimantFlagBy, claimantFlagAgent, claimantFlagAgentID}
+
 func NewClaimCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentClaimCommandBuilder()
-	byFlag := cmd.Flags().Lookup("by")
-	if byFlag != nil {
-		cmd.Flags().Var(byFlag.Value, "agent", "Alias for --by (claimant agent or account id)")
-		cmd.Flags().Var(byFlag.Value, "agent-id", "Alias for --by (claimant agent or account id)")
-	}
 	if cmd.Flags().Lookup("estimated-effort") == nil {
 		cmd.Flags().String("estimated-effort", "", "Estimated effort duration (e.g. 2h, 30m; required when effort-aware objects enter in_progress)")
 	}
@@ -32,23 +38,39 @@ func NewClaimCmd() *cobra.Command {
 	return cmd
 }
 
-func parseClaimant(cmd *cobra.Command, proc *cli.Processor, flags *clipkg.FlagBag, fallbackIfEmpty bool) string {
-	claimant := strings.TrimSpace(flags.String(cmd, "by"))
-	if claimant == "" && cmd != nil && cmd.Flags().Lookup("agent") != nil {
-		claimant = strings.TrimSpace(flags.String(cmd, "agent"))
-	}
-	if claimant == "" && cmd != nil && cmd.Flags().Lookup("agent-id") != nil {
-		claimant = strings.TrimSpace(flags.String(cmd, "agent-id"))
+// parseClaimant resolves the claimant from --by / --agent / --agent-id. Supplying
+// more than one is allowed only when all non-empty values agree; conflicting values
+// fail closed rather than silently picking one.
+func parseClaimant(cmd *cobra.Command, proc *cli.Processor, flags *clipkg.FlagBag, fallbackIfEmpty bool) (string, error) {
+	claimant, source := "", ""
+	for _, name := range claimantFlagNames {
+		if cmd == nil || cmd.Flags().Lookup(name) == nil {
+			continue
+		}
+		v := strings.TrimSpace(flags.String(cmd, name))
+		if v == "" {
+			continue
+		}
+		if claimant == "" {
+			claimant, source = v, name
+			continue
+		}
+		if v != claimant {
+			return "", errfmt.Errorf("conflicting claimant flags: --%s=%q and --%s=%q (--agent and --agent-id are aliases for --by; pass one value)", source, claimant, name, v)
+		}
 	}
 	if claimant == "" && fallbackIfEmpty {
-		return resolveClaimantIdentity(cmd, proc)
+		return resolveClaimantIdentity(cmd, proc), nil
 	}
-	return claimant
+	return claimant, nil
 }
 
 func runClaim(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	var flags clipkg.FlagBag
-	who := parseClaimant(cmd, proc, &flags, true)
+	who, err := parseClaimant(cmd, proc, &flags, true)
+	if err != nil {
+		return err
+	}
 	forRef := flags.String(cmd, "for")
 	cvsRef := flags.String(cmd, "cvs")
 	exitWhenCVSCompleted := flags.Bool(cmd, "exit-when-cvs-completed")
@@ -103,11 +125,6 @@ func checkinDue(projectRoot, taskID string) string {
 
 func NewReleaseCmd() *cobra.Command {
 	cmd := bldr_cli_cmd_v1.NewAgentReleaseCommandBuilder()
-	byFlag := cmd.Flags().Lookup("by")
-	if byFlag != nil {
-		cmd.Flags().Var(byFlag.Value, "agent", "Alias for --by (claimant that must currently hold the claim)")
-		cmd.Flags().Var(byFlag.Value, "agent-id", "Alias for --by (claimant that must currently hold the claim)")
-	}
 	cmd.RunE = cli.WithProcessor(runRelease)
 	return cmd
 }
@@ -115,7 +132,10 @@ func NewReleaseCmd() *cobra.Command {
 func runRelease(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	var flags clipkg.FlagBag
 	force := flags.Bool(cmd, "force")
-	who := parseClaimant(cmd, proc, &flags, !force)
+	who, err := parseClaimant(cmd, proc, &flags, !force)
+	if err != nil {
+		return err
+	}
 	if err := flags.Err(); err != nil {
 		return err
 	}

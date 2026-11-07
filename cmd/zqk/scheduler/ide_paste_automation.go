@@ -153,13 +153,62 @@ func writeAppleScriptPreamble(b *strings.Builder, tokens []string) {
 	b.WriteString("\n-- See: cmd/zqk/scheduler/ide_paste_automation.go\n--\n\n")
 }
 
+// idePasteTerminalFrontmostNames are host processes that must never receive IDE
+// chat paste keystrokes. System Events keystroke targets the frontmost app even
+// inside `tell process` — so we fail closed when a terminal stole focus.
+func idePasteTerminalFrontmostNames() []string {
+	return []string{
+		"Terminal", "iTerm2", "iTerm", "Alacritty", "Warp", "Ghostty", "kitty", "Hyper", "WezTerm",
+	}
+}
+
+func writeAppleScriptFrontmostGuard(b *strings.Builder, app string, stepLabel string) {
+	b.WriteString(`	set zqkFM to name of first application process whose frontmost is true` + "\n")
+	b.WriteString(`	if zqkFM is not ` + app + ` then` + "\n")
+	b.WriteString(`		error "zqk agent_prompt: refuse paste at ` + stepLabel + ` — frontmost is " & zqkFM & " (want " & ` + app + ` & "); refusing Terminal/non-IDE mistarget"` + "\n")
+	b.WriteString(`	end if` + "\n")
+	b.WriteString(`	set zqkTermDeny to {` + appleScriptStringList(idePasteTerminalFrontmostNames()) + `}` + "\n")
+	b.WriteString(`	if zqkTermDeny contains zqkFM then` + "\n")
+	b.WriteString(`		error "zqk agent_prompt: refuse paste at ` + stepLabel + ` — frontmost terminal " & zqkFM` + "\n")
+	b.WriteString(`	end if` + "\n")
+}
+
+func appleScriptStringList(names []string) string {
+	parts := make([]string, 0, len(names))
+	for _, n := range names {
+		parts = append(parts, appleScriptQuoted(n))
+	}
+	return strings.Join(parts, ", ")
+}
+
+func writeAppleScriptAcquireIDEFrontmost(b *strings.Builder, app string) {
+	// Poll activate until the IDE owns frontmost. Never emit keystrokes while a
+	// terminal (or any other app) is frontmost — that is the mistarget failure mode.
+	b.WriteString(`log "zqk agent_prompt: step=acquire_ide_frontmost"` + "\n")
+	b.WriteString(`set zqkGotFront to false` + "\n")
+	b.WriteString(`repeat 30 times` + "\n")
+	b.WriteString(`	tell application ` + app + ` to activate` + "\n")
+	b.WriteString(`	delay 0.08` + "\n")
+	b.WriteString(`	tell application "System Events"` + "\n")
+	b.WriteString(`		set zqkFM to name of first application process whose frontmost is true` + "\n")
+	b.WriteString(`	end tell` + "\n")
+	b.WriteString(`	if zqkFM is ` + app + ` then` + "\n")
+	b.WriteString(`		set zqkGotFront to true` + "\n")
+	b.WriteString(`		exit repeat` + "\n")
+	b.WriteString(`	end if` + "\n")
+	b.WriteString(`end repeat` + "\n")
+	b.WriteString(`if zqkGotFront is false then` + "\n")
+	b.WriteString(`	tell application "System Events" to set zqkFM to name of first application process whose frontmost is true` + "\n")
+	b.WriteString(`	error "zqk agent_prompt: could not make " & ` + app + ` & " frontmost (still " & zqkFM & "); refuse paste"` + "\n")
+	b.WriteString(`end if` + "\n")
+}
+
 func appleScriptIDEPasteFromTokens(tokens []string) (string, error) {
 	app := appleScriptQuoted(idePasteApplicationName())
 	var b strings.Builder
 	writeAppleScriptPreamble(&b, tokens)
 	b.WriteString(`log "zqk agent_prompt: step=activate_ide"` + "\n")
-	b.WriteString(`tell application ` + app + ` to activate` + "\n")
-	b.WriteString(`delay 0.5` + "\n")
+	writeAppleScriptAcquireIDEFrontmost(&b, app)
 	b.WriteString(`tell application "System Events"` + "\n")
 	b.WriteString(`	set zqkCP to missing value` + "\n")
 	b.WriteString(`	try` + "\n")
@@ -176,9 +225,10 @@ func appleScriptIDEPasteFromTokens(tokens []string) (string, error) {
 	b.WriteString(`	try` + "\n")
 	b.WriteString(`		log "zqk agent_prompt: step=resolved_process unix_id=" & (unix id of zqkCP)` + "\n")
 	b.WriteString(`	end try` + "\n")
+	writeAppleScriptFrontmostGuard(&b, app, "before_prefix")
 	b.WriteString(`	tell zqkCP` + "\n")
 	b.WriteString(`		set frontmost to true` + "\n")
-	b.WriteString(`		delay 0.25` + "\n")
+	b.WriteString(`		delay 0.2` + "\n")
 	for _, tok := range tokens {
 		switch tok {
 		case idePasteCmdShiftE:
@@ -205,9 +255,18 @@ func appleScriptIDEPasteFromTokens(tokens []string) (string, error) {
 			return "", errfmt.Errorf("internal: unknown token %q", tok)
 		}
 	}
+	b.WriteString(`	end tell` + "\n")
+	// Re-verify after prefix keystrokes (Explorer/chat focus can yield to Terminal).
+	writeAppleScriptFrontmostGuard(&b, app, "before_cmd_v")
+	b.WriteString(`	tell zqkCP` + "\n")
+	b.WriteString(`		set frontmost to true` + "\n")
 	b.WriteString(`		log "zqk agent_prompt: step=keystroke_cmd_v_paste"` + "\n")
 	b.WriteString(`		keystroke "v" using command down` + "\n")
 	b.WriteString(`		delay 0.3` + "\n")
+	b.WriteString(`	end tell` + "\n")
+	writeAppleScriptFrontmostGuard(&b, app, "before_return")
+	b.WriteString(`	tell zqkCP` + "\n")
+	b.WriteString(`		set frontmost to true` + "\n")
 	b.WriteString(`		log "zqk agent_prompt: step=key_code_36_return_submit"` + "\n")
 	b.WriteString(`		key code 36` + "\n")
 	b.WriteString(`	end tell` + "\n")
@@ -321,6 +380,18 @@ func validateBuiltIDEPasteScript(s string, tokens []string) error {
 	}
 	if got := strings.Count(s, `keystroke "e" using {command down, option down}`); got != want[idePasteOptionCmdE] {
 		return errfmt.Errorf("internal: option_cmd_e keystroke count mismatch: got %d want %d", got, want[idePasteOptionCmdE])
+	}
+	// Frontmost fail-closed markers (must not regress to blind System Events paste).
+	for _, marker := range []string{
+		"acquire_ide_frontmost",
+		"refuse paste",
+		"before_cmd_v",
+		"before_return",
+		"Terminal",
+	} {
+		if !strings.Contains(s, marker) {
+			return errfmt.Errorf("internal: IDE paste AppleScript missing frontmost guard marker %q", marker)
+		}
 	}
 	return nil
 }

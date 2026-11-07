@@ -34,6 +34,12 @@ import (
 const (
 	emptyValue          = ""
 	commandSpecFilePerm = paths.FilePerm644
+
+	// criteriaCategoryFlag is the --category flag bound on `zqk new criteria`.
+	criteriaCategoryFlag = "category"
+	// defaultCriteriaCategory is applied when criteria are minted without an
+	// explicit category (GH-949; criteria ontology requires category).
+	defaultCriteriaCategory = "functional"
 )
 
 func newRootIntro() string {
@@ -194,29 +200,13 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	if body != emptyValue {
 		objData[objects.FieldKeyDescription] = body
 	}
-	if kind == objects.KindCriteria {
-		category := "functional"
-		if cmd.Flags().Lookup("category") != nil {
-			if flagCat, _ := cmd.Flags().GetString("category"); strings.TrimSpace(flagCat) != "" {
-				category = strings.TrimSpace(flagCat)
-			}
-		}
-		objData[objects.FieldKeyCategory] = category
-	}
+	applyCriteriaDefaultCategory(cmd, kind, objData)
+	// --req/--goal lineage refs are persisted by applyRelationalFlags, which
+	// honours per-kind forbidden fields (GH-946); here they only gate CAS crossing.
 	reqID, _ := cmd.Flags().GetString("req")
 	goalID, _ := cmd.Flags().GetString("goal")
 	reqID = strings.TrimSpace(reqID)
 	goalID = strings.TrimSpace(goalID)
-	if kind == objects.KindPriorityPlan {
-		applyPriorityPlanRelationalFlags(objData, nil, parseRelationalRefs(reqID), parseRelationalRefs(goalID))
-	} else {
-		if reqID != emptyValue {
-			objData[objects.FieldKeyRequirementRefs] = []any{reqID}
-		}
-		if goalID != emptyValue {
-			objData[objects.FieldKeyGoalRefs] = []any{goalID}
-		}
-	}
 	effort, _ := cmd.Flags().GetString("estimated-effort")
 	effort = strings.TrimSpace(effort)
 	if effort == emptyValue {
@@ -233,15 +223,6 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	if kind == objects.KindBacklogItem && (wantPromote || wantCAS) && reqID == emptyValue && goalID == emptyValue {
 		return errfmt.Errorf("%s", paths.RewriteCanonicalCLIInvocations(
 			"backlog_item crossing CAS requires a hierarchical parent: pass --req <REQ-*> or --goal <GOAL-*> (GH#963)"))
-	}
-	if kind == objects.KindCriteria {
-		category := "functional"
-		if cmd.Flags().Lookup("category") != nil {
-			if flagCat, _ := cmd.Flags().GetString("category"); strings.TrimSpace(flagCat) != "" {
-				category = strings.TrimSpace(flagCat)
-			}
-		}
-		objData[objects.FieldKeyCategory] = category
 	}
 	if kind == objects.KindAgentTask {
 		if _, ok := objData[objects.FieldKeyArtifacts]; !ok {
@@ -272,6 +253,21 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 	emitJITGuidanceTip(cmd, kind)
 
 	return handleMintPromote(cmd, projectRoot, id, kind)
+}
+
+// applyCriteriaDefaultCategory sets category on criteria drafts: an explicit
+// non-blank --category wins; otherwise defaultCriteriaCategory (GH-949).
+func applyCriteriaDefaultCategory(cmd *cobra.Command, kind string, objData map[string]any) {
+	if kind != objects.KindCriteria || objData == nil {
+		return
+	}
+	category := defaultCriteriaCategory
+	if cmd != nil && cmd.Flags().Lookup(criteriaCategoryFlag) != nil {
+		if flagCat, _ := cmd.Flags().GetString(criteriaCategoryFlag); strings.TrimSpace(flagCat) != emptyValue {
+			category = strings.TrimSpace(flagCat)
+		}
+	}
+	objData[objects.FieldKeyCategory] = category
 }
 
 func handleMintPromote(cmd *cobra.Command, projectRoot, id, kind string) error {

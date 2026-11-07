@@ -329,14 +329,14 @@ func TestFormatUnmetPreconditionDetail_GitMutationEvidence(t *testing.T) {
 		objects.FieldKeyID: "BLI-1234",
 	}
 	detail := FormatUnmetPreconditionDetail(PrecondCommitHashesGitMutationEvidence, objWithID)
-	expected := "commit_hashes have git mutation evidence for this backlog_item (ensure at least one commit touches code_location and mentions [BLI-1234] in its commit message)"
+	expected := "commit_hashes have git mutation evidence for this backlog_item (ensure at least one cited commit is a non-merge commit reachable from branch_name, changes at least one file outside .zqk/process/, and mentions BLI-1234 in its commit message (recommended subject tag: \"[BLI-1234] <summary>\"))"
 	if detail != expected {
 		t.Fatalf("got %q, want %q", detail, expected)
 	}
 
 	// 2. Without BLI ID (empty map)
 	detail = FormatUnmetPreconditionDetail(PrecondCommitHashesGitMutationEvidence, map[string]any{})
-	expected = "commit_hashes have git mutation evidence for this backlog_item (ensure at least one commit touches code_location and mentions [BLI-xxx] in its commit message)"
+	expected = "commit_hashes have git mutation evidence for this backlog_item (ensure at least one cited commit is a non-merge commit reachable from branch_name, changes at least one file outside .zqk/process/, and mentions BLI-xxx in its commit message (recommended subject tag: \"[BLI-xxx] <summary>\"))"
 	if detail != expected {
 		t.Fatalf("got %q, want %q", detail, expected)
 	}
@@ -430,7 +430,7 @@ func TestValidateLifecycleState_DetailedPreconditionErrors(t *testing.T) {
 		}
 		errs, _ := gv.validateLifecycleState(t.Context(), objects.KindBacklogItem, objects.ObjectStatusComplete, objects.ObjectStatusInProgress, obj, opts)
 		var found bool
-		wantSub := "commit_hashes have git mutation evidence for this backlog_item (ensure at least one commit touches code_location and mentions [BLI-TEST-999] in its commit message)"
+		wantSub := "commit_hashes have git mutation evidence for this backlog_item (ensure at least one cited commit is a non-merge commit reachable from branch_name, changes at least one file outside .zqk/process/, and mentions BLI-TEST-999 in its commit message (recommended subject tag: \"[BLI-TEST-999] <summary>\"); rejected: "
 		for _, e := range errs {
 			if strings.Contains(e.Message, wantSub) {
 				found = true
@@ -441,4 +441,49 @@ func TestValidateLifecycleState_DetailedPreconditionErrors(t *testing.T) {
 			t.Fatalf("expected git mutation evidence error with tag format, got errs: %v", errs)
 		}
 	})
+}
+
+func TestFormatUnmetPreconditionDetail_GitMutationEvidencePlanAltAndIdempotent(t *testing.T) {
+	t.Parallel()
+	obj := map[string]any{
+		objects.FieldKeyID:              "BLI-77",
+		objects.FieldKeyPriorityPlanRef: "PRI-9",
+	}
+	detail := FormatUnmetPreconditionDetail(PrecondCommitRefsGitMutationEvidence, obj)
+	for _, want := range []string{"mentions BLI-77 (or its priority_plan_ref PRI-9)", `"[BLI-77] <summary>"`} {
+		if !strings.Contains(detail, want) {
+			t.Fatalf("detail %q missing %q", detail, want)
+		}
+	}
+	// Already-enriched messages must not be double-annotated.
+	if again := FormatUnmetPreconditionDetail(detail, obj); again != detail {
+		t.Fatalf("expected idempotent enrichment, got %q", again)
+	}
+	// Unrelated preconditions pass through untouched.
+	if got := FormatUnmetPreconditionDetail(PrecondCommitHashesNotEmpty, obj); got != PrecondCommitHashesNotEmpty {
+		t.Fatalf("unrelated precondition mutated: %q", got)
+	}
+}
+
+func TestFormatUnmetPreconditionDetailForOptions_SurfacesPerCommitRejection(t *testing.T) {
+	t.Parallel()
+	gv := NewGoValidator()
+	root := t.TempDir()
+	obj := map[string]any{
+		objects.FieldKeyID:           "BLI-REJECT-1",
+		objects.FieldKeyCommitHashes: []string{"deadbeefcafe"},
+	}
+	opts := &ValidationOptions{ProjectRoot: root, CurrentState: objects.ObjectStatusInProgress}
+	detail := gv.formatUnmetPreconditionDetailForOptions(PrecondCommitHashesGitMutationEvidence, obj, opts)
+	for _, want := range []string{`"[BLI-REJECT-1] <summary>"`, "; rejected: ", `commit_hashes "deadbeefcafe" is not a resolvable git commit`} {
+		if !strings.Contains(detail, want) {
+			t.Fatalf("detail %q missing %q", detail, want)
+		}
+	}
+	// Empty commit_hashes names the concrete reason too.
+	delete(obj, objects.FieldKeyCommitHashes)
+	detail = gv.formatUnmetPreconditionDetailForOptions(PrecondCommitHashesGitMutationEvidence, obj, opts)
+	if !strings.Contains(detail, "; rejected: commit_hashes is empty") {
+		t.Fatalf("expected empty-hashes rejection, got %q", detail)
+	}
 }

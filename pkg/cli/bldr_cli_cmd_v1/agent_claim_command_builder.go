@@ -20,6 +20,8 @@ func NewAgentClaimCommandBuilder() *cobra.Command {
 	help.ExcludeFlag("columns")
 	builder.WithHelpBuilder(help)
 	builder.WithArgs(cobra.ExactArgs(1))
+	builder.AddStringFlag("agent", "", "", "Alias for --by (claimant agent or account id)")
+	builder.AddStringFlag("agent-id", "", "", "Alias for --by (claimant agent or account id)")
 	builder.AddStringFlag("by", "", "", "Claimant agent or account id (default: seating or env identity)")
 	builder.AddDurationFlag("checkin-cadence", "", "5m0s", "How long the claim may stay silent before the orchestrator is woken")
 	builder.AddStringFlag("cvs", "", "", "Active convergence session reference")

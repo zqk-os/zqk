@@ -321,10 +321,11 @@ func TestElevation_Cycle92_ContinuationHook_ExecutionAndBranches(t *testing.T) {
 	assert.NoError(t, emitContinuationDecision(&outWindsurfEmpty, "windsurf", "allow", ""))
 	assert.NoError(t, emitContinuationDecision(&outClineEmpty, "cline", "allow", ""))
 
-	// 9. Full CLI command execution via executeAgentCommand
+	// 9. Full CLI command execution via executeAgentCommand (Cursor stop contract)
 	outCLI, errCLI := executeAgentCommand(t, tempDir, provider, "hook", "continuation", "--vendor", "cursor", "--marker", markerPath, "--agent-id", seatID)
 	require.NoError(t, errCLI)
-	assert.Contains(t, outCLI, `"decision": "continue"`)
+	assert.Contains(t, outCLI, `"followup_message"`)
+	assert.Contains(t, outCLI, planID)
 }
 
 // -----------------------------------------------------------------------------
