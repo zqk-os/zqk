@@ -165,7 +165,7 @@ func (gv *GoValidator) Validate(ctx context.Context, obj map[string]any, kind st
 	}
 
 	if options.StrictMode {
-		result.Errors = append(result.Errors, gv.validateUnknownFields(kind, obj, spec)...)
+		result.Errors = append(result.Errors, gv.validateUnknownFieldsWithOptions(kind, obj, spec, options)...)
 		result.Errors = append(result.Errors, validateDuplicateRefs(obj)...)
 	}
 
@@ -890,6 +890,9 @@ func (gv *GoValidator) validateLifecycleState(ctx context.Context, kind, status,
 	}
 
 	skipStatusPre := edgeOverride
+	if options != nil && options.SkipStatusHoldPreconditions {
+		skipStatusPre = true
+	}
 	if skipStatusPre && strings.EqualFold(status, objects.ObjectStatusComplete) &&
 		(kind == objects.KindPriorityPlan || kind == objects.KindBacklogItem) {
 		skipStatusPre = false
@@ -1490,15 +1493,35 @@ func isEmptyUnknownFieldResidue(val any) bool {
 }
 
 func (gv *GoValidator) validateUnknownFields(kind string, obj map[string]any, spec *objects.Spec) []ValidationError {
+	return gv.validateUnknownFieldsWithOptions(kind, obj, spec, nil)
+}
+
+func (gv *GoValidator) validateUnknownFieldsWithOptions(kind string, obj map[string]any, spec *objects.Spec, options *ValidationOptions) []ValidationError {
 	if spec == nil || spec.ResolvedFields == nil {
 		return nil
 	}
+	if options != nil && options.RelaxedUnknownFields {
+		return nil
+	}
+
+	var modifiedMap map[string]bool
+	if options != nil && len(options.ModifiedFields) > 0 {
+		modifiedMap = make(map[string]bool, len(options.ModifiedFields))
+		for _, f := range options.ModifiedFields {
+			modifiedMap[f] = true
+		}
+	}
+
 	var errs []ValidationError
 	for key, val := range obj {
 		if isStandardMetadataField(key) {
 			continue
 		}
 		if val == nil || val == "<UNSET>" || reflect.TypeOf(val).Name() == "fieldUnsetMarker" {
+			continue
+		}
+		// If scoped to modified fields, ignore legacy unknown fields that were untouched.
+		if modifiedMap != nil && !modifiedMap[key] {
 			continue
 		}
 		// Empty template residue must not fail StrictMode (parity with stripEmptyUnknownFieldResidue).

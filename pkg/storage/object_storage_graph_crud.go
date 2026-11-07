@@ -269,7 +269,15 @@ func (g *GraphObjectStorage) Update(ctx context.Context, secCtx *pkgctx.Security
 	}
 
 	// Validate object (spec, lifecycle, references)
-	if err := g.validateObject(ctx, existing, kind, oldState); err != nil {
+	validateCtx := ctx
+	if len(updates) > 0 {
+		var modKeys []string
+		for k := range updates {
+			modKeys = append(modKeys, k)
+		}
+		validateCtx = pkgctx.WithModifiedFields(validateCtx, modKeys)
+	}
+	if err := g.validateObject(validateCtx, existing, kind, oldState); err != nil {
 		return errfmt.Newf(ConstStreamValidationFailed).Wrap(err)
 	}
 

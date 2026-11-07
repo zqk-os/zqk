@@ -199,7 +199,15 @@ func (f *FileObjectStorage) mergeFileObjectUpdate(p *fileObjectUpdatePrep) error
 	}
 
 	// Validate object (spec, lifecycle, references)
-	if err := f.validateObject(ctx, existing, kind, oldState); err != nil {
+	validateCtx := ctx
+	if len(updates) > 0 {
+		var modKeys []string
+		for k := range updates {
+			modKeys = append(modKeys, k)
+		}
+		validateCtx = pkgctx.WithModifiedFields(validateCtx, modKeys)
+	}
+	if err := f.validateObject(validateCtx, existing, kind, oldState); err != nil {
 		return errfmt.Newf(ErrMsgValidationFailed).Wrap(err)
 	}
 

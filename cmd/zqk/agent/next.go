@@ -174,7 +174,7 @@ func requireAtkWorktreeTornDown(projectRoot, taskID string) error {
 func requireCommitsMergedToIntegration(ctx context.Context, projectRoot, taskID, priRef string, task map[string]any) error {
 	commitRefs, _ := task[objects.FieldKeyCommitHashes].([]any)
 	if len(commitRefs) == 0 {
-		return errfmt.Errorf("FAIL-CLOSED: no commit_hashes found on task %s. You must merge your work into integration/%s and update commit_hashes before calling 'agent next'.", taskID, strings.ToLower(priRef))
+		return errfmt.Errorf("FAIL-CLOSED: no commit_hashes found on task %s. You must merge your work into integration/%s and update commit_hashes (e.g. '%s') before calling 'agent next'.", taskID, strings.ToLower(priRef), paths.CLIInvocation(fmt.Sprintf("object update %s --field 'commit_hashes=[\"<hash>\"]'", taskID)))
 	}
 	integrationBranch := "integration/" + strings.ToLower(priRef)
 	for _, cr := range commitRefs {
@@ -182,11 +182,31 @@ func requireCommitsMergedToIntegration(ctx context.Context, projectRoot, taskID,
 		if !ok || crStr == "" {
 			continue
 		}
-		cmd := execwrap.CommandContext(ctx, "git", "branch", "--contains", crStr)
+		// Check both local and remote branches (-a) containing this commit.
+		// In squash merges or landed PRs, the commit may be on main, origin/main, or remote integration branches.
+		cmd := execwrap.CommandContext(ctx, "git", "branch", "-a", "--contains", crStr)
 		cmd.Dir = projectRoot
 		out, err := cmd.CombinedOutput()
-		if err != nil || !strings.Contains(strings.ToLower(string(out)), strings.ToLower(integrationBranch)) {
-			return errfmt.Errorf("FAIL-CLOSED: commit %s is not merged into %s. You must merge your work before calling 'agent next'.", crStr, integrationBranch)
+		outLower := strings.ToLower(string(out))
+		isMerged := err == nil && (strings.Contains(outLower, strings.ToLower(integrationBranch)) ||
+			strings.Contains(outLower, "main") ||
+			strings.Contains(outLower, "master"))
+		if !isMerged {
+			// Fallback: check git merge-base --is-ancestor with HEAD or origin/main
+			ancestorCmd := execwrap.CommandContext(ctx, "git", "merge-base", "--is-ancestor", crStr, "HEAD")
+			ancestorCmd.Dir = projectRoot
+			if ancestorErr := ancestorCmd.Run(); ancestorErr == nil {
+				isMerged = true
+			} else {
+				ancestorOrigin := execwrap.CommandContext(ctx, "git", "merge-base", "--is-ancestor", crStr, "origin/main")
+				ancestorOrigin.Dir = projectRoot
+				if ancestorOriginErr := ancestorOrigin.Run(); ancestorOriginErr == nil {
+					isMerged = true
+				}
+			}
+		}
+		if !isMerged {
+			return errfmt.Errorf("FAIL-CLOSED: commit %s is not merged into %s or main. You must merge your work into %s (or main via PR) and update commit_hashes (e.g. '%s') before calling 'agent next'.", crStr, integrationBranch, integrationBranch, paths.CLIInvocation(fmt.Sprintf("object update %s --field 'commit_hashes=[\"<hash>\"]'", taskID)))
 		}
 	}
 	return nil
