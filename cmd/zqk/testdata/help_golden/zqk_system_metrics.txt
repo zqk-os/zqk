@@ -41,6 +41,7 @@ Usage:
 Available Commands:
   feed             Push metrics digest to agent_feed with notify
   file-lock        Manage file lock metrics (view buffer, flush)
+  llm              Scrutinize LLM interaction transcripts and rank model correctness
   scheduler-health Manage scheduler health metrics
 
 Flags:
