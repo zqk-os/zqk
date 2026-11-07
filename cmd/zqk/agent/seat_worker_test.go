@@ -24,6 +24,16 @@ func TestParseOrchestratePlanDirective(t *testing.T) {
 	if !ok || planID != "PRI-123" {
 		t.Fatalf("planID=%q ok=%v, want PRI-123 true", planID, ok)
 	}
+
+	// Same-line CAP prose must not be swallowed into the plan id (inbox starvation).
+	capBody := "ORCHESTRATE_PLAN PRI-1793500783722150000-96758b5f CAP CAP-20261105T104319Z-31337: batch planned BLIs on intake column; agent orchestrate this plan; agent next --on-validation-failure wake"
+	planID, ok, err = parseOrchestratePlanDirective(capBody)
+	if err != nil {
+		t.Fatalf("CAP same-line suffix: %v", err)
+	}
+	if !ok || planID != "PRI-1793500783722150000-96758b5f" {
+		t.Fatalf("CAP same-line planID=%q ok=%v", planID, ok)
+	}
 }
 
 func TestExtractATKIDFromSteer(t *testing.T) {

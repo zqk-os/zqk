@@ -1,0 +1,47 @@
+$schema: "../../_schemas/command_spec.schema.json"
+
+name: "llm"
+short: "Scrutinize LLM interaction transcripts and rank model correctness"
+description: |
+  Analyze streaming interaction transcript logs across conversation sessions.
+  Computes empirical tool call accuracy, self-correction recovery efficiency,
+  token economics, composite model rankings, and diagnostic prompt tuning
+  recommendations. Requires --file or --dir; model labels come from --model or
+  the vendor-neutral unlabeled bucket when omitted.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dir"
+    type: "string"
+    default: ""
+    description: "Directory containing conversation transcript logs (required unless --file)"
+  - name: "file"
+    type: "string"
+    default: ""
+    description: "Path to a specific transcript.jsonl file (required unless --dir)"
+  - name: "model"
+    type: "string"
+    default: ""
+    description: "Optional model label for ranking buckets (empty uses unlabeled)"
+  - name: "format"
+    shorthand: "f"
+    type: "string"
+    default: "table"
+    description: "Output format (table, json, yaml)"
+
+help:
+  examples:
+    - comment: "Evaluate a specific conversation transcript"
+      command: "%s system metrics llm --file path/to/transcript.jsonl"
+    - comment: "Evaluate all transcripts under a directory"
+      command: "%s system metrics llm --dir path/to/transcripts"
+    - comment: "Label ranking buckets with an explicit model id"
+      command: "%s system metrics llm --file path/to/transcript.jsonl --model my-model --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runLLMMetrics"
+common_flags: true

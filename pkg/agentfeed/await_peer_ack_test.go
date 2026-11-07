@@ -151,6 +151,56 @@ func TestPeerAckAwaitStorePath_underStateMesh(t *testing.T) {
 	}
 }
 
+func TestPeerAckAwaitRelievesOutbox_terminal(t *testing.T) {
+	root := t.TempDir()
+	a, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     "AFE-live",
+		FromAgentID: "tpm-seat",
+		Action:      AwaitActionWake,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if PeerAckAwaitRelievesOutbox(root, a.EventID) {
+		t.Fatal("open await must not relieve outbox")
+	}
+	if _, err := ExpirePeerAckAwaits(root, 0); err != nil {
+		t.Fatal(err)
+	}
+	if !PeerAckAwaitRelievesOutbox(root, a.EventID) {
+		t.Fatal("expired await should relieve outbox")
+	}
+}
+
+func TestPeerAckAwaitRelievesOutbox_missingAwaitRelieves(t *testing.T) {
+	root := t.TempDir()
+	if !PeerAckAwaitRelievesOutbox(root, "AFE-never-registered") {
+		t.Fatal("missing await record must relieve outbox (stale JSONL steers)")
+	}
+}
+
+func TestPeerAckAwaitRelievesOutbox_completedRelieves(t *testing.T) {
+	prev := PeerAckAwaitFire
+	PeerAckAwaitFire = func(a PeerAckAwait) error { return nil }
+	t.Cleanup(func() { PeerAckAwaitFire = prev })
+	root := t.TempDir()
+	a, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     "AFE-done",
+		FromAgentID: "tpm-seat",
+		ToAgentID:   "agy-seat",
+		Action:      AwaitActionWake,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := CompletePeerAckAwaits(root, a.EventID, "agy-seat"); err != nil {
+		t.Fatal(err)
+	}
+	if !PeerAckAwaitRelievesOutbox(root, a.EventID) {
+		t.Fatal("completed await should relieve outbox")
+	}
+}
+
 func TestExpirePeerAckAwaits(t *testing.T) {
 	root := t.TempDir()
 

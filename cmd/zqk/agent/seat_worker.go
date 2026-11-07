@@ -346,7 +346,9 @@ func handleNonCommsWithAgentX(
 ) error {
 	if planID, ok, err := parseOrchestratePlanDirective(body); ok {
 		if err != nil {
-			return err
+			// Permanent parse failure must peer_ack+park or CAP ATTNs stay
+			// skipped forever behind inboxHasOrch (ProcessSeatInbox).
+			return ackSeatWorkerSkip(root, agentID, personaRef, sessionID, item.EventID, err.Error())
 		}
 		result, submitErr := triggerPlanOrchestration(ctx, sp, secCtx, root, planID)
 		writeSeatWorkerResult(root, seatWorkerEngineIDWithRoot(root, personaRef, agentID), result)
@@ -746,7 +748,17 @@ func parseOrchestratePlanDirective(body string) (string, bool, error) {
 	if !strings.HasPrefix(firstLine, orchestratePlanDirective) {
 		return "", false, nil
 	}
-	planID := strings.TrimSpace(strings.TrimPrefix(firstLine, orchestratePlanDirective))
+	// CAP steers put prose on the same line ("ORCHESTRATE_PLAN PRI-… CAP …").
+	// Taking the whole remainder made validPlanDirectiveID fail, OnNonComms
+	// returned without peer_ack, and inboxHasOrch starved every later ATTN
+	// (hourglass peer_ack timeouts). First whitespace field is the plan id.
+	// Orchestrate plan directive: CAP same-line suffix starvation prevention
+	rest := strings.TrimSpace(strings.TrimPrefix(firstLine, orchestratePlanDirective))
+	planID := rest
+	if field, _, ok := strings.Cut(rest, " "); ok {
+		planID = strings.TrimSpace(field)
+	}
+	planID = strings.TrimRight(planID, ":,;")
 	if !validPlanDirectiveID(planID) {
 		return "", true, errfmt.Errorf("invalid ORCHESTRATE_PLAN id %q", planID)
 	}

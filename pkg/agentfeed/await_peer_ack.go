@@ -196,12 +196,14 @@ func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, err
 }
 
 // ExpirePeerAckAwaits marks open awaits expired if older than maxAge.
-// PeerAckAwaitRelievesOutbox reports whether a registered await for eventID has
-// reached a terminal status that should stop blocking outbox_awaiting_peer_ack
-// (expired / cancelled). Completed normally pairs with a peer_ack on the feed;
-// expired means the hourglass flipped without a peer receipt (e.g. CSRF-blocked
-// AGY) and must not strand PROCESS-ADMIN with await_peer_ack_keep_working forever.
-// TRACK: POL-AGENT-ORCH-HOURGLASS-001
+// PeerAckAwaitRelievesOutbox reports whether eventID should stop blocking
+// outbox_awaiting_peer_ack. Terminal await statuses (expired / cancelled /
+// completed) relieve. Missing await records also relieve: correspondence scans
+// the full JSONL for directed steers, so pre-registry or drained events with no
+// peer_ack_awaits row must not strand PROCESS-ADMIN on await_peer_ack_keep_working
+// forever after SCH-PEER-ACK-TIMEOUT (open count 0) — observed CAP outbox with
+// Nov-era AFEs while awaits file had only completed/expired rows.
+// Open awaits do not relieve (hourglass still live).
 func PeerAckAwaitRelievesOutbox(projectRoot, eventID string) bool {
 	eventID = strings.TrimSpace(eventID)
 	if eventID == "" || strings.TrimSpace(projectRoot) == "" {
@@ -217,11 +219,17 @@ func PeerAckAwaitRelievesOutbox(projectRoot, eventID string) bool {
 			continue
 		}
 		switch a.Status {
-		case AwaitStatusExpired, AwaitStatusCancelled:
+		case AwaitStatusExpired, AwaitStatusCancelled, AwaitStatusCompleted:
 			return true
+		case AwaitStatusOpen:
+			return false
 		}
+		// Unknown status: fail closed (keep hourglass) rather than stranding CAP.
+		return false
 	}
-	return false
+	// No await row for this event → not an active hourglass; do not clog outbox.
+	// TRACK: CAP outbox Nov-era AFEs with open awaits=0 after SCH-PEER-ACK-TIMEOUT.
+	return true
 }
 
 func ExpirePeerAckAwaits(projectRoot string, maxAge time.Duration) ([]PeerAckAwait, error) {

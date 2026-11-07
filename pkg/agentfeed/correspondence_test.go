@@ -69,6 +69,14 @@ func TestCorrespondence_inboxOutboxPeerAck(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if _, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     steer.EventID,
+		FromAgentID: "peer-tpm-01",
+		ToAgentID:   "peer-agent-01",
+		Action:      AwaitActionWake,
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	agy := Seat{AgentID: "peer-agent-01", PersonaRef: "PER-coder", RoleHints: []string{"agy"}}
 	tpm := Seat{AgentID: "peer-tpm-01", RoleHints: []string{"tpm"}}
@@ -271,6 +279,14 @@ func TestCorrespondence_meshStatusDoesNotBlockOutbox(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if _, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     steer.EventID,
+		FromAgentID: agy.AgentID,
+		ToAgentID:   "peer-tpm-02",
+		Action:      AwaitActionWake,
+	}); err != nil {
+		t.Fatal(err)
+	}
 	snap2, err := LoadCorrespondence(root, agy, 10)
 	if err != nil {
 		t.Fatal(err)
@@ -345,6 +361,14 @@ func TestCorrespondence_AdditionalEventTypes(t *testing.T) {
 			SelfACK:     true,
 		})
 		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+			EventID:     ev.EventID,
+			FromAgentID: "peer-tpm-02",
+			ToAgentID:   "peer-agent-03",
+			Action:      AwaitActionWake,
+		}); err != nil {
 			t.Fatal(err)
 		}
 
