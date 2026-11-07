@@ -98,6 +98,14 @@ func TestCorrespondence_impersonatedAckDoesNotClearOutbox(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if _, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     steer2.EventID,
+		FromAgentID: "peer-tpm-01",
+		ToAgentID:   "peer-agent-02",
+		Action:      AwaitActionWake,
+	}); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := AppendEvent(AppendEventInput{
 		ProjectRoot: root,
 		Message:     "cleared by AGY-1",

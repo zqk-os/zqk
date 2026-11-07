@@ -219,14 +219,17 @@ func PeerAckAwaitRelievesOutbox(projectRoot, eventID string) bool {
 			continue
 		}
 		switch a.Status {
-		case AwaitStatusExpired, AwaitStatusCancelled:
+		case AwaitStatusExpired, AwaitStatusCancelled, AwaitStatusCompleted:
 			return true
 		case AwaitStatusOpen:
 			return false
 		}
+		// Unknown status: fail closed (keep hourglass) rather than stranding CAP.
+		return false
 	}
 	// No await row for this event → not an active hourglass; do not clog outbox.
-	return false
+	// TRACK: CAP outbox Nov-era AFEs with open awaits=0 after SCH-PEER-ACK-TIMEOUT.
+	return true
 }
 
 func ExpirePeerAckAwaits(projectRoot string, maxAge time.Duration) ([]PeerAckAwait, error) {
