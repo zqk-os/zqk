@@ -7,6 +7,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/nodesovereignty"
+	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -89,27 +90,12 @@ func InspectFeed(opts DoctorOptions) DoctorResult {
 	}
 
 	// 4. Peer seat PID hygiene (mesh notify targets).
-	if seats, err := LoadPeerSeats(opts.ProjectRoot); err != nil {
-		result.Issues = append(result.Issues, "peer_seats_read_failed: "+err.Error())
-	} else {
-		live := 0
-		for id, rec := range seats.Seats {
-			if rec.PID <= 0 {
-				continue
-			}
-			if IsPIDAlive(rec.PID) {
-				live++
-			} else {
-				result.Issues = append(result.Issues, "peer_seat_stale_pid: "+id+" pid="+itoa(rec.PID))
-			}
-		}
-		result.PeerSeatsLive = live
-		if live > 0 {
-			result.PeerWakeLive = true
-		} else if len(seats.Seats) > 0 {
-			result.Issues = append(result.Issues, "peer_seats_present_but_no_live_pids: run feed doctor --refresh-seats")
-		}
-	}
+	// Seat PIDs must track seat-worker heartbeats.
+	inspectPeerSeatPIDHygiene(opts.ProjectRoot, &result)
+
+	// 4b. PrivilegedWriter project socket (CAS ops fail-closed without it).
+	// Ops must use project-scoped PrivilegedWriter socket.
+	inspectPrivilegedWriterSocket(opts.ProjectRoot, &result)
 
 	// 5. Node sovereignty (multi-root LaunchAgent / global MCP pin).
 	result.NodeSovereignty = nodesovereignty.Assess(opts.ProjectRoot)
@@ -124,6 +110,73 @@ func InspectFeed(opts DoctorOptions) DoctorResult {
 	}
 
 	return result
+}
+
+// inspectPeerSeatPIDHygiene counts live peer seats, reconciling peer_seats.json from
+// seat-worker heartbeats when seating PIDs are dead or lag the heartbeat SSOT.
+func inspectPeerSeatPIDHygiene(projectRoot string, result *DoctorResult) {
+	if result == nil {
+		return
+	}
+	seats, err := LoadPeerSeats(projectRoot)
+	if err != nil {
+		result.Issues = append(result.Issues, "peer_seats_read_failed: "+err.Error())
+		return
+	}
+	aliveBySeat, hbErr := listSeatWorkerAlivePIDsFn(projectRoot)
+	if hbErr != nil {
+		result.Issues = append(result.Issues, "seat_worker_heartbeats_read_failed: "+hbErr.Error())
+	}
+	needsRefresh := false
+	for id, rec := range seats.Seats {
+		if hb, ok := aliveBySeat[id]; ok && hb > 0 && IsPIDAlive(hb) {
+			if rec.PID != hb {
+				needsRefresh = true
+			}
+			continue
+		}
+		if rec.PID > 0 && !IsPIDAlive(rec.PID) {
+			needsRefresh = true
+		}
+	}
+	if needsRefresh {
+		if _, rerr := RefreshPeerSeatsFromLivePIDs(projectRoot, false); rerr != nil {
+			result.Issues = append(result.Issues, "peer_seats_heartbeat_reconcile_failed: "+rerr.Error())
+		} else if reloaded, lerr := LoadPeerSeats(projectRoot); lerr == nil {
+			seats = reloaded
+		}
+	}
+	live := 0
+	for id, rec := range seats.Seats {
+		if rec.PID <= 0 {
+			continue
+		}
+		if IsPIDAlive(rec.PID) {
+			live++
+			continue
+		}
+		result.Issues = append(result.Issues, "peer_seat_stale_pid: "+id+" pid="+itoa(rec.PID))
+	}
+	result.PeerSeatsLive = live
+	if live > 0 {
+		result.PeerWakeLive = true
+	} else if len(seats.Seats) > 0 {
+		result.Issues = append(result.Issues, "peer_seats_present_but_no_live_pids: run feed doctor --refresh-seats")
+	}
+}
+
+// inspectPrivilegedWriterSocket reports when the PrivilegedWriter UNIX socket used by
+// CAS (env override or project-scoped default) is unreachable.
+func inspectPrivilegedWriterSocket(projectRoot string, result *DoctorResult) {
+	if result == nil || projectRoot == "" {
+		return
+	}
+	if storage.PrivilegedWriterSocketReachable(projectRoot) {
+		return
+	}
+	sock := storage.PrivilegedWriterSocketPathForProject(projectRoot)
+	// Issue only — do not flip feed_health (correspondence plane ≠ CAS membrane).
+	result.Issues = append(result.Issues, "privileged_writer_socket_missing: "+sock)
 }
 
 func init() {

@@ -20,6 +20,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/workflow/whatsnext"
 )
 
 const (
@@ -130,11 +131,17 @@ func runContinuationHookWithDeps(
 		pol = res.Step.PolicyID
 	}
 
+	// Prefer live whats-next fill_item. Only rewrite the stale "autofix dangling"
+	// wording to heal-dangling; do not invent a GhostRef fill when fill_item is nil.
 	fillHint := ""
-	if outboxAwaitN > 0 {
-		// Stale whats-next fill wording ("system check autofix dangling") remints
-		// a non-command; hourglass keep-working names the real heal path.
-		fillHint = "system kernel-integrity heal-dangling --apply"
+	if projectRoot != "" {
+		amb := whatsnext.LoadKernelAmbience(projectRoot)
+		if fill := whatsnext.CompileFillItem(&amb); fill != nil {
+			fillHint = strings.TrimSpace(fill.CommandHint)
+			if strings.Contains(fillHint, "autofix dangling") {
+				fillHint = paths.CLICommandName + " system kernel-integrity heal-dangling --apply"
+			}
+		}
 	}
 	drive := interactionpolicy.CompileTurnContinue(interactionpolicy.TurnContinueInput{
 		InboxUnacked:          inboxN,

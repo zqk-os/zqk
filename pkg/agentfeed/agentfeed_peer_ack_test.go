@@ -489,7 +489,13 @@ func TestCycle146_Doctor_InspectFeed(t *testing.T) {
 	})
 	assert.True(t, report.PeerWakeLive)
 	assert.Equal(t, 1, report.MCPSubscribers)
-	assert.Empty(t, report.Issues)
+	var nonPWIssues []string
+	for _, issue := range report.Issues {
+		if !strings.Contains(issue, "privileged_writer_socket_missing") {
+			nonPWIssues = append(nonPWIssues, issue)
+		}
+	}
+	assert.Empty(t, nonPWIssues)
 }
 
 func TestCycle146_PrioritizeSeatInbox_Ordering(t *testing.T) {
