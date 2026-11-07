@@ -137,7 +137,9 @@ func writeRankingTable(buf *strings.Builder, rankings []llmtranscript.ModelMetri
 			m.TokensPerSuccess,
 		)
 	}
-	_ = w.Flush()
+	if err := w.Flush(); err != nil {
+		fmt.Fprintf(buf, "failed to flush table: %v\n", err)
+	}
 }
 
 func writeModelPatternsAndTips(buf *strings.Builder, rankings []llmtranscript.ModelMetrics) {
