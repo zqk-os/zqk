@@ -204,7 +204,6 @@ func ListOpenPeerAckAwaits(projectRoot, fromAgentID string) ([]PeerAckAwait, err
 // forever after SCH-PEER-ACK-TIMEOUT (open count 0) — observed CAP outbox with
 // Nov-era AFEs while awaits file had only completed/expired rows.
 // Open awaits do not relieve (hourglass still live).
-// TRACK: POL-AGENT-ORCH-HOURGLASS-001 / BLI-1785905541906569000-074e24d7
 func PeerAckAwaitRelievesOutbox(projectRoot, eventID string) bool {
 	eventID = strings.TrimSpace(eventID)
 	if eventID == "" || strings.TrimSpace(projectRoot) == "" {

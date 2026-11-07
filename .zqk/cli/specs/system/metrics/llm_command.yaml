@@ -1,14 +1,46 @@
-$schema: ../../_schemas/command_spec.schema.json
-name: llm
-short: Scrutinize LLM interaction transcripts and rank model correctness
-description: |-
-    Analyze streaming interaction transcript logs across conversation sessions.
-    Computes empirical tool call accuracy, self-correction recovery efficiency,
-    token economics, composite model rankings, and diagnostic prompt tuning recommendations.
+$schema: "../../_schemas/command_spec.schema.json"
 
-      Evaluate all sessions in default brain directory
-      zqk system metrics llm
-      Evaluate a specific conversation transcript
-      zqk system metrics llm --file path/to/transcript.jsonl
-      Output evaluation report as JSON
-      zqk system metrics llm --format json
+name: "llm"
+short: "Scrutinize LLM interaction transcripts and rank model correctness"
+description: |
+  Analyze streaming interaction transcript logs across conversation sessions.
+  Computes empirical tool call accuracy, self-correction recovery efficiency,
+  token economics, composite model rankings, and diagnostic prompt tuning
+  recommendations.
+
+args:
+  type: "no_args"
+
+flags:
+  - name: "dir"
+    type: "string"
+    default: ""
+    description: "Directory containing conversation transcript logs"
+  - name: "file"
+    type: "string"
+    default: ""
+    description: "Path to a specific transcript.jsonl file"
+  - name: "model"
+    type: "string"
+    default: ""
+    description: "Model label override (default auto-detected from environment/settings)"
+  - name: "format"
+    shorthand: "f"
+    type: "string"
+    default: "table"
+    description: "Output format (table, json, yaml)"
+
+help:
+  examples:
+    - comment: "Evaluate all sessions in default brain directory"
+      command: "%s system metrics llm"
+    - comment: "Evaluate a specific conversation transcript"
+      command: "%s system metrics llm --file path/to/transcript.jsonl"
+    - comment: "Output evaluation report as JSON"
+      command: "%s system metrics llm --format json"
+  exclude_flags:
+    - "columns"
+    - "ignore-scheduler-down"
+
+run_e: "runLLMMetrics"
+common_flags: true

@@ -5,6 +5,7 @@ package bldr_cli_cmd_v1
 import (
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 )
 
 // NewSystemMetricsLlmCommandBuilder creates a new system_metrics_llm command
@@ -14,16 +15,20 @@ func NewSystemMetricsLlmCommandBuilder() *cobra.Command {
 	help := clipkg.DynamicHelpBuilder("Scrutinize LLM interaction transcripts and rank model correctness")
 	help.WithDescriptionLines("Analyze streaming interaction transcript logs across conversation sessions.")
 	help.WithDescriptionLines("Computes empirical tool call accuracy, self-correction recovery efficiency,")
-	help.WithDescriptionLines("token economics, composite model rankings, and diagnostic prompt tuning recommendations.")
-	help.WithDescriptionLines("")
-	help.WithDescriptionLines("  Evaluate all sessions in default brain directory")
-	help.WithDescriptionLines("  zqk system metrics llm")
-	help.WithDescriptionLines("  Evaluate a specific conversation transcript")
-	help.WithDescriptionLines("  zqk system metrics llm --file path/to/transcript.jsonl")
-	help.WithDescriptionLines("  Output evaluation report as JSON")
-	help.WithDescriptionLines("  zqk system metrics llm --format json")
+	help.WithDescriptionLines("token economics, composite model rankings, and diagnostic prompt tuning")
+	help.WithDescriptionLines("recommendations.")
+	help.AddExample("Evaluate all sessions in default brain directory", "%s system metrics llm")
+	help.AddExample("Evaluate a specific conversation transcript", "%s system metrics llm --file path/to/transcript.jsonl")
+	help.AddExample("Output evaluation report as JSON", "%s system metrics llm --format json")
+	help.ExcludeFlag("columns")
+	help.ExcludeFlag("ignore-scheduler-down")
 	builder.WithHelpBuilder(help)
-	builder.WithCommonFlags(false, nil)
+	builder.WithArgs(cobra.NoArgs)
+	builder.AddStringFlag("dir", "", "", "Directory containing conversation transcript logs")
+	builder.AddStringFlag("file", "", "", "Path to a specific transcript.jsonl file")
+	builder.AddStringFlag("model", "", "", "Model label override (default auto-detected from environment/settings)")
+	builder.AddStringFlag("format", "f", "table", "Output format (table, json, yaml)")
+	builder.WithCommonFlagsExcluding(cli.AddCommonFlagsExcluding, []string{"columns", "ignore-scheduler-down"})
 	cmd := builder.Build()
 	return cmd
 }

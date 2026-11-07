@@ -9,6 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/telemetry/llmtranscript"
 )
@@ -16,29 +17,11 @@ import (
 // NewLLMMetricsCmd creates a subcommand to analyze LLM transcript telemetry,
 // rank model correctness, and generate prompt honing feedback streams.
 func NewLLMMetricsCmd() *cobra.Command {
-	helpBuilder := clipkg.DynamicHelpBuilder(
-		"Scrutinize LLM interaction transcripts, rank model correctness, and generate prompt honing guidance",
-		"Analyze streaming interaction transcript logs across conversation sessions.",
-		"Computes empirical tool call accuracy, self-correction recovery efficiency,",
-		"token economics, composite model rankings, and diagnostic prompt tuning recommendations.",
-	).
-		AddExample("Evaluate all sessions in default brain directory", "%s system metrics llm").
-		AddExample("Evaluate a specific conversation transcript", "%s system metrics llm --file path/to/transcript.jsonl").
-		AddExample("Output evaluation report as JSON", "%s system metrics llm --format json")
-
-	cmd := &cobra.Command{
-		Use:   "llm",
-		Short: "Scrutinize LLM interaction transcripts and rank model correctness",
-		RunE:  runLLMMetrics,
-	}
-
-	cmd.Flags().String("dir", "", "Directory containing conversation transcript logs (default: ~/.gemini/antigravity-cli/brain)")
-	cmd.Flags().String("file", "", "Path to a specific transcript.jsonl file")
-	cmd.Flags().String("model", "", "Model label override (default: auto-detected from environment/settings)")
-	cmd.Flags().StringP("format", "f", "table", "Output format (table, json, yaml)")
-
-	helpBuilder.ApplyToCommand(cmd)
-	return cmd
+	return clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewSystemMetricsLlmCommandBuilder(), &cobra.Command{
+		Use:  "llm",
+		Args: cobra.NoArgs,
+		RunE: runLLMMetrics,
+	})
 }
 
 func runLLMMetrics(cmd *cobra.Command, args []string) error {
