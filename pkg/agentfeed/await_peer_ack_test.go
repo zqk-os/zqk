@@ -151,12 +151,8 @@ func TestPeerAckAwaitStorePath_underStateMesh(t *testing.T) {
 	}
 }
 
-func TestPeerAckAwaitRelievesOutbox_missingAndTerminal(t *testing.T) {
+func TestPeerAckAwaitRelievesOutbox_terminal(t *testing.T) {
 	root := t.TempDir()
-	// Legacy / drained JSONL steers with no await row must not clog outbox.
-	if !PeerAckAwaitRelievesOutbox(root, "AFE-never-registered") {
-		t.Fatal("missing await should relieve outbox")
-	}
 	a, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
 		EventID:     "AFE-live",
 		FromAgentID: "tpm-seat",

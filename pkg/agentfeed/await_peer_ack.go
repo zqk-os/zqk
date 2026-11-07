@@ -213,22 +213,20 @@ func PeerAckAwaitRelievesOutbox(projectRoot, eventID string) bool {
 	if err != nil {
 		return false
 	}
-	found := false
 	for i := range f.Awaits {
 		a := f.Awaits[i]
 		if a.EventID != eventID {
 			continue
 		}
-		found = true
 		switch a.Status {
-		case AwaitStatusExpired, AwaitStatusCancelled, AwaitStatusCompleted:
+		case AwaitStatusExpired, AwaitStatusCancelled:
 			return true
 		case AwaitStatusOpen:
 			return false
 		}
 	}
 	// No await row for this event → not an active hourglass; do not clog outbox.
-	return !found
+	return false
 }
 
 func ExpirePeerAckAwaits(projectRoot string, maxAge time.Duration) ([]PeerAckAwait, error) {
