@@ -90,11 +90,11 @@ func InspectFeed(opts DoctorOptions) DoctorResult {
 	}
 
 	// 4. Peer seat PID hygiene (mesh notify targets).
-	// TRACK: BLI-1793613648594753500-6feb1c69 — seat PIDs must track seat-worker heartbeats.
+	// Seat PIDs must track seat-worker heartbeats.
 	inspectPeerSeatPIDHygiene(opts.ProjectRoot, &result)
 
 	// 4b. PrivilegedWriter project socket (CAS ops fail-closed without it).
-	// TRACK: BLI-1793613648594753500-6feb1c69 — ops must use project-scoped PrivilegedWriter socket.
+	// Ops must use project-scoped PrivilegedWriter socket.
 	inspectPrivilegedWriterSocket(opts.ProjectRoot, &result)
 
 	// 5. Node sovereignty (multi-root LaunchAgent / global MCP pin).

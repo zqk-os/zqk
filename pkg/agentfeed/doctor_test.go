@@ -83,7 +83,7 @@ func TestInspectFeed_Doctor(t *testing.T) {
 }
 
 func TestInspectFeed_ReconcilesStaleSeatPIDFromHeartbeat(t *testing.T) {
-	// TRACK: BLI-1793613648594753500-6feb1c69 — doctor must track seat-worker heartbeats.
+	// Doctor must track seat-worker heartbeats.
 	root := t.TempDir()
 	feedPath := datacell.AgentChatChannelEventsJSONLPath(root)
 	require.NoError(t, fileutil.EnsureDir(filepath.Dir(feedPath)))
