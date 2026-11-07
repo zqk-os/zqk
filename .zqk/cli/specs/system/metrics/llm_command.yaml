@@ -1,0 +1,14 @@
+$schema: ../../_schemas/command_spec.schema.json
+name: llm
+short: Scrutinize LLM interaction transcripts and rank model correctness
+description: |-
+    Analyze streaming interaction transcript logs across conversation sessions.
+    Computes empirical tool call accuracy, self-correction recovery efficiency,
+    token economics, composite model rankings, and diagnostic prompt tuning recommendations.
+
+      Evaluate all sessions in default brain directory
+      zqk system metrics llm
+      Evaluate a specific conversation transcript
+      zqk system metrics llm --file path/to/transcript.jsonl
+      Output evaluation report as JSON
+      zqk system metrics llm --format json

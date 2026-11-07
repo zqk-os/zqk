@@ -39,11 +39,14 @@ func TestParseTranscript_Success(t *testing.T) {
 	assert.Equal(t, "run_command", steps[1].ToolCalls[0].Name)
 }
 
-func TestExtractTurns_EvaluatesTurnOutcomesAndSelfCorrection(t *testing.T) {
+func parseSampleTurns(t *testing.T) []llmtranscript.Turn {
 	steps, err := llmtranscript.ParseTranscript(strings.NewReader(sampleTranscriptJSONL))
 	require.NoError(t, err)
+	return llmtranscript.ExtractTurns(steps, "Gemini 3.8 Flash")
+}
 
-	turns := llmtranscript.ExtractTurns(steps, "Gemini 3.8 Flash")
+func TestExtractTurns_EvaluatesTurnOutcomesAndSelfCorrection(t *testing.T) {
+	turns := parseSampleTurns(t)
 	require.Len(t, turns, 4)
 
 	// Turn 0: step 1 (which zqk -> code 0)
@@ -76,10 +79,7 @@ func TestExtractTurns_EvaluatesTurnOutcomesAndSelfCorrection(t *testing.T) {
 }
 
 func TestEvaluateTurns_GeneratesRankingsAndPromptHoning(t *testing.T) {
-	steps, err := llmtranscript.ParseTranscript(strings.NewReader(sampleTranscriptJSONL))
-	require.NoError(t, err)
-
-	turns := llmtranscript.ExtractTurns(steps, "Gemini 3.8 Flash")
+	turns := parseSampleTurns(t)
 	rankings := llmtranscript.EvaluateTurns(turns)
 
 	require.Len(t, rankings, 1)

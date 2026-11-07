@@ -1,7 +1,6 @@
 package system
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,8 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/telemetry/llmtranscript"
-	"gopkg.in/yaml.v3"
 )
 
 // NewLLMMetricsCmd creates a subcommand to analyze LLM transcript telemetry,
@@ -66,7 +65,7 @@ func runLLMMetrics(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return renderReport(report, format)
+	return renderReport(cmd, report, format)
 }
 
 func resolveModelOverride(override string) string {
@@ -110,45 +109,36 @@ func buildEvaluationReport(filePath, dirPath, model string) (*llmtranscript.Eval
 	return llmtranscript.AnalyzeDirectory(dirPath, model)
 }
 
-func renderReport(report *llmtranscript.EvaluationReport, format string) error {
+func renderReport(cmd *cobra.Command, report *llmtranscript.EvaluationReport, format string) error {
 	switch format {
 	case "json":
-		data, err := json.MarshalIndent(report, "", "  ")
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(data))
-		return nil
+		return cli.FormatOutputAs(cmd, cli.FormatJSON, report)
 	case "yaml":
-		data, err := yaml.Marshal(report)
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(data))
-		return nil
+		return cli.FormatOutputAs(cmd, cli.FormatYAML, report)
 	default:
-		printTableReport(report)
-		return nil
+		return cli.WriteOutput(cmd, []byte(formatTableReport(report)))
 	}
 }
 
-func printTableReport(report *llmtranscript.EvaluationReport) {
-	fmt.Printf("\n=== LLM Interaction Telemetry & Model Correctness Report ===\n")
-	fmt.Printf("Conversations Analyzed: %d | Total Steps: %d | Total Evaluated Turns: %d\n\n",
+func formatTableReport(report *llmtranscript.EvaluationReport) string {
+	var buf strings.Builder
+	fmt.Fprintf(&buf, "\n=== LLM Interaction Telemetry & Model Correctness Report ===\n")
+	fmt.Fprintf(&buf, "Conversations Analyzed: %d | Total Steps: %d | Total Evaluated Turns: %d\n\n",
 		report.ConversationsAnalyzed, report.TotalSteps, report.TotalTurns)
 
 	if len(report.ModelRankings) == 0 {
-		fmt.Println("No model interaction turns detected.")
-		return
+		buf.WriteString("No model interaction turns detected.\n")
+		return buf.String()
 	}
 
-	printRankingTable(report.ModelRankings)
-	printModelPatternsAndTips(report.ModelRankings)
-	fmt.Println()
+	writeRankingTable(&buf, report.ModelRankings)
+	writeModelPatternsAndTips(&buf, report.ModelRankings)
+	buf.WriteByte('\n')
+	return buf.String()
 }
 
-func printRankingTable(rankings []llmtranscript.ModelMetrics) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+func writeRankingTable(buf *strings.Builder, rankings []llmtranscript.ModelMetrics) {
+	w := tabwriter.NewWriter(buf, 0, 0, 3, ' ', 0)
 	fmt.Fprintln(w, "RANK\tMODEL\tSCORE\tTOOL ACCURACY\tRECOVERY RATE\tTOOL CALLS\tTOKENS/SUCCESS")
 	fmt.Fprintln(w, "----\t-----\t-----\t-------------\t-------------\t----------\t--------------")
 
@@ -167,22 +157,22 @@ func printRankingTable(rankings []llmtranscript.ModelMetrics) {
 	_ = w.Flush()
 }
 
-func printModelPatternsAndTips(rankings []llmtranscript.ModelMetrics) {
+func writeModelPatternsAndTips(buf *strings.Builder, rankings []llmtranscript.ModelMetrics) {
 	for _, m := range rankings {
 		if len(m.TopFailurePatterns) > 0 {
-			fmt.Printf("\n--- Empirical Failure Archetypes: %s ---\n", m.Model)
+			fmt.Fprintf(buf, "\n--- Empirical Failure Archetypes: %s ---\n", m.Model)
 			for _, p := range m.TopFailurePatterns {
-				fmt.Printf("  • [%s] %s (count: %d)\n", p.Tool, p.Pattern, p.Count)
+				fmt.Fprintf(buf, "  • [%s] %s (count: %d)\n", p.Tool, p.Pattern, p.Count)
 				if p.Sample != "" {
-					fmt.Printf("    Sample: %s\n", truncateSample(p.Sample, 80))
+					fmt.Fprintf(buf, "    Sample: %s\n", truncateSample(p.Sample, 80))
 				}
 			}
 		}
 
 		if len(m.PromptHoningTips) > 0 {
-			fmt.Printf("\n--- Actionable Prompt Honing Guidance: %s ---\n", m.Model)
+			fmt.Fprintf(buf, "\n--- Actionable Prompt Honing Guidance: %s ---\n", m.Model)
 			for _, tip := range m.PromptHoningTips {
-				fmt.Printf("  → %s\n", tip)
+				fmt.Fprintf(buf, "  → %s\n", tip)
 			}
 		}
 	}
