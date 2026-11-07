@@ -130,6 +130,12 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 			}
 
 			bulkCtx := proc.OperationContext()
+			if relaxed {
+				bulkCtx = pkgctx.WithRelaxedValidation(bulkCtx, true)
+			}
+			if unsetFields, _ := cmd.Flags().GetStringArray("unset-field"); len(unsetFields) > 0 {
+				bulkCtx = pkgctx.WithUnsetFieldOperation(bulkCtx, true)
+			}
 			for _, k := range affectedKinds {
 				var glassErr error
 				bulkCtx, glassErr = withUpdateBreakGlass(cmd, bulkCtx, k)
@@ -317,6 +323,12 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 
 			// Build cache context
 			opCtx := buildUpdateCacheContext(proc, id, updates, objKind)
+			if relaxed, _ := cmd.Flags().GetBool("relaxed"); relaxed {
+				opCtx = pkgctx.WithRelaxedValidation(opCtx, true)
+			}
+			if unsetFields, _ := cmd.Flags().GetStringArray("unset-field"); len(unsetFields) > 0 {
+				opCtx = pkgctx.WithUnsetFieldOperation(opCtx, true)
+			}
 			var glassErr error
 			opCtx, glassErr = withUpdateBreakGlass(cmd, opCtx, objKind)
 			if glassErr != nil {

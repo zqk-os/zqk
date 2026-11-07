@@ -205,6 +205,9 @@ func (f *FileObjectStorage) validateObject(ctx context.Context, obj map[string]a
 		IsDraftPlaneOnly: func(id string) bool {
 			return f.IsDraftPlaneOnly(id)
 		},
+		ModifiedFields:              pkgctx.GetModifiedFields(ctx),
+		RelaxedUnknownFields:        pkgctx.IsRelaxedValidation(ctx),
+		SkipStatusHoldPreconditions: pkgctx.IsUnsetFieldOperation(ctx),
 	}
 	BindValidationLookups(options, ctx, f, pkgctx.NewSystemSecurityContext())
 	if fn := pkgctx.GetValidationProgress(ctx); fn != nil {

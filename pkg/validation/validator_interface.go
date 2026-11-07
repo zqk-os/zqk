@@ -77,6 +77,15 @@ type ValidationOptions struct {
 
 	// OnValidationEvent is an optional event callback for validation lifecycle events.
 	OnValidationEvent func(event ValidationEvent)
+
+	// ModifiedFields restricts strict unknown field checks to only these mutated fields (GH-1014).
+	ModifiedFields []string
+
+	// RelaxedUnknownFields suppresses unknown field validation errors (GH-1014).
+	RelaxedUnknownFields bool
+
+	// SkipStatusHoldPreconditions bypasses forward preconditions for stable status (e.g. during --unset-field) (GH-1019).
+	SkipStatusHoldPreconditions bool
 }
 
 // DefaultValidationOptions returns default validation options

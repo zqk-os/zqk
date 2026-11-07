@@ -915,3 +915,63 @@ func EnforceTimeout(ctx stdcontext.Context, defaultTimeout time.Duration) (stdco
 	}
 	return stdcontext.WithTimeout(ctx, defaultTimeout)
 }
+
+type relaxedValidationKey struct{}
+
+// WithRelaxedValidation marks the context to suppress unknown field errors during validation (GH-1014).
+func WithRelaxedValidation(ctx stdcontext.Context, relaxed bool) stdcontext.Context {
+	if ctx == nil {
+		ctx = stdcontext.Background()
+	}
+	return stdcontext.WithValue(ctx, relaxedValidationKey{}, relaxed)
+}
+
+// IsRelaxedValidation reports whether relaxed schema validation is active on the context.
+func IsRelaxedValidation(ctx stdcontext.Context) bool {
+	if ctx == nil {
+		return false
+	}
+	v, ok := ctx.Value(relaxedValidationKey{}).(bool)
+	return ok && v
+}
+
+type unsetFieldOperationKey struct{}
+
+// WithUnsetFieldOperation marks the context as performing an unset-field mutation (GH-1019).
+func WithUnsetFieldOperation(ctx stdcontext.Context, unset bool) stdcontext.Context {
+	if ctx == nil {
+		ctx = stdcontext.Background()
+	}
+	return stdcontext.WithValue(ctx, unsetFieldOperationKey{}, unset)
+}
+
+// IsUnsetFieldOperation reports whether an unset-field operation is active on the context.
+func IsUnsetFieldOperation(ctx stdcontext.Context) bool {
+	if ctx == nil {
+		return false
+	}
+	v, ok := ctx.Value(unsetFieldOperationKey{}).(bool)
+	return ok && v
+}
+
+type modifiedFieldsKey struct{}
+
+// WithModifiedFields attaches the explicitly modified fields to the context (GH-1014).
+func WithModifiedFields(ctx stdcontext.Context, fields []string) stdcontext.Context {
+	if ctx == nil {
+		ctx = stdcontext.Background()
+	}
+	return stdcontext.WithValue(ctx, modifiedFieldsKey{}, fields)
+}
+
+// GetModifiedFields retrieves the modified fields attached to the context, or nil if none.
+func GetModifiedFields(ctx stdcontext.Context) []string {
+	if ctx == nil {
+		return nil
+	}
+	fields, ok := ctx.Value(modifiedFieldsKey{}).([]string)
+	if !ok {
+		return nil
+	}
+	return fields
+}

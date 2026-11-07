@@ -370,3 +370,86 @@ func TestCompose_BacklogItem_RefusesDuplicateRefs(t *testing.T) {
 		t.Fatalf("expected intra_object_duplicate_ref error on backlog_item from compose overlay, got: %v", res.Errors)
 	}
 }
+
+func TestGoValidator_ScopedUpdate_IgnoresUntouchedUnknownFields(t *testing.T) {
+	gv := NewGoValidator()
+	ctx := pkgctx.NewSystemContext()
+
+	// Object with legacy unknown field and a modified field
+	obj := map[string]any{
+		objects.FieldKeyID:            "GOAL-TEST-002",
+		objects.FieldKeyKind:          objects.KindGoal,
+		objects.FieldKeyTitle:         "Updated title",
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
+		objects.FieldKeyCreatedBy:     "ACC-TEST",
+		objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
+		objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		"legacy_untouched_field":      "historical data",
+	}
+
+	// Scoped update: only "title" was modified. Untouched legacy field should NOT fail validation (GH-1014).
+	resScoped, err := gv.Validate(ctx, obj, objects.KindGoal, &ValidationOptions{
+		StrictMode:     true,
+		ModifiedFields: []string{objects.FieldKeyTitle},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	for _, e := range resScoped.Errors {
+		if e.Rule == "unknown_field" && e.Field == "legacy_untouched_field" {
+			t.Fatalf("scoped update should not fail on untouched legacy field, got: %v", e)
+		}
+	}
+
+	// But if the unknown field itself was in ModifiedFields, it must be rejected!
+	resModifiedStray, err := gv.Validate(ctx, obj, objects.KindGoal, &ValidationOptions{
+		StrictMode:     true,
+		ModifiedFields: []string{"legacy_untouched_field"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	found := false
+	for _, e := range resModifiedStray.Errors {
+		if e.Rule == "unknown_field" && e.Field == "legacy_untouched_field" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected unknown_field error when the stray field itself is modified, got: %v", resModifiedStray.Errors)
+	}
+}
+
+func TestGoValidator_RelaxedUnknownFields_SuppressesUnknownFieldErrors(t *testing.T) {
+	gv := NewGoValidator()
+	ctx := pkgctx.NewSystemContext()
+
+	obj := map[string]any{
+		objects.FieldKeyID:            "GOAL-TEST-003",
+		objects.FieldKeyKind:          objects.KindGoal,
+		objects.FieldKeyTitle:         "Relaxed title",
+		objects.FieldKeyStatus:        objects.ObjectStatusActive,
+		objects.FieldKeySchemaVersion: objects.DefaultSchemaVersion,
+		objects.FieldKeyCreatedAt:     "2026-01-01T00:00:00Z",
+		objects.FieldKeyCreatedBy:     "ACC-TEST",
+		objects.FieldKeyUpdatedAt:     "2026-01-01T00:00:00Z",
+		objects.FieldKeyUpdatedBy:     "ACC-TEST",
+		"deprecated_legacy_key":       "old value",
+	}
+
+	resRelaxed, err := gv.Validate(ctx, obj, objects.KindGoal, &ValidationOptions{
+		StrictMode:           true,
+		RelaxedUnknownFields: true,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	for _, e := range resRelaxed.Errors {
+		if e.Rule == "unknown_field" {
+			t.Fatalf("RelaxedUnknownFields should suppress unknown field errors, got: %v", e)
+		}
+	}
+}
