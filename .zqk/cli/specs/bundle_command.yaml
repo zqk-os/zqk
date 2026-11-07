@@ -1,0 +1,30 @@
+$schema: _schemas/command_spec.schema.json
+name: bundle
+short: Manage modular language bundles, architecture standards, and verification packs
+description: |
+  Manage modular language bundles and process packs. Bundles encapsulate
+  declarative AST hygiene policies, static verification gates, anti-pattern rules,
+  and agent directives for downstream consumer repositories.
+help:
+  examples:
+    - comment: List installed language bundles
+      command: "%s bundle list"
+    - comment: Inspect an installed language bundle
+      command: "%s bundle info <bundle-name>"
+    - comment: Install a language bundle from manifest
+      command: "%s bundle add --file <manifest.yaml>"
+    - comment: Uninstall a language bundle
+      command: "%s bundle remove <bundle-name>"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: list
+    spec_ref: bundle/list_command.yaml
+  - name: info
+    spec_ref: bundle/info_command.yaml
+  - name: add
+    spec_ref: bundle/add_command.yaml
+  - name: remove
+    spec_ref: bundle/remove_command.yaml
