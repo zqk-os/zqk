@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
@@ -23,12 +24,8 @@ import (
 
 const (
 	defaultMarkerFilename = "cap_loop_active"
-	defaultActivePlanInfo = "Active cycle in progress"
-	activePlanInfoFmt     = "Active plan in progress: %s (%s)"
 	steeringSummaryFmt    = "- [%s from %s]: %s"
 	steeringNudgeFmt      = " Pending steering inbox (%d unacked message(s)):\n%s."
-	capPromptTemplate     = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): Autonomous progression trigger. %s.%s Query %s and advance without idling. Do not stop."
-	workflowWhatsNextCmd  = "workflow whats-next"
 )
 
 type continuationHookOutput struct {
@@ -78,77 +75,134 @@ func runContinuationHookWithDeps(
 	in io.Reader,
 	out io.Writer,
 ) error {
-	// 1. Drain stdin safely (tolerate empty, non-JSON payloads, or interactive terminal)
 	if _, err := safeDrainInput(in); err != nil {
 		return err
 	}
 
-	// 2. Resolve default marker if empty
 	if markerPath == "" && projectRoot != "" {
 		markerPath = filepath.Join(projectRoot, paths.ProjectDataDir, "state", defaultMarkerFilename)
 	}
 
-	// 3. Inspect active marker existence
-	if !markerExists(markerPath) {
-		return emitContinuationDecision(out, vendor, "allow", "")
-	}
-
-	// 4. Query active in-progress priority plan if storage is available
-	activePlanInfo := defaultActivePlanInfo
+	capActive := markerExists(markerPath)
+	planInfo := ""
 	if sp != nil {
-		filter := storage.ListFilter{
-			Kind: objects.KindPriorityPlan,
-			Filters: map[string]any{
-				objects.FieldKeyStatus: objects.ObjectStatusInProgress,
-			},
-		}
-		if res, err := sp.List(ctx, sec, nil, filter); err == nil && len(res.Objects) > 0 {
-			first := res.Objects[0]
-			pID, okID := first[objects.FieldKeyID].(string)
-			title, okTitle := first[objects.FieldKeyTitle].(string)
-			if okID && pID != "" && okTitle {
-				activePlanInfo = fmt.Sprintf(activePlanInfoFmt, title, pID)
-			}
+		planInfo = executionFacingPlanInfo(ctx, sec, sp)
+		if planInfo != "" {
+			capActive = true
+		} else if !capActive {
+			capActive = hasExecutionFacingPlan(ctx, sec, sp)
 		}
 	}
 
-	// 5. Query pending unacked steering messages from agentfeed correspondence
-	targetAgentID := strings.TrimSpace(agentID)
-	if targetAgentID == "" {
-		targetAgentID = strings.TrimSpace(os.Getenv("ZQK_AGENT_ID"))
-		if targetAgentID == "" {
-			targetAgentID = strings.TrimSpace(os.Getenv("ZQK_SEAT_ID"))
-		}
-		if targetAgentID == "" && projectRoot != "" {
-			targetAgentID = strings.TrimSpace(agentfeed.CoordinatorSeatID(projectRoot))
-			if targetAgentID == "" {
-				targetAgentID = strings.TrimSpace(agentfeed.WorkerSeatID(projectRoot))
-			}
-		}
-		if targetAgentID == "" {
-			targetAgentID = "coordinator"
-		}
-	}
+	targetAgentID := resolveContinuationSeatID(projectRoot, agentID)
 	var steeringNudge string
+	inboxN := 0
 	if targetAgentID != "" && projectRoot != "" {
 		seat := agentfeed.Seat{
 			AgentID:    targetAgentID,
 			PersonaRef: strings.TrimSpace(personaRef),
 		}
-		if snap, err := agentfeed.LoadCorrespondence(projectRoot, seat, 5); err == nil && len(snap.InboxUnacked) > 0 {
-			var msgSummaries []string
-			for _, item := range snap.InboxUnacked {
-				msgSummaries = append(msgSummaries, fmt.Sprintf(steeringSummaryFmt, item.EventType, item.FromAgentID, item.Summary))
+		if snap, err := agentfeed.LoadCorrespondence(projectRoot, seat, 5); err == nil {
+			inboxN = len(snap.InboxUnacked)
+			if inboxN > 0 {
+				var msgSummaries []string
+				for _, item := range snap.InboxUnacked {
+					msgSummaries = append(msgSummaries, fmt.Sprintf(steeringSummaryFmt, item.EventType, item.FromAgentID, item.Summary))
+				}
+				steeringNudge = fmt.Sprintf(steeringNudgeFmt, inboxN, strings.Join(msgSummaries, "\n"))
 			}
-			steeringNudge = fmt.Sprintf(steeringNudgeFmt, len(snap.InboxUnacked), strings.Join(msgSummaries, "\n"))
 		}
 	}
 
-	promptMsg := fmt.Sprintf(capPromptTemplate, activePlanInfo, steeringNudge, paths.CLIInvocation(workflowWhatsNextCmd))
-	reason := paths.RewriteCanonicalCLIInvocations(promptMsg)
+	ev := interactionpolicy.EventIdle
+	if inboxN > 0 {
+		ev = interactionpolicy.EventInboxUnacked
+	}
+	res := interactionpolicy.Evaluate(nil, ev)
+	step := ""
+	hint := ""
+	pol := ""
+	if res.Matched && res.Step != nil {
+		step = res.Step.GuidingStep
+		hint = res.Step.CommandHint
+		pol = res.Step.PolicyID
+	}
+
+	drive := interactionpolicy.CompileTurnContinue(interactionpolicy.TurnContinueInput{
+		InboxUnacked:  inboxN,
+		GuidingEvent:  ev,
+		GuidingStep:   step,
+		CommandHint:   hint,
+		PolicyID:      pol,
+		CapLoopActive: capActive,
+		SteeringNudge: steeringNudge,
+	})
+	if !drive.Continue {
+		return emitContinuationDecision(out, vendor, "allow", "")
+	}
+	reason := drive.Message
+	if planInfo != "" && !strings.Contains(reason, planInfo) {
+		reason = planInfo + ". " + reason
+	}
+	reason = paths.RewriteCanonicalCLIInvocations(reason)
 	return emitContinuationDecision(out, vendor, "continue", reason)
 }
 
+func hasExecutionFacingPlan(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider) bool {
+	return executionFacingPlanInfo(ctx, sec, sp) != ""
+}
+
+func executionFacingPlanInfo(ctx context.Context, sec *pkgctx.SecurityContext, sp storage.ObjectStorageProvider) string {
+	for _, status := range []string{objects.ObjectStatusInProgress, objects.ObjectStatusActive} {
+		filter := storage.ListFilter{
+			Kind: objects.KindPriorityPlan,
+			Filters: map[string]any{
+				objects.FieldKeyStatus: status,
+			},
+		}
+		res, err := sp.List(ctx, sec, nil, filter)
+		if err != nil || len(res.Objects) == 0 {
+			continue
+		}
+		first := res.Objects[0]
+		pID, _ := first[objects.FieldKeyID].(string)
+		title, _ := first[objects.FieldKeyTitle].(string)
+		pID = strings.TrimSpace(pID)
+		title = strings.TrimSpace(title)
+		if pID == "" {
+			continue
+		}
+		if title == "" {
+			return pID
+		}
+		return fmt.Sprintf("Active plan in progress: %s (%s)", title, pID)
+	}
+	return ""
+}
+
+func resolveContinuationSeatID(projectRoot, agentID string) string {
+	if id := strings.TrimSpace(agentID); id != "" {
+		return id
+	}
+	if id := strings.TrimSpace(os.Getenv("ZQK_AGENT_ID")); id != "" {
+		return id
+	}
+	if id := strings.TrimSpace(os.Getenv("ZQK_SEAT_ID")); id != "" {
+		return id
+	}
+	if projectRoot != "" {
+		if id := strings.TrimSpace(agentfeed.CoordinatorSeatID(projectRoot)); id != "" {
+			return id
+		}
+		if id := strings.TrimSpace(agentfeed.WorkerSeatID(projectRoot)); id != "" {
+			return id
+		}
+	}
+	return "coordinator"
+}
+
+// emitContinuationDecision maps the generic continue/allow decision onto vendor
+// host contracts. Cursor stop hooks require followup_message (not decision/message).
 func emitContinuationDecision(out io.Writer, vendor string, decision string, reason string) error {
 	v := strings.ToLower(strings.TrimSpace(vendor))
 	switch v {
@@ -157,56 +211,47 @@ func emitContinuationDecision(out io.Writer, vendor string, decision string, rea
 		if d == "continue" {
 			d = "block"
 		}
-		output := map[string]any{
-			"decision": d,
-		}
+		output := map[string]any{"decision": d}
 		if reason != "" {
 			output["reason"] = reason
 		}
-		enc := json.NewEncoder(out)
-		enc.SetIndent("", "  ")
-		return enc.Encode(output)
+		return encodeJSON(out, output)
 	case "cursor":
-		output := map[string]any{
-			"decision": decision,
+		// Cursor Agent `stop` hook: empty object ends the turn; followup_message
+		// is auto-submitted as the next user message (host specialization only).
+		if decision != "continue" || strings.TrimSpace(reason) == "" {
+			return encodeJSON(out, map[string]any{})
 		}
-		if reason != "" {
-			output["reason"] = reason
-			output["message"] = reason
-		}
-		enc := json.NewEncoder(out)
-		enc.SetIndent("", "  ")
-		return enc.Encode(output)
+		return encodeJSON(out, map[string]any{
+			"followup_message":   reason,
+			"additional_context": reason,
+		})
 	case "windsurf", "cascade":
-		output := map[string]any{
-			"decision": decision,
-		}
+		output := map[string]any{"decision": decision}
 		if reason != "" {
 			output["reason"] = reason
 			output["explanation"] = reason
 		}
-		enc := json.NewEncoder(out)
-		enc.SetIndent("", "  ")
-		return enc.Encode(output)
+		return encodeJSON(out, output)
 	case "cline", "roo":
-		output := map[string]any{
-			"decision": decision,
-		}
+		output := map[string]any{"decision": decision}
 		if reason != "" {
 			output["reason"] = reason
 		}
-		enc := json.NewEncoder(out)
-		enc.SetIndent("", "  ")
-		return enc.Encode(output)
+		return encodeJSON(out, output)
 	default:
 		output := continuationHookOutput{
 			Decision: decision,
 			Reason:   reason,
 		}
-		enc := json.NewEncoder(out)
-		enc.SetIndent("", "  ")
-		return enc.Encode(output)
+		return encodeJSON(out, output)
 	}
+}
+
+func encodeJSON(out io.Writer, v any) error {
+	enc := json.NewEncoder(out)
+	enc.SetIndent("", "  ")
+	return enc.Encode(v)
 }
 
 func markerExists(path string) bool {

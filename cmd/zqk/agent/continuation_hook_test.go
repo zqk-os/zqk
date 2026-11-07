@@ -147,16 +147,16 @@ func TestContinuationHook_BoundaryValidationAndErrorRecovery(t *testing.T) {
 		assert.NotEmpty(t, rawMap["reason"])
 	}
 
-	// Subtest 6: Cursor vendor format (decision is "continue" with message & reason)
+	// Subtest 6: Cursor stop-hook contract is followup_message (not decision/message).
 	{
 		var outBuf bytes.Buffer
 		err := runContinuationHookWithDeps(context.Background(), secCtx, fs, root, "cursor", markerPath, "", "", strings.NewReader("{}"), &outBuf)
 		require.NoError(t, err)
 		var rawMap map[string]any
 		require.NoError(t, json.Unmarshal(outBuf.Bytes(), &rawMap))
-		assert.Equal(t, "continue", rawMap["decision"])
-		assert.NotEmpty(t, rawMap["reason"])
-		assert.Equal(t, rawMap["reason"], rawMap["message"])
+		assert.NotEmpty(t, rawMap["followup_message"])
+		assert.Equal(t, rawMap["followup_message"], rawMap["additional_context"])
+		assert.Nil(t, rawMap["decision"])
 	}
 
 	// Subtest 7: Windsurf / Cascade vendor format (decision is "continue" with explanation & reason)

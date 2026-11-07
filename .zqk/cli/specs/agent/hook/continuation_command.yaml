@@ -11,7 +11,7 @@ flags:
   - name: vendor
     type: string
     default: "antigravity"
-    description: "Target agent host vendor format (antigravity, generic)"
+    description: "Target agent host vendor format (antigravity, cursor, claude, windsurf, cline, generic)"
   - name: marker
     type: string
     default: ""
@@ -30,5 +30,7 @@ help:
   examples:
     - comment: Run agent hook continuation
       command: '%s agent hook continuation --vendor antigravity'
+    - comment: Cursor stop-hook adapter (emits followup_message)
+      command: '%s agent hook continuation --vendor cursor --agent-id cursor-composer'
 run_e: runAgentHookContinuation
 common_flags: true
