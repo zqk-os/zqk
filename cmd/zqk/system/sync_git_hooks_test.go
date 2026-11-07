@@ -1002,7 +1002,7 @@ func TestSyncGitHooks_PreCommitSupportsZQKPrecommitTimeout(t *testing.T) {
 	}
 
 	requiredTokens := []string{
-		`PRECOMMIT_TIMEOUT="${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}"`,
+		`PRECOMMIT_TIMEOUT="${ZQK_SYSTEM_CHECK_TIMEOUT:-${ZQK_PRECOMMIT_TIMEOUT:-$DEFAULT_TIMEOUT}}"`,
 		`system check --tier 1 --timeout "$PRECOMMIT_TIMEOUT"`,
 		`DEFAULT_TIMEOUT="120s"`,
 		`if [ "$CAS_OBJ_COUNT" -gt 1500 ]; then`,

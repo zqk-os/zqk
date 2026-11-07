@@ -54,6 +54,7 @@ func TestClaimAliasFlags_ConflictingValuesFailClosed(t *testing.T) {
 			err := cmd.Execute()
 			require.Error(t, err, "%s %v", cmd.Name(), flagArgs)
 			assert.Contains(t, err.Error(), "conflicting claimant flags")
+			_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(root, nil))
 		}
 	}
 }
