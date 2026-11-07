@@ -146,3 +146,13 @@ The evaluation engine performs deterministic multi-dimensional calculation:
 | `pkg/eval/eval_test.go` | Three-Fold Proof (Static, Dynamic, Negative) | Verified |
 | `cmd/zqk/eval/eval.go` | CLI adapter suite with Cobra & JSON output | Verified |
 | `cmd/zqk/eval/eval_test.go` | Command suite structure, run, and validate test | Verified |
+
+---
+
+## 7. Conformance and Quality Auditing
+
+The generic scenario evaluation framework adheres to strict static analysis and runtime safety standards:
+- **AST Compliance**: All AST inspections and CLI handlers avoid blank identifier error swallowing (`_ = ...`) to prevent silent failure propagation.
+- **Fail-Closed Validation**: Schema weight validation enforces exact 1.0 normalization within 0.001 tolerance, rejecting improperly weighted templates upfront.
+- **Deterministic Token Scopes**: Rule evaluation operates strictly in-memory without network side-effects, supporting sub-15ms fast-path gate integration in CI and pre-commit pipelines.
+
