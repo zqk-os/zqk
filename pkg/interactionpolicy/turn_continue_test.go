@@ -13,8 +13,42 @@ func TestCommandHintIsDispatchRemint(t *testing.T) {
 	if !CommandHintIsDispatchRemint("zqk feed steer --to-agent-id peer-agent-1 --await-peer-ack") {
 		t.Fatal("directed steer must remint")
 	}
+	if !CommandHintIsDispatchRemint("zqk-tip agent swarm-init --plan-id PRI-1 --allow-chat") {
+		t.Fatal("swarm-init must remint")
+	}
+	if !CommandHintIsDispatchRemint(hintSwarmInitSuffix) {
+		t.Fatal("catalog swarm-init suffix must remint")
+	}
 	if CommandHintIsDispatchRemint(HintAlignRefresh()) {
 		t.Fatal("align hint must not remint")
+	}
+}
+
+func TestCompileTurnContinue_HourglassSuppressesSwarmInitRemint(t *testing.T) {
+	t.Parallel()
+	got := CompileTurnContinue(TurnContinueInput{
+		GuidingEvent:          EventIdle,
+		GuidingStep:           "Lead has planned BLIs. Hand off via swarm orchestration.",
+		CommandHint:           HintSwarmInit("PRI-1"),
+		PolicyID:              PolicyTPMProcessAdmin,
+		CapLoopActive:         true,
+		OutboxAwaitingPeerAck: 2,
+		FillItemCommandHint:   "system kernel-integrity heal-dangling --apply",
+	})
+	if !got.Continue {
+		t.Fatal("must continue under hourglass")
+	}
+	if got.Reason != reasonHourglassKeepWork {
+		t.Fatalf("reason=%q", got.Reason)
+	}
+	if strings.Contains(got.Message, "swarm-init") && strings.Contains(got.Message, "Next:") {
+		t.Fatalf("must not remint Next: swarm-init: %q", got.Message)
+	}
+	if !strings.Contains(got.Message, "await_peer_ack_keep_working") {
+		t.Fatalf("hourglass keep-working missing: %q", got.Message)
+	}
+	if !strings.Contains(got.Message, "heal-dangling") {
+		t.Fatalf("fill heal path missing: %q", got.Message)
 	}
 }
 

@@ -97,6 +97,7 @@ func runContinuationHookWithDeps(
 	targetAgentID := resolveContinuationSeatID(projectRoot, agentID)
 	var steeringNudge string
 	inboxN := 0
+	outboxAwaitN := 0
 	if targetAgentID != "" && projectRoot != "" {
 		seat := agentfeed.Seat{
 			AgentID:    targetAgentID,
@@ -104,6 +105,7 @@ func runContinuationHookWithDeps(
 		}
 		if snap, err := agentfeed.LoadCorrespondence(projectRoot, seat, 5); err == nil {
 			inboxN = len(snap.InboxUnacked)
+			outboxAwaitN = len(snap.OutboxAwaitingPeerAck)
 			if inboxN > 0 {
 				var msgSummaries []string
 				for _, item := range snap.InboxUnacked {
@@ -128,14 +130,22 @@ func runContinuationHookWithDeps(
 		pol = res.Step.PolicyID
 	}
 
+	fillHint := ""
+	if outboxAwaitN > 0 {
+		// Stale whats-next fill wording ("system check autofix dangling") remints
+		// a non-command; hourglass keep-working names the real heal path.
+		fillHint = "system kernel-integrity heal-dangling --apply"
+	}
 	drive := interactionpolicy.CompileTurnContinue(interactionpolicy.TurnContinueInput{
-		InboxUnacked:  inboxN,
-		GuidingEvent:  ev,
-		GuidingStep:   step,
-		CommandHint:   hint,
-		PolicyID:      pol,
-		CapLoopActive: capActive,
-		SteeringNudge: steeringNudge,
+		InboxUnacked:          inboxN,
+		OutboxAwaitingPeerAck: outboxAwaitN,
+		GuidingEvent:          ev,
+		GuidingStep:           step,
+		CommandHint:           hint,
+		PolicyID:              pol,
+		CapLoopActive:         capActive,
+		SteeringNudge:         steeringNudge,
+		FillItemCommandHint:   fillHint,
 	})
 	if !drive.Continue {
 		return emitContinuationDecision(out, vendor, "allow", "")

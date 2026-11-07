@@ -17,51 +17,71 @@ type TurnContinue struct {
 
 // TurnContinueInput is compiled ambient + guiding hunger for one seat stop.
 type TurnContinueInput struct {
-	InboxUnacked  int
-	GuidingEvent  string
-	GuidingStep   string
-	CommandHint   string
-	PolicyID      string
-	CapLoopActive bool
-	SteeringNudge string
+	InboxUnacked          int
+	OutboxAwaitingPeerAck int
+	GuidingEvent          string
+	GuidingStep           string
+	CommandHint           string
+	PolicyID              string
+	CapLoopActive         bool
+	SteeringNudge         string
+	FillItemCommandHint   string
 }
 
 const (
-	reasonInboxUnacked    = "inbox_unacked"
-	reasonCapKeepWorking  = "cap_keep_working"
-	reasonGuidingKeepWork = "guiding_keep_working"
-	reasonNoDrive         = "no_drive"
-	reasonRemintHintStrip = "remint_hint_stripped"
-	defaultInboxContinue  = "Inbox has unacked swarm mail. Ack as this seat, then keep working (do not end the turn while peers await)."
-	defaultCapContinue    = "CAP loop active. Query workflow whats-next and advance without idling."
-	capLoopPreamble       = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): "
+	reasonInboxUnacked       = "inbox_unacked"
+	reasonCapKeepWorking     = "cap_keep_working"
+	reasonGuidingKeepWork    = "guiding_keep_working"
+	reasonNoDrive            = "no_drive"
+	reasonRemintHintStrip    = "remint_hint_stripped"
+	reasonHourglassKeepWork  = "hourglass_keep_working"
+	defaultInboxContinue     = "Inbox has unacked swarm mail. Ack as this seat, then keep working (do not end the turn while peers await)."
+	defaultCapContinue       = "CAP loop active. Query workflow whats-next and advance without idling."
+	defaultHourglassContinue = "Hourglass open (outbox awaiting peer_ack). Do NOT remint agent swarm-init / ORCHESTRATE_PLAN. await_peer_ack_keep_working: advance fill_item / local TPM work; ring peers only via feed steer|wake --await-peer-ack."
+	capLoopPreamble          = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): "
 )
 
 // CommandHintIsDispatchRemint reports hints that belong on seat-worker/scheduler
-// dispatch, not host chat remint (ORCHESTRATE_PLAN / directed feed steer).
+// dispatch, not host chat remint (ORCHESTRATE_PLAN / swarm-init / directed steer).
 func CommandHintIsDispatchRemint(hint string) bool {
 	h := strings.TrimSpace(hint)
 	if h == "" {
 		return false
 	}
+	low := strings.ToLower(h)
 	return strings.Contains(h, "ORCHESTRATE_PLAN") ||
 		strings.Contains(h, "feed steer --to-agent-id") ||
-		strings.Contains(h, HintOrchestratePrefix)
+		strings.Contains(h, HintOrchestratePrefix) ||
+		strings.Contains(low, "swarm-init") ||
+		strings.Contains(low, hintSwarmInitSuffix) ||
+		strings.Contains(low, HintSwarmInitText)
 }
 
 // CompileTurnContinue decides whether a seat host must auto-continue the turn.
 // Ping-pong invariant (POL-AGENT-INTERACTION-POLICY-001): never silence when
 // hunger exists. Idle with planned work / CAP active still continues; remint
-// dispatch hints are stripped so chat is not the scheduler.
+// dispatch hints are stripped so chat is not the scheduler. Open peer-ack
+// hourglass suppresses swarm-init / ORCHESTRATE remint (await_peer_ack_keep_working).
 func CompileTurnContinue(in TurnContinueInput) TurnContinue {
 	ev := strings.TrimSpace(in.GuidingEvent)
 	step := strings.TrimSpace(in.GuidingStep)
 	hint := strings.TrimSpace(in.CommandHint)
 	pol := strings.TrimSpace(in.PolicyID)
+	fill := strings.TrimSpace(in.FillItemCommandHint)
 	stripped := false
 	if CommandHintIsDispatchRemint(hint) {
 		hint = ""
 		stripped = true
+	}
+	hourglass := in.OutboxAwaitingPeerAck > 0
+	if hourglass {
+		// Never re-issue dispatch remints while peers owe acks on directed steers.
+		hint = ""
+		stripped = true
+		step = defaultHourglassContinue
+		if fill != "" {
+			step = step + " fill_item: " + fill + " (prefer kernel-integrity heal-dangling --apply over stale autofix dangling wording)."
+		}
 	}
 
 	// Host auto-continue is for CAP / swarm seats only. Ordinary IDE chats must
@@ -115,12 +135,14 @@ func CompileTurnContinue(in TurnContinueInput) TurnContinue {
 	if ev == "" {
 		ev = EventIdle
 	}
-	key := fmt.Sprintf("%s|%s|%s", pol, ev, hint)
+	key := fmt.Sprintf("%s|%s|%s|hg=%d", pol, ev, hint, in.OutboxAwaitingPeerAck)
 	reason := reasonGuidingKeepWork
 	if in.CapLoopActive {
 		reason = reasonCapKeepWorking
 	}
-	if stripped {
+	if hourglass {
+		reason = reasonHourglassKeepWork
+	} else if stripped {
 		reason = reasonRemintHintStrip
 	}
 	return TurnContinue{
