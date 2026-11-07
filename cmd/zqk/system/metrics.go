@@ -54,6 +54,7 @@ func NewMetricsCmd() *cobra.Command {
 	cmd.AddCommand(NewFileLockMetricsCmd())
 	cmd.AddCommand(NewSchedulerHealthMetricsCmd())
 	cmd.AddCommand(NewMetricsFeedCmd())
+	cmd.AddCommand(NewLLMMetricsCmd())
 
 	cli.AddCommonFlags(cmd)
 	return cmd

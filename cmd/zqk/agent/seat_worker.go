@@ -752,7 +752,7 @@ func parseOrchestratePlanDirective(body string) (string, bool, error) {
 	// Taking the whole remainder made validPlanDirectiveID fail, OnNonComms
 	// returned without peer_ack, and inboxHasOrch starved every later ATTN
 	// (hourglass peer_ack timeouts). First whitespace field is the plan id.
-	// TRACK: BLI-COMMS-ORCH-EXECUTE-NOT-ACK-001 — CAP same-line suffix starvation
+	// Orchestrate plan directive: CAP same-line suffix starvation prevention
 	rest := strings.TrimSpace(strings.TrimPrefix(firstLine, orchestratePlanDirective))
 	planID := rest
 	if field, _, ok := strings.Cut(rest, " "); ok {
