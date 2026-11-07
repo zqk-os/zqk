@@ -35,7 +35,15 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 	// Draft-plane / leave-preliminary: sync only (no write-behind). Promote materializes into CAS.
 	effectiveStatus, _ := existing[objects.FieldKeyStatus].(string)
 	onDraftPlane := f.objectDraftPlaneExists(kind, id)
-	stayOnDraftPlane := shouldUseObjectDraftPlane(kind, effectiveStatus) || caspkg.ParkCriteriaWithoutCategory(kind, existing) || caspkg.ParkObjectWithoutDescription(kind, existing)
+	// Description/category membrane parks apply while an object is still on the draft plane
+	// (or is lifecycle-preliminary). They must NOT yank a CAS-resident object back onto
+	// draft — that deletes the CAS blob (MIL-008 / complete-milestone demotion hazard).
+	// TRACK: BLI-1794075198197653000-dc625b46 — CAS rename only; refuse demotion.
+	membranePark := caspkg.ParkCriteriaWithoutCategory(kind, existing) || caspkg.ParkObjectWithoutDescription(kind, existing)
+	stayOnDraftPlane := shouldUseObjectDraftPlane(kind, effectiveStatus)
+	if onDraftPlane && membranePark {
+		stayOnDraftPlane = true
+	}
 	if onDraftPlane || stayOnDraftPlane {
 		data, marshalErr := f.yamlMarshalForPersistence(existing)
 		if marshalErr != nil {
