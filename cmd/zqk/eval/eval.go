@@ -13,6 +13,7 @@ import (
 	cliapp "github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/eval"
+	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -24,6 +25,7 @@ func NewEvalCmd() *cobra.Command {
 	cmd.AddCommand(newRunCmd())
 	cmd.AddCommand(newValidateCmd())
 	cmd.AddCommand(newMatrixCmd())
+	cmd.AddCommand(newLLMScrutinyCmd())
 
 	return cmd
 }
@@ -201,4 +203,99 @@ func evalStatusStr(passed bool) string {
 		return "PASS"
 	}
 	return "FAIL"
+}
+
+func newLLMScrutinyCmd() *cobra.Command {
+	return clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewEvalLlmScrutinyCommandBuilder(), &cobra.Command{
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logsFlag, logsErr := cmd.Flags().GetString("logs")
+			modelFilter, modelErr := cmd.Flags().GetString("model")
+			sinceFlag, sinceErr := cmd.Flags().GetDuration("since")
+			topFlag, topErr := cmd.Flags().GetInt("top")
+			formatFlag, formatErr := cmd.Flags().GetString("format")
+			if logsErr != nil || modelErr != nil || sinceErr != nil || topErr != nil || formatErr != nil {
+				return errfmt.Errorf("failed to parse scrutiny flags")
+			}
+
+			root := resolveRoot(cmd)
+			var logFiles []string
+			if strings.TrimSpace(logsFlag) != "" {
+				info, err := fileutil.Stat(logsFlag)
+				if err != nil {
+					return errfmt.Errorf("failed to access logs path: %w", err)
+				}
+				if info.IsDir() {
+					discovered, discErr := eval.DiscoverLogs(logsFlag, sinceFlag, false)
+					if discErr == nil {
+						logFiles = discovered
+					}
+				} else {
+					logFiles = []string{logsFlag}
+				}
+			} else {
+				discovered, discErr := eval.DiscoverLogs(root, sinceFlag, true)
+				if discErr == nil {
+					logFiles = discovered
+				}
+			}
+
+			parser := eval.NewLLMScrutinyParser()
+			var allInteractions []eval.LLMInteraction
+
+			for _, path := range logFiles {
+				f, err := fileutil.Open(path)
+				if err != nil {
+					continue
+				}
+				var (
+					items    []eval.LLMInteraction
+					parseErr error
+				)
+				if strings.HasSuffix(path, ".jsonl") {
+					items, parseErr = parser.ParseTranscriptJSONL(f, path)
+				} else if strings.HasSuffix(path, ".log") {
+					items, parseErr = parser.ParseLLMTraceLog(f, path)
+				}
+				if closeErr := f.Close(); closeErr != nil {
+					logging.LogSwallowedError(closeErr)
+				}
+				if parseErr != nil {
+					logging.LogSwallowedError(parseErr)
+				}
+
+				for _, item := range items {
+					if modelFilter != "" && !strings.EqualFold(item.Model, modelFilter) {
+						continue
+					}
+					allInteractions = append(allInteractions, item)
+				}
+			}
+
+			evaluator := eval.NewScrutinyEvaluator()
+			report := evaluator.Evaluate(allInteractions)
+			report.LogsParsed = len(logFiles)
+			if saveErr := eval.SaveMetrics(root, report); saveErr != nil {
+				logging.LogSwallowedError(saveErr)
+			}
+
+			if topFlag > 0 && len(report.Rankings) > topFlag {
+				report.Rankings = report.Rankings[:topFlag]
+			}
+
+			switch strings.ToLower(formatFlag) {
+			case "json":
+				data, err := json.MarshalIndent(report, "", "  ")
+				if err != nil {
+					return err
+				}
+				fmt.Fprintln(cmd.OutOrStdout(), string(data))
+			case "md", "markdown":
+				fmt.Fprint(cmd.OutOrStdout(), eval.FormatMarkdown(report))
+			default:
+				fmt.Fprint(cmd.OutOrStdout(), eval.FormatTable(report))
+			}
+
+			return nil
+		},
+	})
 }

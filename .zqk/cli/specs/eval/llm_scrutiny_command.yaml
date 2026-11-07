@@ -1,0 +1,48 @@
+$schema: ../_schemas/command_spec.schema.json
+name: llm-scrutiny
+short: Deep-dive scrutiny on LLM interactions from logs with model correctness rankings
+description: |
+  Scrutinizes agent transcripts, swarm traces, and telemetry logs to evaluate LLM correctness
+  by model, produce quality rankings, and establish prompt honing and tuning feedback streams.
+flags:
+  - name: logs
+    shorthand: l
+    type: string
+    default: ""
+    required: false
+    description: "Path to log file or directory (defaults to auto-discovering transcripts and swarm traces)"
+  - name: model
+    shorthand: m
+    type: string
+    default: ""
+    required: false
+    description: "Filter scrutiny to a specific model name"
+  - name: since
+    shorthand: s
+    type: duration
+    default: 168h
+    required: false
+    description: "Only scrutinize logs modified within this duration (e.g. 24h, 168h)"
+  - name: top
+    type: int
+    default: 10
+    required: false
+    description: "Limit report to top N ranked models"
+  - name: format
+    shorthand: f
+    type: string
+    default: table
+    required: false
+    description: "Output format (table, json, markdown)"
+help:
+  examples:
+    - comment: Scrutinize recent logs and display model correctness rankings
+      command: "%s eval llm-scrutiny"
+    - comment: Scrutinize logs from a specific path with markdown output
+      command: "%s eval llm-scrutiny --logs .zqk/logs/ --format markdown"
+    - comment: Output full scrutiny rankings in JSON format
+      command: "%s eval llm-scrutiny --format json"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
