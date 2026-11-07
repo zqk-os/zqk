@@ -2,6 +2,10 @@ package llmtranscript
 
 import "time"
 
+// UnlabeledModel is the vendor-neutral bucket when no --model override and no
+// settings detection supply a label. Do not invent vendor product names here.
+const UnlabeledModel = "unlabeled"
+
 // TranscriptStep models a single JSONL event emitted in the agent transcript log.
 type TranscriptStep struct {
 	StepIndex       int        `json:"step_index"`

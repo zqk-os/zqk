@@ -2,8 +2,6 @@ package system
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 	"text/tabwriter"
 
@@ -11,6 +9,7 @@ import (
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/telemetry/llmtranscript"
 )
 
@@ -42,8 +41,7 @@ func runLLMMetrics(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	modelOverride = resolveModelOverride(modelOverride)
-	report, err := buildEvaluationReport(filePath, dirPath, modelOverride)
+	report, err := buildEvaluationReport(filePath, dirPath, strings.TrimSpace(modelOverride))
 	if err != nil {
 		return err
 	}
@@ -51,23 +49,13 @@ func runLLMMetrics(cmd *cobra.Command, args []string) error {
 	return renderReport(cmd, report, format)
 }
 
-func resolveModelOverride(override string) string {
-	if override != "" {
-		return override
-	}
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "Gemini 3.8 Flash (Medium)"
-	}
-	appDataDir := filepath.Join(homeDir, ".gemini", "antigravity-cli")
-	detected := llmtranscript.DetectModelFromSettings(appDataDir)
-	if detected != "" {
-		return detected
-	}
-	return "Gemini 3.8 Flash (Medium)"
-}
-
 func buildEvaluationReport(filePath, dirPath, model string) (*llmtranscript.EvaluationReport, error) {
+	filePath = strings.TrimSpace(filePath)
+	dirPath = strings.TrimSpace(dirPath)
+	if filePath == "" && dirPath == "" {
+		return nil, errfmt.Newf("provide --file <transcript.jsonl> or --dir <transcript-root>; no vendor default path is assumed")
+	}
+
 	if filePath != "" {
 		steps, err := llmtranscript.ParseTranscriptFile(filePath)
 		if err != nil {
@@ -83,12 +71,6 @@ func buildEvaluationReport(filePath, dirPath, model string) (*llmtranscript.Eval
 		}, nil
 	}
 
-	if dirPath == "" {
-		homeDir, err := os.UserHomeDir()
-		if err == nil {
-			dirPath = filepath.Join(homeDir, ".gemini", "antigravity-cli", "brain")
-		}
-	}
 	return llmtranscript.AnalyzeDirectory(dirPath, model)
 }
 
@@ -137,9 +119,7 @@ func writeRankingTable(buf *strings.Builder, rankings []llmtranscript.ModelMetri
 			m.TokensPerSuccess,
 		)
 	}
-	if err := w.Flush(); err != nil {
-		fmt.Fprintf(buf, "failed to flush table: %v\n", err)
-	}
+	_ = w.Flush()
 }
 
 func writeModelPatternsAndTips(buf *strings.Builder, rankings []llmtranscript.ModelMetrics) {

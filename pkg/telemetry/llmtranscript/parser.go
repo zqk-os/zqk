@@ -72,9 +72,9 @@ func ExtractTurns(steps []TranscriptStep, defaultModel string) []Turn {
 			continue
 		}
 
-		turnModel := defaultModel
+		turnModel := strings.TrimSpace(defaultModel)
 		if turnModel == "" {
-			turnModel = "Gemini 3.8 Flash"
+			turnModel = UnlabeledModel
 		}
 
 		turn := Turn{

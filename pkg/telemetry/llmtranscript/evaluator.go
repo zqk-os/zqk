@@ -205,7 +205,7 @@ func generatePromptHoningTips(patterns []FailurePattern) []string {
 	return tips
 }
 
-// AnalyzeDirectory scans a root folder (such as ~/.gemini/antigravity-cli/brain/)
+// AnalyzeDirectory scans a root folder of conversation trees for transcript.jsonl
 // for all transcript.jsonl files, parses them, and returns an EvaluationReport.
 func AnalyzeDirectory(rootDir string, defaultModel string) (*EvaluationReport, error) {
 	var allSteps []TranscriptStep

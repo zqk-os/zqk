@@ -65,3 +65,12 @@ func TestRunLLMMetrics_NonExistentFileReturnsError(t *testing.T) {
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to parse transcript file")
 }
+
+func TestRunLLMMetrics_RequiresFileOrDir(t *testing.T) {
+	cmd := system.NewLLMMetricsCmd()
+	cmd.SetArgs([]string{})
+
+	err := cmd.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "provide --file")
+}
