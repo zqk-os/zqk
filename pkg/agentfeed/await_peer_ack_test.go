@@ -151,6 +151,31 @@ func TestPeerAckAwaitStorePath_underStateMesh(t *testing.T) {
 	}
 }
 
+func TestPeerAckAwaitRelievesOutbox_missingAndTerminal(t *testing.T) {
+	root := t.TempDir()
+	// Legacy / drained JSONL steers with no await row must not clog outbox.
+	if !PeerAckAwaitRelievesOutbox(root, "AFE-never-registered") {
+		t.Fatal("missing await should relieve outbox")
+	}
+	a, err := RegisterPeerAckAwait(root, PeerAckAwaitInput{
+		EventID:     "AFE-live",
+		FromAgentID: "tpm-seat",
+		Action:      AwaitActionWake,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if PeerAckAwaitRelievesOutbox(root, a.EventID) {
+		t.Fatal("open await must not relieve outbox")
+	}
+	if _, err := ExpirePeerAckAwaits(root, 0); err != nil {
+		t.Fatal(err)
+	}
+	if !PeerAckAwaitRelievesOutbox(root, a.EventID) {
+		t.Fatal("expired await should relieve outbox")
+	}
+}
+
 func TestExpirePeerAckAwaits(t *testing.T) {
 	root := t.TempDir()
 

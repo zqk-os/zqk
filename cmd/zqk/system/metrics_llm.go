@@ -43,59 +43,86 @@ func NewLLMMetricsCmd() *cobra.Command {
 }
 
 func runLLMMetrics(cmd *cobra.Command, args []string) error {
-	filePath, _ := cmd.Flags().GetString("file")
-	dirPath, _ := cmd.Flags().GetString("dir")
-	modelOverride, _ := cmd.Flags().GetString("model")
-	format, _ := cmd.Flags().GetString("format")
-
-	homeDir, _ := os.UserHomeDir()
-	appDataDir := filepath.Join(homeDir, ".gemini", "antigravity-cli")
-
-	if modelOverride == "" {
-		modelOverride = llmtranscript.DetectModelFromSettings(appDataDir)
-		if modelOverride == "" {
-			modelOverride = "Gemini 3.8 Flash (Medium)"
-		}
+	filePath, err := cmd.Flags().GetString("file")
+	if err != nil {
+		return err
+	}
+	dirPath, err := cmd.Flags().GetString("dir")
+	if err != nil {
+		return err
+	}
+	modelOverride, err := cmd.Flags().GetString("model")
+	if err != nil {
+		return err
+	}
+	format, err := cmd.Flags().GetString("format")
+	if err != nil {
+		return err
 	}
 
-	var report *llmtranscript.EvaluationReport
-	var err error
+	modelOverride = resolveModelOverride(modelOverride)
+	report, err := buildEvaluationReport(filePath, dirPath, modelOverride)
+	if err != nil {
+		return err
+	}
 
+	return renderReport(report, format)
+}
+
+func resolveModelOverride(override string) string {
+	if override != "" {
+		return override
+	}
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "Gemini 3.8 Flash (Medium)"
+	}
+	appDataDir := filepath.Join(homeDir, ".gemini", "antigravity-cli")
+	detected := llmtranscript.DetectModelFromSettings(appDataDir)
+	if detected != "" {
+		return detected
+	}
+	return "Gemini 3.8 Flash (Medium)"
+}
+
+func buildEvaluationReport(filePath, dirPath, model string) (*llmtranscript.EvaluationReport, error) {
 	if filePath != "" {
-		steps, pErr := llmtranscript.ParseTranscriptFile(filePath)
-		if pErr != nil {
-			return fmt.Errorf("failed to parse transcript file %s: %w", filePath, pErr)
+		steps, err := llmtranscript.ParseTranscriptFile(filePath)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse transcript file %s: %w", filePath, err)
 		}
-		turns := llmtranscript.ExtractTurns(steps, modelOverride)
+		turns := llmtranscript.ExtractTurns(steps, model)
 		rankings := llmtranscript.EvaluateTurns(turns)
-		report = &llmtranscript.EvaluationReport{
+		return &llmtranscript.EvaluationReport{
 			ConversationsAnalyzed: 1,
 			TotalSteps:            len(steps),
 			TotalTurns:            len(turns),
 			ModelRankings:         rankings,
-		}
-	} else {
-		if dirPath == "" {
-			dirPath = filepath.Join(appDataDir, "brain")
-		}
-		report, err = llmtranscript.AnalyzeDirectory(dirPath, modelOverride)
-		if err != nil {
-			return fmt.Errorf("failed to analyze directory %s: %w", dirPath, err)
-		}
+		}, nil
 	}
 
+	if dirPath == "" {
+		homeDir, err := os.UserHomeDir()
+		if err == nil {
+			dirPath = filepath.Join(homeDir, ".gemini", "antigravity-cli", "brain")
+		}
+	}
+	return llmtranscript.AnalyzeDirectory(dirPath, model)
+}
+
+func renderReport(report *llmtranscript.EvaluationReport, format string) error {
 	switch format {
 	case "json":
-		data, mErr := json.MarshalIndent(report, "", "  ")
-		if mErr != nil {
-			return mErr
+		data, err := json.MarshalIndent(report, "", "  ")
+		if err != nil {
+			return err
 		}
 		fmt.Println(string(data))
 		return nil
 	case "yaml":
-		data, mErr := yaml.Marshal(report)
-		if mErr != nil {
-			return mErr
+		data, err := yaml.Marshal(report)
+		if err != nil {
+			return err
 		}
 		fmt.Println(string(data))
 		return nil
@@ -115,11 +142,17 @@ func printTableReport(report *llmtranscript.EvaluationReport) {
 		return
 	}
 
+	printRankingTable(report.ModelRankings)
+	printModelPatternsAndTips(report.ModelRankings)
+	fmt.Println()
+}
+
+func printRankingTable(rankings []llmtranscript.ModelMetrics) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	fmt.Fprintln(w, "RANK\tMODEL\tSCORE\tTOOL ACCURACY\tRECOVERY RATE\tTOOL CALLS\tTOKENS/SUCCESS")
 	fmt.Fprintln(w, "----\t-----\t-----\t-------------\t-------------\t----------\t--------------")
 
-	for _, m := range report.ModelRankings {
+	for _, m := range rankings {
 		fmt.Fprintf(w, "#%d\t%s\t%.1f/100\t%.1f%%\t%.1f%%\t%d/%d\t%.0f\n",
 			m.Rank,
 			m.Model,
@@ -131,10 +164,11 @@ func printTableReport(report *llmtranscript.EvaluationReport) {
 			m.TokensPerSuccess,
 		)
 	}
-	w.Flush()
+	_ = w.Flush()
+}
 
-	// Failure breakdown & prompt honing recommendations
-	for _, m := range report.ModelRankings {
+func printModelPatternsAndTips(rankings []llmtranscript.ModelMetrics) {
+	for _, m := range rankings {
 		if len(m.TopFailurePatterns) > 0 {
 			fmt.Printf("\n--- Empirical Failure Archetypes: %s ---\n", m.Model)
 			for _, p := range m.TopFailurePatterns {
@@ -152,7 +186,6 @@ func printTableReport(report *llmtranscript.EvaluationReport) {
 			}
 		}
 	}
-	fmt.Println()
 }
 
 func truncateSample(s string, maxLen int) string {

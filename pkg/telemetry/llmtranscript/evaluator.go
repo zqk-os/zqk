@@ -13,6 +13,19 @@ import (
 // EvaluateTurns processes interaction turns and calculates empirical model correctness metrics,
 // composite rankings, and actionable prompt honing guidance.
 func EvaluateTurns(turns []Turn) []ModelMetrics {
+	byModel := groupTurnsByModel(turns)
+	var results []ModelMetrics
+
+	for model, mTurns := range byModel {
+		metrics := buildModelMetrics(model, mTurns)
+		results = append(results, metrics)
+	}
+
+	sortAndRankModels(results)
+	return results
+}
+
+func groupTurnsByModel(turns []Turn) map[string][]Turn {
 	byModel := make(map[string][]Turn)
 	for _, turn := range turns {
 		model := turn.Model
@@ -21,93 +34,98 @@ func EvaluateTurns(turns []Turn) []ModelMetrics {
 		}
 		byModel[model] = append(byModel[model], turn)
 	}
+	return byModel
+}
 
-	var results []ModelMetrics
-
-	for model, mTurns := range byModel {
-		metrics := ModelMetrics{
-			Model:      model,
-			TotalTurns: len(mTurns),
-		}
-
-		patternCounts := make(map[string]*FailurePattern)
-
-		for _, t := range mTurns {
-			metrics.TotalInputTokens += t.InputTokens
-			metrics.TotalOutputTokens += t.OutputTokens
-			metrics.TotalCacheReadTokens += t.CacheReadTokens
-
-			metrics.TotalToolCalls += len(t.Executions)
-			for _, exec := range t.Executions {
-				if exec.Success {
-					metrics.SuccessfulToolCalls++
-				} else {
-					metrics.FailedToolCalls++
-					categorizeFailure(exec, patternCounts)
-				}
-			}
-
-			if t.IsSelfCorrection {
-				metrics.SelfCorrectionAttempts++
-				if t.CorrectedPrevious {
-					metrics.SelfCorrectionSuccesses++
-				}
-			}
-		}
-
-		if metrics.TotalToolCalls > 0 {
-			metrics.ToolAccuracy = float64(metrics.SuccessfulToolCalls) / float64(metrics.TotalToolCalls)
-		} else {
-			metrics.ToolAccuracy = 1.0
-		}
-
-		if metrics.SelfCorrectionAttempts > 0 {
-			metrics.SelfCorrectionRate = float64(metrics.SelfCorrectionSuccesses) / float64(metrics.SelfCorrectionAttempts)
-		} else {
-			metrics.SelfCorrectionRate = 1.0
-		}
-
-		totalTokens := metrics.TotalInputTokens + metrics.TotalOutputTokens
-		denom := math.Max(1.0, float64(metrics.SuccessfulToolCalls))
-		metrics.TokensPerSuccess = float64(totalTokens) / denom
-
-		// Compute Composite Score:
-		// 50% Accuracy, 25% Self-Correction Recovery, 25% Token Efficiency
-		accScore := metrics.ToolAccuracy * 50.0
-		recScore := metrics.SelfCorrectionRate * 25.0
-
-		// Token economy: benchmark at 25,000 tokens per success (scales between 0 and 25)
-		tokenScore := 25.0
-		if metrics.TokensPerSuccess > 0 {
-			ratio := 15000.0 / metrics.TokensPerSuccess
-			if ratio > 1.0 {
-				tokenScore = 25.0
-			} else {
-				tokenScore = math.Max(0.0, ratio*25.0)
-			}
-		}
-		metrics.CompositeScore = math.Round((accScore+recScore+tokenScore)*100) / 100
-
-		// Aggregate top failure patterns
-		var patterns []FailurePattern
-		for _, p := range patternCounts {
-			patterns = append(patterns, *p)
-		}
-		sort.Slice(patterns, func(i, j int) bool {
-			return patterns[i].Count > patterns[j].Count
-		})
-		if len(patterns) > 5 {
-			patterns = patterns[:5]
-		}
-		metrics.TopFailurePatterns = patterns
-
-		// Synthesize prompt honing recommendations
-		metrics.PromptHoningTips = generatePromptHoningTips(patterns)
-
-		results = append(results, metrics)
+func buildModelMetrics(model string, mTurns []Turn) ModelMetrics {
+	metrics := ModelMetrics{
+		Model:      model,
+		TotalTurns: len(mTurns),
 	}
 
-	// Sort by CompositeScore descending
+	patternCounts := make(map[string]*FailurePattern)
+	for _, t := range mTurns {
+		accumulateTurnMetrics(&metrics, t, patternCounts)
+	}
+
+	if metrics.TotalToolCalls > 0 {
+		metrics.ToolAccuracy = float64(metrics.SuccessfulToolCalls) / float64(metrics.TotalToolCalls)
+	} else {
+		metrics.ToolAccuracy = 1.0
+	}
+
+	if metrics.SelfCorrectionAttempts > 0 {
+		metrics.SelfCorrectionRate = float64(metrics.SelfCorrectionSuccesses) / float64(metrics.SelfCorrectionAttempts)
+	} else {
+		metrics.SelfCorrectionRate = 1.0
+	}
+
+	totalTokens := metrics.TotalInputTokens + metrics.TotalOutputTokens
+	denom := math.Max(1.0, float64(metrics.SuccessfulToolCalls))
+	metrics.TokensPerSuccess = float64(totalTokens) / denom
+	metrics.CompositeScore = calculateCompositeScore(metrics.ToolAccuracy, metrics.SelfCorrectionRate, metrics.TokensPerSuccess)
+
+	patterns := extractTopFailurePatterns(patternCounts)
+	metrics.TopFailurePatterns = patterns
+	metrics.PromptHoningTips = generatePromptHoningTips(patterns)
+
+	return metrics
+}
+
+func accumulateTurnMetrics(metrics *ModelMetrics, t Turn, patternCounts map[string]*FailurePattern) {
+	metrics.TotalInputTokens += t.InputTokens
+	metrics.TotalOutputTokens += t.OutputTokens
+	metrics.TotalCacheReadTokens += t.CacheReadTokens
+
+	metrics.TotalToolCalls += len(t.Executions)
+	for _, exec := range t.Executions {
+		if exec.Success {
+			metrics.SuccessfulToolCalls++
+		} else {
+			metrics.FailedToolCalls++
+			categorizeFailure(exec, patternCounts)
+		}
+	}
+
+	if t.IsSelfCorrection {
+		metrics.SelfCorrectionAttempts++
+		if t.CorrectedPrevious {
+			metrics.SelfCorrectionSuccesses++
+		}
+	}
+}
+
+func calculateCompositeScore(accuracy, recovery, tokensPerSuccess float64) float64 {
+	accScore := accuracy * 50.0
+	recScore := recovery * 25.0
+
+	tokenScore := 25.0
+	if tokensPerSuccess > 0 {
+		ratio := 15000.0 / tokensPerSuccess
+		if ratio > 1.0 {
+			tokenScore = 25.0
+		} else {
+			tokenScore = math.Max(0.0, ratio*25.0)
+		}
+	}
+	return math.Round((accScore+recScore+tokenScore)*100) / 100
+}
+
+func extractTopFailurePatterns(patternCounts map[string]*FailurePattern) []FailurePattern {
+	var patterns []FailurePattern
+	for _, p := range patternCounts {
+		patterns = append(patterns, *p)
+	}
+	sort.Slice(patterns, func(i, j int) bool {
+		return patterns[i].Count > patterns[j].Count
+	})
+	if len(patterns) > 5 {
+		patterns = patterns[:5]
+	}
+	return patterns
+}
+
+func sortAndRankModels(results []ModelMetrics) {
 	sort.Slice(results, func(i, j int) bool {
 		if results[i].CompositeScore == results[j].CompositeScore {
 			return results[i].ToolAccuracy > results[j].ToolAccuracy
@@ -118,8 +136,6 @@ func EvaluateTurns(turns []Turn) []ModelMetrics {
 	for i := range results {
 		results[i].Rank = i + 1
 	}
-
-	return results
 }
 
 // categorizeFailure groups a tool failure into standard archetypes for prompt diagnosis.
