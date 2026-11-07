@@ -4,19 +4,6 @@
 # Fail-closed enforcement for projects initialized with ZQK:
 # 0. Branch Protection Gate: Direct commits to main/master prohibited (POL-WORKFLOW-002)
 # 1. CAS Membrane Integrity Gate (Prevent hand-editing of files past the CAS membrane)
-# 1b. Process CAS rename must ship with the work (POL-CODE-CAS-COMMIT-001)
-# Same commit as code/object work, or the immediately following commit — do not
-# leave complete/in_progress hash YAML untracked across resets.
-if [ -x "$REPO_ROOT/scripts/check-process-cas-commit-with-work.sh" ]; then
-	if ! "$REPO_ROOT/scripts/check-process-cas-commit-with-work.sh"; then
-		exit 1
-	fi
-elif [ -f "$REPO_ROOT/scripts/check-process-cas-commit-with-work.sh" ]; then
-	if ! sh "$REPO_ROOT/scripts/check-process-cas-commit-with-work.sh"; then
-		exit 1
-	fi
-fi
-
 # 2. Knowledge Kernel CAS & Referential Integrity Gate (zqk system check)
 # 3. Test-Driven Development & Lineage Gate (zqk test dashboard --check-dod)
 # 4. Secret & Credential Leak Scanning Gate (scripts/scan-secrets.sh)

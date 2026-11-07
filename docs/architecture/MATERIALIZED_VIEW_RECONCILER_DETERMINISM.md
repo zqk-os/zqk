@@ -36,9 +36,9 @@ When verifying hot path performance over multi-iteration loops (e.g. 50 reads):
 - Allow individual iteration jitter up to 75ms on heavily loaded CI runners, bounding allowable outliers to ensure single-thread scheduling anomalies do not fail test suites.
 
 ## Verification & Traceability
-- **Requirement**: `REQ-1794024331551639000-74bea9e1` (Materialized View Reconciler Determinism & CI Flake Eradication)
-- **Test Case**: `TST-1794024333601816001-34b7c634` (Test Suite: Materialized View Reconciler Determinism & CI Flake Eradication)
-- **Criteria**:
-  - `CRIT-1794024333601816000-7a9a8257` (Functional Acceptance)
-  - `CRIT-1794024333601817000-0dd242a6` (Boundary & Error Handling)
-  - `CRIT-1794024333601818000-53c6e712` (Documentation & Knowledge Base Entry)
+- **Requirement**: Materialized View Reconciler Determinism & CI Flake Eradication
+- **Test Suite**: `pkg/workflow/whatsnext/materialized_view_test.go`
+- **Verification Gates**:
+  - Functional Acceptance: Sub-5ms Hot Path and Quiescent Watermark Invariant
+  - Boundary & Error Handling: Quiescent Watermark Touch and Async Recovery Circuit Breaker
+  - Conformance: Single-flight Reconciler Mutex and TempDir Isolation Invariants
