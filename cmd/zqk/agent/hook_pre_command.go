@@ -66,6 +66,12 @@ func NewPreCommandHookCmd() *cobra.Command {
 		},
 	})
 
+	if cmd.Flags().Lookup("vendor") == nil {
+		cmd.Flags().StringVar(&vendor, "vendor", "antigravity", "Target agent host vendor format (antigravity, generic)")
+	}
+	if cmd.Flags().Lookup("project-root") == nil {
+		cmd.Flags().StringVar(&projectRoot, "project-root", "", "Project root directory")
+	}
 	if cmd.Flags().Lookup("max-tokens") == nil {
 		cmd.Flags().IntVar(&maxTokens, "max-tokens", 0, "Maximum token budget for rewritten code searches")
 	}
