@@ -72,6 +72,14 @@ func formatUnmetPreconditionDetail(precondition string, obj map[string]any) stri
 // errGitEvidenceNoProjectRoot is reported when no git project root can be resolved for evidence checks.
 var errGitEvidenceNoProjectRoot = errors.New("no git project root resolved for commit_hashes evidence")
 
+// escapeDoubleQuotedLiteral safely escapes user-provided content before embedding into
+// text that may be consumed in double-quoted contexts.
+func escapeDoubleQuotedLiteral(raw string) string {
+	escaped := strings.ReplaceAll(raw, `\`, `\\`)
+	escaped = strings.ReplaceAll(escaped, `"`, `\"`)
+	return escaped
+}
+
 // formatUnmetPreconditionDetailForOptions enriches an unmet precondition and, for the git
 // mutation evidence gate, re-derives the concrete per-commit rejection reason so operators
 // see which SHA failed and why (SHA not found, merge commit, missing id mention, process-only paths).
@@ -99,11 +107,13 @@ func formatGitMutationEvidenceExplanation(obj map[string]any, reason error) stri
 	if bliID == "" {
 		bliID = ExplanationGitMutationEvidencePlaceholderID
 	}
-	accepted := bliID
+	safeBliID := escapeDoubleQuotedLiteral(bliID)
+	accepted := safeBliID
 	if planRef, _ := obj[objects.FieldKeyPriorityPlanRef].(string); strings.TrimSpace(planRef) != "" {
-		accepted = fmt.Sprintf(ExplanationGitMutationEvidencePlanAltFormat, bliID, strings.TrimSpace(planRef))
+		safePlanRef := escapeDoubleQuotedLiteral(strings.TrimSpace(planRef))
+		accepted = fmt.Sprintf(ExplanationGitMutationEvidencePlanAltFormat, safeBliID, safePlanRef)
 	}
-	tag := fmt.Sprintf(ExplanationGitMutationEvidenceTagFormat, bliID)
+	tag := fmt.Sprintf(ExplanationGitMutationEvidenceTagFormat, safeBliID)
 	explanation := fmt.Sprintf(ExplanationGitMutationEvidenceFormat, accepted, tag)
 	if reason != nil {
 		explanation = fmt.Sprintf(ExplanationGitMutationEvidenceRejectedFormat, explanation, reason)
