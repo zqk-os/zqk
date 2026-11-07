@@ -998,14 +998,30 @@ func IsCachedPlanStale(ctx context.Context, sp storage.ObjectStorageProvider, pl
 			})
 		}
 		if len(plansList) > 0 {
-			lead, _ := EvaluatePhiLead(plansList, nil)
-			if lead != nil && lead.ID != plan.ID {
+			lead, rankedPlans := EvaluatePhiLead(plansList, nil)
+			if len(rankedPlans) > 0 && lead != nil && lead.ID != plan.ID {
 				return true
 			}
 		}
 	}
 
 	return false
+}
+
+func newBootstrapPayload(reason string) *WhatsNextLitePayload {
+	return &WhatsNextLitePayload{
+		SchemaVersion:       MaterializedViewSchemaVersion,
+		MaterializedAt:      time.Now(),
+		Stale:               true,
+		Recovering:          true,
+		DegradedReason:      reason,
+		BacklogCountsByPlan: make(map[string]map[string]int),
+		TotalBacklogCounts:  make(map[string]int),
+		ActivePlans:         make([]WhatsNextPriorityPlan, 0),
+		Plans:               make([]*PlanNode, 0),
+		Backlogs:            make([]*BacklogNode, 0),
+		Tasks:               make([]*TaskNode, 0),
+	}
 }
 
 // GetOrRecoverPayload implements the strict Zero-Hot-Path-Scan Invariant.
@@ -1026,19 +1042,7 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 		} else if err != nil && !os.IsNotExist(err) {
 			reason = fmt.Sprintf("materialized_projection_corrupted: %v", err)
 		}
-		bootstrap := &WhatsNextLitePayload{
-			SchemaVersion:       MaterializedViewSchemaVersion,
-			MaterializedAt:      time.Now(),
-			Stale:               true,
-			Recovering:          true,
-			DegradedReason:      reason,
-			BacklogCountsByPlan: make(map[string]map[string]int),
-			TotalBacklogCounts:  make(map[string]int),
-			ActivePlans:         make([]WhatsNextPriorityPlan, 0),
-			Plans:               make([]*PlanNode, 0),
-			Backlogs:            make([]*BacklogNode, 0),
-			Tasks:               make([]*TaskNode, 0),
-		}
+		bootstrap := newBootstrapPayload(reason)
 		TriggerAsyncRebuild(projectRoot, sp)
 		return bootstrap, nil
 	}
@@ -1058,7 +1062,10 @@ func GetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, 
 			}
 			rebuildView := NewWhatsNextMaterializedView(projectRoot)
 			if scanErr := rebuildView.ScanFromStorageWithSecurity(ctx, sp, secCtx); scanErr == nil {
-				_ = rebuildView.SaveToLiteFile()
+				if saveErr := rebuildView.SaveToLiteFile(); saveErr != nil {
+					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+						Warn(fmt.Sprintf("failed to save refreshed lite file: %v", saveErr)).Log()
+				}
 				refreshed := rebuildView.BuildPayloadLocked()
 				refreshed.Stale = false
 				refreshed.Recovering = false

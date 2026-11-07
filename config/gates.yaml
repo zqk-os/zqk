@@ -136,6 +136,9 @@ tree_police:
     - "scan-secrets.sh"
     - "check-doc-cli-coherency.sh"
     - "check-doc-links.sh"
+    - "check-process-cas-commit-with-work.sh"
+    - "cas_unpaired_delete_inbound_refs.py"
+    - "cas_unpaired_delete_inbound_refs_test.py"
   allowed_script_prefixes:
     - "scripts/open-core/"
     - "scripts/starter_kernel_graph/"

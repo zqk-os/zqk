@@ -133,6 +133,27 @@ func setupScannedTestView(t *testing.T) (string, *mockStorageProvider, *WhatsNex
 	return tempDir, mockSp, view
 }
 
+func setupSavedTestView(t *testing.T) (string, *mockStorageProvider, *WhatsNextMaterializedView) {
+	t.Helper()
+	tempDir, mockSp, view := setupScannedTestView(t)
+	if err := view.SaveToLiteFile(); err != nil {
+		t.Fatalf("save lite file failed: %v", err)
+	}
+	return tempDir, mockSp, view
+}
+
+func setupSavedViewWithStorage(t *testing.T, tempDir string, mockSp storage.ObjectStorageProvider) *WhatsNextMaterializedView {
+	t.Helper()
+	view := NewWhatsNextMaterializedView(tempDir)
+	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
+		t.Fatalf("scan failed: %v", err)
+	}
+	if err := view.SaveToLiteFile(); err != nil {
+		t.Fatalf("save lite file failed: %v", err)
+	}
+	return view
+}
+
 func setupReconcileTestEnv(t *testing.T, delay time.Duration) (string, *mockStorageProvider) {
 	t.Helper()
 	atomic.StoreUint32(&isReconciling, 0)
@@ -140,6 +161,19 @@ func setupReconcileTestEnv(t *testing.T, delay time.Duration) (string, *mockStor
 	mockSp := newMockStorage()
 	mockSp.scanDelay = delay
 	return tempDir, mockSp
+}
+
+func setupSavedReconcileTestEnv(t *testing.T, delay time.Duration) (string, *mockStorageProvider, *WhatsNextMaterializedView) {
+	t.Helper()
+	tempDir, mockSp := setupReconcileTestEnv(t, delay)
+	view := setupSavedViewWithStorage(t, tempDir, mockSp)
+	return tempDir, mockSp, view
+}
+
+func timedGetOrRecoverPayload(ctx context.Context, sp storage.ObjectStorageProvider, dir string, tol time.Duration) (*WhatsNextLitePayload, time.Duration, error) {
+	start := time.Now()
+	payload, err := GetOrRecoverPayload(ctx, sp, dir, tol)
+	return payload, time.Since(start), err
 }
 
 func TestWhatsNextMaterializedViewPredicates(t *testing.T) {
@@ -212,17 +246,7 @@ func TestWhatsNextMaterializedViewPredicates(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-
-	// 1. Initial scan and persistence
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("initial scan failed: %v", err)
-	}
-	if err := view.SaveToLiteFile(); err != nil {
-		t.Fatalf("save lite file failed: %v", err)
-	}
+	tempDir, mockSp, _ := setupSavedTestView(t)
 
 	// Warmup read to load disk page into OS cache
 	_, _ = GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
@@ -262,17 +286,7 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 }
 
 func TestGetOrRecoverPayload_AutoInvalidationOnCompletedPlan(t *testing.T) {
-	tempDir := t.TempDir()
-	mockSp := newMockStorage()
-
-	// 1. Initial scan and persistence where PRI-002 is in_progress lead plan
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("initial scan failed: %v", err)
-	}
-	if err := view.SaveToLiteFile(); err != nil {
-		t.Fatalf("save lite file failed: %v", err)
-	}
+	tempDir, mockSp, _ := setupSavedTestView(t)
 
 	// Verify cached payload has PRI-002 as lead plan
 	loaded, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
@@ -334,13 +348,7 @@ func TestGetOrRecoverPayload_AutoInvalidationOnHigherActiveOrderPromotion(t *tes
 	}
 	mockSp.mu.Unlock()
 
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("scan failed: %v", err)
-	}
-	if err := view.SaveToLiteFile(); err != nil {
-		t.Fatalf("save lite file failed: %v", err)
-	}
+	setupSavedViewWithStorage(t, tempDir, mockSp)
 
 	// Verify cached lead plan is PRI-001
 	loaded, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
@@ -510,9 +518,7 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 	_ = fileutil.WriteFile(walPath, []byte("event: test_mutation\n"), paths.FilePerm644)
 
 	// Hot path call on stale file: must return immediately (<25ms vs 200ms scan), marked stale/recovering, and kick off async rebuild
-	startStale := time.Now()
-	recoveringPayload, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, 2*time.Minute)
-	elapsedStale := time.Since(startStale)
+	recoveringPayload, elapsedStale, err := timedGetOrRecoverPayload(context.Background(), mockSp, tempDir, 2*time.Minute)
 
 	if err != nil {
 		t.Fatalf("stale read failed: %v", err)
@@ -540,17 +546,8 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 }
 
 func TestWhatsNextMaterializedViewQuiescentWatermarkTouch(t *testing.T) {
-	tempDir, mockSp := setupReconcileTestEnv(t, 200*time.Millisecond)
+	tempDir, mockSp, view := setupSavedReconcileTestEnv(t, 200*time.Millisecond)
 	defer atomic.StoreUint32(&isReconciling, 0)
-
-	// Pre-seed a fresh lite file
-	view := NewWhatsNextMaterializedView(tempDir)
-	if err := view.ScanFromStorage(context.Background(), mockSp); err != nil {
-		t.Fatalf("scan failed: %v", err)
-	}
-	if err := view.SaveToLiteFile(); err != nil {
-		t.Fatalf("save lite file failed: %v", err)
-	}
 
 	// Age the materialized view by 10 minutes
 	stalePayload, err := view.LoadFromLiteFile()
@@ -647,17 +644,12 @@ func BenchmarkWhatsNextMaterializedViewHotPath(b *testing.B) {
 // Reactive view projections adhere to the non-blocking zero-scan contract and sub-5ms SLA.
 func TestReactiveViewsAccumulatorConformance(t *testing.T) {
 	t.Parallel()
-	tempDir, mockSp, view := setupScannedTestView(t)
-	if err := view.SaveToLiteFile(); err != nil {
-		t.Fatalf("save lite file failed: %v", err)
-	}
+	tempDir, mockSp, _ := setupSavedTestView(t)
 
 	// Warmup read to load disk page into OS cache
 	_, _ = GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
 
-	start := time.Now()
-	payload, err := GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
-	elapsed := time.Since(start)
+	payload, elapsed, err := timedGetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
 
 	if err != nil {
 		t.Fatalf("get payload failed: %v", err)
