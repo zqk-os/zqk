@@ -1,0 +1,32 @@
+$schema: ../_schemas/command_spec.schema.json
+name: matrix
+short: Evaluate a convergence session matrix against an eval template
+description: |
+  Connects an active or target convergence session (CVS) to an evaluation template,
+  evaluating dimension scores and recording results into the convergence matrix.
+flags:
+  - name: session-id
+    shorthand: s
+    type: string
+    default: ""
+    required: true
+    description: "Convergence session ID (e.g. CVS-001)"
+  - name: template
+    shorthand: t
+    type: string
+    default: ""
+    required: true
+    description: "Path or identifier of the eval template"
+  - name: json
+    type: bool
+    default: false
+    required: false
+    description: "Output matrix evaluation results in JSON"
+help:
+  examples:
+    - comment: Evaluate convergence session against an eval template
+      command: "%s eval matrix --session-id CVS-001 --template ast-hygiene"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

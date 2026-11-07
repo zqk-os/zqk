@@ -194,6 +194,25 @@ func TestExecuteToolCall_mcpCallToolRejectsShellName(t *testing.T) {
 	}
 }
 
+func TestResolveRegisteredToolName_tipChannelPrefix(t *testing.T) {
+	t.Parallel()
+	ex := &MCPExecutor{allTools: map[string]llm.ToolDefinition{
+		"zqk_observer_search": {},
+		"zqk_write_code":      {},
+	}}
+	got, ok := ex.resolveRegisteredToolName("zqk-tip_observer_search")
+	if !ok || got != "zqk_observer_search" {
+		t.Fatalf("tip observer alias: got %q ok=%v", got, ok)
+	}
+	got, ok = ex.resolveRegisteredToolName("zqk-tip_write_code")
+	if !ok || got != "zqk_write_code" {
+		t.Fatalf("tip write_code alias: got %q ok=%v", got, ok)
+	}
+	if _, ok := ex.resolveRegisteredToolName("zqk-tip_not_a_tool"); ok {
+		t.Fatal("unknown tip tool must not resolve")
+	}
+}
+
 func TestNormalizeToolName_prefersExactLazyWriteCode(t *testing.T) {
 	t.Parallel()
 	executor := &MCPExecutor{

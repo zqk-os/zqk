@@ -1,0 +1,39 @@
+$schema: ../_schemas/command_spec.schema.json
+name: run
+short: Execute an evaluation against target sources or assets using an eval template
+description: |
+  Runs fast-path structural/lexical checks and multi-dimensional quality evaluations
+  against target files or directories specified in or overridden by the evaluation template.
+flags:
+  - name: template
+    shorthand: t
+    type: string
+    default: ""
+    required: true
+    description: "Path or identifier of the eval template"
+  - name: target
+    shorthand: p
+    type: string
+    default: ""
+    required: false
+    description: "Target file or directory override"
+  - name: auto-mint
+    type: bool
+    default: true
+    required: false
+    description: "Automatically mint kernel technical_debt on threshold failure"
+  - name: json
+    type: bool
+    default: false
+    required: false
+    description: "Output scorecard in JSON format"
+help:
+  examples:
+    - comment: Evaluate a package using a template
+      command: "%s eval run --template .zqk/eval/templates/go-hygiene.yaml --target pkg/eval"
+    - comment: Run evaluation and output JSON scorecard without auto-minting
+      command: "%s eval run --template template.yaml --auto-mint=false --json"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false

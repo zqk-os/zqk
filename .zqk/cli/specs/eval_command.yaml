@@ -1,0 +1,26 @@
+$schema: _schemas/command_spec.schema.json
+name: eval
+short: Generic scenario evaluation framework, declarative eval templates, and convergence verification
+description: |
+  Execute scenario evaluations against declarative eval templates. Supports fast-path
+  structural and lexical inspection (AST, regex), multi-dimensional quality scoring,
+  CVS convergence session integration, and automated remediation object minting.
+help:
+  examples:
+    - comment: Run evaluation using an eval template
+      command: "%s eval run --template .zqk/eval/templates/ast-hygiene.yaml --target pkg/core"
+    - comment: Validate an eval template schema
+      command: "%s eval validate --file ./eval_template.yaml"
+    - comment: Evaluate convergence session against an eval template
+      command: "%s eval matrix --session-id CVS-001 --template ast-hygiene"
+common_flags: false
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: run
+    spec_ref: eval/run_command.yaml
+  - name: validate
+    spec_ref: eval/validate_command.yaml
+  - name: matrix
+    spec_ref: eval/matrix_command.yaml
