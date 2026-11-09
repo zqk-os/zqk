@@ -169,29 +169,25 @@ func newMatrixCmd() *cobra.Command {
 				return err
 			}
 
-			engine := eval.NewEngine(root)
-			result, err := engine.Execute(context.Background(), tmpl, "")
+			matrixEngine := eval.NewMatrixEngine(root)
+			cfg := eval.MatrixConfig{
+				Templates: []*eval.EvalTemplate{tmpl},
+				SessionID: sessionID,
+			}
+			result, err := matrixEngine.ExecuteMatrix(context.Background(), cfg)
 			if err != nil {
 				return err
 			}
 
-			matrixResult := map[string]any{
-				"session_id":       sessionID,
-				"template_id":      tmpl.TemplateID,
-				"passed":           result.Passed,
-				"composite_score":  result.CompositeScore,
-				"dimension_scores": result.DimensionScores,
-			}
-
 			if outputJSON {
-				data, mErr := json.MarshalIndent(matrixResult, "", "  ")
+				data, mErr := json.MarshalIndent(result, "", "  ")
 				if mErr != nil {
 					return mErr
 				}
 				fmt.Fprintln(cmd.OutOrStdout(), string(data))
 			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "✓ Convergence matrix evaluated for session %s using template %s (score: %0.2f)\n",
-					sessionID, tmpl.TemplateID, result.CompositeScore)
+				fmt.Fprintf(cmd.OutOrStdout(), "✓ Convergence matrix evaluated for session %s using template %s (scenarios: %d, passed: %d, score: %0.2f)\n",
+					sessionID, tmpl.TemplateID, result.TotalScenarios, result.PassedScenarios, result.AverageCompositeScore)
 			}
 			return nil
 		},
