@@ -64,6 +64,28 @@ rules:
     child_max_timeout_exempt_if_explicit: true
     idle_shutdown_duration: 5m
 
+  # Object promote: walks validation/CAS and applies lifecycle graph hops; allow generous
+  # timeout and idle window so non-zqk parent (agent/IDE) does not cancel context.
+  - pattern: "object promote"
+    timeout: 5m
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 5m
+
+  # Object ref: add/remove graph references; allow generous timeout and idle window
+  - pattern: "object ref"
+    timeout: 5m
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 5m
+
+  # New / mint commands: allow generous timeout and idle window for CAS hashing and graph links
+  - pattern: "new "
+    timeout: 5m
+    child_max_timeout_exempt: true
+    child_max_timeout_exempt_if_explicit: true
+    idle_shutdown_duration: 5m
+
   # Object import: bulk import validates and writes many objects; needs generous timeout and idle window
   - pattern: "object import"
     timeout: 10m
