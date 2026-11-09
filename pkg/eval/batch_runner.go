@@ -204,70 +204,70 @@ func (r *BatchRunner) Run(ctx context.Context, stream chan<- StreamEvent) (*Batc
 		goroutinelabels.NewGoroutine("batch_eval_worker", "process evaluation scenarios concurrently").
 			StartSimple(func() {
 				defer wg.Done()
-			for sc := range workCh {
-				if runCtx.Err() != nil || budgetExceeded.Load() {
-					return
-				}
-
-				scStart := time.Now()
-				if stream != nil {
-					stream <- StreamEvent{
-						Type:        EventScenarioProgress,
-						ScenarioID:  sc.ID,
-						Timestamp:   time.Now().UTC(),
-						TotalTokens: r.metrics.TotalTokens(),
+				for sc := range workCh {
+					if runCtx.Err() != nil || budgetExceeded.Load() {
+						return
 					}
-				}
 
-				pTokens, cTokens, err := r.executor(runCtx, sc)
-				dur := time.Since(scStart)
-				totTokens := r.metrics.RecordTokens(pTokens, cTokens, 0)
-
-				outcome := ScenarioOutcome{
-					ScenarioID:       sc.ID,
-					PromptTokens:     pTokens,
-					CompletionTokens: cTokens,
-					Duration:         dur,
-				}
-
-				if err != nil {
-					atomic.AddInt64(&r.metrics.TotalFailures, 1)
-					outcome.Success = false
-					outcome.Error = err.Error()
+					scStart := time.Now()
 					if stream != nil {
 						stream <- StreamEvent{
-							Type:        EventScenarioFailed,
+							Type:        EventScenarioProgress,
 							ScenarioID:  sc.ID,
 							Timestamp:   time.Now().UTC(),
-							TokensUsed:  pTokens + cTokens,
-							TotalTokens: totTokens,
-							Error:       err.Error(),
+							TotalTokens: r.metrics.TotalTokens(),
 						}
 					}
-				} else {
-					atomic.AddInt64(&r.metrics.TotalScenariosRun, 1)
-					outcome.Success = true
-					if stream != nil {
-						stream <- StreamEvent{
-							Type:        EventScenarioCompleted,
-							ScenarioID:  sc.ID,
-							Timestamp:   time.Now().UTC(),
-							TokensUsed:  pTokens + cTokens,
-							TotalTokens: totTokens,
+
+					pTokens, cTokens, err := r.executor(runCtx, sc)
+					dur := time.Since(scStart)
+					totTokens := r.metrics.RecordTokens(pTokens, cTokens, 0)
+
+					outcome := ScenarioOutcome{
+						ScenarioID:       sc.ID,
+						PromptTokens:     pTokens,
+						CompletionTokens: cTokens,
+						Duration:         dur,
+					}
+
+					if err != nil {
+						atomic.AddInt64(&r.metrics.TotalFailures, 1)
+						outcome.Success = false
+						outcome.Error = err.Error()
+						if stream != nil {
+							stream <- StreamEvent{
+								Type:        EventScenarioFailed,
+								ScenarioID:  sc.ID,
+								Timestamp:   time.Now().UTC(),
+								TokensUsed:  pTokens + cTokens,
+								TotalTokens: totTokens,
+								Error:       err.Error(),
+							}
+						}
+					} else {
+						atomic.AddInt64(&r.metrics.TotalScenariosRun, 1)
+						outcome.Success = true
+						if stream != nil {
+							stream <- StreamEvent{
+								Type:        EventScenarioCompleted,
+								ScenarioID:  sc.ID,
+								Timestamp:   time.Now().UTC(),
+								TokensUsed:  pTokens + cTokens,
+								TotalTokens: totTokens,
+							}
 						}
 					}
-				}
 
-				outcomesMu.Lock()
-				outcomes = append(outcomes, outcome)
-				outcomesMu.Unlock()
+					outcomesMu.Lock()
+					outcomes = append(outcomes, outcome)
+					outcomesMu.Unlock()
 
-				if totTokens >= r.config.MaxTokens {
-					budgetExceeded.Store(true)
-					return
+					if totTokens >= r.config.MaxTokens {
+						budgetExceeded.Store(true)
+						return
+					}
 				}
-			}
-		})
+			})
 	}
 
 	wg.Wait()
