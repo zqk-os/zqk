@@ -29,12 +29,12 @@ All pre-flight verification gates codified in `pkg/releasegate/` satisfy the Thr
 | **Operational Dynamic Proof** | End-to-end payload packaging, tarball/zip archive construction, executable bit retention, license embedding, and checksum integrity. | `scripts/open-core/check-public-release-payload.sh` & `TestVerifyPublicReleasePayload` | **PASS** |
 | **Negative Adversarial Boundaries** | Fail-closed rejection of process instance data, studio kernel IDs, sensitive files (.DS_Store, private keys), directory traversals, and insecure symlinks. | `TestPublicPayloadCheck_BoundaryAndErrorHandling` | **PASS** |
 
-## Resolved Technical Debt Tickets
-The following technical debt objects in the Knowledge Kernel CAS are verified and promoted to resolved:
-- `TDE-1794028974930200000-3dbf01cf` (Remediate `zqk system check` timeout on deep object graphs)
-- `TDE-1794028972032239000-4803e78a` (Implement `--unset-field` on `zqk object update` to clear stray properties)
-- `TDE-1794033231724999000-85948d4b` (Eliminate write contention in concurrent agent CAS transactions)
-- `TDE-1794033236151759000-dd98d035` (Streamline graph validation pipeline to sub-3s latency)
+## Resolved Technical Debt & Issue Backlog
+The following technical debt areas in the Knowledge Kernel CAS are verified and promoted to resolved:
+- **GH-1018**: Remediate `zqk system check` timeout on deep object graphs.
+- **GH-1019**: Implement `--unset-field` on `zqk object update` to clear stray properties.
+- **GH-1014**: Eliminate write contention in concurrent agent CAS transactions.
+- **Graph Streamlining**: Streamline graph validation pipeline to sub-3s latency.
 
 ## Distribution Manifest
 The candidate release bundle for `v0.3.4` comprises:
