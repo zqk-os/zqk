@@ -516,7 +516,7 @@ func GC() (removed []Entry, err error) {
 	}
 	// Node sovereignty: also GC legacy / ephemeral mesh seat-worker LaunchAgents.
 	// Live foreign root-scoped units are preserved (GCMeshSeatWorkerZombies).
-	// TRACK: BLI-1793916946555827500-2e550485 — hostservice.GC covers seat-worker zombies.
+	// Hostservice GC covers seat-worker zombies.
 	if _, meshErr := GCMeshSeatWorkerZombies(); meshErr != nil {
 		return removed, meshErr
 	}
