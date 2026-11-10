@@ -514,6 +514,12 @@ func GC() (removed []Entry, err error) {
 	if err := SaveRegistry(reg); err != nil {
 		return removed, err
 	}
+	// Node sovereignty: also GC legacy / ephemeral mesh seat-worker LaunchAgents.
+	// Live foreign root-scoped units are preserved (GCMeshSeatWorkerZombies).
+	// Hostservice GC covers seat-worker zombies.
+	if _, meshErr := GCMeshSeatWorkerZombies(); meshErr != nil {
+		return removed, meshErr
+	}
 	return removed, nil
 }
 

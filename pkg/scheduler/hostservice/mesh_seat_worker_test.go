@@ -127,6 +127,52 @@ func TestGCMeshSeatWorkerZombies_legacyAndTestRoot(t *testing.T) {
 	}
 }
 
+func TestGC_alsoRemovesLegacyMeshSeatWorkers(t *testing.T) {
+	// hostservice.GC must quarantine legacy / ephemeral mesh seat-worker units
+	// (node sovereignty) while preserving live foreign root-scoped labels.
+	if runtime.GOOS != "darwin" && runtime.GOOS != "linux" {
+		t.Skip("LaunchAgents-shaped GC")
+	}
+	agents := t.TempDir()
+	t.Setenv(zqkenv.LaunchAgentsDir().Name(), agents)
+
+	legacyLabel := hostservice.LegacyMeshSeatWorkerUnitLabel("gc-worker-1")
+	legacyPlist := filepath.Join(agents, legacyLabel+".plist")
+	zombieRoot := t.TempDir()
+	body := `<?xml version="1.0"?><plist><dict>
+  <key>WorkingDirectory</key><string>` + zombieRoot + `</string>
+</dict></plist>`
+	if err := fileutil.WriteFile(legacyPlist, []byte(body), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	liveHome := filepath.Join(fileutil.TempDir(), "zqk-hs-gc-live-"+strings.ReplaceAll(t.Name(), "/", "_"))
+	_ = fileutil.RemoveAll(liveHome)
+	liveRoot := filepath.Join(liveHome, "proj")
+	if err := fileutil.MkdirAll(liveRoot, paths.DirPerm755); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = fileutil.RemoveAll(liveHome) })
+	liveLabel := hostservice.MeshSeatWorkerUnitLabel(hostservice.RootID(liveRoot), "peer-agent-1")
+	livePlist := filepath.Join(agents, liveLabel+".plist")
+	liveBody := `<?xml version="1.0"?><plist><dict>
+  <key>WorkingDirectory</key><string>` + liveRoot + `</string>
+</dict></plist>`
+	if err := fileutil.WriteFile(livePlist, []byte(liveBody), paths.FilePerm644); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := hostservice.GC(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := fileutil.Stat(legacyPlist); err == nil {
+		t.Fatal("hostservice.GC must remove legacy unscoped mesh seat-worker units")
+	}
+	if _, err := fileutil.Stat(livePlist); err != nil {
+		t.Fatal("live root-scoped mesh seat-worker must survive hostservice.GC")
+	}
+}
+
 func TestShouldCleanupLegacyMeshLabel(t *testing.T) {
 	t.Parallel()
 	legacy := hostservice.LegacyMeshSeatWorkerUnitLabel("peer-1")
