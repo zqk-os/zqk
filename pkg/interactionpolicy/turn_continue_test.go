@@ -115,6 +115,34 @@ func TestCompileTurnContinue_StripsDispatchRemintHint(t *testing.T) {
 	}
 }
 
+func TestCompileTurnContinue_ScrubsSwarmInitProseWhenRemintStripped(t *testing.T) {
+	t.Parallel()
+	got := CompileTurnContinue(TurnContinueInput{
+		GuidingEvent:  EventIdle,
+		GuidingStep:   "Lead priority_plan has planned BLIs. Anti-piecemeal invariant: hand off batch to deterministic swarm orchestration (agent swarm-init / orchestrate).",
+		CommandHint:   HintSwarmInit("PRI-1"),
+		PolicyID:      PolicyTPMProcessAdmin,
+		CapLoopActive: true,
+	})
+	if !got.Continue {
+		t.Fatal("must continue")
+	}
+	if got.Reason != reasonRemintHintStrip {
+		t.Fatalf("reason=%q", got.Reason)
+	}
+	if strings.Contains(strings.ToLower(got.Message), "anti-piecemeal") ||
+		strings.Contains(got.Message, "hand off batch") ||
+		strings.Contains(got.Message, "Next:") {
+		t.Fatalf("catalog remint prose must be scrubbed: %q", got.Message)
+	}
+	if !strings.Contains(got.Message, "Seat-worker/scheduler owns") {
+		t.Fatalf("keep-working remint-stripped text missing: %q", got.Message)
+	}
+	if !strings.Contains(got.Message, "do NOT remint") {
+		t.Fatalf("explicit no-remint missing: %q", got.Message)
+	}
+}
+
 func TestCompileTurnContinue_CapActiveDefault(t *testing.T) {
 	t.Parallel()
 	got := CompileTurnContinue(TurnContinueInput{CapLoopActive: true})
