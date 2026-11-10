@@ -204,6 +204,11 @@ func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
 		_ = fileutil.Remove(plistPath)
 		removed = append(removed, MeshSeatWorkerGCResult{Label: label, AbsRoot: absRoot, Reason: reason})
 	}
+	legacyMCPPW, err := GCLegacyHostGlobalMCPAndPW()
+	if err != nil {
+		return removed, err
+	}
+	removed = append(removed, legacyMCPPW...)
 	return removed, nil
 }
 

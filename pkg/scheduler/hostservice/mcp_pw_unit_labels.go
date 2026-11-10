@@ -1,9 +1,15 @@
 package hostservice
 
 import (
+	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/brand"
+	"github.com/zqk-os/zqk/pkg/errfmt"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // MCP daemon and PrivilegedWriter LaunchAgent labels are root-scoped so concurrent
@@ -14,7 +20,7 @@ import (
 //        com.<brand>.privileged-writer.<root_id>
 // Legacy (unscoped): com.<brand>.mcp-daemon / com.<brand>.privileged-writer
 //
-// TRACK: BLI-1794029815318590500-e7b20dbd / BLI-1793916946555828500-77934cb1
+// TRACK: BLI-1794029815318590500-e7b20dbd / BLI-1793916946555828500-77934cb1 / BLI-1793916946555827500-2e550485
 
 func mcpDaemonLabelPrefix() string {
 	return "com." + brand.ExecutableName() + ".mcp-daemon"
@@ -116,4 +122,68 @@ func IsLegacyMCPDaemonLabel(label string) bool {
 func IsLegacyPrivilegedWriterLabel(label string) bool {
 	p := ParsePrivilegedWriterLabel(label)
 	return p.Valid && p.Legacy
+}
+
+// GCLegacyHostGlobalMCPAndPW removes host-global (unscoped) mcp-daemon and
+// privileged-writer LaunchAgent plists once any root-scoped counterpart exists
+// in the same LaunchAgents dir. Safe when only legacy units remain (no-op).
+// TRACK: BLI-1793916946555827500-2e550485
+func GCLegacyHostGlobalMCPAndPW() ([]MeshSeatWorkerGCResult, error) {
+	if runtime.GOOS != "darwin" && strings.TrimSpace(zqkenv.LaunchAgentsDir().Get()) == "" {
+		return nil, nil
+	}
+	dir, err := LaunchAgentsDir()
+	if err != nil {
+		return nil, err
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, errfmt.Newf("read LaunchAgents").Wrap(err)
+	}
+	hasRootScopedMCP := false
+	hasRootScopedPW := false
+	legacyMCPPath := ""
+	legacyPWPath := ""
+	for _, ent := range entries {
+		if ent.IsDir() || !strings.HasSuffix(ent.Name(), ".plist") {
+			continue
+		}
+		label := strings.TrimSuffix(ent.Name(), ".plist")
+		plistPath := filepath.Join(dir, ent.Name())
+		if mcp := ParseMCPDaemonLabel(label); mcp.Valid {
+			if mcp.Legacy {
+				legacyMCPPath = plistPath
+			} else {
+				hasRootScopedMCP = true
+			}
+		}
+		if pw := ParsePrivilegedWriterLabel(label); pw.Valid {
+			if pw.Legacy {
+				legacyPWPath = plistPath
+			} else {
+				hasRootScopedPW = true
+			}
+		}
+	}
+	var removed []MeshSeatWorkerGCResult
+	unload := func(plistPath, reason string) {
+		if plistPath == "" {
+			return
+		}
+		label := strings.TrimSuffix(filepath.Base(plistPath), ".plist")
+		_ = launchctlCmd("bootout", "gui/"+uid(), plistPath)
+		_ = launchctlCmd("unload", "-w", plistPath)
+		_ = fileutil.Remove(plistPath)
+		removed = append(removed, MeshSeatWorkerGCResult{Label: label, Reason: reason})
+	}
+	if hasRootScopedMCP && legacyMCPPath != "" {
+		unload(legacyMCPPath, "legacy_unscoped_mcp_daemon")
+	}
+	if hasRootScopedPW && legacyPWPath != "" {
+		unload(legacyPWPath, "legacy_unscoped_privileged_writer")
+	}
+	return removed, nil
 }
