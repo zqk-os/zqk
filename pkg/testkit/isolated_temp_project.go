@@ -125,7 +125,11 @@ func runIsolatedTempProjectPipeline(tb testing.TB, root string, opts *IsolatedTe
 		for i := 0; i < 25; i++ {
 			_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 				if err == nil {
-					_ = os.Chmod(path, 0700)
+					perm := os.FileMode(0600)
+					if info != nil && info.IsDir() {
+						perm = 0700
+					}
+					_ = os.Chmod(path, perm) //nolint:gosec // #nosec G302 - test teardown permission reset before removal
 				}
 				return nil
 			})
