@@ -62,13 +62,20 @@ func NewAutoEvalGate(config GateConfig) (*AutoEvalGate, error) {
 }
 
 // CalculateVariance computes the mean, sample variance, and standard deviation for a slice of rates.
+// Corrupted numbers (NaN, Inf) are filtered to prevent statistical poisoning.
 func CalculateVariance(values []float64) (float64, float64, float64) {
-	n := len(values)
+	var clean []float64
+	for _, v := range values {
+		if !math.IsNaN(v) && !math.IsInf(v, 0) {
+			clean = append(clean, v)
+		}
+	}
+	n := len(clean)
 	if n == 0 {
 		return 0, 0, 0
 	}
 	var sum float64
-	for _, v := range values {
+	for _, v := range clean {
 		sum += v
 	}
 	mean := sum / float64(n)
@@ -76,7 +83,7 @@ func CalculateVariance(values []float64) (float64, float64, float64) {
 		return mean, 0, 0
 	}
 	var sumSqDiff float64
-	for _, v := range values {
+	for _, v := range clean {
 		diff := v - mean
 		sumSqDiff += diff * diff
 	}

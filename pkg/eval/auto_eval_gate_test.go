@@ -223,4 +223,35 @@ func TestCycle69_AutoEvalGate_NegativeAdversarialBoundary(t *testing.T) {
 			t.Fatalf("expected gate to FAIL due to missing required model")
 		}
 	})
+
+	t.Run("nan_inf_sanitization_in_variance", func(t *testing.T) {
+		dirty := []float64{0.80, math.NaN(), 0.90, math.Inf(1)}
+		mean, variance, stdDev := CalculateVariance(dirty)
+		if math.IsNaN(mean) || math.IsInf(mean, 0) {
+			t.Fatalf("expected clean mean, got %f", mean)
+		}
+		if math.Abs(mean-0.85) > 1e-4 {
+			t.Errorf("expected clean mean 0.85, got %f", mean)
+		}
+		if variance <= 0 || stdDev <= 0 {
+			t.Errorf("expected positive variance and stdDev, got var=%f stdDev=%f", variance, stdDev)
+		}
+	})
+
+	t.Run("single_model_zero_variance", func(t *testing.T) {
+		single := []float64{0.95}
+		mean, variance, stdDev := CalculateVariance(single)
+		if mean != 0.95 {
+			t.Errorf("expected mean 0.95, got %f", mean)
+		}
+		if variance != 0 || stdDev != 0 {
+			t.Errorf("expected zero variance for single value, got var=%f stdDev=%f", variance, stdDev)
+		}
+	})
+
+	t.Run("format_dashboard_nil_safe", func(t *testing.T) {
+		if out := gate.FormatDashboard(nil); out != "" {
+			t.Errorf("expected empty string for nil decision, got %q", out)
+		}
+	})
 }
