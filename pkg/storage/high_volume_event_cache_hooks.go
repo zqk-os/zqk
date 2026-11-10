@@ -43,14 +43,15 @@ func scheduleHighVolumeEventCachePersist(projectRoot string) {
 	hvePersistMu.Lock()
 	defer hvePersistMu.Unlock()
 	if hvePersistTimer != nil {
-		if hvePersistTimer.Stop() {
-			hvePersistWg.Done()
-		}
+		hvePersistTimer.Stop()
+		hvePersistTimer = nil
 	}
-	hvePersistWg.Add(1)
+	timerReady := make(chan *time.Timer, 1)
 	hvePersistTimer = time.AfterFunc(highVolumeEventPersistDebounce, func() {
+		hvePersistWg.Add(1)
 		defer hvePersistWg.Done()
 
+		_ = <-timerReady
 		hvePersistMu.Lock()
 		timerActive := (hvePersistTimer != nil)
 		hvePersistTimer = nil
@@ -60,6 +61,7 @@ func scheduleHighVolumeEventCachePersist(projectRoot string) {
 		}
 		SaveHighVolumeEventCache(root)
 	})
+	timerReady <- hvePersistTimer
 }
 
 // StopHighVolumeEventCachePersistForTest cancels any pending debounce timer for tests.
@@ -71,9 +73,7 @@ func StopHighVolumeEventCachePersistForTest(projectRoot string) {
 	}
 	hvePersistMu.Lock()
 	if hvePersistTimer != nil {
-		if hvePersistTimer.Stop() {
-			hvePersistWg.Done()
-		}
+		hvePersistTimer.Stop()
 		hvePersistTimer = nil
 	}
 	hvePersistMu.Unlock()
