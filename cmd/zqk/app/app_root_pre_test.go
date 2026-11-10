@@ -345,6 +345,7 @@ func TestCacheOperationHandler_Operations(t *testing.T) {
 	cDef := &pkgctx.CacheContext{Operation: "unknown_op"}
 	err = handler(cDef)
 	require.NoError(t, err)
+	_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(proj.Root, nil))
 }
 
 func TestMcpInitTrace_Logging(t *testing.T) {
