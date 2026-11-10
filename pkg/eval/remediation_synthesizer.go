@@ -95,9 +95,9 @@ func NormalizeErrorMessage(msg string) string {
 
 // ComputeFailureFingerprint calculates deterministic SHA-256 hash across failure dimensions.
 func ComputeFailureFingerprint(scenarioID, modelName, normalizedMsg string) string {
-	h := sha256.New()
-	_, _ = fmt.Fprintf(h, "%s:%s:%s", scenarioID, modelName, normalizedMsg)
-	return hex.EncodeToString(h.Sum(nil))
+	payload := scenarioID + ":" + modelName + ":" + normalizedMsg
+	sum := sha256.Sum256([]byte(payload))
+	return hex.EncodeToString(sum[:])
 }
 
 // ClassifySeverity maps failure category to priority tier.
