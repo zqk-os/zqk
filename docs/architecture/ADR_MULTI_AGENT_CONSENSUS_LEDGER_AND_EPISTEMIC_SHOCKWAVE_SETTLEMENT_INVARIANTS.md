@@ -35,11 +35,11 @@ To guarantee deterministic, verifiable convergence across swarms, ZQK requires a
 - **Negative Adversarial Boundary**: Rejection of forged parent hashes, replay attacks, stale epoch indices, sub-quorum proposals, and concurrent fork conflict arbitration.
 
 ## Traceability
-- **Milestone**: Cycle 88 (`MIL-1794326147696007000-68ef119a`)
-- **Priority Plan**: `PRI-1794326154927788000-a6464f70`
-- **Requirement**: `REQ-1794283823017060000-85a99984`
+- **Milestone**: Cycle 88 (Multi-Agent Consensus Ledger & Epistemic Shockwave Settlement Invariants)
+- **Priority Plan**: Cycle 88 Execution Plan
+- **Requirement**: Multi-Agent Consensus Ledger & Epistemic Shockwave Settlement Invariants
 - **Criteria**:
-  - `CRIT-1794326184914998000-1f66d2e2` (Acceptance: Consensus ledger replication)
-  - `CRIT-1794326191550023000-693bfe44` (Boundary: Fork detection & shockwave settlement)
-  - `CRIT-1794326198576746000-ef6374e8` (ADR Documentation & specification)
+  - Acceptance: Consensus ledger replication & state propagation
+  - Boundary: Fork detection, partition tolerance & epistemic shockwave conflict resolution
+  - Documentation: Architecture ADR and specification entry
 - **Test Suites**: `pkg/consensus`, `pkg/ambient` (`TestConsensusReflex_.*`)
