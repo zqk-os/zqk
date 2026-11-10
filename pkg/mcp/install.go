@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/adapters/cursor"
+	"github.com/zqk-os/zqk/pkg/adapters/ide"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -35,34 +35,17 @@ type mcpServerConfig struct {
 const mcpTransportStdio = "stdio"
 
 func isForeignMCPConfig(ideName, configPath string) bool {
-	p := filepath.ToSlash(configPath)
-	if strings.Contains(p, "/.gemini/") || strings.Contains(p, "/.codeium/") {
-		return true
-	}
-	return strings.Contains(ideName, "AGY") || strings.Contains(ideName, "Windsurf")
+	return ide.IsForeignConfig(ideName, configPath)
 }
 
 func isWorkspaceConfig(ideName, projectRoot, configPath string) bool {
-	if projectRoot == "" {
-		return false
-	}
-	if strings.Contains(ideName, "Desktop") || strings.Contains(ideName, "Global") {
-		return false
-	}
-	cleanRoot := filepath.Clean(projectRoot)
-	cleanPath := filepath.Clean(configPath)
-	return strings.HasPrefix(cleanPath, cleanRoot+string(filepath.Separator)) || cleanPath == cleanRoot
+	return ide.IsWorkspaceConfig(ideName, projectRoot, configPath)
 }
 
 // isIDEStdioAdapterConfig is true for Cursor/IDE mcp.json that must spawn
 // ide-adapter (stdio → daemon TCP), not fat mcp serve.
 func isIDEStdioAdapterConfig(ideName, configPath string) bool {
-	switch ideName {
-	case "IDE (Workspace)", "Cursor (Workspace)", "Cursor (Global)":
-		return true
-	}
-	parent := filepath.Base(filepath.Dir(configPath))
-	return filepath.Base(configPath) == "mcp.json" && (parent == ".cursor" || parent == ".ide")
+	return ide.IsIDEStdioAdapterConfig(ideName, configPath)
 }
 
 // AutoInstall registers the ZQK MCP server with supported IDEs and Agents.
@@ -103,86 +86,11 @@ func AutoInstall(projectRoot string, logger logging.Logger) error {
 
 // findMCPConfigs dynamically searches common directories for known MCP config files
 func findMCPConfigs(homeDir, projectRoot string) map[string]string {
-	configs := make(map[string]string)
-
-	// Always ensure IDE workspace is targeted if in a project
-	if projectRoot != "" {
-		configs["IDE (Workspace)"] = filepath.Join(projectRoot, ".ide", "mcp.json")
-		// Cursor 2026 Customize reads project .cursor/mcp.json (not only .ide/).
-		configs["Cursor (Workspace)"] = filepath.Join(projectRoot, ".cursor", "mcp.json")
-		configs["Claude Code (Workspace)"] = filepath.Join(projectRoot, ".claude.json")
-		configs["Windsurf (Workspace)"] = filepath.Join(projectRoot, ".codeium", "windsurf", "mcp_config.json")
-		configs["Cline (Workspace)"] = filepath.Join(projectRoot, ".cline", "mcp_settings.json")
-	}
-	if homeDir == "" {
-		return configs
-	}
-
-	// Relocated MCP controls (Customize sidebar) edit ~/.cursor/mcp.json.
-	// Empty global mcpServers leaves the connector red even when project file is valid.
-	configs["Cursor (Global)"] = filepath.Join(homeDir, ".cursor", "mcp.json")
-	if fileutil.Exists(filepath.Join(homeDir, ".claude.json")) {
-		configs["Claude Code (Global)"] = filepath.Join(homeDir, ".claude.json")
-	}
-
-	knownFiles := map[string]string{
-		"mcp_config.json":            "Global Daemon (AGY/Windsurf)",
-		"mcp.json":                   "IDE (Global)",
-		"claude_desktop_config.json": "Claude Desktop",
-		"cline_mcp_settings.json":    "Cline",
-		".claude.json":               "Claude Code",
-	}
-
-	searchDirs := []string{
-		filepath.Join(homeDir, ".codeium"),
-		filepath.Join(homeDir, ".gemini"),
-		filepath.Join(homeDir, ".ide"),
-		filepath.Join(homeDir, ".config"),
-	}
-
-	if runtime.GOOS == "darwin" {
-		searchDirs = append(searchDirs,
-			filepath.Join(homeDir, "Library", "Application Support", "Claude"),
-			filepath.Join(homeDir, "Library", "Application Support", "Cursor"),
-			filepath.Join(homeDir, "Library", "Application Support", "Code"),
-			filepath.Join(homeDir, "Library", "Application Support", "Windsurf"),
-		)
-	} else if runtime.GOOS == "windows" {
-		if appData := zqkenv.OSAppData().Get(); appData != "" {
-			searchDirs = append(searchDirs,
-				filepath.Join(appData, "Claude"),
-				filepath.Join(appData, "Cursor"),
-				filepath.Join(appData, "Code"),
-				filepath.Join(appData, "Windsurf"),
-			)
-		}
-	}
-
-	already := make(map[string]struct{}, len(configs))
-	for _, p := range configs {
-		already[filepath.Clean(p)] = struct{}{}
-	}
-	matches := fileutil.FindFiles(searchDirs, knownFiles)
-	for _, match := range matches {
-		clean := filepath.Clean(match.Path)
-		if _, dup := already[clean]; dup {
-			continue
-		}
-		// Prevent overwriting IDE workspace config if we stumble upon it
-		if projectRoot != "" && clean == filepath.Clean(filepath.Join(projectRoot, ".ide", "mcp.json")) {
-			continue
-		}
-		// Use the path as the key to ensure uniqueness if multiple are found
-		configs[fmt.Sprintf("%s (%s)", match.Identifier, match.Path)] = match.Path
-		already[clean] = struct{}{}
-	}
-
-	return configs
+	return ide.FindConfigs(homeDir, projectRoot)
 }
 
 // InstallToIDE registers the ZQK MCP server in the specific IDE configuration file.
 func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logging.Logger) error {
-	// Check if directory exists; if not, IDE is likely not installed or not initialized
 	dir := filepath.Dir(configPath)
 	if isIDEStdioAdapterConfig(ideName, configPath) || isWorkspaceConfig(ideName, projectRoot, configPath) {
 		if err := fileutil.EnsureDir(dir); err != nil {
@@ -192,118 +100,19 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 		return fmt.Errorf("config directory does not exist: %s", dir)
 	}
 
-	var rawConfig map[string]any
-	var config mcpConfig
-
-	// Read existing config if it exists
-	if data, err := fileutil.ReadFile(configPath); err == nil {
-		if err := json.Unmarshal(data, &rawConfig); err != nil {
-			// Vendor/global files we do not own (empty Gemini mcp_config.json)
-			// must not warn-flood AutoInstall. Skip; do not rewrite.
-			// no longer walks ~/.gemini / AGY paths.
-			if isForeignMCPConfig(ideName, configPath) || len(bytes.TrimSpace(data)) == 0 {
-				return nil
-			}
-			return fmt.Errorf("failed to parse existing config: %w", err)
-		}
-		_ = json.Unmarshal(data, &config)
-	}
-
-	if rawConfig == nil {
-		rawConfig = make(map[string]any)
-	}
-	if config.MCPServers == nil {
-		config.MCPServers = make(map[string]mcpServerConfig)
-	}
-
-	// Determine server name and configuration (brand-generic; no hardcoded product name).
-	exeName := brand.ExecutableName()
-	serverName := exeName
-	var env map[string]string
-	var cwd string
-	var command string
-	var args []string
-
 	if projectRoot == "" {
 		projectRoot = paths.ResolveProjectRoot(".")
 	}
 
-	if projectRoot != "" {
-		mcpEnv := map[string]string{
-			zqkenv.ProjectRoot().Name():   projectRoot,
-			zqkenv.MCPConfigPath().Name(): paths.MCPConfigPath(projectRoot),
-		}
-		if isIDEStdioAdapterConfig(ideName, configPath) {
-			// IDE entrypoint: ide-adapter (stdio MCP face) → host MCP daemon.
-			// Prefer workshop stable so Cursor/MCP share the same inode as scheduler;
-			// tip bin/zqk is for rebuilds — promote via scripts/install.sh.
-			// TRACK: no tip/stable split-brain.
-			serverName = exeName
-			target := ""
-			for _, candidate := range paths.StableBinaryCandidates(projectRoot) {
-				if fileutil.IsRegularFile(candidate) {
-					target = candidate
-					break
-				}
-			}
-			if target == "" {
-				target = paths.RepoBinPath(projectRoot)
-			}
-			if !fileutil.IsRegularFile(target) {
-				target = execPath
-			}
-			// Pin absolute seated-kernel paths — never ${workspaceFolder}.
-			// Cursor multi-root can resolve workspaceFolder to a sibling checkout
-			// (e.g. public-candidate) while the studio daemon listens on :8443,
-			// spawning the wrong-tree ide-adapter against the seated kernel.
-			// Re-run mcp ensure / AutoInstall after clone relocate.
-			roleBin := filepath.Join(projectRoot, "bin", MCPRoleProcessName(MCPRoleIDEAdapter))
-			if _, linkErr := EnsureMCPRoleSymlink(projectRoot, MCPRoleIDEAdapter, target); linkErr != nil {
-				logging.Fluent(logger).Warn("MCP ide-adapter role symlink unavailable; using target bin in mcp.json").
-					WithError(linkErr).
-					Path(target).
-					Log()
-				command = target
-			} else {
-				command = roleBin
-			}
-			cwd = projectRoot
-			env = mcpEnv
-			args = []string{"mcp", "ide-adapter", "--tcp", DefaultDaemonTCP}
-		} else {
-			// For global daemons and IDEs (AGY, Claude Desktop, Windsurf), we need a project-specific entry
-			// so that they don't overwrite each other. For IDE (Workspace) and Claude Code workspace, the bare brand name is fine.
-			if strings.Contains(ideName, "Workspace") || ideName == "Claude Code" {
-				serverName = exeName
-			} else {
-				serverName = exeName + "-" + filepath.Base(projectRoot)
-			}
-			cwd = projectRoot
-			command = filepath.Base(execPath)
-			args = []string{"mcp", "serve"}
-			env = mcpEnv
-		}
-	} else {
-		command = filepath.Base(execPath)
-		args = []string{"mcp", "serve"}
+	rawConfig, config, err := readExistingMCPConfig(ideName, configPath)
+	if err != nil {
+		return err
+	}
+	if rawConfig == nil {
+		return nil
 	}
 
-	// Add or update ZQK server
-	entry := mcpServerConfig{
-		Command: command,
-		Args:    args,
-		Env:     env,
-		Cwd:     cwd,
-	}
-	if prev, ok := config.MCPServers[serverName]; ok && prev.EnvFile != "" {
-		entry.EnvFile = prev.EnvFile
-	}
-	if isIDEStdioAdapterConfig(ideName, configPath) {
-		entry.Type = mcpTransportStdio
-		if projectRoot != "" {
-			entry.EnvFile = filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, "cursor-stdio.env")
-		}
-	}
+	serverName, entry := buildMCPServerConfig(ideName, configPath, execPath, projectRoot, config.MCPServers, logger)
 	config.MCPServers[serverName] = entry
 	rawConfig["mcpServers"] = config.MCPServers
 
@@ -330,4 +139,110 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 
 	logging.Fluent(logger).Info("Configured MCP server").IDE(ideName).Path(configPath).Log()
 	return nil
+}
+
+func readExistingMCPConfig(ideName, configPath string) (map[string]any, mcpConfig, error) {
+	rawConfig := make(map[string]any)
+	var config mcpConfig
+
+	data, err := fileutil.ReadFile(configPath)
+	if err != nil {
+		config.MCPServers = make(map[string]mcpServerConfig)
+		return rawConfig, config, nil
+	}
+
+	if err := json.Unmarshal(data, &rawConfig); err != nil {
+		if isForeignMCPConfig(ideName, configPath) || len(bytes.TrimSpace(data)) == 0 {
+			return nil, config, nil
+		}
+		return nil, config, fmt.Errorf("failed to parse existing config: %w", err)
+	}
+
+	if err := json.Unmarshal(data, &config); err != nil {
+		// Tolerated schema variance: typed unmarshal is auxiliary to rawConfig
+		config.MCPServers = make(map[string]mcpServerConfig)
+	}
+
+	if rawConfig == nil {
+		rawConfig = make(map[string]any)
+	}
+	if config.MCPServers == nil {
+		config.MCPServers = make(map[string]mcpServerConfig)
+	}
+	return rawConfig, config, nil
+}
+
+func buildMCPServerConfig(ideName, configPath, execPath, projectRoot string, existingServers map[string]mcpServerConfig, logger logging.Logger) (string, mcpServerConfig) {
+	exeName := brand.ExecutableName()
+	serverName := exeName
+	var env map[string]string
+	var cwd string
+	var command string
+	var args []string
+
+	if projectRoot != "" {
+		mcpEnv := map[string]string{
+			zqkenv.ProjectRoot().Name():   projectRoot,
+			zqkenv.MCPConfigPath().Name(): paths.MCPConfigPath(projectRoot),
+		}
+		if isIDEStdioAdapterConfig(ideName, configPath) {
+			serverName = exeName
+			target := ""
+			for _, candidate := range paths.StableBinaryCandidates(projectRoot) {
+				if fileutil.IsRegularFile(candidate) {
+					target = candidate
+					break
+				}
+			}
+			if target == "" {
+				target = paths.RepoBinPath(projectRoot)
+			}
+			if !fileutil.IsRegularFile(target) {
+				target = execPath
+			}
+			roleBin := filepath.Join(projectRoot, "bin", MCPRoleProcessName(MCPRoleIDEAdapter))
+			if _, linkErr := EnsureMCPRoleSymlink(projectRoot, MCPRoleIDEAdapter, target); linkErr != nil {
+				logging.Fluent(logger).Warn("MCP ide-adapter role symlink unavailable; using target bin in mcp.json").
+					WithError(linkErr).
+					Path(target).
+					Log()
+				command = target
+			} else {
+				command = roleBin
+			}
+			cwd = projectRoot
+			env = mcpEnv
+			args = []string{"mcp", "ide-adapter", "--tcp", DefaultDaemonTCP}
+		} else {
+			if strings.Contains(ideName, "Workspace") || ideName == "Claude Code" {
+				serverName = exeName
+			} else {
+				serverName = exeName + "-" + filepath.Base(projectRoot)
+			}
+			cwd = projectRoot
+			command = filepath.Base(execPath)
+			args = []string{"mcp", "serve"}
+			env = mcpEnv
+		}
+	} else {
+		command = filepath.Base(execPath)
+		args = []string{"mcp", "serve"}
+	}
+
+	entry := mcpServerConfig{
+		Command: command,
+		Args:    args,
+		Env:     env,
+		Cwd:     cwd,
+	}
+	if prev, ok := existingServers[serverName]; ok && prev.EnvFile != "" {
+		entry.EnvFile = prev.EnvFile
+	}
+	if isIDEStdioAdapterConfig(ideName, configPath) {
+		entry.Type = mcpTransportStdio
+		if projectRoot != "" {
+			entry.EnvFile = filepath.Join(projectRoot, paths.ProjectDataDir, paths.MCPDir, "cursor-stdio.env")
+		}
+	}
+	return serverName, entry
 }
