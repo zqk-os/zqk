@@ -181,3 +181,94 @@ func TestDocsPortal_DeployDryRunAndCoherency(t *testing.T) {
 		t.Errorf("expected .nojekyll marker at %s", nojekyllPath)
 	}
 }
+
+// TestDocsPortal_CIInvariantAndLinkRotSentinel verifies that the documentation portal
+// dry-run build succeeds and internal link validation passes with zero broken links
+// (CRIT-1794319905719999000-fdfb2782).
+func TestDocsPortal_CIInvariantAndLinkRotSentinel(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping in -short mode")
+	}
+	root := paths.ResolveProjectRoot(".")
+	checkScript := filepath.Join(root, "scripts", "open-core", "check-doc-links.sh")
+	if !fileutil.Exists(checkScript) {
+		t.Fatalf("expected check-doc-links.sh at %s", checkScript)
+	}
+
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", checkScript)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("check-doc-links.sh failed: %v, output:\n%s", err, string(out))
+	}
+	outputStr := string(out)
+	if !strings.Contains(outputStr, "Validation passed: All internal links resolve correctly.") {
+		t.Errorf("expected validation success message, got: %s", outputStr)
+	}
+}
+
+// TestDocsPortal_BrokenLinkDetection_NegativeBoundary verifies that check-doc-links.sh
+// fails closed and detects deliberate broken markdown links (CRIT-1794319905720000000-adbe923f).
+func TestDocsPortal_BrokenLinkDetection_NegativeBoundary(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	checkScript := filepath.Join(root, "scripts", "open-core", "check-doc-links.sh")
+
+	// Create a temporary dummy doc file under docs/ with a broken link
+	testDocPath := filepath.Join(root, "docs", "TMP_SENTINEL_NEGATIVE_TEST.md")
+	defer func() {
+		_ = fileutil.Remove(testDocPath)
+	}()
+
+	brokenContent := "# Temporary Sentinel Test\n\n[Broken Link](./nonexistent_ghost_file_xyz_123.md)\n"
+	if err := fileutil.WriteDurableFile(testDocPath, []byte(brokenContent), 0644); err != nil {
+		t.Fatalf("failed to create test file: %v", err)
+	}
+
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", checkScript)
+	cmd.Dir = root
+	out, err := cmd.CombinedOutput()
+	if err == nil {
+		t.Fatalf("expected check-doc-links.sh to fail on broken link, but exited 0. Output:\n%s", string(out))
+	}
+	outputStr := string(out)
+	if !strings.Contains(outputStr, "Broken link found in ./docs/TMP_SENTINEL_NEGATIVE_TEST.md") {
+		t.Errorf("expected broken link identification in output, got: %s", outputStr)
+	}
+}
+
+// TestDocsPortal_WorkflowAndArchitectureConformance verifies that CI workflow configuration
+// and generator scripts mandate documentation portal verification on PR gates
+// (CRIT-1794319905720001000-2a8b4721).
+func TestDocsPortal_WorkflowAndArchitectureConformance(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	ciPath := filepath.Join(root, ".github", "workflows", "ci.yml")
+	ciBytes, err := fileutil.ReadFile(ciPath)
+	if err != nil {
+		t.Fatalf("failed to read .github/workflows/ci.yml: %v", err)
+	}
+	ciContent := string(ciBytes)
+	if !strings.Contains(ciContent, "deploy-docs-portal.sh --dry-run") {
+		t.Errorf("expected deploy-docs-portal.sh --dry-run in ci.yml")
+	}
+	if !strings.Contains(ciContent, "check-doc-links.sh") {
+		t.Errorf("expected check-doc-links.sh in ci.yml")
+	}
+
+	deployScript := filepath.Join(root, "scripts", "open-core", "docs-portal", "deploy-docs-portal.sh")
+	deployFi, err := fileutil.Stat(deployScript)
+	if err != nil {
+		t.Fatalf("failed to stat deploy-docs-portal.sh: %v", err)
+	}
+	if deployFi.Mode()&0111 == 0 {
+		t.Errorf("expected deploy-docs-portal.sh to have executable permissions")
+	}
+
+	checkScript := filepath.Join(root, "scripts", "open-core", "check-doc-links.sh")
+	checkFi, err := fileutil.Stat(checkScript)
+	if err != nil {
+		t.Fatalf("failed to stat check-doc-links.sh: %v", err)
+	}
+	if checkFi.Mode()&0111 == 0 {
+		t.Errorf("expected check-doc-links.sh to have executable permissions")
+	}
+}

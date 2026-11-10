@@ -3,7 +3,7 @@
 ## Overview
 - **Code**: `HCODE`
 - **Name**: Hardcoded Logic and Literal Eradication
-- **Persona Owner**: [Hardcoding Eradication Czar](file:///.zqk/process/personas/PER-HARDCODING-ERADICATION-CZAR.yaml)
+- **Persona Owner**: Hardcoding Eradication Czar
 - **Policy Invariant**: `POL-CODE-1791593579304410000-e749bb5f`
 - **Applicable File Classes**: `go_prod`, `go_test`, `script`, `config_file`
 

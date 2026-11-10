@@ -348,6 +348,6 @@ sh scripts/open-core/check-public-release-payload.sh .
 ## 11. Related Subsystem Documentation
 
 - [Transport & RPC Protocol Subsystem Guide](./CLI_MESH_SUBSYSTEM_GUIDE.md)
-- [Cryptographic License & Entitlements Guide](./KEYSTORE_SUBSYSTEM_GUIDE.md)
+- [Cryptographic License & Entitlements Guide](./CLI_KEYSTORE_SUBSYSTEM_GUIDE.md)
 - [Goroutine Labels & Managed Concurrency Subsystem Guide](./GOROUTINE_LABELS_SUBSYSTEM_GUIDE.md)
 - [Event Streaming & Ingestion Architecture Guide](./EVENT_STREAMING_SUBSYSTEM_GUIDE.md)
