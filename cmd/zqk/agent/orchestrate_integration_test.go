@@ -136,6 +136,8 @@ func setupOrchestrateTest(t *testing.T) (string, storage.ObjectStorageProvider) 
 					if data, err := fileutil.ReadFile(defaultAgentSrc); err == nil {
 						_ = fileutil.WriteStandardFile(filepath.Join(root, paths.ProcessDir, "personas", "PER-DEFAULT-AGENT.yaml"), data)
 					}
+					orchPersonaPath := filepath.Join(root, paths.ProcessDir, "personas", "PER-ORCH-ALPHA.yaml")
+					_ = fileutil.WriteStandardFile(orchPersonaPath, []byte("id: PER-ORCH-ALPHA\nkind: persona\nname: Orchestrator Persona\ntitle: Orchestrator Persona\nrole: agent\nschema_version: 2.0.0\nstatus: implemented\n"))
 					for _, pID := range agentprompt.StandingPolicyRefs() {
 						polPath := filepath.Join(root, paths.ProcessDir, "policies", pID+".yaml")
 						_ = fileutil.WriteStandardFile(polPath, []byte("id: "+pID+"\nkind: policy\ntitle: Policy "+pID+"\nstatus: active\npolicy_type: standing\n"))
