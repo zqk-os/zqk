@@ -13,14 +13,14 @@ Usage:
   zqk system validate-command-specs [flags]
 
 Flags:
-      --baseline string    Override the accepted historical-drift baseline
-  -f, --format string      Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-  -o, --output string      Write output to file
-  -q, --quiet              Suppress non-essential output
-      --specs-dir string   Override the canonical command-spec directory
-      --timeout duration   Timeout for command execution (0 = auto-calculate)
-  -v, --verbose            Verbose output
-      --write-baseline     Replace the baseline with the current measured drift
+      --baseline string               Override the accepted historical-drift baseline
+  -f, --format string                 Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+  -o, --output string                 Write output to file
+  -q, --quiet[=true|false]            Suppress non-essential output
+      --specs-dir string              Override the canonical command-spec directory
+      --timeout duration              Timeout for command execution (0 = auto-calculate)
+  -v, --verbose[=true|false]          Verbose output
+      --write-baseline[=true|false]   Replace the baseline with the current measured drift
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

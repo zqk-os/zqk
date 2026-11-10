@@ -9,4 +9,4 @@ Flags:
       --targets strings       Target branches to check against (default [origin/main])
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

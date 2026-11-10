@@ -30,13 +30,13 @@ Aliases:
   get, show, view
 
 Flags:
-      --fields stringArray       Top-level keys to include in output (repeat or comma-separated); same hybrid projection as list. Omit for full object after overlays. Put -h before --fields if you need help so '-h' is not parsed as a field name.
-      --kind string              Object kind (optional, inferred from ID)
-      --link-hydration string    Reference overlay: none/omit/raw (default) = no embeds; lazy = one hop; default = depth 2; eager = deeper.
-      --resolved-sidecar-only    After hydrating, write sidecar and emit raw CAS object (no resolved_* in stdout)
-      --view string              Optional view name to scope output fields (default: full object with reference-resolver overlay).
-      --write-resolved-sidecar   Write hydration overlay to .zqk/resolved/… sidecar (CAS get stays raw when combined with --resolved-sidecar-only)
+      --fields stringArray                    Top-level keys to include in output (repeat or comma-separated); same hybrid projection as list. Omit for full object after overlays. Put -h before --fields if you need help so '-h' is not parsed as a field name.
+      --kind string                           Object kind (optional, inferred from ID)
+      --link-hydration string                 Reference overlay: none/omit/raw (default) = no embeds; lazy = one hop; default = depth 2; eager = deeper.
+      --resolved-sidecar-only[=true|false]    After hydrating, write sidecar and emit raw CAS object (no resolved_* in stdout)
+      --view string                           Optional view name to scope output fields (default: full object with reference-resolver overlay).
+      --write-resolved-sidecar[=true|false]   Write hydration overlay to .zqk/resolved/… sidecar (CAS get stays raw when combined with --resolved-sidecar-only)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
-      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal[=true|false]         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

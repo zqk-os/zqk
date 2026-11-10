@@ -12,4 +12,4 @@ Flags:
       --budget int   Maximum token budget for the generated prompt context (default 3000)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -33,12 +33,12 @@ Usage:
   zqk system sync-git-hooks [flags]
 
 Flags:
-      --disable string   Turn off a hook by name (e.g. pre-commit)
-      --dry-run          Report only, exit with error if out of sync
-      --enable string    Turn a previously disabled hook back on
-      --list             List installed hooks with their enabled or disabled state
-      --source string    Source directory containing git hook templates (default "tools/git-hooks")
-      --target string    Target directory to install git hooks (default ".git/hooks")
+      --disable string         Turn off a hook by name (e.g. pre-commit)
+      --dry-run[=true|false]   Report only, exit with error if out of sync
+      --enable string          Turn a previously disabled hook back on
+      --list[=true|false]      List installed hooks with their enabled or disabled state
+      --source string          Source directory containing git hook templates (default "tools/git-hooks")
+      --target string          Target directory to install git hooks (default ".git/hooks")
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

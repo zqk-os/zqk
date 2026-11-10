@@ -9,7 +9,7 @@ Usage:
   zqk system quarantine-report [flags]
 
 Flags:
-      --verbose   Include per-kind breakdown under hash-duplicates (always included in JSON/YAML)
+      --verbose[=true|false]   Include per-kind breakdown under hash-duplicates (always included in JSON/YAML)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

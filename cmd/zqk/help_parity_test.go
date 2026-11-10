@@ -143,8 +143,8 @@ func checkFormattingQuality(t *testing.T, path, output string) {
 	lines := strings.Split(output, "\n")
 
 	// Check for lines that are too long (should wrap at reasonable length)
-	// Allow up to 250 characters (some flag descriptions are lengthy)
-	maxLineLength := 250
+	// Allow up to 300 characters (some flag descriptions are lengthy, especially with pflag 1.1.0 layout)
+	maxLineLength := 300
 	longLines := []int{}
 	for i, line := range lines {
 		// Skip lines that are part of code examples (they may be intentionally long)

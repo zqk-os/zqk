@@ -17,9 +17,9 @@ Usage:
   zqk object rename [flags]
 
 Flags:
-      --dry-run             Show what would be renamed without making changes
-      --update-references   Update all objects that reference the old ID to use the new ID
+      --dry-run[=true|false]             Show what would be renamed without making changes
+      --update-references[=true|false]   Update all objects that reference the old ID to use the new ID
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
-      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal[=true|false]         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

@@ -17,8 +17,8 @@ Usage:
   zqk system verify-completion <object-id> [flags]
 
 Flags:
-      --organizer         Execute composite execution organizer for multi-criteria test verification
-      --topology string   Execution topology mode for organizer (sequential, concurrent, hybrid_dag) (default "sequential")
+      --organizer[=true|false]   Execute composite execution organizer for multi-criteria test verification
+      --topology string          Execution topology mode for organizer (sequential, concurrent, hybrid_dag) (default "sequential")
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

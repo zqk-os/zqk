@@ -8,8 +8,8 @@ Usage:
   zqk system metrics feed [flags]
 
 Flags:
-      --agent-id string   Agent ID for the feed sender (default "kernel-metrics-feeder")
-      --notify            Queue IDE proof of life (notify) (default true)
+      --agent-id string       Agent ID for the feed sender (default "kernel-metrics-feeder")
+      --notify[=true|false]   Queue IDE proof of life (notify) (default true)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

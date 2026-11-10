@@ -6,8 +6,8 @@ Usage:
   zqk system truth-sentinel [flags]
 
 Flags:
-      --ids stringArray   Object ids to audit when --once is set
-      --once              Audit --ids then exit (do not watch the WAL)
+      --ids stringArray     Object ids to audit when --once is set
+      --once[=true|false]   Audit --ids then exit (do not watch the WAL)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

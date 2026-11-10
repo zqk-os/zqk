@@ -14,7 +14,7 @@ Usage:
   zqk system migrate-cas [flags]
 
 Flags:
-      --remove-old-files   Remove old ID-based files after migration (default true)
+      --remove-old-files[=true|false]   Remove old ID-based files after migration (default true)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

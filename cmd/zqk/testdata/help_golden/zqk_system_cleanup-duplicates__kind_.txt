@@ -10,11 +10,11 @@ Usage:
   zqk system cleanup-duplicates [kind] [flags]
 
 Flags:
-      --delete-hash-duplicates   Delete duplicate hash-based files instead of quarantining them (use with care)
-      --dry-run                  Show what would be deleted without actually deleting
-      --hash-duplicates          Also handle duplicate hash-based files for the same object ID (quarantine by default)
-      --quarantine-dir string    Directory to move quarantined duplicate hash files into (default: .zqk/system-health/quarantine/hash-duplicates)
-      --verbose                  Show detailed output
+      --delete-hash-duplicates[=true|false]   Delete duplicate hash-based files instead of quarantining them (use with care)
+      --dry-run[=true|false]                  Show what would be deleted without actually deleting
+      --hash-duplicates[=true|false]          Also handle duplicate hash-based files for the same object ID (quarantine by default)
+      --quarantine-dir string                 Directory to move quarantined duplicate hash files into (default: .zqk/system-health/quarantine/hash-duplicates)
+      --verbose[=true|false]                  Show detailed output
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

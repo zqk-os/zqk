@@ -40,6 +40,6 @@ Available Commands:
   update      Update an internal or built-in object (admin only)
 
 Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
 
 Use "zqk internal [command] --help" for more information about a command.

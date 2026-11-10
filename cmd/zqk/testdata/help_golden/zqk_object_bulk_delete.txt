@@ -47,21 +47,21 @@ Usage:
   zqk object bulk delete [flags]
 
 Flags:
-      --cascade                 Delete object and all objects that reference it
-      --columns string          Override column widths for table output (format: field:width)
-      --dry-run                 Show what would be done without actually doing it
-      --fields stringArray      Top-level keys for each successful delete entry in formatted output (when stored).
-      --file string             Path to YAML file containing array of IDs
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-      --ids string              Comma-separated list of object IDs
-      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
-  -o, --output string           Write output to file
-  -q, --quiet                   Suppress non-essential output
-      --reason-code string      Required for hard-delete of core kernel kinds (min 30 chars); prefer archive+aggregate instead
-      --timeout duration        Timeout for command execution (0 = auto-calculate)
-      --unlink-references       Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)
-  -v, --verbose                 Verbose output
+      --cascade[=true|false]                 Delete object and all objects that reference it
+      --columns string                       Override column widths for table output (format: field:width)
+      --dry-run[=true|false]                 Show what would be done without actually doing it
+      --fields stringArray                   Top-level keys for each successful delete entry in formatted output (when stored).
+      --file string                          Path to YAML file containing array of IDs
+  -f, --format string                        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+      --ids string                           Comma-separated list of object IDs
+      --ignore-scheduler-down[=true|false]   Ignore scheduler down warning/lockdown
+  -o, --output string                        Write output to file
+  -q, --quiet[=true|false]                   Suppress non-essential output
+      --reason-code string                   Required for hard-delete of core kernel kinds (min 30 chars); prefer archive+aggregate instead
+      --timeout duration                     Timeout for command execution (0 = auto-calculate)
+      --unlink-references[=true|false]       Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)
+  -v, --verbose[=true|false]                 Verbose output
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
-      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal[=true|false]         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

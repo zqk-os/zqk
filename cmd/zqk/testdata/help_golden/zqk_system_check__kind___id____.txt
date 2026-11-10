@@ -65,46 +65,46 @@ Usage:
   zqk system check [kind] [id...] [flags]
 
 Flags:
-      --auto-fix                     Automatically fix recoverable issues (missing hashes and hash mismatches)
-      --auto-fix-scheduler           Use scheduler for auto-fix batching (provides status updates and timeout handling, default: true for batches >= 10 issues) (default true)
-      --auto-remedy                  Automatically diagnose and safely apply precondition and hygiene fixes (stale locks, orphaned tmp files, unseeded essentials)
-      --background                   Run in background: return immediately with operation ID; check continues and completion is reported via coordinator (default: wait and show progress)
-      --cache-only                   Show cached validation results only (do not run validation, trigger background scan)
-      --check-refs                   Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled (default true)
-      --clean-cache                  Clean stale entries from object ID cache (removes entries for deleted files)
-      --clear-cache                  Break-glass: wipe validation_cache.json. Checker, binary, and lifecycle fingerprints normally invalidate on the next check; reserve this for admin recovery
-      --columns string               Override column widths for table output (format: field:width)
-      --cpu-profile string           Write CPU profile to file (for performance analysis)
-      --delimiter string             Delimiter to use between object IDs when using the 'ids' format (default: newline) (default "\\n")
-      --details                      Show detailed list of object IDs for ready, completed, or static configurations (alias for --include-ids)
-      --dispatch-to string           Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')
-      --fail-level string            Failure level that triggers non-zero exit code ('error' or 'warning', default: 'warning') (default "warning")
-      --fast                         Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped
-      --force                        Force fix hash mismatches (requires explicit confirmation, creates audit event)
-  -f, --format string                Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-      --goroutine-profile string     Write goroutine profile to file (for hang/deadlock analysis)
-      --ids-from-file string         Read object IDs from file (one per line, # ignored) and validate only those objects (fast re-check after fixes)
-      --ignore-scheduler-down        Ignore scheduler down warning/lockdown
-      --ignore-warnings              Ignore advisory warnings (exit code 3) and exit with code 0 if no blockers exist
-      --include-ids                  Include individual object IDs in status breakdown tables
-      --incremental                  Validate only dirty/staged objects under .zqk/process/ and immediate invariants (sub-second fast path)
-      --layer int                    Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all) (default -1)
-      --metrics-file string          Write performance metrics to JSON file
-      --notify string[="@primary"]   Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)
-  -o, --output string                Write output to file
-  -q, --quiet                        Suppress non-essential output
-      --refresh-cache                Rebuild object-id cache and validation-related caches; honored with --fast (fast still skips refs only). Also auto-applied when a significant CAS/cache change marker is present
-      --skip-if-locked               Cleanly exit with code 0 if auto-fix lock is held by another process
-      --snapshot string              Save check results as snapshot to test-scenario folder (e.g., 'test-scenarios/check-violations')
-      --staged                       Validate only git-staged objects under .zqk/process/ (staged incremental mode)
-      --surface string               Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class
-      --tier int                     Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)
-      --timeout duration             Timeout for command execution (0 = auto-calculate)
-      --unresolvable-only            Filter output to only show unresolvable violations
-      --validate-specs               Validate object specifications: check that all fields have complete checklists with criteria traceability
-  -v, --verbose                      Verbose output
-      --workers int                  Number of worker goroutines for async validation (0 = auto-detect based on CPU cores, default: NumCPU * 2, max: 32)
-      --write-failing-ids string     After check, write object IDs with Tier 1 issues to this file (use with --ids-from-file for fast iteration)
+      --auto-fix[=true|false]                Automatically fix recoverable issues (missing hashes and hash mismatches)
+      --auto-fix-scheduler[=true|false]      Use scheduler for auto-fix batching (provides status updates and timeout handling, default: true for batches >= 10 issues) (default true)
+      --auto-remedy[=true|false]             Automatically diagnose and safely apply precondition and hygiene fixes (stale locks, orphaned tmp files, unseeded essentials)
+      --background[=true|false]              Run in background: return immediately with operation ID; check continues and completion is reported via coordinator (default: wait and show progress)
+      --cache-only[=true|false]              Show cached validation results only (do not run validation, trigger background scan)
+      --check-refs[=true|false]              Check reference integrity (enabled by default; --fast disables). Combined with --auto-fix/--force, refs are re-enabled (default true)
+      --clean-cache[=true|false]             Clean stale entries from object ID cache (removes entries for deleted files)
+      --clear-cache[=true|false]             Break-glass: wipe validation_cache.json. Checker, binary, and lifecycle fingerprints normally invalidate on the next check; reserve this for admin recovery
+      --columns string                       Override column widths for table output (format: field:width)
+      --cpu-profile string                   Write CPU profile to file (for performance analysis)
+      --delimiter string                     Delimiter to use between object IDs when using the 'ids' format (default: newline) (default "\\n")
+      --details[=true|false]                 Show detailed list of object IDs for ready, completed, or static configurations (alias for --include-ids)
+      --dispatch-to string                   Dispatch health violations/issues as inbox items to the specified agent/role (e.g. 'QA-Engineer', 'Security-Engineer', 'technical-program-manager', or 'auto')
+      --fail-level string                    Failure level that triggers non-zero exit code ('error' or 'warning', default: 'warning') (default "warning")
+      --fast[=true|false]                    Partial check: skip reference integrity only. Not an authoritative health verdict. Combined with --auto-fix/--force, --fast is dropped
+      --force[=true|false]                   Force fix hash mismatches (requires explicit confirmation, creates audit event)
+  -f, --format string                        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+      --goroutine-profile string             Write goroutine profile to file (for hang/deadlock analysis)
+      --ids-from-file string                 Read object IDs from file (one per line, # ignored) and validate only those objects (fast re-check after fixes)
+      --ignore-scheduler-down[=true|false]   Ignore scheduler down warning/lockdown
+      --ignore-warnings[=true|false]         Ignore advisory warnings (exit code 3) and exit with code 0 if no blockers exist
+      --include-ids[=true|false]             Include individual object IDs in status breakdown tables
+      --incremental[=true|false]             Validate only dirty/staged objects under .zqk/process/ and immediate invariants (sub-second fast path)
+      --layer int                            Filter results to only show objects in the specified compliance layer (0=integrity, 1=needs_fixes, 2=ready, 3=complete, -1=all) (default -1)
+      --metrics-file string                  Write performance metrics to JSON file
+      --notify string[="@primary"]           Wake this agent seat if draft-plane / error-status / blocking / warning / informational thresholds trip after the check; omit value to use primary orchestrator (see .zqk/agent-runtime/primary_orchestrator.json)
+  -o, --output string                        Write output to file
+  -q, --quiet[=true|false]                   Suppress non-essential output
+      --refresh-cache[=true|false]           Rebuild object-id cache and validation-related caches; honored with --fast (fast still skips refs only). Also auto-applied when a significant CAS/cache change marker is present
+      --skip-if-locked[=true|false]          Cleanly exit with code 0 if auto-fix lock is held by another process
+      --snapshot string                      Save check results as snapshot to test-scenario folder (e.g., 'test-scenarios/check-violations')
+      --staged[=true|false]                  Validate only git-staged objects under .zqk/process/ (staged incremental mode)
+      --surface string                       Filter issues by fitness surface (auth, agent_dispatch, system_check_l0, system_check_l1, admin_form, whats_next, list_default); annotates issue_class
+      --tier int                             Filter results to only show objects with issues of the specified tier (1=blocking, 2=warning, 3=informational, 4=recommendation, 0=all)
+      --timeout duration                     Timeout for command execution (0 = auto-calculate)
+      --unresolvable-only[=true|false]       Filter output to only show unresolvable violations
+      --validate-specs[=true|false]          Validate object specifications: check that all fields have complete checklists with criteria traceability
+  -v, --verbose[=true|false]                 Verbose output
+      --workers int                          Number of worker goroutines for async validation (0 = auto-detect based on CPU cores, default: NumCPU * 2, max: 32)
+      --write-failing-ids string             After check, write object IDs with Tier 1 issues to this file (use with --ids-from-file for fast iteration)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

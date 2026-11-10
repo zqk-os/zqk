@@ -11,17 +11,17 @@ Usage:
   zqk system spec-origination [flags]
 
 Flags:
-      --apply-trigger                 Run glossary, instance-builder, and path-cache trigger steps
-      --dry-run                       Validate and report the origination plan without writing materialized artifacts (default true)
-  -f, --format string                 Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-      --materialize-field-keys        Regenerate pkg/objects/field_keys.go from the current spec plane
-      --ontology string               Object kind stem under .zqk/specs/objects
-  -o, --output string                 Write output to file
-  -q, --quiet                         Suppress non-essential output
-      --skip-finalize-validation      Record final spec validation errors without failing the pipeline
-      --skip-materialize-spec-index   Do not refresh the materialized spec index
-      --timeout duration              Timeout for command execution (0 = auto-calculate)
-  -v, --verbose                       Verbose output
+      --apply-trigger[=true|false]                 Run glossary, instance-builder, and path-cache trigger steps
+      --dry-run[=true|false]                       Validate and report the origination plan without writing materialized artifacts (default true)
+  -f, --format string                              Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+      --materialize-field-keys[=true|false]        Regenerate pkg/objects/field_keys.go from the current spec plane
+      --ontology string                            Object kind stem under .zqk/specs/objects
+  -o, --output string                              Write output to file
+  -q, --quiet[=true|false]                         Suppress non-essential output
+      --skip-finalize-validation[=true|false]      Record final spec validation errors without failing the pipeline
+      --skip-materialize-spec-index[=true|false]   Do not refresh the materialized spec index
+      --timeout duration                           Timeout for command execution (0 = auto-calculate)
+  -v, --verbose[=true|false]                       Verbose output
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -26,10 +26,10 @@ Usage:
   zqk object template [flags]
 
 Flags:
-      --include-comments   Include field descriptions as comments (default: true) (default true)
-      --include-optional   Include optional fields in template (default: true) (default true)
-  -o, --output string      Write output to file
+      --include-comments[=true|false]   Include field descriptions as comments (default: true) (default true)
+      --include-optional[=true|false]   Include optional fields in template (default: true) (default true)
+  -o, --output string                   Write output to file
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
-      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal[=true|false]         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

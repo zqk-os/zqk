@@ -19,11 +19,11 @@ Aliases:
   test-drive, td, testdrive
 
 Flags:
-      --dry-run           Simulate test-drive workflow without disk mutations
-      --intent string     Developer intent prompt or feature brief to simulate
-      --non-interactive   Run non-interactively with automatic defaults (recommended for CI/testing)
-      --scenario string   Preset scenario (api-service, cli-tool, stream-pipeline, custom) (default "api-service")
-      --speed string      Pacing speed for demonstration (normal, fast, instant) (default "normal")
+      --dry-run[=true|false]           Simulate test-drive workflow without disk mutations
+      --intent string                  Developer intent prompt or feature brief to simulate
+      --non-interactive[=true|false]   Run non-interactively with automatic defaults (recommended for CI/testing)
+      --scenario string                Preset scenario (api-service, cli-tool, stream-pipeline, custom) (default "api-service")
+      --speed string                   Pacing speed for demonstration (normal, fast, instant) (default "normal")
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

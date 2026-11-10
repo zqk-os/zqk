@@ -14,9 +14,9 @@ Usage:
   zqk system snapshot-expand [flags] <csnap-file>
 
 Flags:
-      --output-dir string   Directory to write expanded objects (default: stdout)
-      --show-object int     Show specific object by index (0-based) (default -1)
-      --verify-only         Only verify the snapshot without expanding
+      --output-dir string          Directory to write expanded objects (default: stdout)
+      --show-object int            Show specific object by index (0-based) (default -1)
+      --verify-only[=true|false]   Only verify the snapshot without expanding
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
