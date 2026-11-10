@@ -192,8 +192,8 @@ func requireCommitsMergedToIntegration(ctx context.Context, projectRoot, taskID,
 			strings.Contains(outLower, "main") ||
 			strings.Contains(outLower, "master"))
 		if !isMerged {
-			// Fallback: check git merge-base --is-ancestor with HEAD or origin/main
-			ancestorCmd := execwrap.CommandContext(ctx, "git", "merge-base", "--is-ancestor", crStr, "HEAD")
+			// Fallback: check git merge-base --is-ancestor with integrationBranch or origin/main
+			ancestorCmd := execwrap.CommandContext(ctx, "git", "merge-base", "--is-ancestor", crStr, integrationBranch)
 			ancestorCmd.Dir = projectRoot
 			if ancestorErr := ancestorCmd.Run(); ancestorErr == nil {
 				isMerged = true

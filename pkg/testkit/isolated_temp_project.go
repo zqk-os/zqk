@@ -2,9 +2,11 @@ package testkit
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -119,7 +121,25 @@ func runIsolatedTempProjectPipeline(tb testing.TB, root string, opts *IsolatedTe
 	// FAIL with unlinkat ENOTEMPTY under CI coverage (GOTMPDIR=RUNNER_TEMP, -cover -p 2).
 	// ForceRemoveRootOnCleanup remains for callers that set it explicitly; behavior is now default-on.
 	// TRACK: coverage gate after storage teardown #977 — system TempDir flakes.
-	tb.Cleanup(func() { _ = fileutil.RemoveAll(root) })
+	tb.Cleanup(func() {
+		objects.DrainPrewarmForTesting()
+		for i := 0; i < 25; i++ {
+			_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+				if err == nil {
+					perm := os.FileMode(0600)
+					if info != nil && info.IsDir() {
+						perm = 0700
+					}
+					_ = os.Chmod(path, perm) //nolint:gosec // #nosec G302 - test teardown permission reset before removal
+				}
+				return nil
+			})
+			if err := fileutil.RemoveAll(root); err == nil {
+				return
+			}
+			time.Sleep(15 * time.Millisecond)
+		}
+	})
 
 	kind := opts.Kind
 	if kind == "" {

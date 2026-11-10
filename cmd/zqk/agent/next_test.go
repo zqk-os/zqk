@@ -81,8 +81,13 @@ func TestAgentNext_FailClosedOnNotMerged(t *testing.T) {
 		t.Fatalf("git branch failed: %v", err)
 	}
 
-	// Get a commit hash that is NOT in integration/pri-123
-	// We make a new commit on main
+	// Get a commit hash that is NOT in integration/pri-123 or main
+	checkoutCmd := testkit.ManagedCommand(t, t.Context(), "git", "checkout", "-b", "feature/unmerged")
+	checkoutCmd.Dir = root
+	if err := checkoutCmd.Run(); err != nil {
+		t.Fatalf("git checkout feature/unmerged failed: %v", err)
+	}
+
 	commitCmd2 := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "unmerged")
 	commitCmd2.Dir = root
 	commitCmd2.Env = append(os.Environ(), "GIT_AUTHOR_NAME=Test", "GIT_AUTHOR_EMAIL=test@example.com", "GIT_COMMITTER_NAME=Test", "GIT_COMMITTER_EMAIL=test@example.com")
@@ -105,7 +110,8 @@ func TestAgentNext_FailClosedOnNotMerged(t *testing.T) {
 		objects.FieldKeyKind:            objects.KindAgentTask,
 		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
 		objects.FieldKeyTitle:           "Test task not merged",
-		objects.FieldKeyPriorityPlanRef: "pri-123",
+		objects.FieldKeyDescription:     "Test task description for not merged check",
+		objects.FieldKeyPriorityPlanRef: "PRI-123",
 		objects.FieldKeyCommitHashes:    []any{hash},
 	}
 
@@ -135,10 +141,11 @@ func TestAgentNext_FailClosedOnMissingPriorityPlanRef(t *testing.T) {
 
 	taskID := "ATK-TEST-NO-PRI-REF"
 	task := map[string]any{
-		objects.FieldKeyID:     taskID,
-		objects.FieldKeyKind:   objects.KindAgentTask,
-		objects.FieldKeyStatus: objects.ObjectStatusInProgress,
-		objects.FieldKeyTitle:  "Test task without priority_plan_ref",
+		objects.FieldKeyID:          taskID,
+		objects.FieldKeyKind:        objects.KindAgentTask,
+		objects.FieldKeyStatus:      objects.ObjectStatusInProgress,
+		objects.FieldKeyTitle:       "Test task without priority_plan_ref",
+		objects.FieldKeyDescription: "Test task description without priority_plan_ref",
 	}
 
 	ctx := storage.WithSyncCreateForKind(context.Background(), objects.KindAgentTask)
@@ -179,7 +186,13 @@ func TestAgentNext_FailClosedOnNotMerged_Lowercase(t *testing.T) {
 		t.Fatalf("git commit failed: %v", err)
 	}
 
-	// create unmerged commit
+	// create unmerged commit on a separate branch
+	checkoutCmd := testkit.ManagedCommand(t, t.Context(), "git", "checkout", "-b", "feature/unmerged-lower")
+	checkoutCmd.Dir = root
+	if err := checkoutCmd.Run(); err != nil {
+		t.Fatalf("git checkout feature/unmerged-lower failed: %v", err)
+	}
+
 	commitCmd2 := testkit.ManagedCommand(t, t.Context(), "git", "commit", "--allow-empty", "-m", "unmerged")
 	commitCmd2.Dir = root
 	commitCmd2.Env = append(os.Environ(), "GIT_AUTHOR_NAME=Test", "GIT_AUTHOR_EMAIL=test@example.com", "GIT_COMMITTER_NAME=Test", "GIT_COMMITTER_EMAIL=test@example.com")
@@ -201,6 +214,7 @@ func TestAgentNext_FailClosedOnNotMerged_Lowercase(t *testing.T) {
 		objects.FieldKeyKind:            objects.KindAgentTask,
 		objects.FieldKeyStatus:          objects.ObjectStatusInProgress,
 		objects.FieldKeyTitle:           "Test task not merged lowercase check",
+		objects.FieldKeyDescription:     "Test task description for not merged lowercase check",
 		objects.FieldKeyPriorityPlanRef: "PRI-ABC",
 		objects.FieldKeyCommitHashes:    []any{hash},
 	}

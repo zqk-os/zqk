@@ -287,6 +287,7 @@ func TestOnStorageCreated_Hook(t *testing.T) {
 			err := proj.FileStorage.Shutdown(context.Background())
 			require.NoError(t, err)
 		}
+		objects.DrainPrewarmForTesting()
 	}()
 
 	if cli.OnStorageCreated != nil {

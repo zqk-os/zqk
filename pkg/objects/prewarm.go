@@ -2,11 +2,19 @@ package objects
 
 import (
 	"path/filepath"
+	"sync"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
+
+var prewarmWG sync.WaitGroup
+
+// DrainPrewarmForTesting blocks until any in-flight prewarm background goroutines complete.
+func DrainPrewarmForTesting() {
+	prewarmWG.Wait()
+}
 
 // PrewarmGlobalsForProjectRoot warms the global kind mapper, spec loader, and field registry
 // for the given project root. Preferred pattern: load once (here), cache (singleton registry),
@@ -28,7 +36,9 @@ func PrewarmGlobalsForProjectRoot(projectRoot string) {
 	}
 	// Run heavy prewarm (83 specs + field registry) in background so we don't block the CLI.
 	// Hot path uses GetFieldsForKindIfLoaded; when this completes, cache is warm for later use.
+	prewarmWG.Add(1)
 	goroutinelabels.NewGoroutine("objects", "prewarm").StartSimple(func() {
+		defer prewarmWG.Done()
 		loader := GetGlobalSpecLoader()
 		if mapper := GetGlobalKindMapper(); mapper != nil {
 			for _, kind := range mapper.GetAllKinds() {

@@ -139,3 +139,37 @@ func TestRefreshPeerSeatsFromLivePIDs_HeartbeatReplacesStickyLivePID(t *testing.
 		t.Fatalf("expected peer-agent-1 in StaleCleared, got %v", res.StaleCleared)
 	}
 }
+
+// TestRefreshPeerSeats_AgyCSRFEmptyDoesNotZeroLive proves peer_seats_live stays
+// positive when agy executable discovery is empty (CSRF/infra_red wake path) as
+// long as seat-worker heartbeats are fresh.
+func TestRefreshPeerSeats_AgyCSRFEmptyDoesNotZeroLive(t *testing.T) {
+	root := t.TempDir()
+	self := os.Getpid()
+	prevExec := listPeerExecutablePIDsFn
+	// Simulate agy discovery empty / CSRF wake unavailable.
+	listPeerExecutablePIDsFn = func() ([]int, error) { return nil, nil }
+	t.Cleanup(func() { listPeerExecutablePIDsFn = prevExec })
+
+	if _, err := WriteSeatWorkerAlive(root, "peer-agent-1", "sess-csrf", time.Now().UTC()); err != nil {
+		t.Fatalf("alive: %v", err)
+	}
+	if _, err := WriteSeatWorkerAlive(root, "peer-agent-2", "sess-csrf-2", time.Now().UTC()); err != nil {
+		t.Fatalf("alive2: %v", err)
+	}
+
+	res, err := RefreshPeerSeatsFromLivePIDs(root, false)
+	if err != nil {
+		t.Fatalf("refresh: %v", err)
+	}
+	if len(res.Assigned) < 2 {
+		t.Fatalf("assigned=%v want both seats from heartbeats despite empty agy list", res.Assigned)
+	}
+	doc := InspectFeed(DoctorOptions{ProjectRoot: root})
+	if doc.PeerSeatsLive < 2 {
+		t.Fatalf("PeerSeatsLive=%d want >=2 with seat-worker heartbeats (agy CSRF empty); issues=%v", doc.PeerSeatsLive, doc.Issues)
+	}
+	if res.Assigned["peer-agent-1"] != self && res.Assigned["peer-agent-2"] != self {
+		t.Fatalf("expected self pid among assignments, got %v self=%d", res.Assigned, self)
+	}
+}
