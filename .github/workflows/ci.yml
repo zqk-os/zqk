@@ -142,6 +142,13 @@ jobs:
               ./pkg/tray/... ./pkg/utils/... ./pkg/vds/... ./pkg/walutil/...
               ./pkg/when/... ./pkg/workflow/... ./pkg/wsobs/... ./pkg/zqkcli/...
               ./pkg/zqkdev/... ./pkg/zqkenv/... ./pkg/zqksession/... ./pkg/zqktime/...
+              ./pkg/acronyms/... ./pkg/architecture/... ./pkg/bootstrap/... ./pkg/bundle/...
+              ./pkg/ci/... ./pkg/consensus/... ./pkg/coverage/... ./pkg/daemon/...
+              ./pkg/demo/... ./pkg/eval/... ./pkg/gate/... ./pkg/gitplumbing/...
+              ./pkg/io/... ./pkg/liveness/... ./pkg/predicate/... ./pkg/prime/...
+              ./pkg/router/... ./pkg/scaffold/... ./pkg/service/... ./pkg/steer/...
+              ./pkg/studio/... ./pkg/supervision/... ./pkg/system/... ./pkg/traversal/...
+              ./pkg/tui/... ./pkg/vector/... ./pkg/packaging/...
           - suite: storage
             packages: >-
               ./pkg/storage/...
@@ -154,6 +161,11 @@ jobs:
               ./pkg/objectidcache/... ./pkg/objectrecord/... ./pkg/pm/...
               ./pkg/specbuilder/... ./pkg/specorigination/... ./pkg/migration/...
               ./pkg/semantic/... ./pkg/ontology/...
+              ./pkg/agentpack/... ./pkg/decisionpack/... ./pkg/displaypack/...
+              ./pkg/evolutionpack/... ./pkg/interfacepack/... ./pkg/librarypack/...
+              ./pkg/metricpack/... ./pkg/orgpack/... ./pkg/packrecord/...
+              ./pkg/pipelinepack/... ./pkg/qapack/... ./pkg/releasepack/...
+              ./pkg/vocabularypack/... ./pkg/workflowpack/... ./pkg/workpack/...
           - suite: agent-and-orchestration
             packages: >-
               ./pkg/agent/... ./pkg/agentclaim/... ./pkg/agentdelivery/...
@@ -162,12 +174,14 @@ jobs:
               ./pkg/orchestration/... ./pkg/mesh/... ./pkg/federation/...
               ./pkg/swarm/... ./pkg/swarminit/... ./pkg/mcp/...
               ./pkg/coordination/... ./pkg/primaryorch/... ./pkg/seatworker/...
+              ./pkg/mcpkeepalive/... ./pkg/nodesovereignty/...
           - suite: validation-and-tpm
             packages: >-
               ./pkg/validation/... ./pkg/tpm/... ./pkg/testdiscovery/...
               ./pkg/testkit/... ./pkg/testenvroot/...
               ./pkg/testrunner/... ./pkg/testservices/...
               ./pkg/verification/... ./pkg/tdval/... ./pkg/reqharness/...
+              ./pkg/testdrive/... ./pkg/vet/...
           - suite: scheduler
             packages: >-
               ./pkg/scheduler/...
@@ -263,59 +277,11 @@ jobs:
           if-no-files-found: warn
 
 
-  extended-unit-tests:
-    name: Extended Unit Tests (Full Non-Short)
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-
-      - name: Free Disk Space on Runner
-        run: |
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" 2>/dev/null || true
-          df -h
-
-      - name: Set up Go
-        uses: actions/setup-go@v7
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Run Full Unit Tests (Non-Short)
-        env:
-          GOTMPDIR: ${{ runner.temp }}
-          TMPDIR: ${{ runner.temp }}
-        run: |
-          go test -p 2 -timeout 20m -coverprofile=coverage-extended.out \
-            ./pkg/brand/... ./pkg/bridge/... ./pkg/circuitbreaker/... ./pkg/cli/... \
-            ./pkg/concurrency/... ./pkg/dna/... ./pkg/docman/... ./pkg/graph/... \
-            ./pkg/healthcheck/... ./pkg/hive/... ./pkg/hostload/... ./pkg/integrity/... \
-            ./pkg/interactive/... ./pkg/kernel/... ./pkg/telemetry/... ./pkg/accumulator/... \
-            ./pkg/authcred/... ./pkg/bufferpool/... ./pkg/cleanup/... ./pkg/clihooks/... \
-            ./pkg/closureevidence/... ./pkg/coordination/... ./pkg/crypto/... ./pkg/datacell/... \
-            ./pkg/dispatch/... ./pkg/events/... ./pkg/grooming/... ./pkg/handslapper/... \
-            ./pkg/hivemind/... ./pkg/idebridge/... ./pkg/idehooks/... \
-            ./pkg/infrastructure/... ./pkg/ingestion/... ./pkg/interactionpolicy/... \
-            ./pkg/kernelcas ./pkg/lifecycle/... ./pkg/lockhealth/... ./pkg/observability/... \
-            ./pkg/paths/... ./pkg/pipeline/... ./pkg/tray/... ./pkg/vds/... ./pkg/walutil/... \
-            ./pkg/contextevents/... ./pkg/quality/... ./pkg/stampmemo/... ./pkg/zqkenv/... \
-            ./pkg/objects/... ./pkg/validation/... ./pkg/scheduler/... ./pkg/storage/... \
-            ./cmd/zqk/test
-
-      - name: Generate Extended Coverage Summary
-        if: always()
-        run: |
-          if [ -f "coverage-extended.out" ]; then
-            python3 scripts/open-core/generate-coverage-summary.py "coverage-extended.out" "Extended Unit Test Coverage (Non-Short)"
-          fi
-
-
   build:
     name: Build Binary & Assets
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [lint-and-format, unit-tests, extended-unit-tests]
+    needs: [lint-and-format, unit-tests, consolidate-coverage]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
