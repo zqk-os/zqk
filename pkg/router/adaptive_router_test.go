@@ -13,18 +13,28 @@ func setupTestRouter(t *testing.T, budget int) *AdaptiveRouter {
 		t.Fatalf("failed to create adaptive router: %v", err)
 	}
 
-	_ = r.RegisterModelCost(ModelCostProfile{ModelID: "gemini-flash", Tier: TierFast, CostPer1k: 0.001})
-	_ = r.RegisterModelCost(ModelCostProfile{ModelID: "gemini-pro", Tier: TierStandard, CostPer1k: 0.005})
-	_ = r.RegisterModelCost(ModelCostProfile{ModelID: "gemini-ultra", Tier: TierHeavy, CostPer1k: 0.020})
-	_ = r.RegisterModelCost(ModelCostProfile{ModelID: "fallback-standard", Tier: TierStandard, CostPer1k: 0.005})
+	if err := r.RegisterModelCost(ModelCostProfile{ModelID: "gemini-flash", Tier: TierFast, CostPer1k: 0.001}); err != nil {
+		t.Fatalf("register flash cost failed: %v", err)
+	}
+	if err := r.RegisterModelCost(ModelCostProfile{ModelID: "gemini-pro", Tier: TierStandard, CostPer1k: 0.005}); err != nil {
+		t.Fatalf("register pro cost failed: %v", err)
+	}
+	if err := r.RegisterModelCost(ModelCostProfile{ModelID: "gemini-ultra", Tier: TierHeavy, CostPer1k: 0.020}); err != nil {
+		t.Fatalf("register ultra cost failed: %v", err)
+	}
+	if err := r.RegisterModelCost(ModelCostProfile{ModelID: "fallback-standard", Tier: TierStandard, CostPer1k: 0.005}); err != nil {
+		t.Fatalf("register fallback cost failed: %v", err)
+	}
 
-	_ = r.RegisterRule(RoutingRule{
+	if err := r.RegisterRule(RoutingRule{
 		ScenarioID:   "code-synthesis",
 		MinPassRate:  0.80,
 		MaxVariance:  0.10,
 		MaxLatencyMs: 2000.0,
 		FallbackTier: TierStandard,
-	})
+	}); err != nil {
+		t.Fatalf("register rule failed: %v", err)
+	}
 
 	return r
 }
