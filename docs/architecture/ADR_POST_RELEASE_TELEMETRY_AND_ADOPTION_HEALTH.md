@@ -13,4 +13,4 @@ Following the public release of `v0.3.4` (incorporating zero-vendor decoupling, 
    - Feedback from community first-run workflows and issue tracker traffic is aggregated into Knowledge Kernel technical debt and backlog triage cycles.
 
 ## Status
-Accepted and codified in Knowledge Kernel for Cycle 85 (`PRI-1794317104550629000-bdcdfa52`).
+Accepted and codified in Knowledge Kernel for Cycle 85 (Post-Release Telemetry & Community Adoption Health Monitoring).
