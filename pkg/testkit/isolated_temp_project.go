@@ -122,6 +122,7 @@ func runIsolatedTempProjectPipeline(tb testing.TB, root string, opts *IsolatedTe
 	// ForceRemoveRootOnCleanup remains for callers that set it explicitly; behavior is now default-on.
 	// TRACK: coverage gate after storage teardown #977 — system TempDir flakes.
 	tb.Cleanup(func() {
+		objects.DrainPrewarmForTesting()
 		for i := 0; i < 25; i++ {
 			_ = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 				if err == nil {
