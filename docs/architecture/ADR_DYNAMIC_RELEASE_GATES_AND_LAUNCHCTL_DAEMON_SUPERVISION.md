@@ -2,7 +2,7 @@
 
 **Status**: Accepted  
 **Date**: November 2026  
-**Context**: Cycle 93 (`PRI-1794335884197989000-cfe4f7e9`)  
+**Context**: Cycle 93  
 **Scope**: Open-Core Release Verification & Background Host Daemon Supervision  
 
 ---
