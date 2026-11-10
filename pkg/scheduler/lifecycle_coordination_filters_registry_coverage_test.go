@@ -14,6 +14,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	storagepkg "github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 func TestExtended_LifecycleCoordination_Filters(t *testing.T) {
@@ -102,10 +104,17 @@ func TestExtended_LifecycleCoordination_Filters(t *testing.T) {
 func TestExtended_LifecycleCoordination_TriggerAndExecution(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
+	testkit.RegisterTempProjectTeardown(t, tmpDir, sp)
+	if cleanup := sp.GetTestCleanup(); cleanup != nil {
+		defer cleanup()
+	}
+	defer func() { _ = sp.Shutdown(ctx) }()
+	t.Cleanup(func() { objects.DrainPrewarmForTesting() })
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -252,10 +261,17 @@ func TestExtended_LifecycleCoordination_TriggerAndExecution(t *testing.T) {
 func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
+	testkit.RegisterTempProjectTeardown(t, tmpDir, sp)
+	if cleanup := sp.GetTestCleanup(); cleanup != nil {
+		defer cleanup()
+	}
+	defer func() { _ = sp.Shutdown(ctx) }()
+	t.Cleanup(func() { objects.DrainPrewarmForTesting() })
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()
@@ -280,7 +296,7 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 
 	// Setup hourglass directory
 	hgDir := filepath.Join(tmpDir, ".zqk", "scheduler", "hourglass")
-	if err := os.MkdirAll(hgDir, 0755); err != nil {
+	if err := fileutil.MkdirAll(hgDir, 0755); err != nil {
 		t.Fatalf("failed to create hourglass dir: %v", err)
 	}
 
@@ -294,7 +310,7 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 		"kind":       objects.KindAgentTask,
 	}
 	dBytes, _ := json.Marshal(dInfo)
-	_ = os.WriteFile(deadlineFile, dBytes, 0644)
+	_ = fileutil.WriteFile(deadlineFile, dBytes, 0644)
 
 	// Create corresponding task in storage
 	_ = sp.Create(ctx, secCtx, map[string]any{
@@ -315,7 +331,7 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 		"window_seconds": 60,
 	}
 	cBytes, _ := json.Marshal(cInfo)
-	_ = os.WriteFile(checkinFile, cBytes, 0644)
+	_ = fileutil.WriteFile(checkinFile, cBytes, 0644)
 
 	// Create corresponding task in storage
 	_ = sp.Create(ctx, secCtx, map[string]any{
@@ -336,7 +352,7 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 		"type":       "subagent",
 	}
 	sBytes, _ := json.Marshal(sInfo)
-	_ = os.WriteFile(stuckFile, sBytes, 0644)
+	_ = fileutil.WriteFile(stuckFile, sBytes, 0644)
 
 	// Create corresponding task in storage with steps
 	_ = sp.Create(ctx, secCtx, map[string]any{
@@ -353,11 +369,11 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 
 	// 4. Corrupted json file
 	corruptFile := filepath.Join(hgDir, "corrupt.json")
-	_ = os.WriteFile(corruptFile, []byte("invalid json"), 0644)
+	_ = fileutil.WriteFile(corruptFile, []byte("invalid json"), 0644)
 
 	// 5. Unparseable time file
 	unparseFile := filepath.Join(hgDir, "badtime.json")
-	_ = os.WriteFile(unparseFile, []byte(`{"expires_at":"invalid-date"}`), 0644)
+	_ = fileutil.WriteFile(unparseFile, []byte(`{"expires_at":"invalid-date"}`), 0644)
 
 	// Run checkHourglassTimers
 	s.checkHourglassTimers(ctx)
@@ -399,10 +415,17 @@ func TestExtended_HourglassWatchAndEscalate(t *testing.T) {
 func TestExtended_RetentionTolerance_MaxCountAndCleanup(t *testing.T) {
 	ctx := context.Background()
 	tmpDir := t.TempDir()
+	t.Setenv("ZQK_TEST_ROOT", tmpDir)
 	sp, err := storagepkg.NewFileObjectStorageForTest(tmpDir)
 	if err != nil {
 		t.Fatalf("failed to create storage: %v", err)
 	}
+	testkit.RegisterTempProjectTeardown(t, tmpDir, sp)
+	if cleanup := sp.GetTestCleanup(); cleanup != nil {
+		defer cleanup()
+	}
+	defer func() { _ = sp.Shutdown(ctx) }()
+	t.Cleanup(func() { objects.DrainPrewarmForTesting() })
 
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	secCtx := pkgctx.NewSystemSecurityContext()
