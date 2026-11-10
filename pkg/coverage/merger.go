@@ -81,7 +81,7 @@ func (b *ProfileBlock) Validate(allowEscape bool) error {
 	if b.StartLine < 1 || b.StartCol < 1 || b.EndLine < b.StartLine || (b.EndLine == b.StartLine && b.EndCol < b.StartCol) {
 		return fmt.Errorf("%w: invalid line/col coordinates (%d.%d,%d.%d)", ErrMalformedCoverageLine, b.StartLine, b.StartCol, b.EndLine, b.EndCol)
 	}
-	if b.NumStmt <= 0 {
+	if b.NumStmt < 0 {
 		return fmt.Errorf("%w: numStmt=%d", ErrInvalidStatementCount, b.NumStmt)
 	}
 	if b.Count < 0 {
