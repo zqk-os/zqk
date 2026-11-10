@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/adapters/antigravity"
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 
@@ -489,14 +490,8 @@ func resolveAgentAPIBin() (string, error) {
 			return p, nil
 		}
 	}
-	if p, err := exec.LookPath("agentapi"); err == nil {
+	if p := antigravity.LookPathAgentAPI(); p != "" {
 		return p, nil
-	}
-	if home, err := os.UserHomeDir(); err == nil {
-		p := filepath.Join(home, ".gemini", "antigravity-cli", "bin", "agentapi")
-		if fileutil.IsRegularFile(p) {
-			return p, nil
-		}
 	}
 	if p, err := exec.LookPath("agy"); err == nil {
 		return p, nil

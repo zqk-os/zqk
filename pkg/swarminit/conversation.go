@@ -5,14 +5,13 @@ import (
 	"context"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/adapters/antigravity"
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/execwrap"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // ProbeConversationViaAgentAPI calls agentapi get-conversation-metadata.
@@ -82,20 +81,9 @@ func NewConversationProbe(agentapiBin, lsAddr string) ConversationProbe {
 	}
 }
 
-// LookPathAgentAPI locates the agentapi binary (PATH, then antigravity-cli home).
+// LookPathAgentAPI locates the agentapi binary via the antigravity adapter.
 func LookPathAgentAPI() string {
-	if p, err := exec.LookPath("agentapi"); err == nil && strings.TrimSpace(p) != "" {
-		return p
-	}
-	home := strings.TrimSpace(os.Getenv("HOME"))
-	if home == "" {
-		return ""
-	}
-	cand := filepath.Join(home, ".gemini", "antigravity-cli", "bin", "agentapi")
-	if fileutil.IsRegularFile(cand) {
-		return cand
-	}
-	return ""
+	return antigravity.LookPathAgentAPI()
 }
 
 // DiscoverLSHTTP picks the agy HTTP listen port for pid (skips gRPC ports that
