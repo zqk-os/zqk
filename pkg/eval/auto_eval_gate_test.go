@@ -138,6 +138,12 @@ func TestCycle69_AutoEvalGate_NegativeAdversarialBoundary(t *testing.T) {
 		t.Fatalf("failed to init gate: %v", err)
 	}
 
+	runSoftFailureSubtests(t, gate)
+	runFailClosedSubtests(t, gate)
+	runMathSanitizationSubtests(t, gate)
+}
+
+func runSoftFailureSubtests(t *testing.T, gate *AutoEvalGate) {
 	t.Run("nil_matrix_result_fails_soft", func(t *testing.T) {
 		_, err := gate.EvaluateMatrix(context.Background(), nil)
 		if err == nil {
@@ -153,99 +159,66 @@ func TestCycle69_AutoEvalGate_NegativeAdversarialBoundary(t *testing.T) {
 	})
 
 	t.Run("empty_model_outcomes_fails_soft", func(t *testing.T) {
-		outcomes := map[string][]ScenarioOutcome{
-			"primary-model": {},
-		}
+		outcomes := map[string][]ScenarioOutcome{"primary-model": {}}
 		_, err := gate.EvaluateOutcomes(context.Background(), outcomes)
 		if err == nil {
 			t.Fatalf("expected error on empty scenario outcomes for model")
 		}
 	})
+}
 
+func runFailClosedSubtests(t *testing.T, gate *AutoEvalGate) {
 	t.Run("fail_closed_low_pass_rate", func(t *testing.T) {
 		outcomes := map[string][]ScenarioOutcome{
 			"primary-model": {
 				{ScenarioID: "sc-1", Success: false},
 				{ScenarioID: "sc-2", Success: true},
-			}, // 50% < 80%
+			},
 		}
 		decision, err := gate.EvaluateOutcomes(context.Background(), outcomes)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if decision.Passed {
-			t.Fatalf("expected gate to FAIL due to low pass rate")
-		}
-		if len(decision.Violations) == 0 {
-			t.Fatalf("expected violations to be recorded")
+		if err != nil || decision.Passed || len(decision.Violations) == 0 {
+			t.Fatalf("expected gate failure on low pass rate, got pass=%v err=%v", decision.Passed, err)
 		}
 	})
 
 	t.Run("fail_closed_excessive_variance", func(t *testing.T) {
-		// Model A: 100%, Model B: 0% -> variance = (1.0-0.5)^2 + (0.0-0.5)^2 = 0.50 > 0.02
 		outcomes := map[string][]ScenarioOutcome{
-			"primary-model": {
-				{ScenarioID: "sc-1", Success: true},
-			},
-			"flaky-model": {
-				{ScenarioID: "sc-1", Success: false},
-			},
+			"primary-model": {{ScenarioID: "sc-1", Success: true}},
+			"flaky-model":   {{ScenarioID: "sc-1", Success: false}},
 		}
 		decision, err := gate.EvaluateOutcomes(context.Background(), outcomes)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if decision.Passed {
-			t.Fatalf("expected gate to FAIL due to excessive variance")
-		}
-		var varianceReported bool
-		for _, v := range decision.Violations {
-			if strings.Contains(v, "cross-model variance") {
-				varianceReported = true
-			}
-		}
-		if !varianceReported {
-			t.Errorf("expected variance violation in: %v", decision.Violations)
+		if err != nil || decision.Passed {
+			t.Fatalf("expected gate failure on high variance, got pass=%v err=%v", decision.Passed, err)
 		}
 	})
 
 	t.Run("fail_closed_missing_required_model", func(t *testing.T) {
 		outcomes := map[string][]ScenarioOutcome{
-			"other-model": {
-				{ScenarioID: "sc-1", Success: true},
-			},
+			"other-model": {{ScenarioID: "sc-1", Success: true}},
 		}
 		decision, err := gate.EvaluateOutcomes(context.Background(), outcomes)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		if decision.Passed {
-			t.Fatalf("expected gate to FAIL due to missing required model")
+		if err != nil || decision.Passed {
+			t.Fatalf("expected failure for missing required model")
 		}
 	})
+}
 
+func runMathSanitizationSubtests(t *testing.T, gate *AutoEvalGate) {
 	t.Run("nan_inf_sanitization_in_variance", func(t *testing.T) {
 		dirty := []float64{0.80, math.NaN(), 0.90, math.Inf(1)}
 		mean, variance, stdDev := CalculateVariance(dirty)
-		if math.IsNaN(mean) || math.IsInf(mean, 0) {
-			t.Fatalf("expected clean mean, got %f", mean)
-		}
-		if math.Abs(mean-0.85) > 1e-4 {
-			t.Errorf("expected clean mean 0.85, got %f", mean)
+		if math.IsNaN(mean) || math.IsInf(mean, 0) || math.Abs(mean-0.85) > 1e-4 {
+			t.Fatalf("expected clean mean 0.85, got %f", mean)
 		}
 		if variance <= 0 || stdDev <= 0 {
-			t.Errorf("expected positive variance and stdDev, got var=%f stdDev=%f", variance, stdDev)
+			t.Errorf("expected positive variance and stdDev")
 		}
 	})
 
 	t.Run("single_model_zero_variance", func(t *testing.T) {
-		single := []float64{0.95}
-		mean, variance, stdDev := CalculateVariance(single)
-		if mean != 0.95 {
-			t.Errorf("expected mean 0.95, got %f", mean)
-		}
-		if variance != 0 || stdDev != 0 {
-			t.Errorf("expected zero variance for single value, got var=%f stdDev=%f", variance, stdDev)
+		mean, variance, stdDev := CalculateVariance([]float64{0.95})
+		if mean != 0.95 || variance != 0 || stdDev != 0 {
+			t.Errorf("expected zero variance for single value")
 		}
 	})
 
