@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	_ "github.com/zqk-os/zqk/pkg/adapters/cursor"
 	"github.com/zqk-os/zqk/pkg/nodesovereignty"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"

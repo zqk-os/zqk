@@ -35,6 +35,7 @@ const _sfxAgentSyncMaxStagnantTicks = "AGENT_SYNC_MAX_STAGNANT_TICKS"
 const _sfxAPIKey = "API_KEY"
 const _sfxAggregationMetricCreationTimeout = "AGGREGATION_METRIC_CREATION_TIMEOUT"
 const _sfxAllowForegroundGoTest = "ALLOW_FOREGROUND_GO_TEST"
+const _sfxAllowGlobalMCPPinRewrite = "ALLOW_GLOBAL_MCP_PIN_REWRITE"
 const _sfxBin = "BIN"
 const _sfxBulkBenchSize = "BULK_BENCH_SIZE"
 const _sfxLocalCIDir = "LOCAL_CI_DIR"
@@ -756,6 +757,12 @@ func TestRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestRoot)} }
 // (brand-prefixed). It grants exactly one thing: permission to run `go test` in the foreground
 // without the agent guard panicking. It changes no paths and no behavior, which is the point —
 // it is safe to export into a long-lived shell.
+// AllowGlobalMCPPinRewrite is human opt-in to let AutoInstall/InstallToIDE rewrite
+// a host-global IDE MCP pin when an existing pin points at a different seated root.
+func AllowGlobalMCPPinRewrite() EnvVar {
+	return EnvVar{Key: brand.EnvVar(_sfxAllowGlobalMCPPinRewrite)}
+}
+
 func AllowForegroundGoTest() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxAllowForegroundGoTest)} }
 
 // SharedTestBin returns the environment variable name for SHARED_TEST_BIN (brand-prefixed).

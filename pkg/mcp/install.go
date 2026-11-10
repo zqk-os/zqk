@@ -8,6 +8,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/adapters/cursor"
 	"github.com/zqk-os/zqk/pkg/brand"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -305,6 +306,17 @@ func InstallToIDE(ideName, configPath, execPath, projectRoot string, logger logg
 	}
 	config.MCPServers[serverName] = entry
 	rawConfig["mcpServers"] = config.MCPServers
+
+	// Fail-closed: prevent clobbering an existing seated host-global MCP pin
+	// without human opt-in or a recent intentional node_hop.
+	if err := cursor.RefuseGlobalMCPPinRewrite(projectRoot, configPath); err != nil {
+		logging.Fluent(logger).Warn("skipped global mcp.json rewrite (node sovereignty)").
+			IDE(ideName).
+			Path(configPath).
+			WithError(err).
+			Log()
+		return err
+	}
 
 	// Write back
 	data, err := json.MarshalIndent(rawConfig, "", "  ")
