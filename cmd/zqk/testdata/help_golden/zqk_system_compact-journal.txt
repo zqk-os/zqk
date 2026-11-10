@@ -18,4 +18,4 @@ Flags:
       --window-hours int    Time window in hours to compact (counting back from now) (default 24)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

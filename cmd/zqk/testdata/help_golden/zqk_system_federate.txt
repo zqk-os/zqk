@@ -11,6 +11,6 @@ Available Commands:
   status      Show the status of the federated sovereign mesh
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
 
 Use "zqk system federate [command] --help" for more information about a command.

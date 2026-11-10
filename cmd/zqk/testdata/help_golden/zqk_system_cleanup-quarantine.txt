@@ -8,9 +8,9 @@ Usage:
   zqk system cleanup-quarantine [flags]
 
 Flags:
-      --dry-run               Show what would be removed without deleting
-      --older-than duration   Remove files older than this (default: 720h = 30 days) (default 720h0m0s)
-      --verbose               Show each file removed or would be removed
+      --dry-run[=true|false]   Show what would be removed without deleting
+      --older-than duration    Remove files older than this (default: 720h = 30 days) (default 720h0m0s)
+      --verbose[=true|false]   Show each file removed or would be removed
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -35,6 +35,6 @@ Usage:
   zqk utility validate-yaml [file...] [flags]
 
 Flags:
-  -q, --quiet             Only show errors, suppress success messages
-  -r, --recursive         Recursively validate YAML files in directories
-      --register-hashes   Register integrity hashes for valid YAML object files (does not fix YAML syntax)
+  -q, --quiet[=true|false]             Only show errors, suppress success messages
+  -r, --recursive[=true|false]         Recursively validate YAML files in directories
+      --register-hashes[=true|false]   Register integrity hashes for valid YAML object files (does not fix YAML syntax)

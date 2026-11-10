@@ -18,8 +18,8 @@ Usage:
   zqk utility fix-registration [id...] [flags]
 
 Flags:
-      --all           Fix all registration issues in the system
-      --dry-run       With --fix, show what would be added without writing
-      --fix           Update id_prefixes config to accept discovered prefixes
-      --kind string   Fix registration for all objects of the specified kind
-  -q, --quiet         Only show errors and fix summary
+      --all[=true|false]       Fix all registration issues in the system
+      --dry-run[=true|false]   With --fix, show what would be added without writing
+      --fix[=true|false]       Update id_prefixes config to accept discovered prefixes
+      --kind string            Fix registration for all objects of the specified kind
+  -q, --quiet[=true|false]     Only show errors and fix summary

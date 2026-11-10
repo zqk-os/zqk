@@ -23,9 +23,9 @@ Usage:
   zqk utility fix-hashes [path...] [flags]
 
 Flags:
-      --dry-run       Show what would be fixed without making changes
-  -F, --force         Force fix hash mismatches (creates audit events)
-      --internal      Fix hashes for all internal objects (audit_event, change_journal_entry)
-      --kind string   Fix hashes for all objects of the specified kind
-  -q, --quiet         Only show errors, suppress success messages
-  -r, --recursive     Recursively fix hashes for YAML files in directories
+      --dry-run[=true|false]     Show what would be fixed without making changes
+  -F, --force[=true|false]       Force fix hash mismatches (creates audit events)
+      --internal[=true|false]    Fix hashes for all internal objects (audit_event, change_journal_entry)
+      --kind string              Fix hashes for all objects of the specified kind
+  -q, --quiet[=true|false]       Only show errors, suppress success messages
+  -r, --recursive[=true|false]   Recursively fix hashes for YAML files in directories

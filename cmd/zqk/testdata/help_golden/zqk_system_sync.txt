@@ -41,19 +41,19 @@ Usage:
   zqk system sync [flags]
 
 Flags:
-      --auto-commit       Auto-generate commit message and commit
-      --commit            Commit staged changes (requires --message or --auto-commit)
-      --create-pr         Create Pull Request (GitHub) or Merge Request (GitLab) after push
-      --dry-run           Validate without executing
-  -F, --force             Skip confirmation
-      --message string    Commit message (required if --commit without --auto-commit)
-      --pr-body string    PR/MR body (auto-generated from priority plan if not provided)
-      --pr-title string   PR/MR title (auto-generated from priority plan if not provided)
-      --pull              Pull changes from remote
-      --push              Push changes to remote
-      --skip-check        Skip system health check (not recommended)
-      --stage             Stage all changes
-      --verify            Verify signatures
+      --auto-commit[=true|false]   Auto-generate commit message and commit
+      --commit[=true|false]        Commit staged changes (requires --message or --auto-commit)
+      --create-pr[=true|false]     Create Pull Request (GitHub) or Merge Request (GitLab) after push
+      --dry-run[=true|false]       Validate without executing
+  -F, --force[=true|false]         Skip confirmation
+      --message string             Commit message (required if --commit without --auto-commit)
+      --pr-body string             PR/MR body (auto-generated from priority plan if not provided)
+      --pr-title string            PR/MR title (auto-generated from priority plan if not provided)
+      --pull[=true|false]          Pull changes from remote
+      --push[=true|false]          Push changes to remote
+      --skip-check[=true|false]    Skip system health check (not recommended)
+      --stage[=true|false]         Stage all changes
+      --verify[=true|false]        Verify signatures
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

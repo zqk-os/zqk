@@ -15,14 +15,14 @@ Usage:
   zqk object fields [flags]
 
 Flags:
-      --all-kinds          Show full registered kind catalog (bypass planner/doer discovery membrane)
-      --filterable         Show only filterable fields
-      --format string      Output format: table, json, yaml (default "table")
-      --groupable          Show only groupable fields
-      --list-kinds         List all object kinds (instead of listing fields for a kind)
-      --sortable           Show only sortable fields
-      --specialized-only   Show only specialized fields (exclude common fields)
+      --all-kinds[=true|false]          Show full registered kind catalog (bypass planner/doer discovery membrane)
+      --filterable[=true|false]         Show only filterable fields
+      --format string                   Output format: table, json, yaml (default "table")
+      --groupable[=true|false]          Show only groupable fields
+      --list-kinds[=true|false]         List all object kinds (instead of listing fields for a kind)
+      --sortable[=true|false]           Show only sortable fields
+      --specialized-only[=true|false]   Show only specialized fields (exclude common fields)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
-      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal[=true|false]         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

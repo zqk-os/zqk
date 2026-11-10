@@ -50,21 +50,21 @@ Aliases:
   list, ls, find
 
 Flags:
-      --all-kinds            Show full registered kind catalog (bypass planner/doer discovery membrane)
-      --all-namespaces       Alias for --federated
-      --allow-degraded       Allow running when scheduler daemon is not running (results may be partial/stale)
-      --count                Only return the count of matching objects (no object details)
-      --federated            Disable namespace isolation and query across all namespaces
-      --fields stringArray   Keys to include per object (repeat or comma-separated); omit for full rows. Sort/group columns merge automatically.
-      --filter stringArray   Filter by field (format: field=value or field:value, can be used multiple times)
-      --group-by string      Field to group results by
-      --group-limit int      Maximum items per group when using --group-by (0 = no limit)
-      --kind string          Object kind to list (can also be specified as positional argument)
-      --limit int            Pagination limit
-      --namespace string     Restrict results to this namespace_id (when omitted, default kernel isolation applies)
-      --offset int           Pagination offset
-      --sort-asc             Sort ascending (default: true) (default true)
-      --sort-by string       Field to sort by
+      --all-kinds[=true|false]        Show full registered kind catalog (bypass planner/doer discovery membrane)
+      --all-namespaces[=true|false]   Alias for --federated
+      --allow-degraded[=true|false]   Allow running when scheduler daemon is not running (results may be partial/stale)
+      --count[=true|false]            Only return the count of matching objects (no object details)
+      --federated[=true|false]        Disable namespace isolation and query across all namespaces
+      --fields stringArray            Keys to include per object (repeat or comma-separated); omit for full rows. Sort/group columns merge automatically.
+      --filter stringArray            Filter by field (format: field=value or field:value, can be used multiple times)
+      --group-by string               Field to group results by
+      --group-limit int               Maximum items per group when using --group-by (0 = no limit)
+      --kind string                   Object kind to list (can also be specified as positional argument)
+      --limit int                     Pagination limit
+      --namespace string              Restrict results to this namespace_id (when omitted, default kernel isolation applies)
+      --offset int                    Pagination offset
+      --sort-asc[=true|false]         Sort ascending (default: true) (default true)
+      --sort-by string                Field to sort by
 
 Global Flags:
-      --internal   Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --internal[=true|false]   Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

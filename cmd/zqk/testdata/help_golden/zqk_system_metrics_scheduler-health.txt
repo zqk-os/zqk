@@ -23,6 +23,6 @@ Available Commands:
   test        Create a dummy scheduler health metric for inspection
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
 
 Use "zqk system metrics scheduler-health [command] --help" for more information about a command.

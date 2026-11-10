@@ -13,9 +13,9 @@ Usage:
   zqk system snapshot-verify [flags] <csnap-file>
 
 Flags:
-      --fields strings    Specific fields to compare (default: all fields)
-      --max-objects int   Maximum number of objects to verify (0 = all) (default 10)
-      --strict            Fail on any mismatch (default: report all mismatches)
+      --fields strings        Specific fields to compare (default: all fields)
+      --max-objects int       Maximum number of objects to verify (0 = all) (default 10)
+      --strict[=true|false]   Fail on any mismatch (default: report all mismatches)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

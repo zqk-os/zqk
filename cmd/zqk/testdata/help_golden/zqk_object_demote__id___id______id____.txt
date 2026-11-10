@@ -10,5 +10,5 @@ Flags:
       --ids string   Comma-separated list of object IDs (same as positional multi-ID / comma lists)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
-      --internal         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --internal[=true|false]         Elevated access mode for built-in and internal kinds (requires Enterprise license or zqk-admin)

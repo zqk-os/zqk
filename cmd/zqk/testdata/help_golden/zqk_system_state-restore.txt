@@ -10,16 +10,16 @@ Usage:
   zqk system state-restore [flags]
 
 Flags:
-      --columns string          Override column widths for table output (format: field:width)
-      --confirm-prune           Required with --prune to actually delete non-core orphans (Kernel Mutation Pipeline)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
-      --input string            Path to read the compressed snapshot (default ".zqk-state/system-state.csnap")
-  -o, --output string           Write output to file
-      --prune                   Prune YAML under .zqk/process not present in the snapshot (skips core kernel kinds; default off)
-  -q, --quiet                   Suppress non-essential output
-      --timeout duration        Timeout for command execution (0 = auto-calculate)
-  -v, --verbose                 Verbose output
+      --columns string                       Override column widths for table output (format: field:width)
+      --confirm-prune[=true|false]           Required with --prune to actually delete non-core orphans (Kernel Mutation Pipeline)
+  -f, --format string                        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+      --ignore-scheduler-down[=true|false]   Ignore scheduler down warning/lockdown
+      --input string                         Path to read the compressed snapshot (default ".zqk-state/system-state.csnap")
+  -o, --output string                        Write output to file
+      --prune[=true|false]                   Prune YAML under .zqk/process not present in the snapshot (skips core kernel kinds; default off)
+  -q, --quiet[=true|false]                   Suppress non-essential output
+      --timeout duration                     Timeout for command execution (0 = auto-calculate)
+  -v, --verbose[=true|false]                 Verbose output
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

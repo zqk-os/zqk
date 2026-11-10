@@ -22,11 +22,11 @@ Usage:
   zqk system repair-cas-corruption [flags]
 
 Flags:
-      --dry-run                 Show what would be repaired without making changes
-      --input-file string       Path to TSV input file (defaults to .zqk/system-health/tier1-cas-corruption.tsv)
-      --quarantine-dir string   Directory to move corrupt files into (defaults to .zqk/system-health/quarantine)
-      --restart-scheduler       Restart scheduler daemon after repair (only if --stop-scheduler is true)
-      --stop-scheduler          Stop scheduler daemon before repairing (recommended for scheduler_job corruption)
+      --dry-run[=true|false]             Show what would be repaired without making changes
+      --input-file string                Path to TSV input file (defaults to .zqk/system-health/tier1-cas-corruption.tsv)
+      --quarantine-dir string            Directory to move corrupt files into (defaults to .zqk/system-health/quarantine)
+      --restart-scheduler[=true|false]   Restart scheduler daemon after repair (only if --stop-scheduler is true)
+      --stop-scheduler[=true|false]      Stop scheduler daemon before repairing (recommended for scheduler_job corruption)
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

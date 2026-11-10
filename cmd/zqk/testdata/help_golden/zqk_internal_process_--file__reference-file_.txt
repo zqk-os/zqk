@@ -19,15 +19,15 @@ Usage:
   zqk internal process --file <reference-file> [flags]
 
 Flags:
-      --columns string          Override column widths for table output (format: field:width)
-      --dry-run                 Show what would be executed without actually executing
-      --file string             Path to reference file (required)
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
-  -o, --output string           Write output to file
-  -q, --quiet                   Suppress non-essential output
-      --timeout duration        Timeout for command execution (0 = auto-calculate)
-  -v, --verbose                 Verbose output
+      --columns string                       Override column widths for table output (format: field:width)
+      --dry-run[=true|false]                 Show what would be executed without actually executing
+      --file string                          Path to reference file (required)
+  -f, --format string                        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+      --ignore-scheduler-down[=true|false]   Ignore scheduler down warning/lockdown
+  -o, --output string                        Write output to file
+  -q, --quiet[=true|false]                   Suppress non-essential output
+      --timeout duration                     Timeout for command execution (0 = auto-calculate)
+  -v, --verbose[=true|false]                 Verbose output
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running

@@ -28,16 +28,16 @@ Usage:
   zqk internal delete <id> [--unlink-references] [--cascade] [flags]
 
 Flags:
-      --cascade                 Delete object and all objects that reference it
-      --columns string          Override column widths for table output (format: field:width)
-      --dry-run                 Show what would be deleted without actually deleting it
-  -f, --format string           Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
-      --ignore-scheduler-down   Ignore scheduler down warning/lockdown
-  -o, --output string           Write output to file
-  -q, --quiet                   Suppress non-essential output
-      --timeout duration        Timeout for command execution (0 = auto-calculate)
-      --unlink-references       Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)
-  -v, --verbose                 Verbose output
+      --cascade[=true|false]                 Delete object and all objects that reference it
+      --columns string                       Override column widths for table output (format: field:width)
+      --dry-run[=true|false]                 Show what would be deleted without actually deleting it
+  -f, --format string                        Output format (table, json, jsonl, yaml, csv, json-rpc, stream, agent-prompt, semantic-link, raw, md, html) (default "table")
+      --ignore-scheduler-down[=true|false]   Ignore scheduler down warning/lockdown
+  -o, --output string                        Write output to file
+  -q, --quiet[=true|false]                   Suppress non-essential output
+      --timeout duration                     Timeout for command execution (0 = auto-calculate)
+      --unlink-references[=true|false]       Strip this ID from dependents' reference fields, then delete (does not delete dependent objects)
+  -v, --verbose[=true|false]                 Verbose output
 
 Global Flags:
-      --allow-degraded   Allow scheduler-dependent commands to run when scheduler daemon is not running
+      --allow-degraded[=true|false]   Allow scheduler-dependent commands to run when scheduler daemon is not running
