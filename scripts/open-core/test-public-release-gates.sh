@@ -68,6 +68,7 @@ sh -n "$ROOT/scripts/open-core/check-public-release-payload.sh"
 sh "$ROOT/scripts/open-core/check-public-release-payload.sh" "$ROOT"
 
 if [ "$STAGE" = "payload" ]; then
+	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
 	printf '%s\n' "CRITERIA PASS: Functional Acceptance Verified"
 	exit 0
 fi

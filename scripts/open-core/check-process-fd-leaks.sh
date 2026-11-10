@@ -37,8 +37,10 @@ get_fd_count() {
 	fi
 }
 
-# 1. Audit all running zqk processes
+# 1. Audit running zqk processes for this workspace
 say "--- Phase 1: Live Process Audit ---"
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+AUDIT_ALL="${ZQK_FD_AUDIT_ALL:-0}"
 ZQK_PIDS=$(pgrep -f "bin/zqk" 2>/dev/null || true)
 if [ -n "$ZQK_PIDS" ]; then
 	for pid in $ZQK_PIDS; do
@@ -46,12 +48,28 @@ if [ -n "$ZQK_PIDS" ]; then
 		if [ "$pid" = "$$" ]; then
 			continue
 		fi
-		cmd_name=$(ps -p "$pid" -o command= 2>/dev/null | awk '{print $1, $2, $3}' || echo "zqk")
-		case "$cmd_name" in
+		full_cmd=$(ps -p "$pid" -o command= 2>/dev/null || true)
+		case "$full_cmd" in
 			*go\ build*|*go\ test*|*git*|*grep*|*zsh*)
 				continue
 				;;
 		esac
+		# Filter to processes belonging to this repository unless ZQK_FD_AUDIT_ALL=1
+		if [ "$AUDIT_ALL" != "1" ]; then
+			case "$full_cmd" in
+				/*)
+					case "$full_cmd" in
+						"$ROOT"*) ;;
+						*) continue ;;
+					esac
+					;;
+				*)
+					# Relative path command (e.g. ./bin/zqk)
+					;;
+			esac
+		fi
+		cmd_name=$(printf '%s' "$full_cmd" | awk '{print $1, $2, $3}')
+		[ -n "$cmd_name" ] || cmd_name="zqk"
 		fd_count=$(get_fd_count "$pid")
 		if [ "$fd_count" -ge 0 ]; then
 			if [ "$fd_count" -gt "$MAX_ALLOWED_FDS" ]; then
@@ -67,7 +85,6 @@ fi
 
 # 2. Phase 2: Active FSWatcher regression test
 say "--- Phase 2: Active Ambient Daemon Regression Test ---"
-ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 ZQK_BIN="${ROOT}/bin/zqk"
 if [ ! -x "$ZQK_BIN" ]; then
 	say "Compiling bin/zqk for test..."
