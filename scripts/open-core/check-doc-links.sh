@@ -52,6 +52,11 @@ for file in $MD_FILES; do
         file_path="${link%%#*}"
         [ -z "$file_path" ] && continue
 
+        # Skip runtime state references (.zqk, .gemini) which are gitignored and generated at runtime
+        if [[ "$file_path" == *".zqk"* ]] || [[ "$file_path" == *".gemini"* ]]; then
+            continue
+        fi
+
         # Skip code tokens or parameter names without slashes or file extensions
         if [[ "$file_path" != *"/"* ]] && [[ "$file_path" != *"."* ]]; then
             if [ ! -e "$dir/$file_path" ] && [ ! -d "$dir/$file_path" ]; then

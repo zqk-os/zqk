@@ -114,7 +114,7 @@ This ensures generated code is always up-to-date.
 - [Specbuilder Package README](../README.md) - Overview of the specbuilder package
 - [Builders README](../builders/README.md) - Base builder implementation
 - [CLI Command Taxonomy Standards](../../../docs/architecture/CLI_COMMAND_TAXONOMY_STANDARDS.md) - Canonical CLI architecture and taxonomy standards
-- [Object Specs Documentation](../../../.zqk/specs/objects/README.md) - Spec file format reference
+- [Specbuilder Architecture](../../../docs/architecture/INDEX.md) - Spec file format and architecture reference
 
 ## Versioning
 
