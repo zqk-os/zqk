@@ -1,0 +1,49 @@
+# syntax=docker/dockerfile:1.7
+
+# Stage 1: Build ZQK Product Binary
+FROM golang:1.26-alpine AS zqk-builder
+
+WORKDIR /build
+RUN apk add --no-cache git make
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /build/bin/zqk ./cmd/zqk
+
+# Stage 2: Build llama.cpp Server with CPU Optimization
+FROM alpine:3.21 AS llama-builder
+
+RUN apk add --no-cache build-base cmake git
+WORKDIR /src
+RUN git clone --depth 1 https://github.com/ggerganov/llama.cpp.git . \
+    && cmake -B build -DLLAMA_BUILD_SERVER=ON -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build build --config Release -j $(nproc) --target llama-server
+
+# Stage 3: Turnkey Standalone Appliance
+FROM alpine:3.21 AS runner
+
+RUN apk add --no-cache ca-certificates git bash curl libstdc++ libgomp \
+    && adduser -D -u 10001 -s /bin/bash zqk \
+    && mkdir -p /workspace /home/zqk/.zqk /models \
+    && chown -R zqk:zqk /workspace /home/zqk /models
+
+COPY --from=zqk-builder /build/bin/zqk /usr/local/bin/zqk
+COPY --from=llama-builder /src/build/bin/llama-server /usr/local/bin/llama-server
+COPY scripts/open-core/entrypoint-standalone.sh /usr/local/bin/entrypoint-standalone.sh
+RUN chmod +x /usr/local/bin/entrypoint-standalone.sh
+
+USER 10001
+WORKDIR /workspace
+ENV HOME=/home/zqk
+ENV ZQK_CONTEXT=ai-agent
+ENV ZQK_LLM_PROVIDER=openai_compatible
+ENV ZQK_LLM_ENDPOINT=http://127.0.0.1:8080/v1
+ENV MODEL_PATH=/models/model.gguf
+
+EXPOSE 8080 8443
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD ["/usr/local/bin/zqk", "system", "status", "--quiet"] || exit 1
+
+ENTRYPOINT ["/usr/local/bin/entrypoint-standalone.sh"]
+CMD ["do"]
