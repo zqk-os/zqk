@@ -69,7 +69,7 @@ func writeFakeAgentAPI(t *testing.T, script string) string {
 	t.Helper()
 	dir := t.TempDir()
 	path := filepath.Join(dir, "agentapi")
-	if err := fileutil.WriteFile(path, []byte(script), 0o755); err != nil {
+	if err := fileutil.WriteDurableFile(path, []byte(script), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	return path
