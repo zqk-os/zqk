@@ -196,6 +196,66 @@ jobs:
             python3 scripts/open-core/generate-coverage-summary.py "coverage-${{ matrix.suite }}.out" "Unit Test Coverage (${{ matrix.suite }})"
           fi
 
+      - name: Upload Shard Coverage Artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: shard-coverage-${{ matrix.suite }}
+          path: coverage-${{ matrix.suite }}.out
+          if-no-files-found: ignore
+
+
+  consolidate-coverage:
+    name: Consolidate Matrix Coverage & Rollup
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [unit-tests]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Free Disk Space on Runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" 2>/dev/null || true
+          df -h
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download Shard Coverage Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: shard-coverage-*
+          path: shard-coverage
+          merge-multiple: true
+
+      - name: Merge Shard Profiles & Generate Verified Package Rollup
+        run: |
+          go run ./scripts/open-core/coverage-rollup \
+            -shards "shard-coverage/coverage-*.out" \
+            -out coverage.out \
+            -out-dir . \
+            -threshold 85
+
+      - name: Generate Consolidated Coverage Summary
+        if: always()
+        run: |
+          if [ -f "coverage.out" ]; then
+            python3 scripts/open-core/generate-coverage-summary.py coverage.out "Consolidated Matrix Coverage Report"
+          fi
+
+      - name: Upload Verified Coverage Artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: |
+            package-coverage-rollup.json
+            package-coverage-rollup.json.sha256
+          if-no-files-found: warn
+
 
   extended-unit-tests:
     name: Extended Unit Tests (Full Non-Short)
