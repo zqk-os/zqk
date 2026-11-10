@@ -147,11 +147,8 @@ cat >"$HEX_REPO/scripts/open-core/police-community-tree.sh" <<'EOF'
 #!/bin/sh
 exit 0
 EOF
-{
-	printf '%s\n' 'package ci'
-	printf '%s\n' '// Kernel: '"PRI-1785699924616992000-8000284f"
-	printf '%s\n' 'func NewCICmd() {}'
-} >"$HEX_REPO/cmd/zqk/ci.go"
+	SYNTHETIC_HEX_ID="PRI-17$(printf '%017d' 0)-00000000"
+	printf 'package ci\n// Kernel: %s\nfunc NewCICmd() {}\n' "$SYNTHETIC_HEX_ID" >"$HEX_REPO/cmd/zqk/ci.go"
 git -C "$HEX_REPO" init -q
 git -C "$HEX_REPO" add .
 if sh "$HEX_REPO/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO" >"$HEX_REPO/result.log" 2>&1; then
