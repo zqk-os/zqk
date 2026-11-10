@@ -64,7 +64,7 @@ type HopRecord struct {
 	At       string `json:"at"`
 }
 
-// Assess compares seated root vs cwd, env, and global Cursor MCP pin when present.
+// Assess compares seated root vs cwd, env, and global IDE MCP pin when present.
 func Assess(seatedRoot string) Report {
 	abs := filepath.Clean(strings.TrimSpace(seatedRoot))
 	rep := Report{
@@ -77,7 +77,7 @@ func Assess(seatedRoot string) Report {
 		rep.CWD = filepath.Clean(cwd)
 	}
 	if shouldProbeGlobalMCP(abs) {
-		rep.MCPPin = detectGlobalCursorMCPPin()
+		rep.MCPPin = detectGlobalMCPPin()
 	}
 
 	add := func(code, detail, sev string) {
@@ -105,7 +105,7 @@ func Assess(seatedRoot string) Report {
 			pinAbs = filepath.Clean(pinAbs)
 			rep.MCPPin = pinAbs
 			if pinAbs != abs {
-				add("global_mcp_pin_mismatch", "cursor mcp.json pins "+pinAbs+" but seated root is "+abs, SeverityHijacked)
+				add("global_mcp_pin_mismatch", "global mcp.json pins "+pinAbs+" but seated root is "+abs, SeverityHijacked)
 			}
 		}
 	}
@@ -133,7 +133,7 @@ func Assess(seatedRoot string) Report {
 	return rep
 }
 
-// shouldProbeGlobalMCP skips reading the operator's real ~/.cursor/mcp.json when the
+// shouldProbeGlobalMCP skips reading the operator's real host-global mcp.json when the
 // seated root is a Go testing.TempDir (avoids false hijack in unit tests).
 func shouldProbeGlobalMCP(seatedRoot string) bool {
 	if !testing.Testing() {
@@ -147,41 +147,27 @@ func shouldProbeGlobalMCP(seatedRoot string) bool {
 	return true
 }
 
-func detectGlobalCursorMCPPin() string {
-	home, err := fileutil.UserHomeDir()
-	if err != nil {
-		return ""
-	}
-	path := filepath.Join(home, ".cursor", "mcp.json")
-	b, err := fileutil.ReadFile(path)
-	if err != nil {
-		return ""
-	}
-	var doc map[string]any
-	if err := json.Unmarshal(b, &doc); err != nil {
-		return ""
-	}
-	servers, _ := doc["mcpServers"].(map[string]any)
-	if servers == nil {
-		return ""
-	}
-	for _, raw := range servers {
-		cfg, _ := raw.(map[string]any)
-		if cfg == nil {
-			continue
-		}
-		if env, ok := cfg["env"].(map[string]any); ok {
-			for k, v := range env {
-				if strings.EqualFold(k, "ZQK_PROJECT_ROOT") || strings.EqualFold(k, zqkenv.ProjectRoot().Name()) {
-					if s, ok := v.(string); ok && strings.TrimSpace(s) != "" {
-						return strings.TrimSpace(s)
-					}
-				}
+func detectGlobalMCPPin() string {
+	idePinAdaptersMu.RLock()
+	adapters := make([]IDEPinAdapter, len(idePinAdapters))
+	copy(adapters, idePinAdapters)
+	idePinAdaptersMu.RUnlock()
+
+	for _, a := range adapters {
+		cfgPath := a.GlobalConfigPath()
+		if cfgPath != "" && fileutil.IsRegularFile(cfgPath) {
+			if pin := a.ReadPin(cfgPath); pin != "" {
+				return pin
 			}
 		}
-		if cwd, ok := cfg["cwd"].(string); ok && looksLikeZqkRoot(cwd) {
-			return strings.TrimSpace(cwd)
-		}
+	}
+	home, err := fileutil.UserHomeDir()
+	if err != nil || home == "" {
+		return ""
+	}
+	idePath := filepath.Join(home, ".ide", "mcp.json")
+	if fileutil.IsRegularFile(idePath) {
+		return ReadGlobalMCPPin(idePath)
 	}
 	return ""
 }

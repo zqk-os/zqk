@@ -17,11 +17,10 @@ import (
 // (studio :8443 / project PW socket). Same sovereignty pattern as scheduler + seat-workers.
 //
 // Shape: com.<brand>.mcp-daemon.<root_id>
-//        com.<brand>.privileged-writer.<root_id>
-// Legacy (unscoped): com.<brand>.mcp-daemon / com.<brand>.privileged-writer
 //
-// TRACK: BLI-1794029815318590500-e7b20dbd / BLI-1793916946555828500-77934cb1 / BLI-1793916946555827500-2e550485
-
+//	com.<brand>.privileged-writer.<root_id>
+//
+// Legacy (unscoped): com.<brand>.mcp-daemon / com.<brand>.privileged-writer
 func mcpDaemonLabelPrefix() string {
 	return "com." + brand.ExecutableName() + ".mcp-daemon"
 }
@@ -127,7 +126,6 @@ func IsLegacyPrivilegedWriterLabel(label string) bool {
 // GCLegacyHostGlobalMCPAndPW removes host-global (unscoped) mcp-daemon and
 // privileged-writer LaunchAgent plists once any root-scoped counterpart exists
 // in the same LaunchAgents dir. Safe when only legacy units remain (no-op).
-// TRACK: BLI-1793916946555827500-2e550485
 func GCLegacyHostGlobalMCPAndPW() ([]MeshSeatWorkerGCResult, error) {
 	if runtime.GOOS != "darwin" && strings.TrimSpace(zqkenv.LaunchAgentsDir().Get()) == "" {
 		return nil, nil

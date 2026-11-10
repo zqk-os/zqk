@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -11,28 +12,71 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-// IsGlobalCursorMCPConfig reports whether configPath is the host-global
-// ~/.cursor/mcp.json pin (not a project workspace .cursor/mcp.json).
-func IsGlobalCursorMCPConfig(projectRoot, configPath string) bool {
+// IDEPinAdapter specifies how an IDE adapter detects and inspects its host-global MCP configuration.
+type IDEPinAdapter interface {
+	Vendor() string
+	IsGlobalConfig(projectRoot, configPath string) bool
+	ReadPin(configPath string) string
+	GlobalConfigPath() string
+}
+
+var (
+	idePinAdaptersMu sync.RWMutex
+	idePinAdapters   []IDEPinAdapter
+)
+
+// RegisterIDEPinAdapter registers an IDEPinAdapter for global MCP pin sovereignty checks.
+func RegisterIDEPinAdapter(a IDEPinAdapter) {
+	if a == nil {
+		return
+	}
+	idePinAdaptersMu.Lock()
+	defer idePinAdaptersMu.Unlock()
+	for _, existing := range idePinAdapters {
+		if existing.Vendor() == a.Vendor() {
+			return
+		}
+	}
+	idePinAdapters = append(idePinAdapters, a)
+}
+
+// IsGlobalMCPConfig reports whether configPath is a host-global MCP configuration
+// pin rather than a project workspace configuration.
+// If an adapter is provided, detection is delegated to that adapter; otherwise
+// registered adapters are consulted, falling back to generic path heuristics.
+func IsGlobalMCPConfig(projectRoot, configPath string, adapter ...IDEPinAdapter) bool {
 	clean := filepath.Clean(strings.TrimSpace(configPath))
 	if clean == "" || clean == "." {
 		return false
 	}
-	if filepath.Base(clean) != "mcp.json" || filepath.Base(filepath.Dir(clean)) != ".cursor" {
-		return false
+	if len(adapter) > 0 && adapter[0] != nil {
+		return adapter[0].IsGlobalConfig(projectRoot, clean)
 	}
+	idePinAdaptersMu.RLock()
+	for _, a := range idePinAdapters {
+		if a.IsGlobalConfig(projectRoot, clean) {
+			idePinAdaptersMu.RUnlock()
+			return true
+		}
+	}
+	idePinAdaptersMu.RUnlock()
+
 	if projectRoot != "" {
-		ws := filepath.Clean(filepath.Join(projectRoot, ".cursor", "mcp.json"))
-		if clean == ws {
+		root := filepath.Clean(strings.TrimSpace(projectRoot))
+		rel, err := filepath.Rel(root, clean)
+		if err == nil && !strings.HasPrefix(rel, "..") && rel != "." {
 			return false
 		}
 	}
-	return true
+	return filepath.Base(clean) == "mcp.json"
 }
 
-// ReadCursorMCPPin extracts ZQK_PROJECT_ROOT (or cwd that looks like a kernel root)
-// from a Cursor mcp.json document. Empty when absent/unparseable.
-func ReadCursorMCPPin(configPath string) string {
+// ReadGlobalMCPPin extracts ZQK_PROJECT_ROOT (or cwd that looks like a kernel root)
+// from an MCP JSON configuration document. Empty when absent/unparseable.
+func ReadGlobalMCPPin(configPath string, adapter ...IDEPinAdapter) string {
+	if len(adapter) > 0 && adapter[0] != nil {
+		return adapter[0].ReadPin(configPath)
+	}
 	b, err := fileutil.ReadFile(configPath)
 	if err != nil {
 		return ""
@@ -66,19 +110,42 @@ func ReadCursorMCPPin(configPath string) string {
 	return ""
 }
 
-// RefuseGlobalMCPPinRewrite fails closed when InstallToIDE would rewrite the
-// host-global ~/.cursor/mcp.json away from an existing seated pin (studio /
+// RefuseGlobalMCPPinRewrite fails closed when InstallToIDE would rewrite a
+// host-global MCP configuration away from an existing seated pin (studio /
 // another kernel) without human opt-in or a recent intentional node_hop.
-//
-// TRACK: BLI-1794075314772743000-369a713f / BLI-1794029815318591000-4655e144
-func RefuseGlobalMCPPinRewrite(projectRoot, configPath string) error {
-	if !IsGlobalCursorMCPConfig(projectRoot, configPath) {
+func RefuseGlobalMCPPinRewrite(projectRoot, configPath string, adapter ...IDEPinAdapter) error {
+	var activeAdapter IDEPinAdapter
+	if len(adapter) > 0 && adapter[0] != nil {
+		activeAdapter = adapter[0]
+	} else {
+		idePinAdaptersMu.RLock()
+		for _, a := range idePinAdapters {
+			if a.IsGlobalConfig(projectRoot, configPath) {
+				activeAdapter = a
+				break
+			}
+		}
+		idePinAdaptersMu.RUnlock()
+	}
+
+	if activeAdapter != nil {
+		if !activeAdapter.IsGlobalConfig(projectRoot, configPath) {
+			return nil
+		}
+	} else if !IsGlobalMCPConfig(projectRoot, configPath) {
 		return nil
 	}
+
 	if zqkenv.AllowGlobalMCPPinRewrite().Get() == "1" {
 		return nil
 	}
-	existing := strings.TrimSpace(ReadCursorMCPPin(configPath))
+
+	var existing string
+	if activeAdapter != nil {
+		existing = strings.TrimSpace(activeAdapter.ReadPin(configPath))
+	} else {
+		existing = strings.TrimSpace(ReadGlobalMCPPin(configPath))
+	}
 	if existing == "" {
 		return nil
 	}

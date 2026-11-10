@@ -758,8 +758,7 @@ func TestRoot() EnvVar { return EnvVar{Key: brand.EnvVar(_sfxTestRoot)} }
 // without the agent guard panicking. It changes no paths and no behavior, which is the point —
 // it is safe to export into a long-lived shell.
 // AllowGlobalMCPPinRewrite is human opt-in to let AutoInstall/InstallToIDE rewrite
-// ~/.cursor/mcp.json when an existing pin points at a different seated root.
-// TRACK: BLI-1794075314772743000-369a713f
+// a host-global IDE MCP pin when an existing pin points at a different seated root.
 func AllowGlobalMCPPinRewrite() EnvVar {
 	return EnvVar{Key: brand.EnvVar(_sfxAllowGlobalMCPPinRewrite)}
 }

@@ -52,10 +52,10 @@ All generated plist configurations must strictly adhere to the following invaria
 ## Three-Fold Verification Strategy
 
 ### 1. Static Floor Invariant (CRIT 1)
-- `CRIT-1794273507520870000-e60010ac`: Verifies that overseer plist templates and active configurations conform to schema validations, path invariants, and absence of orphaned or legacy daemon plists.
+- `CRIT-OVERSEER-PLIST-VALIDATION`: Verifies that overseer plist templates and active configurations conform to schema validations, path invariants, and absence of orphaned or legacy daemon plists.
 
 ### 2. Operational Dynamic Proof (CRIT 2)
-- `CRIT-1794273512729644000-1dcf3b9f`: Verifies live supervisor lifecycle execution: dynamic heartbeat probes, synthetic crash injection, exponential backoff recovery, and graceful process group drain.
+- `CRIT-OVERSEER-LIFECYCLE-EXECUTION`: Verifies live supervisor lifecycle execution: dynamic heartbeat probes, synthetic crash injection, exponential backoff recovery, and graceful process group drain.
 
 ### 3. Negative Adversarial Boundary (CRIT 3)
-- `CRIT-1794273518574773000-f4277182`: Verifies fail-closed behavior under malformed wake payloads, corrupt plists, and unrecoverable child process crash loops without compromising supervisor stability or autonomous loop progress.
+- `CRIT-OVERSEER-FAIL-CLOSED-RECOVERY`: Verifies fail-closed behavior under malformed wake payloads, corrupt plists, and unrecoverable child process crash loops without compromising supervisor stability or autonomous loop progress.
