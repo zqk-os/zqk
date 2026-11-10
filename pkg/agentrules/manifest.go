@@ -60,7 +60,7 @@ const DefaultAgentRulesRelativePath = ".cursor/rules"
 // repo does not have made the documented no-flag invocation fail with "no such file or
 // directory" — which is why nothing wired the gate into pre-commit and the manifest was free to
 // drift while two checklists claimed pre-commit enforced it.
-var candidateRulesDirs = []string{".cursor/rules", ".ide/rules"}
+var candidateRulesDirs = []string{".agent/rules", ".agents/rules", ".ide/rules", ".cursor/rules"}
 
 // Manifest lists allowed agent rule files (basenames, typically *.mdc).
 type Manifest struct {
