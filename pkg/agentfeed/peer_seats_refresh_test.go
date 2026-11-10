@@ -142,7 +142,7 @@ func TestRefreshPeerSeatsFromLivePIDs_HeartbeatReplacesStickyLivePID(t *testing.
 
 // TestRefreshPeerSeats_AgyCSRFEmptyDoesNotZeroLive proves peer_seats_live stays
 // positive when agy executable discovery is empty (CSRF/infra_red wake path) as
-// long as seat-worker heartbeats are fresh. TRACK: PRI-1793453683750698000-5488b0fe
+// long as seat-worker heartbeats are fresh.
 func TestRefreshPeerSeats_AgyCSRFEmptyDoesNotZeroLive(t *testing.T) {
 	root := t.TempDir()
 	self := os.Getpid()
