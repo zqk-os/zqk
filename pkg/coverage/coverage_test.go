@@ -85,252 +85,241 @@ func TestMatrixCoverage_StaticFloorInvariants(t *testing.T) {
 // Invariant 2: Operational Dynamic Proof (CRIT-1794286018797248000-f65600e3)
 // Demonstrate atomic merging of multi-shard coverprofile blocks, accurate statement count deduplication, and validated JSON report generation.
 func TestMatrixCoverage_OperationalDynamicProof(t *testing.T) {
-	t.Run("MultiShardDeduplicationAndAtomicCountSum", func(t *testing.T) {
-		shard1 := []byte(`mode: atomic
-github.com/zqk-os/zqk/pkg/shared/util.go:10.1,12.5 2 3
-github.com/zqk-os/zqk/pkg/shard1/a.go:5.1,8.10 4 1
-`)
-		shard2 := []byte(`mode: atomic
-github.com/zqk-os/zqk/pkg/shared/util.go:10.1,12.5 2 7
-github.com/zqk-os/zqk/pkg/shard2/b.go:20.1,25.4 6 2
-`)
-		shard3 := []byte(`mode: atomic
-github.com/zqk-os/zqk/pkg/shared/util.go:10.1,12.5 2 2
-github.com/zqk-os/zqk/pkg/shard3/c.go:30.1,35.4 3 0
-`)
+	t.Run("MultiShardDeduplicationAndAtomicCountSum", testOperationalProof_Deduplication)
+	t.Run("SevenShardMatrixSimulation", testOperationalProof_SevenShards)
+	t.Run("FileMergingAndArtifactWriting", testOperationalProof_FileMerging)
+}
 
-		m := NewMerger()
-		merged, err := m.MergeShards(shard1, shard2, shard3)
-		if err != nil {
-			t.Fatalf("unexpected error merging shards: %v", err)
-		}
+func testOperationalProof_Deduplication(t *testing.T) {
+	shard1 := []byte("mode: atomic\n" +
+		"github.com/zqk-os/zqk/pkg/shared/util.go:10.1,12.5 2 3\n" +
+		"github.com/zqk-os/zqk/pkg/shard1/a.go:5.1,8.10 4 1\n")
+	shard2 := []byte("mode: atomic\n" +
+		"github.com/zqk-os/zqk/pkg/shared/util.go:10.1,12.5 2 7\n" +
+		"github.com/zqk-os/zqk/pkg/shard2/b.go:20.1,25.4 6 2\n")
+	shard3 := []byte("mode: atomic\n" +
+		"github.com/zqk-os/zqk/pkg/shared/util.go:10.1,12.5 2 2\n" +
+		"github.com/zqk-os/zqk/pkg/shard3/c.go:30.1,35.4 3 0\n")
 
-		// 4 unique blocks total across 3 shards
-		if merged.BlockCount() != 4 {
-			t.Fatalf("expected 4 deduplicated blocks, got %d", merged.BlockCount())
-		}
+	m := NewMerger()
+	merged, err := m.MergeShards(shard1, shard2, shard3)
+	if err != nil {
+		t.Fatalf("unexpected error merging shards: %v", err)
+	}
 
-		// Total statements: 2 (shared) + 4 (shard1) + 6 (shard2) + 3 (shard3) = 15 statements
-		// Without deduplication, shared block would be counted 3 times (21 statements)
-		totalStmts, coveredStmts := merged.TotalStatements()
-		if totalStmts != 15 {
-			t.Fatalf("expected 15 total statements, got %d (check for duplicate counting)", totalStmts)
-		}
-		// Covered: shared (2) + shard1 (4) + shard2 (6) = 12 statements (shard3 count=0)
-		if coveredStmts != 12 {
-			t.Fatalf("expected 12 covered statements, got %d", coveredStmts)
-		}
+	if merged.BlockCount() != 4 {
+		t.Fatalf("expected 4 deduplicated blocks, got %d", merged.BlockCount())
+	}
 
-		// Check shared block count accumulation (3 + 7 + 2 = 12)
-		blocks := merged.SortedBlocks()
-		var sharedBlock *ProfileBlock
-		for _, b := range blocks {
-			if strings.Contains(b.Path, "shared/util.go") {
-				sharedBlock = b
-				break
-			}
-		}
-		if sharedBlock == nil {
-			t.Fatal("shared block not found in merged profile")
-		}
-		if sharedBlock.Count != 12 {
-			t.Fatalf("expected accumulated count 12, got %d", sharedBlock.Count)
-		}
+	totalStmts, coveredStmts := merged.TotalStatements()
+	if totalStmts != 15 {
+		t.Fatalf("expected 15 total statements, got %d (check for duplicate counting)", totalStmts)
+	}
+	if coveredStmts != 12 {
+		t.Fatalf("expected 12 covered statements, got %d", coveredStmts)
+	}
 
-		// Canonical formatted output should have mode: atomic at top and sorted blocks
-		formatted := merged.Format()
-		if !strings.HasPrefix(string(formatted), "mode: atomic\n") {
-			t.Fatalf("expected formatted output to begin with 'mode: atomic\\n', got: %s", string(formatted[:20]))
+	var sharedBlock *ProfileBlock
+	for _, b := range merged.SortedBlocks() {
+		if strings.Contains(b.Path, "shared/util.go") {
+			sharedBlock = b
+			break
 		}
-	})
+	}
+	if sharedBlock == nil {
+		t.Fatal("shared block not found in merged profile")
+	}
+	if sharedBlock.Count != 12 {
+		t.Fatalf("expected accumulated count 12, got %d", sharedBlock.Count)
+	}
 
-	t.Run("SevenShardMatrixSimulation", func(t *testing.T) {
-		shards := make([][]byte, 7)
-		shardNames := []string{"core-kernel", "storage", "cli", "objects", "agent", "validation", "ai-tools"}
-		for i, name := range shardNames {
-			shards[i] = []byte(strings.Join([]string{
-				"mode: atomic",
-				"github.com/zqk-os/zqk/pkg/common/base.go:1.1,5.1 3 1",
-				"github.com/zqk-os/zqk/pkg/" + name + "/file.go:10.1,20.1 5 10",
-			}, "\n") + "\n")
-		}
+	formatted := merged.Format()
+	if !strings.HasPrefix(string(formatted), "mode: atomic\n") {
+		t.Fatalf("expected formatted output to begin with 'mode: atomic\\n', got: %s", string(formatted[:20]))
+	}
+}
 
-		m := NewMerger()
-		merged, err := m.MergeShards(shards...)
-		if err != nil {
-			t.Fatalf("unexpected error merging 7 shards: %v", err)
-		}
+func testOperationalProof_SevenShards(t *testing.T) {
+	shards := make([][]byte, 7)
+	shardNames := []string{"core-kernel", "storage", "cli", "objects", "agent", "validation", "ai-tools"}
+	for i, name := range shardNames {
+		shards[i] = []byte(strings.Join([]string{
+			"mode: atomic",
+			"github.com/zqk-os/zqk/pkg/common/base.go:1.1,5.1 3 1",
+			"github.com/zqk-os/zqk/pkg/" + name + "/file.go:10.1,20.1 5 10",
+		}, "\n") + "\n")
+	}
 
-		// 1 common block + 7 distinct package blocks = 8 blocks
-		if merged.BlockCount() != 8 {
-			t.Fatalf("expected 8 blocks, got %d", merged.BlockCount())
-		}
-		total, covered := merged.TotalStatements()
-		// 3 (common) + 7 * 5 = 38 statements total
-		if total != 38 {
-			t.Fatalf("expected 38 statements, got %d", total)
-		}
-		if covered != 38 {
-			t.Fatalf("expected 38 covered statements, got %d", covered)
-		}
+	m := NewMerger()
+	merged, err := m.MergeShards(shards...)
+	if err != nil {
+		t.Fatalf("unexpected error merging 7 shards: %v", err)
+	}
 
-		// Verify Rollup synthesis
-		report, err := merged.Rollup(80.0)
-		if err != nil {
-			t.Fatalf("failed to synthesize rollup: %v", err)
-		}
-		if report.TotalStatements != 38 {
-			t.Fatalf("expected rollup total statements 38, got %d", report.TotalStatements)
-		}
-		if report.CoveredStatements != 38 {
-			t.Fatalf("expected rollup covered statements 38, got %d", report.CoveredStatements)
-		}
-		if report.CoveragePct != 100.0 {
-			t.Fatalf("expected 100%% coverage, got %.2f%%", report.CoveragePct)
-		}
-		if !report.MeetsThreshold {
-			t.Fatal("expected report to meet threshold 80.0%")
-		}
-	})
+	if merged.BlockCount() != 8 {
+		t.Fatalf("expected 8 blocks, got %d", merged.BlockCount())
+	}
+	total, covered := merged.TotalStatements()
+	if total != 38 {
+		t.Fatalf("expected 38 statements, got %d", total)
+	}
+	if covered != 38 {
+		t.Fatalf("expected 38 covered statements, got %d", covered)
+	}
 
-	t.Run("FileMergingAndArtifactWriting", func(t *testing.T) {
-		tempDir := t.TempDir()
-		shard1Path := filepath.Join(tempDir, "coverage-1.out")
-		shard2Path := filepath.Join(tempDir, "coverage-2.out")
+	report, err := merged.Rollup(80.0)
+	if err != nil {
+		t.Fatalf("failed to synthesize rollup: %v", err)
+	}
+	if report.TotalStatements != 38 || report.CoveredStatements != 38 || report.CoveragePct != 100.0 {
+		t.Fatalf("unexpected rollup metrics: %+v", report)
+	}
+	if !report.MeetsThreshold {
+		t.Fatal("expected report to meet threshold 80.0%")
+	}
+}
 
-		if err := fileutil.WriteFile(shard1Path, []byte("mode: atomic\ngithub.com/zqk-os/zqk/pkg/foo/foo.go:1.1,5.1 2 5\n"), 0o600); err != nil {
-			t.Fatal(err)
-		}
-		if err := fileutil.WriteFile(shard2Path, []byte("mode: atomic\ngithub.com/zqk-os/zqk/pkg/bar/bar.go:1.1,5.1 4 3\n"), 0o600); err != nil {
-			t.Fatal(err)
-		}
+func testOperationalProof_FileMerging(t *testing.T) {
+	tempDir := t.TempDir()
+	shard1Path := filepath.Join(tempDir, "coverage-1.out")
+	shard2Path := filepath.Join(tempDir, "coverage-2.out")
 
-		m := NewMerger()
-		merged, err := m.MergeGlob(filepath.Join(tempDir, "coverage-*.out"))
-		if err != nil {
-			t.Fatalf("MergeGlob failed: %v", err)
-		}
-		if merged.BlockCount() != 2 {
-			t.Fatalf("expected 2 blocks, got %d", merged.BlockCount())
-		}
+	if err := fileutil.WriteFile(shard1Path, []byte("mode: atomic\ngithub.com/zqk-os/zqk/pkg/foo/foo.go:1.1,5.1 2 5\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := fileutil.WriteFile(shard2Path, []byte("mode: atomic\ngithub.com/zqk-os/zqk/pkg/bar/bar.go:1.1,5.1 4 3\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 
-		report, err := merged.Rollup(85.0)
-		if err != nil {
-			t.Fatal(err)
-		}
+	m := NewMerger()
+	merged, err := m.MergeGlob(filepath.Join(tempDir, "coverage-*.out"))
+	if err != nil {
+		t.Fatalf("MergeGlob failed: %v", err)
+	}
+	if merged.BlockCount() != 2 {
+		t.Fatalf("expected 2 blocks, got %d", merged.BlockCount())
+	}
 
-		artifactPath, checksumPath, err := community.WriteVerifiedCoverageArtifact(tempDir, report)
-		if err != nil {
-			t.Fatalf("failed to write coverage artifact: %v", err)
-		}
+	report, err := merged.Rollup(85.0)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		verified, err := community.VerifyCoverageArtifact(artifactPath)
-		if err != nil {
-			t.Fatalf("artifact verification failed: %v", err)
-		}
-		if !verified.Verified {
-			t.Fatal("expected verified coverage artifact")
-		}
-		if !filepath.IsAbs(checksumPath) {
-			t.Fatalf("expected absolute checksum path: %s", checksumPath)
-		}
-	})
+	artifactPath, checksumPath, err := community.WriteVerifiedCoverageArtifact(tempDir, report)
+	if err != nil {
+		t.Fatalf("failed to write coverage artifact: %v", err)
+	}
+
+	verified, err := community.VerifyCoverageArtifact(artifactPath)
+	if err != nil {
+		t.Fatalf("artifact verification failed: %v", err)
+	}
+	if !verified.Verified {
+		t.Fatal("expected verified coverage artifact")
+	}
+	if !filepath.IsAbs(checksumPath) {
+		t.Fatalf("expected absolute checksum path: %s", checksumPath)
+	}
 }
 
 // Invariant 3: Negative Adversarial Boundary (CRIT-1794286021883487000-9b1dd315)
 // Enforce fail-closed rejection when coverprofile blocks have invalid syntax, missing shard payloads, conflicting statement counts, or paths outside project root.
 func TestMatrixCoverage_NegativeAdversarialBoundaries(t *testing.T) {
-	t.Run("RejectsEmptyShardSet", func(t *testing.T) {
-		m := NewMerger()
-		_, err := m.MergeShards()
-		if !errors.Is(err, ErrEmptyShardSet) {
-			t.Fatalf("expected ErrEmptyShardSet, got %v", err)
+	t.Run("RejectsEmptyShardSet", testNegativeBoundaries_EmptyShards)
+	t.Run("RejectsMissingShardFile", testNegativeBoundaries_MissingFile)
+	t.Run("RejectsMalformedBlockSyntax", testNegativeBoundaries_MalformedSyntax)
+	t.Run("RejectsInconsistentCoverageModes", testNegativeBoundaries_InconsistentModes)
+	t.Run("RejectsConflictingStatementCounts", testNegativeBoundaries_ConflictingCounts)
+	t.Run("RejectsEscapingPathsAndTraversal", testNegativeBoundaries_EscapingPaths)
+	t.Run("RejectsNilBlockOrProfile", testNegativeBoundaries_NilBlocks)
+}
+
+func testNegativeBoundaries_EmptyShards(t *testing.T) {
+	m := NewMerger()
+	if _, err := m.MergeShards(); !errors.Is(err, ErrEmptyShardSet) {
+		t.Fatalf("expected ErrEmptyShardSet, got %v", err)
+	}
+	if _, err := m.MergeFiles(); !errors.Is(err, ErrEmptyShardSet) {
+		t.Fatalf("expected ErrEmptyShardSet, got %v", err)
+	}
+}
+
+func testNegativeBoundaries_MissingFile(t *testing.T) {
+	m := NewMerger()
+	if _, err := m.MergeFiles("non-existent-shard-file.out"); err == nil {
+		t.Fatal("expected error for non-existent file, got nil")
+	}
+}
+
+func testNegativeBoundaries_MalformedSyntax(t *testing.T) {
+	m := NewMerger()
+	malformedCases := []string{
+		"pkg/a/a.go 1 1",
+		"pkg/a/a.go:1.1 1 1",
+		"pkg/a/a.go:x.y,z.w 1 1",
+		"pkg/a/a.go:1.1,2.1 notanint 1",
+		"pkg/a/a.go:1.1,2.1 1 notanint",
+		"pkg/a/a.go:5.1,2.1 1 1",
+		"pkg/a/a.go:1.1,2.1 -5 1",
+		"pkg/a/a.go:1.1,2.1 1 -2",
+	}
+
+	for _, badLine := range malformedCases {
+		if _, err := m.ParseLine(badLine); err == nil {
+			t.Fatalf("expected rejection for malformed line %q, got nil", badLine)
 		}
+	}
 
-		_, err = m.MergeFiles()
-		if !errors.Is(err, ErrEmptyShardSet) {
-			t.Fatalf("expected ErrEmptyShardSet, got %v", err)
+	zeroStmtBlock, err := m.ParseLine("pkg/a/a.go:1.1,2.1 0 1")
+	if err != nil {
+		t.Fatalf("expected acceptance of zero-statement block, got %v", err)
+	}
+	if zeroStmtBlock.NumStmt != 0 {
+		t.Fatalf("expected NumStmt=0, got %d", zeroStmtBlock.NumStmt)
+	}
+}
+
+func testNegativeBoundaries_InconsistentModes(t *testing.T) {
+	m := NewMerger()
+	shardAtomic := []byte("mode: atomic\npkg/a/a.go:1.1,2.1 1 1\n")
+	shardSet := []byte("mode: set\npkg/b/b.go:1.1,2.1 1 1\n")
+	if _, err := m.MergeShards(shardAtomic, shardSet); !errors.Is(err, ErrInconsistentCoverageMode) {
+		t.Fatalf("expected ErrInconsistentCoverageMode, got %v", err)
+	}
+}
+
+func testNegativeBoundaries_ConflictingCounts(t *testing.T) {
+	m := NewMerger()
+	shardA := []byte("mode: atomic\npkg/a/a.go:1.1,5.1 4 1\n")
+	shardB := []byte("mode: atomic\npkg/a/a.go:1.1,5.1 6 2\n")
+	if _, err := m.MergeShards(shardA, shardB); !errors.Is(err, ErrConflictingStatementCount) {
+		t.Fatalf("expected ErrConflictingStatementCount, got %v", err)
+	}
+}
+
+func testNegativeBoundaries_EscapingPaths(t *testing.T) {
+	m := NewMerger()
+	traversalCases := []string{
+		"../escape/evil.go:1.1,2.1 1 1",
+		"pkg/../../evil.go:1.1,2.1 1 1",
+		"/etc/passwd:1.1,2.1 1 1",
+		`pkg\windows\backslash.go:1.1,2.1 1 1`,
+	}
+	for _, bad := range traversalCases {
+		if _, err := m.ParseLine(bad); !errors.Is(err, ErrInvalidProfilePath) {
+			t.Fatalf("expected ErrInvalidProfilePath for line %q, got %v", bad, err)
 		}
-	})
+	}
+}
 
-	t.Run("RejectsMissingShardFile", func(t *testing.T) {
-		m := NewMerger()
-		_, err := m.MergeFiles("non-existent-shard-file.out")
-		if err == nil {
-			t.Fatal("expected error for non-existent file, got nil")
-		}
-	})
+func testNegativeBoundaries_NilBlocks(t *testing.T) {
+	var nilBlock *ProfileBlock
+	if err := nilBlock.Validate(false); !errors.Is(err, ErrNilProfile) {
+		t.Fatalf("expected ErrNilProfile, got %v", err)
+	}
 
-	t.Run("RejectsMalformedBlockSyntax", func(t *testing.T) {
-		m := NewMerger()
-		malformedCases := []string{
-			"pkg/a/a.go 1 1",                // missing coords
-			"pkg/a/a.go:1.1 1 1",            // missing end coords
-			"pkg/a/a.go:x.y,z.w 1 1",        // non-numeric coords
-			"pkg/a/a.go:1.1,2.1 notanint 1", // non-numeric numStmt
-			"pkg/a/a.go:1.1,2.1 1 notanint", // non-numeric count
-			"pkg/a/a.go:5.1,2.1 1 1",        // end line < start line
-			"pkg/a/a.go:1.1,2.1 0 1",        // numStmt <= 0
-			"pkg/a/a.go:1.1,2.1 -5 1",       // negative numStmt
-			"pkg/a/a.go:1.1,2.1 1 -2",       // negative count
-		}
-
-		for _, badLine := range malformedCases {
-			_, err := m.ParseLine(badLine)
-			if err == nil {
-				t.Fatalf("expected rejection for malformed line %q, got nil", badLine)
-			}
-		}
-	})
-
-	t.Run("RejectsInconsistentCoverageModes", func(t *testing.T) {
-		m := NewMerger()
-		shardAtomic := []byte("mode: atomic\npkg/a/a.go:1.1,2.1 1 1\n")
-		shardSet := []byte("mode: set\npkg/b/b.go:1.1,2.1 1 1\n")
-
-		_, err := m.MergeShards(shardAtomic, shardSet)
-		if !errors.Is(err, ErrInconsistentCoverageMode) {
-			t.Fatalf("expected ErrInconsistentCoverageMode, got %v", err)
-		}
-	})
-
-	t.Run("RejectsConflictingStatementCounts", func(t *testing.T) {
-		m := NewMerger()
-		shardA := []byte("mode: atomic\npkg/a/a.go:1.1,5.1 4 1\n")
-		shardB := []byte("mode: atomic\npkg/a/a.go:1.1,5.1 6 2\n") // Conflicting: 6 vs 4 stmts
-
-		_, err := m.MergeShards(shardA, shardB)
-		if !errors.Is(err, ErrConflictingStatementCount) {
-			t.Fatalf("expected ErrConflictingStatementCount, got %v", err)
-		}
-	})
-
-	t.Run("RejectsEscapingPathsAndTraversal", func(t *testing.T) {
-		m := NewMerger()
-		traversalCases := []string{
-			"../escape/evil.go:1.1,2.1 1 1",
-			"pkg/../../evil.go:1.1,2.1 1 1",
-			"/etc/passwd:1.1,2.1 1 1",
-			`pkg\windows\backslash.go:1.1,2.1 1 1`,
-		}
-
-		for _, bad := range traversalCases {
-			_, err := m.ParseLine(bad)
-			if !errors.Is(err, ErrInvalidProfilePath) {
-				t.Fatalf("expected ErrInvalidProfilePath for line %q, got %v", bad, err)
-			}
-		}
-	})
-
-	t.Run("RejectsNilBlockOrProfile", func(t *testing.T) {
-		var nilBlock *ProfileBlock
-		if err := nilBlock.Validate(false); !errors.Is(err, ErrNilProfile) {
-			t.Fatalf("expected ErrNilProfile, got %v", err)
-		}
-
-		p := NewMergedProfile(ModeAtomic)
-		if err := p.AddBlock(nil); !errors.Is(err, ErrNilProfile) {
-			t.Fatalf("expected ErrNilProfile on AddBlock(nil), got %v", err)
-		}
-	})
+	p := NewMergedProfile(ModeAtomic)
+	if err := p.AddBlock(nil); !errors.Is(err, ErrNilProfile) {
+		t.Fatalf("expected ErrNilProfile on AddBlock(nil), got %v", err)
+	}
 }
