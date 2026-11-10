@@ -122,7 +122,6 @@ func runContinuationHookWithDeps(
 	// Also classify ambience from live backlog counts — hardcoding EventIdle made
 	// CAP followups always demand swarm-init even when planned=0 (stratplan_ahead),
 	// which burned Cursor stop loop_limit then suspended the loop.
-	// TRACK: BLI-CAP-IDLE-SUSPEND-001
 	fillHint := ""
 	planned, inProgress, exploring, validated := 0, 0, 0, 0
 	planStatus := ""

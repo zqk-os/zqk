@@ -38,7 +38,7 @@ const (
 	defaultInboxContinue     = "Inbox has unacked swarm mail. Ack as this seat, then keep working (do not end the turn while peers await)."
 	defaultCapContinue       = "CAP loop active. Query workflow whats-next and advance without idling."
 	defaultHourglassContinue = "Hourglass open (outbox awaiting peer_ack). Do NOT remint agent swarm-init / ORCHESTRATE_PLAN. await_peer_ack_keep_working: advance fill_item / local TPM work; ring peers only via feed steer|wake --await-peer-ack."
-	// TRACK: BLI-CAP-IDLE-SUSPEND-001 — remint strip must also scrub GuidingStep swarm-init prose
+	// Remint strip must also scrub GuidingStep swarm-init prose
 	// or CAP refuses remint, burns Cursor stop loop_limit, then sits idle until a human intervenes.
 	defaultRemintStrippedContinue = "Seat-worker/scheduler owns ORCHESTRATE_PLAN and swarm-init — do NOT remint from chat. Query workflow whats-next; advance fill_item / absorb peer lands / process-admin; keep CAP moving."
 	capLoopPreamble               = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): "

@@ -2,9 +2,7 @@
 
 ## Status
 - **Author**: PER-COMMUNITY-SYSTEM-ARCHITECT
-- **Cycle**: Cycle 75 (`PRI-1794278779706237000-b18e37a2`)
-- **Requirement**: `REQ-1794278714519592000-38ce3fef`
-- **Milestone**: `MIL-1794278708954786000-0d54f862`
+- **Cycle**: Cycle 75
 - **Status**: Approved / Draft
 
 ---
@@ -109,11 +107,11 @@ type RemediationReceipt struct {
 
 ### 2.2 Invariant Guarantees & Safeguards
 
-1. **Static Floor Invariant (`CRIT-1794278721649883000-3691707c`)**:
+1. **Static Floor Invariant**:
    - `PolicyRule` configurations must satisfy immutable structural bounds: `ID` and `Name` cannot be empty; `Impact` must be one of the 4 defined enum constants; `Weight` must be within `[1, 100]`; `MaxRetries` must be within `[0, 10]`; `BackoffBaseMs` must be positive.
-2. **Operational Dynamic Proof (`CRIT-1794278727036494000-24e2d2fd`)**:
+2. **Operational Dynamic Proof**:
    - Given a failure telemetry payload matching an enabled rule's filter, the orchestrator evaluates the highest-weight matching rule and safely dispatches a `RemediationReceipt` with correctly calculated backoff delay.
-3. **Negative Adversarial Boundary (`CRIT-1794278732561365000-892ac816`)**:
+3. **Negative Adversarial Boundary**:
    - Cyclic triggers (repeated failure loops exceeding `MaxRetries` on the same session/job) fail-closed by rejecting automatic dispatch and transitioning the session to quarantine.
    - Corrupted or invalid payloads (e.g. empty `SessionID`, negative exit codes, or unregistered actions) are rejected with deterministic error returns.
 
@@ -121,5 +119,5 @@ type RemediationReceipt struct {
 
 ## 3. Verification & Traceability
 
-- **Unified Test Case**: `TST-1794278773079844000-c77a3903`
+- **Unified Test Case**: Three-fold proof test suite
 - **Target Implementation**: `pkg/convergence/orchestrator.go`, `pkg/convergence/evaluator.go`, `pkg/convergence/orchestrator_test.go`
