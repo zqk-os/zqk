@@ -161,18 +161,93 @@ func DefaultScenarioExecutor(ctx context.Context, sc Scenario) (int64, int64, er
 }
 
 // Run executes all configured scenarios using a bounded worker pool and streams events.
-func (r *BatchRunner) Run(ctx context.Context, stream chan<- StreamEvent) (*BatchResult, error) {
+func (r *BatchRunner) emitBatchStarted(stream chan<- StreamEvent) {
+	if stream == nil {
+		return
+	}
+	stream <- StreamEvent{
+		Type:      EventBatchStarted,
+		Timestamp: time.Now().UTC(),
+		Payload: map[string]any{
+			"total_scenarios": len(r.config.Scenarios),
+			"concurrency":     r.config.Concurrency,
+			"max_tokens":      r.config.MaxTokens,
+		},
+	}
+}
+
+func (r *BatchRunner) emitBatchCompleted(stream chan<- StreamEvent, res *BatchResult) {
+	if stream == nil {
+		return
+	}
+	stream <- StreamEvent{
+		Type:        EventBatchCompleted,
+		Timestamp:   time.Now().UTC(),
+		TotalTokens: res.TotalTokens,
+		Payload: map[string]any{
+			"successful": res.Successful,
+			"failed":     res.Failed,
+			"duration":   res.Duration.String(),
+		},
+	}
+}
+
+func (r *BatchRunner) processScenario(ctx context.Context, sc Scenario, stream chan<- StreamEvent) (ScenarioOutcome, int64) {
+	scStart := time.Now()
 	if stream != nil {
 		stream <- StreamEvent{
-			Type:      EventBatchStarted,
-			Timestamp: time.Now().UTC(),
-			Payload: map[string]any{
-				"total_scenarios": len(r.config.Scenarios),
-				"concurrency":     r.config.Concurrency,
-				"max_tokens":      r.config.MaxTokens,
-			},
+			Type:        EventScenarioProgress,
+			ScenarioID:  sc.ID,
+			Timestamp:   time.Now().UTC(),
+			TotalTokens: r.metrics.TotalTokens(),
 		}
 	}
+
+	pTokens, cTokens, err := r.executor(ctx, sc)
+	dur := time.Since(scStart)
+	totTokens := r.metrics.RecordTokens(pTokens, cTokens, 0)
+
+	outcome := ScenarioOutcome{
+		ScenarioID:       sc.ID,
+		PromptTokens:     pTokens,
+		CompletionTokens: cTokens,
+		Duration:         dur,
+	}
+
+	if err != nil {
+		atomic.AddInt64(&r.metrics.TotalFailures, 1)
+		outcome.Success = false
+		outcome.Error = err.Error()
+		if stream != nil {
+			stream <- StreamEvent{
+				Type:        EventScenarioFailed,
+				ScenarioID:  sc.ID,
+				Timestamp:   time.Now().UTC(),
+				TokensUsed:  pTokens + cTokens,
+				TotalTokens: totTokens,
+				Error:       err.Error(),
+			}
+		}
+	} else {
+		atomic.AddInt64(&r.metrics.TotalScenariosRun, 1)
+		outcome.Success = true
+		if stream != nil {
+			stream <- StreamEvent{
+				Type:        EventScenarioCompleted,
+				ScenarioID:  sc.ID,
+				Timestamp:   time.Now().UTC(),
+				TokensUsed:  pTokens + cTokens,
+				TotalTokens: totTokens,
+			}
+		}
+	}
+
+	return outcome, totTokens
+}
+
+// Run executes the batch of scenarios under concurrency and token constraints.
+func (r *BatchRunner) Run(ctx context.Context, stream chan<- StreamEvent) (*BatchResult, error) {
+	r.emitBatchStarted(stream)
 
 	runCtx := ctx
 	var cancel context.CancelFunc
@@ -209,54 +284,7 @@ func (r *BatchRunner) Run(ctx context.Context, stream chan<- StreamEvent) (*Batc
 						return
 					}
 
-					scStart := time.Now()
-					if stream != nil {
-						stream <- StreamEvent{
-							Type:        EventScenarioProgress,
-							ScenarioID:  sc.ID,
-							Timestamp:   time.Now().UTC(),
-							TotalTokens: r.metrics.TotalTokens(),
-						}
-					}
-
-					pTokens, cTokens, err := r.executor(runCtx, sc)
-					dur := time.Since(scStart)
-					totTokens := r.metrics.RecordTokens(pTokens, cTokens, 0)
-
-					outcome := ScenarioOutcome{
-						ScenarioID:       sc.ID,
-						PromptTokens:     pTokens,
-						CompletionTokens: cTokens,
-						Duration:         dur,
-					}
-
-					if err != nil {
-						atomic.AddInt64(&r.metrics.TotalFailures, 1)
-						outcome.Success = false
-						outcome.Error = err.Error()
-						if stream != nil {
-							stream <- StreamEvent{
-								Type:        EventScenarioFailed,
-								ScenarioID:  sc.ID,
-								Timestamp:   time.Now().UTC(),
-								TokensUsed:  pTokens + cTokens,
-								TotalTokens: totTokens,
-								Error:       err.Error(),
-							}
-						}
-					} else {
-						atomic.AddInt64(&r.metrics.TotalScenariosRun, 1)
-						outcome.Success = true
-						if stream != nil {
-							stream <- StreamEvent{
-								Type:        EventScenarioCompleted,
-								ScenarioID:  sc.ID,
-								Timestamp:   time.Now().UTC(),
-								TokensUsed:  pTokens + cTokens,
-								TotalTokens: totTokens,
-							}
-						}
-					}
+					outcome, totTokens := r.processScenario(runCtx, sc, stream)
 
 					outcomesMu.Lock()
 					outcomes = append(outcomes, outcome)
@@ -282,18 +310,7 @@ func (r *BatchRunner) Run(ctx context.Context, stream chan<- StreamEvent) (*Batc
 		Outcomes:       outcomes,
 	}
 
-	if stream != nil {
-		stream <- StreamEvent{
-			Type:        EventBatchCompleted,
-			Timestamp:   time.Now().UTC(),
-			TotalTokens: res.TotalTokens,
-			Payload: map[string]any{
-				"successful": res.Successful,
-				"failed":     res.Failed,
-				"duration":   duration.String(),
-			},
-		}
-	}
+	r.emitBatchCompleted(stream, res)
 
 	if budgetExceeded.Load() {
 		return res, ErrTokenBudgetExceeded
