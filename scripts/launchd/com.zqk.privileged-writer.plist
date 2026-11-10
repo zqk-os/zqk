@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>Label</key>
-	<string>com.zqk.privileged-writer</string>
+	<string>com.zqk.privileged-writer.__ROOT_ID__</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>__ZQK_PROJECT_ROOT__/.zqk/bin/zqk-pw</string>

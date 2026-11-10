@@ -18,7 +18,7 @@ import (
 // checkouts can both supervise peer-agent-1 without last-install-wins.
 // Shape: com.<brand>.mesh.seat-worker.<root_id>.<seat_id>
 // Legacy (unscoped): com.<brand>.mesh.seat-worker.<seat_id>
-// Follow-up: root-scope com.<brand>.mcp-daemon and privileged-writer host units the same way.
+// MCP daemon + PrivilegedWriter use the same root_id pattern (see mcp_pw_unit_labels.go).
 
 var (
 	rootIDHexRe          = regexp.MustCompile(`^[0-9a-f]{16}$`)

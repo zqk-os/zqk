@@ -87,41 +87,57 @@ func (w *RuntimeWrangler) Status() (*RuntimeWranglerReport, error) {
 	}
 	report.Units = append(report.Units, schedUnit)
 
-	// 2. Privileged Writer
+	// 2. Privileged Writer (root-scoped LaunchAgent; fall back to legacy label)
 	pwUnit := HostServiceUnit{
 		Name:         "privileged-writer",
-		Label:        "com.zqk.privileged-writer",
+		Label:        PrivilegedWriterUnitLabel(rootID),
 		Kind:         "launch_agent",
 		DesiredState: DesiredStateEnabled,
 	}
 	pwPID, pwRunning, pwDetails := inspectLaunchAgent(pwUnit.Label)
+	if !pwRunning {
+		if legPID, legRunning, legDetails := inspectLaunchAgent(LegacyPrivilegedWriterUnitLabel()); legRunning {
+			pwUnit.Label = LegacyPrivilegedWriterUnitLabel()
+			pwPID, pwRunning, pwDetails = legPID, legRunning, legDetails+" (legacy label)"
+		}
+	}
 	pwUnit.PID = pwPID
 	pwUnit.Running = pwRunning
 	pwUnit.Details = pwDetails
 	report.Units = append(report.Units, pwUnit)
 
-	// 3. MCP Daemon
+	// 3. MCP Daemon (root-scoped LaunchAgent + TCP listen probe)
 	mcpUnit := HostServiceUnit{
 		Name:         "mcp-daemon",
-		Label:        "com.zqk.mcp",
-		Kind:         "tcp_daemon",
+		Label:        MCPDaemonUnitLabel(rootID),
+		Kind:         "launch_agent",
 		DesiredState: DesiredStateEnabled,
 	}
+	mcpPID, mcpRunning, mcpDetails := inspectLaunchAgent(mcpUnit.Label)
+	if !mcpRunning {
+		if legPID, legRunning, legDetails := inspectLaunchAgent(LegacyMCPDaemonUnitLabel()); legRunning {
+			mcpUnit.Label = LegacyMCPDaemonUnitLabel()
+			mcpPID, mcpRunning, mcpDetails = legPID, legRunning, legDetails+" (legacy label)"
+		}
+	}
+	mcpUnit.PID = mcpPID
+	mcpUnit.Running = mcpRunning
+	mcpUnit.Details = mcpDetails
 	mcpPidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, "mcp", "daemon-8443.pid")
-	if pid, alive := readPidFile(mcpPidFile); alive {
-		mcpUnit.Running = true
-		mcpUnit.PID = pid
-		mcpUnit.Details = "port 8443 open"
-	} else {
-		// Port probe
-		conn, err := net.DialTimeout("tcp", "127.0.0.1:8443", 200*time.Millisecond)
-		if err == nil {
-			_ = conn.Close()
+	if !mcpUnit.Running {
+		if pid, alive := readPidFile(mcpPidFile); alive {
 			mcpUnit.Running = true
-			mcpUnit.Details = "port 8443 open (external PID)"
+			mcpUnit.PID = pid
+			mcpUnit.Details = "active via pidfile"
 		} else {
-			mcpUnit.Running = false
-			mcpUnit.Details = "stopped"
+			conn, err := net.DialTimeout("tcp", "127.0.0.1:8443", 200*time.Millisecond)
+			if err == nil {
+				_ = conn.Close()
+				mcpUnit.Running = true
+				mcpUnit.Details = "port 8443 open (external PID)"
+			} else if mcpUnit.Details == "" {
+				mcpUnit.Details = "stopped"
+			}
 		}
 	}
 	report.Units = append(report.Units, mcpUnit)
@@ -183,6 +199,10 @@ func (w *RuntimeWrangler) Stop() error {
 		home, _ := fileutil.UserHomeDir()
 		labels := []string{
 			UnitLabel(rootID),
+			PrivilegedWriterUnitLabel(rootID),
+			LegacyPrivilegedWriterUnitLabel(),
+			MCPDaemonUnitLabel(rootID),
+			LegacyMCPDaemonUnitLabel(),
 			"com.zqk.mesh.night-duty",
 			"com.zqk.mesh.tpm-agy-watchdog",
 		}
