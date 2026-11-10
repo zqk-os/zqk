@@ -51,6 +51,11 @@ jobs:
       - name: Check Hardcoded Paths and Permissions
         run: ./scripts/check-hardcoded-paths-and-perms-repo.sh --no-dups
 
+      - name: Verify Documentation Portal & Link Rot Invariant
+        run: |
+          ./scripts/open-core/docs-portal/deploy-docs-portal.sh --dry-run
+          bash scripts/open-core/check-doc-links.sh
+
       # - name: Check CLI Name Literals
       #   run: ./scripts/check-cli-name-literals-repo.sh # Removed: script does not exist yet
 
@@ -78,6 +83,7 @@ jobs:
           | ZQK Verification Engine (`zqk-vet`) | ✅ Passed |
           | Public Release Payload Gate | ✅ Passed |
           | Path & Permission Literals | ✅ Passed |
+          | Documentation Portal & Link Rot Sentinel | ✅ Passed |
           | CLI Name Literals | ✅ Passed |
           | Go Linter (`golangci-lint`) | ✅ Passed |
           | Dependency Vulnerabilities (`govulncheck`) | ✅ Passed |
