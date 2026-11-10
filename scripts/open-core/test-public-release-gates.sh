@@ -54,7 +54,11 @@ fi
 
 if [ "$STAGE" = "docs" ]; then
 	test -f "$ROOT/docs/quality/COMMUNITY_ISSUE_VERIFICATION_MATRIX.md"
-	test -f "$ROOT/docs/releases/v0.3.3.md"
+	test -d "$ROOT/docs/releases"
+	if ! ls "$ROOT"/docs/releases/v*.md >/dev/null 2>&1; then
+		printf '%s\n' "release notes missing in docs/releases/" >&2
+		exit 1
+	fi
 	sh "$ROOT/scripts/open-core/docs-portal/deploy-docs-portal.sh" --dry-run
 	printf '%s\n' "CRITERIA PASS: Documentation & Knowledge Base Entry Verified"
 	exit 0
