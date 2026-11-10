@@ -57,6 +57,6 @@ Prior to object creation, the synthesizer checks the active working set for exis
 - If a prior remediation is marked `resolved` or `complete`, a new failure triggers a reopened or regression-flagged remediation.
 
 ## 5. Verification & Three-Fold Proof
-1. **Static Floor Invariant (`CRIT-1794268578254927000-e95b39d5`)**: Validates remediation schema structure, required fields, and non-empty failure fingerprints.
-2. **Operational Dynamic Proof (`CRIT-1794268584752127000-5fbd84fa`)**: Executes synthetic failed scenario run and verifies automated minting of valid CAS object.
-3. **Negative Adversarial Boundary (`CRIT-1794268594261938000-1a2338fa`)**: Ingests duplicate, malformed, and empty failure traces; proves zero duplicate object minting and fail-closed error containment.
+1. **Static Floor Invariant**: Validates remediation schema structure, required fields, and non-empty failure fingerprints.
+2. **Operational Dynamic Proof**: Executes synthetic failed scenario run and verifies automated minting of valid CAS object.
+3. **Negative Adversarial Boundary**: Ingests duplicate, malformed, and empty failure traces; proves zero duplicate object minting and fail-closed error containment.
