@@ -22,7 +22,7 @@ RUN apk add --no-cache ca-certificates git bash curl \
 
 COPY --from=builder /build/bin/zqk /usr/local/bin/zqk
 
-USER 10001
+USER 10001:10001
 WORKDIR /workspace
 ENV HOME=/home/zqk
 ENV ZQK_CONTEXT=ai-agent
