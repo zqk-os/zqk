@@ -16,7 +16,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 |---------|-------------|-------|-------|-------------|--------|-------------|
 | [accumulator](./accumulator/) | `github.com/zqk-os/zqk/pkg/accumulator` | 4+3 | 3 | - | ❌ - | Aggregation and time-windowed rollups for execution metrics, status events, and telemetry. |
 | [acronyms](./acronyms/) | `github.com/zqk-os/zqk/pkg/acronyms` | 1+2 | 2 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |
-| [adapters](./adapters/) | `github.com/zqk-os/zqk/pkg/adapters` | 4+2 | 2 | antigravity, cursor, +7 more | ❌ - | The vendor-neutral factory for host/IDE message delivery. Kernel code depends on [MessageDelivery] and [Resolve] only. Concrete... |
+| [adapters](./adapters/) | `github.com/zqk-os/zqk/pkg/adapters` | 4+2 | 2 | antigravity, cursor, +8 more | ❌ - | The vendor-neutral factory for host/IDE message delivery. Kernel code depends on [MessageDelivery] and [Resolve] only. Concrete... |
 | [agent](./agent/) | `github.com/zqk-os/zqk/pkg/agent` | 1+1 | 1 | - | ❌ - | Cryptographic utilities, key management, and security identity primitives for agents. |
 | [agentclaim](./agentclaim/) | `github.com/zqk-os/zqk/pkg/agentclaim` | 7+10 | 10 | - | ❌ - | Agent work claiming, cadence check-ins, lease acquisition, and write gating. |
 | [agentdelivery](./agentdelivery/) | `github.com/zqk-os/zqk/pkg/agentdelivery` | 8+5 | 5 | adapter | ❌ - | Host-neutral delivery of messages, steers, and task notifications to agent environments. |
@@ -260,6 +260,7 @@ pkg/
 │   └── cursor/
 │   └── gemini/
 │   └── golang/
+│   └── ide/
 │   └── macos/
 │   └── ollama/
 │   └── openai/

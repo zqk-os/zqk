@@ -51,8 +51,10 @@
 ./cli_specs/agent/guiding_step_command.yaml
 ./cli_specs/agent/hook/
 ./cli_specs/agent/hook/continuation_command.yaml
+./cli_specs/agent/hook/pre_command_command.yaml
 ./cli_specs/agent/hook/pre_subagent_command.yaml
 ./cli_specs/agent/hook_command.yaml
+./cli_specs/agent/install_seat_workers_command.yaml
 ./cli_specs/agent/new_command.yaml
 ./cli_specs/agent/next_command.yaml
 ./cli_specs/agent/orchestrate_command.yaml
@@ -92,6 +94,12 @@
 ./cli_specs/automation/docman_sync_command.yaml
 ./cli_specs/automation/lint_bypass_audit_command.yaml
 ./cli_specs/automation_command.yaml
+./cli_specs/bundle/
+./cli_specs/bundle/add_command.yaml
+./cli_specs/bundle/info_command.yaml
+./cli_specs/bundle/list_command.yaml
+./cli_specs/bundle/remove_command.yaml
+./cli_specs/bundle_command.yaml
 ./cli_specs/callback/
 ./cli_specs/callback/notify_command.yaml
 ./cli_specs/callback_command.yaml
@@ -138,6 +146,12 @@
 ./cli_specs/domain/discover_command.yaml
 ./cli_specs/domain/register_command.yaml
 ./cli_specs/domain_command.yaml
+./cli_specs/eval/
+./cli_specs/eval/llm_scrutiny_command.yaml
+./cli_specs/eval/matrix_command.yaml
+./cli_specs/eval/run_command.yaml
+./cli_specs/eval/validate_command.yaml
+./cli_specs/eval_command.yaml
 ./cli_specs/explain_command.yaml
 ./cli_specs/feed/
 ./cli_specs/feed/ack_command.yaml
@@ -286,6 +300,10 @@
 ./cli_specs/rollback_command.yaml
 ./cli_specs/root/
 ./cli_specs/root/version_command.yaml
+./cli_specs/router/
+./cli_specs/router/eval_command.yaml
+./cli_specs/router/stats_command.yaml
+./cli_specs/router_command.yaml
 ./cli_specs/rules/
 ./cli_specs/rules/generate_command.yaml
 ./cli_specs/rules_command.yaml
@@ -471,6 +489,7 @@
 ./cli_specs/system/metrics/file_lock/flush_command.yaml
 ./cli_specs/system/metrics/file_lock/view_command.yaml
 ./cli_specs/system/metrics/file_lock_command.yaml
+./cli_specs/system/metrics/llm_command.yaml
 ./cli_specs/system/metrics/scheduler_health/
 ./cli_specs/system/metrics/scheduler_health/test_command.yaml
 ./cli_specs/system/metrics/scheduler_health_command.yaml

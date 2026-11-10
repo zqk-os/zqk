@@ -46,8 +46,12 @@ type LedgerEntry struct {
 
 func CalculateEntryHash(index int64, prevHash string, payload []byte, proposedBy string, epoch int64, ts time.Time) string {
 	h := sha256.New()
-	_, _ = h.Write([]byte(fmt.Sprintf("%d:%s:%s:%d:%d:", index, prevHash, proposedBy, epoch, ts.UnixNano())))
-	_, _ = h.Write(payload)
+	if _, err := h.Write([]byte(fmt.Sprintf("%d:%s:%s:%d:%d:", index, prevHash, proposedBy, epoch, ts.UnixNano()))); err != nil {
+		return ""
+	}
+	if _, err := h.Write(payload); err != nil {
+		return ""
+	}
 	return hex.EncodeToString(h.Sum(nil))
 }
 

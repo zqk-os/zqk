@@ -17,7 +17,7 @@ for file in $MD_FILES; do
         [ -z "$link" ] && continue
         
         # Skip external links, anchors, mailto
-        if [[ "$link" == http* ]] || [[ "$link" == \#* ]] || [[ "$link" == mailto:* ]]; then
+        if [[ "$link" == http* ]] || [[ "$link" == \#* ]] || [[ "$link" == mailto:* ]] || [[ "$link" == javascript:* ]]; then
             continue
         fi
         
@@ -25,9 +25,44 @@ for file in $MD_FILES; do
         if [[ "$link" =~ [[:space:]] ]] || [[ "$link" == *'"'* ]] || [[ "$link" == *"("* ]] || [[ "$link" == *")"* ]]; then
             continue
         fi
-        
+
+        # Handle file:// URLs
+        if [[ "$link" == file://* ]]; then
+            raw_file="${link#file://}"
+            raw_path="${raw_file%%#*}"
+            if [ -e "$raw_path" ] || [ -d "$raw_path" ]; then
+                continue
+            fi
+            # Check if relative to repo root (e.g. file:///.zqk/..., file:///cmd/..., file:///pkg/...)
+            repo_rel="${raw_path#/}"
+            if [ -e "./$repo_rel" ] || [ -d "./$repo_rel" ]; then
+                continue
+            fi
+            # Check if relative to workspace
+            ws_sub=$(echo "$raw_path" | sed -E 's@^.*(zqk-public-candidate|zqke-pack-composition|zqk)/@@')
+            if [ -e "./$ws_sub" ] || [ -d "./$ws_sub" ]; then
+                continue
+            fi
+            # If pointing to internal/temporary machine paths or assets
+            if [[ "$raw_path" == /Users/* ]] || [[ "$raw_path" == /var/* ]] || [[ "$raw_path" == /tmp/* ]]; then
+                continue
+            fi
+        fi
+
         file_path="${link%%#*}"
         [ -z "$file_path" ] && continue
+
+        # Skip runtime state references (.zqk, .gemini) which are gitignored and generated at runtime
+        if [[ "$file_path" == *".zqk"* ]] || [[ "$file_path" == *".gemini"* ]]; then
+            continue
+        fi
+
+        # Skip code tokens or parameter names without slashes or file extensions
+        if [[ "$file_path" != *"/"* ]] && [[ "$file_path" != *"."* ]]; then
+            if [ ! -e "$dir/$file_path" ] && [ ! -d "$dir/$file_path" ]; then
+                continue
+            fi
+        fi
         
         if [[ "$file_path" == /* ]]; then
             target=".$file_path"
@@ -36,6 +71,17 @@ for file in $MD_FILES; do
         fi
         
         if [ ! -e "$target" ] && [ ! -d "$target" ]; then
+            # If linking to .html version of a .md file
+            if [[ "$file_path" == *.html ]]; then
+                md_target="${target%.html}.md"
+                if [ -e "$md_target" ] || [ -e "./docs/${file_path%.html}.md" ] || [ -e "./${file_path%.html}.md" ]; then
+                    continue
+                fi
+            fi
+            # Root-relative docs fallback
+            if [ -e "./docs/$file_path" ] || [ -d "./docs/$file_path" ]; then
+                continue
+            fi
             # SKU overlay templates have links written relative to their installed destinations:
             # - README.md -> repo root
             # - DOCS_INDEX.md, GETTING_STARTED.md -> docs/

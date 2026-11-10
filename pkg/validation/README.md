@@ -49,4 +49,4 @@ asyncVal.Enqueue(ctx, task)
 
 - [pkg/storage](../storage/README.md) — Storage layer that uses validation on write.
 - [pkg/context](../context/) — Context and pipeline used during validation.
-- [.zqk/process/object_specs](../../.zqk/process/) — Object specs that drive validation.
+- [pkg/specbuilder](../specbuilder/) — Object specs that drive validation.

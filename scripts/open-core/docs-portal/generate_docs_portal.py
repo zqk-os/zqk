@@ -413,6 +413,26 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
         if target.startswith("#"):
             return match.group(0)
 
+        # Handle local file:// URI links by converting them to repo-relative paths
+        if target.startswith("file://"):
+            file_raw = target[7:]
+            file_anchor = ""
+            if "#" in file_raw:
+                file_raw, file_anchor = file_raw.split("#", 1)
+                file_anchor = "#" + file_anchor
+            if repo_root and repo_root in file_raw:
+                target = os.path.relpath(file_raw, repo_root)
+            elif "/zqk-public-candidate/" in file_raw:
+                target = file_raw.split("/zqk-public-candidate/", 1)[1]
+            elif file_raw.startswith("/"):
+                stripped = file_raw.lstrip("/")
+                if repo_root and os.path.exists(os.path.join(repo_root, stripped)):
+                    target = stripped
+                else:
+                    target = file_raw
+            if file_anchor:
+                target = target + file_anchor
+
         anchor = ""
         if "#" in target:
             target, anchor = target.split("#", 1)

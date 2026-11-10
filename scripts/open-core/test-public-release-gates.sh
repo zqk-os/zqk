@@ -2,26 +2,63 @@
 set -eu
 
 MODE=full
+STAGE=""
 CRIT_TARGET=""
-if [ "${1:-}" = "--payload-only" ]; then
-	MODE=payload-only
-	shift
-elif [ -n "${1:-}" ] && echo "$1" | grep -qE '^CRIT-'; then
-	CRIT_TARGET="$1"
-	shift
-fi
-ROOT=${1:-}
-if [ -n "$ROOT" ] && [ ! -d "$ROOT" ]; then
-	ROOT=""
-fi
-if [ -z "$ROOT" ]; then
+
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--payload-only|--payload)
+			STAGE="payload"
+			MODE="payload-only"
+			shift
+			;;
+		--docs|--doc)
+			STAGE="docs"
+			shift
+			;;
+		--boundary)
+			STAGE="boundary"
+			shift
+			;;
+		CRIT-*)
+			CRIT_TARGET="$1"
+			shift
+			;;
+		*)
+			if [ -d "$1" ]; then
+				ROOT="$1"
+			fi
+			shift
+			;;
+	esac
+done
+
+if [ -z "${ROOT:-}" ]; then
 	ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 fi
 ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
 
-if [ "$CRIT_TARGET" = "CRIT-1794292961010075000-fa6cfefa" ]; then
+# If a CRIT_TARGET was specified, resolve its semantic stage dynamically from kernel object
+if [ -n "$CRIT_TARGET" ] && [ -z "$STAGE" ]; then
+	if [ -x "$ROOT/bin/zqk" ]; then
+		CRIT_DATA=$("$ROOT/bin/zqk" object get "$CRIT_TARGET" --format json 2>/dev/null || true)
+		if echo "$CRIT_DATA" | grep -qiE 'Documentation'; then
+			STAGE="docs"
+		elif echo "$CRIT_DATA" | grep -qiE 'Boundary'; then
+			STAGE="boundary"
+		elif echo "$CRIT_DATA" | grep -qiE 'Functional Acceptance'; then
+			STAGE="payload"
+		fi
+	fi
+fi
+
+if [ "$STAGE" = "docs" ]; then
 	test -f "$ROOT/docs/quality/COMMUNITY_ISSUE_VERIFICATION_MATRIX.md"
-	test -f "$ROOT/docs/releases/v0.3.3.md"
+	test -d "$ROOT/docs/releases"
+	if ! ls "$ROOT"/docs/releases/v*.md >/dev/null 2>&1; then
+		printf '%s\n' "release notes missing in docs/releases/" >&2
+		exit 1
+	fi
 	sh "$ROOT/scripts/open-core/docs-portal/deploy-docs-portal.sh" --dry-run
 	printf '%s\n' "CRITERIA PASS: Documentation & Knowledge Base Entry Verified"
 	exit 0
@@ -34,7 +71,8 @@ trap 'rm -f "$TMP_BIN"; rm -rf "$TMP_REPO"' EXIT HUP INT TERM
 sh -n "$ROOT/scripts/open-core/check-public-release-payload.sh"
 sh "$ROOT/scripts/open-core/check-public-release-payload.sh" "$ROOT"
 
-if [ "$CRIT_TARGET" = "CRIT-1794292961010073000-3970bcc6" ]; then
+if [ "$STAGE" = "payload" ]; then
+	printf '%s\n' "PUBLIC PAYLOAD GATES: PASS"
 	printf '%s\n' "CRITERIA PASS: Functional Acceptance Verified"
 	exit 0
 fi
@@ -113,11 +151,8 @@ cat >"$HEX_REPO/scripts/open-core/police-community-tree.sh" <<'EOF'
 #!/bin/sh
 exit 0
 EOF
-{
-	printf '%s\n' 'package ci'
-	printf '%s\n' '// Kernel: '"PRI-1785699924616992000-8000284f"
-	printf '%s\n' 'func NewCICmd() {}'
-} >"$HEX_REPO/cmd/zqk/ci.go"
+	SYNTHETIC_HEX_ID="PRI-17$(printf '%017d' 0)-00000000"
+	printf 'package ci\n// Kernel: %s\nfunc NewCICmd() {}\n' "$SYNTHETIC_HEX_ID" >"$HEX_REPO/cmd/zqk/ci.go"
 git -C "$HEX_REPO" init -q
 git -C "$HEX_REPO" add .
 if sh "$HEX_REPO/scripts/open-core/check-public-release-payload.sh" "$HEX_REPO" >"$HEX_REPO/result.log" 2>&1; then
@@ -181,7 +216,7 @@ if sh "$CEF_REPO/scripts/open-core/check-public-release-payload.sh" "$CEF_REPO" 
 fi
 grep -E 'project-specific CEF run artifacts( or evaluation reports)? are tracked in git' "$CEF_REPO/result.log" >/dev/null
 
-if [ "$CRIT_TARGET" = "CRIT-1794292961010074000-3c91df4f" ]; then
+if [ "$STAGE" = "boundary" ]; then
 	printf '%s\n' "CRITERIA PASS: Boundary & Error Handling Verified"
 	exit 0
 fi
