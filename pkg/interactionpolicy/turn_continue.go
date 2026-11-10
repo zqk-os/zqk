@@ -38,7 +38,10 @@ const (
 	defaultInboxContinue     = "Inbox has unacked swarm mail. Ack as this seat, then keep working (do not end the turn while peers await)."
 	defaultCapContinue       = "CAP loop active. Query workflow whats-next and advance without idling."
 	defaultHourglassContinue = "Hourglass open (outbox awaiting peer_ack). Do NOT remint agent swarm-init / ORCHESTRATE_PLAN. await_peer_ack_keep_working: advance fill_item / local TPM work; ring peers only via feed steer|wake --await-peer-ack."
-	capLoopPreamble          = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): "
+	// TRACK: BLI-CAP-IDLE-SUSPEND-001 — remint strip must also scrub GuidingStep swarm-init prose
+	// or CAP refuses remint, burns Cursor stop loop_limit, then sits idle until a human intervenes.
+	defaultRemintStrippedContinue = "Seat-worker/scheduler owns ORCHESTRATE_PLAN and swarm-init — do NOT remint from chat. Query workflow whats-next; advance fill_item / absorb peer lands / process-admin; keep CAP moving."
+	capLoopPreamble               = "CONTINUOUS AUTONOMOUS PROGRESSION (CAP LOOP): "
 )
 
 // CommandHintIsDispatchRemint reports hints that belong on seat-worker/scheduler
@@ -72,6 +75,7 @@ func CompileTurnContinue(in TurnContinueInput) TurnContinue {
 	if CommandHintIsDispatchRemint(hint) {
 		hint = ""
 		stripped = true
+		step = scrubDispatchRemintProse(step)
 	}
 	hourglass := in.OutboxAwaitingPeerAck > 0
 	if hourglass {
@@ -162,4 +166,23 @@ func joinPolicy(policyID, step string) string {
 		return step
 	}
 	return policyID + ": " + step
+}
+
+// scrubDispatchRemintProse replaces catalog idle text that still tells chat to
+// hand off via swarm-init/orchestrate after CommandHint was stripped. Leaving
+// that prose in the followup is what makes CAP refuse → stop → loop_limit out.
+func scrubDispatchRemintProse(step string) string {
+	s := strings.TrimSpace(step)
+	if s == "" {
+		return defaultRemintStrippedContinue
+	}
+	low := strings.ToLower(s)
+	if strings.Contains(low, "swarm-init") ||
+		strings.Contains(low, "swarm init") ||
+		strings.Contains(low, "orchestrate") ||
+		strings.Contains(low, "anti-piecemeal") ||
+		strings.Contains(low, "hand off batch") {
+		return defaultRemintStrippedContinue
+	}
+	return s
 }

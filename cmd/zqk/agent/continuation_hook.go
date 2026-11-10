@@ -117,23 +117,15 @@ func runContinuationHookWithDeps(
 		}
 	}
 
-	ev := interactionpolicy.EventIdle
-	if inboxN > 0 {
-		ev = interactionpolicy.EventInboxUnacked
-	}
-	res := interactionpolicy.Evaluate(nil, ev)
-	step := ""
-	hint := ""
-	pol := ""
-	if res.Matched && res.Step != nil {
-		step = res.Step.GuidingStep
-		hint = res.Step.CommandHint
-		pol = res.Step.PolicyID
-	}
-
 	// Prefer live whats-next fill_item. Only rewrite the stale "autofix dangling"
 	// wording to heal-dangling; do not invent a GhostRef fill when fill_item is nil.
+	// Also classify ambience from live backlog counts — hardcoding EventIdle made
+	// CAP followups always demand swarm-init even when planned=0 (stratplan_ahead),
+	// which burned Cursor stop loop_limit then suspended the loop.
+	// TRACK: BLI-CAP-IDLE-SUSPEND-001
 	fillHint := ""
+	planned, inProgress, exploring, validated := 0, 0, 0, 0
+	planStatus := ""
 	if projectRoot != "" {
 		amb := whatsnext.LoadKernelAmbience(projectRoot)
 		if fill := whatsnext.CompileFillItem(&amb); fill != nil {
@@ -142,6 +134,44 @@ func runContinuationHookWithDeps(
 				fillHint = paths.CLICommandName + " system kernel-integrity heal-dangling --apply"
 			}
 		}
+		if sp != nil {
+			wn, wnErr := whatsnext.Execute(ctx, sp, projectRoot, &whatsnext.QueryRequest{
+				SkipMeasure:       true,
+				SkipPersonaFilter: true,
+				AgentID:           targetAgentID,
+			})
+			if wnErr == nil && wn != nil {
+				if wn.BacklogCountsByStatus != nil {
+					planned = wn.BacklogCountsByStatus["planned"]
+					inProgress = wn.BacklogCountsByStatus["in_progress"]
+					exploring = wn.BacklogCountsByStatus["exploring"]
+					validated = wn.BacklogCountsByStatus["validated"]
+				}
+				if wn.PriorityPlan != nil {
+					planStatus = strings.TrimSpace(wn.PriorityPlan.Status)
+				}
+				if fillHint == "" && wn.FillItem != nil {
+					fillHint = strings.TrimSpace(wn.FillItem.CommandHint)
+				}
+			}
+		}
+	}
+	ev := interactionpolicy.ClassifyAmbience(interactionpolicy.Ambience{
+		InboxUnacked: inboxN,
+		Planned:      planned,
+		InProgress:   inProgress,
+		Exploring:    exploring,
+		Validated:    validated,
+		PlanStatus:   planStatus,
+	})
+	res := interactionpolicy.Evaluate(nil, ev)
+	step := ""
+	hint := ""
+	pol := ""
+	if res.Matched && res.Step != nil {
+		step = res.Step.GuidingStep
+		hint = res.Step.CommandHint
+		pol = res.Step.PolicyID
 	}
 	drive := interactionpolicy.CompileTurnContinue(interactionpolicy.TurnContinueInput{
 		InboxUnacked:          inboxN,
