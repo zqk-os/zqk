@@ -37,7 +37,7 @@ func createMockAgentAPIScript(t *testing.T, mode string) string {
 	default:
 		body = "#!/bin/sh\nexit 0\n"
 	}
-	writeErr := fileutil.WriteExecutableFile(binPath, []byte(body))
+	writeErr := fileutil.WriteDurableFile(binPath, []byte(body), 0o755)
 	if writeErr != nil {
 		t.Fatalf("failed to write mock script: %v", writeErr)
 	}
