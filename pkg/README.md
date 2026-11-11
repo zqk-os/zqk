@@ -48,7 +48,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+2 | 2 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
-| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 20+63 | 63 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
+| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 20+64 | 64 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
 | [concurrency](./concurrency/) | `github.com/zqk-os/zqk/pkg/concurrency` | 11+12 | 12 | - | ✅ [README](./concurrency/README.md) | This package provides standardized concurrency primitives and patterns to ensure consistent, safe, and observable concurrent op... |
 | [config](./config/) | `github.com/zqk-os/zqk/pkg/config` | 10+8 | 8 | - | ❌ - | Kernel configuration loading, YAML parsing, environment overrides, and schema validation. |
 | [consensus](./consensus/) | `github.com/zqk-os/zqk/pkg/consensus` | 2+1 | 1 | - | ❌ - | Consensus component and domain abstractions for ZQK Core. |
@@ -183,7 +183,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [safepath](./safepath/) | `github.com/zqk-os/zqk/pkg/safepath` | 1+2 | 2 | - | ❌ - | Builds filesystem paths confined under a root directory to mitigate directory traversal when joining untrusted or external segm... |
 | [scaffold](./scaffold/) | `github.com/zqk-os/zqk/pkg/scaffold` | 0+1 | 1 | - | ❌ - | Scaffold component and domain abstractions for ZQK Core. |
 | [scenario](./scenario/) | `github.com/zqk-os/zqk/pkg/scenario` | 6+8 | 8 | - | ❌ - | Convergence lifecycle end-to-end tests (storage-backed CVS updates). Coverage: measure → BuildSuggestedConvergenceSessionFields... |
-| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 206+260 | 260 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
+| [scheduler](./scheduler/) | `github.com/zqk-os/zqk/pkg/scheduler` | 207+261 | 261 | clusterstatus, hostservice, transceiver | ❌ - | Distributed job scheduler, cron execution, maintenance tasks, and test scans. |
 | [screencap](./screencap/) | `github.com/zqk-os/zqk/pkg/screencap` | 2+4 | 4 | - | ✅ [README](./screencap/README.md) | pkg/screencap provides headless and interactive terminal automation coupled with native screen, window, and rectangular region... |
 | [search](./search/) | `github.com/zqk-os/zqk/pkg/search` | 6+2 | 2 | interceptor | ✅ [README](./search/README.md) | pkg/search provides an in-process, pure-Go code search engine featuring trigram inverted indexing, Go AST structural queries, a... |
 | [seatworker](./seatworker/) | `github.com/zqk-os/zqk/pkg/seatworker` | 1+2 | 2 | - | ✅ [README](./seatworker/README.md) | pkg/seatworker provides OS supervisor installation and lifecycle management for persistent autonomous agent worker processes (z... |

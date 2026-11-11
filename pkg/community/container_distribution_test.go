@@ -237,3 +237,140 @@ func TestContainerDistribution_IntegrationAndConformance(t *testing.T) {
 		t.Errorf("packaged chart missing required entries: Chart=%v, Values=%v, Templates=%v", hasChart, hasValues, hasTemplates)
 	}
 }
+
+// TestContainerPackaging_StaticFloorInvariant verifies that container definitions
+// specify non-root execution (USER 10001), multi-stage builds, and healthcheck configurations
+// (CRIT-1794382593524814000-58594100).
+func TestContainerPackaging_StaticFloorInvariant(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+
+	// Invariant 1: Dockerfile.community multi-stage and hardening
+	communityPath := filepath.Join(root, "Dockerfile.community")
+	communityBytes, err := fileutil.ReadFile(communityPath)
+	if err != nil {
+		t.Fatalf("failed to read Dockerfile.community: %v", err)
+	}
+	communityStr := string(communityBytes)
+	if !strings.Contains(communityStr, "FROM golang:1.26-alpine AS builder") || !strings.Contains(communityStr, "AS runner") {
+		t.Errorf("expected Dockerfile.community multi-stage scaffolding")
+	}
+	if !strings.Contains(communityStr, "USER 10001:10001") && !strings.Contains(communityStr, "USER 10001") {
+		t.Errorf("expected Dockerfile.community non-root USER 10001")
+	}
+	if !strings.Contains(communityStr, "HEALTHCHECK") {
+		t.Errorf("expected Dockerfile.community HEALTHCHECK")
+	}
+
+	// Invariant 2: Dockerfile.standalone multi-stage and local inference topology
+	standalonePath := filepath.Join(root, "Dockerfile.standalone")
+	standaloneBytes, err := fileutil.ReadFile(standalonePath)
+	if err != nil {
+		t.Fatalf("failed to read Dockerfile.standalone: %v", err)
+	}
+	standaloneStr := string(standaloneBytes)
+	if !strings.Contains(standaloneStr, "AS zqk-builder") || !strings.Contains(standaloneStr, "AS llama-builder") || !strings.Contains(standaloneStr, "AS runner") {
+		t.Errorf("expected Dockerfile.standalone multi-stage scaffolding")
+	}
+	if !strings.Contains(standaloneStr, "USER 10001") {
+		t.Errorf("expected Dockerfile.standalone non-root USER 10001")
+	}
+	if !strings.Contains(standaloneStr, "HEALTHCHECK") {
+		t.Errorf("expected Dockerfile.standalone HEALTHCHECK")
+	}
+	if !strings.Contains(standaloneStr, "EXPOSE 8080 8443") {
+		t.Errorf("expected Dockerfile.standalone EXPOSE 8080 8443")
+	}
+
+	// Invariant 3: GitHub Actions Container Publishing Workflow includes both images
+	wfPath := filepath.Join(root, ".github", "workflows", "publish-containers.yml")
+	wfBytes, err := fileutil.ReadFile(wfPath)
+	if err != nil {
+		t.Fatalf("failed to read publish-containers.yml: %v", err)
+	}
+	wfStr := string(wfBytes)
+	if !strings.Contains(wfStr, "build-and-push-community:") || !strings.Contains(wfStr, "build-and-push-standalone:") {
+		t.Errorf("expected publishing workflow to build both community and standalone images")
+	}
+}
+
+// TestContainerPackaging_OperationalProof verifies turnkey standalone supervisor execution
+// with command forwarding and simulated local inference healthcheck
+// (CRIT-1794382599001279000-ffa42c37).
+func TestContainerPackaging_OperationalProof(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	entrypointScript := filepath.Join(root, "scripts", "open-core", "entrypoint-standalone.sh")
+
+	tmpDir := t.TempDir()
+	mockBin := filepath.Join(tmpDir, "mock-zqk.sh")
+	mockScript := "#!/bin/sh\necho \"MOCK_ZQK_INVOKED: $@\"\nexit 0\n"
+	if err := fileutil.WriteFile(mockBin, []byte(mockScript), paths.FilePerm755); err != nil {
+		t.Fatalf("failed to write mock binary: %v", err)
+	}
+
+	cmd := testkit.ManagedCommand(t, t.Context(), "bash", entrypointScript, "do", "--timeout", "5m")
+	cmd.Env = append(cmd.Environ(),
+		"ZQK_BIN="+mockBin,
+		"MODEL_PATH=",
+		"ZQK_UID_OVERRIDE=10001",
+		"ZQK_CONTAINER_MEM_MB=8192",
+	)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("entrypoint script execution failed: %v, out: %s", err, string(out))
+	}
+	outStr := string(out)
+
+	if !strings.Contains(outStr, "[STANDALONE] No local GGUF model detected") {
+		t.Errorf("expected fallback notice in output, got: %s", outStr)
+	}
+	if !strings.Contains(outStr, "MOCK_ZQK_INVOKED: do --timeout 5m") {
+		t.Errorf("expected argument forwarding to ZQK_BIN, got: %s", outStr)
+	}
+}
+
+// TestContainerPackaging_NegativeAdversarialBoundary verifies that container execution
+// fails closed on root UID 0 execution or sub-6GB memory allocations
+// (CRIT-1794382604694864000-68135698).
+func TestContainerPackaging_NegativeAdversarialBoundary(t *testing.T) {
+	root := paths.ResolveProjectRoot(".")
+	entrypointScript := filepath.Join(root, "scripts", "open-core", "entrypoint-standalone.sh")
+
+	tmpDir := t.TempDir()
+	mockBin := filepath.Join(tmpDir, "mock-zqk.sh")
+	mockScript := "#!/bin/sh\necho \"SHOULD_NOT_EXECUTE\"\nexit 0\n"
+	if err := fileutil.WriteFile(mockBin, []byte(mockScript), paths.FilePerm755); err != nil {
+		t.Fatalf("failed to write mock binary: %v", err)
+	}
+
+	// Boundary 1: Root execution rejection (UID 0)
+	cmdRoot := testkit.ManagedCommand(t, t.Context(), "bash", entrypointScript, "do")
+	cmdRoot.Env = append(cmdRoot.Environ(),
+		"ZQK_BIN="+mockBin,
+		"MODEL_PATH=",
+		"ZQK_UID_OVERRIDE=0",
+		"ZQK_CONTAINER_MEM_MB=8192",
+	)
+	outRoot, errRoot := cmdRoot.CombinedOutput()
+	if errRoot == nil {
+		t.Fatalf("expected root execution to fail, but succeeded with output: %s", string(outRoot))
+	}
+	if !strings.Contains(string(outRoot), "Container execution as root (UID 0) is prohibited") {
+		t.Errorf("expected root execution failure message, got: %s", string(outRoot))
+	}
+
+	// Boundary 2: Sub-6GB memory allocation rejection (< 6144 MB)
+	cmdSubMem := testkit.ManagedCommand(t, t.Context(), "bash", entrypointScript, "do")
+	cmdSubMem.Env = append(cmdSubMem.Environ(),
+		"ZQK_BIN="+mockBin,
+		"MODEL_PATH=",
+		"ZQK_UID_OVERRIDE=10001",
+		"ZQK_CONTAINER_MEM_MB=4096",
+	)
+	outSubMem, errSubMem := cmdSubMem.CombinedOutput()
+	if errSubMem == nil {
+		t.Fatalf("expected sub-6GB RAM allocation to fail, but succeeded with output: %s", string(outSubMem))
+	}
+	if !strings.Contains(string(outSubMem), "Insufficient host RAM allocated") || !strings.Contains(string(outSubMem), "minimum of 6144MB") {
+		t.Errorf("expected memory boundary failure message, got: %s", string(outSubMem))
+	}
+}
