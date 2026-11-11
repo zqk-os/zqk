@@ -93,6 +93,7 @@
 ./cli_specs/automation/docman_sync_command.yaml
 ./cli_specs/automation/lint_bypass_audit_command.yaml
 ./cli_specs/automation_command.yaml
+./cli_specs/autopilot_command.yaml
 ./cli_specs/bundle/
 ./cli_specs/bundle/add_command.yaml
 ./cli_specs/bundle/info_command.yaml
