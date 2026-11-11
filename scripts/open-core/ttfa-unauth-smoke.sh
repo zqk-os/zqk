@@ -35,7 +35,15 @@ cleanup() {
     echo "KEEP_TTFA_WORKDIR=1 — left ${WORK_DIR}" >&2
     return 0
   fi
-  # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — remove when: stranger TTFA teardown stops ambient daemons before EXIT
+  # Prefer ambient stop against the temp epoch before rm (BLI-1794409789128810000-ffc46cfd).
+  if [ -n "${ZQK_BIN:-}" ] && [ -x "${ZQK_BIN}" ] && [ -d "${PROJECT_DIR:-}" ]; then
+    (
+      cd "${PROJECT_DIR}"
+      unset ZQK_CURRENT_ROOT 2>/dev/null || true
+      export ZQK_PROJECT_ROOT="${PROJECT_DIR}"
+      "${ZQK_BIN}" ambient stop >/dev/null 2>&1 || true
+    )
+  fi
   pkill -f "${WORK_DIR}" >/dev/null 2>&1 || true
   chmod -R u+w "${WORK_DIR}" >/dev/null 2>&1 || true
   rm -rf "${WORK_DIR}" >/dev/null 2>&1 || true

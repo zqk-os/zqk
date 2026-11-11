@@ -33,6 +33,28 @@ WORK_DIR="$(mktemp -d -t zqk-greenfield-XXXXXX)"
 BIN_DIR="${WORK_DIR}/bin"
 PROJECT_DIR="${WORK_DIR}/my-greenfield-project"
 mkdir -p "$BIN_DIR" "$PROJECT_DIR"
+TEST_ZQK=""
+
+cleanup_greenfield() {
+  # Temp-epoch ambient daemons must not leak after smoke (BLI-1794409789128810000-ffc46cfd).
+  if [ "${KEEP_GREENFIELD_WORKDIR:-0}" = "1" ]; then
+    echo "KEEP_GREENFIELD_WORKDIR=1 — left ${WORK_DIR}" >&2
+    return 0
+  fi
+  if [ -n "${TEST_ZQK:-}" ] && [ -x "${TEST_ZQK}" ] && [ -d "${PROJECT_DIR:-}" ]; then
+    (
+      cd "${PROJECT_DIR}"
+      unset ZQK_CURRENT_ROOT 2>/dev/null || true
+      export ZQK_PROJECT_ROOT="${PROJECT_DIR}"
+      "${TEST_ZQK}" ambient stop >/dev/null 2>&1 || true
+    )
+  fi
+  pkill -f "${WORK_DIR}" >/dev/null 2>&1 || true
+  chmod -R u+w "${WORK_DIR}" >/dev/null 2>&1 || true
+  rm -rf "${WORK_DIR}" >/dev/null 2>&1 || true
+  return 0
+}
+trap cleanup_greenfield EXIT
 
 echo -e "${BLUE}ℹ Sandbox Workspace:${RESET} ${WORK_DIR}"
 echo -e "${BLUE}ℹ Target Version:${RESET}     ${VERSION}"
