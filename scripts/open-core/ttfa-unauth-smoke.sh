@@ -35,7 +35,7 @@ cleanup() {
     echo "KEEP_TTFA_WORKDIR=1 — left ${WORK_DIR}" >&2
     return 0
   fi
-  # TRACK: BLI-1794396118061450000-3e634b9b — remove when: stranger TTFA teardown stops ambient daemons before EXIT
+  # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — remove when: stranger TTFA teardown stops ambient daemons before EXIT
   pkill -f "${WORK_DIR}" >/dev/null 2>&1 || true
   chmod -R u+w "${WORK_DIR}" >/dev/null 2>&1 || true
   rm -rf "${WORK_DIR}" >/dev/null 2>&1 || true

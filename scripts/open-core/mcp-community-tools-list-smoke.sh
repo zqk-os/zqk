@@ -2,7 +2,7 @@
 # Community MCP tools/list parity smoke (stranger profile).
 # Fail-closed if pack ontology getters appear in list-tools output.
 # Docs: docs/onboarding/CURSOR_MCP_SETUP.md
-# TRACK: BLI-1794357633624642000-de0d8426
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger MCP tools/list must exclude pack ontology getters
 set -euo pipefail
 
 ROOT="${ZQK_COMMUNITY_ROOT:-}"
