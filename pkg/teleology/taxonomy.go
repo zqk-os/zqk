@@ -198,7 +198,7 @@ func ExtractCandidateDomains(obj map[string]any) []string {
 	}
 
 	// 1. Explicit Category
-	if cat, ok := obj[objects.FieldKeyCategory].(string); ok && cat != "" {
+	if cat := objects.GetString(obj, objects.FieldKeyCategory); cat != "" {
 		add(cat)
 	}
 

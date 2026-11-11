@@ -29,6 +29,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [aliases](./aliases/) | `github.com/zqk-os/zqk/pkg/aliases` | 2+2 | 2 | - | ❌ - | Command and object alias resolution, shorthand mapping, and synonym expansion. |
 | [ambience](./ambience/) | `github.com/zqk-os/zqk/pkg/ambience` | 4+5 | 5 | - | ❌ - | Background ambient intelligence, contextual awareness, and environment state tracking. |
 | [ambient](./ambient/) | `github.com/zqk-os/zqk/pkg/ambient` | 38+42 | 42 | - | ❌ - | Filesystem watcher daemon, ambient change detection, and reactive event triggering. |
+| [antigaming](./antigaming/) | `github.com/zqk-os/zqk/pkg/antigaming` | 1+1 | 1 | - | ❌ - | Antigaming component and domain abstractions for ZQK Core. |
 | [appledouble](./appledouble/) | `github.com/zqk-os/zqk/pkg/appledouble` | 1+2 | 2 | - | ❌ - | Sanitization and handling of AppleDouble and macOS resource fork metadata files. |
 | [architecture](./architecture/) | `github.com/zqk-os/zqk/pkg/architecture` | 1+1 | 1 | - | ❌ - | Codebase architectural boundaries, layering rules, and static AST governance checks. |
 | [audit](./audit/) | `github.com/zqk-os/zqk/pkg/audit` | 2+3 | 3 | - | ❌ - | High-volume audit log streaming, event persistence, and validation policies. |
@@ -47,7 +48,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+2 | 2 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
-| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 20+61 | 61 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
+| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 20+63 | 63 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
 | [concurrency](./concurrency/) | `github.com/zqk-os/zqk/pkg/concurrency` | 11+12 | 12 | - | ✅ [README](./concurrency/README.md) | This package provides standardized concurrency primitives and patterns to ensure consistent, safe, and observable concurrent op... |
 | [config](./config/) | `github.com/zqk-os/zqk/pkg/config` | 10+8 | 8 | - | ❌ - | Kernel configuration loading, YAML parsing, environment overrides, and schema validation. |
 | [consensus](./consensus/) | `github.com/zqk-os/zqk/pkg/consensus` | 2+1 | 1 | - | ❌ - | Consensus component and domain abstractions for ZQK Core. |
@@ -215,6 +216,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [tde](./tde/) | `github.com/zqk-os/zqk/pkg/tde` | 5+5 | 5 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |
 | [tdval](./tdval/) | `github.com/zqk-os/zqk/pkg/tdval` | 1+2 | 2 | - | ❌ - | Test-driven validation engines, acceptance criteria gates, and verification suites. |
 | [telemetry](./telemetry/) | `github.com/zqk-os/zqk/pkg/telemetry` | 10+10 | 10 | llmtranscript | ✅ [README](./telemetry/README.md) | This package provides telemetry tracking, diagnostics hooks, and daemon synchronization capabilities to monitor Knowledge Kerne... |
+| [teleology](./teleology/) | `github.com/zqk-os/zqk/pkg/teleology` | 2+1 | 1 | - | ❌ - | Teleology component and domain abstractions for ZQK Core. |
 | [testdiscovery](./testdiscovery/) | `github.com/zqk-os/zqk/pkg/testdiscovery` | 7+9 | 9 | - | ❌ - | Automated discovery of unit, integration, and criteria-linked test targets across Go, Python, and TypeScript. |
 | [testdrive](./testdrive/) | `github.com/zqk-os/zqk/pkg/testdrive` | 3+1 | 1 | - | ❌ - | Testdrive component and domain abstractions for ZQK Core. |
 | [testenvroot](./testenvroot/) | `github.com/zqk-os/zqk/pkg/testenvroot` | 4+6 | 6 | - | ❌ - | A minimal test project layout (.zqk/process + test-settings) without importing pkg/testing (import-cycle hygiene for packages l... |
@@ -281,6 +283,7 @@ pkg/
 ├── aliases/          # Command and object alias resolution, shorthand mapping, and 
 ├── ambience/          # Background ambient intelligence, contextual awareness, and e
 ├── ambient/          # Filesystem watcher daemon, ambient change detection, and rea
+├── antigaming/          # Antigaming component and domain abstractions for ZQK Core.
 ├── appledouble/          # Sanitization and handling of AppleDouble and macOS resource 
 ├── architecture/          # Codebase architectural boundaries, layering rules, and stati
 ├── audit/          # High-volume audit log streaming, event persistence, and vali
@@ -583,6 +586,7 @@ pkg/
 ├── tdval/          # Test-driven validation engines, acceptance criteria gates, a
 ├── telemetry/          # This package provides telemetry tracking, diagnostics hooks,
 │   └── llmtranscript/
+├── teleology/          # Teleology component and domain abstractions for ZQK Core.
 ├── testdiscovery/          # Automated discovery of unit, integration, and criteria-linke
 ├── testdrive/          # Testdrive component and domain abstractions for ZQK Core.
 ├── testenvroot/          # A minimal test project layout (.zqk/process + test-settings)

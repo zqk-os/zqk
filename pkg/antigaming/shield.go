@@ -48,16 +48,7 @@ type AntiGamingReport struct {
 
 // CalculateAntiGamingShield analyzes work items for strategic breadth and anti-gaming compliance.
 func CalculateAntiGamingShield(items []map[string]any, cfg ShieldConfig) *AntiGamingReport {
-	if cfg.LeafSaturationLimit <= 0 {
-		cfg.LeafSaturationLimit = 5
-	}
-	if cfg.ExternalFrontierBonus <= 0 {
-		cfg.ExternalFrontierBonus = 1.25
-	}
-	if len(cfg.ExternalFrontierPrefixes) == 0 {
-		cfg = DefaultShieldConfig()
-	}
-
+	cfg = normalizeShieldConfig(cfg)
 	report := &AntiGamingReport{
 		DomainDistribution:     make(map[string]int),
 		ExternalFrontierWeight: 1.0,
@@ -70,6 +61,37 @@ func CalculateAntiGamingShield(items []map[string]any, cfg ShieldConfig) *AntiGa
 		return report
 	}
 
+	externalCount, totalLocs := collectDomainDistributions(items, cfg, report.DomainDistribution)
+
+	// 1. Calculate Domain Diversity Score
+	report.DomainDiversityScore = calculateDomainDiversity(len(items), report.DomainDistribution)
+
+	// 2. Leaf Saturation & Diminishing Marginal Returns Calculation
+	calculateSaturationPenalty(report, cfg)
+
+	// 3. External Integration Frontier Weighting & Mathematical Silo Detection
+	calculateFrontierWeighting(report, len(items), totalLocs, externalCount, cfg)
+
+	// 4. Strategic Capability Breadth Index computation
+	computeBreadthIndex(report, len(items))
+
+	return report
+}
+
+func normalizeShieldConfig(cfg ShieldConfig) ShieldConfig {
+	if cfg.LeafSaturationLimit <= 0 {
+		cfg.LeafSaturationLimit = 5
+	}
+	if cfg.ExternalFrontierBonus <= 0 {
+		cfg.ExternalFrontierBonus = 1.25
+	}
+	if len(cfg.ExternalFrontierPrefixes) == 0 {
+		return DefaultShieldConfig()
+	}
+	return cfg
+}
+
+func collectDomainDistributions(items []map[string]any, cfg ShieldConfig, dist map[string]int) (int, int) {
 	externalFrontierCount := 0
 	totalCodeLocations := 0
 
@@ -77,9 +99,8 @@ func CalculateAntiGamingShield(items []map[string]any, cfg ShieldConfig) *AntiGa
 		locs := extractLocations(item)
 		totalCodeLocations += len(locs)
 
-		domains := extractItemDomains(item, locs)
-		for _, d := range domains {
-			report.DomainDistribution[d]++
+		for _, d := range extractItemDomains(item, locs) {
+			dist[d]++
 		}
 
 		for _, l := range locs {
@@ -89,27 +110,27 @@ func CalculateAntiGamingShield(items []map[string]any, cfg ShieldConfig) *AntiGa
 			}
 		}
 	}
+	return externalFrontierCount, totalCodeLocations
+}
 
-	// 1. Calculate Domain Diversity Score
-	uniqueDomains := len(report.DomainDistribution)
+func calculateDomainDiversity(itemCount int, dist map[string]int) float64 {
+	uniqueDomains := len(dist)
 	if uniqueDomains == 0 {
 		uniqueDomains = 1
 	}
-	// Scale domain diversity: target at least 2 distinct domains for healthy breadth in larger sets
-	diversityRatio := float64(uniqueDomains) / math.Max(1.0, math.Min(5.0, float64(len(items))))
+	diversityRatio := float64(uniqueDomains) / math.Max(1.0, math.Min(5.0, float64(itemCount)))
 	if diversityRatio > 1.0 {
 		diversityRatio = 1.0
 	}
-	report.DomainDiversityScore = math.Round(diversityRatio*100) / 100
+	return math.Round(diversityRatio*100) / 100
+}
 
-	// 2. Leaf Saturation & Diminishing Marginal Returns Calculation
+func calculateSaturationPenalty(report *AntiGamingReport, cfg ShieldConfig) {
 	totalSaturationPenalty := 0.0
 	for domain, count := range report.DomainDistribution {
 		if count > cfg.LeafSaturationLimit {
 			report.SaturatedDomains = append(report.SaturatedDomains, domain)
 			excess := float64(count - cfg.LeafSaturationLimit)
-			// Logarithmic diminishing returns penalty:
-			// higher saturation leads to proportionally higher penalty on marginal yield
 			penalty := math.Log2(1.0+excess) / 10.0
 			totalSaturationPenalty += penalty
 		}
@@ -123,20 +144,20 @@ func CalculateAntiGamingShield(items []map[string]any, cfg ShieldConfig) *AntiGa
 		report.LeafSaturationPenalty = math.Round(totalSaturationPenalty*100) / 100
 		report.Warnings = append(report.Warnings, "Diminishing returns applied due to domain saturation: "+strings.Join(report.SaturatedDomains, ", "))
 	}
+}
 
-	// 3. External Integration Frontier Weighting & Mathematical Silo Detection
-	if totalCodeLocations > 0 && externalFrontierCount == 0 {
-		// 100% of code locations touch internal leaf/pure-math modules with zero external frontier call paths
+func calculateFrontierWeighting(report *AntiGamingReport, itemCount, totalLocs, externalCount int, cfg ShieldConfig) {
+	if totalLocs > 0 && externalCount == 0 {
 		report.MathematicalSiloDetected = true
 		report.Status = "WARNING"
 		report.Warnings = append(report.Warnings, "Mathematical silo detected: zero call paths to external integration frontier (network, storage, CLI, or adapters)")
-	} else if externalFrontierCount > 0 {
-		frontierRatio := float64(externalFrontierCount) / float64(len(items))
+	} else if externalCount > 0 {
+		frontierRatio := float64(externalCount) / float64(itemCount)
 		report.ExternalFrontierWeight = math.Round((1.0+(frontierRatio*(cfg.ExternalFrontierBonus-1.0)))*100) / 100
 	}
+}
 
-	// 4. Strategic Capability Breadth Index computation
-	// Breadth = (Diversity * FrontierWeight) - SaturationPenalty
+func computeBreadthIndex(report *AntiGamingReport, itemCount int) {
 	breadth := (report.DomainDiversityScore * report.ExternalFrontierWeight) - report.LeafSaturationPenalty
 	if report.MathematicalSiloDetected {
 		breadth *= 0.5
@@ -149,11 +170,9 @@ func CalculateAntiGamingShield(items []map[string]any, cfg ShieldConfig) *AntiGa
 	}
 	report.StrategicCapabilityBreadthIndex = math.Round(breadth*100) / 100
 
-	if report.MathematicalSiloDetected && len(items) >= 3 {
+	if report.MathematicalSiloDetected && itemCount >= 3 {
 		report.Status = "BLOCKED"
 	}
-
-	return report
 }
 
 func extractLocations(item map[string]any) []string {
@@ -173,8 +192,8 @@ func extractLocations(item map[string]any) []string {
 func extractItemDomains(item map[string]any, locs []string) []string {
 	domains := make(map[string]bool)
 
-	if cat, ok := item[objects.FieldKeyCategory].(string); ok && strings.TrimSpace(cat) != "" {
-		domains[strings.TrimSpace(cat)] = true
+	if cat := strings.TrimSpace(objects.GetString(item, objects.FieldKeyCategory)); cat != "" {
+		domains[cat] = true
 	}
 
 	if comps, ok := item[objects.FieldKeyComponents].([]any); ok {
