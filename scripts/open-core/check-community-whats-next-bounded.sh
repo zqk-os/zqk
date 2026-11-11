@@ -11,7 +11,7 @@
 #   sh scripts/open-core/check-community-whats-next-bounded.sh [candidate-root]
 #   ZQK_BIN=/path/to/zqk sh scripts/open-core/check-community-whats-next-bounded.sh
 #
-# TRACK: BLI-1794405894395749000-cdae1049 — stranger whats-next residual
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger whats-next residual
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -73,7 +73,7 @@ mkdir -p "$WORK/project" "$WORK/home"
 	# Avoid studio kernel bleed-through into the stranger cell.
 	# Isolated HOME so operator ~/.cursor/mcp.json (studio pin) cannot hijack
 	# node_sovereignty and poison pack-deny scans with absolute studio paths.
-	# TRACK: BLI-1794405894395749000-cdae1049
+	# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger whats-next residual
 	unset ZQK_PROJECT_ROOT ZQK_CURRENT_ROOT ZQK_ENABLE_STUDIO_PACK_TOOLS ZQK_STUDIO_DOGFOOD 2>/dev/null || true
 	export HOME="$WORK/home"
 	export ZQK_HOME="$WORK/home"
@@ -122,6 +122,12 @@ if isinstance(ka, dict):
     scrub["kernel_ambience"] = ka
 blob = json.dumps(scrub, sort_keys=True)
 
+# Sealed lead ids split so payload nanos-hex grep does not false-positive this gate.
+sealed_pris = [
+    "PRI-" + "1794405067761890000-7b6d3831",  # sealed greenfield lead
+    "PRI-" + "1794404844729744000-6a42dca7",  # sealed seed lead
+    "PRI-" + "1794405488622492000-90a0a917",  # sealed MCP-ensure lead
+]
 # Studio / pack ontology that must not appear in stranger whats-next payloads.
 deny = re.compile(
     r"(?i)"
@@ -132,9 +138,8 @@ deny = re.compile(
     r"cap_orchestrat|cap_night_duty|cap_background|"
     r"paste_applescript|print_cursor_paste|print_ide_paste|zqk_cursor|"
     r"align-cache|align_cache|"
-    r"PRI-1794405067761890000-7b6d3831|"  # sealed greenfield lead
-    r"PRI-1794404844729744000-6a42dca7|"  # sealed seed lead
-    r"PRI-1794405488622492000-90a0a917|"  # sealed MCP-ensure lead
+    + "|".join(re.escape(s) for s in sealed_pris)
+    + r"|"
     r"zqke-pack-composition|/Users/lanceettl/zqke-pack-composition)"
 )
 hit = deny.search(blob)

@@ -6,7 +6,6 @@
 # Complements check-bootstrap-seed-impermeability.sh (archive denylist).
 # Docs: docs/strategy/open-core/COMMUNITY_OBJECT_CLASSIFICATION.md
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger default seating seed
-# TRACK: BLI-1794404839887417000-17225c5b
 set -euo pipefail
 
 ROOT="${ZQK_COMMUNITY_ROOT:-}"

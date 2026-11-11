@@ -127,7 +127,7 @@ if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ] && \
 fi
 
 # Default seating seed stranger-clean (no pack ontology leakage in personas/skills).
-# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — BLI-1794404839887417000-17225c5b
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger default seating seed
 SEATING_SMOKE=""
 if [ -f "$ROOT/scripts/open-core/community-seed-default-seating-smoke.sh" ]; then
   SEATING_SMOKE="$ROOT/scripts/open-core/community-seed-default-seating-smoke.sh"
@@ -152,7 +152,7 @@ if [ -f "$ROOT/scripts/open-core/check-community-session-paging.sh" ] && \
 fi
 
 # Bounded stranger whats-next: community starter plan only, no pack ontology leakage.
-# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — BLI-1794405894395749000-cdae1049
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger whats-next residual
 WN_BOUNDED=""
 if [ -f "$ROOT/scripts/open-core/check-community-whats-next-bounded.sh" ]; then
   WN_BOUNDED="$ROOT/scripts/open-core/check-community-whats-next-bounded.sh"
