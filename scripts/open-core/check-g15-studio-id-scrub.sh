@@ -1,6 +1,8 @@
 #!/bin/sh
-# G15: non-test product Go must not embed live studio kernel IDs (long form).
-# Aligns with sync-public-candidate.sh scrub pattern. Tests may still cite CRIT/BLI in comments.
+# G15: product Go must not embed live studio kernel IDs (long form).
+# Scope: pkg/** and cmd/zqk*/** non-test *.go (product contracts).
+# Pattern matches sync-public-candidate.sh scrub (incl. POL-*).
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE G15
 set -eu
 ROOT=${1:-}
 if [ -z "$ROOT" ]; then
@@ -18,13 +20,16 @@ for p in pkg cmd/zqk cmd/zqk-community; do
 done
 [ -n "$PATHS" ] || { say "FAIL: no product Go trees"; exit 1; }
 
-HITS=$(rg -n --glob '*.go' --glob '!*_test.go' \
-  -e '(BLI|REQ|DEC|PRI|ATK|CRIT|TEST|GOAL|CVS|POL)-[0-9]{13,}-[a-f0-9]{6,}' \
-  $PATHS 2>/dev/null || true)
+# Long-form studio CAS IDs only (not symbolic POL-WORKFLOW-VDS product names).
+ID_PAT='(BLI|REQ|DEC|PRI|ATK|CRIT|TEST|GOAL|CVS|POL)-[0-9]{13,}-[a-f0-9]{6,}'
+
+HITS=$(rg -n --glob '*.go' --glob '!*_test.go' -e "$ID_PAT" $PATHS 2>/dev/null || true)
 
 if [ -n "$HITS" ]; then
   say "FAIL: studio kernel IDs present in non-test product Go:"
   say "$HITS" | head -40
+  count=$(printf '%s\n' "$HITS" | wc -l | tr -d ' ')
+  say "(showing up to 40 of $count hits)"
   exit 1
 fi
 say "G15 STUDIO-ID SCRUB: PASS"

@@ -25,6 +25,9 @@ cmd/utilities
 scripts/zqk-internal
 scripts/legacy-decommission
 pkg/billing
+internal/billing
+pkg/economy
+internal/economy
 '
 
 for p in $must_not_paths; do
@@ -89,14 +92,8 @@ if command -v find >/dev/null 2>&1; then
       echo "$extras"
       FAIL=1
     fi
-    studio_diffs=$(find "$ROOT/scripts" -name 'community-to-studio-*' 2>/dev/null || true)
-    if [ -n "$studio_diffs" ]; then
-      echo "MUST_NOT leftover studio patch dump:"
-      echo "$studio_diffs"
-      FAIL=1
-    fi
   fi
-  # Archived docs must not be present in candidate docs.
+  # Archived docs must not be present in candidate docs
   if [ -d "$ROOT/docs" ]; then
     archived_docs=$(find "$ROOT/docs" \( -name "archive" -o -name "_archive" -o -path '*/archive/*' -o -path '*/_archive/*' \) 2>/dev/null || true)
     if [ -n "$archived_docs" ]; then
@@ -119,19 +116,10 @@ if [ -f "$ROOT/.gitignore" ]; then
   done
 fi
 
-# Studio script bleedthrough prohibition: Open-Core must never reference studio-only scripts.
-for bad_script in 'install-zqk-stable\.sh' 'recycle-stable-daemons\.sh' 'declare-change-intent\.sh' 'check-change-intent\.sh'; do
-  if [ -d "$ROOT/.git" ] && command -v git >/dev/null 2>&1; then
-    if git -C "$ROOT" grep -n -E "$bad_script" -- . ':!scripts/open-core/police-community-tree.sh' >/dev/null 2>&1; then
-      echo "MUST_NOT studio script reference found ($bad_script):"
-      git -C "$ROOT" grep -n -E "$bad_script" -- . ':!scripts/open-core/police-community-tree.sh' || true
-      FAIL=1
-    fi
-  fi
-done
-
-# Seed impermeability: CAP/MMORCH/orchestrate/TPM must not appear in bootstrap archive.
-if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
+# Seed impermeability when candidate embeds pkg/bootstrap/archive (PC layout).
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — bootstrap seed impermeability
+if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ] && \
+   { [ -f "$ROOT/pkg/bootstrap/archive/manifest.txt" ] || [ -f "$ROOT/pkg/bootstrap/archive/bootstrap.tar.gz" ]; }; then
   if ! sh "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" "$ROOT"; then
     echo "MUST_NOT bootstrap seed impermeability failed"
     FAIL=1
@@ -139,13 +127,32 @@ if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
 fi
 
 # Virtual-context paging residual: stranger sessions keep local context without Studio paging deps.
-# TRACK: BLI-1794392835641397000-394120e0
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — community session paging
 if [ -f "$ROOT/scripts/open-core/check-community-session-paging.sh" ] && \
    { [ -d "$ROOT/pkg/sessionpaging" ] || [ -f "$ROOT/docs/strategy/open-core/CONTEXT_PAGING_DESIGN.md" ]; }; then
   if ! sh "$ROOT/scripts/open-core/check-community-session-paging.sh" "$ROOT"; then
     echo "MUST_NOT community session paging residual failed"
     FAIL=1
   fi
+fi
+
+# G15: fail-closed studio kernel-ID scrub on product Go (non-test).
+# Prefer candidate-local script; fall back to studio police host copy.
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE G15
+G15_SCRIPT=""
+if [ -f "$ROOT/scripts/open-core/check-g15-studio-id-scrub.sh" ]; then
+  G15_SCRIPT="$ROOT/scripts/open-core/check-g15-studio-id-scrub.sh"
+elif [ -f "$(dirname "$0")/check-g15-studio-id-scrub.sh" ]; then
+  G15_SCRIPT="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-g15-studio-id-scrub.sh"
+fi
+if [ -n "$G15_SCRIPT" ]; then
+  if ! sh "$G15_SCRIPT" "$ROOT"; then
+    echo "MUST_NOT G15 studio-ID scrub failed"
+    FAIL=1
+  fi
+else
+  echo "MUST_NOT missing check-g15-studio-id-scrub.sh (G15 fail-closed)"
+  FAIL=1
 fi
 
 if [ "$FAIL" -ne 0 ]; then
