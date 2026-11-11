@@ -13,7 +13,6 @@
 #   ZQK_BIN=/path/to/zqk sh scripts/open-core/check-community-doctor-bounded.sh
 #
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger doctor residual
-# TRACK: BLI-1794414873240313500-8bf29b97 — doctor smoke honesty after archive/COMMS
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -180,6 +179,7 @@ sealed_pris = [
     "PRI-" + "1794414492536041000-532f5365",  # sealed archive residual
     "PRI-" + "1794413974482357000-9876ca42",  # sealed feed/COMMS residual
     "PRI-" + "1794408540878556000-de9a91f3",  # sealed prior doctor residual
+    "PRI-" + "1794421149879909000-9915d25e",  # sealed doctor residual follow-on after launch-gate
     "PRI-" + "1794405067761890000-7b6d3831",  # sealed greenfield lead
     "PRI-" + "1794404844729744000-6a42dca7",  # sealed seed lead
 ]
