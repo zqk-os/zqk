@@ -11,6 +11,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+const (
+	checkIDTopicBudget    = "doc/topic_character_budget"
+	checkIDKernelIDLeak   = "doc/kernel_id_leak"
+	checkIDCycleNarrative = "doc/cycle_narrative_leak"
+	checkIDBadAcronym     = "doc/contradictory_acronym"
+	suiteDocs             = "docs"
+)
+
 var (
 	// Leaked project-specific kernel ID pattern (e.g. BLI-1793550036532835000-d003a18d)
 	kernelIDRegex = regexp.MustCompile(`\b(BLI|REQ|PRI|TST|CRIT|GOAL|MIL|ACC)-179\d{16}-[0-9a-f]{8}\b`)
@@ -98,7 +106,10 @@ func CheckDocumentationQuality(root string, cfg *GatesConfig) ([]Finding, error)
 			return nil
 		}
 
-		relPath, _ := filepath.Rel(root, path)
+		relPath, relErr := filepath.Rel(root, path)
+		if relErr != nil {
+			return nil
+		}
 		relPathSlash := filepath.ToSlash(relPath)
 
 		if isPathExempt(relPathSlash, exemptions) {
@@ -154,8 +165,8 @@ func checkTopicCharacterBudgets(file, content string, maxChars int) []Finding {
 		introLen := len(strings.TrimSpace(sections[0]))
 		if introLen > maxChars {
 			findings = append(findings, Finding{
-				CheckID:  "doc/topic_character_budget",
-				Suite:    "docs",
+				CheckID:  checkIDTopicBudget,
+				Suite:    suiteDocs,
 				File:     file,
 				Line:     1,
 				Message:  fmt.Sprintf("Introduction topic exceeds character budget (%d > %d characters)", introLen, maxChars),
@@ -171,8 +182,8 @@ func checkTopicCharacterBudgets(file, content string, maxChars int) []Finding {
 			bodyLen := len(sectionBody)
 			if bodyLen > maxChars {
 				findings = append(findings, Finding{
-					CheckID:  "doc/topic_character_budget",
-					Suite:    "docs",
+					CheckID:  checkIDTopicBudget,
+					Suite:    suiteDocs,
 					File:     file,
 					Line:     1,
 					Message:  fmt.Sprintf("Topic '## %s' exceeds character budget (%d > %d characters)", sectionTitle, bodyLen, maxChars),
@@ -185,74 +196,68 @@ func checkTopicCharacterBudgets(file, content string, maxChars int) []Finding {
 	return findings
 }
 
-func checkKernelIDLeaks(file, content string) []Finding {
+func scanDocumentLines(content string, handler func(lineNum int, line string) []Finding) []Finding {
 	var findings []Finding
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	lineNum := 0
-	inCodeBlock := false
-
 	for scanner.Scan() {
 		lineNum++
-		line := scanner.Text()
+		if res := handler(lineNum, scanner.Text()); len(res) > 0 {
+			findings = append(findings, res...)
+		}
+	}
+	return findings
+}
+
+func checkKernelIDLeaks(file, content string) []Finding {
+	inCodeBlock := false
+	return scanDocumentLines(content, func(lineNum int, line string) []Finding {
+		var lineFindings []Finding
 		trimmed := strings.TrimSpace(line)
 
 		if strings.HasPrefix(trimmed, "```") {
 			inCodeBlock = !inCodeBlock
-			continue
+			return nil
 		}
 
-		// Exempt schema example code or generic mock ids
 		if inCodeBlock && (strings.Contains(trimmed, "yaml") || strings.Contains(trimmed, "json")) {
-			continue
+			return nil
 		}
 
 		matches := kernelIDRegex.FindAllString(line, -1)
 		for _, m := range matches {
-			findings = append(findings, Finding{
-				CheckID:  "doc/kernel_id_leak",
-				Suite:    "docs",
+			lineFindings = append(lineFindings, Finding{
+				CheckID:  checkIDKernelIDLeak,
+				Suite:    suiteDocs,
 				File:     file,
 				Line:     lineNum,
 				Message:  fmt.Sprintf("Leaked project-specific kernel ID '%s' in public documentation", m),
 				Severity: SeverityError,
 			})
 		}
-	}
-
-	return findings
+		return lineFindings
+	})
 }
 
 func checkCycleNarratives(file, content string) []Finding {
-	var findings []Finding
-	scanner := bufio.NewScanner(strings.NewReader(content))
-	lineNum := 0
-
-	for scanner.Scan() {
-		lineNum++
-		line := scanner.Text()
+	return scanDocumentLines(content, func(lineNum int, line string) []Finding {
 		if cycleNarrativeRegex.MatchString(line) {
-			findings = append(findings, Finding{
-				CheckID:  "doc/cycle_narrative_leak",
-				Suite:    "docs",
+			return []Finding{{
+				CheckID:  checkIDCycleNarrative,
+				Suite:    suiteDocs,
 				File:     file,
 				Line:     lineNum,
 				Message:  fmt.Sprintf("Internal cycle sprint narrative leaked in public documentation: %q", strings.TrimSpace(line)),
 				Severity: SeverityError,
-			})
+			}}
 		}
-	}
-
-	return findings
+		return nil
+	})
 }
 
 func checkAcronymConsistency(file, content string, canonical map[string]string) []Finding {
-	var findings []Finding
-	scanner := bufio.NewScanner(strings.NewReader(content))
-	lineNum := 0
-
-	for scanner.Scan() {
-		lineNum++
-		line := scanner.Text()
+	return scanDocumentLines(content, func(lineNum int, line string) []Finding {
+		var lineFindings []Finding
 		lineLower := strings.ToLower(line)
 
 		for acr, contradictions := range knownAcronymContradictions {
@@ -262,9 +267,9 @@ func checkAcronymConsistency(file, content string, canonical map[string]string) 
 			for _, c := range contradictions {
 				if strings.Contains(lineLower, c) {
 					canon := canonical[acr]
-					findings = append(findings, Finding{
-						CheckID:  "doc/contradictory_acronym",
-						Suite:    "docs",
+					lineFindings = append(lineFindings, Finding{
+						CheckID:  checkIDBadAcronym,
+						Suite:    suiteDocs,
 						File:     file,
 						Line:     lineNum,
 						Message:  fmt.Sprintf("Contradictory acronym definition for %s: found %q, canonical is %q", acr, c, canon),
@@ -273,7 +278,6 @@ func checkAcronymConsistency(file, content string, canonical map[string]string) 
 				}
 			}
 		}
-	}
-
-	return findings
+		return lineFindings
+	})
 }
