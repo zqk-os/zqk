@@ -433,18 +433,19 @@ func registerCommands() {
 	completionCmd.GroupID = "integrations"
 	rootCmd.AddCommand(completionCmd)
 
-	// Pack ontology CLI (pplan getters + agent/CAP/MMORCH orchestrate discovery):
+	// Priority plan shortcuts (pplan add/remove/current/next/prev):
 	// stranger/community default excludes — same opt-in as MCP IsStudioPackToolsEnabled.
 	// TRACK: stranger-cli-surface (open-core)
 	if shouldRegisterStudioPackCLI() {
 		pplanCmdInst := object.NewPPlanCmd()
 		pplanCmdInst.GroupID = "everyday"
 		rootCmd.AddCommand(pplanCmdInst)
-
-		agentCmdInst := agent.NewAgentCmd()
-		agentCmdInst.GroupID = "advanced"
-		rootCmd.AddCommand(agentCmdInst)
 	}
+
+	// Multi-agent orchestration
+	agentCmdInst := agent.NewAgentCmd()
+	agentCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(agentCmdInst)
 
 	// Live kernel state tree and mutation journal
 	stateCmdInst := state.NewStateCmd()
