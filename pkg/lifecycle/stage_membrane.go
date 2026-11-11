@@ -150,6 +150,10 @@ func PlanStageMembraneHop(
 	for _, id := range seedIDs {
 		seedSet[strings.TrimSpace(id)] = true
 	}
+	// Complete sibling plans discovered from BLI.priority_plan_ref during an
+	// archive walk. Applied into seedSet before includeAsMember so lineage
+	// kinds hop even if they were loaded before the co-seed mark.
+	archiveCoSeeds := make(map[string]bool)
 
 	type pendingID struct {
 		id       string
@@ -237,6 +241,35 @@ func PlanStageMembraneHop(
 			policy = ResolveShockwavePolicy(nil, from, toStatus)
 		}
 
+		// Archive burrito: BLIs pulled in via a shared REQ/CRIT cluster may still
+		// point at a *different* complete priority_plan. Co-seed only complete
+		// parents (not live, not already-archived) so includeAsMember admits the
+		// lineage kind and rejectArchivedBacklogUnderLivePlan does not freeze a
+		// complete↔complete deadlock. Live parents still fail closed; archived
+		// parents stay lineage trunks.
+		// Dual-complete PRI archive membrane resolution.
+		if strings.EqualFold(toStatus, objects.ObjectStatusArchived) &&
+			strings.EqualFold(kind, objects.KindBacklogItem) {
+			if planRef := strings.TrimSpace(objects.GetString(obj, objects.FieldKeyPriorityPlanRef)); planRef != emptyValue {
+				planObj := loaded[planRef]
+				if planObj == nil && reader != nil {
+					if got, err := reader.Read(ctx, secCtx, planRef); err == nil && got != nil {
+						planObj = got
+						loaded[planRef] = got
+					}
+				}
+				if planObj != nil {
+					planSt, _ := planObj[objects.FieldKeyStatus].(string)
+					planSt = strings.ToLower(strings.TrimSpace(planSt))
+					if planSt == objects.ObjectStatusComplete || planSt == objects.ObjectStatusCompleted {
+						archiveCoSeeds[planRef] = true
+						seedSet[planRef] = true
+						enqueue(planRef, true)
+					}
+				}
+			}
+		}
+
 		noteLineageParents(obj, policy, lineageParentIDs, seedSet)
 		expandShockwave(item.id, kind, obj, policy, seedSet[item.id], dependents, enqueue)
 	}
@@ -257,6 +290,9 @@ func PlanStageMembraneHop(
 		obj := loaded[id]
 		kind, _ := obj[objects.FieldKeyKind].(string)
 		kind = strings.TrimSpace(kind)
+		if archiveCoSeeds[id] {
+			seedSet[id] = true
+		}
 		if !includeAsMember(id, kind, seedSet, seedKind, policy) {
 			if !seedSet[id] && (policy.IsLineageKind(kind) || policy.Mode == objects.ShockwaveModeShared) {
 				lineageParentIDs[id] = true
