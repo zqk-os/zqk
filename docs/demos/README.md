@@ -2,6 +2,8 @@
 
 > **Principle:** Agents manage the work. ZQK enforces the physics.
 
+**Procurement / 60-second smoke:** [SIXTY_SECOND_CAPABILITY.md](./SIXTY_SECOND_CAPABILITY.md) — concrete commands a buyer can run in ~60s.
+
 The demonstrations in `scripts/demos/` showcase the core architectural guarantees of the **Zen Quantum Kernel (ZQK)**. Unlike conventional AI coding tools where agent memory is volatile, execution state is lost on crashes, and security is left to LLM prompt compliance, ZQK operates as a **durable, cellular operating system and knowledge kernel**.
 
 Every demo in this suite performs **100% authentic operations** against the live kernel, with zero simulated mocks.
