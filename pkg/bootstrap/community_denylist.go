@@ -7,7 +7,7 @@ import "strings"
 // entry paths. Covers CAP/MMORCH/orchestrate/TPM operator ontology that must not land
 // in a stranger init seed.
 //
-// TRACK: BLI-1794356846362471000-b781465c — keep CI script scripts/open-core/check-bootstrap-seed-impermeability.sh in sync when extending.
+// Keep CI script scripts/open-core/check-bootstrap-seed-impermeability.sh in sync when extending.
 var communityBootstrapDenylist = []string{
 	"print_cursor_paste_applescript",
 	"print_ide_paste_applescript",

@@ -114,7 +114,6 @@ find "$STAGING" \( \
 
 # Seed impermeability scrub (community archive): drop CAP/MMORCH/orchestrate/TPM
 # operator ontology before embed. Fragments align with pkg/bootstrap/community_denylist.go.
-# TRACK: BLI-1794356846362471000-b781465c
 SEED_DENY_FRAGMENTS='
 print_cursor_paste_applescript
 print_ide_paste_applescript

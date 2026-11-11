@@ -115,7 +115,6 @@ func TestManifestPaths_EmbeddedArchive(t *testing.T) {
 
 // TestEmbeddedManifest_NoDenylistHits fails closed if the embedded init seed
 // still lists CAP/MMORCH/orchestrate/TPM operator ontology (seed impermeability).
-// TRACK: BLI-1794356846362471000-b781465c
 func TestEmbeddedManifest_NoDenylistHits(t *testing.T) {
 	t.Parallel()
 	paths := ManifestPaths()

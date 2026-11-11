@@ -9,8 +9,6 @@
 # Looks for pkg/bootstrap/archive/manifest.txt (preferred) or lists
 # pkg/bootstrap/archive/bootstrap.tar.gz. Fragments MUST stay aligned with
 # pkg/bootstrap/community_denylist.go (CommunityBootstrapDenylist).
-#
-# TRACK: BLI-1794356846362471000-b781465c
 set -eu
 
 ROOT=""

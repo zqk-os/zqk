@@ -182,7 +182,6 @@ if ! sh "$ROOT/scripts/open-core/police-community-tree.sh" "$ROOT"; then
 fi
 
 # Explicit seed impermeability (also invoked from police); keep as a named gate for CI clarity.
-# TRACK: BLI-1794356846362471000-b781465c
 if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
 	if ! sh "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" "$ROOT"; then
 		fail "bootstrap seed impermeability failed (CAP/MMORCH/orchestrate/TPM in init archive)"
