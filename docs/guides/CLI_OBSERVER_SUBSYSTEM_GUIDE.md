@@ -22,7 +22,7 @@ cmd/zqk/observer/
 ├── observer.go                                      # Root 'zqk observer' command builder, 'extract', and 'populate' subcommands
 ├── observer_test.go                                # Hierarchy and command structural verification
 ├── observer_extended_test.go                       # Base integration tests (isolated temp project execution, mock graph)
-└── observer_coverage_elevation_cycle99_test.go     # Cycle 99 comprehensive unit tests (flags, syntax warnings, event streaming)
+└── observer_coverage_elevation_cycle99_test.go     # Comprehensive unit tests (flags, syntax warnings, event streaming)
 
 pkg/observer/
 ├── extractor.go                                    # Extractor interface, ExtractResult, concurrent directory walker

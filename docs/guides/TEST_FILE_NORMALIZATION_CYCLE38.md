@@ -1,10 +1,10 @@
-# Repository Test File Normalization & Hygiene Migration (Cycle 38)
+# Repository Test File Normalization & Hygiene Migration 
 
 ## 1. Executive Summary
 
 During iterative coverage elevation cycles across the ZQK Knowledge Kernel (Cycles 11 through 35), test suites were authored into transiently named files matching `*_coverage_elevation_cycle<N>_test.go` and `*_cycle<N>_crit<M>_test.go`. While helpful during rapid sprint iterations for isolating new coverage assertions, retaining sprint cycle numbers in long-term repository filenames creates opaque indirection, hinders discoverability, and clutters the test taxonomy once test coverage baselines are permanently secured.
 
-This architectural guide documents the structural migration, canonical naming conventions, Three-Fold Verification Proof, and automated tooling delivered in Cycle 38 under **REQ-1793779110030263000-646a7780** and **PRI-1793779152046546000-4aa29d9f**.
+This architectural guide documents the structural migration, canonical naming conventions, Three-Fold Verification Proof, and automated tooling delivered in Cycle 38 under **REQ-001** and **PRI-001**.
 
 ---
 
@@ -56,12 +56,12 @@ The test suite in [`pkg/community/test_hygiene_cycle38_test.go`](../../pkg/commu
 
 ## 5. Knowledge Kernel Traceability
 
-- **Milestone**: `MIL-1793779146182730000-0aa5577d` (*Cycle 38: Repository Test File Normalization & Hygiene Migration*)
-- **Requirement**: `REQ-1793779110030263000-646a7780`
-- **Priority Plan**: `PRI-1793779152046546000-4aa29d9f`
-- **Test Case**: `TST-1793779121489789001-e75aee8b`
+- **Milestone**: `MIL-001` (*Cycle 38: Repository Test File Normalization & Hygiene Migration*)
+- **Requirement**: `REQ-001`
+- **Priority Plan**: `PRI-001`
+- **Test Case**: `TST-001`
 - **Backlog Items**:
-  - `BLI-1793779121489789500-d479b6dc` (Core Capability & Functional Delivery)
-  - `BLI-1793779121489790000-3f6097d7` (Boundary Validation & Error Recovery)
-  - `BLI-1793779121489790500-76fa9efb` (Architecture Specification & Conformance)
-- **Technical Debt**: `TDE-1793777516472794000-2118fc77`
+  - `BLI-001` (Core Capability & Functional Delivery)
+  - `BLI-001` (Boundary Validation & Error Recovery)
+  - `BLI-001` (Architecture Specification & Conformance)
+- **Technical Debt**: `TDE-001`

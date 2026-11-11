@@ -178,6 +178,6 @@ zqk agent recover --stale-threshold 1h --auto-rescue
 
 | Criterion ID | Category | Description | Verification Method |
 |--------------|----------|-------------|---------------------|
-| `CRIT-1792429379773841000-8a2e2413` | Acceptance | Elevate `cmd/zqk/agent` test statement coverage to $\ge 85.0\%$ | `go test -short -cover ./cmd/zqk/agent/...` |
-| `CRIT-1792429379773842000-ab3faebb` | Boundary | Validate edge cases, invalid flags, lease conflicts, worktree failures, and recovery paths | `cmd/zqk/agent/*_test.go` |
-| `CRIT-1792429379773843000-2983fedc` | Compliance | Comprehensive Agent Subsystem & Seating Guide authored and verified | `docs/guides/CLI_AGENT_SUBSYSTEM_AND_SEATING_GUIDE.md` |
+| `CRIT-001` | Acceptance | Elevate `cmd/zqk/agent` test statement coverage to $\ge 85.0\%$ | `go test -short -cover ./cmd/zqk/agent/...` |
+| `CRIT-001` | Boundary | Validate edge cases, invalid flags, lease conflicts, worktree failures, and recovery paths | `cmd/zqk/agent/*_test.go` |
+| `CRIT-001` | Compliance | Comprehensive Agent Subsystem & Seating Guide authored and verified | `docs/guides/CLI_AGENT_SUBSYSTEM_AND_SEATING_GUIDE.md` |

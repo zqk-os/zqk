@@ -200,7 +200,7 @@ The `pkg/filter` subsystem is designed for low-latency, concurrent execution wit
 
 The `pkg/filter` package is subject to strict automated verification invariants:
 
-- **Static Floor Invariant:** Statement test coverage must strictly remain $\ge 85.0\%$ (achieving $>99\%$ under Cycle 171 elevation).
+- **Static Floor Invariant:** Statement test coverage must strictly remain $\ge 85.0\%$ (achieving $>99\%$ under core verification).
 - **Zero Swallowed Errors:** All error paths and conversion failures are explicitly handled or returned.
 - **Modular Function Invariant:** All functional routines and test cases maintain $<100$ lines per block for cognitive clarity.
 - **Public Release Invariant:** Guides and source files are verified against the open-core release gates with zero nanosecond process identifiers.

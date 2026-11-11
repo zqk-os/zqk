@@ -206,7 +206,7 @@ Renders an aligned monospace table displaying code, full name, category, and bri
 CODE     FULL NAME             CATEGORY      DEFINITION
 -----------------------------------------------------------------------------------------------------------------------
 ACC      Actor / Context       architecture  System context or acting persona boundary...
-ATK      Adversarial Test Kit  assurance     Automated adversarial verification test suite...
+ATK      Agent Task            execution     A granular, autonomous unit of work assigned to and executed by an agent persona.
 BLI      Backlog Item          work          A discrete, tracked work package or deliverable...
 CAP      Continuous Autonomy   system        Autonomous looping and task execution engine...
 CAS      Content Addressable   architecture  Cryptographically hashed, immutable object store...
@@ -269,7 +269,7 @@ If a queried custom scheme contains no stored terms, the subsystem gracefully fa
 Statement test coverage for `cmd/zqk/explain` is strictly enforced:
 
 - **Baseline Floor Requirement**: `>= 85.0%` statement coverage.
-- **Cycle 106 Target Verified**: `>= 95.0%` statement coverage (`95.2%` achieved).
+- **Verification Standard Verified**: `>= 95.0%` statement coverage (`95.2%` achieved).
 - **Test Matrix (`cmd/zqk/explain/`)**:
   - `explain_test.go`: Core functional acceptance, dynamic glossary term discovery, and fuzzy boundary verification.
   - `explain_extended_test.go`: Flag combinations (`--sync`, `-f json`), multi-field table formatting, and security context initialization.

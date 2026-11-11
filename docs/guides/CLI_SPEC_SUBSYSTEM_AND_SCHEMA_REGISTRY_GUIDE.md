@@ -122,8 +122,8 @@ Introspects field definitions, data types, permissions, and validation rules for
 
 ## 4. Verification and Done-Gates
 
-Verification for the spec subsystem is codified in `TST-1792081516722975001-0952f45e` and fulfills the Three-Fold Proof:
+Verification for the spec subsystem is codified in `TST-001` and fulfills the Three-Fold Proof:
 
-1. **Static Floor Invariant (`CRIT-1792081516722975000-0bc7e96d`):** Statement test coverage in `cmd/zqk/spec` elevates to $\ge 90.0\%$ with all subcommands (`list`, `get`, `fields`, `NewSpecCmd`) exercising in-process execution paths across table, JSON, and YAML formats.
-2. **Operational Dynamic Proof (`CRIT-1792081516722976000-499ea52d`):** In-process test suites execute commands against isolated temporary projects, validating dual-source fallback, prefix normalization, raw vs. resolved traits, and deterministic error handling for non-existent kinds.
-3. **Negative Boundary & Architectural Conformance (`CRIT-1792081516722977000-a3ea1c87`):** Authoritative CLI guide `docs/guides/CLI_SPEC_SUBSYSTEM_AND_SCHEMA_REGISTRY_GUIDE.md` authored, cataloging command taxonomy, operational examples, and relational schema registry invariants.
+1. **Static Floor Invariant (`CRIT-001`):** Statement test coverage in `cmd/zqk/spec` elevates to $\ge 90.0\%$ with all subcommands (`list`, `get`, `fields`, `NewSpecCmd`) exercising in-process execution paths across table, JSON, and YAML formats.
+2. **Operational Dynamic Proof (`CRIT-001`):** In-process test suites execute commands against isolated temporary projects, validating dual-source fallback, prefix normalization, raw vs. resolved traits, and deterministic error handling for non-existent kinds.
+3. **Negative Boundary & Architectural Conformance (`CRIT-001`):** Authoritative CLI guide `docs/guides/CLI_SPEC_SUBSYSTEM_AND_SCHEMA_REGISTRY_GUIDE.md` authored, cataloging command taxonomy, operational examples, and relational schema registry invariants.

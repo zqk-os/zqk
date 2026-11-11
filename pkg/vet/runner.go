@@ -55,6 +55,9 @@ func (r *Runner) Run(opts RunOptions) (*Report, error) {
 			suite = "tree_police"
 		case "payload":
 			findings, err = CheckPayload(r.Root, r.Config)
+		case "docs", "doc_scrutiny":
+			findings, err = CheckDocumentationQuality(r.Root, r.Config)
+			suite = "docs"
 		default:
 			return nil, fmt.Errorf("unknown vet suite: %s", suite)
 		}
@@ -189,13 +192,13 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 
 func (r *Runner) normalizeSuites(suites []string) []string {
 	if len(suites) == 0 {
-		return []string{"hygiene", "tree_police", "payload"}
+		return []string{"hygiene", "tree_police", "payload", "docs"}
 	}
 	var res []string
 	for _, s := range suites {
 		s = strings.TrimSpace(strings.ToLower(s))
 		if s == "all" {
-			return []string{"hygiene", "tree_police", "payload"}
+			return []string{"hygiene", "tree_police", "payload", "docs"}
 		}
 		res = append(res, s)
 	}

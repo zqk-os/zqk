@@ -10,9 +10,9 @@ In the ZQK Knowledge Kernel, work prioritization operates across distinct ontolo
 1. **Strategic Contract Plane (`requirement`)**: Timeless feature contracts specifying what the system must deliver. Prioritization on requirements is expressed using relative urgency tiers: `p0`, `p1`, `p2`, `p3`.
 2. **Execution Delivery Plane (`backlog_item`)**: Atomic units of effort grouped within 1-cycle Priority Plans. Prioritization on backlog items is expressed using human-legible severity/urgency labels: `critical`, `high`, `medium`, `low`, paired with an ontological tier: `P0`, `P1`, `P2`, `P3`.
 
-Prior to this specification (resolved in **GH-928 / TDE-1793819986950218000-5c27bcb2**), differences between requirement priority strings (`p0`..`p3`) and backlog item priority strings (`critical`..`low`) caused friction during automated orchestration, bulk updates, and cross-object queries.
+Prior to this specification (resolved in **GH-928 / TDE-001**), differences between requirement priority strings (`p0`..`p3`) and backlog item priority strings (`critical`..`low`) caused friction during automated orchestration, bulk updates, and cross-object queries.
 
-Under **POL-DOC-001** and criteria **CRIT-1793968598478512000-1638f7af**, **CRIT-1793968601415990000-9fc4de65**, and **CRIT-1793968604958619000-c1329de3**, this guide establishes:
+Under **POL-DOC-001** and criteria **CRIT-001**, **CRIT-001**, and **CRIT-001**, this guide establishes:
 - The authoritative bidirectional mapping between requirement tiers and backlog item labels.
 - The operational normalization and coercion engine in `pkg/objects` and `pkg/validation`.
 - Fail-closed negative boundary rejection for invalid priority literals.
@@ -127,11 +127,11 @@ Field priority must be one of: p0, p1, p2, p3, critical, high, medium, low
 
 This specification is verified by automated test suites satisfying the three-fold proof:
 
-1. **Static Invariant Proof (`CRIT-1793968598478512000-1638f7af`)**:
+1. **Static Invariant Proof (`CRIT-001`)**:
    - Verified by this specification: `docs/guides/PRIORITY_ENUM_PARITY.md`.
-2. **Operational Dynamic Proof (`CRIT-1793968601415990000-9fc4de65`)**:
+2. **Operational Dynamic Proof (`CRIT-001`)**:
    - `pkg/validation/priority_enum_coercion_test.go:TestPriority_EnumCoercionAndParity`
    - Unit tests covering bidirectional coercion across requirements (`medium` -> `p2`) and backlog items (`p2` -> `medium`, `priority_tier: "P2"`).
    - Validation test confirming `zqk object update` compatibility for both kinds.
-3. **Negative Adversarial Boundary Proof (`CRIT-1793968604958619000-c1329de3`)**:
+3. **Negative Adversarial Boundary Proof (`CRIT-001`)**:
    - Tests asserting that literals `urgent`, `p4`, `unknown` fail with descriptive enum option errors.

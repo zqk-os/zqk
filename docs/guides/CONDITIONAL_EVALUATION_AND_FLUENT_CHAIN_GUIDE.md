@@ -218,7 +218,7 @@ The `pkg/when` subsystem is architected for zero-contention concurrent execution
 
 The `pkg/when` package conforms to mandatory quality standards:
 
-- **Static Floor Invariant:** Statement test coverage must strictly remain $\ge 85.0\%$ (achieving **100.0% statement coverage** under Cycle 172 elevation).
+- **Static Floor Invariant:** Statement test coverage must strictly remain $\ge 85.0\%$ (achieving **100.0% statement coverage** under core verification).
 - **Deterministic Execution:** Dynamic proof verification guarantees short-circuit sequencing, monadic error wrapping, and flow signal propagation behave predictably across all execution paths.
 - **Zero Swallowed Errors:** All error-returning branches must be explicitly asserted, verified, or returned (`_ = ...` is strictly banned).
 - **Cognitive Clarity:** All functional routines and test cases maintain $<100$ lines per block.

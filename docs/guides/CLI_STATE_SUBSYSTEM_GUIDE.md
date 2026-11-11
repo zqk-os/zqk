@@ -30,7 +30,7 @@ cmd/zqk/state/
 ├── tsdb_test.go                                   # TSDB flag and execution tests
 ├── stream_test.go                                 # Stream command tests
 ├── state_extended_test.go                         # Extended integration tests across all commands
-└── state_coverage_elevation_cycle110_test.go       # Cycle 110 comprehensive test suite (>= 85.0% coverage)
+└── state_coverage_elevation_cycle110_test.go       # Comprehensive test suite (>= 85.0% coverage)
 ```
 
 ---
@@ -208,7 +208,7 @@ To ensure system reliability, the ZQK project enforces strict architectural and 
 
 1. **Statement Coverage Floor (>= 85.0%)**:
    - The package `cmd/zqk/state` must maintain a minimum statement coverage of 85.0%.
-   - In Cycle 110, statement test coverage was elevated from 83.3% to **95.0%** via `state_coverage_elevation_cycle110_test.go`.
+   - Statement test coverage is maintained at **95.0%** via `state_coverage_elevation_cycle110_test.go`.
    - Covered surfaces include:
      - `buildStateTreePayload`: 100.0% coverage covering the full ontological cascade and requirement mapping.
      - `ReadRecentStreamMutations`: 97.5% coverage covering multi-category stream aggregation, fallback attribute extraction, and stamp-based caching.

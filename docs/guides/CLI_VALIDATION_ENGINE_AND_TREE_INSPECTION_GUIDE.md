@@ -41,7 +41,7 @@ Displays hierarchical tree of priority plans, goals, requirements, backlogs, and
 zqk validate tree
 
 # Inspect specific priority plan with custom depth
-zqk validate tree --priority-plan PRI-1792008359177241000-141f7d25 --depth 4
+zqk validate tree --priority-plan PRI-001 --depth 4
 ```
 
 ### `zqk validate workflow`
@@ -53,7 +53,7 @@ zqk validate workflow
 ### `zqk validate object`
 Validates schema conformance and machine hints for a specific object.
 ```bash
-zqk validate object BLI-1792008339820626500-98423dfa
+zqk validate object BLI-001
 ```
 
 ### `zqk validate matrix`

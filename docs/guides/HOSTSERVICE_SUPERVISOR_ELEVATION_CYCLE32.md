@@ -1,4 +1,4 @@
-# Host Service Supervisor & Ambient Subsystem Architecture (Cycle 32)
+# Host Service Supervisor & Ambient Subsystem Architecture 
 
 ## 1. Executive Summary
 This architectural specification details the hardening, supervision, and test coverage elevation past **85%** across two foundational systems in ZQK:

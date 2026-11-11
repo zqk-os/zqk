@@ -4,7 +4,7 @@
 
 In multi-core CI runners and high-concurrency swarms, asynchronous pipeline tests and connection pool tests often suffer from timing variance flakes when relying on wall-clock latency assumptions. Under heavy CPU load or virtualization preemption, a goroutine may experience arbitrary scheduling latency between context creation and operation execution, or take longer than microsecond/millisecond budgets.
 
-This guide codifies the core design patterns and timing invariants required across the ZQK Knowledge Kernel test suite under **REQ-1793954204281433000-6c6ecc84** (addressing `TDE-1793579295100762000-1d135d36` and `TDE-1793590071243358000-e9b17591`).
+This guide codifies the core design patterns and timing invariants required across the ZQK Knowledge Kernel test suite under **REQ-001** (addressing `TDE-001` and `TDE-001`).
 
 ---
 
