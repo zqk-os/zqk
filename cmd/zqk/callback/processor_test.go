@@ -60,20 +60,21 @@ func TestProcessor_Enqueue(t *testing.T) {
 	}
 
 	// Wait for processing
-	time.Sleep(200 * time.Millisecond)
-
-	// Verify log file was created and has content
-	if _, err := fileutil.Stat(logFile); fileutil.IsNotExist(err) {
-		t.Error("expected log file to be created")
-	}
-
-	content, err := fileutil.ReadFile(logFile)
-	if err != nil {
-		t.Fatalf("failed to read log file: %v", err)
+	var content []byte
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		if _, err := fileutil.Stat(logFile); err == nil {
+			bytes, err := fileutil.ReadFile(logFile)
+			if err == nil && len(bytes) > 0 {
+				content = bytes
+				break
+			}
+		}
+		time.Sleep(20 * time.Millisecond)
 	}
 
 	if len(content) == 0 {
-		t.Error("expected log file to have content")
+		t.Error("expected log file to be created and have content")
 	}
 }
 
