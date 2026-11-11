@@ -95,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - suite: core-kernel
@@ -223,6 +223,14 @@ jobs:
           name: shard-coverage-${{ matrix.suite }}
           path: coverage-${{ matrix.suite }}.out
           if-no-files-found: ignore
+
+      - name: Stage Status Notification
+        if: always()
+        run: |
+          echo "Stage Unit Tests (${{ matrix.suite }}) outcome: ${{ job.status }}"
+          if [ "${{ job.status }}" != "success" ]; then
+            echo "::error::Unit Test partition ${{ matrix.suite }} failed. Fail-fast active: terminating remaining matrix partitions to prevent runner waste."
+          fi
 
 
   consolidate-coverage:

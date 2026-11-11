@@ -35,6 +35,14 @@
 ## Continuous Autonomous Loop Discipline (Anti-Idleness Protocol)
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into `waiting_for_input` (idle), halting autonomous loop flow.
+- **Strict Anti-Polling Mandate (Zero Polling Timers):**
+  - Setting synthetic interval polling timers (e.g. `schedule DurationSeconds: 30/45/60` or sleeping in shell loops) while waiting for PR merges, CI pipelines, or background tasks is STRICTLY PROHIBITED.
+- **In-Flight Continuous Pipelining:**
+  - While CI or remote runners execute in the background, agents MUST continuously pipeline forward without pausing:
+    1. Shape and groom upcoming Knowledge Kernel objects (Milestone, Goal, Priority Plan, Requirements, Criteria, BLIs, Test Cases).
+    2. Audit and remediate non-functional items and technical debt (`zqk object list technical_debt`).
+    3. Author architectural decision records (`docs/architecture/ADR_*.md`) and register via `zqk new decision --cas` and `zqk docman register`.
+    4. Construct TDD test suites and AST-validated criteria ahead of branch checkout.
 - **Strict Post-Merge Self-Continuation Protocol:**
   1. Fetch and fast-forward local main to origin/main (`git fetch origin && git checkout main && git merge --ff-only origin/main`). Never branch off stale local main (enforced fail-closed by Gate 0b POL-WORKFLOW-003).
   2. Rebuild product binary & promote (`go build -o bin/zqk ./cmd/zqk && ./bin/zqk mcp ensure`).

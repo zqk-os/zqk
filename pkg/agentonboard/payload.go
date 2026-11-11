@@ -41,6 +41,7 @@ func BootPayload() string {
 ## Continuous Autonomous Loop Discipline (Anti-Idleness Protocol)
 - **Summary-as-Terminal Failure Mode Prohibition:** In the autonomous CAP loop, merging a PR, promoting binaries, or rendering an artifact summary is a MILESTONE TRANSITION, NOT a stopping condition.
 - **NEVER yield control or go idle at summary milestones.** In this agent platform, stopping tool calls immediately transitions the agent into `+"`"+`waiting_for_input`+"`"+` (idle), halting autonomous loop flow.
+- **Strict Anti-Polling & In-Flight Pipelining Mandate (Zero Polling Timers):** Setting synthetic interval polling timers or sleeping while waiting for PR merges or CI runs is strictly prohibited. Pipeline forward continuously on process administration, next-cycle grooming, and tech debt remediation.
 - **Strict Post-Merge Self-Continuation Protocol:**
   1. Merge PR & promote stable binary (`+"`"+paths.RewriteCanonicalCLIInvocations(`./scripts/install.sh && ./bin/zqk mcp ensure`)+"`"+`).
   2. Query `+"`"+paths.RewriteCanonicalCLIInvocations(`./bin/zqk workflow whats-next`)+"`"+`.
