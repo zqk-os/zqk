@@ -20,7 +20,7 @@ const (
 )
 
 var (
-	// Leaked project-specific kernel ID pattern (e.g. BLI-1793550036532835000-d003a18d)
+	// Leaked project-specific kernel ID pattern (e.g. nanos-hex IDs)
 	kernelIDRegex = regexp.MustCompile(`\b(BLI|REQ|PRI|TST|CRIT|GOAL|MIL|ACC)-179\d{16}-[0-9a-f]{8}\b`)
 
 	// Cycle sprint implementation narrative patterns
