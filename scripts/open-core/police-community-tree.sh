@@ -181,6 +181,21 @@ if [ -n "$DOCTOR_BOUNDED" ]; then
   fi
 fi
 
+# Stranger MCP tools/list: HOME-isolated cell, no pack ontology getters.
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger MCP tools/list residual
+MCP_TOOLS=""
+if [ -f "$ROOT/scripts/open-core/mcp-community-tools-list-smoke.sh" ]; then
+  MCP_TOOLS="$ROOT/scripts/open-core/mcp-community-tools-list-smoke.sh"
+elif [ -f "$(dirname "$0")/mcp-community-tools-list-smoke.sh" ]; then
+  MCP_TOOLS="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/mcp-community-tools-list-smoke.sh"
+fi
+if [ -n "$MCP_TOOLS" ]; then
+  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" sh "$MCP_TOOLS" "$ROOT"; then
+    echo "MUST_NOT community MCP tools/list residual failed"
+    FAIL=1
+  fi
+fi
+
 # G15: fail-closed studio kernel-ID scrub on product Go (non-test).
 # Prefer candidate-local script; fall back to studio police host copy.
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE G15
