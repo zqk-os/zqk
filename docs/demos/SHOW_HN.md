@@ -113,13 +113,12 @@ See the ACK table above. No MIT community SKU remains on this trust surface.
 
 ## Links
 
-- [Architecture](./ARCHITECTURE.md) — host FSM · capability flow · paging
-- [Examples](./EXAMPLES.md) — jailed worker · MCP DB agent · long-running research
-- [Benchmarks](./BENCHMARKS.md) — init time · memory · context efficiency
+- [Architecture](../architecture/README.md) — host FSM · capability flow · paging
+- [Guides & Recipes](../guides/README.md) — caged worker · MCP DB agent · long-running research
 - [60-second capability demo](./SIXTY_SECOND_CAPABILITY.md)
-- [Quick Start](../../README.md#quick-start--2-min)
+- [Quickstart](../../README.md#quickstart--2-min)
 - [Community First-Run](../onboarding/COMMUNITY_FIRST_RUN.md)
-- [Capability Security Model](../architecture/CAPABILITY_SECURITY_MODEL.md)
+- [Security Primitives & Sanitation](../guides/SECURITY_PRIMITIVES_AND_SANITATION_GUIDE.md)
 
 ---
 

@@ -188,7 +188,7 @@ echo -e "${BOLD}${YELLOW}── Step 5: Connect MCP (zqk mcp install) ──${RE
   cat "${SCRUB_DIR}/mcp-install.out"
 )
 # Fail-closed: mcp install text must not pin the studio tree.
-if grep -Eiq 'zqke-pack-composition' "${SCRUB_DIR}/mcp-install.out" 2>/dev/null; then
+if grep -Eiq 'zqke-pack-composition|/Users/lanceettl/zqke-pack-composition' "${SCRUB_DIR}/mcp-install.out" 2>/dev/null; then
   echo -e "❌ Studio/pack path leaked into mcp install output" >&2
   exit 1
 fi
@@ -259,7 +259,7 @@ deny = re.compile(
     r"align-cache|align_cache|"
     + "|".join(re.escape(s) for s in sealed_pris)
     + r"|"
-    r"zqke-pack-composition)"
+    r"zqke-pack-composition|/Users/lanceettl/zqke-pack-composition)"
 )
 hit = deny.search(blob)
 if hit:
