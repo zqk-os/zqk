@@ -21,6 +21,7 @@ type DocScrutinyConfig struct {
 	Enabled                   bool     `yaml:"enabled"`
 	MaxTopicCharsConcept      int      `yaml:"max_topic_chars_concept"`
 	MaxTopicCharsArchitecture int      `yaml:"max_topic_chars_architecture"`
+	FailOnTopicOverflow       bool     `yaml:"fail_on_topic_overflow"`
 	ProhibitCycleWork         bool     `yaml:"prohibit_cycle_work"`
 	ProhibitKernelIDLeaks     bool     `yaml:"prohibit_kernel_id_leaks"`
 	CheckAcronymConsistency   bool     `yaml:"check_acronym_consistency"`
