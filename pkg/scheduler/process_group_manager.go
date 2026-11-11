@@ -140,7 +140,7 @@ func (pgm *ProcessGroupManager) Shutdown(reason string) error {
 			// Create kill function if not provided
 			pgID := s.ProcessGroupID
 			s.KillFunc = func() error {
-				return syscall.Kill(pgID, syscall.SIGTERM)
+				return killPID(pgID, syscall.SIGTERM)
 			}
 		}
 		if s.KillFunc != nil {
@@ -189,14 +189,14 @@ func (pgm *ProcessGroupManager) Shutdown(reason string) error {
 		for _, s := range stillRunning {
 			if s.ProcessGroupID != 0 {
 				// Force kill process group
-				_ = syscall.Kill(s.ProcessGroupID, syscall.SIGKILL) //nolint:errcheck // Best effort
+				_ = killPID(s.ProcessGroupID, syscall.SIGKILL) //nolint:errcheck // Best effort
 			}
 		}
 	case <-time.After(pgm.shutdownTimeout):
 		// Timeout - force kill all
 		for _, s := range subprocesses {
 			if s.ProcessGroupID != 0 {
-				_ = syscall.Kill(s.ProcessGroupID, syscall.SIGKILL) //nolint:errcheck // Best effort
+				_ = killPID(s.ProcessGroupID, syscall.SIGKILL) //nolint:errcheck // Best effort
 			}
 		}
 	}

@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -433,12 +432,12 @@ func persistOrchestratedTaskOutcome(
 }
 
 func configureOrchestrationExecutorProcess(cmd *exec.Cmd) {
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	setAgentProcessGroup(cmd)
 	cmd.Cancel = func() error {
 		if cmd.Process == nil {
 			return os.ErrProcessDone
 		}
-		return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		return killAgentProcessGroup(cmd)
 	}
 	cmd.WaitDelay = 5 * time.Second
 }

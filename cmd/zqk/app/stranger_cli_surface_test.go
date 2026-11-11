@@ -6,7 +6,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-// TRACK: BLI-1794392273289214000-f82837c4
+// TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger CLI surface
 func TestShouldRegisterStudioPackCLI_defaultOff(t *testing.T) {
 	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "")
 	t.Setenv(zqkenv.StudioDogfood().Name(), "")

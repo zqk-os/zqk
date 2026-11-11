@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -518,7 +517,7 @@ func launchSwarmBackground(projectRoot, planID, cleanName string) (int, string, 
 	orchCmd.Dir = projectRoot
 	orchCmd.Stdout = logFile
 	orchCmd.Stderr = logFile
-	orchCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	setSwarmDaemonSetsid(orchCmd)
 
 	if err := orchCmd.Start(); err != nil {
 		if closeErr := logFile.Close(); closeErr != nil {

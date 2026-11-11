@@ -649,9 +649,7 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 		// CRITICAL: Set process group to ensure child processes are killed on timeout
 		// This prevents process leaks when commands spawn subprocesses
 		// Setpgid: true creates a new process group, allowing us to kill the entire group
-		cmd.SetSysProcAttr(&syscall.SysProcAttr{
-			Setpgid: true, // Create new process group (Unix only)
-		})
+		setRunWrapperProcessGroup(cmd)
 
 		// Set working directory: explicit job value, or project root so jobs run in project context
 		if workingDir != emptyValue {
@@ -819,7 +817,7 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 		killFunc := func() error {
 			if processGroupID != 0 {
 				// Kill entire process group using negative PID
-				return syscall.Kill(processGroupID, syscall.SIGKILL)
+				return killPID(processGroupID, syscall.SIGKILL)
 			}
 			return nil
 		}
@@ -851,7 +849,7 @@ func (h *RunWrapperHandler) runWrapperRetryAttempts(ctx context.Context, job *Sc
 				// This kills the process and all its children
 				if processGroupID != 0 {
 					// Negative PID targets the process group
-					if err := syscall.Kill(processGroupID, syscall.SIGKILL); err != nil {
+					if err := killPID(processGroupID, syscall.SIGKILL); err != nil {
 						RunWrapperLog(h.logger).Debug("Failed to kill process group on cancellation").WithError(err).Log()
 					}
 				}

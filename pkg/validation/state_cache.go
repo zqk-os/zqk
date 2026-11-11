@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/concurrency"
@@ -475,7 +474,7 @@ func (c *ValidationStateCache) Save() error {
 	maxRetries := 50 // Increased maxRetries to 5 seconds to reduce warn-spam
 	lockAcquired := false
 	for i := 0; i < maxRetries; i++ {
-		err = syscallutil.FileFlock(file, syscall.LOCK_EX|syscall.LOCK_NB)
+		err = syscallutil.FileFlock(file, syscallutil.LockEx|syscallutil.LockNB)
 		if err == nil {
 			lockAcquired = true
 			break
@@ -510,7 +509,7 @@ func (c *ValidationStateCache) Save() error {
 		logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgUpdateLockTimestamp, err).Log()
 	}
 	defer func() {
-		if err := syscallutil.FileFlock(file, syscall.LOCK_UN); err != nil {
+		if err := syscallutil.FileFlock(file, syscallutil.LockUn); err != nil {
 			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
 
 				// Do not overwrite a populated cache with an empty one (e.g. process with no validation

@@ -340,7 +340,7 @@ func (h *RunWrapperHandler) executeRunWrapperCore(ctx context.Context, job *Sche
 			return
 		}
 		if currentProcess.processGroupID != 0 {
-			if err := syscall.Kill(currentProcess.processGroupID, syscall.SIGKILL); err != nil {
+			if err := killPID(currentProcess.processGroupID, syscall.SIGKILL); err != nil {
 				RunWrapperLog(h.logger).Debug("Failed to kill process group on exit").WithError(err).Log()
 			}
 		}

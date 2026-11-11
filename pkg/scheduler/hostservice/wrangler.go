@@ -3,13 +3,13 @@ package hostservice
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 	"net"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -183,14 +183,14 @@ func (w *RuntimeWrangler) Stop() error {
 	// Also stop local scheduler PID if running
 	pidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, paths.StateDir, "scheduler.pid")
 	if pid, alive := readPidFile(pidFile); alive {
-		_ = syscall.Kill(pid, syscall.SIGTERM)
+		_ = syscallutil.SignalTerminate(pid)
 	}
 	_ = fileutil.Remove(pidFile)
 
 	// 2. Stop MCP Daemon
 	mcpPidFile := filepath.Join(w.AbsRoot, paths.ProjectDataDir, "mcp", "daemon-8443.pid")
 	if pid, alive := readPidFile(mcpPidFile); alive {
-		_ = syscall.Kill(pid, syscall.SIGTERM)
+		_ = syscallutil.SignalTerminate(pid)
 	}
 	_ = fileutil.Remove(mcpPidFile)
 
@@ -239,7 +239,7 @@ func readPidFile(path string) (int, bool) {
 		return 0, false
 	}
 	// Check alive
-	err := syscall.Kill(pid, 0)
+	err := syscallutil.SignalExists(pid)
 	return pid, err == nil
 }
 

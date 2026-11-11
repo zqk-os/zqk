@@ -3,7 +3,7 @@
 # Fail-closed if pack ontology commands appear in root help or command listing.
 # Complements scripts/open-core/mcp-community-tools-list-smoke.sh (studio) / MCP stranger exclude.
 # Docs: docs/strategy/open-core/KERNEL_VS_PACK_INVENTORY.md
-# TRACK: BLI-1794392273289214000-f82837c4
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger CLI help smoke
 set -euo pipefail
 
 ROOT="${ZQK_COMMUNITY_ROOT:-}"

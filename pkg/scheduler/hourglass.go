@@ -174,7 +174,7 @@ func (s *Scheduler) checkHourglassTimers(ctx context.Context) {
 				// 1. Terminate the process
 				if info.PID > 0 && info.PID != os.Getpid() {
 					// Send SIGKILL to terminate the subagent process immediately
-					_ = syscall.Kill(info.PID, syscall.SIGKILL)
+					_ = killPID(info.PID, syscall.SIGKILL)
 				}
 
 				// 2. Update task status in database to error

@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -57,7 +56,7 @@ func runDump(ctx *cli.Context, cmd *cobra.Command) error {
 		return errfmt.Errorf("scheduler daemon is running but could not determine PID")
 	}
 
-	if err := syscall.Kill(pid, syscall.SIGUSR1); err != nil {
+	if err := signalUSR1(pid); err != nil {
 		return errfmt.Errorf("failed to send SIGUSR1 to daemon (PID %d): %w", pid, err)
 	}
 

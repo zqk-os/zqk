@@ -289,7 +289,7 @@ func StartDaemon(projectRoot string, out interface{ Write([]byte) (int, error) }
 	daemonCmd.Dir = projectRoot
 	daemonCmd.Stdout = logFile
 	daemonCmd.Stderr = logFile
-	daemonCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+	setDaemonSysProcAttr(daemonCmd)
 
 	if err := daemonCmd.Start(); err != nil {
 		_ = logFile.Close()

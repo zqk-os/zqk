@@ -1,7 +1,7 @@
 #!/bin/sh
 # Fail-closed: stranger session continuity uses community kernel (whats-next / objects)
 # plus local pkg/sessionpaging — not Studio-only virtual-context paging packages.
-# TRACK: BLI-1794392835641397000-394120e0
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — community session paging
 set -eu
 ROOT=${1:-}
 if [ -z "$ROOT" ]; then

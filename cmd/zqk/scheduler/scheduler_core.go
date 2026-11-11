@@ -777,7 +777,7 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 	// (e.g. 10k+ goroutines) doesn't block the handler.
 	if runtime.GOOS != schedulerGOOSWindows {
 		sigChan := make(chan os.Signal, 1)
-		signal.Notify(sigChan, syscall.SIGUSR1)
+		notifyUSR1(sigChan)
 		dumpBud := goroutinelabels.DefaultBudget()
 		dumpHandlerBuilder := goroutinelabels.NewGoroutine("scheduler_dump_handler", "handling SIGUSR1 for process dump")
 		if dumpBud != nil {
@@ -792,7 +792,7 @@ func startSchedulerBackgroundWatchers(_ *cobra.Command, startCtx context.Context
 					if !ok {
 						return
 					}
-					if sig == syscall.SIGUSR1 {
+					if isUSR1(sig) {
 						diagnosticsDir := filepath.Join(projectRoot, paths.ProjectDataDir, paths.SchedulerDir, schedulerDiagnosticsDirName)
 						emitSchedulerDumpEventViaCoordinator(startCtx, projectRoot, storageProvider, "started", nil, profile, map[string]any{schedulerFieldDir: diagnosticsDir})
 						captureBuilder := goroutinelabels.NewGoroutine("scheduler_dump_capture", "capturing diagnostics after SIGUSR1")

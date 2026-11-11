@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -44,15 +43,9 @@ var (
 		return process.ProcessCommandLine(pid), nil
 	}
 	killProcessHook = func(pid int, sig syscall.Signal) error {
-		if runtime.GOOS == "windows" {
-			p, err := os.FindProcess(pid)
-			if err == nil {
-				return p.Kill()
-			}
-			return err
-		}
-		_ = syscall.Kill(-pid, sig)
-		return syscall.Kill(pid, sig)
+		// Portable terminate; process-group kill is unix-only (G13 windows residual).
+		_ = sig
+		return syscallutil.SignalTerminate(pid)
 	}
 	isProcessAliveHook = func(pid int) bool {
 		return syscallutil.IsProcessAlive(pid)
@@ -185,7 +178,7 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 			return nil
 		}
 
-		flockErr := syscallutil.FileFlock(fileHandle, syscall.LOCK_EX|syscall.LOCK_NB)
+		flockErr := syscallutil.FileFlock(fileHandle, syscallutil.LockEx|syscallutil.LockNB)
 		if flockErr != nil && !isDeadProcess {
 			// Held by a live process: do not touch
 			_ = fileHandle.Close()
@@ -193,7 +186,7 @@ func ReapStaleLocks(projectRoot string, threshold time.Duration, dryRun bool) (i
 		}
 
 		// Lock acquired or process dead: safe to reap
-		_ = syscallutil.FileFlock(fileHandle, syscall.LOCK_UN)
+		_ = syscallutil.FileFlock(fileHandle, syscallutil.LockUn)
 		_ = fileHandle.Close()
 
 		count++
