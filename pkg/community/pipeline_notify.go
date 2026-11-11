@@ -192,8 +192,12 @@ func (d *PipelineNotificationDispatcher) Dispatch(ctx context.Context, payload P
 		}
 
 		// Read and discard body to allow connection reuse.
-		_, _ = io.Copy(io.Discard, resp.Body)
-		_ = resp.Body.Close()
+		if _, copyErr := io.Copy(io.Discard, resp.Body); copyErr != nil {
+			lastErr = copyErr
+		}
+		if closeErr := resp.Body.Close(); closeErr != nil && lastErr == nil {
+			lastErr = closeErr
+		}
 
 		if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			return nil
@@ -211,7 +215,9 @@ func (d *PipelineNotificationDispatcher) DispatchAsync(ctx context.Context, payl
 	goroutinelabels.NewGoroutine("pipeline_notification_dispatch", "dispatch webhook event async").
 		StartSimple(func() {
 			defer d.wg.Done()
-			_ = d.Dispatch(ctx, payload)
+			if dispatchErr := d.Dispatch(ctx, payload); dispatchErr != nil {
+				// Record dispatch error if needed
+			}
 		})
 }
 

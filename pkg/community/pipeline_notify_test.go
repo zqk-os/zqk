@@ -99,7 +99,11 @@ func TestPipelineNotify_OperationalDynamicProof(t *testing.T) {
 		}
 
 		receivedHeaders = r.Header.Clone()
-		body, _ := io.ReadAll(r.Body)
+		body, readErr := io.ReadAll(r.Body)
+		if readErr != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 		receivedBody = body
 		w.WriteHeader(http.StatusOK)
 	}))
