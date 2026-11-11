@@ -57,6 +57,13 @@ type ZqkConfig struct {
 		QwenBaseURL       *string  `yaml:"qwen_base_url"`
 		Trace             *bool    `yaml:"trace"`
 	} `yaml:"llm"`
+	Teleology struct {
+		Enabled           *bool    `yaml:"enabled"`
+		InScope           []string `yaml:"in_scope"`
+		Prohibited        []string `yaml:"prohibited"`
+		MissionRef        *string  `yaml:"mission_ref"`
+		StrictEnforcement *bool    `yaml:"strict_enforcement"`
+	} `yaml:"teleology"`
 	Storage struct {
 		GraphEnabled                   *bool   `yaml:"graph_enabled"`
 		MockGraph                      *bool   `yaml:"mock_graph"`

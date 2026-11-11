@@ -11,6 +11,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/teleology"
 
 	"github.com/spf13/cobra"
 )
@@ -197,6 +198,16 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 		// BLI-781: alignment score 0-100 (currently goal-work coverage; extensible to stakeholder/policy/context)
 		alignmentScore := RoundTwo(coveragePct)
 
+		projectRoot := ProjectRootOrResolve(sess.Ctx.ProjectRoot)
+		taxonomy, _ := teleology.LoadTaxonomy(projectRoot)
+		teleologyReport := teleology.EvaluateWorkItemsTeleologicalDrift(listResult.Objects, taxonomy)
+		if teleologyReport != nil && taxonomy != nil && taxonomy.Enabled {
+			if teleologyReport.DriftCount > 0 {
+				// Factor teleological alignment into final alignment score
+				alignmentScore = RoundTwo(alignmentScore * (teleologyReport.TeleologicalScore / 100.0))
+			}
+		}
+
 		result := map[string]any{
 			"alignment": map[string]any{
 				"goal_work": map[string]any{
@@ -209,6 +220,16 @@ func runAlign(cmd *cobra.Command, gapsOnly bool, goalID string, scoreOnly bool, 
 			},
 			"alignment_score": alignmentScore,
 			"goals_count":     len(goalIDs),
+		}
+
+		if teleologyReport != nil && taxonomy != nil && taxonomy.Enabled {
+			result["teleological_alignment"] = teleologyReport
+			if alignMap, ok := result["alignment"].(map[string]any); ok {
+				alignMap["teleological_alignment"] = teleologyReport
+			}
+			if teleologyReport.DriftCount > 0 {
+				result["semantic_drift_warning"] = fmt.Sprintf("%d item(s) exhibit teleological drift outside registered taxonomy %s", teleologyReport.DriftCount, teleologyReport.TaxonomyBoundary)
+			}
 		}
 
 		if goalID != emptyValue {
