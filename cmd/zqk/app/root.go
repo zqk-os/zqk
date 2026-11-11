@@ -221,7 +221,7 @@ func init() {
 		).
 		AddSection("Command surfaces",
 			// Stranger/community default omits pack ontology shortcuts (pplan / agent orchestrate);
-			// studio pack opt-in via ZQK_ENABLE_STUDIO_PACK_TOOLS. TRACK: BLI-1794392273289214000-f82837c4
+			// studio pack opt-in via ZQK_ENABLE_STUDIO_PACK_TOOLS. TRACK: stranger-cli-surface (open-core)
 			"Everyday (orientation): workflow whats-next, object, system, auth.\n"+paths.RewriteCanonicalCLIInvocations("Draft objects: zqk object template <kind> (canonical). quick/new are shortcuts — see their --help.\n")+paths.RewriteCanonicalCLIInvocations("Health: zqk system check (warm cache; repeat runs should be fast). Scheduler + integrations below.\n")+
 				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+
 				"The zqk-admin binary (cmd/zqk-admin) shares this same command tree and bootstrap as zqk.\n"+

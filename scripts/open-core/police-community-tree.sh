@@ -138,6 +138,16 @@ if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
   fi
 fi
 
+# Virtual-context paging residual: stranger sessions keep local context without Studio paging deps.
+# TRACK: BLI-1794392835641397000-394120e0
+if [ -f "$ROOT/scripts/open-core/check-community-session-paging.sh" ] && \
+   { [ -d "$ROOT/pkg/sessionpaging" ] || [ -f "$ROOT/docs/strategy/open-core/CONTEXT_PAGING_DESIGN.md" ]; }; then
+  if ! sh "$ROOT/scripts/open-core/check-community-session-paging.sh" "$ROOT"; then
+    echo "MUST_NOT community session paging residual failed"
+    FAIL=1
+  fi
+fi
+
 if [ "$FAIL" -ne 0 ]; then
   echo "POLICE: FAIL"
   exit 1

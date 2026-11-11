@@ -435,7 +435,7 @@ func registerCommands() {
 
 	// Pack ontology CLI (pplan getters + agent/CAP/MMORCH orchestrate discovery):
 	// stranger/community default excludes — same opt-in as MCP IsStudioPackToolsEnabled.
-	// TRACK: BLI-1794392273289214000-f82837c4
+	// TRACK: stranger-cli-surface (open-core)
 	if shouldRegisterStudioPackCLI() {
 		pplanCmdInst := object.NewPPlanCmd()
 		pplanCmdInst.GroupID = "everyday"
