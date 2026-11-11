@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Diagnostic Reports & System Vitality Telemetry Subsystem** ([`pkg/reports`](file:///Users/lanceettl/zqk-public-candidate/pkg/reports/reports.go)) provides real-time, deterministic diagnostic telemetry, lifecycle progression analysis, test execution metrics, and runtime vitality monitoring across the ZQK Knowledge Kernel.
+The **Diagnostic Reports & System Vitality Telemetry Subsystem** ([`pkg/reports`](../../pkg/reports/reports.go)) provides real-time, deterministic diagnostic telemetry, lifecycle progression analysis, test execution metrics, and runtime vitality monitoring across the ZQK Knowledge Kernel.
 
 Rather than relying on transient LLM hallucinations or subjective human estimations, ZQK diagnostic reporting evaluates state directly from Content-Addressed Storage (CAS), runtime memory and concurrency monitors, automated verification test suites, and git version history.
 
@@ -12,7 +12,7 @@ Key capabilities delivered by the subsystem include:
 - **Automated QA Verification Telemetry (`qa_success`):** Gathers test pass rates, skipped counts, coverage statistics, and failure diagnostics.
 - **Cross-Subsystem Telemetry Aggregation (`telemetry_summary`):** Compiles multi-service telemetry payloads into unified health snapshots with automated threshold alerts.
 - **Multi-Format Presentation Pipeline:** Formats diagnostic data dynamically into structured JSON, aligned terminal tables, concise summary text, or native Go map projections.
-- **Seamless Model Context Protocol (MCP) Integration:** Direct binding to [`pkg/mcp/tools_reports.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/mcp/tools_reports.go), enabling IDE hosts (VS Code, Cursor, JetBrains) and autonomous AI agent swarms to query system health natively.
+- **Seamless Model Context Protocol (MCP) Integration:** Direct binding to [`pkg/mcp/tools_reports.go`](../../pkg/mcp/tools_reports.go), enabling IDE hosts (VS Code, Cursor, JetBrains) and autonomous AI agent swarms to query system health natively.
 - **Stateless Concurrency & 100.0% Statement Test Coverage:** Ensures thread-safe execution across concurrent worker routines with zero swallowed errors and strict context cancellation propagation.
 
 ---
@@ -177,7 +177,7 @@ classDiagram
 
 ## 4. MCP Integration & AI Agent Tooling
 
-Autonomous AI agents and IDE hosts interact with diagnostic telemetry through standard Model Context Protocol (MCP) tools registered in [`pkg/mcp/tools_reports.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/mcp/tools_reports.go).
+Autonomous AI agents and IDE hosts interact with diagnostic telemetry through standard Model Context Protocol (MCP) tools registered in [`pkg/mcp/tools_reports.go`](../../pkg/mcp/tools_reports.go).
 
 ```mermaid
 sequenceDiagram

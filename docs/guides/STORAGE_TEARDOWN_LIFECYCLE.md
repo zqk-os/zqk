@@ -2,14 +2,14 @@
 
 ## 1. Executive Summary & Problem Statement
 
-In high-concurrency, race-detected test suites across [`pkg/scheduler`](file:///Users/lanceettl/zqk-public-candidate/pkg/scheduler) and [`pkg/ambient`](file:///Users/lanceettl/zqk-public-candidate/pkg/ambient), test suites that manipulate `.zqk/` or initialize subsystem storage inside temporary project roots (`t.TempDir()`) historically exhibited intermittent flakes:
+In high-concurrency, race-detected test suites across [`pkg/scheduler`](../../pkg/scheduler) and [`pkg/ambient`](../../pkg/ambient), test suites that manipulate `.zqk/` or initialize subsystem storage inside temporary project roots (`t.TempDir()`) historically exhibited intermittent flakes:
 
 ```
 testing.go:1234: TempDir RemoveAll cleanup: unlinkat /var/folders/.../001/.zqk/scheduler: directory not empty
 ```
 
 These errors stem from two systemic lifecycle hazards:
-1. **Asynchronous Storage & Buffer Persistence:** Subsystems instantiate or dynamically resolve storage providers (e.g. via [`storage.GetGlobalStorageProviderCache()`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage/resource_cache.go#L196) and [`storage.GetGlobalBufferRegistry()`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage/audit_events_helper_create.go#L152)) without registering an explicit teardown pipeline. As a consequence, background WAL flushers, listing index queues, and audit event buffers continue dispatching filesystem writes after the test function returns.
+1. **Asynchronous Storage & Buffer Persistence:** Subsystems instantiate or dynamically resolve storage providers (e.g. via [`storage.GetGlobalStorageProviderCache()`](../../pkg/storage/resource_cache.go#L196) and [`storage.GetGlobalBufferRegistry()`](../../pkg/storage/audit_events_helper_create.go#L152)) without registering an explicit teardown pipeline. As a consequence, background WAL flushers, listing index queues, and audit event buffers continue dispatching filesystem writes after the test function returns.
 2. **Unjoined Ambient Daemons & Stream Writers:** Background stream writers, event mesh cancel-forwarders, and ambient ingest holons remain active when tests complete without deterministic joins, racing with Go's built-in `testing.TB.TempDir()` cleanup (`os.RemoveAll`).
 
 This guide documents the core invariants, registration patterns, and lifecycle contracts required to ensure 100% deterministic test cleanup across all packages.
@@ -18,7 +18,7 @@ This guide documents the core invariants, registration patterns, and lifecycle c
 
 ## 2. Core Teardown Architecture & Pipeline
 
-Deterministic teardown is achieved by integrating test temporary directories into the [`StandardProjectTestTeardownPipeline`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage/project_test_teardown.go#L115) via [`pkg/testkit`](file:///Users/lanceettl/zqk-public-candidate/pkg/testkit/register.go).
+Deterministic teardown is achieved by integrating test temporary directories into the [`StandardProjectTestTeardownPipeline`](../../pkg/storage/project_test_teardown.go#L115) via [`pkg/testkit`](../../pkg/testkit/register.go).
 
 ```mermaid
 flowchart TD
@@ -47,11 +47,11 @@ flowchart TD
 
 ### 2.1 The Standard Teardown Pipeline Stages
 
-When [`testkit.RegisterStorageTestCleanup`](file:///Users/lanceettl/zqk-public-candidate/pkg/testkit/register.go#L60) is registered:
+When [`testkit.RegisterStorageTestCleanup`](../../pkg/testkit/register.go#L60) is registered:
 - **Global Listing Index & Write Queue Flush:** Flushes any queued listing updates to disk and shuts down background worker channels.
-- **WAL Draining & FileStorage Shutdown:** Halts the WAL write loop within a bounded timeout (45s max, fast exit when empty) and invokes [`storage.FileObjectStorage.Shutdown()`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage/project_test_teardown.go#L368).
-- **Global Storage Provider Cache Eviction:** Calls `Shutdown()` on the cached provider registered under `projectRoot` and removes it from [`GetGlobalStorageProviderCache()`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage/resource_cache.go#L196).
-- **Audit Buffer Unregistration:** Unregisters and flushes any active in-memory audit buffers from [`GetGlobalBufferRegistry()`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage/project_test_teardown.go#L380).
+- **WAL Draining & FileStorage Shutdown:** Halts the WAL write loop within a bounded timeout (45s max, fast exit when empty) and invokes [`storage.FileObjectStorage.Shutdown()`](../../pkg/storage/project_test_teardown.go#L368).
+- **Global Storage Provider Cache Eviction:** Calls `Shutdown()` on the cached provider registered under `projectRoot` and removes it from [`GetGlobalStorageProviderCache()`](../../pkg/storage/resource_cache.go#L196).
+- **Audit Buffer Unregistration:** Unregisters and flushes any active in-memory audit buffers from [`GetGlobalBufferRegistry()`](../../pkg/storage/project_test_teardown.go#L380).
 - **Process Artifact Stripping & Root Scrubbing:** Strips temporary files and scrubs the project tree before directory deletion.
 
 ---
@@ -73,7 +73,7 @@ func TestSchedulerIssues_Example(t *testing.T) {
 }
 ```
 
-Where [`registerProjectDirTestTeardown`](file:///Users/lanceettl/zqk-public-candidate/pkg/scheduler/helpers_storage_teardown_test.go#L24) is defined as:
+Where [`registerProjectDirTestTeardown`](../../pkg/scheduler/helpers_storage_teardown_test.go#L24) is defined as:
 
 ```go
 func registerProjectDirTestTeardown(t *testing.T, projectRoot string) {

@@ -2,12 +2,12 @@
 
 ## 1. Executive Architectural Summary
 
-The **Domain-Specific String Aliases & Canonical Normalization Subsystem** ([`pkg/aliases`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/resolve.go)) provides deterministic string normalization, boundary whitespace trimming, case-folding, and domain-scoped alias-to-canonical mapping across the **ZQK Knowledge Kernel**.
+The **Domain-Specific String Aliases & Canonical Normalization Subsystem** ([`pkg/aliases`](../../pkg/aliases/resolve.go)) provides deterministic string normalization, boundary whitespace trimming, case-folding, and domain-scoped alias-to-canonical mapping across the **ZQK Knowledge Kernel**.
 
 When engineers, scripts, and autonomous AI agents interact with the CLI, API endpoints, or specification definition engines, command verbs and argument tokens are provided in varied casings, with accidental padding, or using natural-language synonyms (e.g., `define`, `add`, `CREATE`, `  Modify  `). Within core engines, however, execution pipelines and internal state machines require deterministic canonical constants to drive switch branches, metrics aggregation, content-addressed storage (CAS) keys, and verification invariants.
 
 The `pkg/aliases` package provides:
-1. **Domain-Isolated Alias Resolution:** High-performance static alias resolution via [`ResolveStatic`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/resolve.go#L19) and object-oriented encapsulation via [`Table`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L14).
+1. **Domain-Isolated Alias Resolution:** High-performance static alias resolution via [`ResolveStatic`](../../pkg/aliases/resolve.go#L19) and object-oriented encapsulation via [`Table`](../../pkg/aliases/table.go#L14).
 2. **Defensive Normalization Pipeline:** Automatic whitespace trimming and ASCII case-folding ensuring robust matching without brittle string equality bugs.
 3. **Canonical Pass-Through Semantics:** Unregistered inputs and canonical tokens pass through cleanly without synthetic errors or allocations, enabling progressive schema evolution.
 4. **Resilient Nil Safety:** Pure functional design ensuring nil tables or nil receivers gracefully normalize and pass through inputs without panic.
@@ -36,7 +36,7 @@ flowchart TD
 
 ### 2.2 Semantic Corruption in Spec Field Lifecycles
 
-Consider the concrete collision between standard CRUD operations and the ZQK **Spec Field Lifecycle Engine** ([`cmd/zqk/system/spec_field_op.go`](file:///Users/lanceettl/zqk-public-candidate/cmd/zqk/system/spec_field_op.go)):
+Consider the concrete collision between standard CRUD operations and the ZQK **Spec Field Lifecycle Engine** ([`cmd/zqk/system/spec_field_op.go`](../../cmd/zqk/system/spec_field_op.go)):
 - In general CRUD commands (`zqk object ...`, `zqk bli ...`), users frequently type `modify` as a synonym for `update`. A generic CRUD alias table legitimately translates `"modify"` to `"update"`.
 - However, the Spec Field Lifecycle defines explicit, immutable wire operations:
   - `FieldOpCreate` (`"create"`)
@@ -79,17 +79,17 @@ flowchart TD
 
 ### 3.1 Subsystem Components
 
-1. **[`ResolveStatic`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/resolve.go#L19):**
+1. **[`ResolveStatic`](../../pkg/aliases/resolve.go#L19):**
    The foundational resolution function. Accepts raw input string `s` and a `map[string]string` mapping. Trims whitespace, case-folds to lowercase, checks the map, and returns either the mapped canonical string or the trimmed/lowercased input string.
-2. **[`Table`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L14):**
+2. **[`Table`](../../pkg/aliases/table.go#L14):**
    An immutable struct encapsulating a domain name string and a pre-normalized map. Provides methods:
-   - [`NewTable`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L34): Validates and constructs an immutable table.
-   - [`Domain`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L44): Returns the associated domain identifier.
-   - [`Resolve`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L55): Resolves tokens through the table's normalized mapping with nil receiver safety.
-   - [`HasAlias`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L64): Checks whether a token is an explicitly registered alias.
-   - [`Len`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L77): Returns the alias count.
-   - [`Mappings`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L86): Returns a defensive clone of the internal mapping.
-3. **[`NormalizeMap`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L20):**
+   - [`NewTable`](../../pkg/aliases/table.go#L34): Validates and constructs an immutable table.
+   - [`Domain`](../../pkg/aliases/table.go#L44): Returns the associated domain identifier.
+   - [`Resolve`](../../pkg/aliases/table.go#L55): Resolves tokens through the table's normalized mapping with nil receiver safety.
+   - [`HasAlias`](../../pkg/aliases/table.go#L64): Checks whether a token is an explicitly registered alias.
+   - [`Len`](../../pkg/aliases/table.go#L77): Returns the alias count.
+   - [`Mappings`](../../pkg/aliases/table.go#L86): Returns a defensive clone of the internal mapping.
+3. **[`NormalizeMap`](../../pkg/aliases/table.go#L20):**
    Sanitizes a raw developer-provided alias map: trims whitespace from keys and values, converts keys to lowercase, and excludes empty key strings.
 
 ---
@@ -125,8 +125,8 @@ sequenceDiagram
 ## 5. Concurrency & Thread-Safety Guarantees
 
 In high-throughput agent swarms and concurrent CLI workflows:
-- **Read-Only Static Maps:** Tables passed to [`ResolveStatic`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/resolve.go#L19) are declared as package-level immutable maps (`var ... = map[string]string{...}`). Because Go map reads are concurrent-safe so long as no concurrent writes occur, resolution requires zero mutex acquisitions, zero atomic CAS loops, and zero lock contention.
-- **Defensive Map Clones:** The [`Table.Mappings`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L86) method produces a full defensive shallow copy of internal maps, preventing external callers from mutating underlying table state.
+- **Read-Only Static Maps:** Tables passed to [`ResolveStatic`](../../pkg/aliases/resolve.go#L19) are declared as package-level immutable maps (`var ... = map[string]string{...}`). Because Go map reads are concurrent-safe so long as no concurrent writes occur, resolution requires zero mutex acquisitions, zero atomic CAS loops, and zero lock contention.
+- **Defensive Map Clones:** The [`Table.Mappings`](../../pkg/aliases/table.go#L86) method produces a full defensive shallow copy of internal maps, preventing external callers from mutating underlying table state.
 - **Zero Heap Allocations on Matching Clean Inputs:** For strings that are already trimmed and lowercased, Go compiler string slicing and map lookups execute with optimal speed and minimal memory footprint.
 
 ---
@@ -201,6 +201,6 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s -cover ./pkg/aliases
 | `TestResolveStatic_UnicodeAndSpecialCharacters` | Validates multi-byte UTF-8 runes, accented characters, and emojis. |
 | `TestDomainIsolation_CrossSubsystemCollisionSafety` | Proves domain boundary isolation preventing CRUD `"modify"` collisions in spec field lifecycles. |
 | `TestNormalizeMap` | Validates map sanitization, nil handling, key case-folding, and empty key filtering. |
-| `TestTable_MethodsAndNilSafety` | Validates [`Table`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L14) methods, nil receiver safety, and defensive copying. |
+| `TestTable_MethodsAndNilSafety` | Validates [`Table`](../../pkg/aliases/table.go#L14) methods, nil receiver safety, and defensive copying. |
 | `TestResolveStatic_HighConcurrencySafety` | Concurrent stress validation across 32 goroutines managed via `pkg/goroutinelabels`. |
-| `TestTable_HighConcurrencySafety` | Concurrent stress validation for [`Table`](file:///Users/lanceettl/zqk-public-candidate/pkg/aliases/table.go#L14) across 32 goroutines. |
+| `TestTable_HighConcurrencySafety` | Concurrent stress validation for [`Table`](../../pkg/aliases/table.go#L14) across 32 goroutines. |

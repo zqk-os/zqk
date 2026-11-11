@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Workpack Composition & Redundancy Analysis Subsystem** ([`pack.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/workpack/pack.go), [`redundancy.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/workpack/redundancy.go), [`verify.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/workpack/verify.go)) forms the planning, tracking, strategic alignment, and verification backbone of the **ZQK Knowledge Kernel**.
+The **Workpack Composition & Redundancy Analysis Subsystem** ([`pack.go`](../../pkg/workpack/pack.go), [`redundancy.go`](../../pkg/workpack/redundancy.go), [`verify.go`](../../pkg/workpack/verify.go)) forms the planning, tracking, strategic alignment, and verification backbone of the **ZQK Knowledge Kernel**.
 
 In multi-agent autonomous engineering environments, unconstrained conversational prompts are ephemeral and lack verifiable schema boundaries. Without a deterministic relational data model, software projects suffer from scope drift, conflicting field declarations, unverified acceptance criteria, and silent loss of intent across execution cycles. The ZQK Workpack replaces transient prompt memory with persistent, version-controlled graph objects and enforces rigorous schema hygiene through automated static auditing.
 
@@ -18,7 +18,7 @@ In multi-agent autonomous engineering environments, unconstrained conversational
 
 ## 2. Workpack Ontology & Architectural Composition Model
 
-The Workpack subsystem is composed of two cooperating layers: the Go subsystem package ([`pkg/workpack`](file:///Users/lanceettl/zqk-public-candidate/pkg/workpack)) and the declarative pack asset tree ([`packs/work`](file:///Users/lanceettl/zqk-public-candidate/packs/work)).
+The Workpack subsystem is composed of two cooperating layers: the Go subsystem package ([`pkg/workpack`](../../pkg/workpack)) and the declarative pack asset tree ([`packs/work`](../../packs/work)).
 
 ```mermaid
 flowchart TD
@@ -114,7 +114,7 @@ Mixins are structural graph extensions embedded directly into parent planning no
 
 ## 3. Spec Verification Engine & Fail-Closed Bootstrapping
 
-The verification engine in [`verify.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/workpack/verify.go) ensures that all required specification and lifecycle YAML definitions exist, are readable, and conform to repository directory topology before the pack is marked active.
+The verification engine in [`verify.go`](../../pkg/workpack/verify.go) ensures that all required specification and lifecycle YAML definitions exist, are readable, and conform to repository directory topology before the pack is marked active.
 
 ```mermaid
 sequenceDiagram
@@ -202,7 +202,7 @@ The compiled instance constructors (`bldr_instance_v1`) are already statically l
 
 ## 4. Schema Normalization & Redundancy Analysis Algorithms
 
-The redundancy engine in [`redundancy.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/workpack/redundancy.go) enforces strict structural and semantic consistency across all object specifications.
+The redundancy engine in [`redundancy.go`](../../pkg/workpack/redundancy.go) enforces strict structural and semantic consistency across all object specifications.
 
 ### 4.1 System-Managed Base Fields
 
@@ -397,7 +397,7 @@ go tool cover -func=coverage.out
 
 ### 6.3 Registering Commands in Composition Root
 
-In [`cmd/zqk/main.go`](file:///Users/lanceettl/zqk-public-candidate/cmd/zqk/main.go) and the kernel application bootstrap, `workpack.Register(rootCmd)` hooks the 22 kinds into the global command hierarchy:
+In [`cmd/zqk/main.go`](../../cmd/zqk/main.go) and the kernel application bootstrap, `workpack.Register(rootCmd)` hooks the 22 kinds into the global command hierarchy:
 
 ```go
 package main

@@ -1,1 +1,587 @@
-scripts/install.sh
+#!/bin/sh
+# ZQK Installer — supports public release download, go install, and build-from-source.
+#
+# Public OSS install (no token required — once repo is public):
+#   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
+#
+# Private / pre-release install (requires GITHUB_TOKEN):
+#   export GITHUB_TOKEN="ghp_..."
+#   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh -s -- v2.7.0
+#
+# Build from source (Go 1.21+ required — no token, no binary release needed):
+#   ZQK_INSTALL_METHOD=source ./scripts/install.sh
+#
+# go install (module must be public):
+#   ZQK_INSTALL_METHOD=goinstall ./scripts/install.sh
+set -e
+
+REPO="${ZQK_REPO:-zqk-os/zqk}"
+MODULE="${ZQK_MODULE:-github.com/zqk-os/zqk}"
+# INSTALL_METHOD: auto | binary | goinstall | source
+INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
+MODE="${ZQK_MODE:-}"
+STANDALONE=0
+HEADLESS=0
+VERSION="latest"
+
+NO_SUDO=0
+PREFIX_SET=0
+for arg in "$@"; do
+  case "$arg" in
+    --fast|-f)
+      MODE="fast"
+      ;;
+    --walkthrough|-w)
+      MODE="walkthrough"
+      ;;
+    --standalone|-s)
+      STANDALONE=1
+      MODE="fast"
+      ;;
+    --headless)
+      HEADLESS=1
+      MODE="fast"
+      ;;
+    --yes|-y)
+      MODE="fast"
+      ;;
+    --no-sudo)
+      NO_SUDO=1
+      ;;
+    --prefix=*)
+      ZQK_INSTALL_DIR="${arg#--prefix=}"
+      PREFIX_SET=1
+      ;;
+    --prefix)
+      echo "--prefix requires a directory argument (use --prefix=/path)" >&2
+      exit 1
+      ;;
+    -*)
+      echo "Unknown flag: $arg" >&2
+      exit 1
+      ;;
+    *)
+      if [ "$arg" != "latest" ]; then
+        VERSION="$arg"
+      fi
+      ;;
+  esac
+done
+# Headless / non-TTY installs must never block on sudo password prompts (GH#961).
+if [ ! -t 0 ] || [ "$HEADLESS" = "1" ]; then
+  NO_SUDO=1
+fi
+
+# Resolve install directory: prefer user-specified ZQK_INSTALL_DIR,
+# otherwise /usr/local/bin if writable, else user-local $HOME/.local/bin for zero-dependency non-root install
+if [ -n "${ZQK_INSTALL_DIR:-}" ]; then
+  INSTALL_DIR="${ZQK_INSTALL_DIR}"
+elif [ -w "/usr/local/bin" ]; then
+  INSTALL_DIR="/usr/local/bin"
+else
+  INSTALL_DIR="${HOME}/.local/bin"
+fi
+mkdir -p "$INSTALL_DIR" 2>/dev/null || true
+
+if [ -z "$MODE" ]; then
+  if [ -t 0 ] && [ -t 1 ] && [ "$STANDALONE" != "1" ] && [ "$HEADLESS" != "1" ]; then
+    echo "========================================================================"
+    echo "⚡ Welcome to ZQK (Zen Quantum Kernel) Installer"
+    echo "========================================================================"
+    echo "Choose your path:"
+    echo "  1) Go Fast      — 98.8% agent token savings via zgrep in < 5 seconds"
+    echo "  2) Walk Through — Interactive walkthrough of the Knowledge Kernel"
+    printf "Selection [1/2] (default 1): "
+    read -r CHOICE || CHOICE="1"
+    case "$CHOICE" in
+      2) MODE="walkthrough" ;;
+      *) MODE="fast" ;;
+    esac
+  else
+    MODE="fast"
+  fi
+fi
+
+# Auto-detect GITHUB_TOKEN via gh CLI if not explicitly set
+if [ -z "$GITHUB_TOKEN" ] && command -v gh >/dev/null 2>&1; then
+  GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
+fi
+GITHUB_TOKEN="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
+
+# ---------------------------------------------------------------------------
+# 1. Detect OS and Architecture
+# ---------------------------------------------------------------------------
+OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+ARCH="$(uname -m)"
+case "$ARCH" in
+  x86_64)        ARCH="amd64" ;;
+  aarch64|arm64) ARCH="arm64" ;;
+  *) echo "Unsupported architecture: $ARCH" >&2; exit 1 ;;
+esac
+if [ "$OS" != "darwin" ] && [ "$OS" != "linux" ]; then
+  echo "Unsupported OS: $OS" >&2; exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# 2. Resolve 'latest' version tag (unauthenticated for public repo)
+# ---------------------------------------------------------------------------
+resolve_latest() {
+  local tag=""
+  if [ -n "$GITHUB_TOKEN" ]; then
+    tag=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+      | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    if [ -z "$tag" ]; then
+      tag=$(curl -sSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+        -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO}/releases" 2>/dev/null \
+        | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    fi
+  else
+    tag=$(curl -sSL -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/latest" 2>/dev/null \
+      | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    if [ -z "$tag" ]; then
+      tag=$(curl -sSL -H "Accept: application/vnd.github.v3+json" \
+        "https://api.github.com/repos/${REPO}/releases" 2>/dev/null \
+        | grep '"tag_name"' | cut -d'"' -f4 | head -1)
+    fi
+  fi
+  printf '%s' "$tag"
+}
+
+# Verify exactly one archive against checksums.txt. Multi-platform manifests list
+# files we did not download; do not skip unmatched checksum lines.
+_verify_archive_sha256() {
+  local sums="$1"
+  local archive_path="$2"
+  local name
+  name=$(basename "$archive_path")
+  local expected
+  expected=$(awk -v n="$name" '
+    {
+      f=$NF
+      sub(/^\*/, "", f)
+      if (f == n) { print $1; found=1; exit }
+    }
+    END { if (!found) exit 1 }
+  ' "$sums") || {
+    echo "No SHA256 for ${name} in checksums.txt" >&2
+    exit 1
+  }
+  local actual=""
+  if command -v sha256sum >/dev/null 2>&1; then
+    actual=$(sha256sum "$archive_path" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    actual=$(shasum -a 256 "$archive_path" | awk '{print $1}')
+  else
+    echo "Neither sha256sum nor shasum found; cannot verify checksum." >&2
+    exit 1
+  fi
+  expected=$(printf '%s' "$expected" | tr 'A-F' 'a-f')
+  actual=$(printf '%s' "$actual" | tr 'A-F' 'a-f')
+  if [ "$expected" != "$actual" ]; then
+    echo "Checksum mismatch for ${name}" >&2
+    exit 1
+  fi
+}
+
+# Verify checksums.txt signature (checksums.txt.sig) using cosign if available.
+_verify_checksums_signature() {
+  local checksums_path="$1"
+  local sig_path="${checksums_path}.sig" # verifies checksums.txt.sig
+  local cert_path="${checksums_path}.pem"
+  if [ ! -f "$sig_path" ]; then
+    if [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ]; then
+      echo "Error: signature file ${sig_path} not found and ZQK_REQUIRE_COSIGN=1" >&2
+      exit 1
+    fi
+    if command -v cosign >/dev/null 2>&1; then
+      echo "⚠️ Warning: signature file ${sig_path} not found; cosign verification cannot be performed." >&2
+    fi
+    return 0
+  fi
+  if command -v cosign >/dev/null 2>&1; then
+    echo "🔒 Verifying checksums signature with cosign..."
+    local verify_failed=0
+    if [ -n "${ZQK_COSIGN_KEY:-}" ]; then
+      cosign verify-blob --key "${ZQK_COSIGN_KEY}" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    elif [ -f "$cert_path" ]; then
+      cosign verify-blob --certificate "$cert_path" --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    else
+      cosign verify-blob --signature "$sig_path" "$checksums_path" >/dev/null 2>&1 || verify_failed=1
+    fi
+    if [ "$verify_failed" -ne 0 ]; then
+      echo "Error: cosign signature verification failed for checksums.txt (checksums.txt.sig). Aborting install for safety." >&2
+      exit 1
+    fi
+    echo "✓ Cosign signature verified successfully."
+  elif [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ]; then
+    echo "Error: cosign command not found but ZQK_REQUIRE_COSIGN=1" >&2
+    exit 1
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Helper: install binary from GitHub Releases (public or private)
+# ---------------------------------------------------------------------------
+install_binary() {
+  local ver="$1"
+  local ver_num="${ver#v}"
+  local archive="zqk_${ver_num}_${OS}_${ARCH}.tar.gz"
+  local comm_archive="zqk-community_${ver_num}_${OS}_${ARCH}.tar.gz"
+
+  echo "📥 Downloading ZQK ${ver} (${OS}/${ARCH})..."
+
+  TMPDIR="$(mktemp -d)"
+  trap 'rm -rf "$TMPDIR"' EXIT
+
+  local archive_path="${TMPDIR}/${archive}"
+  local checksums_path="${TMPDIR}/checksums.txt"
+
+  local base_url="https://github.com/${REPO}/releases/download/${ver}"
+  local downloaded=0
+  for arch_cand in "${archive}" "${comm_archive}"; do
+    if curl -sSLf "${base_url}/${arch_cand}" -o "${archive_path}" 2>/dev/null; then
+      downloaded=1
+      break
+    fi
+  done
+
+  if [ "$downloaded" -eq 1 ]; then
+    for sums_cand in "checksums.txt" "zqk_${ver_num}_checksums.txt" "zqk-community_${ver_num}_checksums.txt"; do
+      if curl -sSLf "${base_url}/${sums_cand}" -o "${checksums_path}" 2>/dev/null; then
+        curl -sSLf "${base_url}/${sums_cand}.sig" -o "${checksums_path}.sig" 2>/dev/null || true
+        curl -sSLf "${base_url}/${sums_cand}.pem" -o "${checksums_path}.pem" 2>/dev/null || true
+        break
+      fi
+    done
+  elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
+    if ! _download_private "$ver" "$archive" "${archive_path}"; then
+      if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
+        echo "Neither ${archive} nor ${comm_archive} found in release ${ver}" >&2
+        exit 1
+      fi
+    fi
+    local sums_downloaded=0
+    for sums_cand in "checksums.txt" "zqk_${ver_num}_checksums.txt" "zqk-community_${ver_num}_checksums.txt"; do
+      if _download_private "$ver" "${sums_cand}" "${checksums_path}"; then
+        _download_private "$ver" "${sums_cand}.sig" "${checksums_path}.sig" || true
+        _download_private "$ver" "${sums_cand}.pem" "${checksums_path}.pem" || true
+        sums_downloaded=1
+        break
+      fi
+    done
+    if [ "$sums_downloaded" -eq 0 ]; then
+      echo "Checksums file not found in release ${ver}" >&2
+      exit 1
+    fi
+  else
+    echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
+    exit 1
+  fi
+
+  if [ "${ZQK_REQUIRE_COSIGN:-0}" = "1" ] && [ ! -f "${checksums_path}.sig" ]; then
+    echo "Error: checksums.txt.sig could not be downloaded and ZQK_REQUIRE_COSIGN=1" >&2
+    exit 1
+  fi
+
+  echo "🔒 Verifying checksum..."
+  _verify_archive_sha256 "${checksums_path}" "${archive_path}"
+  _verify_checksums_signature "${checksums_path}"
+
+  echo "📦 Extracting..."
+  tar -xzf "${archive_path}" -C "$TMPDIR"
+  local extract_dir="${TMPDIR}/zqk_${ver_num}_${OS}_${ARCH}"
+  [ -d "$extract_dir" ] || extract_dir="${TMPDIR}/zqk-community_${ver_num}_${OS}_${ARCH}"
+  [ -d "$extract_dir" ] || extract_dir="${TMPDIR}"  # goreleaser flat layout fallback
+
+  if [ -f "$extract_dir/zqk-community" ] && [ ! -f "$extract_dir/zqk" ]; then
+    cp "$extract_dir/zqk-community" "$extract_dir/zqk"
+  fi
+
+  _place_binary "$extract_dir/zqk" "$extract_dir/zqk-mcp"
+}
+
+_download_private() {
+  local ver="$1" asset_name="$2" out="$3"
+
+  # Fast path: use gh CLI if available
+  if command -v gh >/dev/null 2>&1; then
+    if gh release download "$ver" -p "$asset_name" --output "$out" --repo "$REPO" --clobber >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  # Fallback: GitHub Releases REST API
+  if [ -n "$GITHUB_TOKEN" ]; then
+    local token
+    token="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
+    local release_json
+    release_json=$(curl -sSL -H "Authorization: Bearer $token" \
+      -H "Accept: application/vnd.github.v3+json" \
+      "https://api.github.com/repos/${REPO}/releases/tags/${ver}" 2>/dev/null)
+
+    local asset_url=""
+    if command -v python3 >/dev/null 2>&1; then
+      asset_url=$(printf '%s' "$release_json" | python3 -c '
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    for a in d.get("assets", []):
+        if a.get("name") == sys.argv[1]:
+            print(a.get("url", ""))
+            break
+except Exception:
+    pass
+' "$asset_name" 2>/dev/null || true)
+    fi
+
+    if [ -z "$asset_url" ]; then
+      asset_url=$(printf '%s' "$release_json" | awk -v name="$asset_name" '
+        BEGIN { RS="{"; FS="," }
+        $0 ~ ("\"name\":[ ]*\"" name "\"") {
+          for (i=1; i<=NF; i++) {
+            if ($i ~ /"url":/) {
+              gsub(/.*"url":[ ]*"/, "", $i)
+              gsub(/".*/, "", $i)
+              print $i
+              exit
+            }
+          }
+        }
+      ')
+    fi
+
+    if [ -n "$asset_url" ]; then
+      if curl -sSL -H "Authorization: Bearer $token" \
+        -H "Accept: application/octet-stream" "$asset_url" -o "$out"; then
+        return 0
+      fi
+    fi
+  fi
+
+  return 1
+}
+
+# ---------------------------------------------------------------------------
+# Helper: go install (requires public module or GONOSUMCHECK)
+# ---------------------------------------------------------------------------
+install_go() {
+  local ver="$1"
+  command -v go >/dev/null 2>&1 || { echo "Go toolchain not found. Install from https://go.dev/dl/" >&2; exit 1; }
+  local pkg="${MODULE}/cmd/zqk@${ver}"
+  echo "🔧 Installing via go install ${pkg}..."
+  go install "$pkg"
+  local gobin
+  gobin="$(go env GOPATH)/bin"
+  if [ -f "${gobin}/zqk" ]; then
+    _place_binary "${gobin}/zqk" ""
+  else
+    echo "go install succeeded; zqk is in $(go env GOPATH)/bin — add it to your PATH." >&2
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Helper: build from source (< 2 min on modern hardware with Go installed)
+# ---------------------------------------------------------------------------
+install_source() {
+  command -v go >/dev/null 2>&1 || { echo "Go toolchain not found. Install from https://go.dev/dl/" >&2; exit 1; }
+
+  # Fast path: if running within local repository checkout, build directly
+  if [ -f "./cmd/zqk/main.go" ]; then
+    echo "🔧 Building from local repository..."
+    local local_bin
+    local_bin="$(mktemp -d)/zqk"
+    go build -o "$local_bin" ./cmd/zqk
+    _place_binary "$local_bin" ""
+    rm -rf "$(dirname "$local_bin")"
+    return 0
+  fi
+
+  command -v git >/dev/null 2>&1 || { echo "git not found." >&2; exit 1; }
+  local src_dir
+  src_dir="$(mktemp -d)/zqk-src"
+  echo "📦 Cloning ${REPO} (shallow)..."
+  git clone --depth=1 "https://github.com/${REPO}.git" "$src_dir"
+  echo "🔧 Building..."
+  if command -v make >/dev/null 2>&1 && [ -f "${src_dir}/Makefile" ]; then
+    make -C "$src_dir" zqk || go build -o "${src_dir}/bin/zqk" "${src_dir}/cmd/zqk"
+  else
+    go build -o "${src_dir}/bin/zqk" "${src_dir}/cmd/zqk"
+  fi
+  if [ -f "${src_dir}/bin/zqk" ]; then
+    _place_binary "${src_dir}/bin/zqk" ""
+  elif [ -f "${src_dir}/zqk" ]; then
+    _place_binary "${src_dir}/zqk" ""
+  else
+    echo "❌ Built binary not found in ${src_dir}/bin/zqk" >&2
+    exit 1
+  fi
+  rm -rf "$src_dir"
+}
+
+# ---------------------------------------------------------------------------
+# Helper: place binary into INSTALL_DIR
+# ---------------------------------------------------------------------------
+_place_binary() {
+  local bin="$1" mcp_bin="$2"
+  if [ ! -w "$INSTALL_DIR" ]; then
+    if [ "$NO_SUDO" = "1" ]; then
+      # Fail closed for agent/headless: never hang on interactive sudo (GH#961).
+      local fallback="${HOME}/.local/bin"
+      if [ -z "${HOME:-}" ]; then
+        fallback="$(pwd)/bin"
+      fi
+      echo "⚠️  ${INSTALL_DIR} is not writable and sudo is disabled (non-interactive/--no-sudo)." >&2
+      echo "    Falling back to ${fallback}. Override with --prefix=/path or ZQK_INSTALL_DIR." >&2
+      INSTALL_DIR="$fallback"
+      mkdir -p "$INSTALL_DIR" || {
+        echo "❌ Cannot create ${INSTALL_DIR}" >&2
+        exit 1
+      }
+    fi
+  fi
+  if [ ! -w "$INSTALL_DIR" ]; then
+    if [ "$NO_SUDO" = "1" ]; then
+      echo "❌ ${INSTALL_DIR} is not writable and interactive sudo is disabled." >&2
+      echo "   Re-run with --prefix=\$HOME/.local/bin or a writable ZQK_INSTALL_DIR." >&2
+      exit 1
+    fi
+    echo "🔑 Installing to ${INSTALL_DIR} (requires sudo)..."
+    sudo install -m 755 "$bin" "${INSTALL_DIR}/zqk"
+    [ -f "$mcp_bin" ] && sudo install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
+    sudo ln -sf "${INSTALL_DIR}/zqk" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
+  else
+    echo "📂 Installing to ${INSTALL_DIR}..."
+    install -m 755 "$bin" "${INSTALL_DIR}/zqk"
+    [ -f "$mcp_bin" ] && install -m 755 "$mcp_bin" "${INSTALL_DIR}/zqk-mcp"
+    ln -sf "${INSTALL_DIR}/zqk" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
+  fi
+  # Remove macOS quarantine flag
+  if [ "$OS" = "darwin" ] && command -v xattr >/dev/null 2>&1; then
+    if [ ! -w "$INSTALL_DIR" ]; then
+      if [ "$NO_SUDO" != "1" ]; then
+        sudo xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+      fi
+    else
+      xattr -d com.apple.quarantine "${INSTALL_DIR}/zqk" 2>/dev/null || true
+    fi
+  fi
+  # Ad-hoc sign binary on macOS to satisfy Gatekeeper / arm64 code signing enforcement (GH-995)
+  if [ "$OS" = "darwin" ] && command -v codesign >/dev/null 2>&1; then
+    codesign -s - -f "${INSTALL_DIR}/zqk" 2>/dev/null || true
+    [ -f "${INSTALL_DIR}/zqk-mcp" ] && codesign -s - -f "${INSTALL_DIR}/zqk-mcp" 2>/dev/null || true
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 3. Main dispatch
+# ---------------------------------------------------------------------------
+echo "🚀 ZQK Installer — method=${INSTALL_METHOD} version=${VERSION}"
+
+case "$INSTALL_METHOD" in
+  source)
+    install_source
+    ;;
+  goinstall)
+    [ "$VERSION" = "latest" ] && VERSION="latest"
+    install_go "$VERSION"
+    ;;
+  binary)
+    if [ "$VERSION" = "latest" ]; then
+      VERSION="$(resolve_latest)"
+      [ -n "$VERSION" ] || { echo "Could not resolve latest version. Specify a version: ./install.sh v2.7.0" >&2; exit 1; }
+    fi
+    install_binary "$VERSION"
+    ;;
+  auto|*)
+    # Auto: try binary (public) → go install → source
+    if [ "$VERSION" = "latest" ]; then
+      VERSION="$(resolve_latest 2>/dev/null)" || true
+    fi
+    if [ -n "$VERSION" ] && [ "$VERSION" != "latest" ]; then
+      install_binary "$VERSION" 2>/dev/null && DONE=1 || true
+    fi
+    if [ -z "$DONE" ]; then
+      echo "Binary release not available — trying go install..."
+      install_go "latest" 2>/dev/null && DONE=1 || true
+    fi
+    if [ -z "$DONE" ]; then
+      echo "go install not available — building from source (requires git + Go)..."
+      install_source
+    fi
+    ;;
+esac
+
+# ---------------------------------------------------------------------------
+# 4. Post-install verification and quick-start hint
+# ---------------------------------------------------------------------------
+if command -v zqk >/dev/null 2>&1 || [ -f "${INSTALL_DIR}/zqk" ]; then
+  ZQK_BIN="${INSTALL_DIR}/zqk"
+  if [ ! -x "$ZQK_BIN" ] && command -v zqk >/dev/null 2>&1; then
+    ZQK_BIN="$(command -v zqk)"
+  fi
+  ln -sf "$ZQK_BIN" "${INSTALL_DIR}/zgrep" 2>/dev/null || true
+  ZQK_VER="$("$ZQK_BIN" version 2>/dev/null || echo 'installed')"
+
+  if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    BOLD="\033[1m"
+    CYAN="\033[36m"
+    GREEN="\033[32m"
+    YELLOW="\033[33m"
+    RESET="\033[0m"
+  else
+    BOLD=""
+    CYAN=""
+    GREEN=""
+    YELLOW=""
+    RESET=""
+  fi
+
+  echo ""
+  echo "${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════════════════════════╗${RESET}"
+  echo "${CYAN}${BOLD}║                     ⚡ ZQK: Git for AI Agent Memory & Task Truth                 ║${RESET}"
+  echo "${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════════════════════════╝${RESET}"
+  echo ""
+  echo "  ${GREEN}✓${RESET} ${BOLD}zqk${RESET}   (${ZQK_VER}) installed to ${INSTALL_DIR}/zqk"
+  echo "  ${GREEN}✓${RESET} ${BOLD}zgrep${RESET} linked to ${INSTALL_DIR}/zgrep"
+  echo ""
+  echo "  ${BOLD}10-Second Value Prop:${RESET}"
+  echo "  • Sub-15ms AST code search stops context-window blowouts in Cursor, Claude Code, Cline & Windsurf."
+  echo "  • Persistent Knowledge Kernel coordinates multi-agent delivery with zero hallucination drift."
+  echo ""
+  echo "  ${YELLOW}${BOLD}Next step:${RESET} run ${CYAN}zqk mcp install${RESET} to supercharge Cursor / Claude Code with sub-15ms persistent memory."
+  echo ""
+
+  case ":$PATH:" in
+    *":$INSTALL_DIR:"*) ;;
+    *)
+      echo "  ${YELLOW}ℹ️  Note:${RESET} ${INSTALL_DIR} is not in your current PATH."
+      echo "     Add it with: export PATH=\"${INSTALL_DIR}:\$PATH\""
+      echo ""
+      ;;
+  esac
+
+  if [ "$MODE" = "fast" ]; then
+    echo "========================================================================"
+    echo "⚡ Go Fast — Drop into your agent rules (.cursorrules, CLAUDE.md, .clinerules):"
+    echo "========================================================================"
+    echo "  • Search:  zgrep \"<query>\" --max-tokens 500 -f json"
+    echo "  • Go AST:  zgrep --ast --kind struct|func \"<name>\""
+    echo "  • Reindex: zgrep --reindex"
+    echo ""
+    echo "Ready to explore the kernel later? Run: zqk system start-here"
+    echo "Docs: https://github.com/${REPO}#readme"
+    echo "========================================================================"
+  else
+    echo "========================================================================"
+    echo "🧭 Walk Through — Launching Knowledge Kernel Walkthrough..."
+    echo "========================================================================"
+    "$ZQK_BIN" system start-here || true
+  fi
+else
+  echo "❌ Installation could not be completed." >&2
+  exit 1
+fi

@@ -2,15 +2,15 @@
 
 ## 1. Executive Architectural Summary
 
-The **AppleDouble Resource-Fork Sidecar & Filesystem Hygiene Subsystem** ([`pkg/appledouble`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go)) provides high-performance, deterministic detection and filtering primitives for macOS AppleDouble resource-fork sidecar files across the **ZQK Knowledge Kernel**.
+The **AppleDouble Resource-Fork Sidecar & Filesystem Hygiene Subsystem** ([`pkg/appledouble`](../../pkg/appledouble/appledouble.go)) provides high-performance, deterministic detection and filtering primitives for macOS AppleDouble resource-fork sidecar files across the **ZQK Knowledge Kernel**.
 
 When engineers and autonomous agents interact with git workspaces, shared network volumes, or external archives, macOS file operations frequently synthesize auxiliary sidecars prefixed with `._`. These sidecars are binary AppleDouble wrappers containing legacy resource forks or extended attributes. If ingested by the Knowledge Kernel's automated scanners, these non-text sidecars contaminate YAML deserializers, trigger parser panics, distort file metrics, and pollute version-controlled trees.
 
 The `pkg/appledouble` package provides:
-1. **Zero-Allocation Filename Detection:** High-speed classification of file basenames via [`IsSidecarFileName`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L14) and its semantic alias [`SkipNameInReadDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L43).
-2. **Segment-Aware Path Traversal:** Deep segment inspection via [`PathHasSidecarSegment`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L20) and [`SkipPathInTreeWalk`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L36) that detects sidecars nested anywhere within directory hierarchies.
+1. **Zero-Allocation Filename Detection:** High-speed classification of file basenames via [`IsSidecarFileName`](../../pkg/appledouble/appledouble.go#L14) and its semantic alias [`SkipNameInReadDir`](../../pkg/appledouble/appledouble.go#L43).
+2. **Segment-Aware Path Traversal:** Deep segment inspection via [`PathHasSidecarSegment`](../../pkg/appledouble/appledouble.go#L20) and [`SkipPathInTreeWalk`](../../pkg/appledouble/appledouble.go#L36) that detects sidecars nested anywhere within directory hierarchies.
 3. **Cross-Platform Path Normalization:** Seamless handling of Unix slashes and Windows backslashes ensuring identical behavior across Darwin, Linux, and Windows runtimes.
-4. **Composite Tree-Walk Evaluator:** Unified pruning logic via [`SkipDirOrSidecar`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L48) for concise, readable filesystem traversal routines.
+4. **Composite Tree-Walk Evaluator:** Unified pruning logic via [`SkipDirOrSidecar`](../../pkg/appledouble/appledouble.go#L48) for concise, readable filesystem traversal routines.
 5. **Strict 100% Statement Coverage Invariant:** Exhaustive boundary, integration, and concurrency verification guarantees absolute reliability on hot scanning paths.
 
 ---
@@ -127,11 +127,11 @@ flowchart TD
 | Primitive / Facade | Signature | Core Responsibility |
 | :--- | :--- | :--- |
 | `SidecarPrefix` | `const string = "._"` | Canonical prefix constant defining AppleDouble sidecar identity. |
-| [`IsSidecarFileName`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L14) | `func(name string) bool` | Extracts `filepath.Base(name)` and evaluates `strings.HasPrefix(base, "._")`. |
-| [`SkipNameInReadDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L43) | `func(name string) bool` | Semantic facade for flat directory readers; clarifies intent at call sites. |
-| [`PathHasSidecarSegment`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L20) | `func(path string) bool` | Normalizes path separators (converting Windows `\` to `/`), splits into segments, and checks each non-empty segment for `SidecarPrefix`. |
-| [`SkipPathInTreeWalk`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L36) | `func(path string) bool` | Semantic facade for recursive tree traversals; drops any file or directory containing a sidecar segment. |
-| [`SkipDirOrSidecar`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L48) | `func(isDir bool, path string) bool` | Composite helper evaluating `isDir || SkipPathInTreeWalk(path)`, standardizing file-only visitor logic. |
+| [`IsSidecarFileName`](../../pkg/appledouble/appledouble.go#L14) | `func(name string) bool` | Extracts `filepath.Base(name)` and evaluates `strings.HasPrefix(base, "._")`. |
+| [`SkipNameInReadDir`](../../pkg/appledouble/appledouble.go#L43) | `func(name string) bool` | Semantic facade for flat directory readers; clarifies intent at call sites. |
+| [`PathHasSidecarSegment`](../../pkg/appledouble/appledouble.go#L20) | `func(path string) bool` | Normalizes path separators (converting Windows `\` to `/`), splits into segments, and checks each non-empty segment for `SidecarPrefix`. |
+| [`SkipPathInTreeWalk`](../../pkg/appledouble/appledouble.go#L36) | `func(path string) bool` | Semantic facade for recursive tree traversals; drops any file or directory containing a sidecar segment. |
+| [`SkipDirOrSidecar`](../../pkg/appledouble/appledouble.go#L48) | `func(isDir bool, path string) bool` | Composite helper evaluating `isDir || SkipPathInTreeWalk(path)`, standardizing file-only visitor logic. |
 
 ---
 
@@ -206,7 +206,7 @@ sequenceDiagram
 
 ### 5.2 Idiomatic Flat Directory Scanning (`os.ReadDir`)
 
-When inspecting single directory contents (e.g., reading manifest collections or draft bundles), use [`SkipNameInReadDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L43):
+When inspecting single directory contents (e.g., reading manifest collections or draft bundles), use [`SkipNameInReadDir`](../../pkg/appledouble/appledouble.go#L43):
 
 ```go
 package manifestloader
@@ -285,8 +285,8 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s -cover ./pkg/appledouble
 
 | Test Suite Function | Target Functionality Verified |
 | :--- | :--- |
-| `TestIsSidecarFileName_Comprehensive` | Unit test matrix for [`IsSidecarFileName`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L14) and [`SkipNameInReadDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L43) across 18 edge cases. |
-| `TestPathHasSidecarSegment_Comprehensive` | Unit test matrix for [`PathHasSidecarSegment`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L20) and [`SkipPathInTreeWalk`](file:///Users/lanceettl/zqk-public-candidate/pkg/appledouble/appledouble.go#L36) covering root paths, deep nesting, Windows backslashes, and consecutive slashes. |
+| `TestIsSidecarFileName_Comprehensive` | Unit test matrix for [`IsSidecarFileName`](../../pkg/appledouble/appledouble.go#L14) and [`SkipNameInReadDir`](../../pkg/appledouble/appledouble.go#L43) across 18 edge cases. |
+| `TestPathHasSidecarSegment_Comprehensive` | Unit test matrix for [`PathHasSidecarSegment`](../../pkg/appledouble/appledouble.go#L20) and [`SkipPathInTreeWalk`](../../pkg/appledouble/appledouble.go#L36) covering root paths, deep nesting, Windows backslashes, and consecutive slashes. |
 | `TestSkipDirOrSidecar_Matrix` | Truth-table coverage for composite evaluation across directory and file permutations. |
 | `TestReadDirFiltering_Hermetic` | Hermetic filesystem test simulating `os.ReadDir` on temporary directory trees. |
 | `TestTreeWalkFiltering_Hermetic` | Hermetic filesystem test simulating `filepath.WalkDir` with sidecar file and directory pruning. |

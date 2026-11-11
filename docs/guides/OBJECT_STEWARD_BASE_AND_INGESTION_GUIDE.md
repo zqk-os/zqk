@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Object Steward Base, Ingestion Enqueuer & Work Delivery Subsystem** ([`pkg/stewardbase`](file:///Users/lanceettl/zqk-public-candidate/pkg/stewardbase/enqueue.go)) delivers a decoupled, thread-safe, and bounded maintenance ingestion pipeline for the **ZQK Knowledge Kernel**.
+The **Object Steward Base, Ingestion Enqueuer & Work Delivery Subsystem** ([`pkg/stewardbase`](../../pkg/stewardbase/enqueue.go)) delivers a decoupled, thread-safe, and bounded maintenance ingestion pipeline for the **ZQK Knowledge Kernel**.
 
 In distributed autonomous kernel architectures, data cells manage distinct physical persistence layouts ranging from Content-Addressed Storage (CAS) entity directories to light runtime configuration files and append-heavy append-only streams. As entities are mutated, invalidated, or compacted, background maintenance operations—such as segment compaction, read-model summary refreshes, stream kind stewardship, and retention sweeps—must be scheduled and executed without stalling interactive operations or blocking hot-path execution loops.
 
@@ -13,11 +13,11 @@ Direct synchronous execution of heavy maintenance within transaction boundaries 
 
 Governed by core platform policies (including POL-DEFAULT-b17f54c251eb3c4d and POL-CODE-007), the `pkg/stewardbase` subsystem solves these challenges by establishing a lightweight, non-blocking ingestion boundary:
 
-1. **Decoupled Ingestion & Scheduling:** Work producers enqueue semantic maintenance operations ([`MaintenanceOp`](file:///Users/lanceettl/zqk-public-candidate/pkg/datacell/membrane.go#L56)) into an append-only JSONL queue without awaiting execution or managing background thread lifecycles.
-2. **Strict Profile Validation:** Enqueuing strictly validates target storage profiles ([`StorageProfile`](file:///Users/lanceettl/zqk-public-candidate/pkg/datacell/profile.go#L9)) fail-closed against known kernel profiles (`cas_entity`, `light_file`, `stream`), rejecting unrecognized profiles upfront.
-3. **Deterministic Payload Clamping:** Operational metadata details are strictly capped at 512 bytes ([`StewardEnqueueDetailMaxBytes`](file:///Users/lanceettl/zqk-public-candidate/pkg/stewardbase/enqueue.go#L17)), preventing runaway log files and guaranteeing bounded scanner memory during queue drainage.
+1. **Decoupled Ingestion & Scheduling:** Work producers enqueue semantic maintenance operations ([`MaintenanceOp`](../../pkg/datacell/membrane.go#L56)) into an append-only JSONL queue without awaiting execution or managing background thread lifecycles.
+2. **Strict Profile Validation:** Enqueuing strictly validates target storage profiles ([`StorageProfile`](../../pkg/datacell/profile.go#L9)) fail-closed against known kernel profiles (`cas_entity`, `light_file`, `stream`), rejecting unrecognized profiles upfront.
+3. **Deterministic Payload Clamping:** Operational metadata details are strictly capped at 512 bytes ([`StewardEnqueueDetailMaxBytes`](../../pkg/stewardbase/enqueue.go#L17)), preventing runaway log files and guaranteeing bounded scanner memory during queue drainage.
 4. **Atomic JSONL Disk Persistence:** Records are serialized to line-delimited JSON and appended atomically to `.zqk/logs/datacell/steward_enqueue.jsonl` using append-only filesystem operations.
-5. **Observability & Structured Telemetry:** Enqueued maintenance operations emit standardized structured logs via [`logging.Fluent`](file:///Users/lanceettl/zqk-public-candidate/pkg/logging/fluent.go) under the canonical event key `datacell_steward_enqueue`.
+5. **Observability & Structured Telemetry:** Enqueued maintenance operations emit standardized structured logs via [`logging.Fluent`](../../pkg/logging/fluent_builder.go) under the canonical event key `datacell_steward_enqueue`.
 6. **Static Floor Coverage Invariant:** The subsystem maintains a 100.0% statement test coverage invariant, surpassing the static floor mandate ($\ge 85.0\%$).
 
 ---
@@ -75,12 +75,12 @@ flowchart TD
 
 | Component | Architecture Role | Key Responsibilities | Source Reference |
 | :--- | :--- | :--- | :--- |
-| **`EnqueueStewardMaintenance`** | Primary Ingestion API | Validates storage profiles, clamps detail payloads, builds JSONL envelope, delegates to appender, and broadcasts telemetry. | [`enqueue.go#L23-L53`](file:///Users/lanceettl/zqk-public-candidate/pkg/stewardbase/enqueue.go#L23-L53) |
-| **`AppendStewardEnqueueRecord`** | Queue Persistence Engine | Validates project root, constructs fallback queue path under `.zqk/logs/datacell/`, and appends JSON lines atomically via `fileutil.AppendJSONLine`. | [`enqueue.go#L56-L69`](file:///Users/lanceettl/zqk-public-candidate/pkg/stewardbase/enqueue.go#L56-L69) |
-| **`StewardEnqueueDetailMaxBytes`** | Bounded Payload Constant | Caps `MaintenanceOp.Detail` strings to exactly 512 bytes to protect against unbounded log file growth and excessive memory allocation during drain scans. | [`enqueue.go#L16-L17`](file:///Users/lanceettl/zqk-public-candidate/pkg/stewardbase/enqueue.go#L16-L17) |
-| **`LogEventStewardEnqueue`** | Canonical Telemetry Key | Standardized event identifier (`datacell_steward_enqueue`) for structured log consumers, dashboards, and SIEM monitoring. | [`enqueue.go#L19-L20`](file:///Users/lanceettl/zqk-public-candidate/pkg/stewardbase/enqueue.go#L19-L20) |
-| **`datacell.StorageProfile`** | Physical Layer Descriptor | Canonical classification of storage layouts (`cas_entity`, `light_file`, `stream`). | [`pkg/datacell/profile.go#L9`](file:///Users/lanceettl/zqk-public-candidate/pkg/datacell/profile.go#L9) |
-| **`datacell.MaintenanceOp`** | Maintenance Work Unit | Struct encapsulating operation semantic name (`compact_segments`, `invalidate_cache`, etc.) and optional diagnostic detail. | [`pkg/datacell/membrane.go#L56`](file:///Users/lanceettl/zqk-public-candidate/pkg/datacell/membrane.go#L56) |
+| **`EnqueueStewardMaintenance`** | Primary Ingestion API | Validates storage profiles, clamps detail payloads, builds JSONL envelope, delegates to appender, and broadcasts telemetry. | [`enqueue.go#L23-L53`](../../pkg/stewardbase/enqueue.go#L23-L53) |
+| **`AppendStewardEnqueueRecord`** | Queue Persistence Engine | Validates project root, constructs fallback queue path under `.zqk/logs/datacell/`, and appends JSON lines atomically via `fileutil.AppendJSONLine`. | [`enqueue.go#L56-L69`](../../pkg/stewardbase/enqueue.go#L56-L69) |
+| **`StewardEnqueueDetailMaxBytes`** | Bounded Payload Constant | Caps `MaintenanceOp.Detail` strings to exactly 512 bytes to protect against unbounded log file growth and excessive memory allocation during drain scans. | [`enqueue.go#L16-L17`](../../pkg/stewardbase/enqueue.go#L16-L17) |
+| **`LogEventStewardEnqueue`** | Canonical Telemetry Key | Standardized event identifier (`datacell_steward_enqueue`) for structured log consumers, dashboards, and SIEM monitoring. | [`enqueue.go#L19-L20`](../../pkg/stewardbase/enqueue.go#L19-L20) |
+| **`datacell.StorageProfile`** | Physical Layer Descriptor | Canonical classification of storage layouts (`cas_entity`, `light_file`, `stream`). | [`pkg/datacell/profile.go#L9`](../../pkg/datacell/profile.go#L9) |
+| **`datacell.MaintenanceOp`** | Maintenance Work Unit | Struct encapsulating operation semantic name (`compact_segments`, `invalidate_cache`, etc.) and optional diagnostic detail. | [`pkg/datacell/membrane.go#L56`](../../pkg/datacell/membrane.go#L56) |
 
 ---
 
@@ -166,7 +166,7 @@ Records are appended to:
 ```
 <projectRoot>/.zqk/logs/datacell/steward_enqueue.jsonl
 ```
-This path is calculated using the canonical path definitions from [`pkg/paths`](file:///Users/lanceettl/zqk-public-candidate/pkg/paths/runtime_layout.go):
+This path is calculated using the canonical path definitions from [`pkg/paths`](../../pkg/paths/runtime_layout.go):
 ```go
 path := filepath.Join(root, paths.ProjectDataDir, paths.LogsDir, "datacell", "steward_enqueue.jsonl")
 ```
@@ -179,12 +179,12 @@ This isolates queue I/O from primary process objects (`.zqk/process/`) while lev
 The `pkg/stewardbase` subsystem achieves high-concurrency safety through three architectural layers:
 
 1. **Lock-Free Ingestion Execution:** The `EnqueueStewardMaintenance` function maintains no shared package-level mutable state or global locks. Each invocation operates solely on its stack parameters and passes an immutable payload to the filesystem layer.
-2. **Filesystem-Level Atomic Appends:** Underlying file writes execute via [`fileutil.AppendJSONLine`](file:///Users/lanceettl/zqk-public-candidate/pkg/utils/fileutil/fileutil.go#L217), which opens the target file with standard operating system append semantics:
+2. **Filesystem-Level Atomic Appends:** Underlying file writes execute via [`fileutil.AppendJSONLine`](../../pkg/utils/fileutil/fileutil.go#L217), which opens the target file with standard operating system append semantics:
    ```go
    os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
    ```
    Under POSIX and macOS filesystem guarantees, atomic append writes ensure that individual JSON records from concurrent goroutines do not interleave or corrupt each other.
-3. **Goroutine Profiling & Labeling:** When concurrent operations enqueue work in background tasks or tests, execution is scheduled via [`goroutinelabels.NewGoroutine`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels/builder.go) to ensure thread tracking, budget allocation, and deadlock avoidance.
+3. **Goroutine Profiling & Labeling:** When concurrent operations enqueue work in background tasks or tests, execution is scheduled via [`goroutinelabels.NewGoroutine`](../../pkg/goroutinelabels/builder.go) to ensure thread tracking, budget allocation, and deadlock avoidance.
 
 ---
 

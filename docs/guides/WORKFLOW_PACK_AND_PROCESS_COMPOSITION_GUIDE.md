@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Workflow Pack & Process Composition Subsystem** ([`pkg/workflowpack`](file:///Users/lanceettl/zqk-public-candidate/pkg/workflowpack/pack.go), [`packs/workflow`](file:///Users/lanceettl/zqk-public-candidate/packs/workflow)) establishes the foundational schema definitions, lifecycle state machine, stage orchestration taxonomy, role-based boundary scoping, and runtime composition root bindings for structured execution methodologies within the **ZQK Knowledge Kernel**.
+The **Workflow Pack & Process Composition Subsystem** ([`pkg/workflowpack`](../../pkg/workflowpack/pack.go), [`packs/workflow`](../../packs/workflow)) establishes the foundational schema definitions, lifecycle state machine, stage orchestration taxonomy, role-based boundary scoping, and runtime composition root bindings for structured execution methodologies within the **ZQK Knowledge Kernel**.
 
 In multi-agent autonomous engineering environments, unconstrained conversational prompts are brittle and error-prone. Without deterministic boundaries, agents frequently wander off-track, invent undocumented steps, skip verification gates, or execute tasks outside their designated roles. The Workflow Pack replaces transient prompting with persistent, verifiable, and version-controlled process graphs:
 

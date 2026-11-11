@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Release Pack Composition, Object Kind Bindings & Spec Mapping Subsystem** ([`pkg/releasepack`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasepack/pack.go)) serves as the core kernel bridge binding release domain object models, lifecycle definitions, and code-generated builder constructors into the unified ZQK composition root.
+The **Release Pack Composition, Object Kind Bindings & Spec Mapping Subsystem** ([`pkg/releasepack`](../../pkg/releasepack/pack.go)) serves as the core kernel bridge binding release domain object models, lifecycle definitions, and code-generated builder constructors into the unified ZQK composition root.
 
 Within the ZQK Knowledge Kernel, functionality is partitioned into modular domain packs (e.g. `workpack`, `agentpack`, `pipelinepack`, `releasepack`). Each pack encapsulates its object schemas, lifecycle state transitions, instance builders, and command bindings. The release pack governs the official representation of software version cuts, tracking milestones, backlog deliverables, verification criteria, and release notes:
 
@@ -260,7 +260,7 @@ To run the release pack test suite in isolation:
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s -cover ./pkg/releasepack
 ```
 
-All test cases are implemented in [`releasepack_coverage_elevation_cycle198_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasepack/releasepack_coverage_elevation_cycle198_test.go), licensed under Apache-2.0, with zero swallowed errors and complete error branch assertion.
+All test cases are implemented in [`releasepack_coverage_elevation_cycle198_test.go`](../../pkg/releasepack/releasepack_kind_verify_test.go), licensed under Apache-2.0, with zero swallowed errors and complete error branch assertion.
 
 ---
 

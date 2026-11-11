@@ -424,14 +424,26 @@ def render_markdown_to_html(content: str, current_html_rel: str, link_map: dict,
                 target = os.path.relpath(file_raw, repo_root)
             elif "/zqk-public-candidate/" in file_raw:
                 target = file_raw.split("/zqk-public-candidate/", 1)[1]
+            elif "/zqk/" in file_raw:
+                target = file_raw.split("/zqk/", 1)[1]
+            elif "/zqke/" in file_raw:
+                target = file_raw.split("/zqke/", 1)[1]
             elif file_raw.startswith("/"):
                 stripped = file_raw.lstrip("/")
                 if repo_root and os.path.exists(os.path.join(repo_root, stripped)):
                     target = stripped
                 else:
-                    target = file_raw
+                    target = stripped
+            else:
+                target = file_raw
             if file_anchor:
                 target = target + file_anchor
+
+        # Strip any absolute workstation paths that leaked through
+        for ws_marker in ["/zqk-public-candidate/", "/zqk/", "/zqke/"]:
+            if ws_marker in target:
+                target = target.split(ws_marker, 1)[1]
+                break
 
         anchor = ""
         if "#" in target:

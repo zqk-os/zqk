@@ -235,7 +235,7 @@ This artifact establishes an automated, collision-free normalization mapping tha
 
 ## Automation & Verification Tooling
 
-A dedicated migration script has been authored at [`scripts/open-core/test-normalization/normalize_cycle_test_names.sh`](file:///scripts/open-core/test-normalization/normalize_cycle_test_names.sh) supporting:
+A dedicated migration script has been authored at [`scripts/open-core/test-normalization/normalize_cycle_test_names.sh`](../../scripts/open-core/test-normalization/normalize_cycle_test_names.sh) supporting:
 
 ```bash
 # 1. Perform dry-run and verify zero collisions

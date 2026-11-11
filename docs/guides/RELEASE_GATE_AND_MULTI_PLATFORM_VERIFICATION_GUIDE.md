@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Release Gate, Multi-Platform Compilation & Public Payload Verification Subsystem** ([`pkg/releasegate`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/public_payload_check.go)) enforces deterministic, fail-closed release readiness across all target operating systems, system architectures, and distribution channels in the ZQK core platform.
+The **Release Gate, Multi-Platform Compilation & Public Payload Verification Subsystem** ([`pkg/releasegate`](../../pkg/releasegate/public_payload_check.go)) enforces deterministic, fail-closed release readiness across all target operating systems, system architectures, and distribution channels in the ZQK core platform.
 
 Governed by core modularity and system boundary policy **POL-DEFAULT-b17f54c251eb3c4d**, the release gate ensures that no binary or distribution tarball reaches end users, homebrew taps, or container registries without cryptographic, structural, and behavioral verification:
 
@@ -92,7 +92,7 @@ flowchart TD
 
 ## 3. Core Component Topology
 
-The subsystem is partitioned into modular, high-cohesion components within [`pkg/releasegate`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/public_payload_check.go):
+The subsystem is partitioned into modular, high-cohesion components within [`pkg/releasegate`](../../pkg/releasegate/public_payload_check.go):
 
 ```mermaid
 graph TD
@@ -113,11 +113,11 @@ graph TD
 
 ### Component Roles & Responsibilities
 
-1. **[`PublicPayloadChecker`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/public_payload_check.go):**
+1. **[`PublicPayloadChecker`](../../pkg/releasegate/public_payload_check.go):**
    Ergonomic entry point offering structured option binding, configuration retrieval (`Options()`), and execution (`Verify()`).
-2. **[`PayloadVerificationOptions`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/public_payload_check.go):**
+2. **[`PayloadVerificationOptions`](../../pkg/releasegate/public_payload_check.go):**
    Defines the target directory, semantic version tag, required target platforms, license enforcement toggle, and secret scanner activation.
-3. **[`PayloadVerificationResult`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/public_payload_check.go):**
+3. **[`PayloadVerificationResult`](../../pkg/releasegate/public_payload_check.go):**
    Aggregates audit outcomes including verified archives, covered platforms, cryptographic validity status, and a detailed diagnostic issue log.
 4. **Archive Inspectors (`verifyTarGzContents`, `verifyZipContents`):**
    Perform deep stream inspection of archive headers, checking for binary presence (`zqk`, `zcom`), mandatory executable permissions, LICENSE files, sensitive data patterns, and path traversal vectors.
@@ -214,7 +214,7 @@ The release gate enforces five non-negotiable security boundaries:
 1. **Deterministic Test Execution:**
    Cross-platform compilation tests verify clean multi-platform builds while respecting test timeouts. If running in fast unit test mode with short timeouts, heavy multi-binary compilation is bypassed cleanly without failing the suite.
 2. **Statement Test Coverage $\ge 85.0\%$:**
-   All routines and branches in [`pkg/releasegate`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/public_payload_check.go) maintain comprehensive automated unit tests in [`releasegate_coverage_elevation_cycle197_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/releasegate/releasegate_coverage_elevation_cycle197_test.go), achieving **93.7% statement coverage**.
+   All routines and branches in [`pkg/releasegate`](../../pkg/releasegate/public_payload_check.go) maintain comprehensive automated unit tests in [`releasegate_coverage_elevation_cycle197_test.go`](../../pkg/releasegate/releasegate_public_payload_test.go), achieving **93.7% statement coverage**.
 3. **Zero Swallowed Errors:**
    All `Close()` operations, reader stream terminations, and hasher operations are verified and captured. Zero `_ = ...` patterns exist in the package.
 4. **Function Complexity & Length:**

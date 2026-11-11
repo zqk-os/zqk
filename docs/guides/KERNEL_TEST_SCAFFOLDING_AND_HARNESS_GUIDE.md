@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary & Purpose
 
-The **Kernel Test Scaffolding, Deterministic Waiting & Scenario Test Harness Subsystem** ([`pkg/testing`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing)) provides the authoritative foundation for hermetic, deterministic, and isolated testing across all layers of the ZQK Knowledge Kernel.
+The **Kernel Test Scaffolding, Deterministic Waiting & Scenario Test Harness Subsystem** ([`pkg/testing`](../../pkg/testing)) provides the authoritative foundation for hermetic, deterministic, and isolated testing across all layers of the ZQK Knowledge Kernel.
 
 Testing high-concurrency event-driven kernel architectures introduces critical failure modes when relying on standard test paradigms:
 - **Flaky Sleep Invariants:** Arbitrary `time.Sleep()` calls lead to non-deterministic race conditions, test flakes, CI timeouts, or unnecessarily inflated test suite execution times.
@@ -13,9 +13,9 @@ Testing high-concurrency event-driven kernel architectures introduces critical f
 Governed by core platform mandates (including **POL-DEFAULT-142277d3** for deterministic test verification and test data isolation), `pkg/testing` establishes an integrated suite of architectural primitives:
 
 1. **Hermetic Environment Isolation:** Automatically provisions per-test temporary working directories via `t.TempDir()`, redirecting `ZQK_TEST_ROOT` and suppressing external state leaks.
-2. **Deterministic Waiting & Polling:** Replaces arbitrary sleeps with condition polling ([`WaitForCondition`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/deterministic_wait.go#L11), [`CallbackWaiter`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/callback_helpers.go#L11), [`WorkerStateTracker`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/callback_helpers.go#L178)) bounded by explicit context timeouts and small tick intervals.
-3. **Scenario Sandboxing & Virtualization:** Virtualizes checked-in scenario environments ([`ScenarioTestEnvironment`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/scenario_environment.go#L22)), creating executable isolated copies while preserving file permissions and directory hierarchies.
-4. **Snapshot Agnostic Verification:** Provides structured snapshot restoration and validation patterns ([`SnapshotTestHelper`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/snapshot_test_helpers.go#L17)), enabling tests to verify system state against canonical baseline snapshots.
+2. **Deterministic Waiting & Polling:** Replaces arbitrary sleeps with condition polling ([`WaitForCondition`](../../pkg/testing/deterministic_wait.go#L11), [`CallbackWaiter`](../../pkg/testing/callback_helpers.go#L11), [`WorkerStateTracker`](../../pkg/testing/callback_helpers.go#L178)) bounded by explicit context timeouts and small tick intervals.
+3. **Scenario Sandboxing & Virtualization:** Virtualizes checked-in scenario environments ([`ScenarioTestEnvironment`](../../pkg/testing/scenario_environment.go#L22)), creating executable isolated copies while preserving file permissions and directory hierarchies.
+4. **Snapshot Agnostic Verification:** Provides structured snapshot restoration and validation patterns ([`SnapshotTestHelper`](../../pkg/testing/snapshot_test_helpers.go#L17)), enabling tests to verify system state against canonical baseline snapshots.
 5. **Thread-Safe Concurrency & Labeling:** Guarantees parallel test safety across goroutines using explicit read-write synchronization and named execution labels via `goroutinelabels.NewGoroutine`.
 6. **Strict Statement Coverage Floor:** Enforces a static floor invariant of statement test coverage strictly $\ge 85.0\%$ across the subsystem.
 
@@ -69,14 +69,14 @@ flowchart TD
 
 | Component | Architecture Role | Key Responsibilities | Source Reference |
 | :--- | :--- | :--- | :--- |
-| **`TestEnvironment`** | Complete Test Harness | Manages test temporary root creation, spec copying and generation, isolated storage factory instantiation, security context creation, and clean teardown. | [`test_setup.go#L29-L49`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/test_setup.go#L29-L49) |
-| **`TestConfig`** | Configuration Membrane | Evaluates `ZQK_TEST_ROOT` and `ZQK_TEST_DATA_DIR`, overriding project root paths and ensuring commands resolve to isolated test sandboxes. | [`config.go#L20-L31`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/config.go#L20-L31) |
-| **`WaitForCondition`** | Deterministic Poller | Executes polling over condition predicates with short interval ticks and context cancellation awareness, eliminating `time.Sleep`. | [`deterministic_wait.go#L11-L29`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/deterministic_wait.go#L11-L29) |
-| **`CallbackWaiter`** | Event Synchronization | Provides thread-safe callback notification tracking with fast-path checks and channel waiting for asynchronous callbacks. | [`callback_helpers.go#L11-L22`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/callback_helpers.go#L11-L22) |
-| **`WorkerStateTracker`** | Lifecycle State Monitor | Tracks worker startup and shutdown states deterministically, with non-blocking event dispatch and timeout-bounded condition waiting. | [`callback_helpers.go#L178-L190`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/callback_helpers.go#L178-L190) |
-| **`ScenarioTestEnvironment`**| Scenario Virtualizer | Copies checked-in test scenario trees from `test-scenarios/` into ephemeral test roots, preserving file modes and binaries. | [`scenario_environment.go#L22-L35`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/scenario_environment.go#L22-L35) |
-| **`SnapshotTestHelper`** | Snapshot Verifier | Handles test environment preparation and baseline snapshot evaluation, decoupling tests from static entity IDs. | [`snapshot_test_helpers.go#L17-L23`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/snapshot_test_helpers.go#L17-L23) |
-| **`ParseGoTestOutput`** | Test Output Parser | Parses `go test` stdout into structured [`TestRunSummary`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/result_parser.go#L9) structs with status breakdowns and data race detection. | [`result_parser.go#L12-L14`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/result_parser.go#L12-L14) |
+| **`TestEnvironment`** | Complete Test Harness | Manages test temporary root creation, spec copying and generation, isolated storage factory instantiation, security context creation, and clean teardown. | [`test_setup.go#L29-L49`](../../pkg/testing/test_setup.go#L29-L49) |
+| **`TestConfig`** | Configuration Membrane | Evaluates `ZQK_TEST_ROOT` and `ZQK_TEST_DATA_DIR`, overriding project root paths and ensuring commands resolve to isolated test sandboxes. | [`config.go#L20-L31`](../../pkg/testing/config.go#L20-L31) |
+| **`WaitForCondition`** | Deterministic Poller | Executes polling over condition predicates with short interval ticks and context cancellation awareness, eliminating `time.Sleep`. | [`deterministic_wait.go#L11-L29`](../../pkg/testing/deterministic_wait.go#L11-L29) |
+| **`CallbackWaiter`** | Event Synchronization | Provides thread-safe callback notification tracking with fast-path checks and channel waiting for asynchronous callbacks. | [`callback_helpers.go#L11-L22`](../../pkg/testing/callback_helpers.go#L11-L22) |
+| **`WorkerStateTracker`** | Lifecycle State Monitor | Tracks worker startup and shutdown states deterministically, with non-blocking event dispatch and timeout-bounded condition waiting. | [`callback_helpers.go#L178-L190`](../../pkg/testing/callback_helpers.go#L178-L190) |
+| **`ScenarioTestEnvironment`**| Scenario Virtualizer | Copies checked-in test scenario trees from `test-scenarios/` into ephemeral test roots, preserving file modes and binaries. | [`scenario_environment.go#L22-L35`](../../pkg/testing/scenario_environment.go#L22-L35) |
+| **`SnapshotTestHelper`** | Snapshot Verifier | Handles test environment preparation and baseline snapshot evaluation, decoupling tests from static entity IDs. | [`snapshot_test_helpers.go#L17-L23`](../../pkg/testing/snapshot_test_helpers.go#L17-L23) |
+| **`ParseGoTestOutput`** | Test Output Parser | Parses `go test` stdout into structured [`TestRunSummary`](../../pkg/testing/result_parser.go#L9) structs with status breakdowns and data race detection. | [`result_parser.go#L12-L14`](../../pkg/testing/result_parser.go#L12-L14) |
 
 ---
 
@@ -193,7 +193,7 @@ flowchart LR
 ```
 
 ### Sandboxing Mechanics
-- **Recursive Directory Copying:** [`CopyDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/scenario_environment.go#L86) walks the scenario directory tree using `filepath.WalkDir`, ensuring subdirectories are created with `fileutil.EnsureDir` and files are cloned with `io.Copy`.
+- **Recursive Directory Copying:** [`CopyDir`](../../pkg/testing/scenario_environment.go#L86) walks the scenario directory tree using `filepath.WalkDir`, ensuring subdirectories are created with `fileutil.EnsureDir` and files are cloned with `io.Copy`.
 - **Mode Preservation:** Source file permissions (including POSIX executable bits `0o755`) are preserved so that scenario initialization binaries remain executable in sandbox copies.
 - **Fail-Safe Missing Directory Handling:** If a scenario directory is not present, `SetupScenarioTestEnvironment` calls `t.Skipf` rather than failing, preventing local configuration variations from breaking test suites.
 
@@ -204,7 +204,7 @@ flowchart LR
 To support parallel test execution (`t.Parallel()`) and multi-agent swarm testing, all synchronization primitives in `pkg/testing` enforce strict concurrency guarantees:
 
 ### 1. `CallbackWaiter` Mutex Isolation
-The [`CallbackWaiter`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/callback_helpers.go#L11) coordinates asynchronous callbacks across arbitrary goroutines using an atomic counter (`atomic.Int64`) combined with a `sync.Mutex` guarding the waiter channel slice:
+The [`CallbackWaiter`](../../pkg/testing/callback_helpers.go#L11) coordinates asynchronous callbacks across arbitrary goroutines using an atomic counter (`atomic.Int64`) combined with a `sync.Mutex` guarding the waiter channel slice:
 ```go
 // Atomic fast-path avoids lock acquisition when already invoked:
 if cw.invocations.Load() > 0 {
@@ -213,7 +213,7 @@ if cw.invocations.Load() > 0 {
 ```
 
 ### 2. `WorkerStateTracker` Read-Write Locking
-[`WorkerStateTracker`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing/callback_helpers.go#L178) tracks worker status maps using `sync.RWMutex`, allowing concurrent read operations (`IsRunning`) while serializing state updates (`SetState`) and broadcasting state change notifications through non-blocking channel sends.
+[`WorkerStateTracker`](../../pkg/testing/callback_helpers.go#L178) tracks worker status maps using `sync.RWMutex`, allowing concurrent read operations (`IsRunning`) while serializing state updates (`SetState`) and broadcasting state change notifications through non-blocking channel sends.
 
 ### 3. Named Goroutine Labels
 When tests launch asynchronous support routines, they must not invoke raw unmonitored `go func()`. Tests utilize `goroutinelabels.NewGoroutine`:

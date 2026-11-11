@@ -2,14 +2,14 @@
 
 ## 1. Executive Architectural Summary
 
-The **Developer Tooling & Code Generation Subsystem** ([`pkg/zqkdev`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqkdev/helpers.go)) provides bounded, concurrent code generation, spec indexing, builder synthesis, and schema artifact generation across the **ZQK Knowledge Kernel**.
+The **Developer Tooling & Code Generation Subsystem** ([`pkg/zqkdev`](../../pkg/zqkdev/helpers.go)) provides bounded, concurrent code generation, spec indexing, builder synthesis, and schema artifact generation across the **ZQK Knowledge Kernel**.
 
 In modern multi-agent systems and high-throughput ontology development, object specifications, traits, configs, routings, profiles, and lifecycles must be compiled into strongly-typed Go builder code. Running non-isolated, unbounded, or non-deterministic generation leads to corrupt schema artifacts, developer friction, file descriptor exhaustion, and Git churn.
 
 The `pkg/zqkdev` package addresses these demands via:
-1. **Bounded Concurrent Generation ([`ConcurrentGenerate`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqkdev/concurrent_generate.go)):** Leverages worker pools with bounded error groups (`golang.org/x/sync/errgroup`) and concurrency caps to prevent CPU starvation and file descriptor exhaustion.
-2. **AppleDouble and Filesystem Hygiene ([`ShouldProcessYAMLDirEntry`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqkdev/helpers.go)):** Automatically prunes macOS resource forks (`._*`), hidden VCS directories (`.git`), vendor caches (`node_modules`), and hashed artifacts from generator inputs.
-3. **Selective Idempotent Synthesis ([`CollectGenerateItems`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqkdev/helpers.go)):** Evaluates target destinations before disk operations, skipping existing generated code unless explicitly requested via `--overwrite`.
+1. **Bounded Concurrent Generation ([`ConcurrentGenerate`](../../pkg/zqkdev/concurrent_generate.go)):** Leverages worker pools with bounded error groups (`golang.org/x/sync/errgroup`) and concurrency caps to prevent CPU starvation and file descriptor exhaustion.
+2. **AppleDouble and Filesystem Hygiene ([`ShouldProcessYAMLDirEntry`](../../pkg/zqkdev/helpers.go)):** Automatically prunes macOS resource forks (`._*`), hidden VCS directories (`.git`), vendor caches (`node_modules`), and hashed artifacts from generator inputs.
+3. **Selective Idempotent Synthesis ([`CollectGenerateItems`](../../pkg/zqkdev/helpers.go)):** Evaluates target destinations before disk operations, skipping existing generated code unless explicitly requested via `--overwrite`.
 4. **Declarative CLI Code Generation Surface:** Exposes granular Cobra commands under `zqk system generate-*` allowing surgical invocation of specific builders or holistic repository compilation.
 5. **Zero Swallowed Error Discipline & AST Safety:** Guarantees strict diagnostic reporting across all pipeline stages with deterministic exit codes.
 
@@ -76,7 +76,7 @@ The developer subsystem provides individual generation commands corresponding to
 
 ## 4. Concurrency & Pipeline Control
 
-Generation operations process multiple YAML files concurrently using [`ConcurrentGenerate`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqkdev/concurrent_generate.go):
+Generation operations process multiple YAML files concurrently using [`ConcurrentGenerate`](../../pkg/zqkdev/concurrent_generate.go):
 
 ```go
 // ConcurrentGenerate executes generator functions concurrently across items with bounded parallelism.
@@ -96,7 +96,7 @@ func ConcurrentGenerate(
 
 ## 5. Storage Migration & Lifecycle Tracking
 
-The subsystem includes utilities to facilitate zero-downtime ontology migrations. [`runGenerateLifecycleIDList`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqkdev/generate_lifecycle_id_list.go) queries active storage, identifies objects conforming to legacy identification patterns, and compiles a migration manifest:
+The subsystem includes utilities to facilitate zero-downtime ontology migrations. [`runGenerateLifecycleIDList`](../../pkg/zqkdev/generate_lifecycle_id_list.go) queries active storage, identifies objects conforming to legacy identification patterns, and compiles a migration manifest:
 
 ```bash
 # Generate lifecycle migration manifest

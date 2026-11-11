@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **System Modularity Inspection & Codebase Peeling Subsystem** ([`pkg/systempeel`](file:///Users/lanceettl/zqk-public-candidate/pkg/systempeel/peel.go)) provides structural inspection, dynamic modular command peeling, lines-of-code (LOC) metrics analysis, and threshold enforcement across the ZQK Knowledge Kernel.
+The **System Modularity Inspection & Codebase Peeling Subsystem** ([`pkg/systempeel`](../../pkg/systempeel/peel.go)) provides structural inspection, dynamic modular command peeling, lines-of-code (LOC) metrics analysis, and threshold enforcement across the ZQK Knowledge Kernel.
 
 As a high-performance systems engineering framework, ZQK must maintain clean module boundaries, prevent monolithic command bloat, and dynamically register peeled subcommands into the active Cobra command hierarchy. Governed by core modularity policy **POL-DEFAULT-b17f54c251eb3c4d**, the subsystem enforces architectural decoupling by:
 - **Structural Codebase Inspection:** Scanning Go source packages to determine file inventories, file-level lines of code, and subcommand composition.

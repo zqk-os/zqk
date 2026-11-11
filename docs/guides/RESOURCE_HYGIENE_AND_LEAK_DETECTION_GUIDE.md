@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **I/O Resource Hygiene, File Descriptor Leak Detection & Storage Telemetry Subsystem** ([`pkg/resourcehygiene`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/reaper.go)) provides comprehensive runtime resource protection, storage telemetry, and autonomous garbage collection for the ZQK Knowledge Kernel.
+The **I/O Resource Hygiene, File Descriptor Leak Detection & Storage Telemetry Subsystem** ([`pkg/resourcehygiene`](../../pkg/resourcehygiene/reaper.go)) provides comprehensive runtime resource protection, storage telemetry, and autonomous garbage collection for the ZQK Knowledge Kernel.
 
 As a high-performance local developer microkernel orchestrating concurrent AI agent swarms, background daemons, scheduled jobs, and ephemeral worktrees, ZQK core operations generate high-velocity filesystem artifacts. These include content-addressed blobs, write-ahead logs (WAL), lock files, temporary staging buffers, execution outputs, and telemetry chunks.
 
@@ -12,7 +12,7 @@ Without automated resource hygiene and continuous monitoring, sustained autonomo
 3. **Orphaned Process Drift:** Abandoned background worker processes reparented to `init` (PID 1) after an unexpected termination consume CPU and retain file descriptor locks.
 4. **Stale Lock Contention:** Abandoned `.lock` files left by crashed processes prevent downstream worker dispatch.
 
-The `pkg/resourcehygiene` package addresses these concerns through deterministic point-in-time telemetry inspection ([`InspectIOResources`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/telemetry.go#L40)), non-blocking advisory flock probing, cross-platform file descriptor monitoring ([`GetProcessFDUsage`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/fd_usage_unix.go#L14)), and coordinated multi-phase resource reclamation ([`ExecuteHygiene`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/reaper.go#L308)).
+The `pkg/resourcehygiene` package addresses these concerns through deterministic point-in-time telemetry inspection ([`InspectIOResources`](../../pkg/resourcehygiene/telemetry.go#L40)), non-blocking advisory flock probing, cross-platform file descriptor monitoring ([`GetProcessFDUsage`](../../pkg/resourcehygiene/fd_usage_unix.go#L14)), and coordinated multi-phase resource reclamation ([`ExecuteHygiene`](../../pkg/resourcehygiene/reaper.go#L308)).
 
 ---
 
@@ -60,10 +60,10 @@ flowchart TD
 
 ### Component Roles
 
-- **Resource Reaper Engine ([`reaper.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/reaper.go)):** Drives atomic sweeps across lock files, temporary files, logs, orphaned scorecards, aged metric chunks, and reparented child processes.
-- **Storage Telemetry Collector ([`telemetry.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/telemetry.go)):** Generates aggregated point-in-time snapshots of open file descriptors, directory tree size, storage volume capacity, and hygiene anomaly counts.
-- **File Descriptor Usage Monitor ([`fd_usage_unix.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/fd_usage_unix.go) / [`fd_usage_windows.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/fd_usage_windows.go)):** Provides low-overhead inspection of open file descriptors and soft `NOFILE` limits across Unix and Windows platforms.
-- **Configuration & Reporting Contracts ([`types.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/types.go)):** Declares [`HygieneOptions`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/types.go#L32), [`DefaultHygieneOptions`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/types.go#L48), [`IOResourceTelemetry`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/types.go#L14), and [`HygieneExecutionReport`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/types.go#L66).
+- **Resource Reaper Engine ([`reaper.go`](../../pkg/resourcehygiene/reaper.go)):** Drives atomic sweeps across lock files, temporary files, logs, orphaned scorecards, aged metric chunks, and reparented child processes.
+- **Storage Telemetry Collector ([`telemetry.go`](../../pkg/resourcehygiene/telemetry.go)):** Generates aggregated point-in-time snapshots of open file descriptors, directory tree size, storage volume capacity, and hygiene anomaly counts.
+- **File Descriptor Usage Monitor ([`fd_usage_unix.go`](../../pkg/resourcehygiene/fd_usage_unix.go) / [`fd_usage_windows.go`](../../pkg/resourcehygiene/fd_usage_windows.go)):** Provides low-overhead inspection of open file descriptors and soft `NOFILE` limits across Unix and Windows platforms.
+- **Configuration & Reporting Contracts ([`types.go`](../../pkg/resourcehygiene/types.go)):** Declares [`HygieneOptions`](../../pkg/resourcehygiene/types.go#L32), [`DefaultHygieneOptions`](../../pkg/resourcehygiene/types.go#L48), [`IOResourceTelemetry`](../../pkg/resourcehygiene/types.go#L14), and [`HygieneExecutionReport`](../../pkg/resourcehygiene/types.go#L66).
 
 ---
 
@@ -164,17 +164,17 @@ flowchart TD
 ## 5. Orphaned Temporary Files & Stale Lock Safety
 
 ### Temporary Artifact Detection Pattern
-Temporary files created during atomic writes or ephemeral operations follow strict naming conventions verified by [`IsTempFileName`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/telemetry.go#L24):
+Temporary files created during atomic writes or ephemeral operations follow strict naming conventions verified by [`IsTempFileName`](../../pkg/resourcehygiene/telemetry.go#L24):
 - Suffix `.tmp` or `.yaml.tmp`
 - Infix `.tmp-` or `.tmp.`
 - Prefix `.tmp-` or `pclimits-`
 
-Any temporary artifact with modification time strictly older than [`DefaultTempOrphanAge`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/telemetry.go#L21) (30 minutes by default) is categorized as orphaned and queued for reclamation.
+Any temporary artifact with modification time strictly older than [`DefaultTempOrphanAge`](../../pkg/resourcehygiene/telemetry.go#L21) (30 minutes by default) is categorized as orphaned and queued for reclamation.
 
 ### Advisory Flock Probing Protocol
 A critical flaw in naive lock file deletion is unlinking a file that is actively held by a running process. In POSIX filesystems, unlinking a locked file causes inode detachment: subsequent callers open a newly created inode, breaking mutual exclusion while the original process is still running.
 
-[`ReapStaleLocks`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/reaper.go#L135) solves this through a non-blocking lock probe:
+[`ReapStaleLocks`](../../pkg/resourcehygiene/reaper.go#L135) solves this through a non-blocking lock probe:
 1. Verify modification time is older than the configured lock stale age (default 15 minutes).
 2. Skip any lock inside `.zqk/state/daemon_locks/` (permanent singleton daemon reservations).
 3. Open the lock file via `fileutil.OpenFile(path, fileutil.O_RDWR, paths.FilePerm600)`.
@@ -211,7 +211,7 @@ stateDiagram-v2
 
 ## 6. Storage Telemetry, Sizing & Volume Breakdown
 
-The [`InspectIOResources`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/telemetry.go#L40) API aggregates operational storage telemetry across the active project root:
+The [`InspectIOResources`](../../pkg/resourcehygiene/telemetry.go#L40) API aggregates operational storage telemetry across the active project root:
 
 | Telemetry Metric | Field Name | Description |
 | :--- | :--- | :--- |
@@ -254,7 +254,7 @@ TSDB chunks and operational metric logs stored under `.zqk/metrics/` (`command_m
 
 All file inspection and sweep routines in `pkg/resourcehygiene` are re-entrant and concurrency-safe:
 - **Zero Mutex Contention on Inspection:** `InspectIOResources` runs without global locks, relying on filesystem snapshot isolation.
-- **Goroutine Labeling Compliance:** Background cleanup loops and async sweepers MUST be dispatched using [`goroutinelabels.NewGoroutine`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels/builder.go) to ensure proper categorization, panic containment, and lifecycle tracing:
+- **Goroutine Labeling Compliance:** Background cleanup loops and async sweepers MUST be dispatched using [`goroutinelabels.NewGoroutine`](../../pkg/goroutinelabels/builder.go) to ensure proper categorization, panic containment, and lifecycle tracing:
 
 ```go
 builder := goroutinelabels.NewGoroutine("resourcehygiene_reaper", "automated periodic storage hygiene sweep")
@@ -266,7 +266,7 @@ builder.StartSimple(func() {
 })
 ```
 
-- **Filesystem Abstraction Invariant:** All filesystem mutations and lookups strictly utilize [`pkg/utils/fileutil`](file:///Users/lanceettl/zqk-public-candidate/pkg/utils/fileutil/fileutil.go), ensuring safe cross-platform descriptor management and preventing file descriptor leaks in test and production environments.
+- **Filesystem Abstraction Invariant:** All filesystem mutations and lookups strictly utilize [`pkg/utils/fileutil`](../../pkg/utils/fileutil/fileutil.go), ensuring safe cross-platform descriptor management and preventing file descriptor leaks in test and production environments.
 
 ---
 

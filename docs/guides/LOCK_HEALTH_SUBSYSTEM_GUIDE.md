@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Stale Lock Health & Cleanup Subsystem** ([`pkg/lockhealth`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go)) provides deterministic, fail-closed stale lock remediation primitives for the ZQK Knowledge Kernel. Distributed and concurrent execution subsystems—including the background task scheduler (`pkg/scheduler`), file-based lock strategies (`pkg/storage/file`), ambient daemons, and state machine registries—rely on advisory filesystem locks to coordinate critical sections.
+The **Stale Lock Health & Cleanup Subsystem** ([`pkg/lockhealth`](../../pkg/lockhealth/lockhealth.go)) provides deterministic, fail-closed stale lock remediation primitives for the ZQK Knowledge Kernel. Distributed and concurrent execution subsystems—including the background task scheduler (`pkg/scheduler`), file-based lock strategies (`pkg/storage/file`), ambient daemons, and state machine registries—rely on advisory filesystem locks to coordinate critical sections.
 
 When worker processes crash, panic, or are forcibly killed (`SIGKILL`), unreleased lock files can anchor stale state across restarts. Naive lock remediation implementations suffer from two catastrophic failure modes:
 1. **False-Positive Cleanup (Silent No-Ops):** Treating missing or unreadable lock directories as successful sweeps, causing operators or autonomous agents to assume the system is clean when locks were never examined.
@@ -15,8 +15,8 @@ The `pkg/lockhealth` package resolves these challenges by unifying stale-lock sw
 ## 2. Component Topology & Sweep Pipeline
 
 The subsystem exposes two primary entry points:
-- [`Sweep(root, threshold)`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L88): Real-time sweep utilizing `time.Now()` as the reference comparison clock.
-- [`SweepAt(root, threshold, referenceNow)`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L94): Deterministic sweep utilizing a pinned reference timestamp for reproducible testing and replay auditing.
+- [`Sweep(root, threshold)`](../../pkg/lockhealth/lockhealth.go#L88): Real-time sweep utilizing `time.Now()` as the reference comparison clock.
+- [`SweepAt(root, threshold, referenceNow)`](../../pkg/lockhealth/lockhealth.go#L94): Deterministic sweep utilizing a pinned reference timestamp for reproducible testing and replay auditing.
 
 ```mermaid
 flowchart TD
@@ -65,12 +65,12 @@ In distributed agent environments, silent error suppression leads to cascading s
 
 | Condition | Failure Semantics | Contract Guarantee |
 | :--- | :--- | :--- |
-| **Empty Root (`""`)** | Returns [`ErrEmptyRoot`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L51) | Fails immediately prior to any filesystem I/O. |
-| **Root Separator (`"/"`)** | Returns [`ErrEmptyRoot`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L51) | Prevents accidental root directory sweeps. |
-| **Threshold `<= 0`** | Returns [`ErrNonPositiveThreshold`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L49) | Disallows zero or negative thresholds that would sweep all active locks. |
-| **Missing Root Directory** | Returns hard error with [`ErrMsgDirMissing`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L33) | Callers expecting a directory cannot proceed on missing paths. |
-| **Non-Directory Root** | Returns hard error with [`ErrMsgRootNotDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L36) | Rejects regular files passed as lock roots. |
-| **Unreadable Directory** | Returns [`ErrDirNotReadable`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L56) | Inability to list entries is never treated as "zero locks found". |
+| **Empty Root (`""`)** | Returns [`ErrEmptyRoot`](../../pkg/lockhealth/lockhealth.go#L51) | Fails immediately prior to any filesystem I/O. |
+| **Root Separator (`"/"`)** | Returns [`ErrEmptyRoot`](../../pkg/lockhealth/lockhealth.go#L51) | Prevents accidental root directory sweeps. |
+| **Threshold `<= 0`** | Returns [`ErrNonPositiveThreshold`](../../pkg/lockhealth/lockhealth.go#L49) | Disallows zero or negative thresholds that would sweep all active locks. |
+| **Missing Root Directory** | Returns hard error with [`ErrMsgDirMissing`](../../pkg/lockhealth/lockhealth.go#L33) | Callers expecting a directory cannot proceed on missing paths. |
+| **Non-Directory Root** | Returns hard error with [`ErrMsgRootNotDir`](../../pkg/lockhealth/lockhealth.go#L36) | Rejects regular files passed as lock roots. |
+| **Unreadable Directory** | Returns [`ErrDirNotReadable`](../../pkg/lockhealth/lockhealth.go#L56) | Inability to list entries is never treated as "zero locks found". |
 
 ```mermaid
 stateDiagram-v2
@@ -138,7 +138,7 @@ sequenceDiagram
 
 ## 5. Owner-Verified Removal Mechanics
 
-When higher-level orchestrators record process IDs (PIDs) in lock metadata, the subsystem provides [`OwnerVerifiedDead(pid)`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L202) for deterministic liveness checking:
+When higher-level orchestrators record process IDs (PIDs) in lock metadata, the subsystem provides [`OwnerVerifiedDead(pid)`](../../pkg/lockhealth/lockhealth.go#L202) for deterministic liveness checking:
 
 ```go
 func OwnerVerifiedDead(pid int) bool {
@@ -163,7 +163,7 @@ func OwnerVerifiedDead(pid int) bool {
 
 ## 6. Structured Observability & Telemetry
 
-Every sweep operation yields a structured [`Report`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L69) and [`SweepStats`](file:///Users/lanceettl/zqk-public-candidate/pkg/lockhealth/lockhealth.go#L59) payload:
+Every sweep operation yields a structured [`Report`](../../pkg/lockhealth/lockhealth.go#L69) and [`SweepStats`](../../pkg/lockhealth/lockhealth.go#L59) payload:
 
 ```go
 type SweepStats struct {

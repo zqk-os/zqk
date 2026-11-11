@@ -8,13 +8,13 @@ Practical architectural and operational guide for dynamic feature toggles, progr
 
 In an autonomous multi-agent operating system, executing experimental validation paths, orchestrating distributed storage engines, or rolling out non-disruptive algorithm upgrades must occur without restarting long-running daemons, breaking running pipelines, or risking data corruption. Hardcoded static toggles or environment-only switches fail to accommodate dynamic runtime adaptation across collaborating agent swarms and scheduled workflows.
 
-The **Feature Flags & Dynamic Toggle Subsystem** ([`pkg/featureflags`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go)) delivers a hardened, thread-safe, and stamp-memoized runtime toggle switchboard for the ZQK Core Organism. It establishes a bounded, project-local "lite file" persistence model anchored at `.zqk/agent-runtime/feature_flags.json` (as mapped by [`datacell.FeatureFlagsPath`](file:///Users/lanceettl/zqk-public-candidate/pkg/datacell/paths.go)).
+The **Feature Flags & Dynamic Toggle Subsystem** ([`pkg/featureflags`](../../pkg/featureflags/feature_flags.go)) delivers a hardened, thread-safe, and stamp-memoized runtime toggle switchboard for the ZQK Core Organism. It establishes a bounded, project-local "lite file" persistence model anchored at `.zqk/agent-runtime/feature_flags.json` (as mapped by [`datacell.FeatureFlagsPath`](../../pkg/datacell/paths.go)).
 
 Key architectural principles include:
 1. **Deterministic Default Initialization:** Default flags are embedded as compiled constants with safe defaults, guaranteeing that uninitialized environments fall back immediately to verified, secure execution paths.
-2. **Fast Synchronous Evaluation:** Reads and writes execute synchronously with explicit concurrency protection via [`sync.RWMutex`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L34), eliminating background goroutine lockups, hanging channels, or deferred read-path deadlocks.
-3. **Stamp-Memoized Process Singleton:** Process-lifetime singleton resolution through [`stampmemo.Table[*FeatureFlags]`](file:///Users/lanceettl/zqk-public-candidate/pkg/stampmemo/stampmemo.go) guarantees zero redundant disk parsing across rapid evaluation loops while ensuring automatic cache invalidation whenever the underlying on-disk JSON file is modified.
-4. **Defensive Mutation & State Isolation:** Snapshot lookups via [`GetAllFlags`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L241-L259) return decoupled deep copies of flag data structures, preventing caller-side pointer contamination from mutating internal state without acquiring write locks.
+2. **Fast Synchronous Evaluation:** Reads and writes execute synchronously with explicit concurrency protection via [`sync.RWMutex`](../../pkg/featureflags/feature_flags.go#L34), eliminating background goroutine lockups, hanging channels, or deferred read-path deadlocks.
+3. **Stamp-Memoized Process Singleton:** Process-lifetime singleton resolution through [`stampmemo.Table[*FeatureFlags]`](../../pkg/stampmemo/table.go) guarantees zero redundant disk parsing across rapid evaluation loops while ensuring automatic cache invalidation whenever the underlying on-disk JSON file is modified.
+4. **Defensive Mutation & State Isolation:** Snapshot lookups via [`GetAllFlags`](../../pkg/featureflags/feature_flags.go#L241-L259) return decoupled deep copies of flag data structures, preventing caller-side pointer contamination from mutating internal state without acquiring write locks.
 5. **Fail-Closed Resilience:** Malformed JSON configurations, missing directories, or unreadable files automatically trigger graceful fallbacks to compiled default flags, keeping agent runtimes operational during edge-case filesystem disruptions.
 
 ---
@@ -70,16 +70,16 @@ flowchart TD
 
 | Symbol | Signature / Type | Description |
 | :--- | :--- | :--- |
-| [`FeatureFlag`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L25-L29) | `struct` | Represents an individual toggle declaration containing `Name`, `Enabled`, and `Description`. |
-| [`FeatureFlags`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L32-L36) | `struct` | Encapsulates the internal flag map, read/write mutex, and resolved filesystem file path. |
-| [`GetGlobalFeatureFlags`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L40-L48) | `func(projectRoot string) *FeatureFlags` | Returns a process-lifetime singleton cached via stamp memoization keyed by root path and file stamp. |
-| [`NewFeatureFlags`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L51-L57) | `func(projectRoot string) *FeatureFlags` | Creates an isolated feature flag manager bound to the target project root datacell path. |
-| [`Load`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L61-L107) | `func() error` | Synchronously reads JSON configuration from disk, initializes missing defaults, and populates memory. |
-| [`Save`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L110-L117) | `func() error` | Serializes in-memory flag definitions into formatted JSON and commits them to disk. |
-| [`IsEnabled`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L184-L199) | `func(name string) bool` | Thread-safe, non-blocking read operation checking whether a named flag evaluates to active. |
-| [`SetEnabled`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L202-L222) | `func(name string, enabled bool) error` | Atomically mutates a flag state under write lock and persists updated configuration to disk. |
-| [`GetFlag`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L225-L239) | `func(name string) (*FeatureFlag, bool)` | Retrieves flag metadata by name with boolean existence indicator under read lock. |
-| [`GetAllFlags`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/feature_flags.go#L241-L259) | `func() map[string]*FeatureFlag` | Produces an isolated, deep-copied dictionary of all registered feature flags. |
+| [`FeatureFlag`](../../pkg/featureflags/feature_flags.go#L25-L29) | `struct` | Represents an individual toggle declaration containing `Name`, `Enabled`, and `Description`. |
+| [`FeatureFlags`](../../pkg/featureflags/feature_flags.go#L32-L36) | `struct` | Encapsulates the internal flag map, read/write mutex, and resolved filesystem file path. |
+| [`GetGlobalFeatureFlags`](../../pkg/featureflags/feature_flags.go#L40-L48) | `func(projectRoot string) *FeatureFlags` | Returns a process-lifetime singleton cached via stamp memoization keyed by root path and file stamp. |
+| [`NewFeatureFlags`](../../pkg/featureflags/feature_flags.go#L51-L57) | `func(projectRoot string) *FeatureFlags` | Creates an isolated feature flag manager bound to the target project root datacell path. |
+| [`Load`](../../pkg/featureflags/feature_flags.go#L61-L107) | `func() error` | Synchronously reads JSON configuration from disk, initializes missing defaults, and populates memory. |
+| [`Save`](../../pkg/featureflags/feature_flags.go#L110-L117) | `func() error` | Serializes in-memory flag definitions into formatted JSON and commits them to disk. |
+| [`IsEnabled`](../../pkg/featureflags/feature_flags.go#L184-L199) | `func(name string) bool` | Thread-safe, non-blocking read operation checking whether a named flag evaluates to active. |
+| [`SetEnabled`](../../pkg/featureflags/feature_flags.go#L202-L222) | `func(name string, enabled bool) error` | Atomically mutates a flag state under write lock and persists updated configuration to disk. |
+| [`GetFlag`](../../pkg/featureflags/feature_flags.go#L225-L239) | `func(name string) (*FeatureFlag, bool)` | Retrieves flag metadata by name with boolean existence indicator under read lock. |
+| [`GetAllFlags`](../../pkg/featureflags/feature_flags.go#L241-L259) | `func() map[string]*FeatureFlag` | Produces an isolated, deep-copied dictionary of all registered feature flags. |
 
 ---
 
@@ -145,7 +145,7 @@ The subsystem exports compiled constants for core organism behavioral switches:
 
 ### Lock Hierarchy & Deadlock Prevention
 
-The subsystem uses structured lock wrappers from [`pkg/concurrency`](file:///Users/lanceettl/zqk-public-candidate/pkg/concurrency) with explicit operation names defined in [`lock_op_names.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/featureflags/lock_op_names.go):
+The subsystem uses structured lock wrappers from [`pkg/concurrency`](../../pkg/concurrency) with explicit operation names defined in [`lock_op_names.go`](../../pkg/featureflags/lock_op_names.go):
 
 ```go
 const (
@@ -161,7 +161,7 @@ const (
 1. **Read Lock Isolation:** Read operations (`IsEnabled`, `GetFlag`, `GetAllFlags`, `Save`) acquire `RunInRLockWithLogger`. Multiple concurrent read routines evaluate simultaneously without contention.
 2. **Write Lock Atomicity:** State mutations (`Load`, `SetEnabled`) acquire `RunInLockWithLogger`. Writes obtain exclusive ownership, preventing dirty reads or concurrent map access panics.
 3. **No Lock Inversion:** Internal helpers such as `saveUnlocked()` execute exclusively while the caller already holds the required mutex, preventing recursive locking deadlocks.
-4. **Goroutine Labeling:** All asynchronous testing and background evaluation routines register under [`goroutinelabels.NewGoroutine`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels) for leak-free monitoring and post-execution cleanup verification.
+4. **Goroutine Labeling:** All asynchronous testing and background evaluation routines register under [`goroutinelabels.NewGoroutine`](../../pkg/goroutinelabels) for leak-free monitoring and post-execution cleanup verification.
 
 ---
 

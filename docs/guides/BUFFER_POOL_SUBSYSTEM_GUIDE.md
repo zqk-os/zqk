@@ -51,7 +51,7 @@ flowchart TD
 
 ## 3. Interface & Contract Specifications
 
-The subsystem exports a minimal, highly ergonomic functional API in [`pool.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/bufferpool/pool.go):
+The subsystem exports a minimal, highly ergonomic functional API in [`pool.go`](../../pkg/bufferpool/pool.go):
 
 ```go
 // Get returns a pooled *bytes.Buffer with its buffer reset.

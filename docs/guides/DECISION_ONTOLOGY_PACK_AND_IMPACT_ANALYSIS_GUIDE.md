@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Architectural Purpose
 
-The **Decision Ontology Pack & Impact Analysis Subsystem** ([`pkg/decisionpack`](file:///Users/lanceettl/zqk-worktree-cycle-258/pkg/decisionpack/pack.go)) anchors the architectural governance, inquiry resolution, and change-blast-radius analysis capabilities of the **ZQK Knowledge Kernel**.
+The **Decision Ontology Pack & Impact Analysis Subsystem** ([`pkg/decisionpack`](../../pkg/decisionpack/pack.go)) anchors the architectural governance, inquiry resolution, and change-blast-radius analysis capabilities of the **ZQK Knowledge Kernel**.
 
 In complex distributed systems and autonomous agent swarms, architectural drift occurs when technical choices, open questions, and cascading impacts are negotiated in ephemeral chats, pull request comments, or transient prompt windows. The ZQK Knowledge Kernel eliminates this failure mode by converting governance artifacts into versioned, verifiable, and immutable graph objects stored in Content-Addressed Storage (CAS).
 

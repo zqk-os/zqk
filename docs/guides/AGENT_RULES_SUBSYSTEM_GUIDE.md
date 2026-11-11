@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Agent Execution Rules & Manifest Governance Subsystem** ([`pkg/agentrules`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/manifest.go)) establishes deterministic, verifiable governance over IDE and autonomous agent execution rules within the ZQK Knowledge Kernel.
+The **Agent Execution Rules & Manifest Governance Subsystem** ([`pkg/agentrules`](../../pkg/agentrules/manifest.go)) establishes deterministic, verifiable governance over IDE and autonomous agent execution rules within the ZQK Knowledge Kernel.
 
 Autonomous AI agents, language models, and modern developer IDEs (such as Cursor, Windsurf, and custom agent harnesses) rely on contextual instruction files (typically formatted as Markdown with frontmatter, ending in `.mdc`) to guide code editing, architectural constraints, test execution policies, and system invariants. Without strict configuration control, these rule definitions are vulnerable to:
 1. **Silent Configuration Drift:** Rule files added or removed on local developer workstations without being tracked in repository-wide contracts.
@@ -10,7 +10,7 @@ Autonomous AI agents, language models, and modern developer IDEs (such as Cursor
 3. **Multi-IDE Path Ambiguity:** Conflicting filesystem conventions across development environments (for example, `.cursor/rules` vs `.ide/rules`).
 4. **Unenforced Policy Bypass:** Rules remaining uncommitted, unvalidated, or silently ignored across continuous integration gates.
 
-The `pkg/agentrules` subsystem eliminates these vulnerabilities through a canonical Content-Addressed and version-controlled manifest ([`agent_rules_manifest.yaml`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/manifest.go#L52)), deterministic directory resolution, automated set equality validation, and self-healing synchronization tooling.
+The `pkg/agentrules` subsystem eliminates these vulnerabilities through a canonical Content-Addressed and version-controlled manifest ([`agent_rules_manifest.yaml`](../../pkg/agentrules/manifest.go#L52)), deterministic directory resolution, automated set equality validation, and self-healing synchronization tooling.
 
 ---
 
@@ -68,13 +68,13 @@ flowchart TD
 
 ### Component Roles
 
-1. **Manifest Registry ([`ManifestPath`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/manifest.go#L72)):**
+1. **Manifest Registry ([`ManifestPath`](../../pkg/agentrules/manifest.go#L72)):**
    Maintains the canonical record of truth at `.zqk/specs/configs/agent_rules_manifest.yaml`. The file contains a schema version and a sorted array of relative `.mdc` rule filenames.
-2. **Rules Directory Resolver ([`ResolveRulesDir`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/manifest.go#L82)):**
+2. **Rules Directory Resolver ([`ResolveRulesDir`](../../pkg/agentrules/manifest.go#L82)):**
    Discovers the active rule directory using an explicit 4-tier precedence hierarchy that supports multi-tenant IDE setups without hardcoding assumptions.
-3. **Rule Set Diff Engine ([`diffRuleSets`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/manifest.go#L27)):**
+3. **Rule Set Diff Engine ([`diffRuleSets`](../../pkg/agentrules/manifest.go#L27)):**
    Performs bidirectional set subtraction between the expected manifest rules and the discovered filesystem `.mdc` files, producing deterministic, sorted discrepancy lists (`missing_on_disk` and `extra_on_disk`).
-4. **Manifest Synchronizer ([`WriteManifestFromDisk`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/manifest.go#L156)):**
+4. **Manifest Synchronizer ([`WriteManifestFromDisk`](../../pkg/agentrules/manifest.go#L156)):**
    Generates a standardized manifest file populated with sorted `.mdc` filenames, injected with canonical command documentation headers, and formatted via Content-Addressed file utilities.
 
 ---
@@ -240,7 +240,7 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s -cover ./pkg/agentrules
 
 ### Test Coverage Architecture
 
-The comprehensive test suite ([`pkg/agentrules/agentrules_coverage_elevation_cycle166_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentrules/agentrules_coverage_elevation_cycle166_test.go)) exercises:
+The comprehensive test suite ([`pkg/agentrules/agentrules_coverage_elevation_cycle166_test.go`](../../pkg/agentrules/agentrules_manifest_dir_test.go)) exercises:
 - Path composition across relative, absolute, and trailing-slash paths.
 - Four-tier resolution precedence: explicit flag, environment variable, candidate scan (`.cursor/rules` vs `.ide/rules`), and default fallback.
 - Manifest loading under corrupt YAML, missing files, and zero-version conditions.

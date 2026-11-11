@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Disk Usage & Storage Capacity Telemetry Subsystem** ([`pkg/diskusage`](file:///Users/lanceettl/zqk-public-candidate/pkg/diskusage/diskusage.go)) provides pure-Go directory traversal, size rollup aggregation, human-readable byte conversions, and storage capacity telemetry primitives for the ZQK Knowledge Kernel.
+The **Disk Usage & Storage Capacity Telemetry Subsystem** ([`pkg/diskusage`](../../pkg/diskusage/diskusage.go)) provides pure-Go directory traversal, size rollup aggregation, human-readable byte conversions, and storage capacity telemetry primitives for the ZQK Knowledge Kernel.
 
 Storage monitoring is critical in high-throughput autonomous multi-agent environments. Background task schedulers, git worktree checkouts, ephemeral scratch workspaces, append-only WAL streams, and CAS object graphs continuously allocate storage across project roots. Unmonitored storage growth leads to cascading disk exhaustion, failed atomic file swaps, corrupted databases, and stalled agent swarms.
 
@@ -52,9 +52,9 @@ flowchart TD
 
 | Component | Module | Core Functionality |
 | :--- | :--- | :--- |
-| **Directory Tree Walker** | [`Scan`](file:///Users/lanceettl/zqk-public-candidate/pkg/diskusage/diskusage.go#L53) | Pure-Go recursive traversal, directory size rollup, depth bounding, symlink avoidance, and top-N sorting. |
-| **Binary Byte Formatter** | [`FormatBytes`](file:///Users/lanceettl/zqk-public-candidate/pkg/diskusage/format.go#L11) | Normalizes byte values into human-readable strings (e.g. `1.5KiB`, `25GiB`) with 1024-based binary scaling. |
-| **Human Size Parser** | [`ParseSize`](file:///Users/lanceettl/zqk-public-candidate/pkg/diskusage/format.go#L42) | Parses string size inputs (`500M`, `1.5GiB`, `1024`, `2TB`) into exact int64 byte counts with strict error checking. |
+| **Directory Tree Walker** | [`Scan`](../../pkg/diskusage/diskusage.go#L53) | Pure-Go recursive traversal, directory size rollup, depth bounding, symlink avoidance, and top-N sorting. |
+| **Binary Byte Formatter** | [`FormatBytes`](../../pkg/diskusage/format.go#L11) | Normalizes byte values into human-readable strings (e.g. `1.5KiB`, `25GiB`) with 1024-based binary scaling. |
+| **Human Size Parser** | [`ParseSize`](../../pkg/diskusage/format.go#L42) | Parses string size inputs (`500M`, `1.5GiB`, `1024`, `2TB`) into exact int64 byte counts with strict error checking. |
 | **Statfs Volume Sentinel** | Volume Inspection | Queries filesystem block availability, total capacity, and tracks consumption against alert thresholds. |
 
 ---
@@ -186,7 +186,7 @@ A critical failure mode in capacity management is confusing **Free Bytes** (`f_b
 
 ## 6. Human-Readable Formatting & Bidirectional Size Parsing
 
-The `pkg/diskusage` package provides zero-dependency formatting and parsing in [`format.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diskusage/format.go).
+The `pkg/diskusage` package provides zero-dependency formatting and parsing in [`format.go`](../../pkg/diskusage/format.go).
 
 ### Format Specification (`FormatBytes`)
 - Values below 1024 bytes are formatted as bare integers (`0B`, `512B`, `1023B`).
@@ -233,7 +233,7 @@ stateDiagram-v2
 The subsystem enforces strict operational invariants verified via automated unit and boundary suites:
 
 1. **Statement Coverage Invariant ($\ge 85.0\%$):**
-   - The test suite [`pkg/diskusage/diskusage_coverage_elevation_cycle160_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diskusage/diskusage_coverage_elevation_cycle160_test.go) achieves **$94.7\%$** statement coverage across all package routines.
+   - The test suite [`pkg/diskusage/diskusage_coverage_elevation_cycle160_test.go`](../../pkg/diskusage/diskusage_scan_directory_test.go) achieves **$94.7\%$** statement coverage across all package routines.
 2. **Concurrency Safety:**
    - Multiple goroutines can execute `Scan`, `FormatBytes`, and `ParseSize` concurrently without data races or lock contention.
 3. **Resilience & Zero Swallowed Errors:**

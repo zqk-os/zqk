@@ -114,7 +114,7 @@ Install to `~/Library/LaunchAgents/com.zqk.privileged-writer.plist`:
     <key>StandardErrorPath</key>
     <string>/tmp/zqk-privileged-writer.err</string>
     <key>WorkingDirectory</key>
-    <string>/Users/shared/zqk-workspace</string>
+    <string>/var/zqk/workspace</string>
 </dict>
 </plist>
 ```

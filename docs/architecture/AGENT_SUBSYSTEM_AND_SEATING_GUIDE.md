@@ -462,10 +462,10 @@ zqk agent hook continuation --vendor antigravity
 ## 8. Relational Manifest & Verification
 
 - **Domain Scope:** Autonomous Swarm Orchestration & Agent Seating Subsystem
-- **Implementation Package:** [`cmd/zqk/agent`](file:///Users/lanceettl/zqk-public-candidate/cmd/zqk/agent)
+- **Implementation Package:** [`cmd/zqk/agent`](../../cmd/zqk/agent)
 - **Supporting Core Libraries:**
-  - [`pkg/agentclaim`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentclaim)
-  - [`pkg/agentfeed`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentfeed)
-  - [`pkg/agentprompt`](file:///Users/lanceettl/zqk-public-candidate/pkg/agentprompt)
-  - [`pkg/seatworker`](file:///Users/lanceettl/zqk-public-candidate/pkg/seatworker)
+  - [`pkg/agentclaim`](../../pkg/agentclaim)
+  - [`pkg/agentfeed`](../../pkg/agentfeed)
+  - [`pkg/agentprompt`](../../pkg/agentprompt)
+  - [`pkg/seatworker`](../../pkg/seatworker)
 - **Verification Invariant:** Automated test coverage elevates statement coverage across CLI agent subcommands to $\ge 80.0\%$ with deterministic error isolation, subagent hook context injection, and seat worker lifecycle supervision.

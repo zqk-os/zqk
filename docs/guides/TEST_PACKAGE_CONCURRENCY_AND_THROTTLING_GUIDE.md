@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Test Package Concurrency Limits & Throttling Subsystem** ([`pkg/testpackageconcurrency`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go)) governs cross-process parallel test execution across the ZQK Knowledge Kernel execution plane under **POL-DEFAULT-b17f54c251eb3c4d**. During autonomous continuous loops, test verification swarms, and background batch runs, unconstrained parallel invocation of compute-heavy or disk-bound test packages (e.g. database transactions, filesystem CAS operations, or lock contention fixtures) risks hardware thrashing, thread starvation, and non-deterministic flakes.
+The **Test Package Concurrency Limits & Throttling Subsystem** ([`pkg/testpackageconcurrency`](../../pkg/testpackageconcurrency/limits.go)) governs cross-process parallel test execution across the ZQK Knowledge Kernel execution plane under **POL-DEFAULT-b17f54c251eb3c4d**. During autonomous continuous loops, test verification swarms, and background batch runs, unconstrained parallel invocation of compute-heavy or disk-bound test packages (e.g. database transactions, filesystem CAS operations, or lock contention fixtures) risks hardware thrashing, thread starvation, and non-deterministic flakes.
 
 This subsystem provides persistent, content-addressed, and runtime-mergeable concurrency constraints without requiring test harnesses to take circular dependencies on heavy execution frameworks. It serves as the single source of truth for:
 - Standardized package path normalization across operating systems and workspace relative coordinates.
@@ -53,7 +53,7 @@ flowchart TD
 
 ## 3. Interface & Contract Specifications
 
-The subsystem provides three core functions defined in [`limits.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go):
+The subsystem provides three core functions defined in [`limits.go`](../../pkg/testpackageconcurrency/limits.go):
 
 ```go
 // NormalizePackagePath trims "./" and surrounding space for map keys and lookups.
@@ -86,10 +86,10 @@ Policy files are persisted at `paths.ProjectDataDir / paths.TestBundlesDir / Lim
 ```
 
 ### Invariant Rules
-- **Path Normalization:** All keys are stripped of leading `./` and surrounding whitespace through [`NormalizePackagePath`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go#L27-L29). Empty keys are discarded.
+- **Path Normalization:** All keys are stripped of leading `./` and surrounding whitespace through [`NormalizePackagePath`](../../pkg/testpackageconcurrency/limits.go#L27-L29). Empty keys are discarded.
 - **Value Clamping:** Any configured concurrency limit greater than `32` is automatically clamped to `32` to protect host CPU and process tables from unbounded thread storms.
 - **Non-Positive Discarding:** Any values `<= 0` are excluded from the active limit map.
-- **Fail-Open on Missing File:** If the limits file does not exist, [`ReadLimitsMap`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go#L33-L64) returns `(nil, nil)`, allowing the caller to apply default scheduler fallbacks without failing.
+- **Fail-Open on Missing File:** If the limits file does not exist, [`ReadLimitsMap`](../../pkg/testpackageconcurrency/limits.go#L33-L64) returns `(nil, nil)`, allowing the caller to apply default scheduler fallbacks without failing.
 
 ---
 
@@ -142,7 +142,7 @@ The subsystem dynamically accommodates diverse host topologies, balancing CPU sa
 ### Conflict Resolution Strategy
 
 When multiple limit definitions exist for the same package:
-1. **Both on-disk and job metadata defined:** [`MergeLimitMaps`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go#L68-L84) applies `min(fileVal, jobVal)`. The more restrictive limit always wins.
+1. **Both on-disk and job metadata defined:** [`MergeLimitMaps`](../../pkg/testpackageconcurrency/limits.go#L68-L84) applies `min(fileVal, jobVal)`. The more restrictive limit always wins.
 2. **Present in only one source:** The declared positive limit is preserved.
 3. **Neither declared:** The scheduler applies its conservative fallback default (`getSchedulerDefaultPackageConcurrency()`).
 
@@ -150,7 +150,7 @@ When multiple limit definitions exist for the same package:
 
 ## 6. Concurrency & Thread-Safety Guarantees
 
-1. **Lock-Free Map Merging:** [`MergeLimitMaps`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go#L68-L84) constructs and returns a newly allocated map, ensuring zero contention and safe immutability across concurrent readers.
+1. **Lock-Free Map Merging:** [`MergeLimitMaps`](../../pkg/testpackageconcurrency/limits.go#L68-L84) constructs and returns a newly allocated map, ensuring zero contention and safe immutability across concurrent readers.
 2. **Atomic Semaphore Tracking:** Downstream limiters implement mutex-protected slot acquisition with context timeouts to prevent deadlocks when test bundles run long.
 3. **Goroutine Labeling:** All asynchronous test and scheduler workers spawning concurrency checks are managed through `goroutinelabels.NewGoroutine`, ensuring transparent attribution in stack traces and panic telemetry.
 
@@ -158,7 +158,7 @@ When multiple limit definitions exist for the same package:
 
 ## 7. Verification & Statement Coverage Invariant
 
-Statement test coverage for [`pkg/testpackageconcurrency`](file:///Users/lanceettl/zqk-public-candidate/pkg/testpackageconcurrency/limits.go) is enforced at **>= 85.0%** with a verified achievement of **100.0%**:
+Statement test coverage for [`pkg/testpackageconcurrency`](../../pkg/testpackageconcurrency/limits.go) is enforced at **>= 85.0%** with a verified achievement of **100.0%**:
 
 ```text
 github.com/zqk-os/zqk/pkg/testpackageconcurrency/limits.go:27: NormalizePackagePath 100.0%

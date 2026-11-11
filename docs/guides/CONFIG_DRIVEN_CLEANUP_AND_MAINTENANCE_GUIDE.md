@@ -8,12 +8,12 @@ Practical architectural and operational guide for declarative cleanup, scheduled
 
 In autonomous development environments and long-running agent swarms, continuous build artifacts, ephemeral execution logs, task scratch files, lock descriptors, and process caches rapidly accumulate. Unchecked filesystem bloat degrades kernel storage performance, exhausts inode quotas, and risks race conditions from orphaned locks and processes.
 
-The **Config-Driven Cleanup Subsystem** ([`pkg/cleanup`](file:///Users/lanceettl/zqk-public-candidate/pkg/cleanup/config.go)) provides a declarative, single-track configuration foundation for all kernel maintenance and housekeeping tasks under policy **POL-DEFAULT-b17f54c251eb3c4d**. Rather than fragmenting cleanup logic across arbitrary ad-hoc shell scripts, cron scripts, or hardcoded CLI routines, ZQK unifies cleanup into a single canonical YAML configuration (by default at `.zqk/cleanup/config.yaml`).
+The **Config-Driven Cleanup Subsystem** ([`pkg/cleanup`](../../pkg/cleanup/config.go)) provides a declarative, single-track configuration foundation for all kernel maintenance and housekeeping tasks under policy **POL-DEFAULT-b17f54c251eb3c4d**. Rather than fragmenting cleanup logic across arbitrary ad-hoc shell scripts, cron scripts, or hardcoded CLI routines, ZQK unifies cleanup into a single canonical YAML configuration (by default at `.zqk/cleanup/config.yaml`).
 
 Key architectural principles include:
 1. **Single Source of Truth:** A single structured YAML configuration governs ordered cleanup sequences, spanning file unlinking, log truncation, build tool invocation, external CLI executions, and resource hygiene tasks.
-2. **Stamp-Memoized Configuration Loading:** High-frequency scheduler loops and ambient daemons load cleanup configurations through a stamp-memoized table ([`stampmemo.Table[*Config]`](file:///Users/lanceettl/zqk-public-candidate/pkg/stampmemo/stampmemo.go)). Configurations are parsed once and cached in-memory, invalidating automatically only when the underlying YAML file's modification timestamp (`mtime`) changes.
-3. **Decoupled Architecture:** `pkg/cleanup` provides pure, hermetic configuration modeling, validation, and deserialization without external runtime dependencies, while execution engines such as [`pkg/scheduler`](file:///Users/lanceettl/zqk-public-candidate/pkg/scheduler/handlers_cleanup_config.go) and [`pkg/resourcehygiene`](file:///Users/lanceettl/zqk-public-candidate/pkg/resourcehygiene/resource_hygiene.go) consume the parsed step models to enforce filesystem invariants.
+2. **Stamp-Memoized Configuration Loading:** High-frequency scheduler loops and ambient daemons load cleanup configurations through a stamp-memoized table ([`stampmemo.Table[*Config]`](../../pkg/stampmemo/table.go)). Configurations are parsed once and cached in-memory, invalidating automatically only when the underlying YAML file's modification timestamp (`mtime`) changes.
+3. **Decoupled Architecture:** `pkg/cleanup` provides pure, hermetic configuration modeling, validation, and deserialization without external runtime dependencies, while execution engines such as [`pkg/scheduler`](../../pkg/scheduler/handlers_cleanup_config.go) and [`pkg/resourcehygiene`](../../pkg/resourcehygiene/reaper.go) consume the parsed step models to enforce filesystem invariants.
 4. **Safety & Fail-Closed Isolation:** Step parameters enforce strict path resolution against working directories, safe deletion safeguards (preventing directory unlinking via globs), and permission lockdowns (`paths.FilePerm600`).
 
 ---
@@ -99,7 +99,7 @@ sequenceDiagram
 
 ## 3. Configuration Schema & Step Taxonomy
 
-The root cleanup configuration schema is defined in [`pkg/cleanup/config.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/cleanup/config.go):
+The root cleanup configuration schema is defined in [`pkg/cleanup/config.go`](../../pkg/cleanup/config.go):
 
 ```yaml
 working_directory: "." # Optional root working directory; defaults to project root

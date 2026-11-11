@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Sovereign Relay Tunnel & Inbound Webhook Bridge Subsystem** ([`pkg/relay`](file:///Users/lanceettl/zqk-public-candidate/pkg/relay/server.go)) provides a secure, bidirectional, multiplexed tunneling bridge between public cloud webhook producers (e.g. GitHub, Stripe, Slack, external event webhooks) and local sovereign ZQK agent daemons running in air-gapped, firewalled, or local developer workstations.
+The **Sovereign Relay Tunnel & Inbound Webhook Bridge Subsystem** ([`pkg/relay`](../../pkg/relay/server.go)) provides a secure, bidirectional, multiplexed tunneling bridge between public cloud webhook producers (e.g. GitHub, Stripe, Slack, external event webhooks) and local sovereign ZQK agent daemons running in air-gapped, firewalled, or local developer workstations.
 
 As an autonomous systems engineering framework, ZQK must receive live webhooks, inbound triggers, and event streams without requiring developers to punch holes in corporate firewalls, expose public IP addresses, or rely on fragile third-party tunneling proxies. Governed by core modularity and system boundary policy **POL-DEFAULT-b17f54c251eb3c4d**, the subsystem enforces:
 - **Offline Cryptographic License Enforcement:** Verifies Ed25519-signed JWT tokens and feature entitlements (`relay_access`) before any network handshake or tunnel establishment.
