@@ -101,7 +101,7 @@ flowchart TD
 
 The `zqk mesh` command group provides the operator entry points for participating in the sovereign mesh network.
 
-### Root Command: `zqk mesh`
+## Root Command: `zqk mesh`
 
 Constructed by `NewMeshCmd()` in `cmd/zqk/mesh/mesh.go`, this parent command aggregates all mesh subcommands:
 
@@ -116,7 +116,7 @@ Subcommands registered:
 
 ---
 
-### Marketplace Query: `zqk mesh market`
+## Marketplace Query: `zqk mesh market`
 
 The `market` command scans Content Addressable Storage for active `capacity_advertisement` objects, formatting them into an ANSI-highlighted console dashboard.
 
@@ -152,7 +152,7 @@ agent_seat [ADV-DEMO-002]
 
 ---
 
-### Capability Advertising: `zqk mesh advertise`
+## Capability Advertising: `zqk mesh advertise`
 
 The `advertise` command allows a kernel operator or background daemon to offer local capacity to other peer kernels in the mesh.
 
@@ -189,7 +189,7 @@ zqk mesh advertise compute --amount 32.0 --units cores --resource-id comp-node-a
 
 ---
 
-### Resource Leasing: `zqk mesh lease`
+## Resource Leasing: `zqk mesh lease`
 
 The `lease` command establishes a formal mutual agreement between the local consumer kernel and a remote provider kernel.
 

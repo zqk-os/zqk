@@ -83,7 +83,7 @@ flowchart TD
     end
 ```
 
-### 1. Interactive Terminal UI Engine (`pkg/tui`)
+## 1. Interactive Terminal UI Engine (`pkg/tui`)
 
 When executed in a standard terminal without `--web` or structured formatting, the subsystem invokes `tui.RunTUI`:
 - **Terminal Setup**: Detects terminal capabilities via `term.IsTerminal()`. When running interactively, puts the terminal into raw mode (`SetupRawTerminal`) and queries terminal dimensions (`term.GetSize`).
@@ -95,7 +95,7 @@ When executed in a standard terminal without `--web` or structured formatting, t
   - `r`: Force instant cache refresh across all kernel telemetry providers.
   - `q` or `Ctrl+C`: Restore terminal state cleanly and exit.
 
-### 2. Web Visual Studio Server (`pkg/studio`)
+## 2. Web Visual Studio Server (`pkg/studio`)
 
 When invoked with `--web`, the command switches to HTTP daemon mode:
 - **Server Construction**: Instantiates an embedded HTTP server bound to the local loopback address (`127.0.0.1`).
@@ -104,7 +104,7 @@ When invoked with `--web`, the command switches to HTTP daemon mode:
   - *Explicit Port Enforcement*: If `--port` is explicitly set by the operator, automatic fallback is disabled; if the specified port is occupied, the command immediately halts fail-closed with an actionable collision message.
 - **Signal Trapping & Graceful Shutdown**: Intercepts `os.Interrupt` (`SIGINT`) and `syscall.SIGTERM` via `signal.NotifyContext`. Upon receipt of a termination signal, the server executes `server.Shutdown(ctx)` with the operation context, releasing socket listeners and flushing background telemetry buffers before exiting cleanly.
 
-### 3. Headless Structured Model Projection
+## 3. Headless Structured Model Projection
 
 When `--format json`, `--format jsonl`, or `--format yaml` is specified, the subsystem activates the headless pipeline:
 - Bypasses terminal allocation and server startup.

@@ -61,7 +61,7 @@ flowchart TD
     Manager --> Protection
 ```
 
-### Core Responsibilities
+## Core Responsibilities
 - **Supervised Lifecycle Governance**: Every managed background routine is assigned a unique identifier, purpose label, category, parent context, and lifecycle state.
 - **Automatic Resource Cleanup**: Associates tickers, channels, and open streams directly with the tracked goroutine, guaranteeing invocation of cleanup routines upon termination.
 - **Panic Interception & Containment**: Captures any panics occurring within managed goroutines, formats structured diagnostic errors, marks the routine as failed, and notifies telemetry hooks without crashing the host process.
@@ -72,7 +72,7 @@ flowchart TD
 
 ## 2. Subsystem Taxonomy & Core Primitives
 
-### 2.1 GoroutineManager Supervision Engine
+## 2.1 GoroutineManager Supervision Engine
 
 The central coordinating type is `GoroutineManager` (`goroutine_manager.go`), which tracks and coordinates the lifecycle of all goroutines within a service or command boundary.
 
@@ -103,7 +103,7 @@ type GoroutineManager struct {
 
 ---
 
-### 2.2 TrackedGoroutine & Lifecycle State Machine
+## 2.2 TrackedGoroutine & Lifecycle State Machine
 
 Each routine managed by `GoroutineManager` is represented by a `TrackedGoroutine` instance containing metadata, context handles, timing records, and operational status.
 
@@ -132,7 +132,7 @@ stateDiagram-v2
 
 ---
 
-### 2.3 Resource Governance & Safe Teardown
+## 2.3 Resource Governance & Safe Teardown
 
 Background tasks often initialize secondary primitives such as `time.Ticker`, event channels, temporary files, or network sockets. If the worker encounters an error or context cancellation, orphaned tickers prevent memory reclamation.
 
@@ -151,7 +151,7 @@ When `Stop` or `stopGoroutine` executes, the manager iterates over all registere
 
 ---
 
-### 2.4 Panic Handlers & Fault Isolation
+## 2.4 Panic Handlers & Fault Isolation
 
 Standard Go unmanaged goroutines that encounter a nil pointer dereference or slice bounds violation terminate the entire operating process immediately. `GoroutineManager` integrates deep panic recovery via `goroutinelabels.WithPanicHandler`:
 

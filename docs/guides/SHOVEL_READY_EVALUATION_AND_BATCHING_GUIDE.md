@@ -76,7 +76,7 @@ classDiagram
     BatchAllocator ..> PriorityPlanPacker : powers packing in
 ```
 
-### 2.1 ShovelReadyEvaluator (`evaluator.go`)
+## 2.1 ShovelReadyEvaluator (`evaluator.go`)
 Evaluates raw backlog item maps against kernel DoR rules. It inspects:
 - **Requirement or Technical Spec Reference**: Requires at least one non-empty reference in `requirement_refs` or `technical_spec_refs`.
 - **Criteria References**: Requires at least one non-empty reference in `criteria_refs`.
@@ -85,14 +85,14 @@ Evaluates raw backlog item maps against kernel DoR rules. It inspects:
 - **Blocker Status**: Fails if status is `blocked` or active references exist in `risk_blocker_refs`.
 - **Synthetic Grooming Bypass**: Items prefixed with `AUTO-BLI-` bypass DoR to facilitate empty-plan recovery.
 
-### 2.2 DependencyGraphAnalyzer (`dependency.go`)
+## 2.2 DependencyGraphAnalyzer (`dependency.go`)
 Constructs an in-memory directed dependency graph supporting:
 - **Acyclic Validation**: Depth-first search (DFS) with 3-state node coloring (unvisited, visiting, visited) to detect cycles and reconstruct circular reference chains (`A -> B -> C -> A`).
 - **Transitive Blocker Propagation**: Walks upstream dependencies recursively to identify any blocked ancestors. If an ancestor is blocked, child tasks are marked unready.
 - **Missing Reference Detection**: Reconciles dependency IDs against known kernel object IDs, exposing unresolvable dependencies before dispatch.
 - **Topological Sorting**: Produces a valid execution order ensuring prerequisites run before dependent tasks.
 
-### 2.3 ReadinessScorer (`scorer.go`)
+## 2.3 ReadinessScorer (`scorer.go`)
 Calculates a multi-dimensional readiness vector normalized to 1.0:
 - **Requirement Weight (0.25)**: Satisfied if requirement or technical spec is present.
 - **Criteria Weight (0.25)**: Satisfied if criteria references are bound.
@@ -101,7 +101,7 @@ Calculates a multi-dimensional readiness vector normalized to 1.0:
 - **Dependency Weight (0.10)**: Satisfied if completely unblocked and upstream ancestors are healthy.
 - **Threshold Gate**: Evaluates `TotalScore >= Threshold` (default 0.80) to qualify for batching.
 
-### 2.4 BatchAllocator & PriorityPlanPacker (`batch.go`)
+## 2.4 BatchAllocator & PriorityPlanPacker (`batch.go`)
 - **Batch Constraints**: Enforces minimum batch size (2), maximum batch size (5), and maximum estimated hours (e.g. 16.0 hours) per single-cycle batch.
 - **Workstream Isolation**: Enforces workstream lane partitioning (`EnforceSingleWorkstream`) to ensure swarm focus remains within a coherent domain.
 - **Priority Tier Slicing**: Orders items by priority tier (P0 > P1 > P2 > P3), then by readiness score, ensuring critical shovel-ready items are scheduled first.

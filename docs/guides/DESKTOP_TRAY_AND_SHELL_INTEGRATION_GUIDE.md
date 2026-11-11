@@ -57,12 +57,12 @@ flowchart TD
     Verifier -->|Unsigned or Tampered| Quarantine["Quarantine / Access Denied Error"]
 ```
 
-### 1. TrayManager & Configuration Loader (`tray.go`)
+## 1. TrayManager & Configuration Loader (`tray.go`)
 - **Dual Configuration Sources**: Loads embedded baseline entries from `default_tray.yaml` and overlays optional project-local entries from `.zqk/tray.yaml`.
 - **Stamp Memoization**: Leverages `stampmemo.Table[[]Entry]` keyed by project root and tracked by modification timestamp (`mtime`), ensuring zero disk I/O on hot lookup paths while dynamically reloading when the on-disk file changes.
 - **Entry Merging**: Performs deterministic overlay (`Merge`). Entries sharing a name with a default entry replace that entry's description and argv; newly declared entries are appended in declaration order. Default entries retain their precedence and are flagged with `IsDefault = true`.
 
-### 2. SchemaValidator (`schema.go`)
+## 2. SchemaValidator (`schema.go`)
 - **JSON Schema Draft-07 Enforcement**: All tray configurations (embedded defaults, project overrides, and merged composites) are validated against `tray_config.schema.json`.
 - **Structural Constraints**:
   - `version`: Integer `>= 1`.
@@ -72,16 +72,16 @@ flowchart TD
   - Optional fields: `description`, `signed_by` (Kernel Account ID), and `signature` (hex-encoded ASN.1 ECDSA signature).
   - Closed schema: `additionalProperties: false` rejects unmapped or extraneous fields.
 
-### 3. SecurityFilter & Cryptographic Verifier (`security.go`)
+## 3. SecurityFilter & Cryptographic Verifier (`security.go`)
 - **Privilege Boundary Enforcement**: Inspects full argument vectors before dispatch to detect restricted flags (`--override`, `--force`, `--clear-cache`, `--internal`) and destructive command verbs (`object delete`, `system shutdown`, `system purge`, `io reap`, `delete`).
 - **Cryptographic Authorization**: Privileged commands cannot execute via the system tray unless signed by an authorized auditor key using ECDSA on curve P-256.
 - **Canonical Payload & SHA-256 Digest**: Serializes `{"argv": [...], "name": "..."}` deterministically before computing SHA-256 digests and evaluating ASN.1 ECDSA signatures.
 
-### 4. MenuBuilder & UI Representation
+## 4. MenuBuilder & UI Representation
 - **Native OS Tray Adapters**: Translates validated `Entry` lists into native macOS NSStatusItem, Windows NotifyIcon, or Linux StatusNotifierItem menus.
 - **Format Explanation**: Provides human-readable command previews via `FormatExplainLine`, properly quoting arguments containing whitespace or shell metacharacters.
 
-### 5. ActionDispatcher
+## 5. ActionDispatcher
 - **Process Isolation**: Dispatches approved actions through `execwrap.CommandContext`, inheriting execution timeout contexts, telemetry spans, and environment variables.
 - **Provenance Annotation**: Injects execution source environment markers (`ZQK_EXEC_SOURCE=tray`) to ensure audit traceability.
 

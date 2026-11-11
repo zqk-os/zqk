@@ -47,7 +47,7 @@ flowchart TD
     Runner -->|"7. Persist Sync Report"| RuntimeStore
 ```
 
-### Core Invariants
+## Core Invariants
 
 1. **Universal Directive Anchor (`AGENTS.md`)**:
    Regardless of detected IDE vendors or headless modes, `pkg/agentonboard` guarantees that `.agents/AGENTS.md` is populated with canonical kernel boot payload directives. This universal directive acts as the primary headless-safe interface.

@@ -685,7 +685,7 @@ def build_portal(repo_root: str, target_dir: str):
     # Collect documentation files strictly from Core, excluding archive/internal dirs
     raw_doc_files = sorted(glob.glob(os.path.join(repo_root, "docs", "**", "*.md"), recursive=True))
     doc_files = []
-    exclude_parts = {"archive", "_archive", "_archive-cef-runs", "cef-runs", ".zqk", "audit", "templates", "package_skeleton", "testdata"}
+    exclude_parts = {"archive", "_archive", "_archive-cef-runs", "cef-runs", ".zqk", "audit", "templates", "package_skeleton", "testdata", "reports"}
     for df in raw_doc_files:
         rel = os.path.relpath(df, repo_root)
         parts = set(rel.split(os.sep))

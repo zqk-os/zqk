@@ -100,7 +100,7 @@ flowchart TD
 
 ## Core Architecture & Invariants
 
-### 1. Hierarchical State Tree Projection (`zqk state tree`)
+## 1. Hierarchical State Tree Projection (`zqk state tree`)
 
 The State Tree command synthesizes an integrated perspective across the Knowledge Kernel's timeless and time-bounded domains:
 
@@ -123,7 +123,7 @@ graph TD
 
 ---
 
-### 2. Change Journal Lifecycle & Stream Aggregation (`zqk state journal`)
+## 2. Change Journal Lifecycle & Stream Aggregation (`zqk state journal`)
 
 The Kernel tracks state transformations using append-only, line-delimited JSON stream records stored in `.zqk/streams/`:
 
@@ -144,7 +144,7 @@ The Kernel tracks state transformations using append-only, line-delimited JSON s
 
 ---
 
-### 3. Time-Series Telemetry & Vitals Engine (`zqk state tsdb`)
+## 3. Time-Series Telemetry & Vitals Engine (`zqk state tsdb`)
 
 The TSDB subsystem monitors kernel operations, execution performance, and system health by aggregating time-series data:
 
@@ -170,7 +170,7 @@ flowchart LR
 
 ---
 
-### 4. Live Kernel State Seismograph & CPCP Membrane (`zqk state stream`)
+## 4. Live Kernel State Seismograph & CPCP Membrane (`zqk state stream`)
 
 The Seismograph command provides continuous monitoring of kernel state transitions. When executed with `--follow`, the command establishes file-system notifications via `fsnotify`:
 

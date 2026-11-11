@@ -26,7 +26,7 @@
 
 The Codebase Evaluation Framework is organized into four clean, functional tiers:
 
-### 1. Framework Core & Governance
+## 1. Framework Core & Governance
 
 | Document | Focus Area & Purpose |
 | :--- | :--- |
@@ -43,7 +43,7 @@ The Codebase Evaluation Framework is organized into four clean, functional tiers
 
 ---
 
-### 2. Evaluation Lenses Matrix (Rubrics & Agent Prompt Pairs)
+## 2. Evaluation Lenses Matrix (Rubrics & Agent Prompt Pairs)
 
 Each evaluation dimension is governed by an authoritative rubric and paired with a specialist evaluator and an adversarial auditor:
 

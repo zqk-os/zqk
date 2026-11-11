@@ -166,7 +166,7 @@ Web Studio provides two specialized views accessible via browser tabs:
 1. **Timeline & Gantt Roadmap**: `http://127.0.0.1:8080/studio/gantt`
 2. **Ontology DAG Visualizer**: `http://127.0.0.1:8080/studio/dag-visualizer`
 
-### Part 1: Chronological Timeline & Gantt Roadmap (`/studio/gantt`)
+## Step 6a: Chronological Timeline & Gantt Roadmap (`/studio/gantt`)
 
 ![Visual Web Studio: Timeline & Gantt Roadmap](../manual/screenshots/ui_web_studio_gantt.svg)
 
@@ -186,7 +186,7 @@ Web Studio provides two specialized views accessible via browser tabs:
 
 ---
 
-### Part 2: Ontology & Causal Dependency DAG Visualizer (`/studio/dag-visualizer`)
+## Step 6b: Ontology & Causal Dependency DAG Visualizer (`/studio/dag-visualizer`)
 
 ![Visual Web Studio: Ontology DAG Dependency Graph](../manual/screenshots/ui_web_studio_dag.svg)
 

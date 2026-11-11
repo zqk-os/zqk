@@ -65,7 +65,7 @@ flowchart TD
     TestHarness -->|"Injects Factory"| StorageSeam
 ```
 
-### Component Responsibilities
+## Component Responsibilities
 
 | Component | Architecture Role | Key Responsibilities | Source Reference |
 | :--- | :--- | :--- | :--- |

@@ -76,7 +76,7 @@ flowchart TD
     Renderer --> CLI
 ```
 
-### 1. Pure-Go In-Process Search Engine
+## 1. Pure-Go In-Process Search Engine
 
 Traditional command-line developer tools rely on fork-exec calls to shell out to `grep` or `ripgrep`. In containerized, sandboxed, or embedded environments where foreign binaries are missing or restricted, those external tools immediately fail. 
 
@@ -85,7 +85,7 @@ ZQK implements its search engine natively in Go:
 - **Predictable Memory Footprint**: Streamed file reading and memory-mapped candidate scans ensure negligible memory churn, even across large codebases.
 - **Cross-Platform Parity**: macOS, Linux, and Windows execute the exact same search logic, path normalizations, and AST parsing semantics.
 
-### 2. Trigram Inverted Index Cache (`.zqk/cache/search_trigram.idx`)
+## 2. Trigram Inverted Index Cache (`.zqk/cache/search_trigram.idx`)
 
 To achieve sub-15ms search latencies on repeated invocations:
 - When a search runs with `--use-index=true` (the default), the engine evaluates 3-gram occurrences across indexed files.
@@ -93,7 +93,7 @@ To achieve sub-15ms search latencies on repeated invocations:
 - The cache is automatically persisted at `.zqk/cache/search_trigram.idx`.
 - Developers and agents can force a cache refresh at any time via `zqk grep --reindex`.
 
-### 3. Go AST Structural Parsing
+## 3. Go AST Structural Parsing
 
 AI agents and software engineers frequently require exact architectural symbol lookups rather than fuzzy string matches. Searching for `func Start(` with regular expressions can produce hundreds of false matches across comments, test fixtures, string constants, and markdown documentation.
 
@@ -103,7 +103,7 @@ The AST engine operates directly on the Go syntax tree:
 - **Function Declarations**: `--ast --kind func` isolates top-level package functions from struct methods.
 - **Zero Comment / String False Positives**: Code enclosed in comments (`// ...`, `/* ... */`) or string literals (`"..."`, `` `...` ``) is ignored by structural AST queries.
 
-### 4. Token-Budgeted AI Agent Output
+## 4. Token-Budgeted AI Agent Output
 
 Unbounded search results are the primary cause of context blowout and context window degradation when AI agents interact with codebases.
 

@@ -121,7 +121,7 @@ All commands under `zqk reports` support:
 
 ## 4. Algorithmic Definitions & Interpretation Thresholds
 
-### 4.1 Project Confidence Score (PCS)
+## 4.1 Project Confidence Score (PCS)
 
 **Definition:**
 The Project Confidence Score measures overall project delivery confidence on a normalized `0.00` to `100.00` scale.
@@ -148,7 +148,7 @@ When commit telemetry is enabled, the score is augmented with Git velocity metri
 
 ---
 
-### 4.2 Effort Distribution Discrepancy (EDD)
+## 4.2 Effort Distribution Discrepancy (EDD)
 
 **Definition:**
 Effort Distribution Discrepancy indicates the variance percentage between estimated work item effort and observed effort distribution.
@@ -172,7 +172,7 @@ When commit telemetry is linked, actual effort is evaluated using commit-to-work
 
 ---
 
-### 4.3 Dependencies & Blockers (D&B)
+## 4.3 Dependencies & Blockers (D&B)
 
 **Definition:**
 The Dependencies & Blockers analyzer discovers potential project friction points across multiple analytical dimensions:

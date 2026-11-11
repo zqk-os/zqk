@@ -68,7 +68,7 @@ flowchart TD
     Projector --> TargetFiles
 ```
 
-### Component Responsibilities
+## Component Responsibilities
 
 | Component | Exported Functions / Types | Core Architectural Responsibility |
 | :--- | :--- | :--- |

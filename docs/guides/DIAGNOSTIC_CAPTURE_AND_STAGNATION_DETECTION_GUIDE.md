@@ -96,7 +96,7 @@ flowchart TD
 
 ## 3. Core Component Deep Dive
 
-### 3.1 Failure Envelopes & Deterministic Signatures
+## 3.1 Failure Envelopes & Deterministic Signatures
 
 The **`FailureEnvelope`** ([`pkg/diagnostics/envelope.go`](../../pkg/diagnostics/envelope.go)) encapsulates execution outcomes across attempts:
 
@@ -136,7 +136,7 @@ The `ClassifyError` function parses error texts and exit codes into unambiguous 
 
 ---
 
-### 3.2 Loop Stagnation Detection & Adaptive Disambiguation
+## 3.2 Loop Stagnation Detection & Adaptive Disambiguation
 
 Retrying failed operations blindly when the underlying state has not changed burns token budgets and wastes compute. The stagnation detector ([`pkg/diagnostics/stagnation.go`](../../pkg/diagnostics/stagnation.go)) and disambiguation engine ([`pkg/diagnostics/disambiguation.go`](../../pkg/diagnostics/disambiguation.go)) implement fail-fast feedback.
 
@@ -169,7 +169,7 @@ When a retry is necessary, `GenerateDisambiguation` synthesizes actionable guida
 
 ---
 
-### 3.3 Diagnostic Capture Pipeline (`CaptureDiagnostics`)
+## 3.3 Diagnostic Capture Pipeline (`CaptureDiagnostics`)
 
 The `CaptureDiagnostics` function ([`pkg/diagnostics/capture.go`](../../pkg/diagnostics/capture.go)) executes a comprehensive system dump:
 
@@ -218,7 +218,7 @@ Each capture invocation calls `pruneDiagnosticsCaptures` ([`pkg/diagnostics/capt
 
 ---
 
-### 3.4 Runtime Profiling & Embedded Pprof Server
+## 3.4 Runtime Profiling & Embedded Pprof Server
 
 #### SIGUSR1 Signal Handler (`SetupSignalHandler`)
 Registers a background listener for `syscall.SIGUSR1`. Upon receipt, it spawns an asynchronous, bounded goroutine to invoke `CaptureDiagnostics`, writing artifacts to `<projectRoot>/.zqk/diagnostics/<prefix>/`. The main listener continues monitoring for subsequent signals.

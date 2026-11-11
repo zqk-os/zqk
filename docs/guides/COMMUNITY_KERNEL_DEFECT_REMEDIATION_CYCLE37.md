@@ -13,7 +13,7 @@ This architectural guide documents the root cause analysis, structural resolutio
 
 ## 2. Root Cause Analysis & Architectural Remediation
 
-### 2.1 GH-921: Schema Vocabulary Parity (`planned` vs. `ready`)
+## 2.1 GH-921: Schema Vocabulary Parity (`planned` vs. `ready`)
 
 #### Root Cause
 In the ZQK Knowledge Kernel ontology, `backlog_item` objects traverse strict lifecycle statuses:
@@ -57,7 +57,7 @@ graph LR
 
 ---
 
-### 2.2 GH-913: Trace Pipeline `goal_refs` Lineage Inheritance
+## 2.2 GH-913: Trace Pipeline `goal_refs` Lineage Inheritance
 
 #### Root Cause
 When executing `zqk workflow gen-trace-pipeline` against a requirement target (`REQ-*`), the pipeline generator (`generateTracePipelineBundle`) is responsible for establishing a 3-facet verification spine:

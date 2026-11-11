@@ -93,7 +93,7 @@ pkg/packrecord/
 
 A Holonic Swarm Package encapsulates a complete collaborative agent swarm designed to achieve a specific operational objective (e.g. code evaluation, legacy refactoring, security boundary audit).
 
-### 1. Swarm Pack Anatomy
+## 1. Swarm Pack Anatomy
 
 When scaffolded via `zqk pack init`, a pack contains:
 
@@ -145,7 +145,7 @@ tasks:
       - "task-evaluate"
 ```
 
-### 2. Command Taxonomy: `zqk pack`
+## 2. Command Taxonomy: `zqk pack`
 
 #### `zqk pack init [target_dir]`
 Scaffolds a new swarm package directory with standard layout, templates, and `swarm.yaml`.

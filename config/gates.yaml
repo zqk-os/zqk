@@ -285,6 +285,7 @@ doc_scrutiny:
   enabled: true
   max_topic_chars_concept: 4000
   max_topic_chars_architecture: 8000
+  fail_on_topic_overflow: true
   prohibit_cycle_work: true
   prohibit_kernel_id_leaks: true
   check_acronym_consistency: true
@@ -292,4 +293,6 @@ doc_scrutiny:
     - "docs/releases/*"
     - "docs/archive/*"
     - "docs/specs/*"
+    - "docs/reports/*"
+    - "docs/guides/README.md"
 

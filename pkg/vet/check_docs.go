@@ -73,10 +73,12 @@ func CheckDocumentationQuality(root string, cfg *GatesConfig) ([]Finding, error)
 		exemptions = cfg.DocScrutiny.Exemptions
 	}
 
-	// Always exempt releases, archive, and internal code packages from public doc scrutiny
+	// Always exempt releases, archive, internal reports, root catalog, and internal code packages from public doc scrutiny
 	defaultExemptions := []string{
 		"docs/releases/*",
 		"docs/archive/*",
+		"docs/reports/*",
+		"docs/guides/README.md",
 		".zqk/process/*",
 		"pkg/*",
 		"cmd/*",
@@ -129,7 +131,8 @@ func CheckDocumentationQuality(root string, cfg *GatesConfig) ([]Finding, error)
 			maxTopicChars = maxArchChars
 		}
 
-		topicFindings := checkTopicCharacterBudgets(relPathSlash, content, maxTopicChars)
+		failOnTopicOverflow := cfg != nil && cfg.DocScrutiny.FailOnTopicOverflow
+		topicFindings := checkTopicCharacterBudgets(relPathSlash, content, maxTopicChars, failOnTopicOverflow)
 		findings = append(findings, topicFindings...)
 
 		// 2. Leaked Kernel ID Sanitization Check (public guides & tutorials)
@@ -154,8 +157,13 @@ func CheckDocumentationQuality(root string, cfg *GatesConfig) ([]Finding, error)
 	return findings, err
 }
 
-func checkTopicCharacterBudgets(file, content string, maxChars int) []Finding {
+func checkTopicCharacterBudgets(file, content string, maxChars int, failOnOverflow bool) []Finding {
 	var findings []Finding
+
+	severity := SeverityWarn
+	if failOnOverflow {
+		severity = SeverityError
+	}
 
 	sections := h2Regex.Split(content, -1)
 	matches := h2Regex.FindAllStringSubmatch(content, -1)
@@ -170,7 +178,7 @@ func checkTopicCharacterBudgets(file, content string, maxChars int) []Finding {
 				File:     file,
 				Line:     1,
 				Message:  fmt.Sprintf("Introduction topic exceeds character budget (%d > %d characters)", introLen, maxChars),
-				Severity: SeverityWarn,
+				Severity: severity,
 			})
 		}
 	}
@@ -187,7 +195,7 @@ func checkTopicCharacterBudgets(file, content string, maxChars int) []Finding {
 					File:     file,
 					Line:     1,
 					Message:  fmt.Sprintf("Topic '## %s' exceeds character budget (%d > %d characters)", sectionTitle, bodyLen, maxChars),
-					Severity: SeverityWarn,
+					Severity: severity,
 				})
 			}
 		}

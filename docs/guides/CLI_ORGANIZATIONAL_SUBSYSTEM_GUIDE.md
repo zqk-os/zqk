@@ -119,7 +119,7 @@ The command group is registered under `zqk organizational`:
 zqk organizational [subcommand] [flags]
 ```
 
-### Available Subcommands
+## Available Subcommands
 
 ```
   analyze-impact   Analyze impact of organizational changes on kernel objects
@@ -130,7 +130,7 @@ zqk organizational [subcommand] [flags]
 
 ---
 
-### 1. `zqk organizational record-change`
+## 1. `zqk organizational record-change`
 
 Records a structural change event in the Knowledge Kernel.
 
@@ -165,7 +165,7 @@ zqk organizational record-change \
 
 ---
 
-### 2. `zqk organizational analyze-impact`
+## 2. `zqk organizational analyze-impact`
 
 Executes graph traversal across the Knowledge Kernel to compute the full blast radius of an organizational change.
 
@@ -201,7 +201,7 @@ Affected object types: 4
 
 ---
 
-### 3. `zqk organizational propagate`
+## 3. `zqk organizational propagate`
 
 Propagates the findings of an impact analysis across downstream kernel entities.
 
@@ -238,7 +238,7 @@ zqk organizational propagate --change OCH-001 --confirm
 
 ---
 
-### 4. `zqk organizational sync`
+## 4. `zqk organizational sync`
 
 Performs high-throughput, declarative ingestion of complete organizational structures from external files.
 

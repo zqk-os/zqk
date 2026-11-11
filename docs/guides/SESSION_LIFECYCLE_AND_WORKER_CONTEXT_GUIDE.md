@@ -48,19 +48,19 @@ This subsystem provides:
          └───────────────────────────┘
 ```
 
-### 1. Account Isolation and Anti-Clobber Invariant
+## 1. Account Isolation and Anti-Clobber Invariant
 A persisted CLI session on a local developer machine belongs strictly to the originating account (`account_id`). When multiple engineers or automated service principals share a filesystem or switch identities, `WritePersistedID` and `TryReuse` verify that an active existing session is not clobbered by a differing account without explicit completion or expiration.
 
-### 2. Cross-Process File Lock Synchronization
+## 2. Cross-Process File Lock Synchronization
 All reads, writes, touches, and clearing of session state files (`.zqk/state/session`, `.zqk/state/last_session_touch`) are synchronized via `storage.NewFileLock` on `.zqk/state/session.lock`. This guarantees that rapid, parallel CLI invocations from shell scripts or agent swarms cannot corrupt session state or trigger write races.
 
-### 3. Touch Throttling Membrane Invariant
+## 3. Touch Throttling Membrane Invariant
 To prevent overwhelming kernel storage providers with high-frequency timestamp updates during rapid command bursts, `TouchIfNotThrottled` enforces a 5-second throttle window (`sessionTouchThrottleWindow`). Timestamps are recorded in local state, and storage updates occur only when the throttle window has elapsed, reducing storage I/O by orders of magnitude.
 
-### 4. Idle Timeout Automatic Eviction
+## 4. Idle Timeout Automatic Eviction
 CLI sessions maintain a configurable idle lifespan (`defaultIdleTimeout` of 24 hours, overridable via `.zqk/config/zqk.yaml` under `session.idle_timeout`). When `TryReuse` encounters an active session whose `updated_at` exceeds the idle threshold, the session is deterministically transitioned to `completed` in kernel storage and purged from local disk.
 
-### 5. Stream Storage Parent Reference Quarantine
+## 5. Stream Storage Parent Reference Quarantine
 Kernel sessions can be persisted to traditional file/CAS storage or high-volume append-only stream storage. In stream storage mode, object locators take the form of segment offsets (`segmentPath::offset`), which cannot survive standard filesystem reference validation. `persistableParentSessionRef` evaluates `storage.StreamStorageEnabledForKind(objects.KindZqkSession)` and omits parent references when stream storage is active, ensuring downstream reference validators remain fail-closed and healthy.
 
 ---

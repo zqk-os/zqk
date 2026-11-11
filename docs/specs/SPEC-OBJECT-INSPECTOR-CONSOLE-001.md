@@ -147,7 +147,7 @@ Evaluates `proc.SecurityContext()` against the target object to present authoriz
 
 ## 5. Live Policy Rule Studio (`--policy-studio`)
 
-### 5.1 Concept & 3-Stage Governance Lifecycle
+## 5.1 Concept & 3-Stage Governance Lifecycle
 
 Writing validation policies in raw YAML is error-prone and risks introducing breaking constraints that deadlock active agent workstreams. The **Policy Rule Studio** turns policy creation, dry-run evaluation, and atomic promotion into an interactive, fail-closed IDE experience.
 
@@ -167,7 +167,7 @@ The Studio implements a strict 3-stage governance lifecycle:
 
 ---
 
-### 5.2 Stage 1: Interactive Rule Creation & DSL Autocompletion
+## 5.2 Stage 1: Interactive Rule Creation & DSL Autocompletion
 
 Operators launch the creation modal via `zqk object inspect --policy-studio` or by pressing <kbd>p</kbd> from within the Object Inspector scoreboard.
 
@@ -190,7 +190,7 @@ Operators launch the creation modal via `zqk object inspect --policy-studio` or 
 
 ---
 
-### 5.3 Stage 2: Live Population Dry-Run Evaluation Matrix
+## 5.3 Stage 2: Live Population Dry-Run Evaluation Matrix
 
 Pressing <kbd>t</kbd> triggers an instant, zero-cost dry-run evaluation across all repository entities matching the target kind.
 
@@ -213,7 +213,7 @@ Pressing <kbd>t</kbd> triggers an instant, zero-cost dry-run evaluation across a
 
 ---
 
-### 5.4 Stage 3: Atomic Policy Save, CAS Promotion & Gate Enforcement
+## 5.4 Stage 3: Atomic Policy Save, CAS Promotion & Gate Enforcement
 
 Once the operator confirms that the dry-run results are sound, pressing <kbd>s</kbd> brings up the **Save & Promotion Confirmation Dialog**. Saving commits the policy to CAS storage and binds it to the system check-valves.
 
@@ -235,7 +235,7 @@ Once the operator confirms that the dry-run results are sound, pressing <kbd>s</
 
 ---
 
-### 5.5 Autocompletion Engine, Standard Library & Complexity Guarantees
+## 5.5 Autocompletion Engine, Standard Library & Complexity Guarantees
 
 The autocompletion engine inspects `objects.GetGlobalFieldRegistry()` dynamically:
 

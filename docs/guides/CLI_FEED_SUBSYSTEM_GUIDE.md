@@ -98,7 +98,7 @@ flowchart TD
     HTTPAPI --> EventLog
 ```
 
-### 1. Swarm Seating, Personas, and Directed Hourglass Discipline
+## 1. Swarm Seating, Personas, and Directed Hourglass Discipline
 
 In the ZQK Knowledge Kernel, multi-agent execution enforces a strict ontological separation between **Swarm Seats** and **Kernel Personas**:
 - **Kernel Persona (`--persona-ref`)**: A durable, versioned persona object in Content-Addressed Storage (e.g. `PER-COMMUNITY-SOFTWARE-ENGINEER`, `PER-DEFAULT-OPERATOR`) defining capabilities, architectural roles, and cognitive boundaries.
@@ -116,7 +116,7 @@ When `zqk feed ack` executes, `agentfeed.AuthorizePeerAck` inspects the parent e
 
 ---
 
-### 2. Heartbeat Mechanisms, Proof-of-Life, and Seating Doctor
+## 2. Heartbeat Mechanisms, Proof-of-Life, and Seating Doctor
 
 Autonomous agent loops operating over complex tasks require continuous proof-of-life verification to distinguish between deep computational processing and crashed or hung processes.
 
@@ -135,7 +135,7 @@ The diagnostic doctor performs a four-point mesh health inspection:
 
 ---
 
-### 3. Non-Interrupting Steering & In-Flight Re-Priming
+## 3. Non-Interrupting Steering & In-Flight Re-Priming
 
 Traditional agent platforms treat incoming messages as immediate conversational interruptions that truncate current tool executions and invalidate the LLM context buffer. ZQK provides surgical steering modes designed for long-running workflows:
 
@@ -149,7 +149,7 @@ Non-Interrupting Re-Prime: [Running Tool] ──► (Buffered)   ──► [Tool
 
 ---
 
-### 4. Streaming JSON Lines & Append-Only Log Architecture
+## 4. Streaming JSON Lines & Append-Only Log Architecture
 
 All feed transactions converge on a single, append-only, line-delimited JSON log located at:
 ```
@@ -186,7 +186,7 @@ Configured via `agent_chat_channel.json` or command-line parameters:
 
 ---
 
-### 5. CLI-to-Daemon Bridge & Webhook Ingestion
+## 5. CLI-to-Daemon Bridge & Webhook Ingestion
 
 The Feed Subsystem bridges command-line tools with asynchronous external systems:
 

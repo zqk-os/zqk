@@ -97,7 +97,7 @@ All commands must implement the standard **Command DNA**:
 
 ---
 
-## 3. Canonical Domain Taxonomy Matrix
+## 3. Canonical Domain Taxonomy Matrix (Core & Day-0)
 
 > **Implementation Note (Current State):** The canonical taxonomy below defines the approved classification and responsibilities for all root commands in `cmd/zqk/`. Core domains, Day-0 entry points, and ergonomics shortcuts provide the stable primary user interface, while specialized/extension domains are managed under `.zqk/cli/command_spec_coverage_baseline.json` and ratcheted toward 100% declarative specification parity.
 
@@ -130,6 +130,13 @@ All commands must implement the standard **Command DNA**:
 | **`zqk daemon`** | Core Domain | Background daemon process group supervisor and lease manager | `daemon list`, `daemon status` |
 | **`zqk keystore`** | Core Domain | Cryptographic key management, signing, and token issuance | `keystore list`, `keystore issue`, `keystore rotate` |
 | **`zqk kernel`** | Core Domain | Knowledge Kernel runtime steward, integrity, and governance | `kernel steward`, `kernel check` |
+
+---
+
+## 3.1 Shortcuts & Extension Domains Matrix
+
+| Command / Domain | Tier | Primary Responsibilities | Example Commands |
+| :--- | :--- | :--- | :--- |
 | **`zqk do`** | Ergonomics Shortcut | Autonomous CAP loop execution shorthand (`zqk workflow vds do`) | `do`, `do BLI-123` |
 | **`zqk inspect`** | Ergonomics Shortcut | Interactive TUI Object Inspector and Policy Studio (`zqk object inspect`) | `inspect <id>` |
 | **`zqk mutate`** | Ergonomics Shortcut | ZQL declarative mutation engine shortcut (`zqk object mutate`) | `mutate <zql-query>` |

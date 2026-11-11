@@ -90,7 +90,7 @@ erDiagram
     WORKFLOW ||--o{ STAGE : "orchestrates (stages)"
 ```
 
-### 3.1 Canonical Field Definitions
+## 3.1 Canonical Field Definitions
 
 The `workflow` object schema provides a complete set of fields for process governance:
 
@@ -112,7 +112,7 @@ The `workflow` object schema provides a complete set of fields for process gover
 | `stages` | `list` | No | `rwx` | Ordered array of workflow stage objects defining sequential execution steps. |
 | `template_refs` | `list` | No | `rwx` | List of template references (`TPL-*`) used for artifact rendering. |
 
-### 3.2 Workflow Categories
+## 3.2 Workflow Categories
 
 Workflows are classified into distinct categories via the `category` enum field:
 
@@ -128,7 +128,7 @@ Workflows are classified into distinct categories via the `category` enum field:
 - `mcp`: Specialized workflows exposed through Model Context Protocol servers.
 - `other`: Specialized or domain-extended methodologies.
 
-### 3.3 Constraint Modeling (`constraints`)
+## 3.3 Constraint Modeling (`constraints`)
 
 The `constraints` object enables declarative boundary rules:
 
@@ -149,7 +149,7 @@ constraints:
       blocked_roles: ["intern"]
 ```
 
-### 3.4 Multi-Stage Definition (`stages`)
+## 3.4 Multi-Stage Definition (`stages`)
 
 Each item in `stages` defines an operational milestone within the workflow:
 

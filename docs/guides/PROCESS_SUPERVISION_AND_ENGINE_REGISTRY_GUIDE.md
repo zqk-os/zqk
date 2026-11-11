@@ -61,7 +61,7 @@ The `pkg/supervision` subsystem solves this by implementing **Adaptive Task Supe
 +-----------------------------------------------------------------------------------+
 ```
 
-### The Four Pillars of Task Supervision
+## The Four Pillars of Task Supervision
 
 1. **Focused Diagnostic Delta:** Filters verbose build logs to isolate critical error markers (`FAIL`, `Error`, `panic:`, `undefined:`, `cannot use`), capturing adjacent context while pruning compilation banners and noise.
 2. **Negative Hypotheses (Invalidated Paths):** Derives explicit forbidden actions from prior attempts, preventing the agent from repeating the same code modifications or strategies that triggered failures.

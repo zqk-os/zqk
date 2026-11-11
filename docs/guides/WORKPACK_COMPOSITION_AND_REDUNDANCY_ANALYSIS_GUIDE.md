@@ -66,7 +66,7 @@ flowchart TD
     Lifecycles -.-> LifecycleRegistry
 ```
 
-### 2.1 The 22 Workpack Kinds
+## 2.1 The 22 Workpack Kinds
 
 The Workpack subsystem owns 22 distinct object kinds divided into two functional tiers:
 
@@ -95,7 +95,7 @@ The Workpack subsystem owns 22 distinct object kinds divided into two functional
 | **Work-Graph Mixin** | `occupancy` | State of assignment for an execution agent or engineer. | *None (Mixin)* |
 | **Work-Graph Mixin** | `remaining_open` | Real-time accumulator metric tracking unfinished criteria. | *None (Mixin)* |
 
-### 2.2 Mixin Exemption Architecture
+## 2.2 Mixin Exemption Architecture
 
 The Workpack subsystem distinguishes between standalone instantiable objects (which require full YAML lifecycle state machine specifications) and work-graph mixins. The internal map `kindsWithoutLifecycle` defines these entities:
 
