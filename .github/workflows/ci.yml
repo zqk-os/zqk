@@ -48,6 +48,13 @@ jobs:
       - name: Verify Public Release Payload
         run: sh scripts/open-core/check-public-release-payload.sh
 
+      # EE module exclude + package-community / stranger extract proof.
+      # TRACK: BLI-1794392630487404500-8c27dcc1
+      - name: EE Packaging Boundary
+        run: |
+          sh scripts/open-core/check-ee-packaging-boundary.sh --self-test
+          sh scripts/open-core/check-ee-packaging-boundary.sh "$GITHUB_WORKSPACE" community
+
       # G11/G12 community hygiene (script budget + MUST_NOT plane). TRACK: BLI-1794357065053000000-e4eddd8d
       # Also invokes G15 studio-ID scrub fail-closed.
       - name: Police Community Tree (G11/G12/G15)
