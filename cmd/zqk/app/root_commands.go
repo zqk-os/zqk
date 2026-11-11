@@ -433,10 +433,18 @@ func registerCommands() {
 	completionCmd.GroupID = "integrations"
 	rootCmd.AddCommand(completionCmd)
 
-	// Priority plan shortcuts (pplan add/remove/current/next/prev)
-	pplanCmdInst := object.NewPPlanCmd()
-	pplanCmdInst.GroupID = "everyday"
-	rootCmd.AddCommand(pplanCmdInst)
+	// Pack ontology CLI (pplan getters + agent/CAP/MMORCH orchestrate discovery):
+	// stranger/community default excludes — same opt-in as MCP IsStudioPackToolsEnabled.
+	// TRACK: BLI-1794392273289214000-f82837c4
+	if shouldRegisterStudioPackCLI() {
+		pplanCmdInst := object.NewPPlanCmd()
+		pplanCmdInst.GroupID = "everyday"
+		rootCmd.AddCommand(pplanCmdInst)
+
+		agentCmdInst := agent.NewAgentCmd()
+		agentCmdInst.GroupID = "advanced"
+		rootCmd.AddCommand(agentCmdInst)
+	}
 
 	// Live kernel state tree and mutation journal
 	stateCmdInst := state.NewStateCmd()
@@ -453,11 +461,6 @@ func registerCommands() {
 	testCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(testCmdInst)
 	system.RegisterTestDashboardWarmer(testcmd.WarmLiteFile)
-
-	// Multi-agent orchestration
-	agentCmdInst := agent.NewAgentCmd()
-	agentCmdInst.GroupID = "advanced"
-	rootCmd.AddCommand(agentCmdInst)
 
 	// Top-level convergence measurement & nest management
 	convergenceCmdInst := convergence.NewConvergenceCmd()
