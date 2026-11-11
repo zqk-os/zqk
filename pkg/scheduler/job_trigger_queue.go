@@ -996,6 +996,9 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 					triggerQueueKeyJobIDs:     remainingIDs,
 					objects.FieldKeyReason:    reason,
 				})
+				// Durable per-job history (AUD) so one-shots are not invisible while
+				// bouncing on pool_full. TRACK: https://github.com/zqk-os/zqk/pull/1074
+				scheduler.RecordAdmissionDeferral(triggerCtx, remainingIDs, err)
 				SchedulerTriggerQueueLog(q.logger).Info(LogEventSchedulerTriggerQueuePoolFullRequeuedForPoll).
 					Int(triggerQueueKeyCount, len(remaining)).
 					String("reason", reason).
