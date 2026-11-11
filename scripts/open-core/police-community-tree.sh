@@ -126,6 +126,21 @@ if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ] && \
   fi
 fi
 
+# Default seating seed stranger-clean (no pack ontology leakage in personas/skills).
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — BLI-1794404839887417000-17225c5b
+SEATING_SMOKE=""
+if [ -f "$ROOT/scripts/open-core/community-seed-default-seating-smoke.sh" ]; then
+  SEATING_SMOKE="$ROOT/scripts/open-core/community-seed-default-seating-smoke.sh"
+elif [ -f "$(dirname "$0")/community-seed-default-seating-smoke.sh" ]; then
+  SEATING_SMOKE="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/community-seed-default-seating-smoke.sh"
+fi
+if [ -n "$SEATING_SMOKE" ] && [ -d "$ROOT/scripts/default_personas" ]; then
+  if ! ZQK_COMMUNITY_ROOT="$ROOT" bash "$SEATING_SMOKE"; then
+    echo "MUST_NOT community default seating seed smoke failed"
+    FAIL=1
+  fi
+fi
+
 # Virtual-context paging residual: stranger sessions keep local context without Studio paging deps.
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — community session paging
 if [ -f "$ROOT/scripts/open-core/check-community-session-paging.sh" ] && \
