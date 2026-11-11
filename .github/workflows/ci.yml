@@ -48,6 +48,10 @@ jobs:
       - name: Verify Public Release Payload
         run: sh scripts/open-core/check-public-release-payload.sh
 
+      # G11/G12 community hygiene (script budget + MUST_NOT plane). TRACK: BLI-1794357065053000000-e4eddd8d
+      - name: Police Community Tree (G11/G12)
+        run: sh scripts/open-core/police-community-tree.sh "$GITHUB_WORKSPACE"
+
       - name: Check Hardcoded Paths and Permissions
         run: ./scripts/check-hardcoded-paths-and-perms-repo.sh --no-dups
 
@@ -82,6 +86,7 @@ jobs:
           | Static Analysis (`go vet`) | ✅ Passed |
           | ZQK Verification Engine (`zqk-vet`) | ✅ Passed |
           | Public Release Payload Gate | ✅ Passed |
+          | Community Tree Police (G11/G12) | ✅ Passed |
           | Path & Permission Literals | ✅ Passed |
           | Documentation Portal & Link Rot Sentinel | ✅ Passed |
           | CLI Name Literals | ✅ Passed |
