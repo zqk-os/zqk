@@ -160,7 +160,7 @@ elif [ -f "$(dirname "$0")/check-community-whats-next-bounded.sh" ]; then
   WN_BOUNDED="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-community-whats-next-bounded.sh"
 fi
 if [ -n "$WN_BOUNDED" ]; then
-  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" sh "$WN_BOUNDED" "$ROOT"; then
+  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$WN_BOUNDED" "$ROOT"; then
     echo "MUST_NOT community whats-next bounded residual failed"
     FAIL=1
   fi
@@ -175,7 +175,7 @@ elif [ -f "$(dirname "$0")/check-community-doctor-bounded.sh" ]; then
   DOCTOR_BOUNDED="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-community-doctor-bounded.sh"
 fi
 if [ -n "$DOCTOR_BOUNDED" ]; then
-  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" sh "$DOCTOR_BOUNDED" "$ROOT"; then
+  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$DOCTOR_BOUNDED" "$ROOT"; then
     echo "MUST_NOT community doctor bounded residual failed"
     FAIL=1
   fi
@@ -190,7 +190,7 @@ elif [ -f "$(dirname "$0")/mcp-community-tools-list-smoke.sh" ]; then
   MCP_TOOLS="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/mcp-community-tools-list-smoke.sh"
 fi
 if [ -n "$MCP_TOOLS" ]; then
-  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" sh "$MCP_TOOLS" "$ROOT"; then
+  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$MCP_TOOLS" "$ROOT"; then
     echo "MUST_NOT community MCP tools/list residual failed"
     FAIL=1
   fi
