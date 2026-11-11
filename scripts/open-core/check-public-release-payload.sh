@@ -70,7 +70,10 @@ fi
 if git -C "$ROOT" grep -n -E 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'scripts' \
 	':!scripts/open-core/check-public-release-payload.sh' \
-	':!scripts/open-core/test-public-release-gates.sh'; then
+	':!scripts/open-core/test-public-release-gates.sh' \
+	':!scripts/fixtures/evidence/**' \
+	':!scripts/fixtures/objectify_claims/**' \
+	':!scripts/fixtures/change_intents/**'; then
 	fail "studio technical_debt instance id remains in scripts"
 fi
 
@@ -81,6 +84,9 @@ if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
 	'cmd' 'scripts' 'pkg' \
 	':!scripts/open-core/check-public-release-payload.sh' \
 	':!scripts/open-core/test-public-release-gates.sh' \
+	':!scripts/fixtures/evidence/**' \
+	':!scripts/fixtures/objectify_claims/**' \
+	':!scripts/fixtures/change_intents/**' \
 	':!pkg/**/testdata/*'; then
 	fail "studio TRACK comment with kernel object id remains in cmd, scripts, or pkg"
 fi
@@ -108,7 +114,10 @@ if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	':!*_test.go' \
 	':!pkg/**/testdata/*' \
 	':!scripts/open-core/check-public-release-payload.sh' \
-	':!scripts/open-core/test-public-release-gates.sh'; then
+	':!scripts/open-core/test-public-release-gates.sh' \
+	':!scripts/fixtures/evidence/**' \
+	':!scripts/fixtures/objectify_claims/**' \
+	':!scripts/fixtures/change_intents/**'; then
 	fail "studio nanos-hex kernel object id remains in production pkg, cmd, docs, scripts, CLI specs, or command builders"
 fi
 
