@@ -73,6 +73,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [docman](./docman/) | `github.com/zqk-os/zqk/pkg/docman` | 5+8 | 8 | - | ❌ - | Documentation discovery, frontmatter verification, and index management. |
 | [domain](./domain/) | `github.com/zqk-os/zqk/pkg/domain` | 0+0 | 0 | organizational | ❌ - | Domain-driven design entity models, value objects, and organizational boundaries. |
 | [drifthotspots](./drifthotspots/) | `github.com/zqk-os/zqk/pkg/drifthotspots` | 4+5 | 5 | - | ❌ - | Detection and heatmapping of code and specification drift across the codebase. |
+| [economy](./economy/) | `github.com/zqk-os/zqk/pkg/economy` | 2+3 | 3 | - | ❌ - | Agent token economy, resource budgeting, compute metering, and credit tracking. |
 | [entitlements](./entitlements/) | `github.com/zqk-os/zqk/pkg/entitlements` | 1+4 | 4 | - | ❌ - | Role-based feature access control, license entitlement gates, and tier verification. |
 | [envelope](./envelope/) | `github.com/zqk-os/zqk/pkg/envelope` | 1+2 | 2 | - | ❌ - | Standardized message envelope format for inter-process and network communication. |
 | [errfmt](./errfmt/) | `github.com/zqk-os/zqk/pkg/errfmt` | 1+4 | 4 | - | ❌ - | Structured error formatting, actionable error reporting, and troubleshooting suggestions. |
@@ -341,6 +342,7 @@ pkg/
 ├── domain/          # Domain-driven design entity models, value objects, and organ
 │   └── organizational/
 ├── drifthotspots/          # Detection and heatmapping of code and specification drift ac
+├── economy/          # Agent token economy, resource budgeting, compute metering, a
 ├── entitlements/          # Role-based feature access control, license entitlement gates
 ├── envelope/          # Standardized message envelope format for inter-process and n
 ├── errfmt/          # Structured error formatting, actionable error reporting, and
