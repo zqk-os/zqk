@@ -155,6 +155,24 @@ else
   FAIL=1
 fi
 
+# EE packaging boundary: community/public tree + package-community must not ship EE.
+# TRACK: BLI-1794392630487404500-8c27dcc1 / PRI-1794392614933833000-c7fb97b3
+EE_SCRIPT=""
+if [ -f "$ROOT/scripts/open-core/check-ee-packaging-boundary.sh" ]; then
+  EE_SCRIPT="$ROOT/scripts/open-core/check-ee-packaging-boundary.sh"
+elif [ -f "$(dirname "$0")/check-ee-packaging-boundary.sh" ]; then
+  EE_SCRIPT="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-ee-packaging-boundary.sh"
+fi
+if [ -n "$EE_SCRIPT" ]; then
+  if ! sh "$EE_SCRIPT" "$ROOT" community; then
+    echo "MUST_NOT EE packaging boundary failed"
+    FAIL=1
+  fi
+else
+  echo "MUST_NOT missing check-ee-packaging-boundary.sh (EE packaging fail-closed)"
+  FAIL=1
+fi
+
 if [ "$FAIL" -ne 0 ]; then
   echo "POLICE: FAIL"
   exit 1
