@@ -157,13 +157,14 @@ func TestMinimalTools_DetailedSchemaVerification(t *testing.T) {
 		toolMap[tool.Name] = tool
 	}
 
+	// Stranger/community default: pack ontology getters excluded (BLI-de0d8426).
 	toolNames := []string{
 		"zqk_test_echo",
 		"zqk_graph_traversal",
 		"zqk_object_list",
-		"zqk_get_current_priority_plan",
 		"zqk_create_object_interactive",
 	}
+	assert.NotContains(t, toolMap, "zqk_get_current_priority_plan", "pack getter must be opt-in")
 
 	for _, name := range toolNames {
 		tool, exists := toolMap[name]

@@ -118,17 +118,18 @@ func TestBuildServer_StructureAndTools(t *testing.T) {
 		toolMap[tool.Name] = true
 	}
 
+	// Stranger/community default: pack ontology getters excluded (BLI-de0d8426).
 	expectedMinimalTools := []string{
 		"zqk_test_echo",
 		"zqk_graph_traversal",
 		"zqk_object_list",
-		"zqk_get_current_priority_plan",
 		"zqk_create_object_interactive",
 	}
 
 	for _, toolName := range expectedMinimalTools {
 		assert.True(t, toolMap[toolName], "expected tool %q to be registered", toolName)
 	}
+	assert.False(t, toolMap["zqk_get_current_priority_plan"], "pack getter must be opt-in")
 
 	// Verify onboarding prompts are registered
 	prompts := server.ListPrompts()
