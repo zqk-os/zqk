@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/operational"
@@ -123,13 +122,13 @@ func InspectIOResources(ctx context.Context, projectRoot string) (*IOResourceTel
 					if errOpen != nil {
 						return nil
 					}
-					flockErr := syscallutil.FileFlock(fileHandle, syscall.LOCK_EX|syscall.LOCK_NB)
+					flockErr := syscallutil.FileFlock(fileHandle, syscallutil.LockEx|syscallutil.LockNB)
 					if flockErr != nil && !isDeadProcess {
 						// Actively held by a live process: not stale!
 						_ = fileHandle.Close()
 						return nil
 					}
-					_ = syscallutil.FileFlock(fileHandle, syscall.LOCK_UN)
+					_ = syscallutil.FileFlock(fileHandle, syscallutil.LockUn)
 					_ = fileHandle.Close()
 
 					rel, relErr := filepath.Rel(projectRoot, path)

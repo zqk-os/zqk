@@ -10,8 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/sys/unix"
-
 	"github.com/zqk-os/zqk/pkg/concurrency"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -160,12 +158,12 @@ func (fl *FileLock) Lock() error {
 			}
 
 			// Try non-blocking acquisition first to allow stale lock reclamation
-			err := syscallutil.FileFlock(fl.file, unix.LOCK_EX|unix.LOCK_NB)
+			err := syscallutil.FileFlock(fl.file, syscallutil.LockEx|syscallutil.LockNB)
 			if err == nil {
 				fl.recordLockAcquired(start, metrics)
 				return nil
 			}
-			if errors.Is(err, unix.EWOULDBLOCK) {
+			if errors.Is(err, syscallutil.EWouldBlock) {
 				if fl.config.StaleLockTTL > 0 && fl.reclaimIfStale() {
 					fl.recordLockAcquired(start, metrics)
 					return nil
@@ -173,7 +171,7 @@ func (fl *FileLock) Lock() error {
 			}
 
 			// Use flock for advisory locking (works across processes)
-			err = syscallutil.FileFlock(fl.file, unix.LOCK_EX)
+			err = syscallutil.FileFlock(fl.file, syscallutil.LockEx)
 			if err != nil {
 				if fl.config.EnableMetrics {
 					metrics.RecordFailure()
@@ -264,7 +262,7 @@ func (fl *FileLock) reclaimIfStale() bool {
 	}
 	fl.file = newFile
 
-	lockErr := syscallutil.FileFlock(fl.file, unix.LOCK_EX|unix.LOCK_NB)
+	lockErr := syscallutil.FileFlock(fl.file, syscallutil.LockEx|syscallutil.LockNB)
 	return lockErr == nil
 }
 
@@ -287,9 +285,9 @@ func (fl *FileLock) TryLock() (bool, error) {
 			}
 
 			// Use LOCK_NB (non-blocking) flag
-			err := syscallutil.FileFlock(fl.file, unix.LOCK_EX|unix.LOCK_NB)
+			err := syscallutil.FileFlock(fl.file, syscallutil.LockEx|syscallutil.LockNB)
 			if err != nil {
-				if errors.Is(err, unix.EWOULDBLOCK) {
+				if errors.Is(err, syscallutil.EWouldBlock) {
 					if fl.config.StaleLockTTL > 0 && fl.reclaimIfStale() {
 						fl.recordLockAcquired(start, metrics)
 						acquired = true
@@ -388,7 +386,7 @@ func (fl *FileLock) Unlock() error {
 			}
 
 			fl.clearOwnershipMetadata()
-			unlockErr = syscallutil.FileFlock(fl.file, unix.LOCK_UN)
+			unlockErr = syscallutil.FileFlock(fl.file, syscallutil.LockUn)
 			if unlockErr != nil {
 				return errfmt.Newf(ConstMiscFailedToReleaseFileLock).Wrap(unlockErr)
 			}
@@ -418,7 +416,7 @@ func (fl *FileLock) Close() error {
 		func() error {
 			if fl.locked {
 				fl.clearOwnershipMetadata()
-				var _err_82483302 = syscallutil.FileFlock(fl.file, unix.LOCK_UN)
+				var _err_82483302 = syscallutil.FileFlock(fl.file, syscallutil.LockUn)
 				if //nolint:errcheck // Lock cleanup errors are non-critical
 				_err_82483302 != nil {
 					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, _err_82483302).Log()

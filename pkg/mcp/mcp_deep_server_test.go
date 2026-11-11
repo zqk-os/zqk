@@ -24,6 +24,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 	"gopkg.in/yaml.v3"
 )
 
@@ -2294,13 +2295,19 @@ func TestCoverageElevation_ToolsSandboxDeep(t *testing.T) {
 
 // TestCoverageElevation_ToolsWorkflowDeep exercises workflow tool registration, format decoding, and result parsing.
 func TestCoverageElevation_ToolsWorkflowDeep(t *testing.T) {
-	t.Parallel()
+	// Not parallel: mutates ZQK_ENABLE_STUDIO_PACK_TOOLS process env.
 
-	// 1. IsStudioPackToolsEnabled
+	// 1. IsStudioPackToolsEnabled — opt-in via env only (admin must not leak pack tools)
+	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "")
+	t.Setenv(zqkenv.StudioDogfood().Name(), "")
 	_ = IsStudioPackToolsEnabled(nil)
 	adminSec := &pkgctx.SecurityContext{Roles: []string{"admin"}}
+	if IsStudioPackToolsEnabled(adminSec) {
+		t.Error("admin security context must not enable studio pack tools without env opt-in")
+	}
+	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "1")
 	if !IsStudioPackToolsEnabled(adminSec) {
-		t.Error("expected admin security context to enable studio pack tools")
+		t.Error("expected ZQK_ENABLE_STUDIO_PACK_TOOLS=1 to enable studio pack tools")
 	}
 
 	// 2. RegisterWorkflowTools

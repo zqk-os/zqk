@@ -20,6 +20,12 @@ fi
 VER_NUM="${VERSION#v}"
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# EE packaging boundary — fail closed before any community binary/archive build.
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — package-community EE exclude
+if [ -f "${REPO_ROOT}/scripts/open-core/check-ee-packaging-boundary.sh" ]; then
+  sh "${REPO_ROOT}/scripts/open-core/check-ee-packaging-boundary.sh" "${REPO_ROOT}" packaging
+fi
 DIST_DIR="${ZQK_DIST_DIR:-${REPO_ROOT}/dist-community}"
 GIT_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD)"
 export SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-$(git -C "$REPO_ROOT" log -1 --pretty=%ct 2>/dev/null || date +%s)}"

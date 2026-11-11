@@ -112,6 +112,29 @@ find "$STAGING" \( \
 	-name 'ACC-*.yaml' \
 	\) -type f -delete 2>/dev/null || true
 
+# Seed impermeability scrub (community archive): drop CAP/MMORCH/orchestrate/TPM
+# operator ontology before embed. Fragments align with pkg/bootstrap/community_denylist.go.
+SEED_DENY_FRAGMENTS='
+print_cursor_paste_applescript
+print_ide_paste_applescript
+paste_applescript
+record_cvs_orchestrate_run
+paste_cursor
+zqk_cursor
+cap_night_duty
+cap_orchestrator
+cap_background
+mmorch
+orchestrate_command
+orchestrate_batch
+tpm_orchestration
+'
+for frag in $SEED_DENY_FRAGMENTS; do
+	find "$STAGING" -type f -iname "*${frag}*" -print -delete 2>/dev/null || true
+done
+# Path-shaped orchestrate under agent/ (basename may not include a denylist fragment).
+rm -f "$STAGING/cli_specs/agent/orchestrate_command.yaml" 2>/dev/null || true
+
 # A commit-derived default makes committing the archive invalidate it immediately
 # when HEAD advances. Release builders may override this standard fixed epoch.
 SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-946684800}"
@@ -126,3 +149,11 @@ mv "$ARCHIVE_TMP" "$ARCHIVE"
 mv "$MANIFEST_TMP" "$MANIFEST"
 ENTRY_COUNT="$(wc -l < "$MANIFEST" | tr -d ' ')"
 echo "Created $ARCHIVE (${ENTRY_COUNT} entries) and $MANIFEST"
+
+# Fail-closed: refuse to leave a denylist-contaminated community seed on disk.
+if [ -x "${REPO_ROOT}/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
+	sh "${REPO_ROOT}/scripts/open-core/check-bootstrap-seed-impermeability.sh" "$REPO_ROOT"
+elif [ -f "${REPO_ROOT}/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
+	sh "${REPO_ROOT}/scripts/open-core/check-bootstrap-seed-impermeability.sh" "$REPO_ROOT"
+fi
+

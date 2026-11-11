@@ -21,6 +21,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/storage"
 	pkgsystem "github.com/zqk-os/zqk/pkg/system"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // DraftPlaneStewardWarn matches system-check draft-plane backlog warning (≥50).
@@ -42,6 +43,14 @@ const (
 
 // AlignLatestRelativePath is where TPM cadence persists `zqk system align --format json`.
 const AlignLatestRelativePath = "state/ambient/align-latest.json"
+
+// studioPackStewardEnabled mirrors MCP pack-tool opt-in: default stranger/community
+// whats-next must not project CAP/MMORCH/align-cache ontology into agent_instruction.
+// TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger whats-next residual
+func studioPackStewardEnabled() bool {
+	return zqkenv.IsCommunityEdition == false &&
+		(zqkenv.EnableStudioPackTools().Get() == "1" || zqkenv.StudioDogfood().Get() == "1")
+}
 
 // KernelAmbience is the cheap thought-projector slice for whats-next:
 // last compact system-check cache + live draft-plane inventory + employed workflows.
@@ -310,20 +319,32 @@ func EnrichStrategicAlignment(amb *KernelAmbience, projectRoot string) {
 	path := filepath.Join(projectRoot, paths.ProjectDataDir, AlignLatestRelativePath)
 	st, err := fileutil.Stat(path)
 	if err != nil || st.IsDir() {
+		note := "no strategic alignment snapshot"
+		if studioPackStewardEnabled() {
+			note = paths.RewriteCanonicalCLIInvocations("no align cache — TPM: zqk system align --format json -o .zqk/state/ambient/align-latest.json")
+		}
 		amb.StrategicAlignment = &StrategicAlignmentSnapshot{
 			Available: false,
-			Note:      paths.RewriteCanonicalCLIInvocations("no align cache — TPM: zqk system align --format json -o .zqk/state/ambient/align-latest.json"),
+			Note:      note,
 		}
 		return
 	}
 	b, err := fileutil.ReadFile(path)
 	if err != nil {
-		amb.StrategicAlignment = &StrategicAlignmentSnapshot{Available: false, Note: "align cache unreadable"}
+		note := "strategic alignment snapshot unreadable"
+		if studioPackStewardEnabled() {
+			note = "align cache unreadable"
+		}
+		amb.StrategicAlignment = &StrategicAlignmentSnapshot{Available: false, Note: note}
 		return
 	}
 	var raw map[string]any
 	if err := json.Unmarshal(b, &raw); err != nil {
-		amb.StrategicAlignment = &StrategicAlignmentSnapshot{Available: false, Note: "align cache JSON invalid"}
+		note := "strategic alignment snapshot JSON invalid"
+		if studioPackStewardEnabled() {
+			note = "align cache JSON invalid"
+		}
+		amb.StrategicAlignment = &StrategicAlignmentSnapshot{Available: false, Note: note}
 		return
 	}
 	snap := &StrategicAlignmentSnapshot{
@@ -628,12 +649,14 @@ func isFixtureWorkflow(obj map[string]any, id string) bool {
 
 func isCoreOperationalWorkflow(id string) bool {
 	switch id {
-	case "WFL-TPM-AGY-MESH-001",
-		"WFL-MMORCH-OPERATIONAL-RUNBOOK",
-		"WFL-MULTI-AGENT-WORK-CLAIM",
+	case "WFL-MULTI-AGENT-WORK-CLAIM",
 		"WFL-SUBAGENT-DISPATCH",
 		"WFL-AGENT-BOOTSTRAP":
 		return true
+	case "WFL-TPM-AGY-MESH-001",
+		"WFL-MMORCH-OPERATIONAL-RUNBOOK":
+		// Studio pack operational WFLs stay off stranger whats-next ambience.
+		return studioPackStewardEnabled()
 	default:
 		return false
 	}
@@ -693,9 +716,17 @@ func ProjectStewardFocus(amb KernelAmbience, correspondenceHint string) string {
 	var parts []string
 	switch amb.SeatMode {
 	case SeatModeTPMProcessAdmin:
-		parts = append(parts, "TPM seat: process administration only (POL-AGENT-TPM-PROCESS-ADMIN-001 / POL-AGENT-TPM-INTAKE-FIREWALL-001) — objectify chat reports to TD/BLI; delegate P0s to worker swarms; maintain active_order, shovel-ready columns, align cache; do NOT write code, run tests, or claim peer BLIs")
+		if studioPackStewardEnabled() {
+			parts = append(parts, "TPM seat: process administration only (POL-AGENT-TPM-PROCESS-ADMIN-001 / POL-AGENT-TPM-INTAKE-FIREWALL-001) — objectify chat reports to TD/BLI; delegate P0s to worker swarms; maintain active_order, shovel-ready columns, align cache; do NOT write code, run tests, or claim peer BLIs")
+		} else {
+			parts = append(parts, "operator seat: keep the active priority_plan healthy; claim and complete open BLIs with evidence; do not invent pack orchestration theater")
+		}
 	case SeatModePeerExecution:
-		parts = append(parts, "peer seat: execute the whats-next priority_plan the system proposes; claim BLIs; prepare-context + orchestrate/subagent scale-up (WFL-SUBAGENT-DISPATCH); hourglass on handoffs")
+		if studioPackStewardEnabled() {
+			parts = append(parts, "peer seat: execute the whats-next priority_plan the system proposes; claim BLIs; prepare-context + orchestrate/subagent scale-up (WFL-SUBAGENT-DISPATCH); hourglass on handoffs")
+		} else {
+			parts = append(parts, "peer seat: execute the whats-next priority_plan; claim BLIs; prepare-context before helpers; land evidence on handoffs")
+		}
 	}
 	if amb.BranchAhead > 0 {
 		parts = append(parts, fmt.Sprintf(
@@ -822,23 +853,40 @@ func PrependStewardProjection(instruction, focus string) string {
 }
 
 // PrependStewardProjectionForSeat varies seat cues (TPM process admin vs peer execution).
+// TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger whats-next residual
 func PrependStewardProjectionForSeat(instruction, focus, seatMode string) string {
 	focus = strings.TrimSpace(focus)
 	if focus == "" {
 		return instruction
 	}
-	seatCue := paths.RewriteCanonicalCLIInvocations("Seat: always pass --agent-id matching peer_seats.json (opaque seat id, not a vendor nickname). " +
-		"COMMS-CHECK / STEWARD: zqk feed ack --agent-id <you> --in-reply-to <AFE>; echo nonce via " +
-		"zqk feed steer --to-agent-id <coordinator seat> --await-peer-ack (not IDE chat). " +
-		"Workflows: honor kernel_ambience.employed_workflows (mesh/MMORCH/subagent/bootstrap) — do not drift from active WFL contracts.\n\n")
-	switch seatMode {
-	case SeatModeTPMProcessAdmin:
-		seatCue = "TPM: process admin only — if align-latest.json is stale (>30m) persist a new align cache; if fresh, do not remint align. Shape an unshaped grooming priority_plan; if it is already shaped, hourglass the lead in_progress PRI and classify draft plane. " +
-			"Set priority_plan.active_order to match mission/vision/strategic_plan; hourglass steer peers to pull whats-next — do not agent orchestrate their PRI. " + seatCue
-	case SeatModePeerExecution:
-		seatCue = paths.RewriteCanonicalCLIInvocations("Peer: run zqk workflow whats-next --agent-id <you> --format json; execute the proposed priority_plan/BLIs; ") +
-			"prepare-context then orchestrate/subagent scale-up; agent next --on-validation-failure wake; " +
-			"draft plane: promote/fix only — never draft sweep apply without RBAC delete:object_draft_plane. " + seatCue
+	var seatCue string
+	if studioPackStewardEnabled() {
+		seatCue = paths.RewriteCanonicalCLIInvocations("Seat: always pass --agent-id matching peer_seats.json (opaque seat id, not a vendor nickname). " +
+			"COMMS-CHECK / STEWARD: zqk feed ack --agent-id <you> --in-reply-to <AFE>; echo nonce via " +
+			"zqk feed steer --to-agent-id <coordinator seat> --await-peer-ack (not IDE chat). " +
+			"Workflows: honor kernel_ambience.employed_workflows (mesh/subagent/bootstrap) — do not drift from active WFL contracts.\n\n")
+		switch seatMode {
+		case SeatModeTPMProcessAdmin:
+			seatCue = "TPM: process admin only — if align-latest.json is stale (>30m) persist a new align cache; if fresh, do not remint align. Shape an unshaped grooming priority_plan; if it is already shaped, hourglass the lead in_progress PRI and classify draft plane. " +
+				"Set priority_plan.active_order to match mission/vision/strategic_plan; hourglass steer peers to pull whats-next — do not agent orchestrate their PRI. " + seatCue
+		case SeatModePeerExecution:
+			seatCue = paths.RewriteCanonicalCLIInvocations("Peer: run zqk workflow whats-next --agent-id <you> --format json; execute the proposed priority_plan/BLIs; ") +
+				"prepare-context then orchestrate/subagent scale-up; agent next --on-validation-failure wake; " +
+				"draft plane: promote/fix only — never draft sweep apply without RBAC delete:object_draft_plane. " + seatCue
+		}
+	} else {
+		// Stranger / community default: pack-free continuity (no CAP/MMORCH/align-cache theater).
+		seatCue = paths.RewriteCanonicalCLIInvocations(
+			"Seat: run zqk workflow whats-next --format json; claim open BLIs on the proposed plan; " +
+				"prepare-context before helpers; land evidence before marking work complete. " +
+				"Workflows: honor kernel_ambience.employed_workflows (mesh/subagent/bootstrap) — do not drift from active WFL contracts.\n\n",
+		)
+		switch seatMode {
+		case SeatModeTPMProcessAdmin:
+			seatCue = "Operator: keep the active priority_plan shovel-ready; prefer whats-next over inventing new plans. " + seatCue
+		case SeatModePeerExecution:
+			seatCue = paths.RewriteCanonicalCLIInvocations("Peer: run zqk workflow whats-next --format json; execute the proposed priority_plan/BLIs; ") + seatCue
+		}
 	}
 	block := stewardProjectionPrefix + " " + focus + "\n\n" + seatCue
 	if strings.HasPrefix(strings.TrimSpace(instruction), stewardProjectionPrefix) {

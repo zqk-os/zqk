@@ -433,10 +433,19 @@ func registerCommands() {
 	completionCmd.GroupID = "integrations"
 	rootCmd.AddCommand(completionCmd)
 
-	// Priority plan shortcuts (pplan add/remove/current/next/prev)
-	pplanCmdInst := object.NewPPlanCmd()
-	pplanCmdInst.GroupID = "everyday"
-	rootCmd.AddCommand(pplanCmdInst)
+	// Priority plan shortcuts (pplan add/remove/current/next/prev):
+	// stranger/community default excludes — same opt-in as MCP IsStudioPackToolsEnabled.
+	// TRACK: stranger-cli-surface (open-core)
+	if shouldRegisterStudioPackCLI() {
+		pplanCmdInst := object.NewPPlanCmd()
+		pplanCmdInst.GroupID = "everyday"
+		rootCmd.AddCommand(pplanCmdInst)
+	}
+
+	// Multi-agent orchestration
+	agentCmdInst := agent.NewAgentCmd()
+	agentCmdInst.GroupID = "advanced"
+	rootCmd.AddCommand(agentCmdInst)
 
 	// Live kernel state tree and mutation journal
 	stateCmdInst := state.NewStateCmd()
@@ -453,11 +462,6 @@ func registerCommands() {
 	testCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(testCmdInst)
 	system.RegisterTestDashboardWarmer(testcmd.WarmLiteFile)
-
-	// Multi-agent orchestration
-	agentCmdInst := agent.NewAgentCmd()
-	agentCmdInst.GroupID = "advanced"
-	rootCmd.AddCommand(agentCmdInst)
 
 	// Top-level convergence measurement & nest management
 	convergenceCmdInst := convergence.NewConvergenceCmd()

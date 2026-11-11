@@ -381,9 +381,9 @@ func ExecuteSubprocess(ctx context.Context, inv CriterionInvocation) CriterionRu
 	goroutinelabels.NewGoroutine("testrunner.signal_teardown", "teardown process group on context cancellation").StartSimple(func() {
 		select {
 		case <-ctx.Done():
-			_ = syscall.Kill(pgid, syscall.SIGTERM)
+			_ = killProcessGroup(pgid, syscall.SIGTERM)
 			time.Sleep(50 * time.Millisecond)
-			_ = syscall.Kill(pgid, syscall.SIGKILL)
+			_ = killProcessGroup(pgid, syscall.SIGKILL)
 		case <-done:
 		}
 	})
@@ -646,9 +646,7 @@ func createEphemeralTmpDir(prefix string) (string, func()) {
 
 // setupIsolatedCommandEnv configures PGID isolation and standard sandbox environment on cmd.
 func setupIsolatedCommandEnv(cmd *exec.Cmd, tmpDir string, baseEnv []string, extraEnv []string) {
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setpgid: true,
-	}
+	setCommandProcessGroup(cmd)
 	cmd.Env = os.Environ()
 	if len(baseEnv) > 0 {
 		cmd.Env = append(cmd.Env, baseEnv...)

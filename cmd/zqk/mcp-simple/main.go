@@ -122,7 +122,10 @@ func registerMinimalTools(server *mcp.Server) {
 	registerEchoTool(server)
 	registerGraphTraversalTool(server)
 	registerObjectListTool(server)
-	registerPriorityPlanTool(server)
+	// Pack ontology getter — opt-in only (stranger/community default excludes).
+	if mcp.IsStudioPackToolsEnabled(nil) {
+		registerPriorityPlanTool(server)
+	}
 	registerInteractiveCreationTool(server)
 }
 

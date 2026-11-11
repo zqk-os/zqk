@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -80,7 +79,7 @@ func AcquireDaemonLock(projectRoot string, daemonName string) (*DaemonLock, erro
 	}
 
 	// Non-blocking exclusive lock: fails immediately if held by another live process
-	flockErr := syscallutil.FileFlock(f, syscall.LOCK_EX|syscall.LOCK_NB)
+	flockErr := syscallutil.FileFlock(f, syscallutil.LockEx|syscallutil.LockNB)
 	if flockErr != nil {
 		existingPID := parseLockPID(f)
 		if closeErr := f.Close(); closeErr != nil {
@@ -138,7 +137,7 @@ func (l *DaemonLock) Release() error {
 		return nil
 	}
 	var firstErr error
-	if unlockErr := syscallutil.FileFlock(l.file, syscall.LOCK_UN); unlockErr != nil && firstErr == nil {
+	if unlockErr := syscallutil.FileFlock(l.file, syscallutil.LockUn); unlockErr != nil && firstErr == nil {
 		firstErr = unlockErr
 	}
 	if closeErr := l.file.Close(); closeErr != nil && firstErr == nil {
@@ -201,14 +200,14 @@ func IsDaemonRunning(projectRoot string, daemonName string) (bool, int, error) {
 	}
 	defer f.Close()
 
-	if err := syscallutil.FileFlock(f, syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
+	if err := syscallutil.FileFlock(f, syscallutil.LockEx|syscallutil.LockNB); err != nil {
 		// Advisory lock is held by a live process
 		pid := parseLockPID(f)
 		return true, pid, nil
 	}
 
 	// Lock was acquired -> no active daemon holding it
-	if unlockErr := syscallutil.FileFlock(f, syscall.LOCK_UN); unlockErr != nil {
+	if unlockErr := syscallutil.FileFlock(f, syscallutil.LockUn); unlockErr != nil {
 		// unlock failure on cleanup
 	}
 	return false, 0, nil

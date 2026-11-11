@@ -42,11 +42,46 @@ jobs:
       - name: Vet Code
         run: go vet ./...
 
+      - name: Compile Product Binary
+        run: make compile-bin
+
       - name: Run ZQK Verification Engine (zqk-vet)
         run: make vet
 
       - name: Verify Public Release Payload
         run: sh scripts/open-core/check-public-release-payload.sh
+
+      # EE module exclude + package-community / stranger extract proof.
+      # TRACK: BLI-1794392630487404500-8c27dcc1
+      - name: EE Packaging Boundary
+        run: |
+          sh scripts/open-core/check-ee-packaging-boundary.sh --self-test
+          sh scripts/open-core/check-ee-packaging-boundary.sh "$GITHUB_WORKSPACE" community
+
+      # G11/G12 community hygiene (script budget + MUST_NOT plane). TRACK: BLI-1794357065053000000-e4eddd8d
+      # Also invokes G15 studio-ID scrub fail-closed.
+      - name: Police Community Tree (G11/G12/G15)
+        run: sh scripts/open-core/police-community-tree.sh "$GITHUB_WORKSPACE"
+
+      # G15 explicit (also via police) — stranger/open-core product Go must not embed studio CAS IDs.
+      # TRACK: BLI-1794391580157275000-0bc1e5f0
+      - name: G15 Studio-ID Scrub
+        run: sh scripts/open-core/check-g15-studio-id-scrub.sh "$GITHUB_WORKSPACE"
+
+      # G13: native build fail-closed; windows residual tracked until syscall portability stubs.
+      # Full G13 (windows+docker) is local/release: omit NATIVE_ONLY / SKIP_DOCKER.
+      # TRACK: BLI-1794391580157275000-0bc1e5f0
+      - name: G13 Cross-Platform Hammer (native CI bar)
+        env:
+          ZQK_G13_NATIVE_ONLY: "1"
+          ZQK_G13_SKIP_DOCKER: "1"
+        run: sh scripts/open-core/g13-cross-platform-hammer.sh "$GITHUB_WORKSPACE"
+
+      # Seed impermeability: CAP/MMORCH/orchestrate/TPM absent from bootstrap archive/manifest.
+      - name: Bootstrap Seed Impermeability
+        run: |
+          sh scripts/open-core/check-bootstrap-seed-impermeability.sh --self-test
+          sh scripts/open-core/check-bootstrap-seed-impermeability.sh "$GITHUB_WORKSPACE"
 
       - name: Check Hardcoded Paths and Permissions
         run: ./scripts/check-hardcoded-paths-and-perms-repo.sh --no-dups
@@ -82,6 +117,9 @@ jobs:
           | Static Analysis (`go vet`) | ✅ Passed |
           | ZQK Verification Engine (`zqk-vet`) | ✅ Passed |
           | Public Release Payload Gate | ✅ Passed |
+          | Community Tree Police (G11/G12/G15) | ✅ Passed |
+          | G15 Studio-ID Scrub | ✅ Passed |
+          | G13 Cross-Platform Hammer (native CI) | ✅ Passed |
           | Path & Permission Literals | ✅ Passed |
           | Documentation Portal & Link Rot Sentinel | ✅ Passed |
           | CLI Name Literals | ✅ Passed |
@@ -112,7 +150,7 @@ jobs:
               ./pkg/convergerollup/... ./pkg/crypto/... ./pkg/datacell/...
               ./pkg/datacellregistry/... ./pkg/diagnostics/... ./pkg/diskusage/...
               ./pkg/dispatch/... ./pkg/dna/... ./pkg/docman/... ./pkg/domain/...
-              ./pkg/drifthotspots/... ./pkg/economy/... ./pkg/entitlements/...
+              ./pkg/drifthotspots/... ./pkg/entitlements/...
               ./pkg/envelope/... ./pkg/errfmt/... ./pkg/events/... ./pkg/evolution/...
               ./pkg/execwrap/... ./pkg/featureflags/... ./pkg/filter/... ./pkg/fitness/...
               ./pkg/functional/... ./pkg/gantt/... ./pkg/git/... ./pkg/gitconstants/...

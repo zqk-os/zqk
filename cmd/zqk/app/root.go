@@ -220,10 +220,12 @@ func init() {
 			"collaborate safely without losing context.",
 		).
 		AddSection("Command surfaces",
-			"Everyday (orientation): workflow whats-next, object, system, pplan, auth.\n"+paths.RewriteCanonicalCLIInvocations("Draft objects: zqk object template <kind> (canonical). quick/new are shortcuts — see their --help.\n")+paths.RewriteCanonicalCLIInvocations("Health: zqk system check (warm cache; repeat runs should be fast). Scheduler + integrations below.\n")+
+			// Stranger/community default omits pack ontology shortcuts (pplan / agent orchestrate);
+			// studio pack opt-in via ZQK_ENABLE_STUDIO_PACK_TOOLS. TRACK: stranger-cli-surface (open-core)
+			"Everyday (orientation): workflow whats-next, object, system, auth.\n"+paths.RewriteCanonicalCLIInvocations("Draft objects: zqk object template <kind> (canonical). quick/new are shortcuts — see their --help.\n")+paths.RewriteCanonicalCLIInvocations("Health: zqk system check (warm cache; repeat runs should be fast). Scheduler + integrations below.\n")+
 				"Privileged / developer: internal (admin), keystore; use only when documented for your role.\n"+
 				"The zqk-admin binary (cmd/zqk-admin) shares this same command tree and bootstrap as zqk.\n"+
-				"See docs/onboarding/AI_AGENT_ONBOARDING.md and .agents/AGENTS.md (CLI command surfaces).",
+				"See docs/onboarding/COMMUNITY_FIRST_RUN.md and docs/onboarding/AI_AGENT_ONBOARDING.md (CLI command surfaces).",
 		).
 		AddSection("Documentation (Divio Index)", "Tutorials: docs/onboarding/COMMUNITY_FIRST_RUN.md, docs/tutorials/INTERACTIVE_OBJECT_INSPECTION_TUTORIAL.md\nHow-To: docs/howto/INSPECT_AND_VALIDATE_OBJECTS.md, docs/howto/SCHEDULER_AND_MAINTENANCE.md\nReference: docs/INDEX.md, docs/architecture/INDEX.md\nExplanation: docs/explanation/README.md, docs/architecture/README.md").WithAutoDiscoverSubcommands(true)
 	helpBuilder.ApplyToCommand(rootCmd)

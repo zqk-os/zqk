@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -55,7 +54,7 @@ func (s *Server) handleAgentTriggerVerificationTool(ctx context.Context, args ma
 		if s.GetProjectRoot() != "" && s.GetProjectRoot() != "." {
 			cmd.Dir = s.GetProjectRoot()
 		}
-		cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+		setCommandProcessGroup(cmd)
 
 		var combinedBuf bytes.Buffer
 		cmd.Stdout = &combinedBuf
@@ -74,7 +73,7 @@ func (s *Server) handleAgentTriggerVerificationTool(ctx context.Context, args ma
 			process := cmd.Process
 			pgm.RegisterSubprocess(subprocessID, "trigger_verification", fmt.Sprintf("verification target: %s", target), process.Pid, false, func() error {
 				if process != nil {
-					_ = syscall.Kill(-process.Pid, syscall.SIGKILL)
+					killProcessGroupNeg(process.Pid)
 					err := process.Kill()
 					pgm.UnregisterSubprocess(subprocessID)
 					return err

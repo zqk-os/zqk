@@ -174,11 +174,11 @@ func isFlockHeld(path string) bool {
 	}
 	defer f.Close()
 
-	if err := syscallutil.FileFlock(f, syscall.LOCK_EX|syscall.LOCK_NB); err != nil {
+	if err := syscallutil.FileFlock(f, syscallutil.LockEx|syscallutil.LockNB); err != nil {
 		// Could not acquire exclusive non-blocking lock: another process holds it.
 		return true
 	}
-	_ = syscallutil.FileFlock(f, syscall.LOCK_UN)
+	_ = syscallutil.FileFlock(f, syscallutil.LockUn)
 	return false
 }
 
@@ -214,7 +214,7 @@ func processAlive(pid int) bool {
 	// kill(pid, 0) is the cheapest liveness probe that does not deliver a
 	// signal: ESRCH means the process does not exist; any other result
 	// (including EPERM: exists but not ours) counts as alive.
-	err := syscall.Kill(pid, 0)
+	err := syscallutil.SignalExists(pid)
 	if err == nil {
 		return true
 	}

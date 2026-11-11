@@ -1,17 +1,21 @@
 #!/bin/sh
 # ZQK Installer — supports public release download, go install, and build-from-source.
 #
-# Public OSS install (no token required — once repo is public):
+# Default public / stranger path (NO GITHUB_TOKEN required):
 #   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
+#   # auto: public binary → go install → source (falls through without a token)
 #
-# Private / pre-release install (requires GITHUB_TOKEN):
+# Force unauthenticated behavior (ignore gh CLI login / never use private assets):
+#   ZQK_INSTALL_UNAUTH=1 curl -sSL ... | sh
+#
+# Private / pre-release install (requires GITHUB_TOKEN or authenticated gh):
 #   export GITHUB_TOKEN="ghp_..."
 #   curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh -s -- v2.7.0
 #
 # Build from source (Go 1.21+ required — no token, no binary release needed):
 #   ZQK_INSTALL_METHOD=source ./scripts/install.sh
 #
-# go install (module must be public):
+# go install (module must be public — no token):
 #   ZQK_INSTALL_METHOD=goinstall ./scripts/install.sh
 set -e
 
@@ -19,6 +23,8 @@ REPO="${ZQK_REPO:-zqk-os/zqk}"
 MODULE="${ZQK_MODULE:-github.com/zqk-os/zqk}"
 # INSTALL_METHOD: auto | binary | goinstall | source
 INSTALL_METHOD="${ZQK_INSTALL_METHOD:-auto}"
+# ZQK_INSTALL_UNAUTH=1: stranger/public path — do not auto-detect gh tokens; never private assets
+INSTALL_UNAUTH="${ZQK_INSTALL_UNAUTH:-0}"
 MODE="${ZQK_MODE:-}"
 STANDALONE=0
 HEADLESS=0
@@ -102,11 +108,21 @@ if [ -z "$MODE" ]; then
   fi
 fi
 
-# Auto-detect GITHUB_TOKEN via gh CLI if not explicitly set
-if [ -z "$GITHUB_TOKEN" ] && command -v gh >/dev/null 2>&1; then
+# Auto-detect GITHUB_TOKEN via gh CLI if not explicitly set.
+# Stranger/public path (ZQK_INSTALL_UNAUTH=1) must never inherit a private gh login.
+if [ "$INSTALL_UNAUTH" != "1" ] && [ -z "${GITHUB_TOKEN:-}" ] && [ -z "${GH_TOKEN:-}" ] \
+  && command -v gh >/dev/null 2>&1; then
   GITHUB_TOKEN="$(gh auth token 2>/dev/null || true)"
 fi
-GITHUB_TOKEN="$(printf '%s' "$GITHUB_TOKEN" | tr -d '\r\n')"
+if [ -z "${GITHUB_TOKEN:-}" ] && [ -n "${GH_TOKEN:-}" ] && [ "$INSTALL_UNAUTH" != "1" ]; then
+  GITHUB_TOKEN="$GH_TOKEN"
+fi
+if [ "$INSTALL_UNAUTH" = "1" ]; then
+  GITHUB_TOKEN=""
+  GH_TOKEN=""
+  export GITHUB_TOKEN GH_TOKEN
+fi
+GITHUB_TOKEN="$(printf '%s' "${GITHUB_TOKEN:-}" | tr -d '\r\n')"
 
 # ---------------------------------------------------------------------------
 # 1. Detect OS and Architecture
@@ -257,7 +273,8 @@ install_binary() {
         break
       fi
     done
-  elif [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; then
+  elif [ "$INSTALL_UNAUTH" != "1" ] && { [ -n "$GITHUB_TOKEN" ] || command -v gh >/dev/null 2>&1; }; then
+    # Private / pre-release path only (token or authenticated gh).
     if ! _download_private "$ver" "$archive" "${archive_path}"; then
       if ! _download_private "$ver" "$comm_archive" "${archive_path}"; then
         echo "Neither ${archive} nor ${comm_archive} found in release ${ver}" >&2
@@ -278,7 +295,10 @@ install_binary() {
       exit 1
     fi
   else
-    echo "Binary release not found for ${ver}. Try ZQK_INSTALL_METHOD=source or set GITHUB_TOKEN." >&2
+    echo "Public binary release not found for ${ver} (no GITHUB_TOKEN required for source/goinstall)." >&2
+    echo "Retry with: ZQK_INSTALL_METHOD=source ./scripts/install.sh" >&2
+    echo "Or (public module): ZQK_INSTALL_METHOD=goinstall ./scripts/install.sh" >&2
+    echo "Private pre-release assets: export GITHUB_TOKEN=... then re-run." >&2
     exit 1
   fi
 
@@ -497,19 +517,27 @@ case "$INSTALL_METHOD" in
     install_binary "$VERSION"
     ;;
   auto|*)
-    # Auto: try binary (public) → go install → source
-    if [ "$VERSION" = "latest" ]; then
-      VERSION="$(resolve_latest 2>/dev/null)" || true
-    fi
-    if [ -n "$VERSION" ] && [ "$VERSION" != "latest" ]; then
-      install_binary "$VERSION" 2>/dev/null && DONE=1 || true
+    # Auto (no token required): local checkout → public binary → go install → source
+    DONE=""
+    if [ -f "./cmd/zqk/main.go" ]; then
+      echo "Local checkout detected — building from source (no GITHUB_TOKEN)..."
+      install_source 2>/dev/null && DONE=1 || true
     fi
     if [ -z "$DONE" ]; then
-      echo "Binary release not available — trying go install..."
+      if [ "$VERSION" = "latest" ]; then
+        VERSION="$(resolve_latest 2>/dev/null)" || true
+      fi
+      if [ -n "$VERSION" ] && [ "$VERSION" != "latest" ]; then
+        echo "Trying public binary release ${VERSION} (no token)..."
+        install_binary "$VERSION" 2>/dev/null && DONE=1 || true
+      fi
+    fi
+    if [ -z "$DONE" ]; then
+      echo "Binary release not available — trying go install (no token)..."
       install_go "latest" 2>/dev/null && DONE=1 || true
     fi
     if [ -z "$DONE" ]; then
-      echo "go install not available — building from source (requires git + Go)..."
+      echo "go install not available — building from source (requires git + Go; no token)..."
       install_source
     fi
     ;;

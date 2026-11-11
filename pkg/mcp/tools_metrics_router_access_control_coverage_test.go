@@ -3,8 +3,8 @@ package mcp
 import (
 	"context"
 	"errors"
+	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"io"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 // 1. Tools comprehensive tests
@@ -123,11 +124,17 @@ func TestDeep4_ToolsWorkflow_Comprehensive(t *testing.T) {
 	secAdmin := pkgctx.NewSecurityContext("ACC-ADMIN", []string{"admin"}, []string{"*"})
 	secDev := pkgctx.NewSecurityContext("ACC-DEV", []string{"developer"}, []string{"read"})
 
-	if !IsStudioPackToolsEnabled(secAdmin) {
-		t.Error("expected studio pack tools enabled for admin")
+	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "")
+	t.Setenv(zqkenv.StudioDogfood().Name(), "")
+	if IsStudioPackToolsEnabled(secAdmin) {
+		t.Error("admin must not enable studio pack tools without env opt-in")
 	}
 	if IsStudioPackToolsEnabled(secDev) {
 		t.Log("studio pack tools disabled for developer without pack")
+	}
+	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "1")
+	if !IsStudioPackToolsEnabled(secAdmin) {
+		t.Error("expected studio pack tools enabled when ZQK_ENABLE_STUDIO_PACK_TOOLS=1")
 	}
 
 	s := NewServer()
@@ -201,9 +208,9 @@ func TestDeep4_Install_Comprehensive(t *testing.T) {
 	}
 
 	cursorDir := filepath.Join(tmpDir, ".cursor")
-	_ = os.MkdirAll(cursorDir, paths.DirPerm755)
+	_ = fileutil.MkdirAll(cursorDir, paths.DirPerm755)
 	configFile := filepath.Join(cursorDir, "mcp.json")
-	_ = os.WriteFile(configFile, []byte(`{"mcpServers":{}}`), paths.FilePerm644)
+	_ = fileutil.WriteFile(configFile, []byte(`{"mcpServers":{}}`), paths.FilePerm644)
 
 	logger := logging.NewLogger(io.Discard, logging.InfoLevel, logging.NewTextFormatter(context.Background()))
 	err := InstallToIDE("cursor", configFile, "/usr/local/bin/zqk", tmpDir, logger)

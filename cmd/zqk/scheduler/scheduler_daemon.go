@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -273,7 +272,7 @@ func spawnConfiguredSchedulerDaemon(execCmd *exec.Cmd, projectRoot, contextLabel
 	}
 
 	if runtime.GOOS != schedulerGOOSWindows {
-		execCmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+		setDaemonSetsid(execCmd)
 	}
 	if err := startDetachedSchedulerDaemonProcess(execCmd); err != nil {
 		cleanup()

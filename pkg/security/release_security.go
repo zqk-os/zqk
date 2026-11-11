@@ -203,7 +203,7 @@ func AuditPayload(root string, opts AuditOptions) (*AuditReport, error) {
 				}
 			}
 
-			// Studio ID leaks (e.g. BLI-1234567890123-abcdef)
+			// Studio ID leaks (long-form kernel ids)
 			if opts.CheckStudioIDs && studioIDRegex.MatchString(line) {
 				report.Violations = append(report.Violations, Violation{
 					Rule:     "LONG_STUDIO_ID_LEAK",

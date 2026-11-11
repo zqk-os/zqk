@@ -14,8 +14,6 @@ import (
 	"sync"
 	"time"
 
-	"golang.org/x/sys/unix"
-
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -73,11 +71,11 @@ func AllocateSequenceRange(dir, prefix string, minDigits, startAt, count int, se
 	deadline := time.Now().Add(5 * time.Second)
 	backoff := 5 * time.Millisecond
 	for {
-		flockErr := syscallutil.FileFlock(file, unix.LOCK_EX|unix.LOCK_NB)
+		flockErr := syscallutil.FileFlock(file, syscallutil.LockEx|syscallutil.LockNB)
 		if flockErr == nil {
 			break
 		}
-		if !errors.Is(flockErr, unix.EWOULDBLOCK) && !errors.Is(flockErr, unix.EAGAIN) {
+		if !errors.Is(flockErr, syscallutil.EWouldBlock) && !errors.Is(flockErr, syscallutil.EWouldBlock) {
 			return nil, errfmt.Newf(ConstLockSequenceFile).Wrap(flockErr)
 		}
 		if time.Now().After(deadline) {
@@ -89,7 +87,7 @@ func AllocateSequenceRange(dir, prefix string, minDigits, startAt, count int, se
 		}
 	}
 	defer func() {
-		logging.LogSwallowedError(syscallutil.FileFlock(file, unix.LOCK_UN))
+		logging.LogSwallowedError(syscallutil.FileFlock(file, syscallutil.LockUn))
 	}()
 
 	var current int

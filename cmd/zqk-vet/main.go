@@ -12,6 +12,7 @@ import (
 
 	"github.com/zqk-os/zqk/cmd/zqk/app"
 	"github.com/zqk-os/zqk/pkg/vet"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func runMain(args []string, stdout, stderr io.Writer) int {
@@ -60,6 +61,7 @@ func runMain(args []string, stdout, stderr io.Writer) int {
 	}
 
 	runner := vet.NewRunner(absRoot, cfg)
+	_ = zqkenv.EnableStudioPackTools().Set("1")
 	runner.RootCommand = app.NewRootCommand()
 	report, err := runner.Run(vet.RunOptions{
 		Suites:   suites,

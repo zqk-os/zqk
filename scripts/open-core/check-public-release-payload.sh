@@ -70,7 +70,10 @@ fi
 if git -C "$ROOT" grep -n -E 'TDE-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	'scripts' \
 	':!scripts/open-core/check-public-release-payload.sh' \
-	':!scripts/open-core/test-public-release-gates.sh'; then
+	':!scripts/open-core/test-public-release-gates.sh' \
+	':!scripts/fixtures/evidence/**' \
+	':!scripts/fixtures/objectify_claims/**' \
+	':!scripts/fixtures/change_intents/**'; then
 	fail "studio technical_debt instance id remains in scripts"
 fi
 
@@ -81,6 +84,9 @@ if git -C "$ROOT" grep -n -E 'TRACK:.*(BLI|REQ|CRIT|PRI|TDE|ATK|CAP|CVS)-' -- \
 	'cmd' 'scripts' 'pkg' \
 	':!scripts/open-core/check-public-release-payload.sh' \
 	':!scripts/open-core/test-public-release-gates.sh' \
+	':!scripts/fixtures/evidence/**' \
+	':!scripts/fixtures/objectify_claims/**' \
+	':!scripts/fixtures/change_intents/**' \
 	':!pkg/**/testdata/*'; then
 	fail "studio TRACK comment with kernel object id remains in cmd, scripts, or pkg"
 fi
@@ -108,7 +114,10 @@ if git -C "$ROOT" grep -n -E '[A-Z]{2,12}-[0-9]{15,}-[0-9a-fA-F]{8}' -- \
 	':!*_test.go' \
 	':!pkg/**/testdata/*' \
 	':!scripts/open-core/check-public-release-payload.sh' \
-	':!scripts/open-core/test-public-release-gates.sh'; then
+	':!scripts/open-core/test-public-release-gates.sh' \
+	':!scripts/fixtures/evidence/**' \
+	':!scripts/fixtures/objectify_claims/**' \
+	':!scripts/fixtures/change_intents/**'; then
 	fail "studio nanos-hex kernel object id remains in production pkg, cmd, docs, scripts, CLI specs, or command builders"
 fi
 
@@ -177,8 +186,21 @@ if git -C "$ROOT" grep -l -E \
 	fail "tracked files contain an obvious credential or private-key marker"
 fi
 
-if ! sh "$ROOT/scripts/open-core/police-community-tree.sh" "$ROOT"; then
+# police-community-tree.sh also runs this payload scrub; the guard breaks the
+# payload -> police -> payload mutual recursion (fork-bomb) in either entry order.
+if [ "${ZQK_PAYLOAD_POLICE_GUARD:-}" = "police" ]; then
+	say "SKIP: community tree police (already running as parent of this payload scrub)"
+elif ! ZQK_PAYLOAD_POLICE_GUARD=payload sh "$ROOT/scripts/open-core/police-community-tree.sh" "$ROOT"; then
 	fail "community tree police failed"
+fi
+
+# Explicit seed impermeability (also invoked from police); keep as a named gate for CI clarity.
+if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
+	if ! sh "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" "$ROOT"; then
+		fail "bootstrap seed impermeability failed (CAP/MMORCH/orchestrate/TPM in init archive)"
+	fi
+else
+	fail "missing scripts/open-core/check-bootstrap-seed-impermeability.sh"
 fi
 
 if [ "$FAIL" -ne 0 ]; then

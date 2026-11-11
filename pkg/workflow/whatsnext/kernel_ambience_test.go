@@ -9,6 +9,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
+	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
 func TestProjectStewardFocus_branchAhead(t *testing.T) {
@@ -79,6 +80,20 @@ func TestPrependStewardProjection_idempotent(t *testing.T) {
 	}
 }
 
+func TestPrependStewardProjection_noStudioPackOntology(t *testing.T) {
+	t.Parallel()
+	// TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger whats-next residual
+	once := PrependStewardProjection("continue", "peer seat: execute the whats-next priority_plan")
+	for _, deny := range []string{"MMORCH", "ORCHESTRATE_PLAN", "cap_orchestrat", "cap_night_duty", "get_current_priority_plan"} {
+		if strings.Contains(once, deny) {
+			t.Fatalf("stranger seat cue must not contain pack ontology %q: %q", deny, once)
+		}
+	}
+	if !strings.Contains(once, "mesh/subagent/bootstrap") {
+		t.Fatalf("expected community workflow family cue: %q", once)
+	}
+}
+
 func TestProjectStewardFocus_employedWorkflows(t *testing.T) {
 	t.Parallel()
 	amb := KernelAmbience{
@@ -98,20 +113,27 @@ func TestProjectStewardFocus_employedWorkflows(t *testing.T) {
 }
 
 func TestTruncateAndFixtureHelpers(t *testing.T) {
-	t.Parallel()
 	if truncateRunes("abcd", 3) != "ab…" {
 		t.Fatalf("truncate")
 	}
 	if !isFixtureWorkflow(map[string]any{objects.FieldKeyTitle: "Fixture: workflow #1"}, "WFL-001") {
 		t.Fatal("expected fixture")
 	}
+	_ = zqkenv.EnableStudioPackTools().Unset()
+	_ = zqkenv.StudioDogfood().Unset()
+	if isCoreOperationalWorkflow("WFL-TPM-AGY-MESH-001") {
+		t.Fatal("mesh WFL must stay pack-gated off stranger ambience by default")
+	}
+	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "1")
+	t.Cleanup(func() { _ = zqkenv.EnableStudioPackTools().Unset() })
 	if !isCoreOperationalWorkflow("WFL-TPM-AGY-MESH-001") {
-		t.Fatal("core mesh")
+		t.Fatal("core mesh when studio pack tools enabled")
 	}
 }
 
 func TestEnrichStrategicAlignment_andSeatMode(t *testing.T) {
-	t.Parallel()
+	t.Setenv(zqkenv.EnableStudioPackTools().Name(), "1")
+	t.Cleanup(func() { _ = zqkenv.EnableStudioPackTools().Unset() })
 	root := t.TempDir()
 	dir := filepath.Join(root, paths.ProjectDataDir, paths.StateDir, "ambient")
 	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
@@ -152,6 +174,20 @@ func TestEnrichStrategicAlignment_andSeatMode(t *testing.T) {
 		t.Fatalf("peer seat=%q", amb.SeatMode)
 	}
 	got := PrependStewardProjectionForSeat("continue", amb.StewardFocus, amb.SeatMode)
+	if !strings.Contains(got, "Peer: run zqk workflow whats-next") {
+		t.Fatalf("prepend=%q", got)
+	}
+}
+
+func TestPrependStewardProjection_strangerPackFree(t *testing.T) {
+	_ = zqkenv.EnableStudioPackTools().Unset()
+	_ = zqkenv.StudioDogfood().Unset()
+	got := PrependStewardProjectionForSeat("continue", "peer seat: execute the whats-next priority_plan", SeatModePeerExecution)
+	for _, bad := range []string{"MMORCH", "align-latest", "align cache", "ORCHESTRATE_PLAN", "cap_orchestrat"} {
+		if strings.Contains(got, bad) {
+			t.Fatalf("stranger projection leaked %q in %q", bad, got)
+		}
+	}
 	if !strings.Contains(got, "Peer: run zqk workflow whats-next") {
 		t.Fatalf("prepend=%q", got)
 	}
