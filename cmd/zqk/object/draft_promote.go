@@ -5,11 +5,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gopkg.in/yaml.v3"
+
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/teleology"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/validation"
 )
@@ -60,23 +63,67 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 			"skipped_items":         skipped,
 		}
 
+		taxonomy, _ := teleology.LoadTaxonomy(proc.ProjectRoot())
+		teleologyRejections := make(map[string]*teleology.TeleologicalReceipt)
+		if taxonomy != nil && taxonomy.Enabled {
+			for _, m := range matched {
+				if m.Path != "" {
+					if data, err := fileutil.ReadFile(m.Path); err == nil {
+						var obj map[string]any
+						if err := yaml.Unmarshal(data, &obj); err == nil {
+							receipt := teleology.EvaluateTeleologicalAlignment(obj, taxonomy)
+							if receipt.Status == "TELEOLOGICAL_DRIFT_REFUSED" {
+								teleologyRejections[m.ID] = receipt
+							}
+						}
+					}
+				}
+			}
+		}
+
 		ids := make([]string, 0, len(matched))
 		candidates := make([]map[string]any, 0, len(matched))
+		var teleologyFailed []draftItemError
 		for _, m := range matched {
-			ids = append(ids, m.ID)
 			row := map[string]any{
 				objects.FieldKeyID: m.ID, objects.FieldKeyKind: m.Kind, objects.FieldKeyStatus: m.Status, objects.FieldKeyPath: m.Path,
 			}
-			if dryRun {
-				row["action"] = "would_promote"
+			if receipt, isRefused := teleologyRejections[m.ID]; isRefused {
+				row["action"] = "refused_teleological_drift"
+				row["receipt"] = receipt
+				teleologyFailed = append(teleologyFailed, draftItemError{
+					ID:    m.ID,
+					Error: fmt.Sprintf("%s: %s (boundary: %s)", receipt.Status, receipt.Cause, receipt.Boundary),
+				})
 			} else {
-				row["action"] = "promote_queued"
+				ids = append(ids, m.ID)
+				if dryRun {
+					row["action"] = "would_promote"
+				} else {
+					row["action"] = "promote_queued"
+				}
 			}
 			candidates = append(candidates, row)
 		}
 		out["candidates"] = candidates
+		if len(teleologyFailed) > 0 {
+			out["teleological_refusals"] = teleologyFailed
+		}
 
 		if dryRun || len(ids) == 0 {
+			if len(teleologyFailed) > 0 && !dryRun {
+				out["promoted"] = 0
+				out["failed"] = len(teleologyFailed)
+				out["errors"] = teleologyFailed
+				var errList []string
+				for _, f := range teleologyFailed {
+					errList = append(errList, fmt.Sprintf("%s: %s", f.ID, f.Error))
+				}
+				summaryErr := fmt.Errorf("draft promote refused by teleological contact inhibition (%d item(s)):\n%s", len(teleologyFailed), strings.Join(errList, "\n"))
+				out["promote_error"] = summaryErr.Error()
+				_ = cli.FormatOutput(cmd, out)
+				return summaryErr
+			}
 			return cli.FormatOutput(cmd, out)
 		}
 
@@ -93,6 +140,9 @@ func runObjectDraftPromote(cmd *cobra.Command, args []string) error {
 
 		var promotedIDs []string
 		var failedItems []draftItemError
+		if len(teleologyFailed) > 0 {
+			failedItems = append(failedItems, teleologyFailed...)
+		}
 		candidateIndex := make(map[string]int, len(candidates))
 		for i, c := range candidates {
 			if cid, ok := c[objects.FieldKeyID].(string); ok {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/zqk-os/zqk/pkg/antigaming"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
@@ -330,6 +331,17 @@ func buildConvergenceOutputMap(snap *schedpkg.TestBundleConvergenceSnapshot, ses
 		if rollupCore != nil {
 			m["rollup_status_core"] = rollupCore
 		}
+		shieldCfg := antigaming.DefaultShieldConfig()
+		var failureItems []map[string]any
+		if snap != nil {
+			for _, fp := range snap.FailingFingerprintsNow {
+				failureItems = append(failureItems, map[string]any{
+					"code_location": []string{fp},
+					"category":      fp,
+				})
+			}
+		}
+		m["anti_gaming_shield"] = antigaming.CalculateAntiGamingShield(failureItems, shieldCfg)
 		return m, nil
 	}
 	sug, err := schedpkg.BuildSuggestedConvergenceSessionFields(snap, effCurrentPhase, effFlowVariant, sessionRoutingMeta, beforeStateSnapshot, stampTombstone, sessionPredictions, finalizeDebrief, debriefNotes, sessionThresholds)
@@ -352,6 +364,17 @@ func buildConvergenceOutputMap(snap *schedpkg.TestBundleConvergenceSnapshot, ses
 	if rollupCore != nil {
 		m["rollup_status_core"] = rollupCore
 	}
+	shieldCfg := antigaming.DefaultShieldConfig()
+	var failureItems []map[string]any
+	if snap != nil {
+		for _, fp := range snap.FailingFingerprintsNow {
+			failureItems = append(failureItems, map[string]any{
+				"code_location": []string{fp},
+				"category":      fp,
+			})
+		}
+	}
+	m["anti_gaming_shield"] = antigaming.CalculateAntiGamingShield(failureItems, shieldCfg)
 	return m, nil
 }
 
