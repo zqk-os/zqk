@@ -4,7 +4,19 @@
 **CLI:** Examples use the canonical executable `zqk`.  
 **Kernel Directory:** `.zqk/` stores local kernel state and runtime artifacts; project configuration resides in `config/`.
 
+## 60-second capability demo
+
+Buyer/procurement smoke with concrete commands: [../demos/SIXTY_SECOND_CAPABILITY.md](../demos/SIXTY_SECOND_CAPABILITY.md).
+
 ## Install
+
+**No `GITHUB_TOKEN` required** for the public stranger path. `scripts/install.sh` tries public release binaries, then `go install`, then source. Private/pre-release assets still accept `GITHUB_TOKEN` when you need them.
+
+### One-liner (macOS & Linux)
+```bash
+curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
+# Force unauthenticated (ignore logged-in gh): ZQK_INSTALL_UNAUTH=1 … | sh
+```
 
 ### Homebrew (macOS & Linux)
 ```bash
@@ -20,8 +32,10 @@ https://github.com/zqk-os/zqk/releases/latest
 ```bash
 make                 # → ./bin/zqk  (or ./bin/<brand.executable_name>)
 ./bin/zqk --version
-# equivalent: ./scripts/install.sh   (builds the branded binary locally; does not clone GitHub)
+# equivalent: ZQK_INSTALL_METHOD=source ./scripts/install.sh
 ```
+
+**TTFA smoke (< 2 min):** `./scripts/open-core/ttfa-unauth-smoke.sh` — unsets `GITHUB_TOKEN`/`GH_TOKEN`, installs from local source, times `zqk init` + `zqk workflow whats-next`, fails if measured wall > 120s.
 
 Use `zqk` (or `./bin/zqk` from this tree). **Do not** `export ZQK_PROJECT_ROOT` in your shell profile.
 
@@ -37,9 +51,15 @@ Launch a zero-touch development environment in under 60 seconds with zero local 
    ./bin/zqk do        # Run autonomous swarm loop
    ```
 
-## Quickstart (2–3 Commands)
+## Quick Start (< 2 min)
 
-**New Project (Greenfield):**
+```bash
+# After install (no GITHUB_TOKEN):
+zqk init
+zqk workflow whats-next
+```
+
+**New Project (Greenfield — extended):**
 ```bash
 zqk test-drive                           # Interactive 60-second tour: intent → kernel graph → verified swarm
 zqk system init --with-onboarding-roadmap # zqk init is a top-level alias for zqk system init

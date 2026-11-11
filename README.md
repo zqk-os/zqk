@@ -9,18 +9,45 @@
 
 ZQK gives AI coding agents (Cursor Composer, Claude Code, Cline, Windsurf) persistent memory, verifiable task truth, and AST-guarded execution. Stop context drift, hallucinated tasks, and token blowouts.
 
-Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md) · Documentation: [docs.zqk.dev](https://docs.zqk.dev)
+Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md) · Documentation: [docs.zqk.dev](https://docs.zqk.dev) · [60-second capability demo](docs/demos/SIXTY_SECOND_CAPABILITY.md)
 
 ---
 
-## Quickstart
+## Apache / Enterprise delineation ACK
 
-### Installation (macOS & Linux)
+**Human-visible license boundary (procurement / sentiment):**
+
+| Surface | License | Scope |
+| :--- | :--- | :--- |
+| **Community / open-core kernel** (this repository) | **[Apache License 2.0](LICENSE)** — see `NOTICE` | Single autonomous cell: CLI, local CAS/graph, MCP, scheduler, fail-closed gates |
+| **Enterprise** | **Separately licensed** (commercial; not Apache) | Multi-node fleet mesh, enterprise RBAC / IdP, cross-cell compliance & sealed fleet audit |
+
+- Evaluating or redistributing the community tree under Apache 2.0 does **not** grant Enterprise modules.
+- The [Open-Core Boundary](#open-core-boundary-single-cell-vs-organism-mesh) table below is the product split; this ACK is the licensing split.
+- Buyer proof in ~60s: [docs/demos/SIXTY_SECOND_CAPABILITY.md](docs/demos/SIXTY_SECOND_CAPABILITY.md). Launch narrative: [docs/launch/SHOW_HN.md](docs/launch/SHOW_HN.md).
+
+---
+
+## Quick Start (< 2 min)
+
+Coherent with [Community First-Run](docs/onboarding/COMMUNITY_FIRST_RUN.md) (install → `zqk init` → `whats-next`; optional `zqk test-drive` for the interactive 60s tour).
+
+No `GITHUB_TOKEN` required. Three steps from install to smoke:
 
 ```sh
-# Single-command install (defaults to interactive choice: Go Fast or Walk Through)
+# 1) Install (public binary → go install → source; never needs a token)
 curl -sSL https://raw.githubusercontent.com/zqk-os/zqk/main/scripts/install.sh | sh
+# From a clone with Go: ZQK_INSTALL_METHOD=source ./scripts/install.sh
+
+# 2) Init a greenfield kernel
+mkdir my-project && cd my-project && zqk init
+
+# 3) Smoke — discover mission / next work
+zqk workflow whats-next
 ```
+
+Timed stranger-path probe (unsets tokens, measures init+smoke ≤120s):
+`./scripts/open-core/ttfa-unauth-smoke.sh`
 
 Or install via Homebrew:
 ```sh
@@ -37,12 +64,9 @@ Experience ZQK instantly in your browser without installing Go or Docker locally
 - **Pre-Wired MCP & Agent Seating:** Automatic MCP daemon bootstrap and agent profile detection.
 - **Security-First Isolation:** Hardened non-root `vscode` user with `--cap-drop=ALL` sandbox containment.
 
-### 30-Second Greenfield Setup
+### Beyond the 2-minute smoke
 
 ```sh
-# Initialize kernel in your repo
-zqk init
-
 # Scaffold zero-config GitHub Actions CI/CD and Homebrew formula
 zqk ci init
 
@@ -188,6 +212,8 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 
 ## Documentation & Guides
 
+- **[60-Second Capability Demo](docs/demos/SIXTY_SECOND_CAPABILITY.md)** — Buyer/procurement smoke (~60s commands).
+- **[Show HN / Launch Narrative](docs/launch/SHOW_HN.md)** — Open-core launch story + Apache ACK.
 - **[Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/COMMUNITY_FIRST_RUN.html)) — Recommended starting point for humans and agents.
 - **[First-Run Object Tutorial](docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html)) — Creating and managing kernel objects.
 - **[Quickstart & MCP Setup](docs/onboarding/QUICKSTART.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/QUICKSTART.html)) — Connecting Cursor, Claude Code, and other LLMs.
@@ -206,4 +232,4 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 
 ## License
 
-Open-Core Community Kernel: [Apache License 2.0](LICENSE) (see `NOTICE`). Enterprise modules and multi-node fleet mesh capabilities are licensed separately.
+**ACK:** Community / open-core kernel is [Apache License 2.0](LICENSE) (see `NOTICE`). **Enterprise** modules and multi-node fleet mesh capabilities are **separately licensed** (not Apache). See [Apache / Enterprise delineation ACK](#apache--enterprise-delineation-ack).
