@@ -24,7 +24,7 @@ Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RU
 
 - Evaluating or redistributing the community tree under Apache 2.0 does **not** grant Enterprise modules.
 - The [Open-Core Boundary](#open-core-boundary-single-cell-vs-organism-mesh) table below is the product split; this ACK is the licensing split.
-- Buyer proof in ~60s: [docs/demos/SIXTY_SECOND_CAPABILITY.md](docs/demos/SIXTY_SECOND_CAPABILITY.md). Launch narrative: [docs/launch/SHOW_HN.md](docs/launch/SHOW_HN.md).
+- Buyer proof in ~60s: [docs/demos/SIXTY_SECOND_CAPABILITY.md](docs/demos/SIXTY_SECOND_CAPABILITY.md). Launch narrative: [docs/demos/SHOW_HN.md](docs/demos/SHOW_HN.md).
 
 ---
 
@@ -213,7 +213,7 @@ ZQK follows the classical operating system boundary: **POSIX/Kernel primitives a
 ## Documentation & Guides
 
 - **[60-Second Capability Demo](docs/demos/SIXTY_SECOND_CAPABILITY.md)** — Buyer/procurement smoke (~60s commands).
-- **[Show HN / Launch Narrative](docs/launch/SHOW_HN.md)** — Open-core launch story + Apache ACK.
+- **[Show HN / Launch Narrative](docs/demos/SHOW_HN.md)** — Open-core launch story + Apache ACK.
 - **[Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/COMMUNITY_FIRST_RUN.html)) — Recommended starting point for humans and agents.
 - **[First-Run Object Tutorial](docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/FIRST_RUN_OBJECT_TUTORIAL.html)) — Creating and managing kernel objects.
 - **[Quickstart & MCP Setup](docs/onboarding/QUICKSTART.md)** ([Web Portal](https://docs.zqk.dev/docs/onboarding/QUICKSTART.html)) — Connecting Cursor, Claude Code, and other LLMs.

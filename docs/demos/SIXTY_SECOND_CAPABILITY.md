@@ -80,5 +80,5 @@ Aligns with Community First-Run Quickstart (2–3 commands).
 ## Related
 
 - [README Quick Start (< 2 min)](../../README.md#quick-start--2-min)
-- [Show HN / launch narrative](../launch/SHOW_HN.md)
+- [Show HN / launch narrative](./SHOW_HN.md)
 - [Interactive demo suite](./README.md)
