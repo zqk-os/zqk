@@ -151,6 +151,21 @@ if [ -f "$ROOT/scripts/open-core/check-community-session-paging.sh" ] && \
   fi
 fi
 
+# Bounded stranger whats-next: community starter plan only, no pack ontology leakage.
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — BLI-1794405894395749000-cdae1049
+WN_BOUNDED=""
+if [ -f "$ROOT/scripts/open-core/check-community-whats-next-bounded.sh" ]; then
+  WN_BOUNDED="$ROOT/scripts/open-core/check-community-whats-next-bounded.sh"
+elif [ -f "$(dirname "$0")/check-community-whats-next-bounded.sh" ]; then
+  WN_BOUNDED="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-community-whats-next-bounded.sh"
+fi
+if [ -n "$WN_BOUNDED" ]; then
+  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" sh "$WN_BOUNDED" "$ROOT"; then
+    echo "MUST_NOT community whats-next bounded residual failed"
+    FAIL=1
+  fi
+fi
+
 # G15: fail-closed studio kernel-ID scrub on product Go (non-test).
 # Prefer candidate-local script; fall back to studio police host copy.
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE G15
