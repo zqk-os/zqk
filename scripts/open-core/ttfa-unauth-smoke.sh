@@ -35,7 +35,7 @@ cleanup() {
     echo "KEEP_TTFA_WORKDIR=1 — left ${WORK_DIR}" >&2
     return 0
   fi
-  # Prefer ambient stop against the temp epoch before rm (BLI-1794409789128810000-ffc46cfd).
+  # Prefer ambient stop against the temp epoch before rm (OPEN_CORE_PUBLIC_RELEASE_HYGIENE).
   if [ -n "${ZQK_BIN:-}" ] && [ -x "${ZQK_BIN}" ] && [ -d "${PROJECT_DIR:-}" ]; then
     (
       cd "${PROJECT_DIR}"

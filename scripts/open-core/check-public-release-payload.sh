@@ -186,7 +186,11 @@ if git -C "$ROOT" grep -l -E \
 	fail "tracked files contain an obvious credential or private-key marker"
 fi
 
-if ! sh "$ROOT/scripts/open-core/police-community-tree.sh" "$ROOT"; then
+# police-community-tree.sh also runs this payload scrub; the guard breaks the
+# payload -> police -> payload mutual recursion (fork-bomb) in either entry order.
+if [ "${ZQK_PAYLOAD_POLICE_GUARD:-}" = "police" ]; then
+	say "SKIP: community tree police (already running as parent of this payload scrub)"
+elif ! ZQK_PAYLOAD_POLICE_GUARD=payload sh "$ROOT/scripts/open-core/police-community-tree.sh" "$ROOT"; then
 	fail "community tree police failed"
 fi
 

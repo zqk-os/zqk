@@ -218,6 +218,27 @@ else
   FAIL=1
 fi
 
+# Payload TRACK/nanos scrub: police must fail-closed when public-release payload is dirty.
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — police/payload residual after launch-gate
+PAYLOAD_SCRIPT=""
+if [ -f "$ROOT/scripts/open-core/check-public-release-payload.sh" ]; then
+  PAYLOAD_SCRIPT="$ROOT/scripts/open-core/check-public-release-payload.sh"
+elif [ -f "$(dirname "$0")/check-public-release-payload.sh" ]; then
+  PAYLOAD_SCRIPT="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-public-release-payload.sh"
+fi
+if [ "${ZQK_PAYLOAD_POLICE_GUARD:-}" = "payload" ]; then
+  # Invoked from check-public-release-payload.sh; that parent already runs the scrub.
+  echo "SKIP: payload TRACK/nanos scrub (parent payload gate is running it)"
+elif [ -n "$PAYLOAD_SCRIPT" ]; then
+  if ! ZQK_PAYLOAD_POLICE_GUARD=police sh "$PAYLOAD_SCRIPT" "$ROOT"; then
+    echo "MUST_NOT public-release payload TRACK/nanos scrub failed"
+    FAIL=1
+  fi
+else
+  echo "MUST_NOT missing check-public-release-payload.sh (payload scrub fail-closed)"
+  FAIL=1
+fi
+
 if [ "$FAIL" -ne 0 ]; then
   echo "POLICE: FAIL"
   exit 1

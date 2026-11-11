@@ -36,7 +36,7 @@ mkdir -p "$BIN_DIR" "$PROJECT_DIR"
 TEST_ZQK=""
 
 cleanup_greenfield() {
-  # Temp-epoch ambient daemons must not leak after smoke (BLI-1794409789128810000-ffc46cfd).
+  # Temp-epoch ambient daemons must not leak after walkthrough (OPEN_CORE_PUBLIC_RELEASE_HYGIENE).
   if [ "${KEEP_GREENFIELD_WORKDIR:-0}" = "1" ]; then
     echo "KEEP_GREENFIELD_WORKDIR=1 — left ${WORK_DIR}" >&2
     return 0

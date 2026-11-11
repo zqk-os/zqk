@@ -12,7 +12,7 @@
 #   sh scripts/open-core/check-community-ambient-teardown-bounded.sh [candidate-root]
 #   ZQK_BIN=/path/to/zqk sh scripts/open-core/check-community-ambient-teardown-bounded.sh
 #
-# TRACK: BLI-1794409789128810000-ffc46cfd — stranger ambient teardown residual
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger ambient teardown residual
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
