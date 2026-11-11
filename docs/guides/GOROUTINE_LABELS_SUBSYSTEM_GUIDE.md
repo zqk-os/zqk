@@ -101,7 +101,7 @@ sequenceDiagram
 
 ## 3. Subsystem Taxonomy & Core Mechanics
 
-### 3.1 Named Goroutines & Runtime Categorization
+## 3.1 Named Goroutines & Runtime Categorization
 
 Goroutine labels are assigned using Go's `runtime/pprof` infrastructure, allowing live profiling tools (`go tool pprof`, execution tracer, and thread dump analyzers) to group running goroutines by logical responsibility:
 
@@ -132,7 +132,7 @@ Key builder options include:
 - `WithPreCleanup(fn)`, `WithCleanup(fn)`, `WithPostCleanup(fn)`: Multi-stage deferral hooks guaranteed to execute even during panics.
 - `WithShutdownCheck(fn)`: Pre-execution guard; if `fn()` returns `true`, the goroutine terminates before entering task logic.
 
-### 3.2 Global Concurrency Budgeting (`Budget`)
+## 3.2 Global Concurrency Budgeting (`Budget`)
 
 The `Budget` component provides a deterministic ceiling on concurrent goroutines across the application. Unlike naive semaphores, `Budget` distinguishes between normal data-plane tasks and mission-critical control-plane processes.
 
@@ -152,7 +152,7 @@ goroutinelabels.SetDefaultBudget(budget)
 - `b.Available()`: Computes remaining slots clamped to `0` even under anomalous saturation conditions.
 - `b.MaxTotal() == 0`: Configures unbounded mode where reservations always succeed.
 
-### 3.3 Control-Plane & Cleanup Immunity
+## 3.3 Control-Plane & Cleanup Immunity
 
 Critical kernel routines (such as WAL finalizers, resource release hooks, signal handlers, and lock sweepers) must never fail to run due to background worker budget exhaustion.
 
@@ -166,7 +166,7 @@ goroutinelabels.NewGoroutine("wal_finalizer", "flushing write-ahead log").
     })
 ```
 
-### 3.4 Bounded Worker Pools (`Pool`)
+## 3.4 Bounded Worker Pools (`Pool`)
 
 The `Pool` abstraction combines budget reservation, channel queuing, and safe drain mechanics:
 
@@ -203,7 +203,7 @@ Calling `pool.Stop()` executes a structured 3-phase shutdown:
 3. Awaits all active workers draining queued tasks before releasing reserved budget slots.
 4. Calling `pool.Stop()` multiple times is safe and strictly idempotent.
 
-### 3.5 Panic Recovery & Telemetry Invariants
+## 3.5 Panic Recovery & Telemetry Invariants
 
 Goroutine execution is encapsulated in fail-closed panic recovery:
 1. Every panic is intercepted by `recoverGoroutine`.
@@ -219,7 +219,7 @@ goroutinelabels.SetDefaultPanicHandler(func(name, purpose string, r any, stack [
 })
 ```
 
-### 3.6 Test Fixtures & Mock Builders
+## 3.6 Test Fixtures & Mock Builders
 
 The subsystem provides ergonomic test helpers in `test_builder.go`:
 - `NewTestGoroutine(name, purpose)`: Constructs a synchronized test goroutine with automatic `Wait()` barrier.

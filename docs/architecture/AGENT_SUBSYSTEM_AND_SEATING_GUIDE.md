@@ -121,7 +121,7 @@ zqk agent
 
 ---
 
-### 3.1 `zqk agent orchestrate`
+## 3.1 `zqk agent orchestrate`
 
 `zqk agent orchestrate [plan_id]` builds and executes a multi-stage instrumented pipeline (`pkg/pipeline`) that translates high-level priority plans (`PRI-*`) into parallel, executed backlog items (`BLI-*`) and agent tasks (`ATK-*`).
 
@@ -165,7 +165,7 @@ sequenceDiagram
 
 ---
 
-### 3.2 `zqk agent prepare-context`
+## 3.2 `zqk agent prepare-context`
 
 `zqk agent prepare-context <task_id> [flags]` is the unified cognition gateway for agent prompt construction. It hydrates the process task subgraph, pulls related requirements and criteria, formats TDD directives, and embeds AST observer context.
 
@@ -185,7 +185,7 @@ Every cognition pathway (CLI `prepare-context`, `seat-worker`, and `pre-subagent
 
 ---
 
-### 3.3 `zqk agent claim` and `zqk agent release`
+## 3.3 `zqk agent claim` and `zqk agent release`
 
 ZQK enforces strict single-claimant leasing over all executable items (`BLI-*`, `ATK-*`) through `pkg/agentclaim`.
 
@@ -208,7 +208,7 @@ Used in automated workflows and pre-commit hooks to block unassigned or rogue mo
 
 ---
 
-### 3.4 `zqk agent next`
+## 3.4 `zqk agent next`
 
 `zqk agent next <task_id>` transitions an in-flight task to `pending_verification`. It acts as the primary quality gatekeeper, enforcing that no work can be marked complete without verified physical evidence.
 
@@ -242,7 +242,7 @@ flowchart TD
 
 ---
 
-### 3.5 Observability: `zqk agent status` and `scoreboard`
+## 3.5 Observability: `zqk agent status` and `scoreboard`
 
 #### `zqk agent status`
 Provides a real-time console view into active swarm operations:
@@ -255,7 +255,7 @@ Surfaces historical idle duration metrics recorded in the persistent idle store 
 
 ---
 
-### 3.6 Lifecycle Hooks: `zqk agent hook`
+## 3.6 Lifecycle Hooks: `zqk agent hook`
 
 The `zqk agent hook` command group integrates directly with the agent harness execution loop to enforce kernel policies transparently.
 

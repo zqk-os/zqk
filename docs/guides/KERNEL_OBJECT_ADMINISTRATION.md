@@ -115,14 +115,14 @@ flowchart TD
 
 ## 5. Epics: Giving Semantic Shape to Multi-Plan Initiatives
 
-### The "Phases of Work" Cognitive Dilemma
+## The "Phases of Work" Cognitive Dilemma
 In large engineering endeavors and strategic roadmaps, initiatives naturally span multiple cycles or phases of work. However, referring to abstract labels like *"Phase 1, Phase 2, Phase 3, Phase 4"* is a notorious source of cognitive confusion:
 * Stakeholders, executives, and agents constantly lose track of when capabilities arrive: *"Was the database migration in Phase 2, or is that upcoming in Phase 4?"*
 * Numerical phase designations strip away domain intent and obscure the overarching milestone being delivered.
 
 **The `epic` exists to give concrete, human-legible semantic shape to the overall thing.** It aggregates multiple 1-cycle `priority_plan` blocks under a recognizable, domain-cohesive umbrella container.
 
-### The Home Remodel Analogy: From Vision to Epics and Plans
+## The Home Remodel Analogy: From Vision to Epics and Plans
 Consider a real-world physical engineering endeavor: flipping an old home.
 * **Vision:** *"Become the most successful, quality-driven real estate developer in the region."* (Timeless inspirational direction).
 * **Mission:** *"Flip the house on 1st Ave and achieve a 25% net return on investment."* (Core initializing intent).
@@ -182,7 +182,7 @@ graph TD
 
 Everyone—from human executives to autonomous worker agents—immediately grasps where any piece of work belongs without tracking abstract phase numbers.
 
-### Epic Shockwaves & Permissive Scope Invariant
+## Epic Shockwaves & Permissive Scope Invariant
 * **Child ➔ Parent Shockwave Progression:**
   * When the *first* linked `priority_plan` transitions to `in_progress`, the parent `epic` automatically shockwaves from `planned` ➔ `in_progress`.
   * When *all* linked priority plans reach `complete`, the parent `epic` automatically shockwaves ➔ `completed`.

@@ -6,7 +6,7 @@ The **LLM Client Abstraction and Provider Adapters Subsystem** (`pkg/llm`) serve
 
 Whether interacting with cloud endpoints (such as Google Gemini and OpenAI) or local open-weights deployments (such as Qwen, Ollama, and vLLM), the subsystem enforces uniform operational contracts, strict security boundaries, robust token budgeting, and automatic failure resilience.
 
-### Ontological Taxonomy & Core Concepts
+## Ontological Taxonomy & Core Concepts
 
 ```mermaid
 classDiagram

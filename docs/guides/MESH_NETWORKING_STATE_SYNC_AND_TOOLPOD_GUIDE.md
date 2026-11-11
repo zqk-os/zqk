@@ -55,29 +55,29 @@ graph TD
     WebhookListener -->|Update Status & URL| MeshController
 ```
 
-### Core Subsystem Components
+## Core Subsystem Components
 
-### 1. Gossip Syncer (`state_sync.go`)
+## 1. Gossip Syncer (`state_sync.go`)
 - **Transport**: Binds to standard UDP sockets (unicast or multicast group addresses).
 - **Event Envelope (`SyncEvent`)**: Contains `node_id`, `timestamp`, `kind` (e.g. `GraphState`, `Schema`), `item_id`, and `signature`.
 - **Payload Canonicalization (`PayloadForSignature`)**: Formats payloads as `NodeID|TimestampNano|Kind|ItemID` to guarantee deterministic cryptographic hashing.
 - **Graph Verification**: Integrates directly with `provider.ConnectionPool` to verify referenced entities exist in the knowledge store via Cypher queries (`MATCH (n) WHERE n.id = $id RETURN count(n)`).
 
-### 2. Cryptographic Trust Verifier (`trust.go`, `identity.go`)
+## 2. Cryptographic Trust Verifier (`trust.go`, `identity.go`)
 - **Registry Abstraction**: Maintains authenticated remote kernel records (`RemoteKernel`) containing hex-encoded Ed25519 public keys and network endpoints.
 - **Signature Integrity**: Rejects malformed public keys (length $\neq 32$ bytes), invalid signatures (length $\neq 64$ bytes), unauthenticated nodes, and tampered payloads.
 
-### 3. Asynchronous Priority Dispatch Queue (`async_dispatch.go`)
+## 3. Asynchronous Priority Dispatch Queue (`async_dispatch.go`)
 - **Strict Priority Lanes**: Maintains separate slices for `PriorityHigh`, `PriorityNormal`, and `PriorityLow`.
 - **Condition Variable Synchronization**: Uses `sync.Cond` to signal waiting workers as soon as any priority sub-queue receives a message, eliminating polling loops.
 - **Batch Dequeue**: Drains up to $K$ messages strictly draining `PriorityHigh` first, then `PriorityNormal`, and finally `PriorityLow`.
 - **Non-blocking Drain**: Immediate total extraction across all priority bands during lifecycle shutdowns or flush operations.
 
-### 4. Backpressure Controller (`async_backpressure.go`)
+## 4. Backpressure Controller (`async_backpressure.go`)
 - **Dual Watermarks**: Configured with a `HighWatermark` (maximum acceptable pending items) and `LowWatermark` (recovery threshold).
 - **Graceful Throttling**: Notifies producers to pause and provides non-blocking context-aware waiting (`WaitUntilHealthy`) until consumers drain beneath the low watermark.
 
-### 5. HTTP ToolPod Coordinator & Webhook Listener (`toolpod.go`, `webhook_listener.go`)
+## 5. HTTP ToolPod Coordinator & Webhook Listener (`toolpod.go`, `webhook_listener.go`)
 - **Job Dispatch**: Sends HTTP POST requests (`FFmpegJobRequest`) to dedicated worker endpoints, expecting `202 Accepted` confirmation.
 - **Webhook Callback Processing**: Processes incoming `WebhookPayload` messages from worker nodes. Validates job completion by verifying either `status == "completed"` with a non-empty `url` or `status == "success"`, updating the target entity in `storage.ObjectStorageProvider`.
 

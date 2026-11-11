@@ -59,7 +59,7 @@ flowchart TD
     TR -->|"Unregistered Fallback"| PT
 ```
 
-### Core Subsystem Invariants
+## Core Subsystem Invariants
 
 1. **Statement Test Coverage Invariant (>= 85.0% Floor)**:
    The subsystem maintains strict statement test coverage exceeding the 85.0% floor (targeting 100.0%) across all routing logic, timeout calculations, scope validators, and concurrency paths.

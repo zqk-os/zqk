@@ -36,7 +36,7 @@ The `zqk scheduler` CLI commands provide comprehensive controls across daemon su
 | `zqk scheduler skip-window` | Maintenance Windows | Sets temporary execution pause windows (`set`, `clear`, `list`) suppressing scheduled job triggers during maintenance. |
 | `zqk scheduler config` | Configuration | Manages runtime scheduler configuration flags, worker concurrency limits, and log level verbosity. |
 
-### Command Flags & Common Options
+## Command Flags & Common Options
 
 The scheduler subsystem provides precise flags for background execution, structured data serialization, and duration filtering:
 

@@ -86,7 +86,7 @@ flowchart TD
 
 ## Core Component Contracts
 
-### 1. Orchestration Manager & Capability Synthesis (`manager.go`)
+## 1. Orchestration Manager & Capability Synthesis (`manager.go`)
 
 `OrchestrationManager` transforms raw declarative intents into verified, operational capabilities:
 
@@ -102,7 +102,7 @@ When an intent is processed:
 3. **Pipeline Synthesis**: Executes `capability.SynthesisPipeline`, validating test case references and structural invariants.
 4. **CAS Commitment**: Writes synthesized capabilities directly into CAS storage under `objects.ObjectStatusProposed`.
 
-### 2. Multi-Agent Convergence Session (`session.go`)
+## 2. Multi-Agent Convergence Session (`session.go`)
 
 Multi-agent convergence sessions synchronize independent agents resolving complex architectural tasks:
 
@@ -121,7 +121,7 @@ The session advances through three immutable stages:
 - **`DECIDE`**: Conducts multi-agent policy deliberation, compromise weighting, and consensus forming.
 - **`COMMIT`**: Validates the proposed decision against system policies (such as `POL-GATE-001`). If a local merge to `main` is attempted without a verified pull request link, the stage fails closed.
 
-### 3. Subagent Execution & Rollback Governance (`subagent_runner.go`)
+## 3. Subagent Execution & Rollback Governance (`subagent_runner.go`)
 
 `SubagentRunner` wraps subagent task execution with deterministic safety boundaries:
 
@@ -157,7 +157,7 @@ Key resilience invariants:
 - **Iterative Rollback**: On any intermediate task error or sentinel violation, state is reverted before retrying.
 - **Terminal Alerting**: If `MaxRetries` is exhausted, an unrecoverable `CAPAlert` is dispatched to the CAP loop.
 
-### 4. Idle Watchdog & Anti-Idleness Protocol (`idle_watchdog.go`)
+## 4. Idle Watchdog & Anti-Idleness Protocol (`idle_watchdog.go`)
 
 The `IdleWatchdog` enforces the platform's Anti-Idleness Protocol (`POL-AGENT-CONTINUOUS-LOOP-001`):
 
@@ -172,7 +172,7 @@ type IdleWatchdog struct {
 - Monitors execution against `IdleTimeout` (defaulting to 5 minutes if unset, clamped to `ProbeTick`).
 - Automatically cancels execution context and emits `subagent execution stalled (idle watchdog triggered)` when tasks hang.
 
-### 5. Worktree Pool & Lease Lifecycle (`worktree_pool.go`, `worktree_sweeper.go`)
+## 5. Worktree Pool & Lease Lifecycle (`worktree_pool.go`, `worktree_sweeper.go`)
 
 To prevent multi-agent filesystem collisions, git operations execute within isolated worktrees:
 

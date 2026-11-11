@@ -60,7 +60,7 @@ To balance universal standardization with local flexibility, ZQK organizes polic
 
 ---
 
-### Tier 1: Canonical Specification Invariants (`POL-<DOMAIN>-<NUM>`)
+## Tier 1: Canonical Specification Invariants (`POL-<DOMAIN>-<NUM>`)
 
 Tier 1 policies represent the constitutional invariants of the operating system. They are fixed identifiers referenced directly in Go source code, abstract syntax tree (AST) linters, and verification test suites.
 
@@ -86,7 +86,7 @@ Tier 1 policies represent the constitutional invariants of the operating system.
 
 ---
 
-### Tier 2: Seeded Default Policies (`POL-DEFAULT-<sha256[:8]>`)
+## Tier 2: Seeded Default Policies (`POL-DEFAULT-<sha256[:8]>`)
 
 When a new repository or workspace is initialized (`./bin/zqk system init`), the system seeds a foundational policy pack into the Knowledge Kernel via `SeedDefaultPolicyPack` in `cmd/zqk/system/init_default_policies.go`.
 
@@ -108,7 +108,7 @@ func stableDefaultPolicyID(title string) string {
 
 ---
 
-### Tier 3: Instance-Local Dynamic Policies (`POL-<nanos>-<hex>`)
+## Tier 3: Instance-Local Dynamic Policies (`POL-<nanos>-<hex>`)
 
 Teams and swarms frequently create custom operational policies for specific projects or domains.
 

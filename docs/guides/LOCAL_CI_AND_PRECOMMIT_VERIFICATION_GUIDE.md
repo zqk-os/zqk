@@ -7,6 +7,10 @@ The ZQK Knowledge Kernel enforces fail-closed safety, invariant gate compliance,
 1. **Local CI Engine (`zqk ci`)**: Manages isolated staging workdirs (`.zqk/local-ci/`), executes test cases against specific commit hashes or working trees (`zqk ci checkout`, `zqk ci run`), provides inspectable status (`zqk ci status`), and cleanly cleans up staging trees (`zqk ci demote`).
 2. **Precommit Gate Verification (`zqk precommit`)**: Enforces pre-commit invariants across categorized checks (`lint`, `policy`, `integrity`, `ast`), records incremental results (`zqk precommit write-result`), aggregates verdicts (`zqk precommit aggregate`), renders diagnostic reports, and verifies that commits only proceed when all gates pass (`zqk precommit status`).
 
+---
+
+## 1.1 Architecture & Workflow Diagram
+
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                        LOCAL CI & PRECOMMIT GOVERNANCE ARCHITECTURE                    │

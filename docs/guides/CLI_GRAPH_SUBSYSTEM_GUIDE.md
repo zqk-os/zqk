@@ -100,7 +100,7 @@ flowchart TD
 
 ## Command Taxonomy & Operations
 
-### 1. `zqk graph discover`
+## 1. `zqk graph discover`
 
 Discovers and visualizes the relationship hierarchy radiating from a given root entity.
 
@@ -136,7 +136,7 @@ Relationship Discovery for:
 
 ---
 
-### 2. `zqk graph export`
+## 2. `zqk graph export`
 
 Extracts and serializes objects from the knowledge kernel into structured graph formats.
 
@@ -195,7 +195,7 @@ zqk graph export --format json-ld
 
 ---
 
-### 3. `zqk graph query`
+## 3. `zqk graph query`
 
 Provides direct query execution capabilities for graph backends supporting Cypher pattern matching.
 

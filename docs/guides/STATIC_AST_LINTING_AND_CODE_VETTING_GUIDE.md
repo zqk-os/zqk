@@ -76,7 +76,7 @@ flowchart TD
     ReportAggregator --> GateValve
 ```
 
-### Component Responsibilities
+## Component Responsibilities
 
 | Component | Routine / Type | Core Architectural Responsibility |
 | :--- | :--- | :--- |
@@ -141,7 +141,7 @@ sequenceDiagram
 
 The vetting engine categorizes findings across three dedicated check suites:
 
-### Check Suite Taxonomy
+## Check Suite Taxonomy
 
 | Suite | Description | Scope | Gate Threshold |
 | :--- | :--- | :--- | :--- |
@@ -149,12 +149,12 @@ The vetting engine categorizes findings across three dedicated check suites:
 | **`tree_police`** | Repository filesystem hierarchy, public release hygiene, documentation substance, and script allowance. | Full repository tree | Zero `ERROR` findings |
 | **`payload`** | Open-core public release boundaries, module path validation, sensitive material leakage, and prohibited tokens. | Git-tracked files & artifacts | Zero `ERROR` findings |
 
-### Finding Severity Levels
+## Finding Severity Levels
 
 - **`SeverityError` (`ERROR`):** Halts pre-commit hooks and local CI gates. Indicates a contract violation, unmanaged concurrency, broken reference integrity, or security leak.
 - **`SeverityWarn` (`WARN`):** Non-blocking architectural notification. Highlights opportunities for code consolidation, map lookup refactoring, or statement sequence deduplication.
 
-### Key Finding Rules
+## Key Finding Rules
 
 | Check ID | Suite | Severity | Trigger Condition | Remediation |
 | :--- | :--- | :--- | :--- | :--- |

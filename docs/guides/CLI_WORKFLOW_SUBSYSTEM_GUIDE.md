@@ -71,7 +71,7 @@ flowchart TD
     WorkflowEngine <--> KernelStorage
 ```
 
-### 1. The 5-Stage Continuous Autonomous Progression (CAP) Loop
+## 1. The 5-Stage Continuous Autonomous Progression (CAP) Loop
 
 The Workflow Subsystem drives autonomous agent swarms through the 5 canonical CAP stages without manual human steering:
 
@@ -88,7 +88,7 @@ The Workflow Subsystem drives autonomous agent swarms through the 5 canonical CA
 
 ---
 
-### 2. Hot-Path Zero-Cost Materialized View (`whats_next_lite.json`)
+## 2. Hot-Path Zero-Cost Materialized View (`whats_next_lite.json`)
 
 To prevent agent swarms from triggering expensive graph traversals on every invocation, the workflow subsystem maintains a materialized projection at `.zqk/state/whats_next_lite.json`.
 
@@ -98,7 +98,7 @@ To prevent agent swarms from triggering expensive graph traversals on every invo
 
 ---
 
-### 3. Dynamic Lead Plan Selection & Ambient Scoring
+## 3. Dynamic Lead Plan Selection & Ambient Scoring
 
 When multiple priority plans exist in active execution, the subsystem uses deterministic multi-factor scoring to identify the lead plan:
 
@@ -113,7 +113,7 @@ Where:
 
 ---
 
-### 4. Deterministic Precedence Arbiter (`zqk workflow next`)
+## 4. Deterministic Precedence Arbiter (`zqk workflow next`)
 
 The `workflow next` command enforces a strict 3-tier hierarchy:
 
@@ -140,7 +140,7 @@ When work context is resolved, `zqk workflow next` enriches the response with pl
 
 ---
 
-### 5. Verifiable Decomposition Spine (VDS) Integration
+## 5. Verifiable Decomposition Spine (VDS) Integration
 
 `zqk workflow vds` manages the quality contract throughout feature construction:
 

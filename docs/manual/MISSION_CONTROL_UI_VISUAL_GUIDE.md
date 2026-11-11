@@ -225,7 +225,7 @@ When launched with the `-w` flag (`zqk ui -w`), ZQK starts a zero-dependency HTT
 
 ---
 
-### 11.1 View 1: Timeline & Gantt Roadmap (`/studio/gantt`)
+## 11.1 View 1: Timeline & Gantt Roadmap (`/studio/gantt`)
 
 The Timeline & Gantt view projects the Knowledge Kernel's strategic roadmap along a continuous chronological timeline. It groups work by workstreams, anchors progress against the current day, and visualizes milestone delivery gates.
 
@@ -252,7 +252,7 @@ The Timeline & Gantt view projects the Knowledge Kernel's strategic roadmap alon
 
 ---
 
-### 11.2 View 2: Ontology DAG Dependency Graph (`/studio/dag-visualizer`)
+## 11.2 View 2: Ontology DAG Dependency Graph (`/studio/dag-visualizer`)
 
 The DAG Dependency Graph view maps the causal dependency chain linking strategic intentions down to automated test latches.
 

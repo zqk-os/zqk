@@ -84,7 +84,7 @@ flowchart TD
     Intake -.->|"Generate Specs"| SpecOrigination
 ```
 
-### Component Responsibilities
+## Component Responsibilities
 
 | Component | Interface / Type | Key Responsibilities | Source Reference |
 | :--- | :--- | :--- | :--- |

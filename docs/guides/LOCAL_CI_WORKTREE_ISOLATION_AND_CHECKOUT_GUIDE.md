@@ -211,7 +211,7 @@ When `opt.Archive` is enabled:
 
 ## 5. Verification, Troubleshooting, and Runbook
 
-### Subsystem Verification Matrix
+## Subsystem Verification Matrix
 
 The test suite validates every operational path, boundary condition, error branch, and filesystem transition:
 
@@ -229,7 +229,7 @@ The test suite validates every operational path, boundary condition, error branc
 | **Demote Teardown** | `TestDemote_ComprehensiveBranches` | Complete cleanup of symlinks, absolute targets, missing targets, legacy directories, multi-tree folders, and metadata files. |
 | **Git Plumbing & Helpers** | `TestRunGit_And_GitTrim_Failures`, `TestLocalCIOptions_And_Helpers`, `TestFirstLine_Table`, `TestWorktreeListContains_Table` | Context handling, whitespace trimming, environment variable resolution, and string parsing helpers. |
 
-### Running the Subsystem Test Suite
+## Running the Subsystem Test Suite
 
 Execute the test suite with race condition detection and statement coverage reporting:
 
@@ -246,7 +246,7 @@ total:                                      (statements) 98.3%
 
 ---
 
-### Operational Runbook & Troubleshooting
+## Operational Runbook & Troubleshooting
 
 #### Issue 1: Dirty Studio Rejection
 **Symptom:** `Checkout` returns error:

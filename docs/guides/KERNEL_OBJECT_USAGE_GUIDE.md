@@ -87,7 +87,7 @@ ZQK organizes its object ontologies into **14 comprehensive domains**: the **Cor
 └─────────────────┘                └─────────────────┘                └─────────────────┘
 ```
 
-### 3.1 Core Platform & Kernel Governance (`.zqk/specs/objects/kernel/` & `platform/`)
+## 3.1 Core Platform & Kernel Governance (`.zqk/specs/objects/kernel/` & `platform/`)
 The underlying governance, security, and runtime primitives of the Knowledge Kernel:
 - **`account`** (`ACC-*`): Human and agent identities, authentication keys, and authorization bindings.
 - **`role`** (`ROL-*`): System authorities (`executive`, `owner`, `automation`, `steward`) governing command execution permissions.
@@ -118,7 +118,7 @@ The underlying governance, security, and runtime primitives of the Knowledge Ker
 - **`bucketing_strategy`** (`BKT-*`): Storage bucketing strategies for tiered storage.
 - **`base_object`**, **`auditable`**, **`object_spec`**, **`lifecycle`**, **`extensible_object`**, **`base_metric`**: Structural meta-types defining the schema system.
 
-### 3.2 Work & Technical Program Management Pack (`packs/work/`)
+## 3.2 Work & Technical Program Management Pack (`packs/work/`)
 The foundational spine for roadmap planning, requirement engineering, and task execution:
 - **`vision`** (`VIS-*`): Long-term strategic aspirations and market horizons.
 - **`mission`** (`MSN-*`): Operational charter operationalizing a vision.
@@ -143,32 +143,32 @@ The foundational spine for roadmap planning, requirement engineering, and task e
 - **`risk_blocker`** (`RSK-*`): Explicit impediments or dependency risks obstructing progress.
 - **`technical_debt`** (`DEB-*`): Tracked architectural debt requiring remediation.
 
-### 3.3 Release & Deployment Pack (`packs/release/`)
+## 3.3 Release & Deployment Pack (`packs/release/`)
 Formal release packaging, artifact manifests, and rollout governance:
 - **`release`** (`REL-*`): Release envelopes containing semver versions, release candidates, target artifact manifests, cryptographic sign-offs, and rollout gates.
 
-### 3.4 Evolution & Schema Migration Pack (`packs/evolution/`)
+## 3.4 Evolution & Schema Migration Pack (`packs/evolution/`)
 Continuous schema evolution and backward compatibility:
 - **`evolution_management`** (`EVO-*`): Schema version migrations, field deprecation schedules, and database transformation plans.
 
-### 3.5 Orchestrated Workflow Pack (`packs/workflow/`)
+## 3.5 Orchestrated Workflow Pack (`packs/workflow/`)
 Multi-step automated workflows:
 - **`workflow`** (`WKF-*`): Orchestrated multi-step graph workflows, automation chains, and phase transitions.
 
-### 3.6 Semantic Vocabulary Pack (`packs/vocabulary/`)
+## 3.6 Semantic Vocabulary Pack (`packs/vocabulary/`)
 Shared terminology, machine hints, and semantic disambiguation:
 - **`glossary_term`** (`GLS-*`): Context-scoped definition embedding human explanations, `agent_prompts` for LLMs, and `machine_hints` for tools.
 - **`vocabulary_scheme`** (`VOC-*`): Scoped taxonomy or lens network (`inference`, `display`, `navigation`, `mixed`, `extension`).
 - **`glossary_term_relation`** (`GTR-*`): Directed typed relationships between glossary terms (`broader`, `narrower`, `related`, `governs`).
 - **`import_tracking`** (`IMP-*`): Provenance tracking for external ontology imports (SKOS, OWL, Dublin Core).
 
-### 3.7 Library & Documentation Pack (`packs/library/`)
+## 3.7 Library & Documentation Pack (`packs/library/`)
 Documentation and composable architecture specifications:
 - **`doc_entry`** (`DOC-*`): First-class CAS object representing a documentation file, tracked with SHA-256 `content_hash` and verified via `zqk docman verify`.
 - **`library`** (`LIB-*`): Composable architectural pattern catalogs with cloneable configurations and shared DNA propagation.
 - **`technical_spec`** (`TSP-*`): Detailed technical specifications attached to libraries.
 
-### 3.8 Autonomous Agent Pack (`packs/agent/`)
+## 3.8 Autonomous Agent Pack (`packs/agent/`)
 Agent coordination, workspace seating, and runtime capabilities:
 - **`persona`** (`PER-*`): Registered agent profile (e.g. `PER-DEFAULT-OPERATOR`, `PER-DEFAULT-ARCHITECT`).
 - **`agent_task`** (`TSK-*`): Subordinate execution task delegated to a subagent.
@@ -184,13 +184,13 @@ Agent coordination, workspace seating, and runtime capabilities:
 - **`provider_profile`** (`PRV-*`): LLM model and backend provider configuration.
 - **`context_refresh_schedule`** (`CRS-*`): Periodic context window refresh triggers preventing context rot.
 
-### 3.9 Decision & Rationalization Pack (`packs/decision/`)
+## 3.9 Decision & Rationalization Pack (`packs/decision/`)
 Architectural decision records and design inquiries:
 - **`decision`** (`DEC-*`): Authoritative architectural decision record (ADR).
 - **`question`** (`QST-*`): Open design inquiry or clarification probe requiring consensus.
 - **`impact_analysis`** (`IMP-*`): Formal risk and cost impact evaluation for architectural transitions.
 
-### 3.10 Quality & Verification Pack (`packs/qa/`)
+## 3.10 Quality & Verification Pack (`packs/qa/`)
 Continuous verification and done-gate enforcement:
 - **`scenario`** (`SCN-*`): End-to-end integration scenario or system test suite.
 - **`code_reference`** (`REF-*`): Semantic link connecting kernel objects to repository source lines (`file://...#L10-L20`).
@@ -203,7 +203,7 @@ Continuous verification and done-gate enforcement:
 - **`test_audit_aggregation_metric`** (`TAM-*`): Aggregated test audit rollups.
 - **`code_quality_metric`** (`CQM-*`): Static analysis and code quality scores.
 
-### 3.11 Organization & Stakeholders Pack (`packs/org/`)
+## 3.11 Organization & Stakeholders Pack (`packs/org/`)
 Organizational structure and governance ownership:
 - **`organization`** (`ORG-*`), **`division`** (`DIV-*`), **`department`** (`DEP-*`), **`team`** (`TEM-*`): Structural hierarchy defining organizational boundaries.
 - **`team_configuration`** (`TCF-*`): Execution configurations and authority delegates for teams.
@@ -212,7 +212,7 @@ Organizational structure and governance ownership:
 - **`partnership`** (`PRN-*`): External ecosystem partner configurations.
 - **`organizational_change`** (`OCH-*`): Organization change impact records.
 
-### 3.12 Telemetry & Metrics Pack (`packs/metric/`)
+## 3.12 Telemetry & Metrics Pack (`packs/metric/`)
 Kernel telemetry, performance metrics, and daemon health:
 - **`command_metric`** (`CMD-*`): Execution metrics (duration, exit code, resource utilization) per CLI command.
 - **`sampler_profile`** (`SMP-*`): Telemetry sampler profiles and sample rates.
@@ -225,14 +225,14 @@ Kernel telemetry, performance metrics, and daemon health:
 - **`base_sampler`** (`BSM-*`): Base metric sampling configuration.
 - **`audit_aggregation_metric`** (`AAM-*`): Telemetry aggregation metrics.
 
-### 3.13 Pipeline Pack (`packs/pipeline/`)
+## 3.13 Pipeline Pack (`packs/pipeline/`)
 Multi-stage build, deployment, and data pipelines:
 - **`pipeline_definition`** (`PLD-*`): Declarative multi-stage pipeline definition.
 - **`pipeline`** (`PIP-*`): Concrete instantiated pipeline instance.
 - **`pipeline_execution`** (`PLX-*`): Execution run receipts with timing, stage outputs, and exit codes.
 - **`pipeline_stage`** (`PLS-*`): Individual stage in a pipeline execution graph.
 
-### 3.14 Interface & Display Pack (`packs/interface/`, `packs/display/`)
+## 3.14 Interface & Display Pack (`packs/interface/`, `packs/display/`)
 CLI commands, APIs, and UI console interfaces:
 - **`command_spec`** (`CMS-*`): Canonical CLI command specifications.
 - **`api_spec`** (`API-*`): Public and internal API endpoint specifications.
@@ -293,7 +293,7 @@ In ZQK, every unit of executable work must form an unbroken chain from strategic
 
 ## 5. Everyday CLI Command Matrix & Recipes
 
-### Recipe 1: Inspecting Specs & Generating Templates (`object template` / `new`)
+## Recipe 1: Inspecting Specs & Generating Templates (`object template` / `new`)
 Before minting an object, inspect its schema and default YAML template:
 ```bash
 # View all available fields and validation constraints for a kind
@@ -306,7 +306,7 @@ zqk object template requirement
 zqk new backlog_item --out /tmp/bli_draft.yaml
 ```
 
-### Recipe 2: Minting an Object (`object create`)
+## Recipe 2: Minting an Object (`object create`)
 Create a new object directly through the CLI storage provider:
 ```bash
 # Mint a new requirement with documentation references
@@ -320,7 +320,7 @@ zqk object create backlog_item \
   --fields priority_tier:P1,priority_plan_ref:PRI-PUBLIC-LAUNCH-100
 ```
 
-### Recipe 3: Reading & Inspecting Objects (`object get` / `object inspect`)
+## Recipe 3: Reading & Inspecting Objects (`object get` / `object inspect`)
 Retrieve full or projected data for an object:
 ```bash
 # Fetch complete object YAML
@@ -333,7 +333,7 @@ zqk object get BLI-AUTH-004 --fields id,title,status,claimed_by --format json
 zqk inspect BLI-AUTH-004
 ```
 
-### Recipe 4: Listing, Filtering & Grouping Objects (`object list`)
+## Recipe 4: Listing, Filtering & Grouping Objects (`object list`)
 Filter across thousands of objects cleanly:
 ```bash
 # List all active backlog items in progress
@@ -352,7 +352,7 @@ zqk object list backlog_item --group-by status
 zqk object list glossary_term --count
 ```
 
-### Recipe 5: Establishing Graph References (`object ref add` / `remove`)
+## Recipe 5: Establishing Graph References (`object ref add` / `remove`)
 Wire relationships between objects atomically:
 ```bash
 # Link a requirement to a backlog item
@@ -368,7 +368,7 @@ zqk object ref add REQ-001 DOC-014 --field doc_entry_refs
 zqk object ref remove BLI-001 REQ-001
 ```
 
-### Recipe 6: Lifecycle State Progression (`object promote` / `demote` / `park`)
+## Recipe 6: Lifecycle State Progression (`object promote` / `demote` / `park`)
 Never modify `status` directly via scalar edits. Use authoritative lifecycle state verbs:
 ```bash
 # Promote an object to its next valid lifecycle state
@@ -384,19 +384,19 @@ zqk object demote BLI-001
 zqk object park BLI-001
 ```
 
-### Recipe 7: Atomic Multi-Object Mutations (ZQL)
+## Recipe 7: Atomic Multi-Object Mutations (ZQL)
 Execute ACID mutations across multiple objects in a single transaction:
 ```bash
 zqk mutate "UPDATE backlog_item SET status = 'in_progress', claimed_by = 'PER-DEFAULT-OPERATOR' WHERE id = 'BLI-001'"
 ```
 
-### Recipe 8: Complex Graph Traversal (ZPARQL)
+## Recipe 8: Complex Graph Traversal (ZPARQL)
 Query the knowledge graph for multi-hop lineage:
 ```bash
 zqk query "MATCH (p:priority_plan)-[:groups]->(r:requirement)-[:decomposed_into]->(c:criteria) WHERE p.id = 'PRI-PUBLIC-LAUNCH-100' RETURN r.title, c.title, c.status"
 ```
 
-### Recipe 9: Schema & Policy Validation (`object validate` / `system check`)
+## Recipe 9: Schema & Policy Validation (`object validate` / `system check`)
 Verify object compliance:
 ```bash
 # Validate an individual object against its specification schema

@@ -92,7 +92,7 @@ erDiagram
     IMPORT_TRACKING }|--|| VOCABULARY_SCHEME : "provenance audit"
 ```
 
-### 3.1 `vocabulary_scheme` (Taxonomy & Scheme Envelopes)
+## 3.1 `vocabulary_scheme` (Taxonomy & Scheme Envelopes)
 
 The `vocabulary_scheme` object names and configures a vocabulary graph, lens network, or navigation scheme. Multiple schemes can coexist across the same terms, allowing distinct views for agent inference versus human documentation navigation.
 
@@ -106,7 +106,7 @@ The `vocabulary_scheme` object names and configures a vocabulary graph, lens net
 | `allowed_kinds` | `list` | No | `rwx` | Specific object kinds constrained or classified under this scheme. |
 | `machine_hints` | `string` | Yes | `rwx` | Machine-readable JSON string with routing and tooling directives. |
 
-### 3.2 `glossary_term` (Context-Scoped Operational Terminology)
+## 3.2 `glossary_term` (Context-Scoped Operational Terminology)
 
 The `glossary_term` object represents a canonical domain term. It provides rich context for agents and human operators to ensure consistent usage across specifications, code, and communication channels.
 
@@ -123,7 +123,7 @@ The `glossary_term` object represents a canonical domain term. It provides rich 
 | `semantic_tags` | `list` | No | `rwx` | Tags classifying usage (`ontology`, `epistemology`, `inference`, `predicate_definition`). |
 | `alias_refs` | `list` | No | `r-x` | References to known aliases or legacy synonyms. |
 
-### 3.3 `glossary_term_relation` (Directed Semantic Relations)
+## 3.3 `glossary_term_relation` (Directed Semantic Relations)
 
 The `glossary_term_relation` object captures typed, directed semantic edges between two glossary terms within a specified scheme. The relationship's meaning is governed by a predicate term whose category documents the predicate semantics.
 
@@ -137,7 +137,7 @@ The `glossary_term_relation` object captures typed, directed semantic edges betw
 | `sort_order` | `integer`| No | `rwx` | Ordering priority for hierarchical displays. |
 | `notes` | `string` | No | `rwx` | Contextual notes detailing edge nuance or historical origin. |
 
-### 3.4 `import_tracking` (External Schema & Ontology Ingestion Audit)
+## 3.4 `import_tracking` (External Schema & Ontology Ingestion Audit)
 
 The `import_tracking` object provides an immutable audit trail for external ontology artifacts imported into the knowledge kernel (such as W3C SKOS, RDF/OWL, JSON Schema, or Turtle exports).
 

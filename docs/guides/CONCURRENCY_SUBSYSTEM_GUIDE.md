@@ -61,7 +61,7 @@ flowchart TD
 
 ## 2. Core Architectural Pillars
 
-### 2.1 Deadlock Prevention & TimeoutMutex Invariants
+## 2.1 Deadlock Prevention & TimeoutMutex Invariants
 
 Standard `sync.Mutex` instances provide no visibility into wait latency and cannot abort when contending threads form a circular dependency. The `TimeoutMutex` engine (`timeout_mutex.go`) transforms mutex acquisition into a deterministic, monitored operation.
 
@@ -98,7 +98,7 @@ A critical design requirement is that lock acquisition and function execution ha
 
 ---
 
-### 2.2 Adaptive GoroutineCeiling & Saturation Defenses
+## 2.2 Adaptive GoroutineCeiling & Saturation Defenses
 
 When concurrent jobs (such as tree-wide CAS scans or multi-target test executions) trigger uncontrolled goroutine generation, memory usage balloons and scheduling latency degrades.
 
@@ -123,7 +123,7 @@ If the runtime goroutine count is below the ceiling or `ceiling <= 0`, it return
 
 ---
 
-### 2.3 Context-Aware Synchronization & Bounded Waits
+## 2.3 Context-Aware Synchronization & Bounded Waits
 
 #### Context-Aware Condition Variables (`WaitCondContext`)
 Go standard library's `sync.Cond` does not support context cancellation, frequently stranding goroutines indefinitely when waiting for state transitions.
@@ -158,7 +158,7 @@ When latency observability is desired without full metric plumbing, `RunInLockWi
 
 ---
 
-### 2.4 Named WaitGroupManager & Goroutine Leak Detection
+## 2.4 Named WaitGroupManager & Goroutine Leak Detection
 
 `WaitGroupManager` (`waitgroup_manager.go`) provides centralized, lifecycle-aware tracking of `sync.WaitGroup` instances across the runtime.
 
@@ -184,7 +184,7 @@ flowchart LR
 
 ---
 
-### 2.5 Polling Engines & Interrupt Propagation
+## 2.5 Polling Engines & Interrupt Propagation
 
 #### Clamped Polling (`PollUntil` & `PollTimeout`)
 Polling loops often suffer from zero-interval tight spinning or forgotten timeout triggers.
@@ -202,7 +202,7 @@ In tight, high-throughput loops processing tens of thousands of items (e.g., AST
 
 ---
 
-### 2.6 Global Concurrency Configuration & Hostload Budgeting
+## 2.6 Global Concurrency Configuration & Hostload Budgeting
 
 `pkg/concurrency/config.go` provides global hardware-aware worker budgeting:
 

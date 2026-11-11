@@ -28,7 +28,7 @@ The `zqk test` suite encompasses core verification commands, AST audits, interac
 | `zqk test stream [pkg]` | Real-Time Runner | Runs Go test suites with live JSON/text streaming, sub-process timeout enforcement, and aggregate status reporting. |
 | `zqk test flaky` | Flakiness Diagnostic | Inspects test run histories, quarantine statuses, and variance metrics to isolate non-deterministic test failures before release gating. |
 
-### Command Flags & Common Options
+## Command Flags & Common Options
 
 The test subsystem provides fine-grained control over execution, filtering, output formatting, and storage synchronization:
 
@@ -103,7 +103,7 @@ flowchart TD
     Runner --> Verification
 ```
 
-### Architectural Subsystem Components
+## Architectural Subsystem Components
 
 #### 1. The Three-Fold Proof Model
 Every feature delivered within the Zen Quantum Kernel must declare a timeless `requirement` contract backed by at least three verifiable `criteria`:

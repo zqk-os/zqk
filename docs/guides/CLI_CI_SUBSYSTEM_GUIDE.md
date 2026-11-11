@@ -201,7 +201,7 @@ sequenceDiagram
     CLI-->>Dev: Complete CI run receipt
 ```
 
-### 1. SHA Checkout vs. Dirty Checkout
+## 1. SHA Checkout vs. Dirty Checkout
 - **Strict Cleanliness Floor:** By default, if the developer's working directory has tracked modifications (`git status --porcelain --untracked-files=no`), `zqk ci checkout` and `zqk ci run` fail closed:
   ```text
   studio has tracked changes; commit first or pass --allow-dirty / --sha <committed>
@@ -210,12 +210,12 @@ sequenceDiagram
   - Passing `--sha <committed>` indicates intent to test a specific committed point in history, ignoring host working directory dirty state.
   - Passing `--allow-dirty` allows testing `HEAD` without committing in-progress work.
 
-### 2. Symlink Swing & Worktree Pruning
+## 2. Symlink Swing & Worktree Pruning
 - Each checked-out commit resides in its own sub-worktree: `.zqk/local-ci/trees/<short_sha>`.
 - The canonical execution path `.zqk/local-ci/workdir` is an atomic symlink pointing to the active short-SHA tree.
 - When swinging to a new SHA, any older worktrees under `.zqk/local-ci/trees/` are automatically pruned via `git worktree remove --force`, preventing unbounded disk consumption.
 
-### 3. State & Pointer Tracking
+## 3. State & Pointer Tracking
 The `.zqk/local-ci` directory maintains three deterministic state files:
 | File | Format | Purpose |
 | :--- | :--- | :--- |
@@ -223,12 +223,12 @@ The `.zqk/local-ci` directory maintains three deterministic state files:
 | `PROMOTED_AT` | RFC3339 UTC timestamp + `\n` | Timestamp of last checkout / promotion |
 | `CURRENT.env` | Key-value pairs (`workdir`, `sha`, `short`, `tree`) | Machine-readable environment for build and test tools |
 
-### 4. Archive Dropping & Retention
+## 4. Archive Dropping & Retention
 - When `--no-archive` is false, Local CI creates a `.tar` snapshot of the committed tree in `.zqk/local-ci/archives/drop-<short>.tar`.
 - A SHA-256 digest is calculated and recorded in `.zqk/local-ci/archive-git/`.
 - Archives are automatically pruned to retain the latest drops (default: 5 archives, configurable via `LOCAL_CI_ARCHIVE_KEEP`).
 
-### 5. Demote Teardown Lifecycle
+## 5. Demote Teardown Lifecycle
 `zqk ci demote` provides clean-slate teardown:
 1. Inspects `.zqk/local-ci/workdir`: if it is a symlink or directory, removes the underlying worktree via `git worktree remove --force` and unlinks the path.
 2. Iterates over all remaining entries in `.zqk/local-ci/trees/` and removes each worktree.

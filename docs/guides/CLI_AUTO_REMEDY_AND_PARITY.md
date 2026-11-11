@@ -132,7 +132,7 @@ func SanitizeRecipeCommand(cmd string) string {
 
 To satisfy **CRIT-001**, recipe commands must not only be sanitized upon generation, but also rigorously validated before execution or presentation.
 
-### 4.1 `ValidateRecipeCommand` Enforcement
+## 4.1 `ValidateRecipeCommand` Enforcement
 
 `ValidateRecipeCommand` parses command tokens using shell-aware quoting rules and asserts:
 
@@ -149,7 +149,7 @@ To satisfy **CRIT-001**, recipe commands must not only be sanitized upon generat
 6. **Unsanitized `--ids` Rejection**: Any command retaining `--ids` or `--ids=` fails validation:
    `recipe command contains invalid flag '--ids': positional ID arguments must be used`
 
-### 4.2 Safe Command Whitelist & Adversarial Boundary Verification
+## 4.2 Safe Command Whitelist & Adversarial Boundary Verification
 
 Under **POL-DOC-001** and **CRIT-001**, `ValidateSafeCommand(cmd, projectRoot)` enforces strict negative adversarial boundaries to guarantee that only safe internal commands are auto-applied, rejecting any foreign, dangerous, or boundary-violating operations:
 
@@ -171,7 +171,7 @@ Under **POL-DOC-001** and **CRIT-001**, `ValidateSafeCommand(cmd, projectRoot)` 
    - Absolute paths targeting outside `ProjectRoot` are rejected:
      `argument "<arg>" references path outside project boundary`
 
-### 4.3 Application Phase Execution & Runner Abstraction
+## 4.3 Application Phase Execution & Runner Abstraction
 
 In `DiagnosticsRemedyEngine.Apply(ctx, plans)`, `ActionRunCommand` plans undergo rigorous gate verification before dispatch:
 

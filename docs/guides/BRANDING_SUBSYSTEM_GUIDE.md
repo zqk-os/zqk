@@ -72,7 +72,7 @@ flowchart TD
 
 The `pkg/brand` package is divided into core functional facets:
 
-### 2.1 Brand Registry & State Storage
+## 2.1 Brand Registry & State Storage
 
 The subsystem maintains process-wide branding attributes using `sync/atomic.Value` instances. This design ensures that brand lookups on hot execution paths remain entirely non-blocking and thread-safe without mutex contention:
 
@@ -88,7 +88,7 @@ var (
 - **`ProductName()`**: Returns the human-readable product display name (default: `"ZQK"`). Used in banners, status logs, and UI presentation.
 - **`NamespacePrefix()`**: Returns the canonical kernel namespace identifier (default: `"zqk"`). Used for MCP tool registration prefixes and internal graph scope identifiers.
 
-### 2.2 Executable Inspector & Test Filter
+## 2.2 Executable Inspector & Test Filter
 
 The executable inspector examines `os.Args[0]` to automatically detect the running binary identity while filtering out ephemeral test binaries:
 
@@ -96,7 +96,7 @@ The executable inspector examines `os.Args[0]` to automatically detect the runni
 2. **Go Test & Build Directory Rejection**: If the executable ends with `.test`, equals `main` or `main.exe`, or originates from a temporary Go build path (`go-build` or `___go_build`), it is immediately rejected, reverting safely to the default canonical name (`"zqk"`).
 3. **Channel & Role Normalization**: Strips packaged role suffixes (such as `zqk-pw`, `zqk-amb`, `zqk-sched`, `zqk-overseer`) or channel identifiers (`zqk-stable`, `zqk-stable-*`) to establish the root brand identity.
 
-### 2.3 Channel & Packaging Suffix Stripper
+## 2.3 Channel & Packaging Suffix Stripper
 
 The `stripEnvChannelSuffix` routine enforces an ordered priority list of packaging and role suffixes. Longer, more specific suffixes are evaluated first to prevent partial truncation:
 
@@ -110,7 +110,7 @@ The `stripEnvChannelSuffix` routine enforces an ordered priority list of packagi
 | **Overseer Service** | `-overseer` | `bar-overseer` → `bar` |
 | **Release Channels** | `-community`, `-stable`, `-dev`, `-beta`, `-alpha`, `-rc` | `zqk-stable` → `zqk` |
 
-### 2.4 Environment Variable Resolver
+## 2.4 Environment Variable Resolver
 
 The environment resolver (`EnvPrefix`, `EnvPrefixForExecutable`, and `EnvVar`) translates arbitrary brand executable names into uppercase, POSIX-compliant environment variable prefixes:
 
@@ -126,7 +126,7 @@ Executable: "acme-corp-cli-stable"
   -> EnvVar("PORT"): "ACME_CORP_CLI_PORT"
 ```
 
-### 2.5 Role Differentiator Decorator
+## 2.5 Role Differentiator Decorator
 
 Daemons and worker processes in the ZQK cluster require specific binary names depending on whether the system is running under the upstream canonical brand or a branded fork.
 

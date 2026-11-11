@@ -15,7 +15,7 @@ This matrix establishes the definitive verification record for all community-rep
 
 ---
 
-## 2. Community Issue Verification Matrix
+## 2. Community Issue Verification Matrix (Issues #1000 - #1013)
 
 | Issue ID | Type | Title / Focus | Resolving Commit / PR | Verification Strategy & Invariants | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -31,6 +31,13 @@ This matrix establishes the definitive verification record for all community-rep
 | **#1011** | Integrity | State tree determinism, draft batch pruning & criteria lint | PR #1011 (`c3fc96a8`) | Strict state serialization sort order, orphan draft garbage collector, and three-fold criteria linter. | **Verified** |
 | **#1012** | Core | Auto-remedy execution, envelope parity & validation cache | PR #1012 (`52bbef22`) | One-shot remedy command execution (`zqk system check --auto-remedy`) with cache invalidation. | **Verified** |
 | **#1013** | Concurrency | Coordinator WaitGroup concurrency guard & tool sensor | PR #1013 (`5f4e7688`) | Deadlock-free sync primitives, bounded worker pools, and gradient routing under load. | **Verified** |
+
+---
+
+## 2.1 Community Issue Verification Matrix (Issues #1014 - #1025)
+
+| Issue ID | Type | Title / Focus | Resolving Commit / PR | Verification Strategy & Invariants | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 | **#1014** | Bug | `zqk agent next`: FAIL-CLOSED commit_hashes gate | PR #1028 (`637637f8`) | Enforced commit hash existence check against current git reflog prior to BLI advancement. | **Verified** |
 | **#1015** | Ergonomics | CLI ergonomics burn-down & parent lineage linking | PR #1015 (`e1f7a6f3`) | Auto-derivation of parent goals and milestones during BLI and task creation. | **Verified** |
 | **#1016** | Traceability | Community ergonomics, traceability alignment & test cleanup | PR #1016 (`f4d705fa`) | Reverse-index graph traversal, broken ref detection, and leak-free temp directory teardown. | **Verified** |
@@ -43,6 +50,13 @@ This matrix establishes the definitive verification record for all community-rep
 | **#1023** | Feature | Core generic scenario evaluation framework | PR #1026 (`d3204361`) | Matrix-driven benchmark runner evaluating multi-model LLM generation across domain scenarios. | **Verified** |
 | **#1024** | Packaging | Modular language bundles and verification packs | PR #1024 (`79ffa3fe`) | Packaging runtime with schema validation and hermetic bundle isolation. | **Verified** |
 | **#1025** | Dependency | Bump `github.com/spf13/pflag` from 1.0.10 to 1.1.0 | PR #1025 (`c443be14`) | Updated flag parsing compatibility, golden CLI output files, and terminal wrap rules. | **Verified** |
+
+---
+
+## 2.2 Community Issue Verification Matrix (Issues #1028 - #1072)
+
+| Issue ID | Type | Title / Focus | Resolving Commit / PR | Verification Strategy & Invariants | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
 | **#1028** | Bug | Kernel defect remediation & CLI robustness | PR #1028 (`637637f8`) | Addressed GH-1014, GH-1018, GH-1019 in a unified hardening cycle. | **Verified** |
 | **#1033** | Maintenance | Hostservice GC removes legacy mesh seat-worker units | PR #1033 (`cc8be850`) | Autonomous pruning of dead seat-worker units and stale socket connections. | **Verified** |
 | **#1039** | Feature | Autonomous daemon overseer supervision & callback wake | PR #1039 (`d3dac010`) | Robust `Overseer` managing 4 system daemons with launchd/systemd supervision and callback wake. | **Verified** |

@@ -46,7 +46,7 @@ The Vocabulary Pack establishes a shared, deterministic ontology across human en
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.1 `glossary_term` (The Unit of Semantic Truth)
+## 2.1 `glossary_term` (The Unit of Semantic Truth)
 A `glossary_term` (`GLS-*`) provides an unambiguous, context-scoped definition. It does not merely define words for humans; it embeds actionable machine hints and model directives.
 
 #### Core Field Specification:
@@ -76,14 +76,14 @@ machine_hints: '{"command_name":"agent","source_kind":"command_spec","spec_path"
 namespace_id: zqk:kernel
 ```
 
-### 2.2 `vocabulary_scheme` (Lens Networks & Taxonomies)
+## 2.2 `vocabulary_scheme` (Lens Networks & Taxonomies)
 A `vocabulary_scheme` (`VOC-*`) defines a bounded namespace or taxonomy graph. Multiple schemes can coexist across the same glossary terms without collision:
 - **`inference`**: Formal logical entailment and dependency analysis.
 - **`display`**: UX and TUI Mission Control groupings.
 - **`navigation`**: Documentation hierarchy and cross-linking.
 - **`extension`**: External domain ontologies (e.g. SKOS, Dublin Core, ISO standards).
 
-### 2.3 `glossary_term_relation` (Typed Semantic Edges)
+## 2.3 `glossary_term_relation` (Typed Semantic Edges)
 Relationships between terms are explicit graph edges (`GTR-*`):
 - `source_term_ref`: Originating `GLS-*` term.
 - `target_term_ref`: Target `GLS-*` term.

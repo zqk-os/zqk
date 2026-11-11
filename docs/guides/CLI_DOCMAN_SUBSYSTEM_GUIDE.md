@@ -100,7 +100,7 @@ flowchart TD
     StorageProvider --> DocEntries
 ```
 
-### 1. Subtree Discovery & Directory Pruning
+## 1. Subtree Discovery & Directory Pruning
 
 The discovery engine (`docman.Discoverer`) scans the repository starting from the project root:
 - **Default Scope**: Scans all Markdown files under `docs/` when no specific subtrees are configured.
@@ -111,14 +111,14 @@ The discovery engine (`docman.Discoverer`) scans the repository starting from th
   - `docs/onboarding`
 - **Exclude Directories**: Automatically prunes non-documentation and cache directories, including `.git`, `node_modules`, `__pycache__`, `.zqk`, and `archive`.
 
-### 2. Frontmatter Parsing & Metadata Extraction
+## 2. Frontmatter Parsing & Metadata Extraction
 
 The parser (`docman.Parser`) extracts structured metadata from discovered files:
 - **YAML Frontmatter**: Reads fenced YAML blocks (`---`) at the top of markdown files. Extracted fields include `title`, `summary`, `group`, `category`, and ontological reference links.
 - **Header Fallback**: If YAML frontmatter is omitted, the parser derives the document title from the first `# Title` markdown heading and infers default categories based on subtree location.
 - **Normalization**: Paths are normalized to repository-relative Unix slashes (`paths.NormalizeDocEntryPathForKey`) ensuring cross-platform stability across Windows, Linux, and macOS.
 
-### 3. Registration Pipeline & Graph Object Synthesis
+## 3. Registration Pipeline & Graph Object Synthesis
 
 The registry (`docman.Registry`) transforms discovered files into versioned kernel objects:
 - **Deterministic ID Generation**: Assigns monotonically increasing identifier keys formatted as `DOC-###` (e.g. `DOC-001`).
@@ -126,7 +126,7 @@ The registry (`docman.Registry`) transforms discovered files into versioned kern
 - **Initial Cryptographic Sealing**: Computes the initial SHA-256 hash and byte size of the document, sealing them onto the `doc_entry` payload upon registration.
 - **Schema Backfilling (`--update-existing`)**: Synchronizes existing `doc_entry` records with required reference schema arrays (`goal_refs`, `workstream_refs`, `milestone_refs`, `requirement_refs`) without modifying document content.
 
-### 4. Cryptographic Drift Verification & Self-Healing
+## 4. Cryptographic Drift Verification & Self-Healing
 
 The verifier (`docman.Verifier`) guarantees documentation integrity:
 - **Double Cryptographic Anchor**: Validates both the SHA-256 content hash and the document size in bytes.

@@ -52,7 +52,7 @@ flowchart TD
 
 ## 2. Architectural Components & Topology
 
-### 2.1 The Event Model (`AmbientEvent` & `EventType`)
+## 2.1 The Event Model (`AmbientEvent` & `EventType`)
 
 Every ambient signal captured in the runtime is normalized into a strongly-typed `AmbientEvent` envelope:
 
@@ -75,7 +75,7 @@ const (
 )
 ```
 
-### 2.2 In-Memory EventMesh Fabric (`InMemoryEventMesh`)
+## 2.2 In-Memory EventMesh Fabric (`InMemoryEventMesh`)
 
 `InMemoryEventMesh` implements the `EventMesh` contract:
 ```go
@@ -92,7 +92,7 @@ Key architectural mechanics:
 - **Audit Event Sourcing**: When event sourcing is enabled via `EnableEventSourcing(projectRoot, secCtx)`, ambient events trigger an asynchronous, named `ambient_audit` goroutine that classifies and records persistent audit records in storage without blocking delivery pipelines.
 - **Deterministic Teardown (`WaitForAudits`)**: Exposes an explicit wait-group barrier allowing callers and test harnesses to drain all in-flight audit emissions prior to workspace cleanup.
 
-### 2.3 Signal Aggregator (`SignalAggregator`)
+## 2.3 Signal Aggregator (`SignalAggregator`)
 
 High-frequency signals (e.g., typing bursts, rapid test re-runs) frequently generate noise. The `SignalAggregator` buffers events across a configurable sliding duration (`window`) and batch threshold (`flushCount`):
 
@@ -114,7 +114,7 @@ type SignalAggregator struct {
   - **Window-Triggered**: If `window` elapses with buffered events, the timer loop flushes accumulated signals.
 - **Non-Blocking Channel Ingress**: Flushes to `flushCh` (buffer size 10) use non-blocking `select` with `default:` drops to prevent stalling the aggregator loop if downstream consumers lag.
 
-### 2.4 Anticipatory Intent Engine (`FSEventsEngine`)
+## 2.4 Anticipatory Intent Engine (`FSEventsEngine`)
 
 `FSEventsEngine` implements the `AnticipatoryEngine` contract:
 ```go

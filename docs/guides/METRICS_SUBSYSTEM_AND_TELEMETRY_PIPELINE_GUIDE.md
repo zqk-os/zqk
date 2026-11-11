@@ -55,7 +55,7 @@ The `pkg/metrics` subsystem resolves this tension by providing:
                    └──────────────────────────────────────────────┘
 ```
 
-### Component Taxonomy
+## Component Taxonomy
 
 1. **MetricPipeline (`pipeline.go`):**
    - Coordinates event collection, trait-based metric discovery, and aggregator routing.
