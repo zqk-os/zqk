@@ -38,11 +38,11 @@ func TestZeroInstall_StaticFloorInvariant(t *testing.T) {
 	assert.Contains(t, installContent, "uname -s", "must detect operating system")
 	assert.Contains(t, installContent, "uname -m", "must detect architecture")
 
-	// 2. Verify root symlink to install.sh
-	rootSymlink := filepath.Join(repoRoot, "install.sh")
-	rootInfo, err := os.Lstat(rootSymlink)
-	require.NoError(t, err, "root install.sh symlink must exist")
-	assert.True(t, rootInfo.Mode()&os.ModeSymlink != 0, "root install.sh must be a symlink")
+	// 2. Verify root install.sh exists, is a regular file, and matches scripts/install.sh
+	rootInstall := filepath.Join(repoRoot, "install.sh")
+	rootInfo, err := os.Lstat(rootInstall)
+	require.NoError(t, err, "root install.sh must exist")
+	assert.True(t, rootInfo.Mode().IsRegular(), "root install.sh must be a regular file (breaks raw.githubusercontent.com curls if symlink)")
 
 	// 3. Verify 'zqk demo' command static flags and builder contract
 	cmd := demo.NewDemoCmd()
