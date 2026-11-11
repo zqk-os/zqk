@@ -29,11 +29,17 @@ PROJECT_DIR="${WORK_DIR}/greenfield"
 mkdir -p "$BIN_DIR" "$PROJECT_DIR"
 
 cleanup() {
+  # Ambient init may leave a live daemon holding files under WORK_DIR.
+  # Cleanup must be best-effort and must never flip a measured PASS to EXIT:1.
   if [ "${KEEP_TTFA_WORKDIR:-0}" = "1" ]; then
     echo "KEEP_TTFA_WORKDIR=1 — left ${WORK_DIR}" >&2
-  else
-    rm -rf "$WORK_DIR"
+    return 0
   fi
+  # TRACK: BLI-1794396118061450000-3e634b9b — remove when: stranger TTFA teardown stops ambient daemons before EXIT
+  pkill -f "${WORK_DIR}" >/dev/null 2>&1 || true
+  chmod -R u+w "${WORK_DIR}" >/dev/null 2>&1 || true
+  rm -rf "${WORK_DIR}" >/dev/null 2>&1 || true
+  return 0
 }
 trap cleanup EXIT
 
