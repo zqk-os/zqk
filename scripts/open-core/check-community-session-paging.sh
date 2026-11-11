@@ -151,7 +151,7 @@ deny = re.compile(
     r"cap_orchestrat|cap_night_duty|cap_background|"
     r"paste_applescript|print_cursor_paste|print_ide_paste|zqk_cursor|"
     r"align-cache|align_cache|"
-    r"zqke-pack-composition|/Users/lanceettl/zqke-pack-composition)"
+    r"zqke-pack-composition)"
 )
 hit = deny.search(blob)
 if hit:

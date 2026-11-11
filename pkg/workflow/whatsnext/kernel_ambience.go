@@ -878,7 +878,8 @@ func PrependStewardProjectionForSeat(instruction, focus, seatMode string) string
 		// Stranger / community default: pack-free continuity (no CAP/MMORCH/align-cache theater).
 		seatCue = paths.RewriteCanonicalCLIInvocations(
 			"Seat: run zqk workflow whats-next --format json; claim open BLIs on the proposed plan; " +
-				"prepare-context before helpers; land evidence before marking work complete.\n\n",
+				"prepare-context before helpers; land evidence before marking work complete. " +
+				"Workflows: honor kernel_ambience.employed_workflows (mesh/subagent/bootstrap) — do not drift from active WFL contracts.\n\n",
 		)
 		switch seatMode {
 		case SeatModeTPMProcessAdmin:

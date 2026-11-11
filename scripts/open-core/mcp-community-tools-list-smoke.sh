@@ -92,7 +92,7 @@ if [ -n "$HITS" ]; then
 fi
 
 # Absolute studio checkout paths must not appear in stranger tools/list text.
-if grep -E 'zqke-pack-composition|/Users/lanceettl/zqke-pack-composition' "$OUT" >/dev/null 2>&1; then
+if grep -E 'zqke-pack-composition' "$OUT" >/dev/null 2>&1; then
 	fail "studio checkout path leaked into mcp list-tools output"
 fi
 

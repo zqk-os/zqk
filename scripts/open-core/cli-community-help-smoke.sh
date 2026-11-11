@@ -10,8 +10,8 @@ ROOT="${ZQK_COMMUNITY_ROOT:-}"
 if [[ -z "$ROOT" ]]; then
   if [[ -x ./bin/zqk ]]; then
     ROOT=$(pwd)
-  elif [[ -x /Users/lanceettl/zqk-public-candidate/bin/zqk ]]; then
-    ROOT=/Users/lanceettl/zqk-public-candidate
+  elif [[ -x "$(git rev-parse --show-toplevel 2>/dev/null)/bin/zqk" ]]; then
+    ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
   else
     echo "FAIL: set ZQK_COMMUNITY_ROOT to a community checkout with bin/zqk" >&2
     exit 2

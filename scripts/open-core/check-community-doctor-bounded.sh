@@ -194,7 +194,7 @@ deny = re.compile(
     r"align-cache|align_cache|"
     + "|".join(re.escape(s) for s in sealed_pris)
     + r"|"
-    r"zqke-pack-composition|/Users/lanceettl/zqke-pack-composition)"
+    r"zqke-pack-composition)"
 )
 hit = deny.search(blob)
 if hit:

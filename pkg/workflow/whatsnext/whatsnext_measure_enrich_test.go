@@ -189,7 +189,11 @@ func TestCycle147_EnrichStrategicAlignment_Branches(t *testing.T) {
 	EnrichStrategicAlignment(amb, tempDir)
 	require.NotNil(t, amb.StrategicAlignment)
 	assert.False(t, amb.StrategicAlignment.Available)
-	assert.Equal(t, "align cache JSON invalid", amb.StrategicAlignment.Note)
+	wantNote := "strategic alignment snapshot JSON invalid"
+	if studioPackStewardEnabled() {
+		wantNote = "align cache JSON invalid"
+	}
+	assert.Equal(t, wantNote, amb.StrategicAlignment.Note)
 
 	// Case 3: Valid JSON with alignment score and goal work
 	validJSON := `{
