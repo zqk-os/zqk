@@ -70,7 +70,7 @@ That script unsets GitHub tokens, installs from local source when needed, times 
 zqk ui -w                 # Visual Web Studio
 zqk mcp ensure            # Wire Cursor / Claude Code
 zqk system agent-onboard  # Detect IDE / seat agent
-zqk do                    # Autonomous claim/execute loop
+# zqk do   # Studio CAP loop — not required for stranger 60s proof
 ```
 
 Aligns with Community First-Run Quickstart (2–3 commands).
