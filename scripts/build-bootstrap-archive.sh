@@ -90,6 +90,25 @@ fi
 # Drop any AppleDouble sidecars that were already in the source tree (COPYFILE_DISABLE does not remove existing ._ files).
 find "$STAGING" -name '._*' -delete 2>/dev/null || true
 
+# Community seed impermeability: never embed CAP/MMORCH/orchestrate/TPM operator
+# ontology in the public bootstrap archive. Keep fragments in sync with
+# pkg/bootstrap/community_denylist.go (TRACK: BLI-1794356846362471000-b781465c).
+find "$STAGING" -type f \( \
+	-iname '*print_cursor_paste_applescript*' -o \
+	-iname '*record_cvs_orchestrate_run*' -o \
+	-iname '*paste_cursor*' -o \
+	-iname '*zqk_cursor*' -o \
+	-iname '*cap_night_duty*' -o \
+	-iname '*cap_orchestrator*' -o \
+	-iname '*cap_background*' -o \
+	-iname '*mmorch*' -o \
+	-iname '*orchestrate_command*' -o \
+	-iname '*orchestrate_batch*' -o \
+	-iname '*tpm_orchestration*' \
+	\) -delete 2>/dev/null || true
+# Path-shaped orchestrate under agent/ (basename may not include fragment above).
+rm -f "$STAGING/cli_specs/agent/orchestrate_command.yaml" 2>/dev/null || true
+
 # Open-core / community hygiene: never embed Studio live process instances.
 # Specs/lifecycles/configs stay; instance-shaped trees and demo BLI YAML go.
 rm -rf \

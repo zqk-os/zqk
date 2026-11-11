@@ -100,8 +100,10 @@ func ExtractGzipTar(data []byte, projectRoot string, logger logging.Logger, forc
 		} else if after, ok := strings.CutPrefix(name, ".\\"); ok {
 			name = after
 		}
-		// Community edition: omit internal/dev-only command specs (core-backlog).
-		if zqkenv.IsCommunityEdition && strings.HasPrefix(name, archivePrefixCLISpecs) && shouldExcludeCommunityCommandSpec(name) {
+		// Community edition: omit CAP/MMORCH/orchestrate/TPM + operator-only paths
+		// (seed impermeability — not limited to cli_specs; scheduler job templates and
+		// default skills can also leak pack ontology into stranger init).
+		if zqkenv.IsCommunityEdition && shouldExcludeCommunityCommandSpec(name) {
 			if hdr.Typeflag == tar.TypeReg && hdr.Size > 0 {
 				if _, err := io.CopyN(io.Discard, tr, hdr.Size); err != nil {
 					return errfmt.Errorf("failed to skip community-denied archive entry %s: %w", hdr.Name, err)

@@ -57,7 +57,6 @@
 ./cli_specs/agent/install_seat_workers_command.yaml
 ./cli_specs/agent/new_command.yaml
 ./cli_specs/agent/next_command.yaml
-./cli_specs/agent/orchestrate_command.yaml
 ./cli_specs/agent/prepare_context_command.yaml
 ./cli_specs/agent/recover_command.yaml
 ./cli_specs/agent/release_command.yaml
@@ -117,7 +116,6 @@
 ./cli_specs/convergence/nest_status_command.yaml
 ./cli_specs/convergence/overseer_command.yaml
 ./cli_specs/convergence/promotion_readiness_command.yaml
-./cli_specs/convergence/record_cvs_orchestrate_run_command.yaml
 ./cli_specs/convergence/record_overseer_run_command.yaml
 ./cli_specs/convergence_command.yaml
 ./cli_specs/daemon/
@@ -333,7 +331,6 @@
 ./cli_specs/scheduler/issues_command.yaml
 ./cli_specs/scheduler/list_command.yaml
 ./cli_specs/scheduler/print_ide_paste_applescript_command.yaml
-./cli_specs/scheduler/record_cvs_orchestrate_run_command.yaml
 ./cli_specs/scheduler/restart_command.yaml
 ./cli_specs/scheduler/service/
 ./cli_specs/scheduler/service/gc_command.yaml
@@ -497,7 +494,6 @@
 ./cli_specs/system/migrate_cas_command.yaml
 ./cli_specs/system/object_count_report_command.yaml
 ./cli_specs/system/object_hygiene_scan_command.yaml
-./cli_specs/system/orchestrate_batch_command.yaml
 ./cli_specs/system/policy_interrupts/
 ./cli_specs/system/policy_interrupts/ack_command.yaml
 ./cli_specs/system/policy_interrupts/emit_command.yaml
@@ -1000,7 +996,6 @@
 ./scripts/default_agent_skills/object_steward.yaml
 ./scripts/default_agent_skills/qa_verification.yaml
 ./scripts/default_agent_skills/security_linter.yaml
-./scripts/default_agent_skills/tpm_orchestration.yaml
 ./scripts/default_agent_skills/zqk_expert.yaml
 ./scripts/default_personas/
 ./scripts/default_personas/code_reviewer.yaml
@@ -1049,8 +1044,6 @@
 ./scripts/scheduler_jobs/autofix_process_pending.yaml
 ./scripts/scheduler_jobs/autofix_run_periodic.yaml
 ./scripts/scheduler_jobs/cache_prewarm.yaml
-./scripts/scheduler_jobs/cap_night_duty.yaml
-./scripts/scheduler_jobs/cap_orchestrator.yaml
 ./scripts/scheduler_jobs/chat_responder.yaml
 ./scripts/scheduler_jobs/cleanup_on_demand.yaml
 ./scripts/scheduler_jobs/convergence_overseer_record_daily.yaml

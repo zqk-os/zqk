@@ -137,10 +137,13 @@ func TestExtractGzipTar_CommunityDenylist(t *testing.T) {
 
 	tarData := buildTestTarGz([]tarEntry{
 		{name: "cli_specs/paste_cursor.yaml", content: []byte("spec: denylisted")},
+		{name: "cli_specs/agent/orchestrate_command.yaml", content: []byte("spec: orchestrate")},
+		{name: "scripts/scheduler_jobs/cap_orchestrator.yaml", content: []byte("job: cap")},
+		{name: "scripts/default_agent_skills/tpm_orchestration.yaml", content: []byte("skill: tpm")},
 		{name: "cli_specs/allowed_cmd.yaml", content: []byte("spec: allowed")},
 	})
 
-	// Test 1: Community edition skips denylisted spec
+	// Test 1: Community edition skips denylisted seed paths (CLI + jobs + skills)
 	zqkenv.IsCommunityEdition = true
 	dst := t.TempDir()
 	if err := ExtractGzipTar(tarData, dst, testLogger(), true); err != nil {
@@ -149,6 +152,18 @@ func TestExtractGzipTar_CommunityDenylist(t *testing.T) {
 	deniedPath := filepath.Join(dst, paths.CLICommandSpecsDir, "paste_cursor.yaml")
 	if fileutil.Exists(deniedPath) {
 		t.Errorf("expected paste_cursor.yaml to be skipped in community edition")
+	}
+	orchPath := filepath.Join(dst, paths.CLICommandSpecsDir, "agent", "orchestrate_command.yaml")
+	if fileutil.Exists(orchPath) {
+		t.Errorf("expected orchestrate_command.yaml to be skipped in community edition")
+	}
+	capJob := filepath.Join(dst, "scripts", "scheduler_jobs", "cap_orchestrator.yaml")
+	if fileutil.Exists(capJob) {
+		t.Errorf("expected cap_orchestrator.yaml to be skipped in community edition")
+	}
+	tpmSkill := filepath.Join(dst, "scripts", "default_agent_skills", "tpm_orchestration.yaml")
+	if fileutil.Exists(tpmSkill) {
+		t.Errorf("expected tpm_orchestration.yaml to be skipped in community edition")
 	}
 	allowedPath := filepath.Join(dst, paths.CLICommandSpecsDir, "allowed_cmd.yaml")
 	if !fileutil.Exists(allowedPath) {
