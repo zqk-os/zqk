@@ -89,16 +89,33 @@ run_bounded() {
 }
 
 TMP=$(mktemp -d /tmp/zqk-session-paging.XXXXXX)
-cleanup() { rm -rf "$TMP" >/dev/null 2>&1 || true; }
+PROJ="$TMP/project"
+cleanup() {
+  # Temp-epoch ambient must not leak after stranger paging probe.
+  if [ -x "${ZQK:-}" ] && [ -d "${PROJ:-}" ]; then
+    (
+      cd "$PROJ"
+      unset ZQK_CURRENT_ROOT 2>/dev/null || true
+      export ZQK_PROJECT_ROOT="$PROJ"
+      "$ZQK" ambient stop >/dev/null 2>&1 || true
+    )
+  fi
+  pkill -f "$TMP" >/dev/null 2>&1 || true
+  rm -rf "$TMP" >/dev/null 2>&1 || true
+}
 trap cleanup EXIT
+mkdir -p "$PROJ" "$TMP/home"
 (
-  cd "$TMP"
-  # Clear studio root bleed-through so stranger continuity is community-local.
-  unset ZQK_PROJECT_ROOT ZQK_CURRENT_ROOT 2>/dev/null || true
+  cd "$PROJ"
+  # Clear studio root bleed-through; isolate HOME so operator MCP/pin paths cannot poison pack-deny.
+  unset ZQK_PROJECT_ROOT ZQK_CURRENT_ROOT ZQK_ENABLE_STUDIO_PACK_TOOLS ZQK_STUDIO_DOGFOOD 2>/dev/null || true
+  export HOME="$TMP/home"
+  export ZQK_HOME="$TMP/home"
   if ! run_bounded 45 "$ZQK" init --format json >"$TMP/init.out" 2>&1; then
     run_bounded 45 "$ZQK" init >"$TMP/init.out" 2>&1 || true
   fi
   out=$(run_bounded 45 "$ZQK" workflow whats-next --skip-measure --format json 2>"$TMP/wn.err" || true)
+  printf '%s\n' "$out" >"$TMP/whats-next.json"
   if echo "$out" | grep -Eq 'zqk_whats_next_v1|"schema"'; then
     say "OK: whats-next returns structured kernel context"
   else
@@ -106,6 +123,48 @@ trap cleanup EXIT
     say "stderr: $(head -c 400 "$TMP/wn.err" 2>/dev/null || true)"
   fi
 )
+
+# Pack-ontology deny on the stranger whats-next payload (session continuity must stay pack-free).
+if [ -s "$TMP/whats-next.json" ] && [ "$FAIL" -eq 0 ]; then
+  if ! python3 - "$TMP/whats-next.json" <<'PY'
+import json, re, sys
+path = sys.argv[1]
+raw = open(path, encoding="utf-8").read()
+try:
+    d = json.loads(raw)
+except Exception as e:
+    print(f"FAIL: whats-next JSON parse: {e}", file=sys.stderr)
+    sys.exit(1)
+scrub = dict(d)
+ka = scrub.get("kernel_ambience")
+if isinstance(ka, dict):
+    ka = dict(ka)
+    ka.pop("node_sovereignty", None)
+    scrub["kernel_ambience"] = ka
+blob = json.dumps(scrub, sort_keys=True)
+deny = re.compile(
+    r"(?i)"
+    r"(PER-ORCH-|PER-STUDIO-|ASK-STUDIO-|ASK-CAP-|"
+    r"mmorch|ORCHESTRATE_PLAN|"
+    r"get_current_priority_plan|get_priority_plan_items|"
+    r"get_current_backlog_item|get_next_backlog_item|"
+    r"cap_orchestrat|cap_night_duty|cap_background|"
+    r"paste_applescript|print_cursor_paste|print_ide_paste|zqk_cursor|"
+    r"align-cache|align_cache|"
+    r"zqke-pack-composition|/Users/lanceettl/zqke-pack-composition)"
+)
+hit = deny.search(blob)
+if hit:
+    print(f"FAIL: pack ontology leakage in session-paging whats-next near {hit.group(0)!r}", file=sys.stderr)
+    sys.exit(1)
+sys.exit(0)
+PY
+  then
+    fail "session-paging stranger whats-next pack-ontology deny failed"
+  else
+    say "OK: stranger whats-next pack-free under isolated HOME"
+  fi
+fi
 
 if [ "$FAIL" -ne 0 ]; then
   say "COMMUNITY SESSION PAGING: FAIL"
