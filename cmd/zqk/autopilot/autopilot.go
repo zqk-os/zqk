@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/llm"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 )
@@ -22,6 +24,7 @@ type AutopilotOptions struct {
 	BudgetTokens int
 	Verify       bool
 	DryRun       bool
+	Harvester    *llm.LocalEngineHarvester
 }
 
 // NewAutopilotCmd creates the 'zqk autopilot' command.
@@ -70,6 +73,7 @@ func runAutopilot(cmd *cobra.Command, args []string, proc *cli.Processor) error 
 		BudgetTokens: budgetTokens,
 		Verify:       verify,
 		DryRun:       dryRun,
+		Harvester:    llm.NewLocalEngineHarvester(500 * time.Millisecond),
 	}
 
 	return ExecuteAutopilot(ctx, sec, proc.Storage(), opts, cmd.OutOrStdout())
@@ -100,6 +104,14 @@ func ExecuteAutopilot(ctx context.Context, sec *pkgctx.SecurityContext, store st
 
 	if targetPlanID == "" && strings.TrimSpace(opts.Intent) == "" {
 		return fmt.Errorf("autopilot fail-closed: neither priority plan nor natural language intent provided")
+	}
+
+	// 2. Discover local models via Harvester if model is unspecified
+	if opts.Model == "" && opts.Harvester != nil {
+		endpoints, err := opts.Harvester.Discover(ctx)
+		if err == nil && len(endpoints) > 0 {
+			opts.Model = endpoints[0].BaseURL
+		}
 	}
 
 	return nil
