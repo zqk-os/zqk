@@ -11,7 +11,6 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/autopilot"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/llm"
-	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -47,9 +46,6 @@ func TestSwarmAutopilot_OperationalDynamicProof(t *testing.T) {
 	defer cancel()
 
 	sec := &pkgctx.SecurityContext{AccountID: "ACC-TEST-AUTOPILOT"}
-	tmpDir := t.TempDir()
-	store, err := storage.NewFileObjectStorageForTest(tmpDir)
-	require.NoError(t, err, "test storage initialization must succeed")
 
 	harvester := llm.NewLocalEngineHarvester(50 * time.Millisecond)
 
@@ -61,7 +57,7 @@ func TestSwarmAutopilot_OperationalDynamicProof(t *testing.T) {
 		Harvester:    harvester,
 	}
 
-	err = autopilot.ExecuteAutopilot(ctx, sec, store, opts, nil)
+	err := autopilot.ExecuteAutopilot(ctx, sec, nil, opts, nil)
 	assert.NoError(t, err, "autopilot execution with valid intent and budget must succeed")
 }
 
@@ -70,9 +66,6 @@ func TestSwarmAutopilot_OperationalDynamicProof(t *testing.T) {
 func TestSwarmAutopilot_NegativeAdversarialBoundary(t *testing.T) {
 	ctx := context.Background()
 	sec := &pkgctx.SecurityContext{AccountID: "ACC-TEST-AUTOPILOT"}
-	tmpDir := t.TempDir()
-	store, err := storage.NewFileObjectStorageForTest(tmpDir)
-	require.NoError(t, err, "test storage initialization must succeed")
 
 	// Boundary 1: Empty intent and empty plan ID must fail-closed
 	optsEmpty := autopilot.AutopilotOptions{
@@ -80,7 +73,7 @@ func TestSwarmAutopilot_NegativeAdversarialBoundary(t *testing.T) {
 		PlanID:       "",
 		BudgetTokens: 10000,
 	}
-	errEmpty := autopilot.ExecuteAutopilot(ctx, sec, store, optsEmpty, nil)
+	errEmpty := autopilot.ExecuteAutopilot(ctx, sec, nil, optsEmpty, nil)
 	assert.Error(t, errEmpty, "empty intent and plan-id must be rejected fail-closed")
 	assert.Contains(t, errEmpty.Error(), "neither priority plan nor natural language intent provided")
 
@@ -89,7 +82,7 @@ func TestSwarmAutopilot_NegativeAdversarialBoundary(t *testing.T) {
 		Intent:       "Valid intent",
 		BudgetTokens: 0,
 	}
-	errZeroBudget := autopilot.ExecuteAutopilot(ctx, sec, store, optsZeroBudget, nil)
+	errZeroBudget := autopilot.ExecuteAutopilot(ctx, sec, nil, optsZeroBudget, nil)
 	assert.Error(t, errZeroBudget, "zero token budget must be rejected fail-closed")
 	assert.Contains(t, errZeroBudget.Error(), "token budget must be positive")
 
@@ -97,7 +90,7 @@ func TestSwarmAutopilot_NegativeAdversarialBoundary(t *testing.T) {
 		Intent:       "Valid intent",
 		BudgetTokens: -500,
 	}
-	errNegativeBudget := autopilot.ExecuteAutopilot(ctx, sec, store, optsNegativeBudget, nil)
+	errNegativeBudget := autopilot.ExecuteAutopilot(ctx, sec, nil, optsNegativeBudget, nil)
 	assert.Error(t, errNegativeBudget, "negative token budget must be rejected fail-closed")
 	assert.Contains(t, errNegativeBudget.Error(), "token budget must be positive")
 }
