@@ -132,18 +132,18 @@ The `/api/graph` endpoint returns nodes and directed edges formatted for interac
       "title": "Establish Community Onboarding and Operational Kernel Foundations",
       "references": {
         "requirement_refs": [
-          "REQ-1793488563899668000-e29afeda"
+          "REQ-001"
         ]
       }
     },
     {
-      "id": "REQ-1793488563899668000-e29afeda",
+      "id": "REQ-001",
       "kind": "requirement",
       "status": "originated",
       "title": "Interactive Swarm Demonstrations and Web Studio",
       "references": {
         "criteria_refs": [
-          "CRIT-1793492511007707000-9b0e56ef"
+          "CRIT-001"
         ]
       }
     }
@@ -151,7 +151,7 @@ The `/api/graph` endpoint returns nodes and directed edges formatted for interac
   "edges": [
     {
       "source": "GOAL-STARTER-COMMUNITY-001",
-      "target": "REQ-1793488563899668000-e29afeda",
+      "target": "REQ-001",
       "relation": "requirement_refs"
     }
   ]

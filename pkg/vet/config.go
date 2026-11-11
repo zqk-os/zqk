@@ -10,10 +10,21 @@ import (
 
 // GatesConfig defines declarative parameters for verification checks.
 type GatesConfig struct {
-	Version    string           `yaml:"version"`
-	Hygiene    HygieneConfig    `yaml:"hygiene"`
-	TreePolice TreePoliceConfig `yaml:"tree_police"`
-	Payload    PayloadConfig    `yaml:"payload"`
+	Version     string            `yaml:"version"`
+	Hygiene     HygieneConfig     `yaml:"hygiene"`
+	TreePolice  TreePoliceConfig  `yaml:"tree_police"`
+	Payload     PayloadConfig     `yaml:"payload"`
+	DocScrutiny DocScrutinyConfig `yaml:"doc_scrutiny"`
+}
+
+type DocScrutinyConfig struct {
+	Enabled                   bool     `yaml:"enabled"`
+	MaxTopicCharsConcept      int      `yaml:"max_topic_chars_concept"`
+	MaxTopicCharsArchitecture int      `yaml:"max_topic_chars_architecture"`
+	ProhibitCycleWork         bool     `yaml:"prohibit_cycle_work"`
+	ProhibitKernelIDLeaks     bool     `yaml:"prohibit_kernel_id_leaks"`
+	CheckAcronymConsistency   bool     `yaml:"check_acronym_consistency"`
+	Exemptions                []string `yaml:"exemptions"`
 }
 
 type HygieneConfig struct {
@@ -141,6 +152,18 @@ func DefaultConfig() *GatesConfig {
 				"*.pem", "*.key", "*.p12", "*.pfx",
 			},
 			GlobalGrepExemptions: []string{"pkg/vet/*", "config/gates.yaml"},
+		},
+		DocScrutiny: DocScrutinyConfig{
+			Enabled:                   true,
+			MaxTopicCharsConcept:      4000,
+			MaxTopicCharsArchitecture: 8000,
+			ProhibitCycleWork:         true,
+			ProhibitKernelIDLeaks:     true,
+			CheckAcronymConsistency:   true,
+			Exemptions: []string{
+				"docs/releases/*",
+				"docs/archive/*",
+			},
 		},
 	}
 }

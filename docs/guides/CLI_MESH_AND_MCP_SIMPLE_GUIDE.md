@@ -161,5 +161,5 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -cover ./cmd/zqk/mesh/...
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -cover ./cmd/zqk/mcp-simple/...
 
 # Verify bound DoD gate
-./bin/zqk test run TST-1791966217716359001-19e9ba1b
+./bin/zqk test run TST-001
 ```

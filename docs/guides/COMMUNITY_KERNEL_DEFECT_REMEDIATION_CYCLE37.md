@@ -1,4 +1,4 @@
-# Community Kernel Defect Remediation & Engine Hardening (Cycle 37)
+# Community Kernel Defect Remediation & Engine Hardening 
 
 ## 1. Executive Summary
 
@@ -7,7 +7,7 @@ During operational usage of the ZQK Knowledge Kernel, community contributors and
 1. **GH-921 (Schema Vocabulary Parity: `planned` vs. `ready`)**: A semantic mismatch existed where the priority plan lifecycle precondition string referenced conversational vocabulary (`at least one ready backlog_item`) instead of the canonical schema lifecycle status (`planned`). Autonomous agents and developers encountering promotion rejection attempted to mutate backlog items to `status: ready`, tripping schema validation errors because `ready` is a lifecycle role, not an allowed status value.
 2. **GH-913 (Trace Pipeline Goal Reference Inheritance)**: When generating child backlog items and verification assets from an existing requirement via `zqk workflow gen-trace-pipeline`, the requirement's `goal_refs` were not consistently inherited by newly minted atomic backlog items. This severed downward strategic lineage between the root `goal` compass and execution-plane `backlog_item` units of effort.
 
-This architectural guide documents the root cause analysis, structural resolutions, architectural invariants, Three-Fold Verification Proof, and operational guidance delivered in Cycle 37 under **REQ-1793776726749343000-c7bee660** and **PRI-1793776752702795000-37f7e959**.
+This architectural guide documents the root cause analysis, structural resolutions, architectural invariants, Three-Fold Verification Proof, and operational guidance delivered in Cycle 37 under **REQ-001** and **PRI-001**.
 
 ---
 

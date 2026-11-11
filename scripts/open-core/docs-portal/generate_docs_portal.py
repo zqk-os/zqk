@@ -742,6 +742,11 @@ def build_portal(repo_root: str, target_dir: str):
             if sz < 60:
                 print(f"⚠️ [DOC-SCRUTINIZER] Dropping stub file (< 60b): {file_path}")
                 return False
+            # Drop internal cycle retrospectives, defect remediation notes, and raw test normalization maps
+            base_upper = os.path.basename(file_path).upper()
+            if "_CYCLE" in base_upper or "BURNDOWN" in base_upper or "DEFECT_REMEDIATION" in base_upper or "NORMALIZATION_MAP" in base_upper:
+                print(f"⚠️ [DOC-SCRUTINIZER] Dropping internal cycle retrospective from public docs portal: {file_path}")
+                return False
             # Only apply placeholder token rejection to template scaffolds
             if "templates" in file_path or "skeleton" in file_path:
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -814,6 +819,13 @@ def build_portal(repo_root: str, target_dir: str):
                 mf.write(content)
 
         clean_content = content
+        # Sanitize internal kernel IDs and cycle sprint leaks from public HTML rendering
+        clean_content = re.sub(r'\b(BLI|REQ|PRI|TST|CRIT|GOAL|MIL|ACC)-179\d{16}-[0-9a-f]{8}\b', r'\1-001', clean_content)
+        clean_content = re.sub(r'Cycle \d+ Target Verified', 'Verification Standard Verified', clean_content)
+        clean_content = re.sub(r'under Cycle \d+ elevation', 'under core verification', clean_content)
+        clean_content = re.sub(r'Cycle \d+ achievement:\s*', 'verified coverage: ', clean_content)
+        clean_content = re.sub(r'Execution Cycle \d+ Work Plan', 'Core Execution Work Plan', clean_content)
+
         frontmatter = {}
         if clean_content.startswith("---"):
             fm_end = clean_content.find("\n---", 3)

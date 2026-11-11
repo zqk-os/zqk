@@ -169,6 +169,6 @@ domains:
 
 | Criterion ID | Category | Description | Verification Method |
 |--------------|----------|-------------|---------------------|
-| `CRIT-1792074161524619000-ceb88a37` | Acceptance | `cmd/zqk/domain` achieves $\ge 80.0\%$ statement coverage and validates CLI command hierarchy | `go test -short -cover ./cmd/zqk/domain` |
-| `CRIT-1792074161524620000-8701f300` | Functional | Boundary condition validation, error paths (storage list/create/update failures), and dry-run preview | `cmd/zqk/domain/domain_coverage_elevation_test.go` |
-| `CRIT-1792074161524621000-5f77f89c` | Compliance | Comprehensive documentation guide authored and committed | `docs/guides/CLI_DOMAIN_SUBSYSTEM_AND_ONTOLOGY_REGISTRATION_GUIDE.md` |
+| `CRIT-001` | Acceptance | `cmd/zqk/domain` achieves $\ge 80.0\%$ statement coverage and validates CLI command hierarchy | `go test -short -cover ./cmd/zqk/domain` |
+| `CRIT-001` | Functional | Boundary condition validation, error paths (storage list/create/update failures), and dry-run preview | `cmd/zqk/domain/domain_coverage_elevation_test.go` |
+| `CRIT-001` | Compliance | Comprehensive documentation guide authored and committed | `docs/guides/CLI_DOMAIN_SUBSYSTEM_AND_ONTOLOGY_REGISTRATION_GUIDE.md` |

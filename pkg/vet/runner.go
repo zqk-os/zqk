@@ -55,6 +55,9 @@ func (r *Runner) Run(opts RunOptions) (*Report, error) {
 			suite = "tree_police"
 		case "payload":
 			findings, err = CheckPayload(r.Root, r.Config)
+		case "docs", "doc_scrutiny":
+			findings, err = CheckDocumentationQuality(r.Root, r.Config)
+			suite = "docs"
 		default:
 			return nil, fmt.Errorf("unknown vet suite: %s", suite)
 		}

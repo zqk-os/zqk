@@ -1,4 +1,4 @@
-# Community Repo Resolver: GitHub Issue Ingestion, Resolution & Convergence Management (Cycle 35)
+# Community Repo Resolver: GitHub Issue Ingestion, Resolution & Convergence Management 
 
 ## 1. Executive Summary
 This architectural specification defines the integration of GitHub issue ingestion, lifecycle management, resolution tracking, and policy-driven convergence steering directly into the community repo resolver subsystem (`pkg/community`).

@@ -116,4 +116,4 @@ The `cmd/zqk-shim` package is verified to **94.2% statement coverage** across th
 | `shim_coverage_elevation_test.go` | Isolated Git repository creation, CAS workstream matching, path traversal, and edge cases. |
 | `e2e_test.go` | End-to-end binary execution, stdout/stderr streaming, and simulated command interception. |
 
-All tests comply with fail-closed kernel constraints and pass automated verification under `TST-1792064673995605001-67d85bd6`.
+All tests comply with fail-closed kernel constraints and pass automated verification under `TST-001`.

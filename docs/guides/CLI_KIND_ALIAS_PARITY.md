@@ -4,7 +4,7 @@
 
 The **CLI Kind Alias Parity Specification** defines the canonical kind shorthand aliases supported across the ZQK CLI, specifically unifying `zqk new <kind>`, `zqk new object <kind>`, and `zqk object new <kind>` (an alias of `zqk object create`).
 
-Under **CRIT-1793968574418837000-610b10ad** (POL-DOC-001 Documentation Invariant for CLI Kind Aliases), this document formalizes the canonical shorthand alias mappings to ensure seamless developer and autonomous agent ergonomics across all entrypoints.
+Under **CRIT-001** (POL-DOC-001 Documentation Invariant for CLI Kind Aliases), this document formalizes the canonical shorthand alias mappings to ensure seamless developer and autonomous agent ergonomics across all entrypoints.
 
 ---
 

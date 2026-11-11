@@ -154,7 +154,7 @@ chunks:
       - path_exists:cmd/zqk/workflow/whats_next.go
       - git_clean:true
     evidence_refs:
-      - BLI-1792053999992462500-162ed0ce
+      - BLI-001
     independent_verify: yes
 ```
 

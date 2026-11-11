@@ -71,8 +71,8 @@ The steward interfaces with `pkg/kernel/steward/monitor.go` to compute runway me
 
 ## 5. Verification and Done-Gates
 
-Verification for the kernel steward subsystem is tracked under `TST-1792076192252488001-88021e12` and satisfies the Three-Fold Proof:
+Verification for the kernel steward subsystem is tracked under `TST-001` and satisfies the Three-Fold Proof:
 
-1. **Static Floor Invariant (`CRIT-1792076192252488000-f4517f8c`):** Statement test coverage in `cmd/zqk/kernel` maintains $\ge 90.0\%$ with no unhandled branch paths.
-2. **Operational Dynamic Proof (`CRIT-1792076192252489000-0a1e990d`):** `TestStewardDaemon_TickerIteration` and `TestKernelStewardSweepExecution` execute cleanly in isolated temp roots and verify sweep telemetry collection.
-3. **Negative Boundary & Hygiene Proof (`CRIT-1792076192252490000-84d273f1`):** Negative flag values (`--interval -10`), missing interval flag fallback, and singleton daemon duplicate prevention execute deterministically without panics or leaks.
+1. **Static Floor Invariant (`CRIT-001`):** Statement test coverage in `cmd/zqk/kernel` maintains $\ge 90.0\%$ with no unhandled branch paths.
+2. **Operational Dynamic Proof (`CRIT-001`):** `TestStewardDaemon_TickerIteration` and `TestKernelStewardSweepExecution` execute cleanly in isolated temp roots and verify sweep telemetry collection.
+3. **Negative Boundary & Hygiene Proof (`CRIT-001`):** Negative flag values (`--interval -10`), missing interval flag fallback, and singleton daemon duplicate prevention execute deterministically without panics or leaks.

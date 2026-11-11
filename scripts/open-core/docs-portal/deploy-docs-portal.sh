@@ -24,6 +24,11 @@ if [[ "${1:-}" == "--dry-run" ]]; then
   echo "🔍 [DRY RUN] Will generate and verify portal without pushing to remote."
 fi
 
+echo "🛡️ [0/4] Executing zqk-vet documentation scrutiny & quality gate..."
+if [[ -x "${REPO_ROOT}/bin/zqk-vet" ]]; then
+  "${REPO_ROOT}/bin/zqk-vet" -suite docs
+fi
+
 echo "🚀 [1/4] Generating static documentation portal into ${BUILD_DIR} from ZQK Core..."
 rm -rf "${BUILD_DIR}"
 python3 "${SCRIPT_DIR}/generate_docs_portal.py" "${BUILD_DIR}"

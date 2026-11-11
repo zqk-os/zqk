@@ -50,9 +50,9 @@ Visualizing query results outputs hierarchical graph trees showing incoming, out
 === ZPARQL Graph Path Visualization ===
 
 [1] Path:
-  ● (p:priority_plan PRI-1791956057434882000-1650245d)
-      ───[:items]──► (b:backlog_item BLI-1791956047783734500-343f3063)
-          ───[:criteria_refs]──► (c:criteria CRIT-1791956047783734000-9dabbbcd)
+  ● (p:priority_plan PRI-001)
+      ───[:items]──► (b:backlog_item BLI-001)
+          ───[:criteria_refs]──► (c:criteria CRIT-001)
       └─ Properties: p.title=Cycle 68, b.status=in_progress
 
 (Visualized 1 path(s))

@@ -172,5 +172,5 @@ Daemon and tray process integrity is verified as part of the ZQK test case harne
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -cover ./cmd/zqk/daemon ./cmd/zqk/tray
 
 # Run the linked kernel test case
-./bin/zqk test run TST-1791958203428881001-1e8395ba
+./bin/zqk test run TST-001
 ```

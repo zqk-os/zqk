@@ -29,7 +29,7 @@ if err != nil {
 }
 
 // Evaluate branch convergence
-result, err := engine.EvaluateConvergence(ctx, "integration/PRI-1793571658840339000-3901b8b5")
+result, err := engine.EvaluateConvergence(ctx, "integration/PRI-001")
 if result.CanPrune {
     pruned, err := engine.PruneMergedBranches(ctx, false)
 }

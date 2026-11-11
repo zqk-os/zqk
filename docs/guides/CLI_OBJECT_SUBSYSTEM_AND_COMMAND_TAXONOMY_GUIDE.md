@@ -129,8 +129,8 @@ When an object is prematurely promoted to CAS before fulfilling quality invarian
 
 ## 4. Verification and Done-Gates
 
-Verification for the object management subsystem is codified in `TST-1792077428809684001-039304c2` and satisfies the Three-Fold Proof:
+Verification for the object management subsystem is codified in `TST-001` and satisfies the Three-Fold Proof:
 
-1. **Static Floor Invariant (`CRIT-1792077428809684000-f3224048`):** Statement test coverage in `cmd/zqk/object` elevates to $\ge 80.0\%$ with all subcommands exercising in-process execution paths.
-2. **Operational Dynamic Proof (`CRIT-1792077428809685000-703332cd`):** In-process test suite `TestInProcess_SubcommandCoverageElevation` executes commands against live SQLite/CAS stores, validating stdout payloads, YAML/JSON structure, and state transitions.
-3. **Negative Boundary & Hygiene Proof (`CRIT-1792077428809686000-8522dd87`):** Commands reject invalid object kinds, malformed filters, unresolvable IDs, and missing positional arguments with informative exit codes and enhanced error guards; complete architectural documentation and guides linked to kernel.
+1. **Static Floor Invariant (`CRIT-001`):** Statement test coverage in `cmd/zqk/object` elevates to $\ge 80.0\%$ with all subcommands exercising in-process execution paths.
+2. **Operational Dynamic Proof (`CRIT-001`):** In-process test suite `TestInProcess_SubcommandCoverageElevation` executes commands against live SQLite/CAS stores, validating stdout payloads, YAML/JSON structure, and state transitions.
+3. **Negative Boundary & Hygiene Proof (`CRIT-001`):** Commands reject invalid object kinds, malformed filters, unresolvable IDs, and missing positional arguments with informative exit codes and enhanced error guards; complete architectural documentation and guides linked to kernel.

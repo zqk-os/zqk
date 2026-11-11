@@ -36,7 +36,7 @@ Executes declarative pattern matching queries across the in-memory or persisted 
 Traces outgoing and incoming edges recursively from a starting node root:
 - **Usage**: `zqk graph discover --root <id> [flags]`
 - **Key Options**:
-  - `--root <ID>`: Target entity ID (e.g., `PRI-1792018926428318000-79da71a3`).
+  - `--root <ID>`: Target entity ID (e.g., `PRI-001`).
   - `--depth <int>`: Traversal recursion limit (default: 3).
   - `--direction <outbound|inbound|both>`: Direction of relational references to follow.
   - `--format <text|json>`: Human-readable tree vs machine-parseable JSON AST.

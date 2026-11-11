@@ -10,7 +10,7 @@ The stability and predictability of autonomous agent swarms and human operators 
 1. **Deterministic Auto-Remedy Recipes**: When workspace or kernel anomalies occur (e.g. stale lock files, unseeded preconditions, corrupted object state), the diagnostic subsystem synthesizes clean, actionable recovery commands that adhere strictly to canonical CLI syntax.
 2. **Help Menu Golden Parity**: The CLI's interactive and machine-readable surfaces must maintain bit-for-bit parity against validated golden specifications, preventing flag drift, missing examples, or syntax ambiguities from polluting agent prompts or causing execution failures.
 
-Under **POL-DOC-001** and criteria **CRIT-1793961672992271000-30fc9f37**, **CRIT-1793961675960953000-217f5c81**, and **CRIT-1793961678251838000-c44a82a1**, this guide defines the invariants, sanitization algorithms, validation gates, and test suites governing auto-remedy recipe generation and CLI golden menu parity.
+Under **POL-DOC-001** and criteria **CRIT-001**, **CRIT-001**, and **CRIT-001**, this guide defines the invariants, sanitization algorithms, validation gates, and test suites governing auto-remedy recipe generation and CLI golden menu parity.
 
 ```
 +-------------------------------------------------------------------------+
@@ -130,7 +130,7 @@ func SanitizeRecipeCommand(cmd string) string {
 
 ## 4. Negative Adversarial Boundary & Fail-Closed Validation
 
-To satisfy **CRIT-1793961678251838000-c44a82a1**, recipe commands must not only be sanitized upon generation, but also rigorously validated before execution or presentation.
+To satisfy **CRIT-001**, recipe commands must not only be sanitized upon generation, but also rigorously validated before execution or presentation.
 
 ### 4.1 `ValidateRecipeCommand` Enforcement
 
@@ -151,7 +151,7 @@ To satisfy **CRIT-1793961678251838000-c44a82a1**, recipe commands must not only 
 
 ### 4.2 Safe Command Whitelist & Adversarial Boundary Verification
 
-Under **POL-DOC-001** and **CRIT-1793982042724177000-c4858ffb**, `ValidateSafeCommand(cmd, projectRoot)` enforces strict negative adversarial boundaries to guarantee that only safe internal commands are auto-applied, rejecting any foreign, dangerous, or boundary-violating operations:
+Under **POL-DOC-001** and **CRIT-001**, `ValidateSafeCommand(cmd, projectRoot)` enforces strict negative adversarial boundaries to guarantee that only safe internal commands are auto-applied, rejecting any foreign, dangerous, or boundary-violating operations:
 
 1. **Strict Executable Whitelist**: Only invocations of the canonical product executable (`zqk`, `paths.CLIName()`, `paths.CLICommandNameDefault`) are permitted. Invocations of external shell interpreters (`sh`, `bash`, `python`), system utilities (`rm`, `curl`, `wget`, `sudo`), or unknown binaries fail closed:
    `executable "<bin>" is not whitelisted; only zqk commands are permitted`
@@ -315,23 +315,23 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test ./cmd/zqk -run TestHelpMenuParity
 
 | Artifact / Contract | Identifier | Verification Proof |
 | :--- | :--- | :--- |
-| **Backlog Item** | `BLI-1793982291304857000-db95a5cd` | Auto-Remedy Execution and Positional Flag Parity |
-| **Priority Plan** | `PRI-1793981968849263000-4288a3b0` | Execution Cycle 55 Work Plan |
-| **Requirement** | `REQ-1793981998623327000-d6da33e0` | Automated System Check Remedy Execution and Flag Parity |
-| **Test Case** | `TST-1793982163056152000-3dc6ac46` | Unified Auto-Remedy Test Suite (`pkg/system/auto_remedy_test.go`) |
-| **Static Floor Criteria** | `CRIT-1793982022958714000-6de30dc2` | `TestAutoRemedy_StaticFloor_SafeCommandRecognitionAndFlagParity` |
-| **Dynamic Operational Criteria** | `CRIT-1793982039960170000-70b46b5b` | `TestAutoRemedy_OperationalProof_AutoFixCommandExecution` |
-| **Negative Boundary Criteria** | `CRIT-1793982042724177000-c4858ffb` | `TestAutoRemedy_NegativeBoundary_UnsafeRecipeRejection` |
-| **Compliance Criteria** | `CRIT-1793982045112235000-37580fdc` | `docs/guides/CLI_AUTO_REMEDY_AND_PARITY.md` specification per POL-DOC-001 |
+| **Backlog Item** | `BLI-001` | Auto-Remedy Execution and Positional Flag Parity |
+| **Priority Plan** | `PRI-001` | Core Execution Work Plan |
+| **Requirement** | `REQ-001` | Automated System Check Remedy Execution and Flag Parity |
+| **Test Case** | `TST-001` | Unified Auto-Remedy Test Suite (`pkg/system/auto_remedy_test.go`) |
+| **Static Floor Criteria** | `CRIT-001` | `TestAutoRemedy_StaticFloor_SafeCommandRecognitionAndFlagParity` |
+| **Dynamic Operational Criteria** | `CRIT-001` | `TestAutoRemedy_OperationalProof_AutoFixCommandExecution` |
+| **Negative Boundary Criteria** | `CRIT-001` | `TestAutoRemedy_NegativeBoundary_UnsafeRecipeRejection` |
+| **Compliance Criteria** | `CRIT-001` | `docs/guides/CLI_AUTO_REMEDY_AND_PARITY.md` specification per POL-DOC-001 |
 
 ### Cycle 52: Recipe Generation & Help Golden Parity Baseline
 
 | Artifact / Contract | Identifier | Verification Proof |
 | :--- | :--- | :--- |
-| **Backlog Item** | `BLI-1793961710448186000-735498b7` | Lane 3: System Check Auto-Remedy Flag Alignment & CLI Menu Parity |
-| **Priority Plan** | `PRI-1793961825245004000-aefe1e40` | Execution Cycle 52 Work Plan |
-| **Requirement** | `REQ-1793961627194340000-ab7f7b2d` | CLI System Check Auto-Remedy Flag Parity & Golden Menu Alignment |
-| **Static Floor Criteria** | `CRIT-1793961672992271000-30fc9f37` | `docs/guides/CLI_AUTO_REMEDY_AND_PARITY.md` specification |
-| **Dynamic Operational Criteria** | `CRIT-1793961675960953000-217f5c81` | `TestSanitizeRecipeCommand_RemovesIDsAcrossAllVerbsAndPreservesPositionalIDs`, `TestAutoRemedy_GeneratedRecipes_OperationalDynamicProof` |
-| **Negative Boundary Criteria** | `CRIT-1793961678251838000-c44a82a1` | `TestValidateRecipeCommand_NegativeAdversarialBoundary` |
+| **Backlog Item** | `BLI-001` | Lane 3: System Check Auto-Remedy Flag Alignment & CLI Menu Parity |
+| **Priority Plan** | `PRI-001` | Core Execution Work Plan |
+| **Requirement** | `REQ-001` | CLI System Check Auto-Remedy Flag Parity & Golden Menu Alignment |
+| **Static Floor Criteria** | `CRIT-001` | `docs/guides/CLI_AUTO_REMEDY_AND_PARITY.md` specification |
+| **Dynamic Operational Criteria** | `CRIT-001` | `TestSanitizeRecipeCommand_RemovesIDsAcrossAllVerbsAndPreservesPositionalIDs`, `TestAutoRemedy_GeneratedRecipes_OperationalDynamicProof` |
+| **Negative Boundary Criteria** | `CRIT-001` | `TestValidateRecipeCommand_NegativeAdversarialBoundary` |
 | **Help Parity Suite** | Golden Parity Gate | `cmd/zqk/help_parity_test.go:TestHelpMenuParity` |

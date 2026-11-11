@@ -67,12 +67,12 @@ The Pack and Kindpack subsystems are partitioned cleanly across command implemen
 cmd/zqk/pack/
 ├── pack.go                                      # Cobra command tree: init, seal, validate, manifest
 ├── pack_test.go                                 # Existing CLI integration tests
-└── pack_coverage_elevation_cycle101_test.go     # Cycle 101 elevation tests (>94% coverage)
+└── pack_coverage_elevation_cycle101_test.go     # Comprehensive tests (>94% coverage)
 
 cmd/zqk/kindpack/
 ├── command.go                                   # Cobra command tree: install, joinKinds
 ├── command_test.go                              # Existing CLI integration tests
-└── kindpack_coverage_elevation_cycle101_test.go # Cycle 101 elevation tests (100% coverage)
+└── kindpack_coverage_elevation_cycle101_test.go # Comprehensive tests (100% coverage)
 
 pkg/swarm/pack/
 ├── manifest.go                                  # SwarmPackage, TeamConfiguration, MembraneRule, AgentConfig

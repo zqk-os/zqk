@@ -201,6 +201,6 @@ sequenceDiagram
 
 In accordance with ZQK engineering standards, `pkg/mutation` is protected by the Three-Fold Proof invariant:
 
-1. **Static Floor Invariant:** Statement test coverage across `pkg/mutation` is strictly maintained at $\ge 85.0\%$ (Cycle 168 achievement: **89.2%**), verified via `go test -cover ./pkg/mutation`.
+1. **Static Floor Invariant:** Statement test coverage across `pkg/mutation` is strictly maintained at $\ge 85.0\%$ (verified coverage: **89.2%**), verified via `go test -cover ./pkg/mutation`.
 2. **Operational Dynamic Proof:** End-to-end verification of ZQL parsing, Kahn dependency sorting, preflight validation rules, transaction lifecycle transitions, all-or-nothing rollbacks, partial commit quarantine, and concurrent multi-goroutine execution.
 3. **Negative Adversarial Boundary:** Rigorous boundary testing against unclosed strings, malformed variable references, cyclic dependencies, missing required fields, illegal lifecycle status transitions, unauthorized system provenance tampering, unstarted transaction staging, and invalid state transitions.

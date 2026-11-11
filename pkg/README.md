@@ -237,7 +237,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [vds](./vds/) | `github.com/zqk-os/zqk/pkg/vds` | 10+8 | 8 | - | ❌ - | Verifiable Decomposition Spine (VDS) verification, traceability, and done-gates. |
 | [vector](./vector/) | `github.com/zqk-os/zqk/pkg/vector` | 3+1 | 1 | - | ❌ - | Vector component and domain abstractions for ZQK Core. |
 | [verification](./verification/) | `github.com/zqk-os/zqk/pkg/verification` | 1+3 | 3 | matrix | ❌ - | Formal verification of kernel constraints, schemas, and invariants. |
-| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 16+10 | 10 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
+| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 17+10 | 10 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
 | [vocabularypack](./vocabularypack/) | `github.com/zqk-os/zqk/pkg/vocabularypack` | 1+1 | 1 | - | ❌ - | Canonical domain terminology and glossary definitions pack. |
 | [walutil](./walutil/) | `github.com/zqk-os/zqk/pkg/walutil` | 3+4 | 4 | - | ❌ - | Walutil component and domain abstractions for ZQK Core. |
 | [when](./when/) | `github.com/zqk-os/zqk/pkg/when` | 5+5 | 5 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |

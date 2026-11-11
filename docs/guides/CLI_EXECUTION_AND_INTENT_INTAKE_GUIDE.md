@@ -109,5 +109,5 @@ Verify the intake test suite and done-gates:
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -cover ./cmd/zqk/intake
 
 # Run the linked kernel test case
-./bin/zqk test run TST-1791959797154056001-0352317d
+./bin/zqk test run TST-001
 ```

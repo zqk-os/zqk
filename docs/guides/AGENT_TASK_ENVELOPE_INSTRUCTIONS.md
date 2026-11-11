@@ -124,12 +124,12 @@ flowchart TD
 
 This specification satisfies the following Knowledge Kernel contracts:
 
-- **Requirement**: `REQ-1793982003787461000-df6b6627` (Agent Task Context Preparation Instruction Parity)
+- **Requirement**: `REQ-001` (Agent Task Context Preparation Instruction Parity)
 - **Criteria**:
-  - `CRIT-1793982054170819000-c69772a1`: Static Floor Invariant: Task envelope template instructs valid CLI invocation for agent prepare-context (`zqk agent prepare-context <ATK>` / `<task-id>`).
-  - `CRIT-1793982057457048000-cb586dda`: Operational Dynamic Proof: Verify agent prepare-context successfully accepts both canonical positional syntax and --task aliases.
-  - `CRIT-1793982060215231000-fd3d7d94`: Negative Adversarial Boundary: Enforce validation failure when conflicting or malformed task identifiers are provided.
-  - `CRIT-1793982062768548000-ee156eec`: Compliance Documentation: Update and maintain AGENT_TASK_ENVELOPE_INSTRUCTIONS.md documenting canonical invocation conventions per POL-DOC-001.
+  - `CRIT-001`: Static Floor Invariant: Task envelope template instructs valid CLI invocation for agent prepare-context (`zqk agent prepare-context <ATK>` / `<task-id>`).
+  - `CRIT-001`: Operational Dynamic Proof: Verify agent prepare-context successfully accepts both canonical positional syntax and --task aliases.
+  - `CRIT-001`: Negative Adversarial Boundary: Enforce validation failure when conflicting or malformed task identifiers are provided.
+  - `CRIT-001`: Compliance Documentation: Update and maintain AGENT_TASK_ENVELOPE_INSTRUCTIONS.md documenting canonical invocation conventions per POL-DOC-001.
 - **Policies**:
   - `POL-DOC-001` (Mandatory documentation clarity and completeness)
   - `POL-DEFAULT-f746cccc03ce5694` (Test-Driven Development and Continuous Verification)
