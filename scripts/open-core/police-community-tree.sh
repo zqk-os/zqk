@@ -130,6 +130,15 @@ for bad_script in 'install-zqk-stable\.sh' 'recycle-stable-daemons\.sh' 'declare
   fi
 done
 
+# Seed impermeability: CAP/MMORCH/orchestrate/TPM must not appear in bootstrap archive.
+# TRACK: BLI-1794356846362471000-b781465c
+if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ]; then
+  if ! sh "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" "$ROOT"; then
+    echo "MUST_NOT bootstrap seed impermeability failed"
+    FAIL=1
+  fi
+fi
+
 if [ "$FAIL" -ne 0 ]; then
   echo "POLICE: FAIL"
   exit 1

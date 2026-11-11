@@ -52,6 +52,13 @@ jobs:
       - name: Police Community Tree (G11/G12)
         run: sh scripts/open-core/police-community-tree.sh "$GITHUB_WORKSPACE"
 
+      # Seed impermeability: CAP/MMORCH/orchestrate/TPM absent from bootstrap archive/manifest.
+      # TRACK: BLI-1794356846362471000-b781465c
+      - name: Bootstrap Seed Impermeability
+        run: |
+          sh scripts/open-core/check-bootstrap-seed-impermeability.sh --self-test
+          sh scripts/open-core/check-bootstrap-seed-impermeability.sh "$GITHUB_WORKSPACE"
+
       # Seed impermeability: CAP/MMORCH/orchestrate/TPM must not appear in bootstrap manifest.
       # TRACK: BLI-1794356846362471000-b781465c
       - name: Bootstrap Seed Impermeability (denylist + init manifest)

@@ -9,6 +9,8 @@ func TestShouldExcludeCommunityCommandSpec(t *testing.T) {
 		want bool
 	}{
 		{"cli_specs/scheduler/print_cursor_paste_applescript_command.yaml", true},
+		{"cli_specs/scheduler/print_ide_paste_applescript_command.yaml", true},
+		{"cli_specs/vendor/cursor/paste_applescript_command.yaml", true},
 		{"cli_specs/scheduler/record_cvs_orchestrate_run_command.yaml", true},
 		{"cli_specs/agent/paste_cursor_command.yaml", true},
 		{"cli_specs/agent/orchestrate_command.yaml", true},
@@ -19,6 +21,7 @@ func TestShouldExcludeCommunityCommandSpec(t *testing.T) {
 		{"docs/onboarding/MMORCH_PEER_SESSION_BOOTSTRAP.md", true},
 		{"cli_specs/scheduler/activity_command.yaml", false},
 		{"object_specs/mission.yaml", false},
+		{"objects/priority_plan.yaml", false},
 		{"scripts/scheduler_jobs/cleanup.yaml", false},
 	}
 	for _, tc := range cases {

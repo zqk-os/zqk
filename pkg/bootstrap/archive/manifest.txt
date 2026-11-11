@@ -330,7 +330,6 @@
 ./cli_specs/scheduler/issues_bundle_health_command.yaml
 ./cli_specs/scheduler/issues_command.yaml
 ./cli_specs/scheduler/list_command.yaml
-./cli_specs/scheduler/print_ide_paste_applescript_command.yaml
 ./cli_specs/scheduler/restart_command.yaml
 ./cli_specs/scheduler/service/
 ./cli_specs/scheduler/service/gc_command.yaml
@@ -585,7 +584,6 @@
 ./cli_specs/vendor/cursor/
 ./cli_specs/vendor/cursor/adapter_command.yaml
 ./cli_specs/vendor/cursor/cursor_command.yaml
-./cli_specs/vendor/cursor/paste_applescript_command.yaml
 ./cli_specs/vendor/vendor_command.yaml
 ./cli_specs/workflow/
 ./cli_specs/workflow/add_command.yaml

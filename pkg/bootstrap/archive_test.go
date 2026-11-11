@@ -112,3 +112,19 @@ func TestManifestPaths_EmbeddedArchive(t *testing.T) {
 		t.Errorf("embedded manifest should include cli_specs/ (command specs) for clean install; got %d paths", len(paths))
 	}
 }
+
+// TestEmbeddedManifest_NoDenylistHits fails closed if the embedded init seed
+// still lists CAP/MMORCH/orchestrate/TPM operator ontology (seed impermeability).
+// TRACK: BLI-1794356846362471000-b781465c
+func TestEmbeddedManifest_NoDenylistHits(t *testing.T) {
+	t.Parallel()
+	paths := ManifestPaths()
+	if paths == nil {
+		t.Skip("no embedded manifest (dev build without archive?)")
+	}
+	for _, p := range paths {
+		if shouldExcludeCommunityCommandSpec(p) {
+			t.Errorf("embedded bootstrap manifest contains denylisted seed path %q", p)
+		}
+	}
+}
