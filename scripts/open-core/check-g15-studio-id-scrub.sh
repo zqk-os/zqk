@@ -23,7 +23,11 @@ done
 # Long-form studio CAS IDs only (not symbolic POL-WORKFLOW-VDS product names).
 ID_PAT='(BLI|REQ|DEC|PRI|ATK|CRIT|TEST|GOAL|CVS|POL)-[0-9]{13,}-[a-f0-9]{6,}'
 
-HITS=$(rg -n --glob '*.go' --glob '!*_test.go' -e "$ID_PAT" $PATHS 2>/dev/null || true)
+if command -v rg >/dev/null 2>&1; then
+  HITS=$(rg -n --glob '*.go' --glob '!*_test.go' -e "$ID_PAT" $PATHS 2>/dev/null || true)
+else
+  HITS=$(git -C "$ROOT" grep -n -E "$ID_PAT" -- 'pkg/**.go' 'cmd/zqk/**.go' 'cmd/zqk-community/**.go' ':!*_test.go' 2>/dev/null || true)
+fi
 
 if [ -n "$HITS" ]; then
   say "FAIL: studio kernel IDs present in non-test product Go:"

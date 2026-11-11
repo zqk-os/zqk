@@ -42,6 +42,9 @@ jobs:
       - name: Vet Code
         run: go vet ./...
 
+      - name: Compile Product Binary
+        run: make compile-bin
+
       - name: Run ZQK Verification Engine (zqk-vet)
         run: make vet
 

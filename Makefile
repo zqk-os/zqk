@@ -142,7 +142,7 @@ lint: bin/zqk-vet
 	sh scripts/scan-secrets.sh .
 	./bin/zqk-vet --suite hygiene
 
-vet: bin/zqk-vet
+vet: compile-bin bin/zqk-vet
 	sh scripts/scan-secrets.sh .
 	./bin/zqk-vet --suite all
 

@@ -57,7 +57,7 @@ unset ZQK_ENABLE_STUDIO_PACK_TOOLS ZQK_STUDIO_DOGFOOD || true
 # Required stranger seats (embedded fallback + on-disk templates).
 need_ids=(PER-DEFAULT-OPERATOR PER-DEFAULT-AGENT ASK-DEFAULT-FEED-CORRESPONDENCE)
 for need in "${need_ids[@]}"; do
-  if ! rg -q --glob '*.yaml' --glob '*.yml' -F "id: $need" "$PERSONAS_DIR" "$SKILLS_DIR"; then
+  if ! grep -rqF --include='*.yaml' --include='*.yml' "id: $need" "$PERSONAS_DIR" "$SKILLS_DIR"; then
     echo "FAIL: required seating id missing from default templates: $need" >&2
     exit 1
   fi
@@ -65,8 +65,8 @@ done
 echo "OK: required PER-DEFAULT / ASK-DEFAULT seating ids present"
 
 # Fail-closed: every template id must be community/kernel-generic prefix.
-bad_ids=$(rg -N --glob '*.yaml' --glob '*.yml' -o '^id:[[:space:]]*\S+' "$PERSONAS_DIR" "$SKILLS_DIR" \
-  | sed -E 's/^.*id:[[:space:]]*//' \
+bad_ids=$(grep -rhoE --include='*.yaml' --include='*.yml' '^id:[[:space:]]*[^[:space:]]+' "$PERSONAS_DIR" "$SKILLS_DIR" \
+  | sed -E 's/^id:[[:space:]]*//' \
   | while read -r id; do
       [[ -z "$id" ]] && continue
       if ! [[ "$id" =~ $ALLOW_ID_REGEX ]]; then
@@ -80,11 +80,11 @@ if [[ -n "$bad_ids" ]]; then
 fi
 echo "OK: seating template ids match community/kernel-generic allowlist"
 
-# Content scan for pack ontology markers (ripgrep -e = regexp; -E is encoding).
+# Content scan for pack ontology markers.
 scan_tmp=$(mktemp)
 trap 'rm -f "$scan_tmp"' EXIT
 set +e
-rg -n -i -e "$PACK_DENY_REGEX" "$PERSONAS_DIR" "$SKILLS_DIR" >"$scan_tmp" 2>&1
+grep -r -n -i -E --include='*.yaml' --include='*.yml' "$PACK_DENY_REGEX" "$PERSONAS_DIR" "$SKILLS_DIR" >"$scan_tmp" 2>&1
 scan_rc=$?
 set -e
 if [[ $scan_rc -gt 1 ]]; then
@@ -128,7 +128,7 @@ fi
 # bootstrap archive listing (tpm_orchestration scrubbed; community skill may
 # remain on disk outside the archive).
 if [[ -f "$ROOT/pkg/bootstrap/archive/manifest.txt" ]]; then
-  if rg -q -F 'tpm_orchestration' "$ROOT/pkg/bootstrap/archive/manifest.txt"; then
+  if grep -q -F 'tpm_orchestration' "$ROOT/pkg/bootstrap/archive/manifest.txt"; then
     echo "FAIL: bootstrap manifest still lists tpm_orchestration (pack/operator seed leak)" >&2
     exit 1
   fi

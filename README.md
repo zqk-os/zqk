@@ -9,26 +9,11 @@
 
 ZQK gives AI coding agents (Cursor Composer, Claude Code, Cline, Windsurf) persistent memory, verifiable task truth, and AST-guarded execution. Stop context drift, hallucinated tasks, and token blowouts.
 
-Canonical portal: [Community First-Run Guide](docs/onboarding/COMMUNITY_FIRST_RUN.md) · Documentation: [docs.zqk.dev](https://docs.zqk.dev) · [60-second capability demo](docs/demos/SIXTY_SECOND_CAPABILITY.md)
+Portal: [Community First-Run](docs/onboarding/COMMUNITY_FIRST_RUN.md) · Docs: [docs.zqk.dev](https://docs.zqk.dev) · [60s demo](docs/demos/SIXTY_SECOND_CAPABILITY.md)
 
 ---
 
-## Apache / Enterprise delineation ACK
-
-**Human-visible license boundary (procurement / sentiment):**
-
-| Surface | License | Scope |
-| :--- | :--- | :--- |
-| **Community / open-core kernel** (this repository) | **[Apache License 2.0](LICENSE)** — see `NOTICE` | Single autonomous cell: CLI, local CAS/graph, MCP, scheduler, fail-closed gates |
-| **Enterprise** | **Separately licensed** (commercial; not Apache) | Multi-node fleet mesh, enterprise RBAC / IdP, cross-cell compliance & sealed fleet audit |
-
-- Evaluating or redistributing the community tree under Apache 2.0 does **not** grant Enterprise modules.
-- The [Open-Core Boundary](#open-core-boundary-single-cell-vs-organism-mesh) table below is the product split; this ACK is the licensing split.
-- Buyer proof in ~60s: [docs/demos/SIXTY_SECOND_CAPABILITY.md](docs/demos/SIXTY_SECOND_CAPABILITY.md). Launch narrative: [docs/demos/SHOW_HN.md](docs/demos/SHOW_HN.md).
-
----
-
-## Quick Start (< 2 min)
+## Quickstart (< 2 min)
 
 Coherent with [Community First-Run](docs/onboarding/COMMUNITY_FIRST_RUN.md) (install → `zqk init` → `whats-next`; optional `zqk test-drive` for the interactive 60s tour).
 
@@ -53,6 +38,21 @@ Or install via Homebrew:
 ```sh
 brew tap zqk-os/tap && brew install zqk
 ```
+
+---
+
+## Apache / Enterprise delineation ACK
+
+**Human-visible license boundary (procurement / sentiment):**
+
+| Surface | License | Scope |
+| :--- | :--- | :--- |
+| **Community / open-core kernel** (this repository) | **[Apache License 2.0](LICENSE)** — see `NOTICE` | Single autonomous cell: CLI, local CAS/graph, MCP, scheduler, fail-closed gates |
+| **Enterprise** | **Separately licensed** (commercial; not Apache) | Multi-node fleet mesh, enterprise RBAC / IdP, cross-cell compliance & sealed fleet audit |
+
+- Evaluating or redistributing the community tree under Apache 2.0 does **not** grant Enterprise modules.
+- The [Open-Core Boundary](#open-core-boundary-single-cell-vs-organism-mesh) table below is the product split; this ACK is the licensing split.
+- Buyer proof in ~60s: [docs/demos/SIXTY_SECOND_CAPABILITY.md](docs/demos/SIXTY_SECOND_CAPABILITY.md). Launch narrative: [docs/demos/SHOW_HN.md](docs/demos/SHOW_HN.md).
 
 ### 1-Click Instant Cloud Sandbox (GitHub Codespaces)
 

@@ -51,7 +51,7 @@ Launch a zero-touch development environment in under 60 seconds with zero local 
    ./bin/zqk do        # Run autonomous swarm loop
    ```
 
-## Quick Start (< 2 min)
+## Quickstart (2–3 Commands)
 
 ```bash
 # After install (no GITHUB_TOKEN):
