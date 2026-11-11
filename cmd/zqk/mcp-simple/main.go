@@ -123,7 +123,6 @@ func registerMinimalTools(server *mcp.Server) {
 	registerGraphTraversalTool(server)
 	registerObjectListTool(server)
 	// Pack ontology getter — opt-in only (stranger/community default excludes).
-	// TRACK: BLI-1794357633624642000-de0d8426
 	if mcp.IsStudioPackToolsEnabled(nil) {
 		registerPriorityPlanTool(server)
 	}

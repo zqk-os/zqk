@@ -52,7 +52,6 @@ const (
 // Admin/system security context must NOT auto-enable pack tools — list-tools and
 // serve commonly use NewSystemSecurityContext (admin), which previously leaked
 // studio ontology getters onto the stranger/community MCP surface.
-// TRACK: BLI-1794357633624642000-de0d8426 — remove when: community tools/list smoke stays green on CI.
 func IsStudioPackToolsEnabled(secCtx *pkgctx.SecurityContext) bool {
 	_ = secCtx // retained for API stability; role no longer gates pack tools
 	return zqkenv.EnableStudioPackTools().Get() == "1" || zqkenv.StudioDogfood().Get() == "1"
