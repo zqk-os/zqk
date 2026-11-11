@@ -43,9 +43,22 @@ echo ""
 # ---------------------------------------------------------------------------
 echo -e "${BOLD}${YELLOW}── Step 1: Install Binary (${VERSION}) ──${RESET}"
 
+# Prefer an explicit binary, then a tree-local bin that already speaks `init`
+# (community/PC), then dist-community archives, then installer. Local
+# install.sh can build a studio stub that lacks top-level `init` — fail closed
+# after selection rather than treating a missing membrane as success.
+bin_supports_init() {
+  local cand="$1"
+  [ -x "$cand" ] || return 1
+  "$cand" init --help >/dev/null 2>&1 || "$cand" system init --help >/dev/null 2>&1
+}
+
 if [ -n "${ZQK_BIN:-}" ] && [ -x "$ZQK_BIN" ]; then
   echo -e "  Using provided binary: ${ZQK_BIN}"
   cp "$ZQK_BIN" "${BIN_DIR}/zqk"
+elif bin_supports_init "${REPO_ROOT}/bin/zqk"; then
+  echo -e "  Using tree-local binary with init: ${REPO_ROOT}/bin/zqk"
+  cp "${REPO_ROOT}/bin/zqk" "${BIN_DIR}/zqk"
 elif [ -f "${REPO_ROOT}/dist-community/zqk_${VERSION#v}_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/').tar.gz" ]; then
   echo -e "  Unpacking from local dist-community release archive..."
   ARCHIVE="${REPO_ROOT}/dist-community/zqk_${VERSION#v}_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/').tar.gz"
@@ -67,6 +80,11 @@ if ! command -v "$TEST_ZQK" >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! bin_supports_init "$TEST_ZQK"; then
+  echo -e "❌ Selected binary lacks \`zqk init\` / \`zqk system init\` (not stranger-ready). Set ZQK_BIN to a community binary." >&2
+  exit 1
+fi
+
 echo -e "${GREEN}✓ Binary ready:${RESET} $($TEST_ZQK version 2>/dev/null || echo 'installed')"
 echo ""
 
@@ -77,7 +95,11 @@ echo -e "${BOLD}${YELLOW}── Step 2: Seed Sovereign Cell (zqk init) ──${R
 (
   cd "$PROJECT_DIR"
   echo "  Running 'zqk init' in fresh directory: ${PROJECT_DIR}"
-  "$TEST_ZQK" init
+  if "$TEST_ZQK" init --help >/dev/null 2>&1; then
+    "$TEST_ZQK" init
+  else
+    "$TEST_ZQK" system init
+  fi
 )
 
 if [ -d "${PROJECT_DIR}/.zqk" ]; then
