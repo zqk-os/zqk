@@ -294,4 +294,5 @@ doc_scrutiny:
     - "docs/archive/*"
     - "docs/specs/*"
     - "docs/reports/*"
+    - "docs/guides/README.md"
 

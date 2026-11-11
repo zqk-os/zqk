@@ -73,11 +73,12 @@ func CheckDocumentationQuality(root string, cfg *GatesConfig) ([]Finding, error)
 		exemptions = cfg.DocScrutiny.Exemptions
 	}
 
-	// Always exempt releases, archive, internal reports, and internal code packages from public doc scrutiny
+	// Always exempt releases, archive, internal reports, root catalog, and internal code packages from public doc scrutiny
 	defaultExemptions := []string{
 		"docs/releases/*",
 		"docs/archive/*",
 		"docs/reports/*",
+		"docs/guides/README.md",
 		".zqk/process/*",
 		"pkg/*",
 		"cmd/*",
