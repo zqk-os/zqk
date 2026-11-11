@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Vocabulary Pack, Ontology Dictionary & Domain Terminology Subsystem** ([`pkg/vocabularypack`](file:///Users/lanceettl/zqk-public-candidate/pkg/vocabularypack/pack.go), [`packs/vocabulary`](file:///Users/lanceettl/zqk-public-candidate/packs/vocabulary)) provides the foundational domain modeling, operational glossary definitions, multi-scheme taxonomy structures, and schema import tracking within the unified **ZQK Knowledge Kernel**.
+The **Vocabulary Pack, Ontology Dictionary & Domain Terminology Subsystem** ([`pkg/vocabularypack`](../../pkg/vocabularypack/pack.go), [`packs/vocabulary`](../../packs/vocabulary)) provides the foundational domain modeling, operational glossary definitions, multi-scheme taxonomy structures, and schema import tracking within the unified **ZQK Knowledge Kernel**.
 
 In modern distributed software engineering and autonomous AI agent orchestration, lexical ambiguity and semantic drift represent significant failure vectors. When autonomous agents, tools, and human engineers use conflicting definitions for system concepts, coordination breaks down. The Vocabulary Pack establishes a persistent, versioned, and verifiable ontological dictionary that replaces transient conversational context with deterministic knowledge graph entities:
 
@@ -277,7 +277,7 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -coverprofile=coverage.out ./pkg/vocab
 go tool cover -func=coverage.out
 ```
 
-All test cases are implemented in [`pack_coverage_elevation_cycle239_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/vocabularypack/pack_coverage_elevation_cycle239_test.go), licensed under Apache-2.0, with complete assertions covering positive execution, negative error pathways, and concurrent multi-goroutine safety.
+All test cases are implemented in [`pack_coverage_elevation_cycle239_test.go`](../../pkg/vocabularypack/pack_kind_verify_test.go), licensed under Apache-2.0, with complete assertions covering positive execution, negative error pathways, and concurrent multi-goroutine safety.
 
 ---
 

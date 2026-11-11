@@ -320,7 +320,7 @@ flowchart TD
 
 In accordance with Knowledge Kernel engineering standards, `pkg/llm` maintains strict continuous verification with statement coverage exceeding the **>= 85.0%** threshold across all unit, boundary, and mock test suites:
 
-- **Verification Test Case**: [`TST-1793443095322094000-02b69dac`](file:///Users/lanceettl/zqk-public-candidate/pkg/llm/llm_coverage_elevation_cycle308_test.go)
+- **Verification Test Case**: [`TST-1793443095322094000-02b69dac`](../../pkg/llm/llm_client_config_test.go)
 - **Statement Coverage**: Verified at **>= 94.7%** across `pkg/llm`.
 - **Race Safety**: Verified via `go test -race -cover ./pkg/llm/...`.
 - **Payload Purity**: 100% clean of raw nanosecond kernel entity IDs.

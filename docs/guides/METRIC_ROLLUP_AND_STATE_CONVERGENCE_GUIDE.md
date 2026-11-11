@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Metric Rollup, Hierarchical Aggregation & State Convergence Subsystem** ([`pkg/rollup`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/calculator.go)) provides pure, kind-agnostic progress aggregation, effort distribution statistics, and multi-tier relational graph tree resolution for the ZQK Knowledge Kernel.
+The **Metric Rollup, Hierarchical Aggregation & State Convergence Subsystem** ([`pkg/rollup`](../../pkg/rollup/calculator.go)) provides pure, kind-agnostic progress aggregation, effort distribution statistics, and multi-tier relational graph tree resolution for the ZQK Knowledge Kernel.
 
 Governed by core platform safety and telemetry policies (including `POL-DEFAULT-142277d3`), the Knowledge Kernel models complex software delivery initiatives as directed acyclic graphs (DAGs) across hierarchical planning containers:
 - **Milestones** anchor time-bounded release objectives across delivered reality.
@@ -10,8 +10,8 @@ Governed by core platform safety and telemetry policies (including `POL-DEFAULT-
 - **Backlog Items & Agent Tasks** encapsulate discrete implementation and verification efforts.
 
 To deliver real-time operational situational awareness without mutating underlying entity CAS storage records during query passes, `pkg/rollup` provides a two-phase decoupled architecture:
-1. **Relational Tree Resolution ([`FetchChildrenForParent`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/resolver.go#L13)):** Traverses hierarchical parent-child relationships generically via direct kind-indexed membership lookups and secondary reverse-dependency indexing.
-2. **Pure Mathematical Calculation ([`Calculate`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/calculator.go#L12)):** Aggregates status counts, computes completion ratios, and derives comprehensive effort distribution metrics (total, average, minimum, maximum, formatted) without side effects or allocations on the hot path.
+1. **Relational Tree Resolution ([`FetchChildrenForParent`](../../pkg/rollup/resolver.go#L13)):** Traverses hierarchical parent-child relationships generically via direct kind-indexed membership lookups and secondary reverse-dependency indexing.
+2. **Pure Mathematical Calculation ([`Calculate`](../../pkg/rollup/calculator.go#L12)):** Aggregates status counts, computes completion ratios, and derives comprehensive effort distribution metrics (total, average, minimum, maximum, formatted) without side effects or allocations on the hot path.
 
 ---
 
@@ -54,10 +54,10 @@ flowchart TD
 
 ### Component Breakdown
 
-- **Tree Resolver ([`resolver.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/resolver.go)):** Generic relational traversal engine. Resolves direct container links (such as `milestone_ref`, `milestone_refs`, `priority_plan_ref`) while falling back to reverse-dependency lookup (`storage.DependentsForID`) to identify custom child kinds dynamically.
-- **Rollup Calculator ([`calculator.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/calculator.go)):** Kind-agnostic aggregation pipeline. Computes total, completed, in-progress, halted, and open counts, as well as percentage completion across arbitrary sets of child entities.
-- **Effort Statistics Engine ([`calculator.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/calculator.go#L68)):** Parses human-readable effort strings (e.g. `2h`, `45m`, `1.5d`) via `validation.ParseEffortHours`, computes total, average, minimum, and maximum hour distributions, and renders human-legible formatted sums.
-- **Type Definitions & Serializers ([`types.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/types.go)):** Holds immutable [`EffortStats`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/types.go#L4) and [`RollupSummary`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/types.go#L14) structs, providing structured map transformation (`ToMap`) for seamless object overlays and JSON API responses.
+- **Tree Resolver ([`resolver.go`](../../pkg/rollup/resolver.go)):** Generic relational traversal engine. Resolves direct container links (such as `milestone_ref`, `milestone_refs`, `priority_plan_ref`) while falling back to reverse-dependency lookup (`storage.DependentsForID`) to identify custom child kinds dynamically.
+- **Rollup Calculator ([`calculator.go`](../../pkg/rollup/calculator.go)):** Kind-agnostic aggregation pipeline. Computes total, completed, in-progress, halted, and open counts, as well as percentage completion across arbitrary sets of child entities.
+- **Effort Statistics Engine ([`calculator.go`](../../pkg/rollup/calculator.go#L68)):** Parses human-readable effort strings (e.g. `2h`, `45m`, `1.5d`) via `validation.ParseEffortHours`, computes total, average, minimum, and maximum hour distributions, and renders human-legible formatted sums.
+- **Type Definitions & Serializers ([`types.go`](../../pkg/rollup/types.go)):** Holds immutable [`EffortStats`](../../pkg/rollup/types.go#L4) and [`RollupSummary`](../../pkg/rollup/types.go#L14) structs, providing structured map transformation (`ToMap`) for seamless object overlays and JSON API responses.
 
 ---
 
@@ -184,9 +184,9 @@ stateDiagram-v2
 
 The `pkg/rollup` calculation pipeline is designed for high-concurrency environments where multiple worker goroutines, background daemons, and CLI queries read graph states simultaneously:
 
-1. **Pure Function Architecture:** [`Calculate`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/calculator.go#L12) and [`computeEffortStats`](file:///Users/lanceettl/zqk-public-candidate/pkg/rollup/calculator.go#L68) operate exclusively on passed-in object slices without mutating caller inputs or mutating global package state.
+1. **Pure Function Architecture:** [`Calculate`](../../pkg/rollup/calculator.go#L12) and [`computeEffortStats`](../../pkg/rollup/calculator.go#L68) operate exclusively on passed-in object slices without mutating caller inputs or mutating global package state.
 2. **Immutable Snapshots:** Child object representations returned by storage providers are treated as point-in-time snapshots.
-3. **Structured Concurrency Governance:** Concurrent rollup calculations across autonomous swarms utilize [`goroutinelabels`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels) builders (`goroutinelabels.NewGoroutine`) to guarantee runtime auditability and leak prevention.
+3. **Structured Concurrency Governance:** Concurrent rollup calculations across autonomous swarms utilize [`goroutinelabels`](../../pkg/goroutinelabels) builders (`goroutinelabels.NewGoroutine`) to guarantee runtime auditability and leak prevention.
 
 ---
 

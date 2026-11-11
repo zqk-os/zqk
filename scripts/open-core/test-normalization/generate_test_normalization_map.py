@@ -236,7 +236,7 @@ def generate_markdown_report(mappings):
     md.append("")
     md.append("## Automation & Verification Tooling")
     md.append("")
-    md.append("A dedicated migration script has been authored at [`scripts/open-core/test-normalization/normalize_cycle_test_names.sh`](file:///scripts/open-core/test-normalization/normalize_cycle_test_names.sh) supporting:")
+    md.append("A dedicated migration script has been authored at [`scripts/open-core/test-normalization/normalize_cycle_test_names.sh`](../../scripts/open-core/test-normalization/normalize_cycle_test_names.sh) supporting:")
     md.append("")
     md.append("```bash")
     md.append("# 1. Perform dry-run and verify zero collisions")

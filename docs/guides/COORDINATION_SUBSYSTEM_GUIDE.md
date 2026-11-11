@@ -44,7 +44,7 @@ flowchart TD
 
 ## 2. Component Topology & Interface Contracts
 
-The coordination subsystem is structured around modular abstractions in [`coordinator.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/coordinator.go):
+The coordination subsystem is structured around modular abstractions in [`coordinator.go`](../../pkg/coordination/coordinator.go):
 
 ### 2.1 The EventCoordinator Interface
 
@@ -65,7 +65,7 @@ type EventCoordinator interface {
 
 ### 2.2 Operational Event Subscribers
 
-Subscribers implement [`OperationalEventSubscriber`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/subscriber.go) to receive filtered or broadcast process coordination signals:
+Subscribers implement [`OperationalEventSubscriber`](../../pkg/coordination/subscriber.go) to receive filtered or broadcast process coordination signals:
 
 ```go
 type OperationalEventSubscriber interface {
@@ -90,7 +90,7 @@ To achieve ultra-low read latency on the hot emit path, the `Coordinator` employ
 
 ### 3.1 EventContext Envelope
 
-Events flow through the coordinator wrapped in an [`EventContext`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/event_context.go) descriptor:
+Events flow through the coordinator wrapped in an [`EventContext`](../../pkg/coordination/event_context.go) descriptor:
 
 | Field | Type | Description |
 | :--- | :--- | :--- |
@@ -164,7 +164,7 @@ flowchart LR
 
 ### 4.1 ProgressHelper
 
-[`ProgressHelper`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/progress_helper.go) streamlines multi-step task reporting:
+[`ProgressHelper`](../../pkg/coordination/progress_helper.go) streamlines multi-step task reporting:
 - `EmitProgress(ctx, progress, total, message, fields, emitAudit)`: Emits progress with automated percentage calculations.
 - `EmitProgressSummary(ctx, summary, progress, total, message, fields)`: Checkpoint updates for milestones.
 - `EmitStatusChange(ctx, oldStatus, newStatus, message, fields)`: Status transitions with built-in deduplication against redundant duplicate emissions.
@@ -172,11 +172,11 @@ flowchart LR
 
 ### 4.2 CoordinatorOperationCallback
 
-[`CoordinatorOperationCallback`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/operation_callback.go) maps concurrency hooks (`OnStart`, `OnProgress`, `OnComplete`, `OnError`, `OnCancel`) directly into structured audit, log, and operational events.
+[`CoordinatorOperationCallback`](../../pkg/coordination/operation_callback.go) maps concurrency hooks (`OnStart`, `OnProgress`, `OnComplete`, `OnError`, `OnCancel`) directly into structured audit, log, and operational events.
 
 ### 4.3 CLI Notifier Adapter
 
-[`CLINotifierAdapter`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/cli_notifier_adapter.go) and [`NewCLINotifierWithCoordinator`](file:///Users/lanceettl/zqk-public-candidate/pkg/coordination/cli_notifier_helper.go) construct fully-wired, coordinator-backed notifiers for terminal and CLI command execution, falling back cleanly to `storage.NoopOperationNotifier` when prerequisites are absent.
+[`CLINotifierAdapter`](../../pkg/coordination/cli_notifier_adapter.go) and [`NewCLINotifierWithCoordinator`](../../pkg/coordination/cli_notifier_helper.go) construct fully-wired, coordinator-backed notifiers for terminal and CLI command execution, falling back cleanly to `storage.NoopOperationNotifier` when prerequisites are absent.
 
 ---
 
@@ -199,7 +199,7 @@ Before dispatching an event, `findRelevantSubscribers` checks `subscriber.IsActi
 ### 6.1 Lock Hierarchies & Atomic Guarantees
 
 1. **State Immutability**: The internal `coordinatorState` struct is never mutated in place. State mutations generate a new state instance swapped atomically via `c.state.Store(newState)`.
-2. **Goroutine Bounding & Labeling**: Every background goroutine launched by the coordinator is tagged with [`goroutinelabels`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels) for tracing in diagnostics logs:
+2. **Goroutine Bounding & Labeling**: Every background goroutine launched by the coordinator is tagged with [`goroutinelabels`](../../pkg/goroutinelabels) for tracing in diagnostics logs:
    ```go
    goroutinelabels.NewGoroutine("coordinator_logging_router", "...").StartSimple(fn)
    ```

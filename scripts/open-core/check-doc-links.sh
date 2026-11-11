@@ -26,27 +26,11 @@ for file in $MD_FILES; do
             continue
         fi
 
-        # Handle file:// URLs
-        if [[ "$link" == file://* ]]; then
-            raw_file="${link#file://}"
-            raw_path="${raw_file%%#*}"
-            if [ -e "$raw_path" ] || [ -d "$raw_path" ]; then
-                continue
-            fi
-            # Check if relative to repo root (e.g. file:///.zqk/..., file:///cmd/..., file:///pkg/...)
-            repo_rel="${raw_path#/}"
-            if [ -e "./$repo_rel" ] || [ -d "./$repo_rel" ]; then
-                continue
-            fi
-            # Check if relative to workspace
-            ws_sub=$(echo "$raw_path" | sed -E 's@^.*(zqk-public-candidate|zqke-pack-composition|zqk)/@@')
-            if [ -e "./$ws_sub" ] || [ -d "./$ws_sub" ]; then
-                continue
-            fi
-            # If pointing to internal/temporary machine paths or assets
-            if [[ "$raw_path" == /Users/* ]] || [[ "$raw_path" == /var/* ]] || [[ "$raw_path" == /tmp/* ]]; then
-                continue
-            fi
+        # Fail-closed check: forbid file:// schemes and local workstation paths
+        if [[ "$link" == file://* ]] || [[ "$link" == /Users/* ]] || [[ "$link" == /home/* ]] || [[ "$link" == /private/var/* ]]; then
+            echo "Illegitimate workstation path or file:// URI found in $file: '$link'"
+            BROKEN_LINKS=1
+            continue
         fi
 
         file_path="${link%%#*}"

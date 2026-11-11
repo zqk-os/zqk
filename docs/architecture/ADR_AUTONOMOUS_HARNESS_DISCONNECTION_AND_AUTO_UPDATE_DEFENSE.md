@@ -32,7 +32,7 @@ Simultaneously, forensic inspection of the CLI binary and updater subsystem reve
   {"success":true,"message":"Update successful, restart CLI to use"}
   ```
   *(Written at 12:17:06)*
-- `/Users/lanceettl/.local/bin/agy`:
+- `~/.local/bin/agy`:
   Modified at `Nov 4 12:17:06`, replacing the binary with version `1.4.12`.
 - `~/.gemini/antigravity-cli/log/cli-20261104_121706.log`:
   ```
@@ -42,7 +42,7 @@ Simultaneously, forensic inspection of the CLI binary and updater subsystem reve
 
 ### 3. Mechanism of the Disconnection Footgun
 1. **Background Polling:** The Antigravity CLI's built-in `auto_updater.go` periodically polls `https://antigravity-cli-auto-updater-974169037036.us-central1.run.app` every 15 minutes.
-2. **Uncoordinated Binary Replacement:** When a new release (`v1.4.12`) is published upstream, `auto_updater.go` automatically streams down the new executable and writes it to `/Users/lanceettl/.local/bin/agy`.
+2. **Uncoordinated Binary Replacement:** When a new release (`v1.4.12`) is published upstream, `auto_updater.go` automatically streams down the new executable and writes it to `~/.local/bin/agy`.
 3. **Process Abort:** Either the updater process or the parent IDE supervisor detects the updated binary and issues `SIGTERM` to the active CLI process to reload it.
 4. **Cascading Drop of In-Flight Execution:** Because the language server process terminates immediately:
    - The active tool turn is aborted (`Tool execution was canceled`).
@@ -51,7 +51,7 @@ Simultaneously, forensic inspection of the CLI binary and updater subsystem reve
    - Any uncommitted in-memory states or locks are dropped.
 
 ### 4. Coincident Mesh LaunchAgent Activity
-At `12:16:36 - 12:16:40`, macOS `backgroundtaskmanagementd` also performed a scan of `/Users/lanceettl/Library/LaunchAgents/`, which coincidentally signaled several seat-worker daemons (`cursor-composer`, `peer-agent-2`, `peer-agent-1`) with `Terminated: 15` as part of ongoing mesh seat synchronization.
+At `12:16:36 - 12:16:40`, macOS `backgroundtaskmanagementd` also performed a scan of `~/Library/LaunchAgents/`, which coincidentally signaled several seat-worker daemons (`cursor-composer`, `peer-agent-2`, `peer-agent-1`) with `Terminated: 15` as part of ongoing mesh seat synchronization.
 
 ---
 

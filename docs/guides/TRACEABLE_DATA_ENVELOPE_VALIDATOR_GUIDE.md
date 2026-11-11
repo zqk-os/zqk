@@ -2,17 +2,17 @@
 
 ## 1. Executive Architectural Summary
 
-The **Traceable Data Envelope Validator Subsystem** ([`pkg/tdval`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval)) establishes a deterministic, fail-closed validation membrane for structured data envelopes across autonomous agents, background workers, and distributed kernel nodes in the **ZQK Knowledge Kernel**.
+The **Traceable Data Envelope Validator Subsystem** ([`pkg/tdval`](../../pkg/tdval)) establishes a deterministic, fail-closed validation membrane for structured data envelopes across autonomous agents, background workers, and distributed kernel nodes in the **ZQK Knowledge Kernel**.
 
 In autonomous development workflows, state transitions, telemetry records, and cross-agent messages are encapsulated into **Traceable Data Envelopes (TDE)**. To prevent invalid payloads, missing parent linkages, corrupted schemas, or forged skill seals from compromising graph consistency, the validator enforces strict structural integrity, field taxonomy rules, and cryptographic skill seal boundaries before any envelope reaches downstream persistence or execution.
 
-Governed by core platform safety policy **POL-DEFAULT-b17f54c251eb3c4d** and continuous verification mandate **POL-DEFAULT-f746cccc03ce5694**, [`pkg/tdval`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval) guarantees:
+Governed by core platform safety policy **POL-DEFAULT-b17f54c251eb3c4d** and continuous verification mandate **POL-DEFAULT-f746cccc03ce5694**, [`pkg/tdval`](../../pkg/tdval) guarantees:
 
 - **Fail-Closed Envelope Ingestion:** Rejecting nil envelopes and empty mandatory attributes (`id`, `kind`, `parent_id`) with actionable error codes.
 - **Configurable Skill Seal Enforcement:** Optional or mandatory validation of cryptographic `SkillSeal` tokens ensuring tamper-evident provenance (minimum 8-character token invariant).
-- **Structured Error Taxonomy:** Type-safe [`ValidationError`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L9-L17) records with explicit field targeting, human-readable error messages, and machine-readable integer codes.
-- **Separation of Fatal Errors and Non-Fatal Warnings:** Clear operational boundary in [`TDEResult`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L36-L40), allowing diagnostic hints and non-breaking warnings without aborting valid envelope flows.
-- **Concurrency & Thread-Safety:** Fully re-entrant validator instances capable of high-throughput concurrent evaluation across multi-goroutine agent pools labeled via [`goroutinelabels.NewGoroutine`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels).
+- **Structured Error Taxonomy:** Type-safe [`ValidationError`](../../pkg/tdval/validator.go#L9-L17) records with explicit field targeting, human-readable error messages, and machine-readable integer codes.
+- **Separation of Fatal Errors and Non-Fatal Warnings:** Clear operational boundary in [`TDEResult`](../../pkg/tdval/validator.go#L36-L40), allowing diagnostic hints and non-breaking warnings without aborting valid envelope flows.
+- **Concurrency & Thread-Safety:** Fully re-entrant validator instances capable of high-throughput concurrent evaluation across multi-goroutine agent pools labeled via [`goroutinelabels.NewGoroutine`](../../pkg/goroutinelabels).
 - **Static Floor Invariant:** A strict statement test coverage floor ($\ge 85.0\%$, verified at $100.0\%$).
 
 ---
@@ -57,12 +57,12 @@ flowchart TD
 
 | Component | Definition | Primary Responsibilities |
 | :--- | :--- | :--- |
-| **Envelope** | [`Envelope`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L20-L33) | Canonical data structure holding standard envelope metadata: `ID`, `Kind`, `Category`, `Status`, `Priority`, timestamps, creator/updater attribution, `Title`, `ParentID`, and optional `SkillSeal`. |
-| **TDEValidator** | [`TDEValidator`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L62-L75) | Configurable validation engine with fluent builder pattern (`WithEnforceSeal`). Evaluates envelopes against schema contracts and operational integrity invariants. |
-| **SchemaChecker** | Structural Logic in [`Validate`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L78-L103) | Enforces non-nil receiver semantics, non-empty `ID`, non-empty `Kind`, and non-empty `ParentID` relational linkage. |
-| **SealVerifier** | Cryptographic Logic in [`Validate`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L96-L100) | Enforces tamper-evident skill seal policies when seal enforcement is activated (`len(SkillSeal) >= 8`). |
-| **TDEResult** | [`TDEResult`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L36-L60) | Accumulator capturing validation outcome, total count of validated units, list of fatal validation errors, and non-fatal warnings. |
-| **ValidationError** | [`ValidationError`](file:///Users/lanceettl/zqk-public-candidate/pkg/tdval/validator.go#L9-L17) | Implements the standard Go `error` interface, supporting structured reflection, serialization, and error wrapping. |
+| **Envelope** | [`Envelope`](../../pkg/tdval/validator.go#L20-L33) | Canonical data structure holding standard envelope metadata: `ID`, `Kind`, `Category`, `Status`, `Priority`, timestamps, creator/updater attribution, `Title`, `ParentID`, and optional `SkillSeal`. |
+| **TDEValidator** | [`TDEValidator`](../../pkg/tdval/validator.go#L62-L75) | Configurable validation engine with fluent builder pattern (`WithEnforceSeal`). Evaluates envelopes against schema contracts and operational integrity invariants. |
+| **SchemaChecker** | Structural Logic in [`Validate`](../../pkg/tdval/validator.go#L78-L103) | Enforces non-nil receiver semantics, non-empty `ID`, non-empty `Kind`, and non-empty `ParentID` relational linkage. |
+| **SealVerifier** | Cryptographic Logic in [`Validate`](../../pkg/tdval/validator.go#L96-L100) | Enforces tamper-evident skill seal policies when seal enforcement is activated (`len(SkillSeal) >= 8`). |
+| **TDEResult** | [`TDEResult`](../../pkg/tdval/validator.go#L36-L60) | Accumulator capturing validation outcome, total count of validated units, list of fatal validation errors, and non-fatal warnings. |
+| **ValidationError** | [`ValidationError`](../../pkg/tdval/validator.go#L9-L17) | Implements the standard Go `error` interface, supporting structured reflection, serialization, and error wrapping. |
 
 ---
 
@@ -187,7 +187,7 @@ The `TDEValidator` struct is stateless with respect to incoming envelopes. The o
 
 - **Re-entrant Design:** Multiple goroutines can invoke `Validate(env)` concurrently on the same validator instance without mutex contention or memory races.
 - **Zero Shared Mutable State:** Each validation invocation allocates an independent `TDEResult` pointer that is returned exclusively to the caller.
-- **Labeled Concurrency Compliance:** High-throughput stress suites and concurrent workers utilize [`goroutinelabels.NewGoroutine`](file:///Users/lanceettl/zqk-public-candidate/pkg/goroutinelabels) for watchdog-supervised thread execution:
+- **Labeled Concurrency Compliance:** High-throughput stress suites and concurrent workers utilize [`goroutinelabels.NewGoroutine`](../../pkg/goroutinelabels) for watchdog-supervised thread execution:
 
 ```go
 builder := goroutinelabels.NewGoroutine(

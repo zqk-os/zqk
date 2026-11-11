@@ -2,15 +2,15 @@
 
 ## 1. Executive Architectural Summary
 
-The **Workstream Observability Subsystem** ([`pkg/wsobs`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go)) provides point-in-time metric snapshots, tagged telemetry sets, and deterministic heuristic validation rules for packages, pipelines, and autonomous execution environments within the **ZQK Knowledge Kernel**.
+The **Workstream Observability Subsystem** ([`pkg/wsobs`](../../pkg/wsobs/metrics.go)) provides point-in-time metric snapshots, tagged telemetry sets, and deterministic heuristic validation rules for packages, pipelines, and autonomous execution environments within the **ZQK Knowledge Kernel**.
 
 In modern multi-agent systems and large-scale autonomous pipelines, continuous execution generates diverse operational signals: package build times, goroutine counts, memory footprints, test pass counts, and static analysis findings. Without structured snapshot isolation and bounded rule evaluation, these metrics risk silent divergence, performance regressions, and uncontrolled workspace bloat.
 
 The `pkg/wsobs` package resolves these challenges through:
-1. **Tagged Metric Snapshotting ([`MetricSet`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L14-L18)):** Captures immutable collections of typed or untyped telemetry values associated with arbitrary dimensional tag slices (such as environment, subsystem tier, or package category).
-2. **Deterministic Heuristic Bounds Checking ([`Heuristic`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L88-L95)):** Evaluates metrics against dynamic min/max thresholds, supporting numeric type coercion across 8 Go primitive types (`int`, `int32`, `int64`, `float64`, `float32`, `uint`, `uint32`, `uint64`).
+1. **Tagged Metric Snapshotting ([`MetricSet`](../../pkg/wsobs/metrics.go#L14-L18)):** Captures immutable collections of typed or untyped telemetry values associated with arbitrary dimensional tag slices (such as environment, subsystem tier, or package category).
+2. **Deterministic Heuristic Bounds Checking ([`Heuristic`](../../pkg/wsobs/metrics.go#L88-L95)):** Evaluates metrics against dynamic min/max thresholds, supporting numeric type coercion across 8 Go primitive types (`int`, `int32`, `int64`, `float64`, `float32`, `uint`, `uint32`, `uint64`).
 3. **Dual Failure Discipline (Fail-Closed vs. Advisory):** Employs configurable `HardFail` toggles, allowing developers and autonomous agents to distinguish between fatal pipeline blockers (`HardFail: true`) and advisory warning notifications (`HardFail: false`).
-4. **Structured Error Diagnostics ([`HeuristicViolation`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L74-L85) & [`MetricError`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L45-L52)):** Emits detailed violation envelopes detailing the failing rule, the exact field name, attempted value, and violated boundaries.
+4. **Structured Error Diagnostics ([`HeuristicViolation`](../../pkg/wsobs/metrics.go#L74-L85) & [`MetricError`](../../pkg/wsobs/metrics.go#L45-L52)):** Emits detailed violation envelopes detailing the failing rule, the exact field name, attempted value, and violated boundaries.
 5. **Zero External Dependency Footprint:** Operates purely within standard Go library primitives, ensuring hermetic performance and zero overhead in constrained execution contexts.
 
 ---
@@ -63,7 +63,7 @@ type MetricSet struct {
 }
 ```
 
-Key invariant: The [`Add`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L30-L42) method enforces idempotency. If a metric key already exists in the set, `Add` returns `false` without overwriting the previous value. If the underlying `Metrics` map is uninitialized (`nil`), `Add` safely initializes the map before insertion.
+Key invariant: The [`Add`](../../pkg/wsobs/metrics.go#L30-L42) method enforces idempotency. If a metric key already exists in the set, `Add` returns `false` without overwriting the previous value. If the underlying `Metrics` map is uninitialized (`nil`), `Add` safely initializes the map before insertion.
 
 #### `Heuristic`
 Defines operational boundaries and severity rules evaluated against a `MetricSet`:
@@ -99,7 +99,7 @@ type MetricSetResult struct {
 }
 ```
 
-The [`Valid()`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L61-L63) method returns `true` if and only if `len(Errors) == 0`.
+The [`Valid()`](../../pkg/wsobs/metrics.go#L61-L63) method returns `true` if and only if `len(Errors) == 0`.
 
 ---
 
@@ -152,7 +152,7 @@ sequenceDiagram
 
 ### Type Coercion Matrix
 
-During [`Heuristic.Validate`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L97-L172), incoming values stored as `interface{}` are normalized to `float64` for uniform relational comparison:
+During [`Heuristic.Validate`](../../pkg/wsobs/metrics.go#L97-L172), incoming values stored as `interface{}` are normalized to `float64` for uniform relational comparison:
 
 | Go Concrete Type | Normalized Representation | Boundary Enforcement Behavior |
 | :--- | :--- | :--- |
@@ -202,9 +202,9 @@ flowchart LR
 
 Observability snapshots in `pkg/wsobs` are designed with immutability and concurrency principles:
 
-1. **Instance Isolation:** Each [`NewMetricSet`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L21-L27) instantiates a completely self-contained struct with its own dedicated hash map. Distinct goroutines managing independent packages or execution phases can populate their respective sets without mutual interference.
-2. **Concurrent Evaluation Safety:** Multiple heuristics can concurrently inspect and validate the same populated `MetricSet`. Because [`Heuristic.Validate`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L97-L172) performs read-only lookups on the metrics map, concurrent validation passes do not suffer data races once metric insertion is finalized.
-3. **Serialization Integrity:** Both [`MetricSet`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L14-L18) and [`MetricItem`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L8-L11) declare standard JSON struct tags (`json:"..."`). Metric sets can be serialized to JSON and persisted to disk, dispatched via HTTP telemetry endpoints, or embedded inside audit logs without schema translation.
+1. **Instance Isolation:** Each [`NewMetricSet`](../../pkg/wsobs/metrics.go#L21-L27) instantiates a completely self-contained struct with its own dedicated hash map. Distinct goroutines managing independent packages or execution phases can populate their respective sets without mutual interference.
+2. **Concurrent Evaluation Safety:** Multiple heuristics can concurrently inspect and validate the same populated `MetricSet`. Because [`Heuristic.Validate`](../../pkg/wsobs/metrics.go#L97-L172) performs read-only lookups on the metrics map, concurrent validation passes do not suffer data races once metric insertion is finalized.
+3. **Serialization Integrity:** Both [`MetricSet`](../../pkg/wsobs/metrics.go#L14-L18) and [`MetricItem`](../../pkg/wsobs/metrics.go#L8-L11) declare standard JSON struct tags (`json:"..."`). Metric sets can be serialized to JSON and persisted to disk, dispatched via HTTP telemetry endpoints, or embedded inside audit logs without schema translation.
 
 ---
 
@@ -238,7 +238,7 @@ flowchart TD
 ### Operational Interaction Points
 
 - **Pipeline Preflight & Postflight Gates:** In autonomous execution pipelines, agents take metric snapshots before and after code generation or refactoring passes. Violations in resource usage or package thresholds halt the pipeline before changes can be promoted.
-- **System Check & Telemetry Dispatch:** Workspace heuristics defined via [`NewWorkspaceHeuristics`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L188-L193) integrate into the system check subsystem (`pkg/systemcheck`), verifying that package counts and failure tolerances align with workspace policies.
+- **System Check & Telemetry Dispatch:** Workspace heuristics defined via [`NewWorkspaceHeuristics`](../../pkg/wsobs/metrics.go#L188-L193) integrate into the system check subsystem (`pkg/systemcheck`), verifying that package counts and failure tolerances align with workspace policies.
 - **TPM Situational Awareness:** Metric rollups and snapshot evaluations supply the technical program management layer with quantitative data regarding system stability and test health.
 
 ---
@@ -350,24 +350,24 @@ func runPackageAudit(packageList []string) {
 
 | Symbol | Kind | Location | Primary Purpose |
 | :--- | :--- | :--- | :--- |
-| [`MetricItem`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L8-L11) | Struct | `metrics.go:8` | Represents an untyped metric value paired with string tags. |
-| [`MetricSet`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L14-L18) | Struct | `metrics.go:14` | Named container holding a map of observed `MetricItem` instances. |
-| [`NewMetricSet`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L21-L27) | Function | `metrics.go:21` | Constructs a `MetricSet` with an initialized map. |
-| [`MetricSet.Add`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L30-L42) | Method | `metrics.go:30` | Idempotently inserts a key-value pair; initializes map if nil. |
-| [`MetricError`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L45-L52) | Struct | `metrics.go:45` | Structured error holding message and numeric status code. |
-| [`MetricSetResult`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L55-L71) | Struct | `metrics.go:55` | Result container tracking total observed items and error records. |
-| [`MetricSetResult.Valid`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L61-L63) | Method | `metrics.go:61` | Evaluates if error slice is empty. |
-| [`MetricSetResult.AddError`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L66-L71) | Method | `metrics.go:66` | Appends a new error entry to the result. |
-| [`HeuristicViolation`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L74-L85) | Struct | `metrics.go:74` | Diagnostic error detailing heuristic rule violations. |
-| [`Heuristic`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L88-L95) | Struct | `metrics.go:88` | Evaluates metric bounds against min/max thresholds. |
-| [`Heuristic.Validate`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L97-L172) | Method | `metrics.go:97` | Coerces numeric types and verifies against boundaries. |
-| [`ObservePackages`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L175-L179) | Function | `metrics.go:175` | Collects observation results across packages. |
-| [`WorkspaceHeuristics`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L182-L185) | Struct | `metrics.go:182` | Encapsulates workspace-level threshold configurations. |
-| [`NewWorkspaceHeuristics`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/metrics.go#L188-L193) | Function | `metrics.go:188` | Instantiates default workspace heuristics (`PackageThreshold: 1, FailureTolerance: 0`). |
+| [`MetricItem`](../../pkg/wsobs/metrics.go#L8-L11) | Struct | `metrics.go:8` | Represents an untyped metric value paired with string tags. |
+| [`MetricSet`](../../pkg/wsobs/metrics.go#L14-L18) | Struct | `metrics.go:14` | Named container holding a map of observed `MetricItem` instances. |
+| [`NewMetricSet`](../../pkg/wsobs/metrics.go#L21-L27) | Function | `metrics.go:21` | Constructs a `MetricSet` with an initialized map. |
+| [`MetricSet.Add`](../../pkg/wsobs/metrics.go#L30-L42) | Method | `metrics.go:30` | Idempotently inserts a key-value pair; initializes map if nil. |
+| [`MetricError`](../../pkg/wsobs/metrics.go#L45-L52) | Struct | `metrics.go:45` | Structured error holding message and numeric status code. |
+| [`MetricSetResult`](../../pkg/wsobs/metrics.go#L55-L71) | Struct | `metrics.go:55` | Result container tracking total observed items and error records. |
+| [`MetricSetResult.Valid`](../../pkg/wsobs/metrics.go#L61-L63) | Method | `metrics.go:61` | Evaluates if error slice is empty. |
+| [`MetricSetResult.AddError`](../../pkg/wsobs/metrics.go#L66-L71) | Method | `metrics.go:66` | Appends a new error entry to the result. |
+| [`HeuristicViolation`](../../pkg/wsobs/metrics.go#L74-L85) | Struct | `metrics.go:74` | Diagnostic error detailing heuristic rule violations. |
+| [`Heuristic`](../../pkg/wsobs/metrics.go#L88-L95) | Struct | `metrics.go:88` | Evaluates metric bounds against min/max thresholds. |
+| [`Heuristic.Validate`](../../pkg/wsobs/metrics.go#L97-L172) | Method | `metrics.go:97` | Coerces numeric types and verifies against boundaries. |
+| [`ObservePackages`](../../pkg/wsobs/metrics.go#L175-L179) | Function | `metrics.go:175` | Collects observation results across packages. |
+| [`WorkspaceHeuristics`](../../pkg/wsobs/metrics.go#L182-L185) | Struct | `metrics.go:182` | Encapsulates workspace-level threshold configurations. |
+| [`NewWorkspaceHeuristics`](../../pkg/wsobs/metrics.go#L188-L193) | Function | `metrics.go:188` | Instantiates default workspace heuristics (`PackageThreshold: 1, FailureTolerance: 0`). |
 
 ### Quality & Coverage Statement
 
 The `pkg/wsobs` subsystem maintains strict continuous verification:
-- **Statement Test Coverage:** `100.0%` of all statements verified via unit tests in [`wsobs_coverage_elevation_cycle242_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/wsobs/wsobs_coverage_elevation_cycle242_test.go).
+- **Statement Test Coverage:** `100.0%` of all statements verified via unit tests in [`wsobs_coverage_elevation_cycle242_test.go`](../../pkg/wsobs/wsobs_metric_heuristic_test.go).
 - **Concurrency Verification:** Isolated snapshot allocations and read-evaluate concurrency verified under parallel stress testing.
 - **Open-Core Cleanliness:** Certified free of literal nanosecond kernel IDs, conforming to public repository release policies.

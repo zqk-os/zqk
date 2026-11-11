@@ -48,7 +48,7 @@ flowchart TD
 
 ## 3. Interface & Contract Specifications
 
-The subsystem defines clean, decoupled interfaces in [`interfaces.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/circuitbreaker/interfaces.go):
+The subsystem defines clean, decoupled interfaces in [`interfaces.go`](../../pkg/circuitbreaker/interfaces.go):
 
 ```go
 type CircuitBreaker interface {

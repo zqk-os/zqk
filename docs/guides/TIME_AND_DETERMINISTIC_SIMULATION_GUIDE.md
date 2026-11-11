@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Time Standardization & Deterministic Simulation Subsystem** ([`pkg/zqktime`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqktime/zqktime.go)) provides universal, allocation-conscious, UTC-enforced timestamp formatting and deterministic temporal simulation for the ZQK Knowledge Kernel.
+The **Time Standardization & Deterministic Simulation Subsystem** ([`pkg/zqktime`](../../pkg/zqktime/zqktime.go)) provides universal, allocation-conscious, UTC-enforced timestamp formatting and deterministic temporal simulation for the ZQK Knowledge Kernel.
 
 In distributed, multi-agent systems and content-addressed storage (CAS) engines, non-deterministic timestamps and uncoordinated local time zones introduce critical failure modes:
 1. **Cryptographic Hash Drift:** In content-addressed storage, timestamps embedded in YAML/JSON documents alter cryptographic hashes (`sha256`), causing spurious version splits and invalidating Merkle trees if local time zone offsets (e.g., `-05:00` vs `+09:00`) leak into serialized manifests.
@@ -67,7 +67,7 @@ flowchart TD
 
 ## 3. Subsystem Architecture & Component Topology
 
-The subsystem is implemented in [`zqktime.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/zqktime/zqktime.go) as a foundational zero-dependency package. To avoid circular dependencies, `pkg/zqktime` imports exclusively Go standard library packages (`time`).
+The subsystem is implemented in [`zqktime.go`](../../pkg/zqktime/zqktime.go) as a foundational zero-dependency package. To avoid circular dependencies, `pkg/zqktime` imports exclusively Go standard library packages (`time`).
 
 ### 3.1 Standard Layout Constants
 

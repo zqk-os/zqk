@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary & Design Philosophy
 
-The **Diagnostic Capture, Stagnation Detection & Runtime Profile Subsystem** ([`pkg/diagnostics`](file:///Users/lanceettl/zqk-public-candidate/pkg/diagnostics)) delivers deterministic failure introspection, non-blocking runtime state extraction, automated stagnation loop prevention, and signal-driven profiling across the ZQK Knowledge Kernel and daemon services.
+The **Diagnostic Capture, Stagnation Detection & Runtime Profile Subsystem** ([`pkg/diagnostics`](../../pkg/diagnostics)) delivers deterministic failure introspection, non-blocking runtime state extraction, automated stagnation loop prevention, and signal-driven profiling across the ZQK Knowledge Kernel and daemon services.
 
 When distributed processes, worker swarms, or background schedulers stall, loop endlessly, or encounter hard errors, naive retry harnesses waste computational budgets, mask root causes, and produce catastrophic cascade failures. The diagnostics subsystem addresses this through four core design pillars:
 
@@ -98,7 +98,7 @@ flowchart TD
 
 ### 3.1 Failure Envelopes & Deterministic Signatures
 
-The **`FailureEnvelope`** ([`pkg/diagnostics/envelope.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diagnostics/envelope.go)) encapsulates execution outcomes across attempts:
+The **`FailureEnvelope`** ([`pkg/diagnostics/envelope.go`](../../pkg/diagnostics/envelope.go)) encapsulates execution outcomes across attempts:
 
 ```go
 type FailureEnvelope struct {
@@ -138,7 +138,7 @@ The `ClassifyError` function parses error texts and exit codes into unambiguous 
 
 ### 3.2 Loop Stagnation Detection & Adaptive Disambiguation
 
-Retrying failed operations blindly when the underlying state has not changed burns token budgets and wastes compute. The stagnation detector ([`pkg/diagnostics/stagnation.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diagnostics/stagnation.go)) and disambiguation engine ([`pkg/diagnostics/disambiguation.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diagnostics/disambiguation.go)) implement fail-fast feedback.
+Retrying failed operations blindly when the underlying state has not changed burns token budgets and wastes compute. The stagnation detector ([`pkg/diagnostics/stagnation.go`](../../pkg/diagnostics/stagnation.go)) and disambiguation engine ([`pkg/diagnostics/disambiguation.go`](../../pkg/diagnostics/disambiguation.go)) implement fail-fast feedback.
 
 #### Stagnation Policy & Assessment Rules
 A `StagnationPolicy` defines loop boundaries:
@@ -171,7 +171,7 @@ When a retry is necessary, `GenerateDisambiguation` synthesizes actionable guida
 
 ### 3.3 Diagnostic Capture Pipeline (`CaptureDiagnostics`)
 
-The `CaptureDiagnostics` function ([`pkg/diagnostics/capture.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diagnostics/capture.go)) executes a comprehensive system dump:
+The `CaptureDiagnostics` function ([`pkg/diagnostics/capture.go`](../../pkg/diagnostics/capture.go)) executes a comprehensive system dump:
 
 ```mermaid
 sequenceDiagram
@@ -211,7 +211,7 @@ Under heavy scheduler load, running `runtime.Stack` on thousands of active gorou
 - Complete goroutine stack traces remain available in the accompanying `*_goroutines.txt` and `*_goroutines.pb.gz` artifacts.
 
 #### Retention Pruning Invariant
-Each capture invocation calls `pruneDiagnosticsCaptures` ([`pkg/diagnostics/capture_prune.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/diagnostics/capture_prune.go)):
+Each capture invocation calls `pruneDiagnosticsCaptures` ([`pkg/diagnostics/capture_prune.go`](../../pkg/diagnostics/capture_prune.go)):
 - Keeps the newest 10 capture sets (`diagnosticsRetentionMaxCaptureSets`).
 - Unmatched or non-diagnostic files are left completely untouched.
 - Cleanups are fail-safe: I/O errors during pruning never fail the diagnostic capture call.

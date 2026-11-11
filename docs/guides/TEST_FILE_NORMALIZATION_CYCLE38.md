@@ -37,13 +37,13 @@ Automated tooling is located in `scripts/open-core/test-normalization/`:
 - `--apply`: Executes `git mv` across all candidate files.
 
 ### 3.2 Mapping Artifact
-- Detailed file mapping catalog: [`docs/reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md`](file:///Users/lanceettl/zqk-public-candidate/docs/reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md).
+- Detailed file mapping catalog: [`docs/reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md`](../reports/REPO_HYGIENE_TEST_NORMALIZATION_MAP.md).
 
 ---
 
 ## 4. Three-Fold Verification Proof
 
-The test suite in [`pkg/community/test_hygiene_cycle38_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/community/test_hygiene_cycle38_test.go) enforces:
+The test suite in [`pkg/community/test_hygiene_cycle38_test.go`](../../pkg/community/test_hygiene_cycle38_test.go) enforces:
 
 1. **Static Floor Invariant (`TestTestNormalizationCycle38_StaticFloorInvariant`)**:
    - Asserts mapping artifact exists, defines >= 190 targets, and asserts zero destination filenames contain cycle elevation tags.

@@ -46,18 +46,18 @@ A field is classified as a reference field if it satisfies any of the following 
 Scaffolding hygiene is enforced across three primary generation surfaces:
 
 ### 1. Printable CLI Templates (`zqk object template <kind>`)
-Located in [`cmd/zqk/object/template.go`](file:///cmd/zqk/object/template.go):
+Located in [`cmd/zqk/object/template.go`](../../cmd/zqk/object/template.go):
 - `isReferenceField(field)` detects both scalar (`_ref`, `_id`, `type: reference`, `semantic_type: reference`) and plural (`_refs`, `_ids`) reference fields.
 - `isOptionalRefField(field)` omits optional reference attributes from the generated YAML template so users are not presented with empty string defaults.
 - Plural reference fields that are generated produce `[]` rather than string placeholders.
 
 ### 2. Interactive and Scripted Minting (`zqk new <kind>`)
-Located in [`cmd/zqk/new/`](file:///cmd/zqk/new/):
+Located in [`cmd/zqk/new/`](../../cmd/zqk/new):
 - Relational flags (`--plan`, `--req`, `--goal`, `--bli`, `--criteria`) only populate reference fields when non-empty arguments are provided.
 - If flags are omitted or blank, reference fields are not populated with empty string values.
 
 ### 3. Draft Plane Materialization (`WriteObjectToDraftPlane`)
-Located in [`pkg/storage/object_draft_plane.go`](file:///pkg/storage/object_draft_plane.go):
+Located in [`pkg/storage/object_draft_plane.go`](../../pkg/storage/object_draft_plane.go):
 - `getDraftPlaneTemplateForKind(kind)` merges specialized field placeholders.
 - Optional scalar reference fields are excluded from merging via `isDraftPlaneReferenceField`.
 - List reference fields are scaffolded as `[]any{}` (empty arrays).
@@ -66,7 +66,7 @@ Located in [`pkg/storage/object_draft_plane.go`](file:///pkg/storage/object_draf
 
 ## 4. Strict Validation Rejection (Negative Adversarial Boundary)
 
-To prevent downstream CAS state corruption, the validation subsystem in [`pkg/validation/`](file:///pkg/validation/) strictly rejects empty string literals in reference fields:
+To prevent downstream CAS state corruption, the validation subsystem in [`pkg/validation/`](../../pkg/validation) strictly rejects empty string literals in reference fields:
 
 ### Validation Rules
 1. **Scalar Reference Check**: If a scalar reference field (`team_configuration_ref`, `release_ref`, etc.) contains an empty string (`""` or whitespace-only string), validation fails closed and emits a `ValidationError` with rule `reference_not_empty`.

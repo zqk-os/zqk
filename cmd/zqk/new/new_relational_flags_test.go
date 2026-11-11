@@ -3,7 +3,6 @@ package newcmd
 import (
 	"bytes"
 	"context"
-	"path/filepath"
 	"slices"
 	"testing"
 	"time"
@@ -13,7 +12,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/objects"
-	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -40,17 +38,7 @@ func setupRelationalFlagsTestEnv(t *testing.T) string {
 		if teardownErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil)); teardownErr != nil {
 			t.Logf("teardown error: %v", teardownErr)
 		}
-		zqkDir := filepath.Join(testRoot, paths.ProjectDataDir)
-		for i := 0; i < 20; i++ {
-			if _, err := fileutil.Stat(zqkDir); err != nil {
-				break
-			}
-			_ = fileutil.RemoveAll(zqkDir)
-			if _, err := fileutil.Stat(zqkDir); err != nil {
-				break
-			}
-			time.Sleep(10 * time.Millisecond)
-		}
+		storage.ScrubProjectRootForTempCleanup(testRoot, 30, 25*time.Millisecond)
 	})
 	return testRoot
 }

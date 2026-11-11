@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Convergence Rollup, BFS Tree Traversal & Reference Cycle Detection Subsystem** ([`pkg/convergerollup`](file:///Users/lanceettl/zqk-public-candidate/pkg/convergerollup)) provides deterministic hierarchical graph traversal, reference cycle detection, multi-tier status rollup aggregation, and overseer child arbitration for convergence sessions in the ZQK Knowledge Kernel.
+The **Convergence Rollup, BFS Tree Traversal & Reference Cycle Detection Subsystem** ([`pkg/convergerollup`](../../pkg/convergerollup)) provides deterministic hierarchical graph traversal, reference cycle detection, multi-tier status rollup aggregation, and overseer child arbitration for convergence sessions in the ZQK Knowledge Kernel.
 
 In the ZQK orchestration model, autonomous execution unfolds across multi-level convergence sessions and relational planning graphs:
 - **Parent/Coordinator Convergence Sessions (`convergence_session`)** anchor high-level strategic hypotheses, orchestrate subagents, and supervise nested child work streams.
@@ -10,9 +10,9 @@ In the ZQK orchestration model, autonomous execution unfolds across multi-level 
 - **Relational Work Containers** (Epics, Milestones, Priority Plans, Backlog Items) structure chronological and functional execution units.
 
 To prevent infinite loops, split-brain completions, or premature session termination while child workers remain active, `pkg/convergerollup` establishes three invariant pillars:
-1. **Depth-Bounded BFS Tree Traversal ([`CollectCVSTreeBFS`](file:///Users/lanceettl/zqk-public-candidate/pkg/convergerollup/cvs_tree_bfs.go#L18)):** Traverses nested session hierarchies with strict depth ceilings (`DefaultOverseerCVSTreeMaxDepth = 3`), diamond deduplication, and non-CVS reference filtering.
-2. **Cycle-Safe DFS Reference Gate ([`DetectCVSRefCycle`](file:///Users/lanceettl/zqk-public-candidate/pkg/convergerollup/ref_cycle.go#L17)):** Validates parent-child relationships upfront before link mutation via depth-limited depth-first cycle path detection (`MaxRelatedCVSHopDepth = 8`).
-3. **Multi-Surface Rollup Status Aggregation & Overseer Arbitration ([`ComputeRollupStatus`](file:///Users/lanceettl/zqk-public-candidate/pkg/convergerollup/rollup_status.go#L43), [`BuildArbitratedParentMessage`](file:///Users/lanceettl/zqk-public-candidate/pkg/convergerollup/overseer.go#L36)):** Synthesizes test bundle health, static gate exit codes, vetting matrix progress, and active child session states into a deterministic four-tier status (`satisfied`, `ready_for_review`, `partial`, `blocked`), computing normative primary measurement outcomes and actionable next steps.
+1. **Depth-Bounded BFS Tree Traversal ([`CollectCVSTreeBFS`](../../pkg/convergerollup/cvs_tree_bfs.go#L18)):** Traverses nested session hierarchies with strict depth ceilings (`DefaultOverseerCVSTreeMaxDepth = 3`), diamond deduplication, and non-CVS reference filtering.
+2. **Cycle-Safe DFS Reference Gate ([`DetectCVSRefCycle`](../../pkg/convergerollup/ref_cycle.go#L17)):** Validates parent-child relationships upfront before link mutation via depth-limited depth-first cycle path detection (`MaxRelatedCVSHopDepth = 8`).
+3. **Multi-Surface Rollup Status Aggregation & Overseer Arbitration ([`ComputeRollupStatus`](../../pkg/convergerollup/rollup_status.go#L43), [`BuildArbitratedParentMessage`](../../pkg/convergerollup/overseer.go#L36)):** Synthesizes test bundle health, static gate exit codes, vetting matrix progress, and active child session states into a deterministic four-tier status (`satisfied`, `ready_for_review`, `partial`, `blocked`), computing normative primary measurement outcomes and actionable next steps.
 
 ---
 
@@ -121,7 +121,7 @@ When multiple parent nodes reference a shared child session (e.g. a shared verif
 
 Circular references in convergence session graphs cause infinite traversal loops, deadlocks in scheduler rollups, and invalid status cascades.
 
-[`DetectCVSRefCycle`](file:///Users/lanceettl/zqk-worktree-cycle-256/pkg/convergerollup/ref_cycle.go#L17) walks the graph via depth-limited depth-first search (DFS):
+[`DetectCVSRefCycle`](../../pkg/convergerollup/ref_cycle.go#L17) walks the graph via depth-limited depth-first search (DFS):
 - Maintains the current branch traversal path: `path []string`.
 - If an edge targets any identifier already present in `path`, a cycle is detected and the complete path ending with the closing node is returned: `[root, child1, child2, child1]`.
 - Traversal depth is capped at `maxDepth` (default: `MaxRelatedCVSHopDepth = 8`).
@@ -165,7 +165,7 @@ sequenceDiagram
 
 ### 5.1 Rollup Status Classification Model
 
-[`ComputeRollupStatus`](file:///Users/lanceettl/zqk-worktree-cycle-256/pkg/convergerollup/rollup_status.go#L43) evaluates four distinct surface inputs:
+[`ComputeRollupStatus`](../../pkg/convergerollup/rollup_status.go#L43) evaluates four distinct surface inputs:
 1. **Test Bundles (`TestBundleInput`)**: `ReadyForSessionCompletion`, `FailingFingerprintsNow`, and `DeltaAssessment` (`trending_away` vs `trending_toward`).
 2. **Literal Code Quality Gates**: Exit status of AST field key literal gate and environment variable literal gate.
 3. **Verification Matrix**: Pending human-scope `.go` matrix rows or unreadable matrix files.

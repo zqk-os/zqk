@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Skill Drift Audit, Integrity Sealing & Evolution Tracking Subsystem** ([`pkg/skill`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill)) establishes a deterministic, tamper-evident verification and synchronization membrane for executable agent skills within the **ZQK Knowledge Kernel**.
+The **Skill Drift Audit, Integrity Sealing & Evolution Tracking Subsystem** ([`pkg/skill`](../../pkg/skill)) establishes a deterministic, tamper-evident verification and synchronization membrane for executable agent skills within the **ZQK Knowledge Kernel**.
 
 In autonomous AI agent swarms and continuous autonomous development (CAP loops), specialized agent skills define operational capabilities, behavioral boundaries, and domain execution routines. However, distributed swarms encounter three critical failure modes:
 1. **Directory Desynchronization & Drift:** Skills maintained in the primary runtime database directory (`.zqk/skills`) drift out of alignment with the checked-in workspace repository authoring directory (`skills/`), leading to inconsistent agent behaviors across branches and worktrees.
@@ -65,10 +65,10 @@ flowchart TD
 
 | Component | Primary Function | Core Responsibilities |
 | :--- | :--- | :--- |
-| **DriftAuditor** | [`Auditor`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/drift_audit.go#L18) | Traverses primary (`.zqk/skills`) and secondary (`skills/`) directories, filters non-directory artifacts, reads `SKILL.md` modification timestamps, and flags missing or out-of-sync skills. |
-| **IntegritySealer** | [`GenerateSealData`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/seal.go#L92) | Computes SHA-256 hash over the skill markdown body and serializes canonical YAML frontmatter containing hash, version, issuer, and RFC3339 timestamp. |
-| **SignatureVerifier** | [`VerifySeal`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/seal.go#L23) | Parses tripartite markdown content (`---frontmatter---body`), strips attribute quoting, validates timestamps, recomputes the body hash, and asserts cryptographic identity. |
-| **TamperSentinel** | [`VerificationResult`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/seal.go#L12) | Fail-closed security evaluator that immediately detects mutated instructions, corrupted digests, missing frontmatter delimiters, or invalid timestamps. |
+| **DriftAuditor** | [`Auditor`](../../pkg/skill/drift_audit.go#L18) | Traverses primary (`.zqk/skills`) and secondary (`skills/`) directories, filters non-directory artifacts, reads `SKILL.md` modification timestamps, and flags missing or out-of-sync skills. |
+| **IntegritySealer** | [`GenerateSealData`](../../pkg/skill/seal.go#L92) | Computes SHA-256 hash over the skill markdown body and serializes canonical YAML frontmatter containing hash, version, issuer, and RFC3339 timestamp. |
+| **SignatureVerifier** | [`VerifySeal`](../../pkg/skill/seal.go#L23) | Parses tripartite markdown content (`---frontmatter---body`), strips attribute quoting, validates timestamps, recomputes the body hash, and asserts cryptographic identity. |
+| **TamperSentinel** | [`VerificationResult`](../../pkg/skill/seal.go#L12) | Fail-closed security evaluator that immediately detects mutated instructions, corrupted digests, missing frontmatter delimiters, or invalid timestamps. |
 | **EvolutionTracker** | Lineage Evaluator | Validates version monotonically advancing strings (`v1`, `1.1.0`, `2.0.0`), issuer attribution, and chronological consistency across evolution phases. |
 
 ---
@@ -120,7 +120,7 @@ sequenceDiagram
 
 ## 4. Drift Issue Classification & Reconciliation Taxonomy
 
-The [`Auditor`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/drift_audit.go#L18) produces structured [`DriftIssue`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/drift_audit.go#L12) descriptors categorized by issue type:
+The [`Auditor`](../../pkg/skill/drift_audit.go#L18) produces structured [`DriftIssue`](../../pkg/skill/drift_audit.go#L12) descriptors categorized by issue type:
 
 | Issue Type | Trigger Condition | Operational Severity | Recommended Reconciliation Action |
 | :--- | :--- | :--- | :--- |
@@ -169,8 +169,8 @@ Instructions, code snippets, or procedures executed by the agent.
 
 Within high-concurrency swarm execution, multiple agent routines simultaneously query and verify skills. The subsystem ensures concurrency safety through:
 
-- **Stateless Verification:** Functions [`VerifySeal`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/seal.go#L23) and [`GenerateSealData`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/seal.go#L92) are pure, side-effect-free functions operating on immutable string payloads. Multiple goroutines can execute verification without mutex contention.
-- **Auditor Thread Safety:** The [`Auditor`](file:///Users/lanceettl/zqk-public-candidate/pkg/skill/drift_audit.go#L18) reads directories using read-only filesystem calls (`fileutil.ReadDir`, `fileutil.Stat`). Concurrent audits run safely in parallel.
+- **Stateless Verification:** Functions [`VerifySeal`](../../pkg/skill/seal.go#L23) and [`GenerateSealData`](../../pkg/skill/seal.go#L92) are pure, side-effect-free functions operating on immutable string payloads. Multiple goroutines can execute verification without mutex contention.
+- **Auditor Thread Safety:** The [`Auditor`](../../pkg/skill/drift_audit.go#L18) reads directories using read-only filesystem calls (`fileutil.ReadDir`, `fileutil.Stat`). Concurrent audits run safely in parallel.
 - **Structured Goroutines:** All asynchronous background verifications launch using named goroutine tracking via `goroutinelabels.NewGoroutine`:
 
 ```go

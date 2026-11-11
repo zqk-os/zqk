@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary
 
-The **Schema Translation, Multi-Format Serialization & Cross-Model Converter Subsystem** ([`pkg/translation`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation)) delivers a unified, thread-safe, and deterministic cross-model schema conversion engine for the **ZQK Knowledge Kernel**.
+The **Schema Translation, Multi-Format Serialization & Cross-Model Converter Subsystem** ([`pkg/translation`](../../pkg/translation)) delivers a unified, thread-safe, and deterministic cross-model schema conversion engine for the **ZQK Knowledge Kernel**.
 
 In modern distributed software ecosystems and enterprise knowledge graphs, domain definitions originate across disparate modeling paradigms and serialization syntaxes:
 - **Graph Query Languages:** Cypher DDL/DML statements declaring node constraints and entity patterns (`CREATE CONSTRAINT`, `CREATE (n:Label)`).
@@ -15,9 +15,9 @@ Direct ingestion of raw external formats into downstream knowledge engines intro
 - **Concurrency Bottlenecks & Race Conditions:** Mutable format converters and uncoordinated format registries induce race conditions under high-throughput ingestion pipelines.
 
 Governed by core platform policies (including POL-DEFAULT-142277d3 and POL-CODE-007), `pkg/translation` solves these challenges through a modular, stateless translator architecture:
-1. **Unified Target Projection:** Normalizes heterogeneous schemas into canonical ZQK Knowledge Kernel objects: the [`domain_registry`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/constants.go#L55) object (kind `domain_registry`) and declarative object specifications (`TranslateResult.Specs`).
-2. **Stateless Translator Pipelines:** Translators execute as pure, side-effect-free converters operating on raw byte streams and optional diagnostic options ([`TranslateOptions`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/types.go#L14)).
-3. **Thread-Safe Format Registry:** Centralized, concurrency-safe translator registry ([`RegistryImpl`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/registry.go#L19)) backed by `sync.RWMutex` and `concurrency.RunInLock`/`RunInRLock` primitives.
+1. **Unified Target Projection:** Normalizes heterogeneous schemas into canonical ZQK Knowledge Kernel objects: the [`domain_registry`](../../pkg/translation/constants.go#L55) object (kind `domain_registry`) and declarative object specifications (`TranslateResult.Specs`).
+2. **Stateless Translator Pipelines:** Translators execute as pure, side-effect-free converters operating on raw byte streams and optional diagnostic options ([`TranslateOptions`](../../pkg/translation/types.go#L14)).
+3. **Thread-Safe Format Registry:** Centralized, concurrency-safe translator registry ([`RegistryImpl`](../../pkg/translation/registry.go#L19)) backed by `sync.RWMutex` and `concurrency.RunInLock`/`RunInRLock` primitives.
 4. **Resilient Fail-Safe Parsing:** Gracefully recovers from malformed, empty, or partial inputs, emitting empty object slices or structured diagnostic warnings without panicking or swallowing errors.
 5. **Static Floor Coverage Invariant:** Maintains 98.9% statement test coverage, far exceeding the static floor mandate ($\ge 85.0\%$).
 
@@ -88,15 +88,15 @@ flowchart TD
 
 | Component | Interface / Type | Key Responsibilities | Source Reference |
 | :--- | :--- | :--- | :--- |
-| **`Translator`** | `interface` | Declares canonical contract: `SourceFormat() string` and `Translate(raw []byte, opts *TranslateOptions) (*TranslateResult, error)`. | [`types.go#L5-L11`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/types.go#L5-L11) |
-| **`Registry`** | Module Functions | Thread-safe singleton registry providing `Register`, `Get`, and `TranslateByFormat`. Protected by `registryMu sync.RWMutex`. | [`registry.go#L10-L60`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/registry.go#L10-L60) |
-| **`CypherTranslator`** | `struct` | Extracts domain classes from Neo4j/Cypher DDL/DML constraints (`CREATE CONSTRAINT FOR (n:Label)`) and creation patterns (`CREATE (n:Label)`). | [`cypher.go#L20-L90`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/cypher.go#L20-L90) |
-| **`JSONSchemaTranslator`** | `struct` | Parses JSON Schema definitions (`definitions`), mapping schemas and metadata (title, description) to domain entities and field specs. | [`json_schema.go#L27-L112`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/json_schema.go#L27-L112) |
-| **`OpenAPITranslator`** | `struct` | Dual-mode YAML/JSON parser for OpenAPI 3.x (`components.schemas`) and Swagger 2.0 (`definitions`), preserving titles and descriptions. | [`openapi.go#L32-L146`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/openapi.go#L32-L146) |
-| **`RDFOWLTranslator`** | `struct` | Multi-syntax ontology translator supporting Turtle, RDF/XML, and JSON-LD with fallback detection based on syntax markers. | [`rdf_owl.go#L14-L134`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/rdf_owl.go#L14-L134) |
-| **`TurtleScanner`** | Function Suite | Lexical scanner parsing Turtle triple blocks, prefix statements, `owl:Class` declarations, and `rdfs:subClassOf` inheritance. | [`turtle.go#L43-L134`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/turtle.go#L43-L134) |
-| **`RDFXMLExtractor`** | Function Suite | Pattern-matching XML parser isolating `<owl:Class rdf:about="...">` blocks, child labels, comments, and resource inheritance links. | [`rdf_xml.go#L33-L101`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/rdf_xml.go#L33-L101) |
-| **`JSONLDExtractor`** | Function Suite | Structured JSON parser inspecting `@graph` and single-object JSON-LD envelopes for OWL classes, labels, and subclass relations. | [`jsonld.go#L26-L163`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/jsonld.go#L26-L163) |
+| **`Translator`** | `interface` | Declares canonical contract: `SourceFormat() string` and `Translate(raw []byte, opts *TranslateOptions) (*TranslateResult, error)`. | [`types.go#L5-L11`](../../pkg/translation/types.go#L5-L11) |
+| **`Registry`** | Module Functions | Thread-safe singleton registry providing `Register`, `Get`, and `TranslateByFormat`. Protected by `registryMu sync.RWMutex`. | [`registry.go#L10-L60`](../../pkg/translation/registry.go#L10-L60) |
+| **`CypherTranslator`** | `struct` | Extracts domain classes from Neo4j/Cypher DDL/DML constraints (`CREATE CONSTRAINT FOR (n:Label)`) and creation patterns (`CREATE (n:Label)`). | [`cypher.go#L20-L90`](../../pkg/translation/cypher.go#L20-L90) |
+| **`JSONSchemaTranslator`** | `struct` | Parses JSON Schema definitions (`definitions`), mapping schemas and metadata (title, description) to domain entities and field specs. | [`json_schema.go#L27-L112`](../../pkg/translation/json_schema.go#L27-L112) |
+| **`OpenAPITranslator`** | `struct` | Dual-mode YAML/JSON parser for OpenAPI 3.x (`components.schemas`) and Swagger 2.0 (`definitions`), preserving titles and descriptions. | [`openapi.go#L32-L146`](../../pkg/translation/openapi.go#L32-L146) |
+| **`RDFOWLTranslator`** | `struct` | Multi-syntax ontology translator supporting Turtle, RDF/XML, and JSON-LD with fallback detection based on syntax markers. | [`rdf_owl.go#L14-L134`](../../pkg/translation/rdf_owl.go#L14-L134) |
+| **`TurtleScanner`** | Function Suite | Lexical scanner parsing Turtle triple blocks, prefix statements, `owl:Class` declarations, and `rdfs:subClassOf` inheritance. | [`turtle.go#L43-L134`](../../pkg/translation/turtle.go#L43-L134) |
+| **`RDFXMLExtractor`** | Function Suite | Pattern-matching XML parser isolating `<owl:Class rdf:about="...">` blocks, child labels, comments, and resource inheritance links. | [`rdf_xml.go#L33-L101`](../../pkg/translation/rdf_xml.go#L33-L101) |
+| **`JSONLDExtractor`** | Function Suite | Structured JSON parser inspecting `@graph` and single-object JSON-LD envelopes for OWL classes, labels, and subclass relations. | [`jsonld.go#L26-L163`](../../pkg/translation/jsonld.go#L26-L163) |
 
 ---
 
@@ -214,7 +214,7 @@ Every successful translation emits a single `domain_registry` object conforming 
 ```
 
 > [!NOTE]
-> The identifier `DOMAIN-REG-000` is an intentional placeholder ID ([`DomainRegistryPlaceholderID`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/constants.go#L57)). When persisted via the storage membrane or import pipeline, the next sequential ID (e.g. `DOMAIN-REG-001`) is assigned automatically.
+> The identifier `DOMAIN-REG-000` is an intentional placeholder ID ([`DomainRegistryPlaceholderID`](../../pkg/translation/constants.go#L57)). When persisted via the storage membrane or import pipeline, the next sequential ID (e.g. `DOMAIN-REG-001`) is assigned automatically.
 
 ### Declarative Object Spec Output (`TranslateResult.Specs`)
 
@@ -232,7 +232,7 @@ For downstream spec generation and meta-schema compilation (`pkg/objects` and `p
 }
 ```
 
-When no parent class is defined, `extends` defaults to [`extensible_object`](file:///Users/lanceettl/zqk-public-candidate/pkg/translation/constants.go#L72).
+When no parent class is defined, `extends` defaults to [`extensible_object`](../../pkg/translation/constants.go#L72).
 
 ---
 

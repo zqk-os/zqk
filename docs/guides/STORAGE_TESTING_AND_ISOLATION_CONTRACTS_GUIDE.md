@@ -2,7 +2,7 @@
 
 ## 1. Executive Architectural Summary & Decoupling Rationale
 
-The **Storage Testing, Isolation Contracts & Decoupling Seams Subsystem** ([`pkg/storagetesting`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go)) establishes a minimal, dependency-free interface boundary between test orchestration harnesses ([`pkg/testing`](file:///Users/lanceettl/zqk-public-candidate/pkg/testing)) and concrete storage engines ([`pkg/storage`](file:///Users/lanceettl/zqk-public-candidate/pkg/storage)).
+The **Storage Testing, Isolation Contracts & Decoupling Seams Subsystem** ([`pkg/storagetesting`](../../pkg/storagetesting/contracts.go)) establishes a minimal, dependency-free interface boundary between test orchestration harnesses ([`pkg/testing`](../../pkg/testing)) and concrete storage engines ([`pkg/storage`](../../pkg/storage)).
 
 In Go codebases, circular dependencies between package hierarchies represent severe architectural anti-patterns:
 - **Direct Coupling Anti-Pattern:** When high-level testing utilities (`pkg/testing`) directly import low-level persistence mechanisms (`pkg/storage`), any storage tests or dependent packages attempting to utilize common testing harnesses introduce import cycles (`pkg/storage` → `pkg/testing` → `pkg/storage`).
@@ -11,9 +11,9 @@ In Go codebases, circular dependencies between package hierarchies represent sev
 
 Governed by core platform invariants, the `pkg/storagetesting` package resolves these challenges:
 
-1. **Clean Import Decoupling:** Defines minimal interface contracts ([`IsolationFactory`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go#L26) and [`GlobalHookConfigurator`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go#L37)) without importing either `pkg/testing` or `pkg/storage`, breaking dependency cycles completely.
-2. **First-Class Mocking Harness:** Provides [`MockIsolationFactory`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/mock.go#L26), a thread-safe, production-grade mock implementation featuring configurable function hooks, call counters, recorded invocation arguments, and sensible default fallbacks.
-3. **Pluggable Global Configuration:** Enables optional global hook configuration via [`GlobalHookOptions`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go#L32) to decouple storage metric toggles and audit buffer inspection from specific storage engines.
+1. **Clean Import Decoupling:** Defines minimal interface contracts ([`IsolationFactory`](../../pkg/storagetesting/contracts.go#L26) and [`GlobalHookConfigurator`](../../pkg/storagetesting/contracts.go#L37)) without importing either `pkg/testing` or `pkg/storage`, breaking dependency cycles completely.
+2. **First-Class Mocking Harness:** Provides [`MockIsolationFactory`](../../pkg/storagetesting/mock.go#L26), a thread-safe, production-grade mock implementation featuring configurable function hooks, call counters, recorded invocation arguments, and sensible default fallbacks.
+3. **Pluggable Global Configuration:** Enables optional global hook configuration via [`GlobalHookOptions`](../../pkg/storagetesting/contracts.go#L32) to decouple storage metric toggles and audit buffer inspection from specific storage engines.
 4. **Thread-Safe Concurrency Guarantees:** Protects all state transitions and argument recordings with read-write mutex locks (`sync.RWMutex`), supporting high-concurrency parallel test execution.
 5. **Static Floor Coverage Invariant:** Maintains a 100.0% statement test coverage invariant, surpassing the static floor mandate ($\ge 85.0\%$).
 
@@ -62,11 +62,11 @@ flowchart TD
 
 | Component | Architecture Role | Key Responsibilities | Source Reference |
 | :--- | :--- | :--- | :--- |
-| **`IsolationFactory`** | Primary Isolation Contract | Exposes methods to create isolated file storage instances within a given root directory and inspect the global audit buffer. | [`contracts.go#L26-L29`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go#L26-L29) |
-| **`GlobalHookConfigurator`** | Optional Global Configuration Seam | Allows factories to receive test context (`*testing.T`) and options (`*GlobalHookOptions`) to tune storage-level test globals. | [`contracts.go#L37-L39`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go#L37-L39) |
-| **`GlobalHookOptions`** | Test Setup Options Envelope | Encapsulates optional execution flags (such as `NoopStorageMetrics`) passed during environment configuration. | [`contracts.go#L32-L34`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/contracts.go#L32-L34) |
-| **`MockIsolationFactory`** | Production-Grade Test Mock | Thread-safe in-memory mock providing configurable function hooks, call counters, recorded arguments, and fluent builder methods. | [`mock.go#L26-L48`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/mock.go#L26-L48) |
-| **`NewMockIsolationFactory`** | Mock Constructor | Instantiates an initialized, thread-safe `MockIsolationFactory` with zero-value call counters and empty argument slices. | [`mock.go#L51-L56`](file:///Users/lanceettl/zqk-public-candidate/pkg/storagetesting/mock.go#L51-L56) |
+| **`IsolationFactory`** | Primary Isolation Contract | Exposes methods to create isolated file storage instances within a given root directory and inspect the global audit buffer. | [`contracts.go#L26-L29`](../../pkg/storagetesting/contracts.go#L26-L29) |
+| **`GlobalHookConfigurator`** | Optional Global Configuration Seam | Allows factories to receive test context (`*testing.T`) and options (`*GlobalHookOptions`) to tune storage-level test globals. | [`contracts.go#L37-L39`](../../pkg/storagetesting/contracts.go#L37-L39) |
+| **`GlobalHookOptions`** | Test Setup Options Envelope | Encapsulates optional execution flags (such as `NoopStorageMetrics`) passed during environment configuration. | [`contracts.go#L32-L34`](../../pkg/storagetesting/contracts.go#L32-L34) |
+| **`MockIsolationFactory`** | Production-Grade Test Mock | Thread-safe in-memory mock providing configurable function hooks, call counters, recorded arguments, and fluent builder methods. | [`mock.go#L26-L48`](../../pkg/storagetesting/mock.go#L26-L48) |
+| **`NewMockIsolationFactory`** | Mock Constructor | Instantiates an initialized, thread-safe `MockIsolationFactory` with zero-value call counters and empty argument slices. | [`mock.go#L51-L56`](../../pkg/storagetesting/mock.go#L51-L56) |
 
 ---
 
