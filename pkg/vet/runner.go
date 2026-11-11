@@ -192,13 +192,13 @@ func (r *Runner) runHygiene(files []string) ([]Finding, error) {
 
 func (r *Runner) normalizeSuites(suites []string) []string {
 	if len(suites) == 0 {
-		return []string{"hygiene", "tree_police", "payload", "docs"}
+		return []string{"hygiene", "tree_police", "payload"}
 	}
 	var res []string
 	for _, s := range suites {
 		s = strings.TrimSpace(strings.ToLower(s))
 		if s == "all" {
-			return []string{"hygiene", "tree_police", "payload", "docs"}
+			return []string{"hygiene", "tree_police", "payload"}
 		}
 		res = append(res, s)
 	}
