@@ -61,15 +61,44 @@ if [ -f "$DOC" ]; then
   say "OK: design note documents kernel whats-next + local sessionpaging"
 fi
 
+# Hot-page continuity: Put/Get/evict + refuse Studio module paths (no Studio pack/CAP).
+if command -v go >/dev/null 2>&1 && [ -d "$ROOT/pkg/sessionpaging" ]; then
+  if (
+    cd "$ROOT" && go test ./pkg/sessionpaging -timeout 60s -count=1 \
+      -run 'TestStore_PutGetEvict|TestRefuseStudioModulePath|TestStore_FailClosedEmptyAndUnsafe|TestStore_PagesUnderStateTree' \
+      >/tmp/zqk-session-paging-gotest.out 2>&1
+  ); then
+    say "OK: pkg/sessionpaging hot-page continuity unit tests"
+  else
+    fail "pkg/sessionpaging hot-page continuity unit tests failed"
+    say "$(tail -c 600 /tmp/zqk-session-paging-gotest.out 2>/dev/null || true)"
+  fi
+else
+  fail "go + pkg/sessionpaging required for hot-page continuity proof"
+fi
+
+# Bound greenfield whats-next so the gate cannot hang on slow init trees (macOS: perl alarm).
+run_bounded() {
+  _secs=$1
+  shift
+  if command -v perl >/dev/null 2>&1; then
+    perl -e "alarm int(shift); exec @ARGV" -- "$_secs" "$@"
+  else
+    "$@"
+  fi
+}
+
 TMP=$(mktemp -d /tmp/zqk-session-paging.XXXXXX)
 cleanup() { rm -rf "$TMP" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 (
   cd "$TMP"
-  if ! "$ZQK" init --format json >"$TMP/init.out" 2>&1; then
-    "$ZQK" init >"$TMP/init.out" 2>&1 || true
+  # Clear studio root bleed-through so stranger continuity is community-local.
+  unset ZQK_PROJECT_ROOT ZQK_CURRENT_ROOT 2>/dev/null || true
+  if ! run_bounded 45 "$ZQK" init --format json >"$TMP/init.out" 2>&1; then
+    run_bounded 45 "$ZQK" init >"$TMP/init.out" 2>&1 || true
   fi
-  out=$("$ZQK" workflow whats-next --skip-measure --format json 2>"$TMP/wn.err" || true)
+  out=$(run_bounded 45 "$ZQK" workflow whats-next --skip-measure --format json 2>"$TMP/wn.err" || true)
   if echo "$out" | grep -Eq 'zqk_whats_next_v1|"schema"'; then
     say "OK: whats-next returns structured kernel context"
   else
