@@ -117,3 +117,5 @@ func TestDocsQuality_NegativeAdversarialBoundary(t *testing.T) {
 	assert.True(t, foundCycleLeak, "must detect and fail-close on internal cycle sprint narratives")
 	assert.True(t, foundBadAcronym, "must detect and fail-close on contradictory acronym expansions")
 }
+
+// Trigger verification of BLI-1794386780719662000-29e59274
