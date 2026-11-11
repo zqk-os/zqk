@@ -25,6 +25,14 @@ import (
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
+func readRepoFile(t *testing.T, repoRoot string, parts ...string) string {
+	t.Helper()
+	p := filepath.Join(append([]string{repoRoot}, parts...)...)
+	content, err := fileutil.ReadFile(p)
+	require.NoError(t, err, "failed to read file: %s", p)
+	return string(content)
+}
+
 // TestCIAntiIdle_StaticFloorInvariant verifies that .github/workflows/ci.yml enforces
 // fail-fast: true across matrix jobs, and .agents/AGENTS.md codifies the strict
 // anti-polling timer directive.
@@ -32,20 +40,12 @@ func TestCIAntiIdle_StaticFloorInvariant(t *testing.T) {
 	repoRoot := findRepoRoot(t)
 
 	// Invariant 1: ci.yml enforces fail-fast: true in unit-tests matrix
-	ciPath := filepath.Join(repoRoot, ".github", "workflows", "ci.yml")
-	ciContent, err := fileutil.ReadFile(ciPath)
-	require.NoError(t, err, "failed to read .github/workflows/ci.yml")
-	ciStr := string(ciContent)
-
+	ciStr := readRepoFile(t, repoRoot, ".github", "workflows", "ci.yml")
 	assert.Contains(t, ciStr, "fail-fast: true", "CI workflow unit-tests matrix must enforce fail-fast: true")
 	assert.NotContains(t, ciStr, "fail-fast: false", "CI workflow unit-tests matrix must NOT allow fail-fast: false")
 
 	// Invariant 2: .agents/AGENTS.md explicitly mandates anti-polling and in-flight pipelining
-	agentsPath := filepath.Join(repoRoot, ".agents", "AGENTS.md")
-	agentsContent, err := fileutil.ReadFile(agentsPath)
-	require.NoError(t, err, "failed to read .agents/AGENTS.md")
-	agentsStr := string(agentsContent)
-
+	agentsStr := readRepoFile(t, repoRoot, ".agents", "AGENTS.md")
 	assert.Contains(t, agentsStr, "Anti-Idleness Protocol", "AGENTS.md must declare Continuous Autonomous Loop Discipline")
 	assert.Contains(t, agentsStr, "Zero Polling Timers", "AGENTS.md must explicitly prohibit synthetic interval polling timers")
 	assert.Contains(t, agentsStr, "In-Flight Continuous Pipelining", "AGENTS.md must mandate in-flight continuous pipelining during CI runs")
@@ -58,21 +58,13 @@ func TestCIAntiIdle_OperationalDynamicProof(t *testing.T) {
 	repoRoot := findRepoRoot(t)
 
 	// Dynamic Proof 1: ci.yml has status reporting step with if: always()
-	ciPath := filepath.Join(repoRoot, ".github", "workflows", "ci.yml")
-	ciContent, err := fileutil.ReadFile(ciPath)
-	require.NoError(t, err)
-	ciStr := string(ciContent)
-
+	ciStr := readRepoFile(t, repoRoot, ".github", "workflows", "ci.yml")
 	assert.True(t, strings.Contains(ciStr, "Notify Stage Status") || strings.Contains(ciStr, "Stage Status Notification"),
 		"CI workflow must contain a stage status notification / reporting step")
 	assert.Contains(t, ciStr, "if: always()", "Stage status step must trigger on both success and failure (if: always())")
 
 	// Dynamic Proof 2: agent onboarding payload contains anti-idle flywheel instructions
-	payloadPath := filepath.Join(repoRoot, "pkg", "agentonboard", "payload.go")
-	payloadContent, err := fileutil.ReadFile(payloadPath)
-	require.NoError(t, err)
-	payloadStr := string(payloadContent)
-
+	payloadStr := readRepoFile(t, repoRoot, "pkg", "agentonboard", "payload.go")
 	assert.Contains(t, payloadStr, "Anti-Idleness Protocol", "pkg/agentonboard/payload.go must codify Anti-Idleness Protocol")
 	assert.Contains(t, payloadStr, "Zero Polling Timers", "pkg/agentonboard/payload.go must codify Zero Polling Timers")
 }
