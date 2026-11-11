@@ -156,7 +156,7 @@ else
 fi
 
 # EE packaging boundary: community/public tree + package-community must not ship EE.
-# TRACK: BLI-1794392630487404500-8c27dcc1 / PRI-1794392614933833000-c7fb97b3
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — EE packaging boundary (PRI lead)
 EE_SCRIPT=""
 if [ -f "$ROOT/scripts/open-core/check-ee-packaging-boundary.sh" ]; then
   EE_SCRIPT="$ROOT/scripts/open-core/check-ee-packaging-boundary.sh"

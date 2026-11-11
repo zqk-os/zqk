@@ -10,7 +10,7 @@
 #   studio-ee-allowed — studio must retain cmd/zqk-admin carve-out
 #   packaging         — allow EE in tree; enforce package-community BINARIES + dist archive exclude
 #
-# TRACK: BLI-1794392630487404500-8c27dcc1 — EE packaging boundary / stranger extract proof
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — EE packaging boundary / stranger extract proof
 set -eu
 
 say() { printf '%s\n' "$*"; }

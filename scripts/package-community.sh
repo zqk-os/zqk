@@ -22,7 +22,7 @@ VER_NUM="${VERSION#v}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # EE packaging boundary — fail closed before any community binary/archive build.
-# TRACK: BLI-1794392630487404500-8c27dcc1
+# TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — package-community EE exclude
 if [ -f "${REPO_ROOT}/scripts/open-core/check-ee-packaging-boundary.sh" ]; then
   sh "${REPO_ROOT}/scripts/open-core/check-ee-packaging-boundary.sh" "${REPO_ROOT}" packaging
 fi
