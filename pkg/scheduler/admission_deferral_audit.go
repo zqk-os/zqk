@@ -13,7 +13,7 @@ import (
 // job events as durable runs so `zqk scheduler history --job-id` is non-empty
 // under pool_full churn (previously only diagnostics.jsonl saw the deferral).
 //
-// TRACK: BLI-1794352583586579500-b4aad3b8 — replace failed-with-reason with a
+// TRACK: https://github.com/zqk-os/zqk/pull/1074 — replace failed-with-reason with a
 // dedicated scheduler_job_deferred_* audit enum + history Deferred outcome once
 // the audit_event enum lands; keep fail-closed AUD persist semantics.
 const admissionDeferralAuditEvent = auditEventSchedulerFailed
