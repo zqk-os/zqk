@@ -10,6 +10,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/agent"
 	"github.com/zqk-os/zqk/cmd/zqk/ambient"
 	"github.com/zqk-os/zqk/cmd/zqk/automation"
+	"github.com/zqk-os/zqk/cmd/zqk/autopilot"
 	bundlecmd "github.com/zqk-os/zqk/cmd/zqk/bundle"
 	"github.com/zqk-os/zqk/cmd/zqk/callback"
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
@@ -102,6 +103,11 @@ func registerCommands() {
 	doCmdInst := do.NewDoCmd()
 	doCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(doCmdInst)
+
+	// Turnkey autopilot convergence runner (zqk autopilot / zqk pilot)
+	autopilotCmdInst := autopilot.NewAutopilotCmd()
+	autopilotCmdInst.GroupID = "everyday"
+	rootCmd.AddCommand(autopilotCmdInst)
 
 	// Top-level inspect command (shortcut for object inspect)
 	inspectCmdInst := object.NewInspectCmd()
