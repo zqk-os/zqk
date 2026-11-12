@@ -48,7 +48,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+2 | 2 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
-| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 39+88 | 88 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
+| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 43+92 | 92 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
 | [concurrency](./concurrency/) | `github.com/zqk-os/zqk/pkg/concurrency` | 11+12 | 12 | - | ✅ [README](./concurrency/README.md) | This package provides standardized concurrency primitives and patterns to ensure consistent, safe, and observable concurrent op... |
 | [config](./config/) | `github.com/zqk-os/zqk/pkg/config` | 10+8 | 8 | - | ❌ - | Kernel configuration loading, YAML parsing, environment overrides, and schema validation. |
 | [consensus](./consensus/) | `github.com/zqk-os/zqk/pkg/consensus` | 2+1 | 1 | - | ❌ - | Consensus component and domain abstractions for ZQK Core. |
