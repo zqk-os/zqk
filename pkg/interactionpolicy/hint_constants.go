@@ -16,6 +16,7 @@ const (
 	HintObjectGetPrefix   = "object get "
 	HintObjectGetSuffix   = " (resolve body before acting)"
 	HintSwarmInitText     = "swarm init"
+	HintProductDeltaText  = "product delta gut-check"
 )
 
 // IsKnownHint reports whether literal is one of the registered hint constants.
@@ -30,7 +31,8 @@ func IsKnownHint(literal string) bool {
 		HintOrchestrateSuffix,
 		HintObjectGetPrefix,
 		HintObjectGetSuffix,
-		HintSwarmInitText:
+		HintSwarmInitText,
+		HintProductDeltaText:
 		return true
 	}
 	return false

@@ -24,6 +24,7 @@ type StratplanAmbient struct {
 	AlignFresh      bool
 	DraftPlaneTotal int
 	NextPlans       []string
+	GutCheck        GutCheckVerdict
 }
 
 const MaxAmbientPlans = 3
@@ -136,6 +137,9 @@ func formatAlignAge(d time.Duration) string {
 // (always align) is what made GROOM-AHEAD feel ignored — TPM already had a
 // fresh cache and a grooming next column, but hunger kept saying "run align".
 func CompileStratplanCommandHint(a StratplanAmbient) string {
+	if a.GutCheck.TheaterRisk {
+		return HintProductReplenish()
+	}
 	if !a.AlignOK || !a.AlignFresh {
 		return HintAlignRefresh()
 	}
@@ -269,6 +273,9 @@ func formatStratplanAmbient(a StratplanAmbient) string {
 		fmt.Fprintf(&b, "; next_priority_plans %s", strings.Join(n, ", "))
 	} else if a.LeadID != "" {
 		b.WriteString("; next_priority_plans none")
+	}
+	if a.LeadID != "" || len(a.NextPlans) > 0 {
+		b.WriteString("; product_delta_gut_check=required (" + PolicyCAPProductAlignment + "); ban residual PASS reaffirmation mint without human audit ask")
 	}
 	return strings.TrimSpace(b.String())
 }

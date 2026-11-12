@@ -26,6 +26,7 @@ type TurnContinueInput struct {
 	CapLoopActive         bool
 	SteeringNudge         string
 	FillItemCommandHint   string
+	GutCheck              GutCheckVerdict
 }
 
 const (
@@ -35,6 +36,7 @@ const (
 	reasonNoDrive            = "no_drive"
 	reasonRemintHintStrip    = "remint_hint_stripped"
 	reasonHourglassKeepWork  = "hourglass_keep_working"
+	reasonProductDeltaStop   = "product_delta_gut_check_stop"
 	defaultInboxContinue     = "Inbox has unacked swarm mail. Ack as this seat, then keep working (do not end the turn while peers await)."
 	defaultCapContinue       = "CAP loop active. Query workflow whats-next and advance without idling."
 	defaultHourglassContinue = "Hourglass open (outbox awaiting peer_ack). Do NOT remint agent swarm-init / ORCHESTRATE_PLAN. await_peer_ack_keep_working: advance fill_item / local TPM work; ring peers only via feed steer|wake --await-peer-ack."
@@ -84,8 +86,20 @@ func CompileTurnContinue(in TurnContinueInput) TurnContinue {
 		stripped = true
 		step = defaultHourglassContinue
 		if fill != "" {
-			step = step + " fill_item: " + fill + " (prefer kernel-integrity heal-dangling --apply over stale autofix dangling wording)."
+			step = step + " fill_item: " + fill + " (prefer kernel-integrity heal-dangling --apply over stale autofix dangling wording; no residual mint)."
 		}
+	}
+
+	// CAP product-delta gut-check (POL-AGENT-CAP-PRODUCT-ALIGNMENT-001): theater risk
+	// overrides keep-working fill/groom prose so hourglass cannot license residual mint.
+	gutStop := in.CapLoopActive && in.GutCheck.TheaterRisk && in.InboxUnacked == 0
+	if gutStop {
+		step = AppendGutCheck(step, in.GutCheck)
+		hint = HintProductReplenish()
+		if hourglass && fill != "" {
+			step = step + " fill_item: " + fill + " (no residual mint; draft heal only)."
+		}
+		pol = PolicyCAPProductAlignment
 	}
 
 	// Host auto-continue is for CAP / swarm seats only. Ordinary IDE chats must
@@ -139,12 +153,14 @@ func CompileTurnContinue(in TurnContinueInput) TurnContinue {
 	if ev == "" {
 		ev = EventIdle
 	}
-	key := fmt.Sprintf("%s|%s|%s|hg=%d", pol, ev, hint, in.OutboxAwaitingPeerAck)
+	key := fmt.Sprintf("%s|%s|%s|hg=%d|gc=%d", pol, ev, hint, in.OutboxAwaitingPeerAck, boolInt(gutStop))
 	reason := reasonGuidingKeepWork
 	if in.CapLoopActive {
 		reason = reasonCapKeepWorking
 	}
-	if hourglass {
+	if gutStop {
+		reason = reasonProductDeltaStop
+	} else if hourglass {
 		reason = reasonHourglassKeepWork
 	} else if stripped {
 		reason = reasonRemintHintStrip
@@ -185,4 +201,11 @@ func scrubDispatchRemintProse(step string) string {
 		return defaultRemintStrippedContinue
 	}
 	return s
+}
+
+func boolInt(v bool) int {
+	if v {
+		return 1
+	}
+	return 0
 }
