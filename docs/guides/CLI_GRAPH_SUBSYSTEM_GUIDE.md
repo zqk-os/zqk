@@ -25,7 +25,7 @@ cmd/zqk/graph/
 ├── query.go                                      # 'zqk graph query': raw Cypher query execution & result formatting
 ├── export_test.go                                # Flag verification and help screen structural tests
 ├── graph_extended_test.go                        # Extended isolated project execution and format tests
-└── graph_coverage_elevation_cycle96_test.go      # Cycle 96 coverage elevation test suite (93.8% statement coverage)
+└── graph_coverage_elevation_cycle96_test.go      # Graph coverage elevation test suite (93.8% statement coverage)
 
 pkg/graph/databook/
 ├── databook.go                                   # W3C Holon DataBook builder, JSON-LD, and Turtle/RDF exporters

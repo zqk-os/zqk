@@ -66,7 +66,7 @@ Renders the complete 5-layer cascade of the active workspace:
 │   └── Mission: Core Mission [MIS-001]
 │       └── Vision: System Vision [VIS-001]
 │           └── Goal: System Quality [GOAL-001]
-│               └── Plan: Cycle 78 [PLAN-001] (in_progress)
+│               └── Plan: Storage Elevation [PLAN-001] (in_progress)
 │                   └── Requirement: Conformance [REQ-001]
 │                       └── Work Item: Implement Tests [ITEM-001] (in_progress)
 ```

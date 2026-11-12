@@ -296,7 +296,7 @@ Items originating from internal creation (e.g. `BLI-COMMUNITY-001`) without exte
 
 ## Verification & Statement Coverage Invariant
 
-The sync subsystem is strictly governed by automated verification gates across three proof tiers, requiring statement test coverage of `cmd/zqk/sync` to meet or exceed `>= 85.0%` (achieving `97.3%` statement coverage in Cycle 112):
+The sync subsystem is strictly governed by automated verification gates across three proof tiers, requiring statement test coverage of `cmd/zqk/sync` to meet or exceed `>= 85.0%` (achieving `97.3%` statement coverage):
 
 1. **Static Floor Invariant (`CRIT-STATIC-001`):**
    - Statement test coverage for `cmd/zqk/sync` is maintained at `>= 85.0%` (achieved `97.3%`).

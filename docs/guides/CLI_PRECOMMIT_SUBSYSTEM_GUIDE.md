@@ -84,7 +84,7 @@ cmd/zqk/precommit/
 ├── write_result_from_last.go                      # 'write-result-from-last' subcommand: promotes staging result
 ├── precommit_cli_test.go                          # Baseline CLI command integration tests
 ├── status_test.go                                 # Status command unit tests
-└── precommit_coverage_elevation_cycle117_test.go  # Cycle 117 coverage elevation test suite (100% statement coverage)
+└── precommit_coverage_elevation_cycle117_test.go  # Precommit coverage elevation test suite (100% statement coverage)
 
 pkg/precommit/
 ├── results.go                                     # CategoryResult, AggregatedResult, IO routines, and aggregation logic

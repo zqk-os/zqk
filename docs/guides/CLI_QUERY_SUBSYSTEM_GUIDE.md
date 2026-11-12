@@ -250,7 +250,7 @@ The Query Subsystem conforms to strict quality, hygiene, and verification gates:
 ### Verification Execution Commands
 
 ```bash
-# Run Cycle 138 focused unit test suite
+# Run focused unit test suite
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s ./cmd/zqk/query -run 'TestCycle138'
 
 # Run full package test coverage report

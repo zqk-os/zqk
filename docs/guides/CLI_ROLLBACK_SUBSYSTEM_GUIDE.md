@@ -128,7 +128,7 @@ Each entry in `rollback_points` is a single serialized JSON object separated by 
       "state": {
         "id": "PRI-COMMUNITY-001",
         "kind": "priority_plan",
-        "title": "Cycle 103 Execution",
+        "title": "Subsystem Execution Batch",
         "status": "in_progress",
         "created_at": "2026-10-20T04:00:00Z",
         "updated_at": "2026-10-20T05:00:00Z"

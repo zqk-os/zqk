@@ -27,7 +27,7 @@ cmd/zqk/swarm/
 ├── run_remote_test.go    # Unit tests for remote swarm package resolution and cache mechanics
 ├── status_test.go        # Unit tests for persona skill reference extraction and aggregation
 ├── swarm_coverage_elevation_test.go        # Elevation test suite for CLI command builders & execution paths
-└── swarm_coverage_elevation_cycle93_test.go # Cycle 93 suite covering storage mocks, edge cases & boundary checks
+└── swarm_coverage_elevation_cycle93_test.go # Swarm coverage suite covering storage mocks, edge cases & boundary checks
 ```
 
 ---

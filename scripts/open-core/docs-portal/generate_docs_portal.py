@@ -744,7 +744,7 @@ def build_portal(repo_root: str, target_dir: str):
                 return False
             # Drop internal cycle retrospectives, defect remediation notes, and raw test normalization maps
             base_upper = os.path.basename(file_path).upper()
-            if "_CYCLE" in base_upper or "BURNDOWN" in base_upper or "DEFECT_REMEDIATION" in base_upper or "NORMALIZATION_MAP" in base_upper:
+            if re.search(r'(?:^|_)CYCLE\d*(?:_|\.|$)|BURNDOWN|DEFECT_REMEDIATION|NORMALIZATION_MAP', base_upper):
                 print(f"⚠️ [DOC-SCRUTINIZER] Dropping internal cycle retrospective from public docs portal: {file_path}")
                 return False
             # Only apply placeholder token rejection to template scaffolds
@@ -805,26 +805,26 @@ def build_portal(repo_root: str, target_dir: str):
             print(f"Warning: could not read {doc}: {e}", file=sys.stderr)
             continue
 
-        # Mirror the raw .md file into target_dir so raw markdown is accessible
+        clean_content = content
+        # Sanitize internal kernel IDs and cycle sprint leaks from public markdown and HTML rendering
+        clean_content = re.sub(r'\b(BLI|REQ|PRI|TST|CRIT|GOAL|MIL|ACC)-179\d{16}-[0-9a-f]{8}\b', r'\1-001', clean_content)
+        clean_content = re.sub(r'Cycle \d+ Target Verified', 'Verification Standard Verified', clean_content)
+        clean_content = re.sub(r'under Cycle \d+ elevation', 'under core verification', clean_content)
+        clean_content = re.sub(r'Cycle \d+ achievement:\s*', 'verified coverage: ', clean_content)
+        clean_content = re.sub(r'Execution Cycle \d+ Work Plan', 'Core Execution Work Plan', clean_content)
+
+        # Mirror the sanitized .md file into target_dir so raw markdown is accessible and clean
         target_md_path = os.path.join(target_dir, rel_path)
         os.makedirs(os.path.dirname(target_md_path), exist_ok=True)
         with open(target_md_path, "w", encoding="utf-8") as mf:
-            mf.write(content)
+            mf.write(clean_content)
 
         # Also write clean non-dot path for web accessibility
         clean_md_path = os.path.join(target_dir, clean_md_rel)
         if clean_md_path != target_md_path:
             os.makedirs(os.path.dirname(clean_md_path), exist_ok=True)
             with open(clean_md_path, "w", encoding="utf-8") as mf:
-                mf.write(content)
-
-        clean_content = content
-        # Sanitize internal kernel IDs and cycle sprint leaks from public HTML rendering
-        clean_content = re.sub(r'\b(BLI|REQ|PRI|TST|CRIT|GOAL|MIL|ACC)-179\d{16}-[0-9a-f]{8}\b', r'\1-001', clean_content)
-        clean_content = re.sub(r'Cycle \d+ Target Verified', 'Verification Standard Verified', clean_content)
-        clean_content = re.sub(r'under Cycle \d+ elevation', 'under core verification', clean_content)
-        clean_content = re.sub(r'Cycle \d+ achievement:\s*', 'verified coverage: ', clean_content)
-        clean_content = re.sub(r'Execution Cycle \d+ Work Plan', 'Core Execution Work Plan', clean_content)
+                mf.write(clean_content)
 
         frontmatter = {}
         if clean_content.startswith("---"):

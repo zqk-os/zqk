@@ -176,7 +176,7 @@ zqk object bulk delete --ids BLI-001,BLI-002 --unlink-references
 
 ## Verification & Statement Coverage Invariant
 
-As part of Cycle 121 governance, the Object Subsystem CLI implementation (`cmd/zqk/object`) enforces a statement test coverage invariant of **$\ge 80.0\%$**.
+As part of core quality governance, the Object Subsystem CLI implementation (`cmd/zqk/object`) enforces a statement test coverage invariant of **$\ge 80.0\%$**.
 
 Unit and integration test suites for this package are implemented in:
 - `cmd/zqk/object/object_coverage_elevation_cycle121_test.go`
@@ -187,7 +187,7 @@ Unit and integration test suites for this package are implemented in:
 To prevent long-running integration suites from triggering process timeouts during CI/CD or local agent runs, always execute targeted test runs with explicit package bounds:
 
 ```bash
-# Execute Cycle 121 test suite
+# Execute focused test suite
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s ./cmd/zqk/object -run 'TestCycle121'
 
 # Measure statement coverage
