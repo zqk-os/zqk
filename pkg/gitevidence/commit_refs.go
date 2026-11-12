@@ -7,10 +7,12 @@ package gitevidence
 import (
 	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
 	"github.com/zqk-os/zqk/pkg/paths"
+	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -115,6 +117,12 @@ func validateOne(repoRoot, bliID, planID, branchRef, hash string) error {
 		return fmt.Errorf("commit_hashes %q: cannot read message: %w", hash, err)
 	}
 	matched := (bliID != "" && strings.Contains(msg, bliID)) || (planID != "" && strings.Contains(msg, planID))
+	if !matched && planID != "" {
+		cycleToken := resolveCycleToken(repoRoot, planID)
+		if cycleToken != "" && strings.Contains(strings.ToLower(msg), strings.ToLower(cycleToken)) {
+			matched = true
+		}
+	}
 	if !matched {
 		return fmt.Errorf("commit_hashes %q message does not mention %s (refuse unrelated SHA cites)", short(full), bliID)
 	}
@@ -197,4 +205,42 @@ func ValidateBranchAncestorOfTrunk(repoRoot, branchName string) error {
 	}
 
 	return nil
+}
+
+var cycleTokenRegex = regexp.MustCompile(`(?i)\bcycle\s+\d+\b`)
+
+func extractCycleToken(s string) string {
+	return strings.TrimSpace(cycleTokenRegex.FindString(s))
+}
+
+func resolveCycleToken(repoRoot, planID string) string {
+	if repoRoot == "" || planID == "" {
+		return ""
+	}
+	plansDir := filepath.Join(repoRoot, paths.ProcessPriorityPlansDir)
+	entries, err := fileutil.ReadDir(plansDir)
+	if err != nil {
+		return ""
+	}
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".yaml") {
+			continue
+		}
+		data, err := fileutil.ReadFile(filepath.Join(plansDir, entry.Name()))
+		if err != nil {
+			continue
+		}
+		content := string(data)
+		if strings.Contains(content, planID) {
+			for _, line := range strings.Split(content, "\n") {
+				trimmed := strings.TrimSpace(line)
+				if strings.HasPrefix(trimmed, "title:") {
+					titleVal := strings.TrimPrefix(trimmed, "title:")
+					titleVal = strings.Trim(strings.TrimSpace(titleVal), "'\"")
+					return extractCycleToken(titleVal)
+				}
+			}
+		}
+	}
+	return ""
 }
