@@ -94,6 +94,10 @@ func TestWorkStealingPool_ConcurrentStealingUnderBurstSkew(t *testing.T) {
 				}
 				if item != nil {
 					processed.Add(1)
+					// Slow down worker 0 slightly to allow concurrent peers to steal under burst skew
+					if workerID == 0 {
+						time.Sleep(50 * time.Microsecond)
+					}
 				}
 			}
 		})
