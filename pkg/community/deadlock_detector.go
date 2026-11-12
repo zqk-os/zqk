@@ -121,14 +121,23 @@ func (lm *ProviderLockManager) AcquireLock(ctx context.Context, providerID, reso
 	return newLock, nil
 }
 
+// heldLockUnderLock retrieves an active lock and verifies that providerID holds it.
+func (lm *ProviderLockManager) heldLockUnderLock(providerID, resourceID string) (*ResourceLock, error) {
+	lock, exists := lm.locks[resourceID]
+	if !exists || lock.HolderID != providerID {
+		return nil, ErrLockNotHeld
+	}
+	return lock, nil
+}
+
 // RenewLease extends the expiration time of an existing lock lease.
 func (lm *ProviderLockManager) RenewLease(providerID, resourceID string, extension time.Duration) error {
 	lm.mu.Lock()
 	defer lm.mu.Unlock()
 
-	lock, exists := lm.locks[resourceID]
-	if !exists || lock.HolderID != providerID {
-		return ErrLockNotHeld
+	lock, err := lm.heldLockUnderLock(providerID, resourceID)
+	if err != nil {
+		return err
 	}
 
 	lock.ExpiresAt = time.Now().Add(extension)
@@ -140,9 +149,8 @@ func (lm *ProviderLockManager) ReleaseLock(providerID, resourceID string) error 
 	lm.mu.Lock()
 	defer lm.mu.Unlock()
 
-	lock, exists := lm.locks[resourceID]
-	if !exists || lock.HolderID != providerID {
-		return ErrLockNotHeld
+	if _, err := lm.heldLockUnderLock(providerID, resourceID); err != nil {
+		return err
 	}
 
 	delete(lm.locks, resourceID)
