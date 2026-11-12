@@ -72,6 +72,20 @@ func TestValidateBacklogCommitHashesWithPlan(t *testing.T) {
 	if err := gitevidence.ValidateBacklogCommitHashesWithPlan(root, bli, plan, "nonexistent-deleted-branch", []string{planCommit}); err != nil {
 		t.Fatalf("deleted branchRef should fall back to main and pass: %v", err)
 	}
+
+	// Canonical cycle token resolution (TDE-1793490028403620000-151451f0)
+	// Commits citing (Cycle 121) where plan YAML has title: 'Cycle 121: ...'
+	cyclePlan := "PRI-CYCLE-TEST-121"
+	planDir := filepath.Join(root, paths.ProcessPriorityPlansDir)
+	_ = fileutil.EnsureDir(planDir)
+	planYAML := "id: " + cyclePlan + "\ntitle: 'Cycle 121: Community Provider Rate Limiting'\n"
+	writeAndCommit(t, root, filepath.Join(paths.ProcessPriorityPlansDir, "cycle121.yaml"), planYAML, "chore: plan")
+	writeAndCommit(t, root, "pkg/work/cycle_work.go", "package work\n", "feat(community): rate limiting (Cycle 121) (#1095)")
+	cycleCommit := head(t, root)
+
+	if err := gitevidence.ValidateBacklogCommitHashesWithPlan(root, bli, cyclePlan, "main", []string{cycleCommit}); err != nil {
+		t.Fatalf("commit mentioning (Cycle 121) should pass for plan with Cycle 121 in title: %v", err)
+	}
 }
 
 func TestValidateBacklogCommitHashes_EdgeCases(t *testing.T) {
