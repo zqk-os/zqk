@@ -196,13 +196,13 @@ func TestPlanStageMembraneHop_ParksCRITBLIREQCluster(t *testing.T) {
 	}
 }
 
-func TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanNotArchived(t *testing.T) {
+func TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanStillLive(t *testing.T) {
 	t.Parallel()
 	store := &memMembraneStore{objs: map[string]map[string]any{
 		"PRI-1": {
 			objects.FieldKeyID:     "PRI-1",
 			objects.FieldKeyKind:   kindPriorityPlan,
-			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+			objects.FieldKeyStatus: objects.ObjectStatusActive,
 		},
 		"BLI-1": {
 			objects.FieldKeyID:              "BLI-1",
@@ -218,6 +218,38 @@ func TestPlanStageMembraneHop_RefusesArchiveBLIWhenPlanNotArchived(t *testing.T)
 	}
 	if blocked.BlockingID != "BLI-1" {
 		t.Fatalf("blocking = %s, want BLI-1", blocked.BlockingID)
+	}
+}
+
+// Seeding a BLI whose plan is already complete co-seeds the plan into the
+// archive burrito (complete↔complete deadlock fix).
+func TestPlanStageMembraneHop_ArchiveBLICoSeedsCompletePlan(t *testing.T) {
+	t.Parallel()
+	store := &memMembraneStore{objs: map[string]map[string]any{
+		"PRI-1": {
+			objects.FieldKeyID:     "PRI-1",
+			objects.FieldKeyKind:   kindPriorityPlan,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+		},
+		"BLI-1": {
+			objects.FieldKeyID:              "BLI-1",
+			objects.FieldKeyKind:            kindBacklogItem,
+			objects.FieldKeyStatus:          objects.ObjectStatusComplete,
+			objects.FieldKeyPriorityPlanRef: "PRI-1",
+		},
+	}}
+	plan, err := PlanStageMembraneHop(context.Background(), pkgctx.NewSystemSecurityContext(), store, storyLifecycles(), func(string) []string { return nil }, []string{"BLI-1"}, objects.ObjectStatusArchived)
+	if err != nil {
+		t.Fatalf("plan: %v", err)
+	}
+	got := map[string]bool{}
+	for _, m := range plan.Members {
+		if !m.Skip {
+			got[m.ID] = true
+		}
+	}
+	if !got["BLI-1"] || !got["PRI-1"] {
+		t.Fatalf("want BLI-1+PRI-1 hop members, got %v", got)
 	}
 }
 
@@ -361,6 +393,70 @@ func TestPlanStageMembraneHop_PriorityPlanIncludesChildBLIs(t *testing.T) {
 	}
 	if !got["CRIT-1"].Skip {
 		t.Fatal("already-archived CRIT should skip")
+	}
+}
+
+// Dual complete PRIs sharing a CRIT/BLI cluster must archive together — seeding
+// only one plan used to freeze the tree (complete↔complete deadlock).
+func TestPlanStageMembraneHop_DualCompletePlansShareClusterArchiveTogether(t *testing.T) {
+	t.Parallel()
+	store := &memMembraneStore{objs: map[string]map[string]any{
+		"PRI-A": {
+			objects.FieldKeyID:     "PRI-A",
+			objects.FieldKeyKind:   kindPriorityPlan,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+		},
+		"PRI-B": {
+			objects.FieldKeyID:     "PRI-B",
+			objects.FieldKeyKind:   kindPriorityPlan,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+		},
+		"CRIT-1": {
+			objects.FieldKeyID:     "CRIT-1",
+			objects.FieldKeyKind:   kindCriteria,
+			objects.FieldKeyStatus: objects.ObjectStatusComplete,
+		},
+		"BLI-A": {
+			objects.FieldKeyID:              "BLI-A",
+			objects.FieldKeyKind:            kindBacklogItem,
+			objects.FieldKeyStatus:          objects.ObjectStatusComplete,
+			objects.FieldKeyPriorityPlanRef: "PRI-A",
+			objects.FieldKeyCriteriaRefs:    []any{"CRIT-1"},
+		},
+		"BLI-B": {
+			objects.FieldKeyID:              "BLI-B",
+			objects.FieldKeyKind:            kindBacklogItem,
+			objects.FieldKeyStatus:          objects.ObjectStatusComplete,
+			objects.FieldKeyPriorityPlanRef: "PRI-B",
+			objects.FieldKeyCriteriaRefs:    []any{"CRIT-1"},
+		},
+	}}
+	deps := func(id string) []string {
+		switch id {
+		case "PRI-A":
+			return []string{"BLI-A"}
+		case "PRI-B":
+			return []string{"BLI-B"}
+		case "CRIT-1":
+			return []string{"BLI-A", "BLI-B"}
+		default:
+			return nil
+		}
+	}
+	plan, err := PlanStageMembraneHop(context.Background(), pkgctx.NewSystemSecurityContext(), store, storyLifecycles(), deps, []string{"PRI-A"}, objects.ObjectStatusArchived)
+	if err != nil {
+		t.Fatalf("plan: %v", err)
+	}
+	got := map[string]bool{}
+	for _, m := range plan.Members {
+		if !m.Skip {
+			got[m.ID] = true
+		}
+	}
+	for _, id := range []string{"PRI-A", "PRI-B", "BLI-A", "BLI-B", "CRIT-1"} {
+		if !got[id] {
+			t.Fatalf("missing hop member %s (members=%v)", id, got)
+		}
 	}
 }
 
