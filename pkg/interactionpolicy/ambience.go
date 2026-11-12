@@ -209,7 +209,9 @@ func planExecutionLocked(s Ambience) bool {
 // planned==0 is not automatically "groom this priority_plan." An execution-locked
 // lead (in_progress items or plan status) is stratplan_ahead: forward planning
 // and alignment, never restuff/seal-break. shovel_ready_empty is only unsealed
-// intake (exploring/validated present, no in-flight work). Align is the last
+// intake (exploring/validated present, no in-flight work). Product-delta gut-check
+// (POL-AGENT-CAP-PRODUCT-ALIGNMENT-001) gates residual reaffirmation mint before
+// groom-ahead fill under stratplan_ahead. Align is the last
 // rung of that event (CompileStratplanCommandHint), not a separate gland.
 //
 // Outbox awaiting peer_ack with planned>0 is keep-working idle, not a hole.

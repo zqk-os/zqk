@@ -168,3 +168,13 @@ func TestHintSwarmInit(t *testing.T) {
 		t.Fatalf("unexpected fallback swarm-init hint: %q", gotEmpty)
 	}
 }
+
+func TestAppendStratplanAmbient_IncludesProductDeltaGutCheck(t *testing.T) {
+	got := AppendStratplanAmbient("drive", StratplanAmbient{LeadID: "PRI-1", LeadStatus: "in_progress"})
+	if !strings.Contains(got, "product_delta_gut_check=required") {
+		t.Fatalf("expected gut-check marker in ambient, got %q", got)
+	}
+	if !strings.Contains(got, PolicyCAPProductAlignment) {
+		t.Fatalf("expected policy id in ambient, got %q", got)
+	}
+}

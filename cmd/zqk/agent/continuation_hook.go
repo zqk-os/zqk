@@ -125,6 +125,7 @@ func runContinuationHookWithDeps(
 	fillHint := ""
 	planned, inProgress, exploring, validated := 0, 0, 0, 0
 	planStatus := ""
+	planTitle := ""
 	if projectRoot != "" {
 		amb := whatsnext.LoadKernelAmbience(projectRoot)
 		if fill := whatsnext.CompileFillItem(&amb); fill != nil {
@@ -148,6 +149,7 @@ func runContinuationHookWithDeps(
 				}
 				if wn.PriorityPlan != nil {
 					planStatus = strings.TrimSpace(wn.PriorityPlan.Status)
+					planTitle = strings.TrimSpace(wn.PriorityPlan.Title)
 				}
 				if fillHint == "" && wn.FillItem != nil {
 					fillHint = strings.TrimSpace(wn.FillItem.CommandHint)
@@ -172,6 +174,10 @@ func runContinuationHookWithDeps(
 		hint = res.Step.CommandHint
 		pol = res.Step.PolicyID
 	}
+	gut := interactionpolicy.CompileProductDeltaGutCheck(interactionpolicy.ProductDeltaSignals{
+		LeadTitleTheater: interactionpolicy.TitleLooksLikeResidualTheater(planTitle),
+		// WindowCommits left 0 unless git signals are available — LeadTitleTheater still bites.
+	})
 	drive := interactionpolicy.CompileTurnContinue(interactionpolicy.TurnContinueInput{
 		InboxUnacked:          inboxN,
 		OutboxAwaitingPeerAck: outboxAwaitN,
@@ -182,6 +188,7 @@ func runContinuationHookWithDeps(
 		CapLoopActive:         capActive,
 		SteeringNudge:         steeringNudge,
 		FillItemCommandHint:   fillHint,
+		GutCheck:              gut,
 	})
 	if !drive.Continue {
 		return emitContinuationDecision(out, vendor, "allow", "")
