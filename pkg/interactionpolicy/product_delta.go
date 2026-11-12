@@ -36,7 +36,7 @@ type GutCheckVerdict struct {
 const GutCheckStopProse = "Product-delta gut-check FAILED (POL-AGENT-CAP-PRODUCT-ALIGNMENT-001): recent work did not change cmd/pkg/stranger-facing behavior and no red gate has a code fix. STOP residual/reaffirmation mint. Mint an undelivered product REQ (gen-trace-pipeline), triage a failing gate with code, or convene the Strategic Planning Meeting Team. Do not seal PASS residuals."
 
 // CompileProductDeltaGutCheck answers the three policy questions.
-// TRACK: POL-AGENT-CAP-PRODUCT-ALIGNMENT-001
+// Policy reference: POL-AGENT-CAP-PRODUCT-ALIGNMENT-001
 func CompileProductDeltaGutCheck(s ProductDeltaSignals) GutCheckVerdict {
 	q1 := s.ProductCommits > 0 || s.RedGates > 0
 	q2 := s.UndeliveredProductREQ > 0 || s.RedGates > 0
