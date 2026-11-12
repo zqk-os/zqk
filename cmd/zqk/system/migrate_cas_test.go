@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
@@ -49,6 +50,7 @@ func TestRunMigrateCas_WithTestEnvironment(t *testing.T) {
 	// No t.Parallel: uses t.Setenv (Go forbids Parallel + Setenv).
 
 	projectRoot := t.TempDir()
+	testkit.RegisterStorageTestCleanup(t, projectRoot, nil)
 	t.Setenv(zqkenv.ProjectRoot().Name(), projectRoot)
 	if _, err := setupSystemTestEnvironmentRoot(t, projectRoot); err != nil {
 		t.Fatalf("setupSystemTestEnvironmentRoot: %v", err)
