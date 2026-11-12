@@ -47,6 +47,7 @@ hygiene:
   check_reference_integrity: true
   check_magic_buffers: true
   check_formatting: true
+  check_imperative_blank_validation: true
   formatting_exemptions:
     - "vendor/*"
     - "*/testdata/*"
