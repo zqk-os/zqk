@@ -18,9 +18,9 @@ The aggregator must:
 5. Maintain strict concurrency hygiene and zero allocations on steady-state heartbeat reads.
 
 ## Decision
-1. Implement `FleetHeartbeat` and `SwarmFleetAggregator` in [`pkg/community/fleet_heartbeat.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/community/fleet_heartbeat.go).
+1. Implement `FleetHeartbeat` and `SwarmFleetAggregator` in `pkg/community/fleet_heartbeat.go`.
 2. Validate required string fields (`NodeID`, `Role`) using `strutil.ErrorOnBlank`.
-3. Provide comprehensive test suite [`pkg/community/fleet_heartbeat_test.go`](file:///Users/lanceettl/zqk-public-candidate/pkg/community/fleet_heartbeat_test.go) verifying:
+3. Provide comprehensive test suite `pkg/community/fleet_heartbeat_test.go` verifying:
    - Static Floor Invariant (zero-value defaults, valid config thresholds)
    - Operational Dynamic Proof (concurrent heartbeats, aggregation, prune/stale transitions)
    - Negative Adversarial Boundary (blank IDs, zero/negative timeouts, stale lookups)
