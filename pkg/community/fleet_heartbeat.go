@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/strutil"
+	"github.com/zqk-os/zqk/pkg/when"
 )
 
 var (
@@ -163,15 +164,11 @@ func (a *SwarmFleetAggregator) AggregateHealth(now time.Time) FleetHealthSummary
 		summary.AverageUtilization = float64(summary.TotalWorkload) / float64(summary.TotalCapacity)
 	}
 
-	if summary.TotalNodes == 0 {
-		summary.ClusterStatus = "empty"
-	} else if summary.HealthyNodes == 0 {
-		summary.ClusterStatus = "critical"
-	} else if summary.StaleNodes > 0 {
-		summary.ClusterStatus = "degraded"
-	} else {
-		summary.ClusterStatus = "healthy"
-	}
+	summary.ClusterStatus = when.Result[string]().
+		When(func() bool { return summary.TotalNodes == 0 }).Then(func() string { return "empty" }).
+		OrElseWhen(func() bool { return summary.HealthyNodes == 0 }).Then(func() string { return "critical" }).
+		OrElseWhen(func() bool { return summary.StaleNodes > 0 }).Then(func() string { return "degraded" }).
+		OrElse(func() string { return "healthy" }).Run()
 
 	return summary
 }
