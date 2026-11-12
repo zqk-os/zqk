@@ -3,7 +3,7 @@
 > **Document ID:** `ADR-0048-CAP-LOOP-LIFECYCLE-GOVERNOR`  
 > **Status:** Accepted  
 > **Scope:** Knowledge Kernel Swarm Engine & Agent Lifecycle (`pkg/community/cap_governor.go`, `cmd/zqk/agent/continuation_hook.go`)  
-> **Traceability:** `REQ-1794446123130678000-93ef90ce`, `PRI-1794446138196724000-d730cb2c`, `MIL-1794446116839706000-77ef2bef`  
+> **Domain:** Multi-Agent Autonomous Progression & Lifecycle Supervision  
 
 ---
 
@@ -58,12 +58,12 @@ flowchart TD
 
 ## 4. Verification & Invariants Matrix
 
-| Criterion | Invariant / Proof Type | Verification Suite | Status |
+| Category | Invariant / Proof Type | Verification Suite | Status |
 |:---|:---|:---|:---|
-| `CRIT-1794446126954083000-6a3b0a6a` | Static Floor Invariant | `TestCAPGovernor_StaticFloorInvariant` | Verified (Pass) |
-| `CRIT-1794446126954083000-6a3b0a6a` | Operational Dynamic Proof | `TestCAPGovernor_OperationalDynamicProof` | Verified (Pass) |
-| `CRIT-1794446126954084000-d831b372` | Negative Adversarial Boundary | `TestCAPGovernor_NegativeBoundaryAndErrorRecovery` | Verified (Pass) |
-| `CRIT-1794446126954085000-4f0edf97` | Architectural Compliance & Spec | `TST-1794446126954083001-58537c7c` | Verified (Pass) |
+| Functional Acceptance | Static Floor Invariant | `TestCAPGovernor_StaticFloorInvariant` | Verified (Pass) |
+| Operational Dynamic Proof | Dynamic Marker Lifecycle | `TestCAPGovernor_OperationalDynamicProof` | Verified (Pass) |
+| Boundary & Error Recovery | Negative Adversarial Boundary | `TestCAPGovernor_NegativeBoundaryAndErrorRecovery` | Verified (Pass) |
+| Architectural Compliance | Three-Fold Invariant & Spec Conformance | `pkg/community/cap_governor_test.go` | Verified (Pass) |
 
 ---
 
