@@ -135,17 +135,13 @@ func CheckDocumentationQuality(root string, cfg *GatesConfig) ([]Finding, error)
 		topicFindings := checkTopicCharacterBudgets(relPathSlash, content, maxTopicChars, failOnTopicOverflow)
 		findings = append(findings, topicFindings...)
 
-		// 2. Leaked Kernel ID Sanitization Check (public guides & tutorials)
-		if strings.Contains(relPathSlash, "docs/guides/") || strings.Contains(relPathSlash, "docs/tutorials/") {
-			idFindings := checkKernelIDLeaks(relPathSlash, content)
-			findings = append(findings, idFindings...)
-		}
+		// 2. Leaked Kernel ID Sanitization Check (across all public docs)
+		idFindings := checkKernelIDLeaks(relPathSlash, content)
+		findings = append(findings, idFindings...)
 
-		// 3. Cycle Implementation Narrative Purging Check
-		if strings.Contains(relPathSlash, "docs/guides/") || strings.Contains(relPathSlash, "docs/tutorials/") {
-			cycleFindings := checkCycleNarratives(relPathSlash, content)
-			findings = append(findings, cycleFindings...)
-		}
+		// 3. Cycle Implementation Narrative Purging Check (across all public docs)
+		cycleFindings := checkCycleNarratives(relPathSlash, content)
+		findings = append(findings, cycleFindings...)
 
 		// 4. Canonical Acronym Consistency Check
 		acronymFindings := checkAcronymConsistency(relPathSlash, content, canonicalAcronyms)

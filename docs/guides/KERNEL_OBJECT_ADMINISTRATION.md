@@ -73,7 +73,7 @@ In ZQK Studio and execution planning, the graph renders as an audited two-dimens
 flowchart TD
     subgraph Matrix["GANTT MATRIX TOPOLOGY"]
         direction TB
-        subgraph Col1["Cycle 1 (Sprint A)"]
+        subgraph Col1["Batch 1 (Sprint A)"]
             P1["PRI-PLAN-001<br/>(Scope-Locked)"]
             subgraph WS1["Workstream 1: Core Engine"]
                 B1["BLI-001"]
@@ -82,7 +82,7 @@ flowchart TD
             P1 --> WS1
         end
 
-        subgraph Col2["Cycle 2 (Sprint B)"]
+        subgraph Col2["Batch 2 (Sprint B)"]
             P2["PRI-PLAN-002<br/>(Scope-Locked)"]
             subgraph WS2["Workstream 2: Studio UI"]
                 B3["BLI-003"]
@@ -91,7 +91,7 @@ flowchart TD
             P2 --> WS2
         end
 
-        subgraph Col3["Cycle 3 (Sprint C)"]
+        subgraph Col3["Batch 3 (Sprint C)"]
             P3["PRI-PLAN-003<br/>(Scope-Locked)"]
             subgraph WS3["Workstream 3: DevRel"]
                 B5["BLI-005"]

@@ -62,7 +62,7 @@ cmd/zqk/validate/
 ├── completion_integration_test.go                # CAS-visible lifecycle and completion hash integration tests
 ├── command_ctor_ast_test.go                      # AST analysis unit tests for command constructor rules
 ├── memory_store_test.go                          # In-memory workflowStorage adapter for isolated unit testing
-└── validate_coverage_elevation_cycle116_test.go  # Cycle 116 coverage elevation test suite (>=90% statement coverage)
+└── validate_coverage_elevation_cycle116_test.go  # Validation coverage elevation test suite (>=90% statement coverage)
 ```
 
 ---

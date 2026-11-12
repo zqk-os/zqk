@@ -67,7 +67,7 @@ flowchart TD
 cmd/zqk/ci/
 ├── ci.go                                      # Cobra CLI command builders, flag definitions, and execution dispatch
 ├── ci_test.go                                 # Core lifecycle, hierarchy, and unset status verification tests
-└── ci_coverage_elevation_cycle113_test.go     # Cycle 113: Full pipeline run, skipped re-checkout, context cancellation tests
+└── ci_coverage_elevation_cycle113_test.go     # Full pipeline run, skipped re-checkout, context cancellation tests
 
 pkg/localci/
 ├── localci.go                                 # Local CI directory resolution, options, and archive retention logic
@@ -265,7 +265,7 @@ sequenceDiagram
 
 ## Verification & Statement Coverage Invariant
 
-The Local CI subsystem is governed by automated verification gates across three proof tiers, requiring statement test coverage of `cmd/zqk/ci` to meet or exceed `>= 90.0%` (achieving `100.0%` statement coverage in Cycle 113):
+The Local CI subsystem is governed by automated verification gates across three proof tiers, requiring statement test coverage of `cmd/zqk/ci` to meet or exceed `>= 90.0%` (achieving `100.0%` statement coverage):
 
 1. **Static Floor Invariant (`CRIT-STATIC-001`):**
    - Statement test coverage for `cmd/zqk/ci` is maintained at `>= 90.0%` (achieved `100.0%`).

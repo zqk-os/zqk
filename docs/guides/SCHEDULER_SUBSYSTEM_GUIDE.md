@@ -123,7 +123,7 @@ The scheduler subsystem is a Tier-0 mission-critical engine. Corrupt execution s
 Execute bounded, non-destructive test runs targeting only the scheduler package:
 
 ```bash
-# Run Cycle 126 coverage elevation suite
+# Run scheduler coverage elevation suite
 ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s ./pkg/scheduler -run 'TestCycle126'
 
 # Measure statement coverage across the scheduler subsystem

@@ -116,7 +116,7 @@ This achieves cascading safety boundaries across distributed components without 
 The integrity of `pkg/events` is guaranteed across three rigorous verification dimensions:
 
 ### 5.1 Static Floor Invariant
-- **Criterion**: Statement test coverage for `pkg/events` must meet or exceed **85.0%** (achieving **100.0%** in Cycle 148).
+- **Criterion**: Statement test coverage for `pkg/events` must meet or exceed **85.0%** (achieving **100.0%** statement coverage).
 - **Rule Enforcement**: Verified deterministically via Go test coverage instrumentation:
   ```bash
   go test -cover ./pkg/events/...

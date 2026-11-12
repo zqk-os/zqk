@@ -311,7 +311,7 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test ./cmd/zqk -run TestHelpMenuParity
 
 ## 7. Traceability Matrix
 
-### Cycle 55: Auto-Remedy Execution & Flag Parity Subsystem
+### Subsystem Track: Auto-Remedy Execution & Flag Parity Subsystem
 
 | Artifact / Contract | Identifier | Verification Proof |
 | :--- | :--- | :--- |
@@ -324,7 +324,7 @@ ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test ./cmd/zqk -run TestHelpMenuParity
 | **Negative Boundary Criteria** | `CRIT-001` | `TestAutoRemedy_NegativeBoundary_UnsafeRecipeRejection` |
 | **Compliance Criteria** | `CRIT-001` | `docs/guides/CLI_AUTO_REMEDY_AND_PARITY.md` specification per POL-DOC-001 |
 
-### Cycle 52: Recipe Generation & Help Golden Parity Baseline
+### Subsystem Track: Recipe Generation & Help Golden Parity Baseline
 
 | Artifact / Contract | Identifier | Verification Proof |
 | :--- | :--- | :--- |

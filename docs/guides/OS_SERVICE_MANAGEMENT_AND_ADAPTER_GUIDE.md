@@ -323,9 +323,9 @@ var (
 
 Statement test coverage for `pkg/service` is strictly governed by automated check valves:
 
-| Package | Minimum Floor Coverage | Target Coverage | Cycle 208 Achieved | Verification Command |
+| Package | Minimum Floor Coverage | Target Coverage | Verified Coverage | Verification Command |
 | :--- | :--- | :--- | :--- | :--- |
-| `pkg/service` | **85.0%** | **>= 95.0%** | **95.4%** | `ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s -cover ./pkg/service` |
+| `pkg/service` | **85.0%** | **>= 95.0%** | **95.4% (Certified)** | `ZQK_ALLOW_FOREGROUND_GO_TEST=1 go test -v -timeout 30s -cover ./pkg/service` |
 
 ### Key Test Suites & Coverage Focus
 - `TestCycle208_AdapterHelpers_DirectoryOperations`: Validates directory scanning, permission error handling, and unit file presence detection.

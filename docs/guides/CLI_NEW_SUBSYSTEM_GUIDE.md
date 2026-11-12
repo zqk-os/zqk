@@ -81,7 +81,7 @@ To eliminate friction during high-velocity development, `zqk new` registers top-
 | `zqk new roadmap` | — | Multi-horizon strategic roadmap | `zqk new roadmap --title "H2 Performance Runway"` |
 | `zqk new workstream` | `ws` | Dedicated domain track | `zqk new workstream --title "Storage Optimization"` |
 | `zqk new epic` | — | Thematic multi-plan container | `zqk new epic --title "Storage Engine Refactor"` |
-| `zqk new plan` | `pri`, `priority_plan` | 1-cycle time-bounded execution batch | `zqk new plan --title "Cycle 110: Storage Sharding"` |
+| `zqk new plan` | `pri`, `priority_plan` | 1-cycle time-bounded execution batch | `zqk new plan --title "Storage Sharding Batch"` |
 | `zqk new req` | `requirement` | Timeless functional whole-feature contract | `zqk new req --title "Append-Only WAL Sharding"` |
 | `zqk new crit` | `criteria` | Three-fold verification contract | `zqk new crit --title "Static Floor: Sync Latency &lt; 2ms"` |
 | `zqk new tc` | `test_case` | 1:1 Unified test suite wrapper | `zqk new tc --title "Verify WAL Sharding Contracts"` |
@@ -286,7 +286,7 @@ zqk new goal --title "Enterprise Storage Resilience"
 zqk new req --title "Multi-Region Read Replicas" --trace-pipeline
 
 # 3. Mint a 1-cycle priority plan aiming toward a release milestone
-zqk new plan --title "Cycle 112: Read Replica Sharding"
+zqk new plan --title "Read Replica Sharding Batch"
 
 # 4. Mint an atomic unit of effort with immediate promote enqueuing
 zqk new bli --title "Add Shard Consensus Ping" \

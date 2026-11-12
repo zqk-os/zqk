@@ -68,7 +68,7 @@ cmd/zqk/automation/
 ├── docman_sync_integration_test.go                    # Integration test suite for docman registry sync
 ├── lint_bypass_coordination_test.go                   # Sync router and storage verification test suite
 ├── automation_coverage_elevation_test.go              # Elevation suite for command execution and auto-detection
-└── automation_coverage_elevation_cycle114_test.go     # Cycle 114: Comprehensive branch coverage (97%+ statements)
+└── automation_coverage_elevation_cycle114_test.go     # Comprehensive branch coverage (97%+ statements)
 ```
 
 ---

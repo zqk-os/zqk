@@ -53,7 +53,7 @@ Visualizing query results outputs hierarchical graph trees showing incoming, out
   ● (p:priority_plan PRI-001)
       ───[:items]──► (b:backlog_item BLI-001)
           ───[:criteria_refs]──► (c:criteria CRIT-001)
-      └─ Properties: p.title=Cycle 68, b.status=in_progress
+      └─ Properties: p.title=Execution Plan Alpha, b.status=in_progress
 
 (Visualized 1 path(s))
 ```

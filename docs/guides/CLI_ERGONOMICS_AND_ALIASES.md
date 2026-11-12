@@ -12,7 +12,7 @@ The Knowledge Kernel CLI provides ergonomic short aliases for common core kinds 
 
 | Kind | Aliases | Example Usage |
 | :--- | :--- | :--- |
-| `priority_plan` | `plan`, `pri` | `zqk new pri --title "Cycle 51 Work"` |
+| `priority_plan` | `plan`, `pri` | `zqk new pri --title "Storage Elevation Plan"` |
 | `requirement` | `req` | `zqk new req --title "Fast Search"` |
 | `criteria` | `crit` | `zqk new crit --title "Sub-15ms Latency"` |
 | `test_case` | `tst`, `tc` | `zqk new tst --title "Verify Latency"` |
