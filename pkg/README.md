@@ -76,7 +76,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [entitlements](./entitlements/) | `github.com/zqk-os/zqk/pkg/entitlements` | 1+4 | 4 | - | ❌ - | Role-based feature access control, license entitlement gates, and tier verification. |
 | [envelope](./envelope/) | `github.com/zqk-os/zqk/pkg/envelope` | 1+2 | 2 | - | ❌ - | Standardized message envelope format for inter-process and network communication. |
 | [errfmt](./errfmt/) | `github.com/zqk-os/zqk/pkg/errfmt` | 1+4 | 4 | - | ❌ - | Structured error formatting, actionable error reporting, and troubleshooting suggestions. |
-| [eval](./eval/) | `github.com/zqk-os/zqk/pkg/eval` | 13+9 | 9 | - | ❌ - | Eval component and domain abstractions for ZQK Core. |
+| [eval](./eval/) | `github.com/zqk-os/zqk/pkg/eval` | 13+10 | 10 | - | ❌ - | Eval component and domain abstractions for ZQK Core. |
 | [events](./events/) | `github.com/zqk-os/zqk/pkg/events` | 2+4 | 4 | - | ❌ - | Event bus, overlay event streams, and asynchronous event pub/sub routing. |
 | [evolution](./evolution/) | `github.com/zqk-os/zqk/pkg/evolution` | 5+5 | 5 | - | ❌ - | Schema migration, data model version evolution, and compatibility adapters. |
 | [evolutionpack](./evolutionpack/) | `github.com/zqk-os/zqk/pkg/evolutionpack` | 1+1 | 1 | - | ❌ - | Model evolution pack managing version upgrade chains and deprecation schedules. |
