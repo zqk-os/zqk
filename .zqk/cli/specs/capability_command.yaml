@@ -1,0 +1,23 @@
+$schema: _schemas/command_spec.schema.json
+name: capability
+short: Deny-by-default capability authorization surface
+description: |
+  Evaluate whether a named capability may proceed. Unknown and forbidden
+  actions return a typed policy rejection so agents can recover to an allowed path.
+help:
+  examples:
+    - comment: "Authorize an allowed capability"
+      command: "%s capability authorize --name demo:safe --agent-id stranger"
+    - comment: "Observe typed denial for a forbidden action"
+      command: "%s capability authorize --name demo:forbidden --agent-id stranger"
+    - comment: "List built-in demo capabilities"
+      command: "%s capability list"
+common_flags: true
+requires_storage: false
+requires_session: false
+requires_scheduler_check: false
+subcommands:
+  - name: authorize
+    spec_ref: capability/authorize_command.yaml
+  - name: list
+    spec_ref: capability/list_command.yaml

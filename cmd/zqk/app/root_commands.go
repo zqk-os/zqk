@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/autopilot"
 	bundlecmd "github.com/zqk-os/zqk/cmd/zqk/bundle"
 	"github.com/zqk-os/zqk/cmd/zqk/callback"
+	capabilitycmd "github.com/zqk-os/zqk/cmd/zqk/capability"
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
 	"github.com/zqk-os/zqk/cmd/zqk/daemon"
@@ -478,6 +479,11 @@ func registerCommands() {
 	steerCmdInst := steercmd.NewSteerCmd()
 	steerCmdInst.GroupID = "everyday"
 	rootCmd.AddCommand(steerCmdInst)
+
+	// Deny-by-default capability surface (zqk capability)
+	capabilityCmdInst := capabilitycmd.NewCapabilityCmd()
+	capabilityCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(capabilityCmdInst)
 
 	// Native N-Vector evaluation registry & steering signal stream (zqk vector)
 	vectorCmdInst := vectorcmd.NewVectorCmd()
