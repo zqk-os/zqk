@@ -87,6 +87,50 @@ func (r *defaultRegistry) List() []Capability {
 	return list
 }
 
+// Authorize evaluates whether the named capability may proceed.
+// Deny-by-default: nil registry, empty name, unknown capability, or a false
+// policy result all return ErrPolicyRejected. Policy evaluation errors fail closed
+// as ErrPolicyRejected (wrapped) so callers can recover on a typed denial.
+func Authorize(ctx context.Context, reg Registry, name string, evalCtx EvalContext) error {
+	if reg == nil {
+		return ErrPolicyRejected
+	}
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return ErrPolicyRejected
+	}
+	c, err := reg.Get(name)
+	if err != nil {
+		return ErrPolicyRejected
+	}
+	ok, err := c.EvaluatePolicy(ctx, evalCtx)
+	if err != nil {
+		return errors.Join(ErrPolicyRejected, err)
+	}
+	if !ok {
+		return ErrPolicyRejected
+	}
+	return nil
+}
+
+// StaticCapability is a fixed allow/deny capability for demos and tests.
+type StaticCapability struct {
+	CapName        string
+	CapDescription string
+	Allow          bool
+}
+
+// Name implements Capability.
+func (s StaticCapability) Name() string { return s.CapName }
+
+// Description implements Capability.
+func (s StaticCapability) Description() string { return s.CapDescription }
+
+// EvaluatePolicy implements Capability.
+func (s StaticCapability) EvaluatePolicy(ctx context.Context, evalCtx EvalContext) (bool, error) {
+	return s.Allow, nil
+}
+
 // SynthesisPipeline enforces that capability synthesis requires a valid test_case reference.
 type SynthesisPipeline struct {
 	registry Registry

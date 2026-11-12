@@ -72,6 +72,34 @@ func TestEvaluatePolicy(t *testing.T) {
 	assert.False(t, allowed)
 }
 
+func TestAuthorize_DenyByDefault(t *testing.T) {
+	ctx := context.Background()
+	reg := capability.NewRegistry()
+	assert.NoError(t, reg.Register(&mockCapability{name: "tool:read", allowed: true}))
+	assert.NoError(t, reg.Register(&mockCapability{name: "tool:write", allowed: false}))
+
+	assert.ErrorIs(t, capability.Authorize(ctx, nil, "tool:read", capability.EvalContext{}), capability.ErrPolicyRejected)
+	assert.ErrorIs(t, capability.Authorize(ctx, reg, "", capability.EvalContext{}), capability.ErrPolicyRejected)
+	assert.ErrorIs(t, capability.Authorize(ctx, reg, "tool:unknown", capability.EvalContext{}), capability.ErrPolicyRejected)
+	assert.ErrorIs(t, capability.Authorize(ctx, reg, "tool:write", capability.EvalContext{}), capability.ErrPolicyRejected)
+	assert.NoError(t, capability.Authorize(ctx, reg, "tool:read", capability.EvalContext{}))
+}
+
+func TestAuthorize_StaticCapabilityDemoPath(t *testing.T) {
+	ctx := context.Background()
+	reg := capability.NewRegistry()
+	assert.NoError(t, reg.Register(capability.StaticCapability{
+		CapName: "demo:safe", CapDescription: "allowed demo action", Allow: true,
+	}))
+	assert.NoError(t, reg.Register(capability.StaticCapability{
+		CapName: "demo:forbidden", CapDescription: "blocked demo action", Allow: false,
+	}))
+
+	assert.NoError(t, capability.Authorize(ctx, reg, "demo:safe", capability.EvalContext{AgentID: "stranger"}))
+	err := capability.Authorize(ctx, reg, "demo:forbidden", capability.EvalContext{AgentID: "stranger"})
+	assert.ErrorIs(t, err, capability.ErrPolicyRejected)
+}
+
 func TestSynthesisPipeline(t *testing.T) {
 	reg := capability.NewRegistry()
 	pipeline := capability.NewSynthesisPipeline(reg)

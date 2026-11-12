@@ -1,0 +1,10 @@
+$schema: ../_schemas/command_spec.schema.json
+name: list
+short: List built-in demo capabilities
+description: |
+  Lists the built-in stranger-demo capability set used by capability authorize.
+help:
+  examples:
+    - comment: "List demo capabilities"
+      command: "%s capability list"
+common_flags: true
