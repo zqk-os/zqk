@@ -430,6 +430,10 @@ type Scheduler struct {
 	// admissionFailed records jobs whose admission hourglass already invoked callback_on_error
 	// so a late pool start cannot double-run or double-callback.
 	admissionFailed sync.Map // jobID -> struct{}
+
+	// stuckDrained records jobIDs whose started-without-complete audit was already drained this
+	// process lifetime so the lifecycle tick does not re-emit scheduler_job_failed every pass.
+	stuckDrained sync.Map // jobID -> struct{}
 }
 
 // lockFailureSkipThreshold: after this many consecutive lock failures, skip execution and stop logging the error.
