@@ -56,7 +56,7 @@ func stuckDrainThresholdForJob(job *ScheduledJob, occupied bool, staleAfter time
 // as failed with a durable audit trail so `scheduler activity` / `history --job-id` stop showing
 // silent forever-started work. Returns the number of jobs drained this call.
 //
-// TRACK: GOAL-1794519849204113000-32fabd28 — scheduler never silently loses work (counsel G3).
+// TRACK: https://github.com/zqk-os/zqk/pull/1117 — stuck started-without-complete drain (counsel G3).
 func (s *Scheduler) DrainStuckStartedJobs(ctx context.Context, staleAfter time.Duration) int {
 	if s == nil {
 		return 0
