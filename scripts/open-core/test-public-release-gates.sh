@@ -59,6 +59,7 @@ if [ "$STAGE" = "docs" ]; then
 		printf '%s\n' "release notes missing in docs/releases/" >&2
 		exit 1
 	fi
+	go test -run TestReleaseNotesChecker_RepoReleases ./pkg/releasegate/...
 	sh "$ROOT/scripts/open-core/docs-portal/deploy-docs-portal.sh" --dry-run
 	printf '%s\n' "CRITERIA PASS: Documentation & Knowledge Base Entry Verified"
 	exit 0

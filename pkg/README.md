@@ -48,7 +48,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [cliapp](./cliapp/) | `github.com/zqk-os/zqk/pkg/cliapp` | 29+33 | 33 | context, errorsuggest, flagutil | ✅ [README](./cliapp/README.md) | Import path: github.com/zqk-os/zqk/pkg/cliapp. |
 | [clihooks](./clihooks/) | `github.com/zqk-os/zqk/pkg/clihooks` | 2+2 | 2 | - | ❌ - | CLI execution hooks, pre/post-command intercepts, and telemetry emission. |
 | [closureevidence](./closureevidence/) | `github.com/zqk-os/zqk/pkg/closureevidence` | 1+2 | 2 | - | ❌ - | Evidence collection and cryptographic verification for backlog item closure. |
-| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 48+177 | 177 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
+| [community](./community/) | `github.com/zqk-os/zqk/pkg/community` | 60+109 | 109 | - | ❌ - | Open-source community distribution, telemetry anonymization, docs portal, and packaging. |
 | [concurrency](./concurrency/) | `github.com/zqk-os/zqk/pkg/concurrency` | 11+12 | 12 | - | ✅ [README](./concurrency/README.md) | This package provides standardized concurrency primitives and patterns to ensure consistent, safe, and observable concurrent op... |
 | [config](./config/) | `github.com/zqk-os/zqk/pkg/config` | 10+8 | 8 | - | ❌ - | Kernel configuration loading, YAML parsing, environment overrides, and schema validation. |
 | [consensus](./consensus/) | `github.com/zqk-os/zqk/pkg/consensus` | 2+1 | 1 | - | ❌ - | Consensus component and domain abstractions for ZQK Core. |
@@ -107,7 +107,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [infrastructure](./infrastructure/) | `github.com/zqk-os/zqk/pkg/infrastructure` | 4+2 | 2 | crypto, hts | ❌ - | Core infrastructure components, hardware abstraction, and cryptographic storage. |
 | [ingestion](./ingestion/) | `github.com/zqk-os/zqk/pkg/ingestion` | 0+0 | 0 | adapters | ❌ - | Data ingestion pipeline, file format adapters, and document translation. |
 | [integrity](./integrity/) | `github.com/zqk-os/zqk/pkg/integrity` | 4+3 | 3 | - | ❌ - | Kernel state integrity verification, hash validation, and tamper detection. |
-| [interactionpolicy](./interactionpolicy/) | `github.com/zqk-os/zqk/pkg/interactionpolicy` | 10+8 | 8 | - | ❌ - | User-agent interaction constraints, confirmation prompts, and safe intervention rules. |
+| [interactionpolicy](./interactionpolicy/) | `github.com/zqk-os/zqk/pkg/interactionpolicy` | 11+9 | 9 | - | ❌ - | User-agent interaction constraints, confirmation prompts, and safe intervention rules. |
 | [interactive](./interactive/) | `github.com/zqk-os/zqk/pkg/interactive` | 6+5 | 5 | - | ❌ - | Interactive terminal UI components, prompts, select menus, and survey wizards. |
 | [interfacepack](./interfacepack/) | `github.com/zqk-os/zqk/pkg/interfacepack` | 1+1 | 1 | - | ❌ - | Interface contract and API boundary specifications pack. |
 | [io](./io/) | `github.com/zqk-os/zqk/pkg/io` | 5+1 | 1 | - | ❌ - | Io component and domain abstractions for ZQK Core. |
@@ -170,7 +170,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [quality](./quality/) | `github.com/zqk-os/zqk/pkg/quality` | 13+17 | 17 | - | ❌ - | Quality component and domain abstractions for ZQK Core. |
 | [quick](./quick/) | `github.com/zqk-os/zqk/pkg/quick` | 1+1 | 1 | - | ❌ - | Parsing and helpers for one-click creation of system objects from text or files. |
 | [relay](./relay/) | `github.com/zqk-os/zqk/pkg/relay` | 2+3 | 3 | - | ❌ - | Message relay, inter-process communication, and agent event forwarding. |
-| [releasegate](./releasegate/) | `github.com/zqk-os/zqk/pkg/releasegate` | 2+4 | 4 | - | ❌ - | Verification gates and multi-platform compilation tests for release candidates. |
+| [releasegate](./releasegate/) | `github.com/zqk-os/zqk/pkg/releasegate` | 3+5 | 5 | - | ❌ - | Verification gates and multi-platform compilation tests for release candidates. |
 | [releasepack](./releasepack/) | `github.com/zqk-os/zqk/pkg/releasepack` | 1+1 | 1 | - | ❌ - | Release gates, artifact generation, and deployment pack. |
 | [reports](./reports/) | `github.com/zqk-os/zqk/pkg/reports` | 4+2 | 2 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |
 | [reqharness](./reqharness/) | `github.com/zqk-os/zqk/pkg/reqharness` | 1+2 | 2 | - | ❌ - | The test-requirements verification harness. It closes the loop between a requirement (kernel object shape: id, claim, test_crit... |
@@ -203,7 +203,8 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [stewardbase](./stewardbase/) | `github.com/zqk-os/zqk/pkg/stewardbase` | 1+2 | 2 | - | ❌ - | Base interfaces and common abstractions for stream storage stewards. |
 | [storage](./storage/) | `github.com/zqk-os/zqk/pkg/storage` | 332+331 | 331 | audit, binary, +11 more | ✅ [README](./storage/README.md) | This package provides a unified storage abstraction layer for zqk, supporting both file-based and graph-based storage backends... |
 | [storagetesting](./storagetesting/) | `github.com/zqk-os/zqk/pkg/storagetesting` | 2+2 | 2 | - | ❌ - | Holds the minimal interfaces and option structs shared by [github.com/zqk-os/zqk/pkg/testing.SetupCompleteTestEnvironment] and... |
-| [strutil](./strutil/) | `github.com/zqk-os/zqk/pkg/strutil` | 4+5 | 5 | - | ❌ - | String manipulation, token extraction, and text formatting utilities. |
+| [stringutil](./stringutil/) | `github.com/zqk-os/zqk/pkg/stringutil` | 1+1 | 1 | - | ❌ - | Stringutil component and domain abstractions for ZQK Core. |
+| [strutil](./strutil/) | `github.com/zqk-os/zqk/pkg/strutil` | 5+6 | 6 | - | ❌ - | String manipulation, token extraction, and text formatting utilities. |
 | [studio](./studio/) | `github.com/zqk-os/zqk/pkg/studio` | 4+2 | 2 | components | ❌ - | Visual Studio Web UI backend, asset serving, and interactive dashboard APIs. |
 | [supervision](./supervision/) | `github.com/zqk-os/zqk/pkg/supervision` | 4+3 | 3 | - | ❌ - | Process supervision trees, worker restarts, and crash resilience. |
 | [supply](./supply/) | `github.com/zqk-os/zqk/pkg/supply` | 1+6 | 6 | - | ❌ - | Dependency supply chain validation, vendor verification, and bill of materials. |
@@ -237,7 +238,7 @@ This directory contains Go packages for the ZQK project. Each package is a modul
 | [vds](./vds/) | `github.com/zqk-os/zqk/pkg/vds` | 10+8 | 8 | - | ❌ - | Verifiable Decomposition Spine (VDS) verification, traceability, and done-gates. |
 | [vector](./vector/) | `github.com/zqk-os/zqk/pkg/vector` | 3+1 | 1 | - | ❌ - | Vector component and domain abstractions for ZQK Core. |
 | [verification](./verification/) | `github.com/zqk-os/zqk/pkg/verification` | 1+3 | 3 | matrix | ❌ - | Formal verification of kernel constraints, schemas, and invariants. |
-| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 17+10 | 10 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
+| [vet](./vet/) | `github.com/zqk-os/zqk/pkg/vet` | 18+11 | 11 | - | ❌ - | Code quality vetting, static analysis rules, and repository linting. |
 | [vocabularypack](./vocabularypack/) | `github.com/zqk-os/zqk/pkg/vocabularypack` | 1+1 | 1 | - | ❌ - | Canonical domain terminology and glossary definitions pack. |
 | [walutil](./walutil/) | `github.com/zqk-os/zqk/pkg/walutil` | 3+4 | 4 | - | ❌ - | Walutil component and domain abstractions for ZQK Core. |
 | [when](./when/) | `github.com/zqk-os/zqk/pkg/when` | 5+5 | 5 | - | ❌ - | Use of this source code is governed by an Apache-2.0 license. |
@@ -562,6 +563,7 @@ pkg/
 │   └── systemcheck/
 │   └── wal/
 ├── storagetesting/          # Holds the minimal interfaces and option structs shared by [g
+├── stringutil/          # Stringutil component and domain abstractions for ZQK Core.
 ├── strutil/          # String manipulation, token extraction, and text formatting u
 ├── studio/          # Visual Studio Web UI backend, asset serving, and interactive
 │   └── components/
