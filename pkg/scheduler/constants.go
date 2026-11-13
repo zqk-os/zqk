@@ -1,6 +1,8 @@
 package scheduler
 
 import (
+	"time"
+
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -203,6 +205,9 @@ const (
 	DefaultRetryCount        = 0
 	DefaultRetryDelaySeconds = 5
 	DefaultMaxRuntimeSeconds = 3600 // 1 hour
+	// DefaultStuckJobDrainAfter matches CLI activity --stuck-stale-after (INV): started-without-
+	// complete audits older than this are drained with a durable scheduler_job_failed trail.
+	DefaultStuckJobDrainAfter = 30 * time.Minute
 )
 
 // MaxAggregationObjectCountPerKind caps per-kind object counts before aggregation handlers adapt

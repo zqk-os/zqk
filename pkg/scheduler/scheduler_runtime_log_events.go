@@ -156,6 +156,7 @@ const (
 	LogEventSchedulerTriggerQueueFailedTriggerFromQueue        = schedulerTriggerQueueWirePrefix + "_failed_trigger_from_queue"
 	LogEventSchedulerTriggerQueueExcessiveMissingTestBundles   = schedulerTriggerQueueWirePrefix + "_excessive_missing_test_bundles"
 	LogEventSchedulerTriggerQueueAdmissionFailed               = schedulerTriggerQueueWirePrefix + "_admission_failed"
+	LogEventSchedulerTriggerQueueStuckJobDrained               = schedulerTriggerQueueWirePrefix + "_stuck_job_drained"
 )
 
 // Dispatch pressure (dispatch_pressure_events.go).

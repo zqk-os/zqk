@@ -147,6 +147,7 @@ func TestSchedulerRuntimeLogEvents_wirePrefixes(t *testing.T) {
 		LogEventSchedulerTriggerQueueFailedReenqueueNotFoundRetry,
 		LogEventSchedulerTriggerQueueFailedReenqueuePoolFull,
 		LogEventSchedulerTriggerQueuePoolFullRequeuedForPoll,
+		LogEventSchedulerTriggerQueueStuckJobDrained,
 		LogEventSchedulerTriggerQueueFailedTriggerFromQueue,
 		LogEventSchedulerTriggerQueueExcessiveMissingTestBundles,
 		LogEventSchedulerTriggerQueueAdmissionFailed,

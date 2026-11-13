@@ -187,6 +187,8 @@ func (s *Scheduler) applySchedulerConfigWatchTick(ctx context.Context) configWat
 		}
 	}
 	s.scanAdmissionTimeouts(ctx)
+	// Drain INV started-without-complete audits so activity/history stop showing silent forever-started work.
+	_ = s.DrainStuckStartedJobs(ctx, DefaultStuckJobDrainAfter)
 	return result
 }
 
