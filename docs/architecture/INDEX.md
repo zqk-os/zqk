@@ -76,6 +76,7 @@ Documents governing multi-agent coordination, bounded domain packages, and exten
 - **[SpecBuilder CodeGen & Enum Consolidation](./SPECBUILDER_CODEGEN_CONSOLIDATION.md)**: SpecBuilder code generation, AST pruning, and domain enum aggregation.
 - **[Synthetic Constant Eradication Governance](./SYNTHETIC_CONSTANT_ERADICATION_GOVERNANCE.md)**: Elimination of stringly-typed magic constants in favor of canonical spec-derived constants.
 - **[Vendor-Agnostic Anti-Idle Continuation Hook Architecture](./VENDOR_AGNOSTIC_ANTI_IDLE_CONTINUATION_HOOK.md)**: Standardized lifecycle continuation hook adapters, non-interrupting steering feeds, and fail-closed anti-idleness in autonomous CAP loops.
+- **[ADR-0149: Federated Knowledge Exchange Dialect & Ontological Mapping v0.4.2](./ADR_FEDERATED_KNOWLEDGE_EXCHANGE_DIALECT_V042.md)**: Cross-cluster dialect schemas, bidirectional field mappings, and cyclic translation defense.
 
 ---
 
