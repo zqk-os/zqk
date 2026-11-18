@@ -63,6 +63,9 @@ type VerificationMesh struct {
 
 // NewVerificationMesh constructs an active peer-to-peer verification mesh.
 func NewVerificationMesh(minStake uint64, quorumPct uint32) (*VerificationMesh, error) {
+	if minStake == 0 {
+		return nil, fmt.Errorf("minimum stake must be positive, got %d", minStake)
+	}
 	if quorumPct == 0 || quorumPct > 100 {
 		return nil, fmt.Errorf("quorum percentage must be between 1 and 100, got %d", quorumPct)
 	}
@@ -87,6 +90,9 @@ func (m *VerificationMesh) RegisterPeer(node PeerNode) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
+	if node.Stake == 0 {
+		return fmt.Errorf("peer stake must be positive")
+	}
 	if node.Stake < m.minStake {
 		return fmt.Errorf("peer stake %d below minimum anti-sybil quota %d", node.Stake, m.minStake)
 	}
@@ -97,6 +103,23 @@ func (m *VerificationMesh) RegisterPeer(node PeerNode) error {
 	node.Active = true
 
 	m.peers[node.ID] = &node
+	return nil
+}
+
+// IsolatePeer marks a registered peer inactive so its claims, votes, and stake are excluded from consensus.
+func (m *VerificationMesh) IsolatePeer(peerID string) error {
+	if err := strutil.ErrorOnBlank(peerID, "peer ID cannot be blank"); err != nil {
+		return err
+	}
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	peer, exists := m.peers[peerID]
+	if !exists {
+		return fmt.Errorf("peer %q not found", peerID)
+	}
+	peer.Active = false
 	return nil
 }
 

@@ -19,7 +19,10 @@ func TestVerificationMesh_StaticFloorInvariant(t *testing.T) {
 		t.Fatalf("failed to initialize mesh: %v", err)
 	}
 
-	// 1. Quorum percentage boundary checks
+	// 1. Stake and quorum percentage boundary checks
+	if _, err := NewVerificationMesh(0, 67); err == nil {
+		t.Fatal("expected error for zero minimum stake")
+	}
 	if _, err := NewVerificationMesh(100, 0); err == nil {
 		t.Fatal("expected error for 0% quorum")
 	}
@@ -37,7 +40,10 @@ func TestVerificationMesh_StaticFloorInvariant(t *testing.T) {
 		t.Fatalf("failed to register valid peer: %v", err)
 	}
 
-	// 3. Reject below-minimum anti-sybil stake quota
+	// 3. Reject zero and below-minimum anti-sybil stake quota
+	if err := mesh.RegisterPeer(PeerNode{ID: "zero-stake-node", PublicKey: "02zero", Stake: 0}); err == nil {
+		t.Fatal("expected rejection of peer with zero stake")
+	}
 	sybilPeer := PeerNode{
 		ID:        "sybil-node-1",
 		PublicKey: "02sybil12345",
@@ -175,5 +181,76 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 	}
 	if err := mesh.CastVote("c1", PeerVote{PeerID: "author-1", Signature: ""}); err == nil {
 		t.Fatal("expected error on blank signature in vote")
+	}
+
+	// 6. Insufficient threshold rejection: sub-threshold quorum and sub-threshold approval
+	if _, err := mesh.EvaluateConsensus("non-existent-claim"); err == nil {
+		t.Fatal("expected error when evaluating consensus for non-existent claim")
+	}
+	for i := 2; i <= 3; i++ {
+		if err := mesh.RegisterPeer(PeerNode{
+			ID:        fmt.Sprintf("author-%d", i),
+			PublicKey: fmt.Sprintf("pub-author-%d", i),
+			Stake:     1000,
+		}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Only author-1 votes (1000 / 3000 = 33.3% < 67% quorum) -> QuorumMet=false, Approved=false
+	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-1", Signature: "sig-1", Approve: true}); err != nil {
+		t.Fatal(err)
+	}
+	subQuorumRes, err := mesh.EvaluateConsensus(claim.ID)
+	if err != nil {
+		t.Fatalf("unexpected error evaluating sub-quorum claim: %v", err)
+	}
+	if subQuorumRes.QuorumMet || subQuorumRes.Approved {
+		t.Fatalf("expected QuorumMet=false and Approved=false for sub-threshold quorum, got QuorumMet=%v Approved=%v", subQuorumRes.QuorumMet, subQuorumRes.Approved)
+	}
+
+	// author-2 rejects (2000 / 3000 = 66.7% < 67% quorum, and 1000/2000 = 50% approval < 67%)
+	// Add author-3 rejecting so quorum is met (3000/3000 = 100%), but approval is 1000/3000 = 33.3% < 67%
+	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-2", Signature: "sig-2", Approve: false}); err != nil {
+		t.Fatal(err)
+	}
+	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-3", Signature: "sig-3", Approve: false}); err != nil {
+		t.Fatal(err)
+	}
+	subApprovalRes, err := mesh.EvaluateConsensus(claim.ID)
+	if err != nil {
+		t.Fatalf("unexpected error evaluating sub-approval claim: %v", err)
+	}
+	if !subApprovalRes.QuorumMet {
+		t.Fatalf("expected QuorumMet=true with 100%% participation, got false")
+	}
+	if subApprovalRes.Approved {
+		t.Fatalf("expected Approved=false for sub-threshold approval (33.3%% < 67%%), got true")
+	}
+
+	// 7. Malicious node isolation and insufficient-stake re-registration rejection
+	if err := mesh.IsolatePeer(""); err == nil {
+		t.Fatal("expected error when isolating blank peer ID")
+	}
+	if err := mesh.IsolatePeer("unknown-peer"); err == nil {
+		t.Fatal("expected error when isolating unknown peer")
+	}
+	if err := mesh.IsolatePeer("author-3"); err != nil {
+		t.Fatalf("failed to isolate peer author-3: %v", err)
+	}
+	if _, err := mesh.SubmitClaim(MeshClaim{ID: "claim-isolated", Author: "author-3", Payload: []byte("malicious")}); err == nil {
+		t.Fatal("expected rejection of claim from isolated peer")
+	}
+	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-3", Signature: "sig-3-retry", Approve: true}); err == nil {
+		t.Fatal("expected rejection of vote from isolated peer")
+	}
+	isolatedRes, err := mesh.EvaluateConsensus(claim.ID)
+	if err != nil {
+		t.Fatalf("unexpected error evaluating consensus after isolation: %v", err)
+	}
+	if isolatedRes.TotalStakeVotes != 2000 {
+		t.Fatalf("expected TotalStakeVotes=2000 after isolating author-3, got %d", isolatedRes.TotalStakeVotes)
+	}
+	if err := mesh.RegisterPeer(PeerNode{ID: "author-3", PublicKey: "pub-author-3", Stake: 50}); err == nil {
+		t.Fatal("expected rejection when re-registering isolated peer with insufficient stake")
 	}
 }
