@@ -80,6 +80,42 @@ func TestFederatedExchange_StaticFloorInvariant(t *testing.T) {
 	if err := ex.RegisterRule(selfRule); err == nil {
 		t.Fatal("expected error when source and target dialect are identical")
 	}
+
+	if err := ex.RegisterDialect(community.DialectSchema{
+		Name:      "dialect_blank_field",
+		Namespace: "cluster-gamma",
+		Version:   "1.0.0",
+		Fields:    map[string]string{" ": "string"},
+	}); err == nil {
+		t.Fatal("expected error on blank dialect schema field name")
+	}
+
+	if err := ex.RegisterRule(community.TranslationRule{
+		ID:            "rule-blank-src-field",
+		SourceDialect: "dialect_a",
+		TargetDialect: "dialect_b",
+		FieldMappings: map[string]string{" ": "node_id"},
+	}); err == nil {
+		t.Fatal("expected error on blank source field name in translation rule")
+	}
+
+	if err := ex.RegisterRule(community.TranslationRule{
+		ID:            "rule-blank-tgt-field",
+		SourceDialect: "dialect_a",
+		TargetDialect: "dialect_b",
+		FieldMappings: map[string]string{"agent_id": ""},
+	}); err == nil {
+		t.Fatal("expected error on blank target field name in translation rule")
+	}
+
+	if _, err := ex.TranslateDirect(community.FederatedQuery{
+		ID:            "q-blank-field",
+		SourceDialect: "dialect_a",
+		TargetDialect: "dialect_b",
+		Payload:       map[string]interface{}{" ": "val"},
+	}); err == nil {
+		t.Fatal("expected error on blank query payload field name")
+	}
 }
 
 func setupChainExchange(t *testing.T) *community.FederatedExchange {
@@ -159,6 +195,72 @@ func TestFederatedExchange_OperationalDynamicProof(t *testing.T) {
 	}
 
 	verifyConcurrentTranslations(t, ex)
+
+	// Verify bidirectional field mapping and round-trip query conversion (100% field fidelity).
+	biEx := community.NewFederatedExchange()
+	for _, d := range []string{"dialect_a", "dialect_b", "dialect_c"} {
+		registerTestDialect(t, biEx, d, fmt.Sprintf("ns-%s", d), "1.0.0", nil)
+	}
+	for _, r := range []community.TranslationRule{
+		{
+			ID:            "bi-ab",
+			SourceDialect: "dialect_a",
+			TargetDialect: "dialect_b",
+			Bidirectional: true,
+			FieldMappings: map[string]string{
+				"agent_name":   "worker_identity",
+				"execution_ms": "elapsed_time",
+			},
+		},
+		{
+			ID:            "bi-bc",
+			SourceDialect: "dialect_b",
+			TargetDialect: "dialect_c",
+			Bidirectional: true,
+			FieldMappings: map[string]string{
+				"worker_identity": "actor_urn",
+				"elapsed_time":    "latency_duration",
+			},
+		},
+	} {
+		if err := biEx.RegisterRule(r); err != nil {
+			t.Fatalf("failed to register bidirectional rule %s: %v", r.ID, err)
+		}
+	}
+
+	fwd, err := biEx.TranslateChain(community.FederatedQuery{
+		ID:            "q-bi-fwd",
+		SourceDialect: "dialect_a",
+		TargetDialect: "dialect_c",
+		Payload: map[string]interface{}{
+			"agent_name":   "holon-validator-03",
+			"execution_ms": 250,
+			"trace_id":     "tr-999",
+		},
+	}, []string{"dialect_b"})
+	if err != nil {
+		t.Fatalf("failed forward bidirectional chain translation: %v", err)
+	}
+	if fwd.TranslatedPayload["actor_urn"] != "holon-validator-03" ||
+		fwd.TranslatedPayload["latency_duration"] != 250 ||
+		fwd.TranslatedPayload["trace_id"] != "tr-999" {
+		t.Fatalf("unexpected forward bidirectional payload: %+v", fwd.TranslatedPayload)
+	}
+
+	rev, err := biEx.TranslateChain(community.FederatedQuery{
+		ID:            "q-bi-rev",
+		SourceDialect: "dialect_c",
+		TargetDialect: "dialect_a",
+		Payload:       fwd.TranslatedPayload,
+	}, []string{"dialect_b"})
+	if err != nil {
+		t.Fatalf("failed reverse bidirectional chain translation: %v", err)
+	}
+	if rev.TranslatedPayload["agent_name"] != "holon-validator-03" ||
+		rev.TranslatedPayload["execution_ms"] != 250 ||
+		rev.TranslatedPayload["trace_id"] != "tr-999" {
+		t.Fatalf("expected 100%% field fidelity on reverse translation, got: %+v", rev.TranslatedPayload)
+	}
 }
 
 func assertCircularChainRejected(t *testing.T, ex *community.FederatedExchange) {
@@ -207,6 +309,16 @@ func TestFederatedExchange_NegativeAdversarialBoundary(t *testing.T) {
 		Payload:       map[string]interface{}{"k": "v"},
 	}); !errors.Is(err, community.ErrTranslationRuleNotFound) {
 		t.Fatalf("expected ErrTranslationRuleNotFound, got %v", err)
+	}
+
+	if err := ex.RegisterRule(community.TranslationRule{
+		ID:            "colliding-bi-rule",
+		SourceDialect: "dialect_x",
+		TargetDialect: "dialect_y",
+		Bidirectional: true,
+		FieldMappings: map[string]string{"src_a": "shared_tgt", "src_b": "shared_tgt"},
+	}); !errors.Is(err, community.ErrInvalidDialectSchema) {
+		t.Fatalf("expected ErrInvalidDialectSchema on colliding bidirectional target fields, got %v", err)
 	}
 
 	assertCircularChainRejected(t, ex)

@@ -36,11 +36,12 @@ type DialectSchema struct {
 	RegisteredAt time.Time         `json:"registered_at"`
 }
 
-// TranslationRule defines directional field-level conversion logic from source to target dialect.
+// TranslationRule defines directional or bidirectional field-level conversion logic between dialects.
 type TranslationRule struct {
 	ID            string            `json:"id"`
 	SourceDialect string            `json:"source_dialect"`
 	TargetDialect string            `json:"target_dialect"`
+	Bidirectional bool              `json:"bidirectional,omitempty"`
 	FieldMappings map[string]string `json:"field_mappings"` // sourceField -> targetField
 }
 
@@ -98,9 +99,15 @@ func (e *FederatedExchange) RegisterDialect(schema DialectSchema) error {
 		schema.RegisteredAt = time.Now().UTC()
 	}
 
-	// Make shallow copy of fields
+	// Make shallow copy of fields while validating non-blank field names and types
 	fieldsCopy := make(map[string]string, len(schema.Fields))
 	for k, v := range schema.Fields {
+		if err := strutil.ErrorOnBlank(k, "dialect field name cannot be blank"); err != nil {
+			return err
+		}
+		if err := strutil.ErrorOnBlank(v, "dialect field type cannot be blank"); err != nil {
+			return err
+		}
 		fieldsCopy[k] = v
 	}
 	schema.Fields = fieldsCopy
@@ -126,6 +133,27 @@ func (e *FederatedExchange) RegisterRule(rule TranslationRule) error {
 	if len(rule.FieldMappings) == 0 {
 		return fmt.Errorf("translation rule must provide at least one field mapping")
 	}
+	mappingsCopy := make(map[string]string, len(rule.FieldMappings))
+	var inverseMappings map[string]string
+	if rule.Bidirectional {
+		inverseMappings = make(map[string]string, len(rule.FieldMappings))
+	}
+	for srcField, tgtField := range rule.FieldMappings {
+		if err := strutil.ErrorOnBlank(srcField, "translation rule source field name cannot be blank"); err != nil {
+			return err
+		}
+		if err := strutil.ErrorOnBlank(tgtField, "translation rule target field name cannot be blank"); err != nil {
+			return err
+		}
+		mappingsCopy[srcField] = tgtField
+		if rule.Bidirectional {
+			if _, dup := inverseMappings[tgtField]; dup {
+				return fmt.Errorf("%w: duplicate target field %q in bidirectional rule", ErrInvalidDialectSchema, tgtField)
+			}
+			inverseMappings[tgtField] = srcField
+		}
+	}
+	rule.FieldMappings = mappingsCopy
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -139,6 +167,17 @@ func (e *FederatedExchange) RegisterRule(rule TranslationRule) error {
 
 	key := fmt.Sprintf("%s->%s", rule.SourceDialect, rule.TargetDialect)
 	e.rules[key] = &rule
+
+	if rule.Bidirectional {
+		revKey := fmt.Sprintf("%s->%s", rule.TargetDialect, rule.SourceDialect)
+		e.rules[revKey] = &TranslationRule{
+			ID:            rule.ID + ":reverse",
+			SourceDialect: rule.TargetDialect,
+			TargetDialect: rule.SourceDialect,
+			Bidirectional: true,
+			FieldMappings: inverseMappings,
+		}
+	}
 	return nil
 }
 
@@ -155,6 +194,11 @@ func (e *FederatedExchange) TranslateDirect(query FederatedQuery) (*TranslatedQu
 	}
 	if len(query.Payload) == 0 {
 		return nil, fmt.Errorf("query payload cannot be empty")
+	}
+	for fieldName := range query.Payload {
+		if err := strutil.ErrorOnBlank(fieldName, "query payload field name cannot be blank"); err != nil {
+			return nil, err
+		}
 	}
 
 	e.mu.RLock()
