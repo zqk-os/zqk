@@ -1243,7 +1243,12 @@ func compileWhatsNextDrive(out *whatsNextOut, ctx context.Context, sp workflowSt
 	}
 	if event == interactionpolicy.EventShovelReadyEmpty || event == interactionpolicy.EventStratplanAhead {
 		amb := stratplanAmbientFromWhatsNext(out)
+		// POL-AGENT-CAP-PRODUCT-ALIGNMENT-001: gut-check before residual fill / groom theater.
+		amb.GutCheck = interactionpolicy.CompileProductDeltaGutCheck(interactionpolicy.ProductDeltaSignals{
+			LeadTitleTheater: interactionpolicy.TitleLooksLikeResidualTheater(amb.LeadTitle),
+		})
 		drive = interactionpolicy.AppendStratplanAmbient(drive, amb)
+		drive = interactionpolicy.AppendGutCheck(drive, amb.GutCheck)
 		if event == interactionpolicy.EventStratplanAhead {
 			hint = interactionpolicy.CompileStratplanCommandHint(amb)
 		}
