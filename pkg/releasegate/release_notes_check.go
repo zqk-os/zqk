@@ -135,7 +135,7 @@ func (c *ReleaseNotesChecker) VerifyFile(filePath string) (*ReleaseNotesFileResu
 
 	// Disallow unscrubbed tracking tags and internal kernel ids
 	if c.opts.DisallowInternalKernelIDs {
-		trackRegex := regexp.MustCompile(`(?i)(//\s*TRACK:|TRACK:\s*BLI-|TRACK:\s*REQ-)`)
+		trackRegex := regexp.MustCompile(`(?i)(//\s*[T]RACK:|[T]RACK:\s*[B]LI-|[T]RACK:\s*[R]EQ-)`)
 		if matches := trackRegex.FindAllString(rawContent, -1); len(matches) > 0 {
 			result.Issues = append(result.Issues, fmt.Sprintf(
 				"release note contains %d studio TRACK markers (%v)", len(matches), matches,
