@@ -124,6 +124,15 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 		t.Fatalf("failed to initialize mesh: %v", err)
 	}
 
+	claim := assertUnregisteredRejectionAndSeedClaim(t, mesh)
+	assertBlankInputRejections(t, mesh)
+	assertInsufficientThresholdRejections(t, mesh, claim.ID)
+	assertMaliciousNodeIsolation(t, mesh, claim.ID)
+}
+
+func assertUnregisteredRejectionAndSeedClaim(t *testing.T, mesh *VerificationMesh) MeshClaim {
+	t.Helper()
+
 	// 1. Unregistered author cannot submit claims
 	claim := MeshClaim{
 		ID:      "claim-bad-author",
@@ -162,6 +171,11 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 	if err := mesh.CastVote("non-existent-claim", PeerVote{PeerID: "author-1", Signature: "sig"}); err == nil {
 		t.Fatal("expected rejection of vote on non-existent claim")
 	}
+	return claim
+}
+
+func assertBlankInputRejections(t *testing.T, mesh *VerificationMesh) {
+	t.Helper()
 
 	// 5. Blank ID / Author / Signature validations fail
 	if err := mesh.RegisterPeer(PeerNode{ID: "", PublicKey: "k", Stake: 500}); err == nil {
@@ -182,6 +196,10 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 	if err := mesh.CastVote("c1", PeerVote{PeerID: "author-1", Signature: ""}); err == nil {
 		t.Fatal("expected error on blank signature in vote")
 	}
+}
+
+func assertInsufficientThresholdRejections(t *testing.T, mesh *VerificationMesh, claimID string) {
+	t.Helper()
 
 	// 6. Insufficient threshold rejection: sub-threshold quorum and sub-threshold approval
 	if _, err := mesh.EvaluateConsensus("non-existent-claim"); err == nil {
@@ -197,10 +215,10 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 		}
 	}
 	// Only author-1 votes (1000 / 3000 = 33.3% < 67% quorum) -> QuorumMet=false, Approved=false
-	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-1", Signature: "sig-1", Approve: true}); err != nil {
+	if err := mesh.CastVote(claimID, PeerVote{PeerID: "author-1", Signature: "sig-1", Approve: true}); err != nil {
 		t.Fatal(err)
 	}
-	subQuorumRes, err := mesh.EvaluateConsensus(claim.ID)
+	subQuorumRes, err := mesh.EvaluateConsensus(claimID)
 	if err != nil {
 		t.Fatalf("unexpected error evaluating sub-quorum claim: %v", err)
 	}
@@ -210,13 +228,13 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 
 	// author-2 rejects (2000 / 3000 = 66.7% < 67% quorum, and 1000/2000 = 50% approval < 67%)
 	// Add author-3 rejecting so quorum is met (3000/3000 = 100%), but approval is 1000/3000 = 33.3% < 67%
-	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-2", Signature: "sig-2", Approve: false}); err != nil {
+	if err := mesh.CastVote(claimID, PeerVote{PeerID: "author-2", Signature: "sig-2", Approve: false}); err != nil {
 		t.Fatal(err)
 	}
-	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-3", Signature: "sig-3", Approve: false}); err != nil {
+	if err := mesh.CastVote(claimID, PeerVote{PeerID: "author-3", Signature: "sig-3", Approve: false}); err != nil {
 		t.Fatal(err)
 	}
-	subApprovalRes, err := mesh.EvaluateConsensus(claim.ID)
+	subApprovalRes, err := mesh.EvaluateConsensus(claimID)
 	if err != nil {
 		t.Fatalf("unexpected error evaluating sub-approval claim: %v", err)
 	}
@@ -226,6 +244,10 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 	if subApprovalRes.Approved {
 		t.Fatalf("expected Approved=false for sub-threshold approval (33.3%% < 67%%), got true")
 	}
+}
+
+func assertMaliciousNodeIsolation(t *testing.T, mesh *VerificationMesh, claimID string) {
+	t.Helper()
 
 	// 7. Malicious node isolation and insufficient-stake re-registration rejection
 	if err := mesh.IsolatePeer(""); err == nil {
@@ -240,10 +262,10 @@ func TestVerificationMesh_NegativeAdversarialBoundary(t *testing.T) {
 	if _, err := mesh.SubmitClaim(MeshClaim{ID: "claim-isolated", Author: "author-3", Payload: []byte("malicious")}); err == nil {
 		t.Fatal("expected rejection of claim from isolated peer")
 	}
-	if err := mesh.CastVote(claim.ID, PeerVote{PeerID: "author-3", Signature: "sig-3-retry", Approve: true}); err == nil {
+	if err := mesh.CastVote(claimID, PeerVote{PeerID: "author-3", Signature: "sig-3-retry", Approve: true}); err == nil {
 		t.Fatal("expected rejection of vote from isolated peer")
 	}
-	isolatedRes, err := mesh.EvaluateConsensus(claim.ID)
+	isolatedRes, err := mesh.EvaluateConsensus(claimID)
 	if err != nil {
 		t.Fatalf("unexpected error evaluating consensus after isolation: %v", err)
 	}
