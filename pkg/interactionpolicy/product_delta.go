@@ -87,9 +87,14 @@ func HintProductReplenish() string {
 }
 
 // AppendGutCheck replaces drive with stop prose when TheaterRisk; otherwise returns drive unchanged.
+// When the prior drive already carries an Ambient: suffix, keep it so whats-next stays greppable.
 func AppendGutCheck(drive string, v GutCheckVerdict) string {
+	drive = strings.TrimSpace(drive)
 	if !v.TheaterRisk {
-		return strings.TrimSpace(drive)
+		return drive
+	}
+	if i := strings.Index(drive, "Ambient:"); i >= 0 {
+		return GutCheckStopProse + " " + strings.TrimSpace(drive[i:])
 	}
 	return GutCheckStopProse
 }
