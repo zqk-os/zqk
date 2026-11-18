@@ -23,12 +23,102 @@ func TestCompileProductDeltaGutCheck_UnknownWindowFailOpen(t *testing.T) {
 	}
 }
 
+func TestCompileProductDeltaGutCheck_ProcessOnlyResidualIsTheaterRisk(t *testing.T) {
+	v := CompileProductDeltaGutCheck(ProductDeltaSignals{
+		WindowCommits:      5,
+		ProcessOnlyCommits: 5,
+		ProductCommits:     0,
+		ResidualMinted:     2,
+	})
+	if !v.TheaterRisk {
+		t.Fatalf("process-only residual mint must be theater risk, got %+v", v)
+	}
+}
+
+func TestCompileProductDeltaGutCheck_ProductCommitsPass(t *testing.T) {
+	v := CompileProductDeltaGutCheck(ProductDeltaSignals{
+		WindowCommits:  4,
+		ProductCommits: 2,
+	})
+	if v.TheaterRisk || !v.ProductDelta {
+		t.Fatalf("product commits must pass gut-check, got %+v", v)
+	}
+}
+
+func TestCompileProductDeltaGutCheck_RedGateWithCodeFixPasses(t *testing.T) {
+	v := CompileProductDeltaGutCheck(ProductDeltaSignals{WindowCommits: 3, RedGates: 1})
+	if v.TheaterRisk || !v.ProductDelta || !v.Capability {
+		t.Fatalf("red gate with code fix must pass, got %+v", v)
+	}
+}
+
+func TestCompileProductDeltaGutCheck_UndeliveredProductREQPassesCapability(t *testing.T) {
+	v := CompileProductDeltaGutCheck(ProductDeltaSignals{
+		WindowCommits:         3,
+		UndeliveredProductREQ: 1,
+	})
+	if v.TheaterRisk || !v.Capability {
+		t.Fatalf("undelivered product REQ runway must pass capability, got %+v", v)
+	}
+}
+
+func TestCompileProductDeltaGutCheck_AuditLeadAssignedExempt(t *testing.T) {
+	v := CompileProductDeltaGutCheck(ProductDeltaSignals{
+		WindowCommits:      3,
+		ProcessOnlyCommits: 3,
+		ResidualMinted:     1,
+		AuditLeadAssigned:  true,
+	})
+	if v.TheaterRisk || !v.AuditExempt {
+		t.Fatalf("named audit lead must exempt residual seals, got %+v", v)
+	}
+}
+
+func TestCompileProductDeltaGutCheck_ResidualMintedWithZeroProductCommitsForcesRisk(t *testing.T) {
+	// Even with undelivered REQ runway, residual mint + zero product commits is theater.
+	v := CompileProductDeltaGutCheck(ProductDeltaSignals{
+		WindowCommits:         6,
+		ProductCommits:        0,
+		ResidualMinted:        1,
+		UndeliveredProductREQ: 2,
+	})
+	if !v.TheaterRisk {
+		t.Fatalf("residual minted with zero product commits must force theater risk, got %+v", v)
+	}
+}
+
 func TestTitleLooksLikeResidualTheater(t *testing.T) {
 	if !TitleLooksLikeResidualTheater("Grooming — Stranger doctor residual (Post-3386)") {
 		t.Fatal("expected residual title match")
 	}
 	if TitleLooksLikeResidualTheater("Product delta + operational alignment") {
 		t.Fatal("product title must not match")
+	}
+}
+
+func TestAppendGutCheck_PreservesAmbientSuffix(t *testing.T) {
+	drive := AppendStratplanAmbient("shape next column", StratplanAmbient{LeadID: "PRI-1", LeadStatus: "in_progress"})
+	got := AppendGutCheck(drive, GutCheckVerdict{TheaterRisk: true})
+	if !strings.Contains(got, GutCheckStopProse) {
+		t.Fatalf("missing stop prose: %q", got)
+	}
+	if !strings.Contains(got, "Ambient:") || !strings.Contains(got, "product_delta_gut_check=required") {
+		t.Fatalf("must keep Ambient suffix for greppability: %q", got)
+	}
+	if AppendGutCheck("keep me", GutCheckVerdict{}) != "keep me" {
+		t.Fatal("zero gut-check must leave drive unchanged")
+	}
+}
+
+func TestCompileStratplanCommandHint_TheaterRiskPreemptsAlignRefresh(t *testing.T) {
+	hint := CompileStratplanCommandHint(StratplanAmbient{
+		GutCheck: GutCheckVerdict{TheaterRisk: true},
+	})
+	if hint != HintProductReplenish() {
+		t.Fatalf("hint=%q want product replenish", hint)
+	}
+	if CommandHintIsDispatchRemint(hint) {
+		t.Fatalf("must not be dispatch remint: %q", hint)
 	}
 }
 

@@ -126,8 +126,11 @@ func runContinuationHookWithDeps(
 	planned, inProgress, exploring, validated := 0, 0, 0, 0
 	planStatus := ""
 	planTitle := ""
+	branchAhead, branchBehind := 0, 0
 	if projectRoot != "" {
 		amb := whatsnext.LoadKernelAmbience(projectRoot)
+		branchAhead = amb.BranchAhead
+		branchBehind = amb.BranchBehind
 		if fill := whatsnext.CompileFillItem(&amb); fill != nil {
 			fillHint = strings.TrimSpace(fill.CommandHint)
 			if strings.Contains(fillHint, "autofix dangling") {
@@ -157,13 +160,17 @@ func runContinuationHookWithDeps(
 			}
 		}
 	}
+	// Parity with whats-next: include branch/outbox so CAP stop-hook classifies the same way.
 	ev := interactionpolicy.ClassifyAmbience(interactionpolicy.Ambience{
-		InboxUnacked: inboxN,
-		Planned:      planned,
-		InProgress:   inProgress,
-		Exploring:    exploring,
-		Validated:    validated,
-		PlanStatus:   planStatus,
+		InboxUnacked:   inboxN,
+		OutboxAwaiting: outboxAwaitN,
+		Planned:        planned,
+		InProgress:     inProgress,
+		Exploring:      exploring,
+		Validated:      validated,
+		PlanStatus:     planStatus,
+		BranchAhead:    branchAhead,
+		BranchBehind:   branchBehind,
 	})
 	res := interactionpolicy.Evaluate(nil, ev)
 	step := ""
