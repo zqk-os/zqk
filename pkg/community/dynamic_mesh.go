@@ -199,57 +199,17 @@ func (m *DynamicMesh) RemoveNode(nodeID string) error {
 	return nil
 }
 
-// UpsertLink creates or updates a directed link between two registered nodes.
-func (m *DynamicMesh) UpsertLink(src, dst string, metrics LinkMetrics) error {
-	if err := validateEndpoints(src, dst); err != nil {
-		return err
-	}
-	if err := validateLinkMetrics(metrics); err != nil {
-		return err
-	}
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	srcNode, srcOK := m.nodes[src]
-	if !srcOK {
-		return ErrMeshNodeNotFound
-	}
-	if _, dstOK := m.nodes[dst]; !dstOK {
-		return ErrMeshNodeNotFound
-	}
-
-	_, updating := m.adj[src][dst]
-	if !updating && len(m.adj[src]) >= srcNode.MaxNeighbors {
-		return ErrMaxNeighborsExceeded
-	}
-	m.adj[src][dst] = metrics
-	m.recomputeMatrixLocked()
-	return nil
-}
-
-// RemoveLink removes a directed link between two nodes.
-func (m *DynamicMesh) RemoveLink(src, dst string) error {
-	if err := validateEndpoints(src, dst); err != nil {
-		return err
-	}
-
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
+func (m *DynamicMesh) requireNodesLocked(src, dst string) error {
 	if _, ok := m.nodes[src]; !ok {
 		return ErrMeshNodeNotFound
 	}
 	if _, ok := m.nodes[dst]; !ok {
 		return ErrMeshNodeNotFound
 	}
-	delete(m.adj[src], dst)
-	m.recomputeMatrixLocked()
 	return nil
 }
 
-// MarkLinkBlackholed toggles partition blackhole state on an existing link.
-func (m *DynamicMesh) MarkLinkBlackholed(src, dst string, blackholed bool) error {
+func (m *DynamicMesh) withEndpointLock(src, dst string, fn func() error) error {
 	if err := validateEndpoints(src, dst); err != nil {
 		return err
 	}
@@ -257,14 +217,51 @@ func (m *DynamicMesh) MarkLinkBlackholed(src, dst string, blackholed bool) error
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	metrics, ok := m.adj[src][dst]
-	if !ok {
-		return ErrMeshNodeNotFound
+	if err := m.requireNodesLocked(src, dst); err != nil {
+		return err
 	}
-	metrics.Blackholed = blackholed
-	m.adj[src][dst] = metrics
+	if err := fn(); err != nil {
+		return err
+	}
 	m.recomputeMatrixLocked()
 	return nil
+}
+
+// UpsertLink creates or updates a directed link between two registered nodes.
+func (m *DynamicMesh) UpsertLink(src, dst string, metrics LinkMetrics) error {
+	if err := validateLinkMetrics(metrics); err != nil {
+		return err
+	}
+	return m.withEndpointLock(src, dst, func() error {
+		srcNode := m.nodes[src]
+		_, updating := m.adj[src][dst]
+		if !updating && len(m.adj[src]) >= srcNode.MaxNeighbors {
+			return ErrMaxNeighborsExceeded
+		}
+		m.adj[src][dst] = metrics
+		return nil
+	})
+}
+
+// RemoveLink removes a directed link between two nodes.
+func (m *DynamicMesh) RemoveLink(src, dst string) error {
+	return m.withEndpointLock(src, dst, func() error {
+		delete(m.adj[src], dst)
+		return nil
+	})
+}
+
+// MarkLinkBlackholed toggles partition blackhole state on an existing link.
+func (m *DynamicMesh) MarkLinkBlackholed(src, dst string, blackholed bool) error {
+	return m.withEndpointLock(src, dst, func() error {
+		metrics, ok := m.adj[src][dst]
+		if !ok {
+			return ErrMeshNodeNotFound
+		}
+		metrics.Blackholed = blackholed
+		m.adj[src][dst] = metrics
+		return nil
+	})
 }
 
 func validateEndpoints(src, dst string) error {
