@@ -86,4 +86,5 @@ Documents governing cryptographic provenance, keys, sovereign local execution, a
 - **[Sovereign Air-Gapped AI Engineering](./SOVEREIGN_AIRGAPPED_AI_ENGINEERING.md)**: Offline execution with local LLMs (Ollama / Apple Silicon), local CAS persistence, and deterministic AST verification.
 - **[Keystore Security & Fallback Specification](./KEYSTORE_SECURITY_AND_FALLBACK_SPECIFICATION.md)**: Ed25519 signing keys, fail-closed key discovery, and environment variable resolution.
 - **[Tray Command Cryptographic Security](./TRAY_COMMAND_CRYPTOGRAPHIC_SECURITY.md)**: Authenticated RPC protocol between background daemons and desktop tray applications.
+- **[ADR-0150: Zero-Knowledge State Attestation & Succinct RSA Accumulator Membership Proofs v0.4.2](./ADR_ZK_STATE_ATTESTATION_MEMBERSHIP_PROOFS_V042.md)**: Constant-size RSA accumulator state commitments, deterministic prime representative mapping, membership/non-membership proofs, and replay-protected state attestations.
 

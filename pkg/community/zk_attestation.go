@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
 	"math/big"
 	"sync"
 	"time"
@@ -206,18 +207,24 @@ func hashToPrimeWithBits(element string, primeBits int) (*big.Int, error) {
 	}
 }
 
+func writeHashParts(h hash.Hash, parts ...[]byte) {
+	for _, part := range parts {
+		if _, err := h.Write(part); err != nil {
+			panic(err)
+		}
+	}
+}
+
 func derivePrimeCandidate(element string, counter uint64, byteLen, primeBits int) *big.Int {
 	h := sha256.New()
-	_, _ = h.Write([]byte(hashToPrimeDomainTag))
 
 	var lenBuf [uint64ByteWidth]byte
 	binary.BigEndian.PutUint64(lenBuf[:], uint64(len(element)))
-	_, _ = h.Write(lenBuf[:])
-	_, _ = h.Write([]byte(element))
 
 	var ctrBuf [uint64ByteWidth]byte
 	binary.BigEndian.PutUint64(ctrBuf[:], counter)
-	_, _ = h.Write(ctrBuf[:])
+
+	writeHashParts(h, []byte(hashToPrimeDomainTag), lenBuf[:], []byte(element), ctrBuf[:])
 
 	digest := h.Sum(nil)
 	buf := make([]byte, byteLen)
@@ -246,16 +253,20 @@ func (a *RSAAccumulator) StateDigest() string {
 
 func (a *RSAAccumulator) stateDigestLocked() string {
 	h := sha256.New()
-	_, _ = h.Write([]byte(stateDigestDomainTag))
-	_, _ = h.Write(a.modulus.Bytes())
-	_, _ = h.Write([]byte{0})
-	_, _ = h.Write(a.generator.Bytes())
-	_, _ = h.Write([]byte{0})
-	_, _ = h.Write(a.current.Bytes())
 
 	var epochBuf [uint64ByteWidth]byte
 	binary.BigEndian.PutUint64(epochBuf[:], a.epoch)
-	_, _ = h.Write(epochBuf[:])
+
+	writeHashParts(
+		h,
+		[]byte(stateDigestDomainTag),
+		a.modulus.Bytes(),
+		[]byte{0},
+		a.generator.Bytes(),
+		[]byte{0},
+		a.current.Bytes(),
+		epochBuf[:],
+	)
 
 	return hex.EncodeToString(h.Sum(nil))
 }
@@ -347,14 +358,16 @@ func (a *RSAAccumulator) generateMembershipWitnessLocked(element string) (*Membe
 	}, nil
 }
 
+func (a *RSAAccumulator) snapshotVerificationState() (modulus, generator, current *big.Int, primeBits int) {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return new(big.Int).Set(a.modulus), new(big.Int).Set(a.generator), new(big.Int).Set(a.current), a.primeBits
+}
+
 // VerifyMembershipWitness verifies that W^p mod N matches the accumulator's
 // current state and that the witness prime matches the element's deterministic representative.
 func (a *RSAAccumulator) VerifyMembershipWitness(w *MembershipWitness) (bool, error) {
-	a.mu.RLock()
-	modulus := new(big.Int).Set(a.modulus)
-	current := new(big.Int).Set(a.current)
-	primeBits := a.primeBits
-	a.mu.RUnlock()
+	modulus, _, current, primeBits := a.snapshotVerificationState()
 
 	if err := verifyMembershipWitnessWithState(w, modulus, current, primeBits); err != nil {
 		return false, err
@@ -534,12 +547,7 @@ func (a *RSAAccumulator) VerifyNonMembershipProof(p *NonMembershipProof) (bool, 
 		return false, fmt.Errorf("%w: proof accumulator value must be positive", ErrInvalidWitness)
 	}
 
-	a.mu.RLock()
-	modulus := new(big.Int).Set(a.modulus)
-	generator := new(big.Int).Set(a.generator)
-	current := new(big.Int).Set(a.current)
-	primeBits := a.primeBits
-	a.mu.RUnlock()
+	modulus, generator, current, primeBits := a.snapshotVerificationState()
 
 	if p.Residue.Cmp(modulus) >= 0 {
 		return false, fmt.Errorf("%w: proof residue must be reduced modulo N", ErrInvalidWitness)

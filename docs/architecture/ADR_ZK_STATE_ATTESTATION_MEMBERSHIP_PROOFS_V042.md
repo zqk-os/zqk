@@ -9,7 +9,7 @@ Accepted
 ## Context
 Distributed ZQK swarm nodes must periodically attest to their Knowledge Kernel and execution state without transmitting full state snapshots or revealing private payload contents to untrusted peers. Communicating full element sets across federated clusters scales linearly with state size and leaks sensitive metadata.
 
-In Cycle 150 (`PRI-1794510339071247000-8972bcf0`), we introduce a cryptographic RSA Accumulator and Zero-Knowledge State Attestation subsystem in `pkg/community/zk_attestation.go` to support constant-size (`O(1)`) state commitments, deterministic prime representative mapping, succinct membership witnesses, non-membership proofs, and anti-replay state attestations.
+In Cycle 150, we introduce a cryptographic RSA Accumulator and Zero-Knowledge State Attestation subsystem in `pkg/community/zk_attestation.go` to support constant-size (`O(1)`) state commitments, deterministic prime representative mapping, succinct membership witnesses, non-membership proofs, and anti-replay state attestations.
 
 ## Decision
 1. **Cryptographic Parameter Floor Invariants**:
