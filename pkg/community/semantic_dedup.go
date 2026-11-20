@@ -236,14 +236,17 @@ func (e *SemanticDedupEngine) RegisterEntity(entity SemanticEntity) error {
 
 // AddEdge validates and records a directed relationship edge between entities.
 func (e *SemanticDedupEngine) AddEdge(edge SemanticEdge) error {
-	if err := strutil.ErrorOnBlank(edge.FromID, "edge from_id cannot be blank"); err != nil {
-		return err
-	}
-	if err := strutil.ErrorOnBlank(edge.ToID, "edge to_id cannot be blank"); err != nil {
-		return err
-	}
-	if err := strutil.ErrorOnBlank(edge.Relation, "edge relation cannot be blank"); err != nil {
-		return err
+	for _, check := range []struct {
+		value string
+		field string
+	}{
+		{value: edge.FromID, field: "from_id"},
+		{value: edge.ToID, field: "to_id"},
+		{value: edge.Relation, field: "relation"},
+	} {
+		if err := strutil.ErrorOnBlank(check.value, "edge %s cannot be blank", check.field); err != nil {
+			return err
+		}
 	}
 
 	e.mu.Lock()

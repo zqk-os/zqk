@@ -63,9 +63,7 @@ func TestSemanticDedup_OperationalDynamicProof(t *testing.T) {
 	assert.Greater(t, NormalizedLevenshtein("Auth Service", "Auth Services"), 0.85)
 	assert.InDelta(t, 0.0, NormalizedLevenshtein("abc", ""), 1e-9)
 
-	cfg := DedupConfig{SimilarityThreshold: 0.85, CosineWeight: 0.7, LexicalWeight: 0.3}
-	engine, err := NewSemanticDedupEngine(cfg)
-	require.NoError(t, err)
+	engine, cfg := newTestDedupEngine(t)
 
 	entities := []SemanticEntity{
 		{ID: "n-01", Label: "Auth Gateway", ParentBranch: "main", Embedding: []float64{0.90, 0.40, 0.10}},
@@ -75,16 +73,18 @@ func TestSemanticDedup_OperationalDynamicProof(t *testing.T) {
 	for _, ent := range entities {
 		require.NoError(t, engine.RegisterEntity(ent))
 	}
-	require.NoError(t, engine.AddEdge(SemanticEdge{FromID: "n-01", ToID: "n-03", Relation: "depends_on"}))
-	require.NoError(t, engine.AddEdge(SemanticEdge{FromID: "n-02", ToID: "n-03", Relation: "depends_on"}))
-	require.NoError(t, engine.AddEdge(SemanticEdge{FromID: "n-02", ToID: "n-01", Relation: "alias_of"}))
+	for _, edge := range []SemanticEdge{
+		{FromID: "n-01", ToID: "n-03", Relation: "depends_on"},
+		{FromID: "n-02", ToID: "n-03", Relation: "depends_on"},
+		{FromID: "n-02", ToID: "n-01", Relation: "alias_of"},
+	} {
+		require.NoError(t, engine.AddEdge(edge))
+	}
 
 	report, err := engine.CollapseDuplicates()
 	require.NoError(t, err)
 
-	assert.Equal(t, 3, report.OriginalCount)
-	assert.Equal(t, 2, report.CanonicalCount)
-	assert.Equal(t, 1, report.CollapsedCount)
+	assertReportCounts(t, report, 3, 2, 1)
 	assert.Equal(t, "n-01", report.RedirectMap["n-02"])
 	require.Len(t, report.Clusters, 1)
 	assert.Equal(t, "n-01", report.Clusters[0].CanonicalID)
@@ -118,30 +118,16 @@ func TestSemanticDedup_OperationalDynamicProof(t *testing.T) {
 }
 
 func TestSemanticDedup_NegativeAdversarialBoundary(t *testing.T) {
-	cfg := DedupConfig{SimilarityThreshold: 0.85, CosineWeight: 0.7, LexicalWeight: 0.3}
-	engine, err := NewSemanticDedupEngine(cfg)
-	require.NoError(t, err)
+	engine, cfg := newTestDedupEngine(t)
 
-	// Distinct semantic signatures must never collapse.
-	require.NoError(t, engine.RegisterEntity(SemanticEntity{
-		ID:           "sig-a",
-		Label:        "Vector Index",
-		ParentBranch: "main",
-		Embedding:    []float64{1.0, 0.0, 0.0},
-	}))
-	require.NoError(t, engine.RegisterEntity(SemanticEntity{
-		ID:           "sig-b",
-		Label:        "Policy Engine",
-		ParentBranch: "main",
-		Embedding:    []float64{0.0, 1.0, 0.0},
-	}))
-	// Identical embedding and label on a diverging ParentBranch must never collapse.
-	require.NoError(t, engine.RegisterEntity(SemanticEntity{
-		ID:           "sig-a-branch",
-		Label:        "Vector Index",
-		ParentBranch: "release/v2",
-		Embedding:    []float64{1.0, 0.0, 0.0},
-	}))
+	// Distinct semantic signatures and diverging ParentBranch entities must never collapse.
+	for _, ent := range []SemanticEntity{
+		{ID: "sig-a", Label: "Vector Index", ParentBranch: "main", Embedding: []float64{1.0, 0.0, 0.0}},
+		{ID: "sig-b", Label: "Policy Engine", ParentBranch: "main", Embedding: []float64{0.0, 1.0, 0.0}},
+		{ID: "sig-a-branch", Label: "Vector Index", ParentBranch: "release/v2", Embedding: []float64{1.0, 0.0, 0.0}},
+	} {
+		require.NoError(t, engine.RegisterEntity(ent))
+	}
 
 	// Duplicate IDs, dimension mismatches, and invalid edges must be rejected immediately.
 	assert.ErrorIs(t, engine.RegisterEntity(SemanticEntity{
@@ -167,8 +153,21 @@ func TestSemanticDedup_NegativeAdversarialBoundary(t *testing.T) {
 
 	report, err := engine.CollapseDuplicates()
 	require.NoError(t, err)
-	assert.Equal(t, 3, report.OriginalCount)
-	assert.Equal(t, 3, report.CanonicalCount)
-	assert.Equal(t, 0, report.CollapsedCount)
+	assertReportCounts(t, report, 3, 3, 0)
 	assert.Empty(t, report.Clusters)
+}
+
+func newTestDedupEngine(t *testing.T) (*SemanticDedupEngine, DedupConfig) {
+	t.Helper()
+	cfg := DedupConfig{SimilarityThreshold: 0.85, CosineWeight: 0.7, LexicalWeight: 0.3}
+	engine, err := NewSemanticDedupEngine(cfg)
+	require.NoError(t, err)
+	return engine, cfg
+}
+
+func assertReportCounts(t *testing.T, report *DedupReport, orig, canon, collapsed int) {
+	t.Helper()
+	assert.Equal(t, orig, report.OriginalCount)
+	assert.Equal(t, canon, report.CanonicalCount)
+	assert.Equal(t, collapsed, report.CollapsedCount)
 }
