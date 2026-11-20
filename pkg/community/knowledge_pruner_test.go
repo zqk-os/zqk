@@ -139,7 +139,9 @@ func TestKnowledgePruner_OperationalDynamicProof(t *testing.T) {
 	}
 
 	wg := goroutinelabels.StartTestGoroutines(t, 4, "pruner-reader", "concurrent snapshot", func(_ int) {
-		_ = compPruner.SnapshotNodes()
+		if got := compPruner.SnapshotNodes(); len(got) == 0 {
+			t.Errorf("expected non-empty snapshot during concurrent reads")
+		}
 	})
 	wg.Wait()
 }
