@@ -1,169 +1,208 @@
 package community
 
 import (
-	"errors"
-	"sort"
+	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
-// TestCRDT_StaticFloorInvariant verifies CRIT-1794506482224793000-2ab4e1d6.
-func TestCRDT_StaticFloorInvariant(t *testing.T) {
-	doc, err := NewCRDTDocument("doc-cluster-alpha")
-	if err != nil {
-		t.Fatalf("expected NewCRDTDocument to succeed, got: %v", err)
-	}
-	if doc.ID() != "doc-cluster-alpha" {
-		t.Errorf("expected doc ID doc-cluster-alpha, got: %s", doc.ID())
-	}
+const (
+	testCRDTClusterAlpha   = "cluster-alpha"
+	testCRDTClusterBeta    = "cluster-beta"
+	testCRDTDocSyncMesh    = "doc-sync-mesh"
+	testCRDTDocBoundary    = "doc-boundary"
+	testCRDTDocForeign     = "doc-foreign"
+	testCRDTNodeAlpha      = "node-alpha"
+	testCRDTNodeBeta       = "node-beta"
+	testCRDTKeyLeader      = "leader"
+	testCRDTKeyCluster     = "cluster_state"
+	testCRDTSvcStorage     = "service-storage"
+	testCRDTSvcGateway     = "service-gateway"
+	testCRDTSvcTelemetry   = "service-telemetry"
+	testCRDTValueActive    = "active"
+	testCRDTValueTieAlpha  = "tie-alpha"
+	testCRDTValueTieZulu   = "tie-zulu"
+	testCRDTBlankSpaces    = "   "
+	testCRDTForgedDigest   = "deadbeef00000000"
+	testCRDTConcurrentDesc = "concurrent crdt delta and register convergence"
+)
 
-	err = doc.SetRegister("cluster_state", "active", 100, "node-1")
-	if err != nil {
-		t.Fatalf("expected SetRegister to succeed, got: %v", err)
-	}
-
-	reg, ok := doc.GetRegister("cluster_state")
-	if !ok {
-		t.Fatalf("expected register cluster_state to exist")
-	}
-	if reg.Value != "active" || reg.Timestamp != 100 || reg.WriterID != "node-1" {
-		t.Errorf("unexpected register value: %+v", reg)
-	}
-
-	err = doc.AddElement("task-101", 100, "node-1")
-	if err != nil {
-		t.Fatalf("expected AddElement to succeed, got: %v", err)
-	}
-	if !doc.HasElement("task-101") {
-		t.Errorf("expected task-101 to be present in document")
-	}
+func mustNewTestCRDTDocument(t *testing.T, clusterID, docID string) *CRDTDocument {
+	t.Helper()
+	doc, err := NewCRDTDocument(clusterID, docID)
+	require.NoError(t, err)
+	require.NotNil(t, doc)
+	return doc
 }
 
-// TestCRDT_OperationalDynamicProof verifies CRIT-1794506489562327000-e050dc64.
-func TestCRDT_OperationalDynamicProof(t *testing.T) {
-	// Simulate two divergent cluster replicas A and B
-	docA, err := NewCRDTDocument("doc-sync-mesh")
-	if err != nil {
-		t.Fatalf("failed creating docA: %v", err)
-	}
-	docB, err := NewCRDTDocument("doc-sync-mesh")
-	if err != nil {
-		t.Fatalf("failed creating docB: %v", err)
-	}
-
-	// Cluster A performs operations
-	_ = docA.SetRegister("leader", "node-A", 150, "node-A")
-	_ = docA.AddElement("service-storage", 100, "node-A")
-	_ = docA.AddElement("service-gateway", 120, "node-A")
-
-	// Cluster B performs concurrent operations
-	_ = docB.SetRegister("leader", "node-B", 200, "node-B") // higher timestamp wins
-	_ = docB.AddElement("service-storage", 110, "node-B")
-	_ = docB.RemoveElement("service-gateway", 130, "node-B") // removal timestamp > add timestamp
-	_ = docB.AddElement("service-telemetry", 140, "node-B")
-
-	// Create clones to verify commutativity: Merge(A, B) vs Merge(B, A)
-	docMergedAB, _ := NewCRDTDocument("doc-sync-mesh")
-	_ = docMergedAB.Merge(docA)
-	_ = docMergedAB.Merge(docB)
-
-	docMergedBA, _ := NewCRDTDocument("doc-sync-mesh")
-	_ = docMergedBA.Merge(docB)
-	_ = docMergedBA.Merge(docA)
-
-	// Invariant: Both must deterministically converge to identical state
-	regAB, _ := docMergedAB.GetRegister("leader")
-	regBA, _ := docMergedBA.GetRegister("leader")
-	if regAB.Value != "node-B" || regBA.Value != "node-B" {
-		t.Errorf("expected leader to be node-B, got AB=%s, BA=%s", regAB.Value, regBA.Value)
-	}
-
-	elemsAB := docMergedAB.Elements()
-	elemsBA := docMergedBA.Elements()
-	sort.Strings(elemsAB)
-	sort.Strings(elemsBA)
-
-	if len(elemsAB) != len(elemsBA) {
-		t.Fatalf("element count mismatch: AB=%v, BA=%v", elemsAB, elemsBA)
-	}
-	for i := range elemsAB {
-		if elemsAB[i] != elemsBA[i] {
-			t.Errorf("element mismatch at %d: %s vs %s", i, elemsAB[i], elemsBA[i])
-		}
-	}
-
-	// Verify gateway was removed (t=130 remove > t=120 add)
-	if docMergedAB.HasElement("service-gateway") {
-		t.Errorf("expected service-gateway to be removed by higher timestamp tombstone")
-	}
-	// Verify storage and telemetry remain
-	if !docMergedAB.HasElement("service-storage") || !docMergedAB.HasElement("service-telemetry") {
-		t.Errorf("expected service-storage and service-telemetry to be present")
-	}
-
-	// Test incremental Delta sync
+func mustBuildSealedCRDTDelta(t *testing.T, clusterID, docID, senderID string, ts int64, regs map[string]LWWRegister) *CRDTDelta {
+	t.Helper()
 	delta := &CRDTDelta{
-		DocumentID: "doc-sync-mesh",
-		Registers: map[string]LWWRegister{
-			"epoch": {Value: "42", Timestamp: 300, WriterID: "node-B"},
-		},
-		SenderID:  "node-B",
-		Timestamp: 300,
+		ClusterID:  clusterID,
+		DocumentID: docID,
+		SenderID:   senderID,
+		Timestamp:  ts,
+		Registers:  regs,
 	}
-	if err := docMergedAB.ApplyDelta(delta); err != nil {
-		t.Fatalf("failed applying delta: %v", err)
-	}
-	epochReg, ok := docMergedAB.GetRegister("epoch")
-	if !ok || epochReg.Value != "42" {
-		t.Errorf("expected epoch register to be 42, got %+v", epochReg)
-	}
+	delta.Seal()
+	return delta
 }
 
-// TestCRDT_NegativeAdversarialBoundary verifies CRIT-1794506496249715000-25164b8d.
-func TestCRDT_NegativeAdversarialBoundary(t *testing.T) {
-	// Blank document ID rejection
-	_, err := NewCRDTDocument("   ")
-	if !errors.Is(err, ErrBlankID) {
-		t.Errorf("expected ErrBlankID for empty document id, got: %v", err)
+// TestCRDTConvergence_StaticFloorInvariant validates document schema, LWW register
+// construction, vector clock tracking, and deterministic SHA-256 state digests.
+func TestCRDTConvergence_StaticFloorInvariant(t *testing.T) {
+	t.Parallel()
+
+	doc := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocSyncMesh)
+	assert.Equal(t, testCRDTClusterAlpha, doc.ClusterID())
+	assert.Equal(t, testCRDTDocSyncMesh, doc.ID())
+
+	require.NoError(t, doc.SetRegister(testCRDTKeyCluster, testCRDTValueActive, 100, testCRDTNodeAlpha))
+	reg, ok := doc.GetRegister(testCRDTKeyCluster)
+	require.True(t, ok)
+	assert.Equal(t, testCRDTValueActive, reg.Value)
+	assert.Equal(t, int64(100), reg.Timestamp)
+	assert.Equal(t, testCRDTNodeAlpha, reg.WriterID)
+	assert.Len(t, reg.ValueDigest, 64)
+
+	require.NoError(t, doc.AddElement(testCRDTSvcStorage, 100, testCRDTNodeAlpha))
+	assert.True(t, doc.HasElement(testCRDTSvcStorage))
+	assert.Equal(t, []string{testCRDTSvcStorage}, doc.Elements())
+
+	vc := doc.VectorClock()
+	assert.Equal(t, uint64(2), vc.Get(testCRDTNodeAlpha))
+
+	digestA := doc.StateDigest()
+	assert.Len(t, digestA, 64)
+	assert.Equal(t, digestA, doc.StateDigest())
+
+	delta, err := doc.BuildDelta(testCRDTNodeAlpha, 120)
+	require.NoError(t, err)
+	require.NoError(t, delta.Validate())
+}
+
+// TestCRDTConvergence_OperationalDynamicProof verifies commutative, associative,
+// idempotent merging, deterministic tie-breaking, and concurrent thread-safe convergence.
+func TestCRDTConvergence_OperationalDynamicProof(t *testing.T) {
+	t.Parallel()
+
+	docA := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocSyncMesh)
+	docB := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocSyncMesh)
+
+	require.NoError(t, docA.SetRegister(testCRDTKeyLeader, testCRDTNodeAlpha, 150, testCRDTNodeAlpha))
+	require.NoError(t, docA.AddElement(testCRDTSvcStorage, 100, testCRDTNodeAlpha))
+	require.NoError(t, docA.AddElement(testCRDTSvcGateway, 120, testCRDTNodeAlpha))
+
+	require.NoError(t, docB.SetRegister(testCRDTKeyLeader, testCRDTNodeBeta, 200, testCRDTNodeBeta))
+	require.NoError(t, docB.AddElement(testCRDTSvcStorage, 110, testCRDTNodeBeta))
+	require.NoError(t, docB.RemoveElement(testCRDTSvcGateway, 130, testCRDTNodeBeta))
+	require.NoError(t, docB.AddElement(testCRDTSvcTelemetry, 140, testCRDTNodeBeta))
+
+	// Same timestamp and writer ID tie-break deterministically on valueDigest.
+	regTie1, err := NewLWWRegister(testCRDTValueTieAlpha, 500, testCRDTNodeAlpha)
+	require.NoError(t, err)
+	regTie2, err := NewLWWRegister(testCRDTValueTieZulu, 500, testCRDTNodeAlpha)
+	require.NoError(t, err)
+	assert.Equal(t, regTie1.Merge(regTie2), regTie2.Merge(regTie1))
+
+	mergedAB := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocSyncMesh)
+	require.NoError(t, mergedAB.Merge(docA))
+	require.NoError(t, mergedAB.Merge(docB))
+
+	mergedBA := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocSyncMesh)
+	require.NoError(t, mergedBA.Merge(docB))
+	require.NoError(t, mergedBA.Merge(docA))
+
+	assert.Equal(t, mergedAB.StateDigest(), mergedBA.StateDigest())
+	assert.Equal(t, mergedAB.Elements(), mergedBA.Elements())
+	assert.False(t, mergedAB.HasElement(testCRDTSvcGateway))
+	assert.True(t, mergedAB.HasElement(testCRDTSvcStorage))
+	assert.True(t, mergedAB.HasElement(testCRDTSvcTelemetry))
+
+	// Concurrent delta applications and reads must remain race-free and convergent.
+	concurrentDoc := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocSyncMesh)
+	wg := goroutinelabels.StartTestGoroutines(t, 6, "crdt_worker", testCRDTConcurrentDesc, func(id int) {
+		nodeID := fmt.Sprintf("worker-%d", id)
+		reg, regErr := NewLWWRegister(nodeID, int64(300+id), nodeID)
+		assert.NoError(t, regErr)
+		delta := mustBuildSealedCRDTDelta(t, testCRDTClusterAlpha, testCRDTDocSyncMesh, nodeID, int64(300+id), map[string]LWWRegister{
+			testCRDTKeyLeader: reg,
+		})
+		assert.NoError(t, concurrentDoc.ApplyDelta(delta))
+		digest := concurrentDoc.StateDigest()
+		assert.Len(t, digest, 64)
+	})
+	wg.Wait()
+
+	finalLeader, ok := concurrentDoc.GetRegister(testCRDTKeyLeader)
+	require.True(t, ok)
+	assert.Equal(t, int64(305), finalLeader.Timestamp)
+	assert.Equal(t, "worker-5", finalLeader.WriterID)
+}
+
+// TestCRDTConvergence_NegativeAdversarialBoundary verifies strict rejection of
+// malformed inputs, cluster mismatches, and forged digests without state mutation.
+func TestCRDTConvergence_NegativeAdversarialBoundary(t *testing.T) {
+	t.Parallel()
+
+	badClusterDoc, err := NewCRDTDocument(testCRDTBlankSpaces, testCRDTDocBoundary)
+	assert.Nil(t, badClusterDoc)
+	assert.ErrorIs(t, err, ErrBlankClusterID)
+
+	badIDDoc, err := NewCRDTDocument(testCRDTClusterAlpha, testCRDTBlankSpaces)
+	assert.Nil(t, badIDDoc)
+	assert.ErrorIs(t, err, ErrBlankID)
+
+	doc := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocBoundary)
+	require.NoError(t, doc.SetRegister(testCRDTKeyCluster, testCRDTValueActive, 100, testCRDTNodeAlpha))
+	baselineDigest := doc.StateDigest()
+
+	assert.ErrorIs(t, doc.SetRegister(testCRDTBlankSpaces, testCRDTValueActive, 110, testCRDTNodeAlpha), ErrBlankID)
+	assert.ErrorIs(t, doc.SetRegister(testCRDTKeyCluster, testCRDTValueActive, 0, testCRDTNodeAlpha), ErrInvalidTimestamp)
+	assert.ErrorIs(t, doc.SetRegister(testCRDTKeyCluster, testCRDTValueActive, -5, testCRDTNodeAlpha), ErrInvalidTimestamp)
+	assert.ErrorIs(t, doc.ApplyDelta(nil), ErrNilDelta)
+
+	forgedDelta := mustBuildSealedCRDTDelta(t, testCRDTClusterAlpha, testCRDTDocBoundary, testCRDTNodeBeta, 200, map[string]LWWRegister{
+		testCRDTKeyLeader: {Value: testCRDTNodeBeta, Timestamp: 200, WriterID: testCRDTNodeBeta},
+	})
+	forgedDelta.Digest = testCRDTForgedDigest
+
+	cases := []struct {
+		name    string
+		delta   *CRDTDelta
+		wantErr error
+	}{
+		{
+			name:    "cluster mismatch",
+			delta:   mustBuildSealedCRDTDelta(t, testCRDTClusterBeta, testCRDTDocBoundary, testCRDTNodeBeta, 200, nil),
+			wantErr: ErrClusterMismatch,
+		},
+		{
+			name:    "document mismatch",
+			delta:   mustBuildSealedCRDTDelta(t, testCRDTClusterAlpha, testCRDTDocForeign, testCRDTNodeBeta, 200, nil),
+			wantErr: ErrCorruptPayload,
+		},
+		{
+			name:    "forged digest",
+			delta:   forgedDelta,
+			wantErr: ErrDigestMismatch,
+		},
 	}
 
-	doc, err := NewCRDTDocument("doc-boundary")
-	if err != nil {
-		t.Fatalf("failed creating doc: %v", err)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.ErrorIs(t, doc.ApplyDelta(tc.delta), tc.wantErr)
+			assert.Equal(t, baselineDigest, doc.StateDigest())
+		})
 	}
 
-	// Blank register key rejection
-	err = doc.SetRegister("", "value", 100, "node-1")
-	if !errors.Is(err, ErrBlankID) {
-		t.Errorf("expected ErrBlankID for blank register key, got: %v", err)
-	}
+	foreignClusterDoc := mustNewTestCRDTDocument(t, testCRDTClusterBeta, testCRDTDocBoundary)
+	assert.ErrorIs(t, doc.Merge(foreignClusterDoc), ErrClusterMismatch)
 
-	// Invalid timestamp rejection
-	err = doc.SetRegister("key", "value", -5, "node-1")
-	if !errors.Is(err, ErrInvalidTimestamp) {
-		t.Errorf("expected ErrInvalidTimestamp for negative timestamp, got: %v", err)
-	}
-
-	// Nil delta rejection
-	err = doc.ApplyDelta(nil)
-	if !errors.Is(err, ErrNilDelta) {
-		t.Errorf("expected ErrNilDelta for nil delta, got: %v", err)
-	}
-
-	// Delta with mismatched document ID rejection
-	mismatchedDelta := &CRDTDelta{
-		DocumentID: "doc-other",
-		SenderID:   "node-1",
-		Timestamp:  100,
-	}
-	err = doc.ApplyDelta(mismatchedDelta)
-	if !errors.Is(err, ErrCorruptPayload) {
-		t.Errorf("expected ErrCorruptPayload for mismatched doc ID, got: %v", err)
-	}
-
-	// Merging document with different ID rejection
-	foreignDoc, _ := NewCRDTDocument("doc-foreign")
-	err = doc.Merge(foreignDoc)
-	if !errors.Is(err, ErrCorruptPayload) {
-		t.Errorf("expected ErrCorruptPayload when merging different doc IDs, got: %v", err)
-	}
+	foreignIDDoc := mustNewTestCRDTDocument(t, testCRDTClusterAlpha, testCRDTDocForeign)
+	assert.ErrorIs(t, doc.Merge(foreignIDDoc), ErrCorruptPayload)
+	assert.Equal(t, baselineDigest, doc.StateDigest())
 }
