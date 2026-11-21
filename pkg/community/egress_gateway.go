@@ -42,9 +42,9 @@ const (
 	egressReasonRestricted         = "restricted classification intercepted"
 	egressReasonUnauthorizedDomain = "unauthorized destination domain"
 	egressReasonClusterMismatch    = "cluster ID mismatch"
-	egressReasonMissingToken       = "missing egress clearance token"
-	egressReasonInvalidToken       = "invalid egress clearance token"
-	egressReasonExpiredToken       = "expired egress clearance token"
+	egressReasonMissingClearance   = "missing egress clearance"
+	egressReasonInvalidClearance   = "invalid egress clearance"
+	egressReasonExpiredClearance   = "expired egress clearance"
 	egressReasonDigestMismatch     = "payload digest mismatch"
 
 	redactCategoryPrivateKey = "private_key"
@@ -80,10 +80,10 @@ var (
 	ErrUnauthorizedDomain = errors.New("unauthorized egress destination domain")
 
 	// ErrInvalidEgressToken indicates a missing, malformed, or forged clearance token.
-	ErrInvalidEgressToken = errors.New(egressReasonInvalidToken)
+	ErrInvalidEgressToken = errors.New(egressReasonInvalidClearance)
 
 	// ErrExpiredEgressToken indicates the clearance token has passed its expiration timestamp.
-	ErrExpiredEgressToken = errors.New(egressReasonExpiredToken)
+	ErrExpiredEgressToken = errors.New(egressReasonExpiredClearance)
 
 	// ErrPayloadDigestMismatch indicates the payload digest does not match the clearance token.
 	ErrPayloadDigestMismatch = errors.New(egressReasonDigestMismatch)
