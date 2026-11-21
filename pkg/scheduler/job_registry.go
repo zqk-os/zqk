@@ -34,14 +34,21 @@ func NewJobRegistryWithPipeline(pipeline *JobAdmissionPipeline) *JobRegistry {
 	}
 }
 
-// SetAdmissionPipeline updates or clears the admission pipeline for the registry.
-func (r *JobRegistry) SetAdmissionPipeline(pipeline *JobAdmissionPipeline) {
+// withLock runs fn while holding the registry write lock, no-oping when r is nil.
+func (r *JobRegistry) withLock(fn func()) {
 	if r == nil {
 		return
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.admissionPipeline = pipeline
+	fn()
+}
+
+// SetAdmissionPipeline updates or clears the admission pipeline for the registry.
+func (r *JobRegistry) SetAdmissionPipeline(pipeline *JobAdmissionPipeline) {
+	r.withLock(func() {
+		r.admissionPipeline = pipeline
+	})
 }
 
 // Register registers a job in the registry. It validates the envelope, evaluates admission filters
@@ -139,10 +146,7 @@ func (r *JobRegistry) Count() int {
 
 // Clear removes all jobs from the registry.
 func (r *JobRegistry) Clear() {
-	if r == nil {
-		return
-	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	r.jobs = make(map[string]*ScheduledJob)
+	r.withLock(func() {
+		r.jobs = make(map[string]*ScheduledJob)
+	})
 }
