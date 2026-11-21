@@ -1,13 +1,10 @@
 package agentclaim
 
 import (
-	"encoding/json"
-	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
-	"github.com/zqk-os/zqk/pkg/paths"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -176,14 +173,7 @@ func (q *CheckinWriteQueue) writeDirect(projectRoot string, timer *CheckinTimer)
 	if q.IsTombstoned(path) {
 		return nil
 	}
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return err
-	}
-	data, err := json.Marshal(timer)
-	if err != nil {
-		return err
-	}
-	return fileutil.WriteFile(path, data, paths.FilePerm644)
+	return writeTimerJSON(path, timer)
 }
 
 func (q *CheckinWriteQueue) Stop() {

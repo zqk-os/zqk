@@ -183,19 +183,41 @@ func RenewCheckin(projectRoot, taskID string) error {
 	return writeCheckin(projectRoot, timer)
 }
 
+func rearmTimerExpiry(timer *CheckinTimer, maxBackoff time.Duration) {
+	backoff := timer.Cadence() * time.Duration(timer.Misses+1)
+	if maxBackoff > 0 && backoff > maxBackoff {
+		backoff = maxBackoff
+	}
+	timer.ExpiresAt = time.Now().UTC().Add(backoff).Format(time.RFC3339)
+}
+
+func removeTimerFile(path string) error {
+	err := fileutil.Remove(path)
+	if err != nil && !fileutil.IsNotExist(err) {
+		return err
+	}
+	return nil
+}
+
+func writeTimerJSON(path string, timer *CheckinTimer) error {
+	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
+		return err
+	}
+	data, err := json.Marshal(timer)
+	if err != nil {
+		return err
+	}
+	return fileutil.WriteFile(path, data, paths.FilePerm644)
+}
+
 // Rearm reopens the window after a miss, backing off so one silent task does not wake the
 // orchestrator on every scheduler tick while it is being triaged.
 func Rearm(projectRoot string, timer *CheckinTimer, maxBackoff time.Duration) error {
 	if timer == nil {
 		return errfmt.Errorf("nil check-in timer")
 	}
-	backoff := timer.Cadence() * time.Duration(timer.Misses+1)
-	if maxBackoff > 0 && backoff > maxBackoff {
-		backoff = maxBackoff
-	}
-
 	// The thundering herd on disk writes is mitigated by the CheckinWriteQueue reducer pattern.
-	timer.ExpiresAt = time.Now().UTC().Add(backoff).Format(time.RFC3339)
+	rearmTimerExpiry(timer, maxBackoff)
 	return writeCheckin(projectRoot, timer)
 }
 
@@ -235,11 +257,7 @@ func ClearCheckin(projectRoot, taskID string) error {
 	walCache.Delete(walCacheKey(projectRoot, taskID))
 	_ = fileutil.Remove(fallbackWALPath(projectRoot, taskID))
 
-	err := fileutil.Remove(path)
-	if err != nil && !fileutil.IsNotExist(err) {
-		return err
-	}
-	return nil
+	return removeTimerFile(path)
 }
 
 // LoadCheckin reads the timer for taskID, returning (nil, nil) when none is armed.

@@ -1,14 +1,12 @@
 package agentclaim
 
 import (
-	"encoding/json"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
-	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
 // Seat heartbeat hourglass — CAP/Composer seat liveness, distinct from ATK check-in.
@@ -95,11 +93,7 @@ func ClearSeatHeartbeat(projectRoot, seatID string) error {
 		return nil
 	}
 	path := SeatHeartbeatPath(projectRoot, seatID)
-	err := fileutil.Remove(path)
-	if err != nil && !fileutil.IsNotExist(err) {
-		return err
-	}
-	return nil
+	return removeTimerFile(path)
 }
 
 // LoadSeatHeartbeat reads the timer for seatID, returning (nil, nil) when none is armed.
@@ -116,11 +110,7 @@ func RearmSeatHeartbeat(projectRoot string, timer *CheckinTimer, maxBackoff time
 	if timer == nil {
 		return errfmt.Errorf("nil seat heartbeat timer")
 	}
-	backoff := timer.Cadence() * time.Duration(timer.Misses+1)
-	if maxBackoff > 0 && backoff > maxBackoff {
-		backoff = maxBackoff
-	}
-	timer.ExpiresAt = time.Now().UTC().Add(backoff).Format(time.RFC3339)
+	rearmTimerExpiry(timer, maxBackoff)
 	return writeSeatHeartbeat(projectRoot, timer)
 }
 
@@ -135,12 +125,5 @@ func writeSeatHeartbeat(projectRoot string, timer *CheckinTimer) error {
 		return errfmt.Errorf("nil seat heartbeat timer")
 	}
 	path := SeatHeartbeatPath(projectRoot, timer.TaskID)
-	if err := fileutil.MkdirAll(filepath.Dir(path), paths.DirPerm755); err != nil {
-		return err
-	}
-	data, err := json.Marshal(timer)
-	if err != nil {
-		return err
-	}
-	return fileutil.WriteFile(path, data, paths.FilePerm644)
+	return writeTimerJSON(path, timer)
 }
