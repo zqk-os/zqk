@@ -221,22 +221,36 @@ func Rearm(projectRoot string, timer *CheckinTimer, maxBackoff time.Duration) er
 	return writeCheckin(projectRoot, timer)
 }
 
-// ForceEvict explicitly terminates a check-in timer before its natural timeout,
-// recording the reason (e.g. process death, admin override).
-func ForceEvict(projectRoot, taskID, reason string) error {
-	timer, err := LoadCheckin(projectRoot, taskID)
+// updateCheckinTimer loads a timer, applies mutate if present, and persists it via write.
+// A nil loaded timer is a no-op returning nil.
+func updateCheckinTimer(
+	load func() (*CheckinTimer, error),
+	mutate func(timer *CheckinTimer, now time.Time),
+	write func(*CheckinTimer) error,
+) error {
+	timer, err := load()
 	if err != nil {
 		return err
 	}
 	if timer == nil {
-		return nil // nothing to evict
+		return nil
 	}
+	mutate(timer, time.Now().UTC())
+	return write(timer)
+}
 
-	now := time.Now().UTC()
-	timer.ExpiresAt = now.Format(time.RFC3339) // Force immediate expiration
-	timer.EvictedAt = now.Format(time.RFC3339)
-	timer.EvictionReason = reason
-	return writeCheckin(projectRoot, timer)
+// ForceEvict explicitly terminates a check-in timer before its natural timeout,
+// recording the reason (e.g. process death, admin override).
+func ForceEvict(projectRoot, taskID, reason string) error {
+	return updateCheckinTimer(
+		func() (*CheckinTimer, error) { return LoadCheckin(projectRoot, taskID) },
+		func(timer *CheckinTimer, now time.Time) {
+			timer.ExpiresAt = now.Format(time.RFC3339) // Force immediate expiration
+			timer.EvictedAt = now.Format(time.RFC3339)
+			timer.EvictionReason = reason
+		},
+		func(timer *CheckinTimer) error { return writeCheckin(projectRoot, timer) },
+	)
 }
 
 // ClearCheckin removes the timer; used on release and on reaching a terminal status.

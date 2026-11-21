@@ -72,18 +72,15 @@ func RenewSeatHeartbeat(projectRoot, seatID string) error {
 	if projectRoot == "" || seatID == "" || seatID == "unknown" {
 		return nil
 	}
-	timer, err := LoadSeatHeartbeat(projectRoot, seatID)
-	if err != nil {
-		return err
-	}
-	if timer == nil {
-		return nil
-	}
-	now := time.Now().UTC()
-	timer.ExpiresAt = now.Add(timer.Cadence()).Format(time.RFC3339)
-	timer.LastCheckinAt = now.Format(time.RFC3339)
-	timer.Misses = 0
-	return writeSeatHeartbeat(projectRoot, timer)
+	return updateCheckinTimer(
+		func() (*CheckinTimer, error) { return LoadSeatHeartbeat(projectRoot, seatID) },
+		func(timer *CheckinTimer, now time.Time) {
+			timer.ExpiresAt = now.Add(timer.Cadence()).Format(time.RFC3339)
+			timer.LastCheckinAt = now.Format(time.RFC3339)
+			timer.Misses = 0
+		},
+		func(timer *CheckinTimer) error { return writeSeatHeartbeat(projectRoot, timer) },
+	)
 }
 
 // ClearSeatHeartbeat removes the seat timer (seat-worker exit / session end).
