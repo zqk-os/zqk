@@ -101,13 +101,7 @@ type TenantDomainBinding struct {
 
 // Validate checks static invariants of TenantDomainBinding.
 func (b TenantDomainBinding) Validate() error {
-	err := validateRequiredFields(
-		ErrInvalidDomainBinding,
-		fieldCheck{val: b.SourceTenant, name: "source_tenant"},
-		fieldCheck{val: b.TargetTenant, name: "target_tenant"},
-		fieldCheck{val: b.FederationDomain, name: "federation_domain"},
-	)
-	if err != nil {
+	if err := validateRequiredFields(ErrInvalidDomainBinding, fieldCheck{val: b.SourceTenant, name: "source_tenant"}, fieldCheck{val: b.TargetTenant, name: "target_tenant"}, fieldCheck{val: b.FederationDomain, name: "federation_domain"}); err != nil {
 		return err
 	}
 	if b.SourceTenant == b.TargetTenant {
@@ -167,6 +161,18 @@ type Commitment struct {
 	Digest string `json:"digest"`
 }
 
+func sha256DelimitedHex(prefix string, parts ...[]byte) string {
+	h := sha256.New()
+	h.Write([]byte(prefix))
+	for i, part := range parts {
+		if i > 0 {
+			h.Write([]byte("|"))
+		}
+		h.Write(part)
+	}
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 // ComputeCommitment creates a hiding commitment over a secret witness and blinding factor.
 func ComputeCommitment(witness []byte, blinding *BlindingFactor) (Commitment, error) {
 	if len(witness) == 0 {
@@ -175,14 +181,9 @@ func ComputeCommitment(witness []byte, blinding *BlindingFactor) (Commitment, er
 	if err := blinding.Validate(); err != nil {
 		return Commitment{}, err
 	}
-	h := sha256.New()
-	h.Write([]byte("zqk:zk:commit:v1|"))
-	h.Write(witness)
-	h.Write([]byte("|"))
-	h.Write(blinding.Salt)
 	return Commitment{
 		Scheme: zkCommitmentScheme,
-		Digest: hex.EncodeToString(h.Sum(nil)),
+		Digest: sha256DelimitedHex("zqk:zk:commit:v1|", witness, blinding.Salt),
 	}, nil
 }
 
@@ -407,18 +408,20 @@ func (ex *ZKProofExchange) checkDomainBinding(actual, expected TenantDomainBindi
 
 func (ex *ZKProofExchange) verifyCryptographicProof(proof *ZKProof) error {
 	expectedChallenge := computeChallenge(proof.Statement, proof.Commitment)
-	if !constantTimeHexEqual(proof.Challenge, expectedChallenge) {
-		return ErrTamperedProof
-	}
 	ex.mu.RLock()
 	expectedResponse := ex.computeResponse(expectedChallenge, proof.Statement, proof.Commitment)
 	ex.mu.RUnlock()
-	if !constantTimeHexEqual(proof.Response, expectedResponse) {
-		return ErrTamperedProof
-	}
 	expectedID := computeProofID(expectedChallenge, expectedResponse)
-	if !constantTimeHexEqual(proof.ProofID, expectedID) {
-		return ErrTamperedProof
+
+	checks := [][2]string{
+		{proof.Challenge, expectedChallenge},
+		{proof.Response, expectedResponse},
+		{proof.ProofID, expectedID},
+	}
+	for _, pair := range checks {
+		if !constantTimeHexEqual(pair[0], pair[1]) {
+			return ErrTamperedProof
+		}
 	}
 	return nil
 }
@@ -437,34 +440,27 @@ func (ex *ZKProofExchange) recordProofID(proofID string) error {
 }
 
 func computeChallenge(stmt Statement, commitment Commitment) string {
-	h := sha256.New()
-	h.Write([]byte("zqk:zk:challenge:v1|"))
-	h.Write(stmt.CanonicalBytes())
-	h.Write([]byte("|"))
-	h.Write([]byte(commitment.Digest))
-	h.Write([]byte("|"))
-	h.Write(stmt.Domain.CanonicalBytes())
-	return hex.EncodeToString(h.Sum(nil))
+	return sha256DelimitedHex(
+		"zqk:zk:challenge:v1|",
+		stmt.CanonicalBytes(),
+		[]byte(commitment.Digest),
+		stmt.Domain.CanonicalBytes(),
+	)
 }
 
 func (ex *ZKProofExchange) computeResponse(challenge string, stmt Statement, commitment Commitment) string {
 	mac := hmac.New(sha256.New, ex.federationKey)
 	mac.Write([]byte("zqk:zk:response:v1|"))
-	mac.Write([]byte(challenge))
-	mac.Write([]byte("|"))
-	mac.Write([]byte(commitment.Digest))
-	mac.Write([]byte("|"))
-	mac.Write([]byte(stmt.ArtifactDigest))
-	mac.Write([]byte("|"))
-	mac.Write(stmt.Domain.CanonicalBytes())
+	parts := [][]byte{[]byte(challenge), []byte(commitment.Digest), []byte(stmt.ArtifactDigest), stmt.Domain.CanonicalBytes()}
+	for i, p := range parts {
+		if i > 0 {
+			mac.Write([]byte("|"))
+		}
+		mac.Write(p)
+	}
 	return hex.EncodeToString(mac.Sum(nil))
 }
 
 func computeProofID(challenge, response string) string {
-	h := sha256.New()
-	h.Write([]byte("zqk:zk:proofid:v1|"))
-	h.Write([]byte(challenge))
-	h.Write([]byte("|"))
-	h.Write([]byte(response))
-	return hex.EncodeToString(h.Sum(nil))[:32]
+	return sha256DelimitedHex("zqk:zk:proofid:v1|", []byte(challenge), []byte(response))[:32]
 }
