@@ -45,13 +45,6 @@ func assertCosineDistanceApprox(t *testing.T, a, b []float64, want float64) {
 	}
 }
 
-func assertErrorIs(t *testing.T, err, target error, context string) {
-	t.Helper()
-	if !errors.Is(err, target) {
-		t.Fatalf("%s: got error %v, want %v", context, err, target)
-	}
-}
-
 func TestSemanticRouter_StaticFloorInvariant(t *testing.T) {
 	assertCosineDistanceApprox(t, []float64{1.0, 2.0, 3.0}, []float64{1.0, 2.0, 3.0}, 0.0)
 	assertCosineDistanceApprox(t, []float64{1.0, 0.0, 0.0}, []float64{0.0, 1.0, 0.0}, 1.0)
