@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/execwrap"
@@ -24,6 +25,9 @@ import (
 	caspkg "github.com/zqk-os/zqk/pkg/storage/cas"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// applyCacheCheckerMu serializes global storage.SetCacheChecker swaps across concurrent ApplyScenarioBundle calls.
+var applyCacheCheckerMu sync.Mutex
 
 // ApplyOptions optional overrides for ApplyScenarioBundle (e.g. use existing storage in tests).
 type ApplyOptions struct {
@@ -149,10 +153,14 @@ func ApplyScenarioBundle(ctx stdcontext.Context, projectRoot string, r io.Reader
 	// Traceability: create order derived from spec index (dependencies first; cycles broken with deferred ref updates).
 	// Set a cache checker so ref validation accepts IDs we've already created in this apply (avoids CAS index
 	// visibility delay when creating requirement/criteria/test_case/backlog_item that reference each other).
+	applyCacheCheckerMu.Lock()
 	createdIDsChecker := makeCreatedIDsCacheChecker(summary)
 	prevChecker := storage.GetCacheChecker()
 	storage.SetCacheChecker(createdIDsChecker)
-	defer storage.SetCacheChecker(prevChecker)
+	defer func() {
+		storage.SetCacheChecker(prevChecker)
+		applyCacheCheckerMu.Unlock()
+	}()
 
 	bundleKinds := bundleTraceabilityKinds(bundle)
 	createOrder, _, err := CreateOrderFromSpecIndex(projectRoot, bundleKinds)
