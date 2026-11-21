@@ -36,12 +36,15 @@ func resolveRoot(cmd *cobra.Command) string {
 	return root
 }
 
+func openBundleContext(cmd *cobra.Command) (*bundle.Registry, string) {
+	format, _ := cmd.Flags().GetString("format")
+	return bundle.NewRegistry(resolveRoot(cmd)), format
+}
+
 func newListCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewBundleListCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
-			format, _ := cmd.Flags().GetString("format")
-			root := resolveRoot(cmd)
-			reg := bundle.NewRegistry(root)
+			reg, format := openBundleContext(cmd)
 			bundles, err := reg.ListInstalled()
 			if err != nil {
 				return err
@@ -81,9 +84,7 @@ func newListCmd() *cobra.Command {
 func newInfoCmd() *cobra.Command {
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewBundleInfoCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, args []string) error {
-			format, _ := cmd.Flags().GetString("format")
-			root := resolveRoot(cmd)
-			reg := bundle.NewRegistry(root)
+			reg, format := openBundleContext(cmd)
 			b, err := reg.Get(args[0])
 			if err != nil {
 				return err

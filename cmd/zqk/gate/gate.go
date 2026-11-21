@@ -57,6 +57,40 @@ func openGateStore(cmd *cobra.Command) (*cli.Processor, storage.ObjectStoragePro
 	return proc, store, nil
 }
 
+type gateContext struct {
+	proc       *cli.Processor
+	store      storage.ObjectStorageProvider
+	jsonOutput bool
+}
+
+func openGateContext(cmd *cobra.Command, flagsBag *clipkg.FlagBag) (gateContext, error) {
+	jsonOutput := flagsBag.Bool(cmd, "json")
+	if flagsBag.Err() != nil {
+		return gateContext{}, flagsBag.Err()
+	}
+	proc, store, err := openGateStore(cmd)
+	if err != nil {
+		return gateContext{}, err
+	}
+	return gateContext{
+		proc:       proc,
+		store:      store,
+		jsonOutput: jsonOutput,
+	}, nil
+}
+
+func parseReviewerFlags(cmd *cobra.Command, flagsBag *clipkg.FlagBag) (string, bool, error) {
+	reviewer := flagsBag.String(cmd, "reviewer")
+	jsonOutput := flagsBag.Bool(cmd, "json")
+	if flagsBag.Err() != nil {
+		return "", false, flagsBag.Err()
+	}
+	if reviewer == "" {
+		return "", false, errfmt.Errorf("--reviewer is required")
+	}
+	return reviewer, jsonOutput, nil
+}
+
 func printGateJSON(cmd *cobra.Command, v any) error {
 	out, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
