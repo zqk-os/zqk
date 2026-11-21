@@ -35,7 +35,7 @@ func newTestExchangeFixture(t *testing.T, fixedNow time.Time) (*ZKProofExchange,
 	return ex, domain, artifact, witness
 }
 
-func assertErrorIs(t *testing.T, label string, got, want error) {
+func assertZKErrorIs(t *testing.T, label string, got, want error) {
 	t.Helper()
 	if !errors.Is(got, want) {
 		t.Fatalf("%s: expected error %v, got %v", label, want, got)
@@ -176,19 +176,19 @@ func TestZKProofExchange_NegativeAdversarialBoundary_TamperAndMismatch(t *testin
 	// Tampered response
 	tamperedResp := *proof
 	tamperedResp.Response = strings.Repeat("a", len(proof.Response))
-	assertErrorIs(t, "tampered response", ex.VerifyProof(&tamperedResp, domain, digest), ErrTamperedProof)
+	assertZKErrorIs(t, "tampered response", ex.VerifyProof(&tamperedResp, domain, digest), ErrTamperedProof)
 
 	// Falsified statement via mismatched expected artifact digest
 	wrongDigest := ComputeArtifactDigest([]byte("other-artifact"))
-	assertErrorIs(t, "falsified artifact digest", ex.VerifyProof(proof, domain, wrongDigest), ErrFalsifiedStatement)
+	assertZKErrorIs(t, "falsified artifact digest", ex.VerifyProof(proof, domain, wrongDigest), ErrFalsifiedStatement)
 
 	// Mismatched commitment between statement and commitment object
 	mismatched := *proof
 	mismatched.Commitment.Digest = strings.Repeat("b", 64)
-	assertErrorIs(t, "mismatched commitment", ex.VerifyProof(&mismatched, domain, digest), ErrCommitmentMismatch)
+	assertZKErrorIs(t, "mismatched commitment", ex.VerifyProof(&mismatched, domain, digest), ErrCommitmentMismatch)
 
 	// Commitment.Open with wrong witness
-	assertErrorIs(t, "wrong witness open", proof.Commitment.Open([]byte("wrong-witness"), blinding), ErrCommitmentMismatch)
+	assertZKErrorIs(t, "wrong witness open", proof.Commitment.Open([]byte("wrong-witness"), blinding), ErrCommitmentMismatch)
 }
 
 func TestZKProofExchange_NegativeAdversarialBoundary_ReplayAndExpiry(t *testing.T) {
@@ -198,15 +198,15 @@ func TestZKProofExchange_NegativeAdversarialBoundary_ReplayAndExpiry(t *testing.
 	// Cross-domain / cross-tenant replay
 	otherTenant := domain
 	otherTenant.TargetTenant = "tenant-gamma"
-	assertErrorIs(t, "cross-tenant replay", ex.VerifyProof(proof, otherTenant, digest), ErrCrossDomainReplay)
+	assertZKErrorIs(t, "cross-tenant replay", ex.VerifyProof(proof, otherTenant, digest), ErrCrossDomainReplay)
 
 	// Valid first verification succeeds, second verification triggers duplicate replay error
 	if err := ex.VerifyProof(proof, domain, digest); err != nil {
 		t.Fatalf("initial VerifyProof failed: %v", err)
 	}
-	assertErrorIs(t, "duplicate proof replay", ex.VerifyProof(proof, domain, digest), ErrProofReplay)
+	assertZKErrorIs(t, "duplicate proof replay", ex.VerifyProof(proof, domain, digest), ErrProofReplay)
 
 	// Expired proof rejected
 	ex.nowFn = func() time.Time { return fixedNow.Add(10 * time.Minute) }
-	assertErrorIs(t, "expired proof", ex.VerifyProof(proof, domain, digest), ErrProofExpired)
+	assertZKErrorIs(t, "expired proof", ex.VerifyProof(proof, domain, digest), ErrProofExpired)
 }
