@@ -139,8 +139,11 @@ func TestWorkloadAttestation_OperationalDynamicProof(t *testing.T) {
 		Metadata:      map[string]string{"arch": "arm64", "env": "prod"},
 	}
 
-	ch1, _ := issueAndVerifyWorkload(t, attestor, "host-ed25519", "task-build-1", payload, edPriv)
-	ch2, _ := issueAndVerifyWorkload(t, attestor, "host-ed25519", "task-build-1", payload, edPriv)
+	ch1, r1 := issueAndVerifyWorkload(t, attestor, "host-ed25519", "task-build-1", payload, edPriv)
+	ch2, r2 := issueAndVerifyWorkload(t, attestor, "host-ed25519", "task-build-1", payload, edPriv)
+	if r1 == nil || r2 == nil {
+		t.Fatal("expected non-nil attestation receipts")
+	}
 	if ch2.Sequence != ch1.Sequence+1 {
 		t.Fatalf("expected monotonic sequence %d, got %d", ch1.Sequence+1, ch2.Sequence)
 	}
@@ -214,9 +217,9 @@ func TestWorkloadAttestation_NegativeAdversarialBoundary(t *testing.T) {
 	attestor.now = func() time.Time { return now }
 	expPriv := registerEd25519Host(t, attestor, "host-expired")
 	expPayload := WorkloadPayload{TaskID: "task-exp", ArtifactBytes: []byte("authentic-bytes")}
-	chExp, _ := issueAndVerifyWorkload(t, attestor, "host-expired", "task-exp", expPayload, expPriv)
-	if chExp.ExpiresAt.Before(now) {
-		t.Fatal("expected challenge expiry in the future")
+	chExp, rExp := issueAndVerifyWorkload(t, attestor, "host-expired", "task-exp", expPayload, expPriv)
+	if rExp == nil || chExp.ExpiresAt.Before(now) {
+		t.Fatal("expected valid receipt and challenge expiry in the future")
 	}
 	chFresh, err := attestor.IssueChallenge("host-expired", "task-exp")
 	if err != nil {
