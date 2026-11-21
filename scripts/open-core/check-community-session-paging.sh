@@ -16,9 +16,14 @@ say "# community session paging (v0.1 kernel-as-SSOT + local hot pages)"
 say "root=$ROOT"
 
 ZQK=""
-for cand in "$ROOT/bin/zqk-community" "$ROOT/bin/zqk"; do
-  [ -x "$cand" ] && ZQK=$cand && break
-done
+if [ -n "${ZQK_BIN:-}" ] && [ -x "${ZQK_BIN}" ]; then
+  ZQK="${ZQK_BIN}"
+fi
+if [ -z "$ZQK" ]; then
+  for cand in "$ROOT/bin/zqk-community" "$ROOT/bin/zqk"; do
+    [ -x "$cand" ] && ZQK=$cand && break
+  done
+fi
 [ -n "$ZQK" ] || { fail "missing bin/zqk under $ROOT"; exit 1; }
 
 # Community-local hot page store must exist (no Studio package required).
