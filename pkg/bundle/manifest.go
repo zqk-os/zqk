@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/strutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
@@ -58,17 +59,18 @@ type DirectiveSpec struct {
 
 // Validate ensures all required static floor invariants are satisfied.
 func (m *LanguageBundleManifest) Validate() error {
-	if strings.TrimSpace(m.SchemaVersion) == "" {
-		return errors.New("manifest schema_version is required")
-	}
-	if strings.TrimSpace(m.Name) == "" {
-		return errors.New("manifest name is required")
-	}
-	if strings.TrimSpace(m.Language) == "" {
-		return errors.New("manifest language is required")
-	}
-	if strings.TrimSpace(m.Version) == "" {
-		return errors.New("manifest version is required")
+	for _, req := range []struct {
+		val  string
+		name string
+	}{
+		{m.SchemaVersion, "schema_version"},
+		{m.Name, "name"},
+		{m.Language, "language"},
+		{m.Version, "version"},
+	} {
+		if err := strutil.ErrorOnBlank(req.val, "manifest %s is required", req.name); err != nil {
+			return err
+		}
 	}
 
 	// Negative adversarial security boundaries: name sanitization and traversal prevention
@@ -77,8 +79,8 @@ func (m *LanguageBundleManifest) Validate() error {
 	}
 
 	for _, dep := range m.Dependencies {
-		if strings.TrimSpace(dep) == "" {
-			return errors.New("manifest contains empty dependency")
+		if err := strutil.ErrorOnBlank(dep, "manifest contains empty dependency"); err != nil {
+			return err
 		}
 		if dep == m.Name {
 			return fmt.Errorf("circular self-dependency detected: %q depends on itself", m.Name)

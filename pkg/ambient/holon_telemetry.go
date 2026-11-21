@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -332,8 +332,8 @@ func (a *HolonTelemetryAggregator) RegisterSubscriber(id string, ch chan<- *Midd
 	if ch == nil {
 		return ErrNilTelemetryChannel
 	}
-	if strings.TrimSpace(id) == "" {
-		return errors.New("subscriber id is required")
+	if err := strutil.ErrorOnBlank(id, "subscriber id is required"); err != nil {
+		return err
 	}
 
 	a.mu.Lock()
@@ -441,7 +441,7 @@ func (a *HolonTelemetryAggregator) RestoreState(filePath string) (*MiddleBrainTe
 // SaveTelemetryStateFile persists a MiddleBrainTelemetrySnapshot to disk at the given path.
 // It fails closed with actionable error receipts on missing path or nil snapshot.
 func SaveTelemetryStateFile(filePath string, snap *MiddleBrainTelemetrySnapshot) error {
-	if strings.TrimSpace(filePath) == "" {
+	if strutil.IsBlank(filePath) {
 		return ErrStatePathRequired
 	}
 	if snap == nil {
@@ -453,7 +453,7 @@ func SaveTelemetryStateFile(filePath string, snap *MiddleBrainTelemetrySnapshot)
 // LoadTelemetryStateFile reads and validates a persisted ambient middle-brain telemetry snapshot from disk.
 // Fails closed with actionable error receipts on missing file, unreadable file, empty file, or malformed JSON.
 func LoadTelemetryStateFile(filePath string) (*MiddleBrainTelemetrySnapshot, error) {
-	if strings.TrimSpace(filePath) == "" {
+	if strutil.IsBlank(filePath) {
 		return nil, ErrStatePathRequired
 	}
 	data, err := fileutil.ReadFile(filePath)
@@ -466,7 +466,7 @@ func LoadTelemetryStateFile(filePath string) (*MiddleBrainTelemetrySnapshot, err
 		}
 		return nil, fmt.Errorf("%w: failed to read state file: %v", ErrCorruptAmbientState, err)
 	}
-	if len(strings.TrimSpace(string(data))) == 0 {
+	if strutil.IsBlank(string(data)) {
 		return nil, fmt.Errorf("%w: state file %q is empty", ErrEmptyAmbientState, filePath)
 	}
 
@@ -538,8 +538,8 @@ func ValidateRiverStream(river *IntentRiver) error {
 	if river == nil {
 		return fmt.Errorf("%w: river is nil", ErrUninitializedStream)
 	}
-	if strings.TrimSpace(river.ID) == "" {
-		return fmt.Errorf("%w: river ID is empty", ErrUninitializedStream)
+	if err := strutil.ErrorOnBlank(river.ID, "%w: river ID is empty", ErrUninitializedStream); err != nil {
+		return err
 	}
 	if river.PooledVector == nil {
 		return fmt.Errorf("%w: river %q has uninitialized pooled vector", ErrUninitializedStream, river.ID)
@@ -552,8 +552,8 @@ func ValidateIntentStream(stream *IntentStream) error {
 	if stream == nil {
 		return fmt.Errorf("%w: stream is nil", ErrUninitializedStream)
 	}
-	if strings.TrimSpace(stream.ID) == "" {
-		return fmt.Errorf("%w: stream ID is empty", ErrUninitializedStream)
+	if err := strutil.ErrorOnBlank(stream.ID, "%w: stream ID is empty", ErrUninitializedStream); err != nil {
+		return err
 	}
 	return nil
 }
