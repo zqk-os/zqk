@@ -19,8 +19,19 @@ import (
 // LoadCache loads the cache from disk if it exists
 // Returns true if cache was successfully loaded, false if cache needs to be rebuilt
 func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
-	cachePath := c.getCacheFilePath(projectRoot)
-	c.cacheDir = filepath.Dir(cachePath)
+	var cachePath string
+	var err_swallow_path = c.withReadLock(
+		locknames.LockNameHighVolumeCacheSaveGetCount,
+		func() error {
+			cachePath = c.getCacheFilePath(projectRoot)
+			return nil
+		},
+	)
+	if err_swallow_path != nil {
+		logging.LogSwallowedError(err_swallow_path)
+		cachePath = c.getCacheFilePath(projectRoot)
+	}
+	cacheDir := filepath.Dir(cachePath)
 
 	data, ok, err := readOptionalCacheData(cachePath)
 	if err != nil || !ok {
@@ -50,9 +61,11 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 		return false, nil
 	}
 
+	var entryCount int
 	var err_swallow_16 = c.withWriteLock(
 		locknames.LockNameHighVolumeCacheLoad,
 		func() error {
+			c.cacheDir = cacheDir
 			when.When(func() bool { return version == "2.0" && len(cacheData.Buckets) > 0 }).Then(func() {
 				c.cache = c.flatMapFromBuckets(cacheData.Buckets)
 			}).OrElseWhen(func() bool { return len(cacheData.Entries) > 0 }).Then(func() {
@@ -66,6 +79,7 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 			}
 			c.rebuildTimeIndex()
 			c.evictOldestToCap(maxHighVolumeEventCacheEntries)
+			entryCount = len(c.cache)
 			return nil
 		},
 	)
@@ -74,7 +88,7 @@ func (c *HighVolumeEventCache) LoadCache(projectRoot string) (bool, error) {
 	}
 
 	StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Debug(LogEventStorageHighVolumeCacheLoadedDebug).
-		EntryCount(len(c.cache)).
+		EntryCount(entryCount).
 		ProjectRoot(projectRoot).
 		Log()
 	return true, nil
@@ -146,18 +160,20 @@ func (c *HighVolumeEventCache) SaveCache(projectRoot string) error {
 		return nil
 	}
 	var entryCount int
+	var cachePath string
 	var err_swallow_17 = c.withReadLock(
 		locknames.LockNameHighVolumeCacheSaveGetCount,
 		func() error {
 			entryCount = len(c.cache)
+			cachePath = c.getCacheFilePath(projectRoot)
 			return nil
 		},
 	)
 	if err_swallow_17 != nil {
 		logging.LogSwallowedError(err_swallow_17)
+		cachePath = c.getCacheFilePath(projectRoot)
 	}
 
-	cachePath := c.getCacheFilePath(projectRoot)
 	cacheDir := filepath.Dir(cachePath)
 	if err := fileutil.MkdirAll(cacheDir, paths.DirPerm755); err != nil {
 		return errfmt.Newf(ConstMiscFailedToCreateCacheDirectory).Wrap(err)
@@ -183,7 +199,8 @@ func (c *HighVolumeEventCache) SaveCache(projectRoot string) error {
 				c.metadata.BuildTime = time.Now().UTC()
 				c.metadata.EntryCount = entryCount
 			}).Run()
-			cacheData.Metadata = c.metadata
+			metaCopy := *c.metadata
+			cacheData.Metadata = &metaCopy
 			cacheData.Buckets = c.bucketsFromCache()
 			return nil
 		},

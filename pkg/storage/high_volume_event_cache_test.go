@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -639,3 +640,37 @@ func TestBuildCache_ConcurrentReadersDoNotBlock(t *testing.T) {
 	<-buildDone // wait for build to finish
 }
 func (s *slowListStorage) Shutdown(ctx context.Context) error { return nil }
+
+func TestHighVolumeEventCache_ConcurrentSaveAndLoad_NoRace(t *testing.T) {
+	projectRoot := t.TempDir()
+	cache := NewHighVolumeEventCache()
+	for i := 0; i < 10; i++ {
+		cache.Set(&HighVolumeEventCacheEntry{
+			ID:        fmt.Sprintf("AUD-RACE-%d", i),
+			Kind:      objects.KindAuditEvent,
+			CreatedAt: time.Now().UTC(),
+			EventType: "test",
+			Exists:    true,
+		})
+	}
+	if err := cache.SaveCache(projectRoot); err != nil {
+		t.Fatalf("initial SaveCache: %v", err)
+	}
+
+	var wg sync.WaitGroup
+	for g := 0; g < 6; g++ {
+		id := g
+		wg.Add(1)
+		goroutinelabels.NewGoroutine("storage_test", "concurrent hve save and load").StartSimple(func() {
+			defer wg.Done()
+			for i := 0; i < 5; i++ {
+				if id%2 == 0 {
+					_ = cache.SaveCache(projectRoot)
+				} else {
+					_, _ = cache.LoadCache(projectRoot)
+				}
+			}
+		})
+	}
+	wg.Wait()
+}
