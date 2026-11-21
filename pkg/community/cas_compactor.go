@@ -254,81 +254,66 @@ func (c *CASCompactor) StageWritePage(txID string, page StoragePage) error {
 		return err
 	}
 
+	return c.withActiveTx(txID, func(tx *writeTxState) error {
+		if norm.Generation <= c.activeGeneration {
+			return fmt.Errorf("%w: staged generation %d must be > active generation %d", ErrNonMonotonicGeneration, norm.Generation, c.activeGeneration)
+		}
+		tx.stagedPages = append(tx.stagedPages, norm)
+		tx.pinnedKeys[compositeObjectKey(norm.Bucket, norm.ObjectKey)] = struct{}{}
+		tx.pinnedGens[norm.Generation] = struct{}{}
+		return nil
+	})
+}
+
+func (c *CASCompactor) withActiveTx(txID string, fn func(tx *writeTxState) error) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	tx, err := c.lookupActiveTxLocked(txID)
-	if err != nil {
-		return err
-	}
-	if norm.Generation <= c.activeGeneration {
-		return fmt.Errorf("%w: staged generation %d must be > active generation %d", ErrNonMonotonicGeneration, norm.Generation, c.activeGeneration)
-	}
-
-	tx.stagedPages = append(tx.stagedPages, norm)
-	tx.pinnedKeys[compositeObjectKey(norm.Bucket, norm.ObjectKey)] = struct{}{}
-	tx.pinnedGens[norm.Generation] = struct{}{}
-	return nil
-}
-
-func (c *CASCompactor) lookupActiveTxLocked(txID string) (*writeTxState, error) {
 	tx, exists := c.writeTxs[txID]
 	if !exists {
-		return nil, fmt.Errorf("%w: %s", ErrWriteTxNotFound, txID)
+		return fmt.Errorf("%w: %s", ErrWriteTxNotFound, txID)
 	}
 	if !tx.active {
-		return nil, fmt.Errorf("%w: %s", ErrWriteTxNotActive, txID)
+		return fmt.Errorf("%w: %s", ErrWriteTxNotActive, txID)
 	}
-	return tx, nil
+	return fn(tx)
 }
 
 // CommitWriteTx atomically commits all staged pages in the transaction and releases its compaction pins.
 func (c *CASCompactor) CommitWriteTx(txID string) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	tx, err := c.lookupActiveTxLocked(txID)
-	if err != nil {
-		return err
-	}
-
-	var maxGen uint64
-	for _, p := range tx.stagedPages {
-		if p.Generation <= c.activeGeneration {
-			return fmt.Errorf("%w: commit generation %d <= active generation %d", ErrNonMonotonicGeneration, p.Generation, c.activeGeneration)
+	return c.withActiveTx(txID, func(tx *writeTxState) error {
+		var maxGen uint64
+		for _, p := range tx.stagedPages {
+			if p.Generation <= c.activeGeneration {
+				return fmt.Errorf("%w: commit generation %d <= active generation %d", ErrNonMonotonicGeneration, p.Generation, c.activeGeneration)
+			}
+			if p.Generation > maxGen {
+				maxGen = p.Generation
+			}
 		}
-		if p.Generation > maxGen {
-			maxGen = p.Generation
-		}
-	}
 
-	for _, p := range tx.stagedPages {
-		if err := c.commitPageLocked(p); err != nil {
-			return err
+		for _, p := range tx.stagedPages {
+			if err := c.commitPageLocked(p); err != nil {
+				return err
+			}
 		}
-	}
-	if maxGen > c.activeGeneration {
-		c.activeGeneration = maxGen
-	}
-	tx.active = false
-	return nil
+		if maxGen > c.activeGeneration {
+			c.activeGeneration = maxGen
+		}
+		tx.active = false
+		return nil
+	})
 }
 
 // AbortWriteTx discards staged uncommitted writes and releases all compaction pins held by the transaction.
 func (c *CASCompactor) AbortWriteTx(txID string) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	tx, err := c.lookupActiveTxLocked(txID)
-	if err != nil {
-		return err
-	}
-
-	tx.stagedPages = nil
-	tx.pinnedKeys = nil
-	tx.pinnedGens = nil
-	tx.active = false
-	return nil
+	return c.withActiveTx(txID, func(tx *writeTxState) error {
+		tx.stagedPages = nil
+		tx.pinnedKeys = nil
+		tx.pinnedGens = nil
+		tx.active = false
+		return nil
+	})
 }
 
 func (c *CASCompactor) isPagePinnedLocked(page *StoragePage) bool {
