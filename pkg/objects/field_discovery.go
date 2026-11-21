@@ -433,8 +433,7 @@ func getIntFromMapAny(m map[interface{}]interface{}, keys ...string) int {
 	return 0
 }
 
-// getStringFromMap returns the string value for key from m, or "" if missing or not a string.
-func getStringFromMap(m map[string]any, key string) string {
+func lookupStringInMap[K comparable](m map[K]any, key K) string {
 	if v, ok := m[key]; ok {
 		if s, ok := v.(string); ok {
 			return s
@@ -443,14 +442,14 @@ func getStringFromMap(m map[string]any, key string) string {
 	return ""
 }
 
+// getStringFromMap returns the string value for key from m, or "" if missing or not a string.
+func getStringFromMap(m map[string]any, key string) string {
+	return lookupStringInMap(m, key)
+}
+
 // getStringFromMapAny returns the string value for key from m, or "" if missing or not a string.
-func getStringFromMapAny(m map[interface{}]interface{}, key string) string {
-	if v, ok := m[key]; ok {
-		if s, ok := v.(string); ok {
-			return s
-		}
-	}
-	return ""
+func getStringFromMapAny(m map[interface{}]interface{}, key interface{}) string {
+	return lookupStringInMap(m, key)
 }
 
 // extractEnumValues appends string values from src ([]any from YAML) into dst.
