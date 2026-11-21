@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -469,69 +470,53 @@ func (r *AmbientTelemetryReport) GetMeshMetrics() HolonMeshMetrics {
 	return r.MeshMetrics
 }
 
-// GetConsensusLeasesActive returns the active consensus lease count in a nil-safe manner.
-func (r *AmbientTelemetryReport) GetConsensusLeasesActive() int {
+func readTelemetryMetric[T comparable](r *AmbientTelemetryReport, read func(*AmbientTelemetryReport) (T, T)) T {
+	var zero T
 	if r == nil {
-		return 0
+		return zero
 	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	if r.ConsensusLeasesActive != 0 {
-		return r.ConsensusLeasesActive
+	primary, fallback := read(r)
+	if primary != zero {
+		return primary
 	}
-	return r.MeshMetrics.ConsensusLeasesActive
+	return fallback
+}
+
+// GetConsensusLeasesActive returns the active consensus lease count in a nil-safe manner.
+func (r *AmbientTelemetryReport) GetConsensusLeasesActive() int {
+	return readTelemetryMetric(r, func(rep *AmbientTelemetryReport) (int, int) {
+		return rep.ConsensusLeasesActive, rep.MeshMetrics.ConsensusLeasesActive
+	})
 }
 
 // GetConsensusCommitted returns the committed consensus task count in a nil-safe manner.
 func (r *AmbientTelemetryReport) GetConsensusCommitted() uint64 {
-	if r == nil {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.ConsensusCommitted != 0 {
-		return r.ConsensusCommitted
-	}
-	return r.MeshMetrics.ConsensusCommitted
+	return readTelemetryMetric(r, func(rep *AmbientTelemetryReport) (uint64, uint64) {
+		return rep.ConsensusCommitted, rep.MeshMetrics.ConsensusCommitted
+	})
 }
 
 // GetConsensusRevoked returns the revoked consensus task count in a nil-safe manner.
 func (r *AmbientTelemetryReport) GetConsensusRevoked() uint64 {
-	if r == nil {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.ConsensusRevoked != 0 {
-		return r.ConsensusRevoked
-	}
-	return r.MeshMetrics.ConsensusRevoked
+	return readTelemetryMetric(r, func(rep *AmbientTelemetryReport) (uint64, uint64) {
+		return rep.ConsensusRevoked, rep.MeshMetrics.ConsensusRevoked
+	})
 }
 
 // GetReflexActionsTotal returns the total reflex actions triggered in a nil-safe manner.
 func (r *AmbientTelemetryReport) GetReflexActionsTotal() uint64 {
-	if r == nil {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.ReflexActionsTotal != 0 {
-		return r.ReflexActionsTotal
-	}
-	return r.MeshMetrics.ReflexActionsTotal
+	return readTelemetryMetric(r, func(rep *AmbientTelemetryReport) (uint64, uint64) {
+		return rep.ReflexActionsTotal, rep.MeshMetrics.ReflexActionsTotal
+	})
 }
 
 // GetReflexRealignCount returns the reflex realignment actions count in a nil-safe manner.
 func (r *AmbientTelemetryReport) GetReflexRealignCount() uint64 {
-	if r == nil {
-		return 0
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.ReflexRealignCount != 0 {
-		return r.ReflexRealignCount
-	}
-	return r.MeshMetrics.ReflexRealignCount
+	return readTelemetryMetric(r, func(rep *AmbientTelemetryReport) (uint64, uint64) {
+		return rep.ReflexRealignCount, rep.MeshMetrics.ReflexRealignCount
+	})
 }
 
 // GetWarnings returns a copy of the warnings slice in a thread-safe and nil-safe manner.
@@ -727,7 +712,7 @@ func SafeLoadTelemetryReport(path string) (*AmbientTelemetryReport, error) {
 		return report, fmt.Errorf("%w: %s: %v", ErrCorruptAmbientState, path, err)
 	}
 
-	if len(strings.TrimSpace(string(data))) == 0 {
+	if strutil.IsBlank(string(data)) {
 		reason := fmt.Sprintf("state file %q is empty", path)
 		report := DegradedTelemetryReport(TelemetryStatusDegraded, reason, "state file contained zero bytes")
 		return report, fmt.Errorf("%w: state file %q is empty", ErrEmptyAmbientState, path)
