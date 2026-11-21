@@ -69,19 +69,24 @@ func (q *TaskDeque) PushBottom(task TaskItem) error {
 	return nil
 }
 
-// PopBottom removes and returns the task at the bottom (local worker pop, LIFO).
-func (q *TaskDeque) PopBottom() (TaskItem, bool) {
+func (q *TaskDeque) withNonEmptyLocked(fn func(n int)) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
-
-	n := len(q.items)
-	if n == 0 {
-		return TaskItem{}, false
+	if n := len(q.items); n > 0 {
+		fn(n)
 	}
+}
 
-	item := q.items[n-1]
-	q.items = q.items[:n-1]
-	return item, true
+// PopBottom removes and returns the task at the bottom (local worker pop, LIFO).
+func (q *TaskDeque) PopBottom() (TaskItem, bool) {
+	var item TaskItem
+	var ok bool
+	q.withNonEmptyLocked(func(n int) {
+		item = q.items[n-1]
+		q.items = q.items[:n-1]
+		ok = true
+	})
+	return item, ok
 }
 
 // StealTop steals up to maxBatch tasks from the top of the deque (remote thief, FIFO).
@@ -89,23 +94,16 @@ func (q *TaskDeque) StealTop(maxBatch int) []TaskItem {
 	if maxBatch <= 0 {
 		return nil
 	}
-
-	q.mu.Lock()
-	defer q.mu.Unlock()
-
-	n := len(q.items)
-	if n == 0 {
-		return nil
-	}
-
-	batchSize := maxBatch
-	if batchSize > n {
-		batchSize = n
-	}
-
-	stolen := make([]TaskItem, batchSize)
-	copy(stolen, q.items[:batchSize])
-	q.items = q.items[batchSize:]
+	var stolen []TaskItem
+	q.withNonEmptyLocked(func(n int) {
+		batchSize := maxBatch
+		if batchSize > n {
+			batchSize = n
+		}
+		stolen = make([]TaskItem, batchSize)
+		copy(stolen, q.items[:batchSize])
+		q.items = q.items[batchSize:]
+	})
 	return stolen
 }
 
@@ -150,10 +148,9 @@ func (b *WorkStealingBalancer) RegisterWorker(workerID string) error {
 	return nil
 }
 
-// SubmitTask assigns a task to a target worker's local deque.
-func (b *WorkStealingBalancer) SubmitTask(workerID string, task TaskItem) error {
+func (b *WorkStealingBalancer) lookupDeque(workerID string) (*TaskDeque, error) {
 	if err := strutil.ErrorOnBlank(workerID, "%w: worker_id is required", ErrBlankWorkerIdentifier); err != nil {
-		return err
+		return nil, err
 	}
 
 	b.mu.RLock()
@@ -161,23 +158,25 @@ func (b *WorkStealingBalancer) SubmitTask(workerID string, task TaskItem) error 
 	b.mu.RUnlock()
 
 	if !exists {
-		return ErrWorkerNotRegistered
+		return nil, ErrWorkerNotRegistered
+	}
+	return deque, nil
+}
+
+// SubmitTask assigns a task to a target worker's local deque.
+func (b *WorkStealingBalancer) SubmitTask(workerID string, task TaskItem) error {
+	deque, err := b.lookupDeque(workerID)
+	if err != nil {
+		return err
 	}
 	return deque.PushBottom(task)
 }
 
 // PopLocal retrieves a task from the bottom of the worker's own deque.
 func (b *WorkStealingBalancer) PopLocal(workerID string) (TaskItem, bool, error) {
-	if err := strutil.ErrorOnBlank(workerID, "%w: worker_id is required", ErrBlankWorkerIdentifier); err != nil {
+	deque, err := b.lookupDeque(workerID)
+	if err != nil {
 		return TaskItem{}, false, err
-	}
-
-	b.mu.RLock()
-	deque, exists := b.deques[workerID]
-	b.mu.RUnlock()
-
-	if !exists {
-		return TaskItem{}, false, ErrWorkerNotRegistered
 	}
 	item, ok := deque.PopBottom()
 	return item, ok, nil
@@ -215,16 +214,9 @@ func (b *WorkStealingBalancer) StealWork(thiefID, victimID string, maxBatch int)
 
 // GetQueueLength returns the count of pending tasks in a worker's deque.
 func (b *WorkStealingBalancer) GetQueueLength(workerID string) (int, error) {
-	if err := strutil.ErrorOnBlank(workerID, "%w: worker_id is required", ErrBlankWorkerIdentifier); err != nil {
+	deque, err := b.lookupDeque(workerID)
+	if err != nil {
 		return 0, err
-	}
-
-	b.mu.RLock()
-	deque, exists := b.deques[workerID]
-	b.mu.RUnlock()
-
-	if !exists {
-		return 0, ErrWorkerNotRegistered
 	}
 	return deque.Len(), nil
 }
