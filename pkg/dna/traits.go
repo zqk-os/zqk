@@ -1,8 +1,9 @@
 package dna
 
 import (
-	"fmt"
 	"strings"
+
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 )
 
 // Foundational biological traits enforced by the Cellular OS microkernel.
@@ -46,11 +47,13 @@ func vetAuditableTrait(obj any, targetPlane Plane) error {
 	if targetPlane == PlanePromoted || targetPlane == PlaneStaged {
 		if aud, ok := obj.(interface{ GetProvenance() Provenance }); ok {
 			prov := aud.GetProvenance()
-			if strings.TrimSpace(prov.Actor()) == "" {
-				return fmt.Errorf("trait invariant violation (auditable): target plane %s requires non-empty AgentURN or AgentID", targetPlane)
+			if err := strutil.ErrorOnBlank(prov.Actor(), "trait invariant violation (auditable): target plane %s requires non-empty AgentURN or AgentID", targetPlane); err != nil {
+				return err
 			}
-			if strings.TrimSpace(prov.ParentHash) == "" && targetPlane == PlanePromoted {
-				return fmt.Errorf("trait invariant violation (auditable): target plane PlanePromoted requires causal ParentHash")
+			if targetPlane == PlanePromoted {
+				if err := strutil.ErrorOnBlank(prov.ParentHash, "trait invariant violation (auditable): target plane PlanePromoted requires causal ParentHash"); err != nil {
+					return err
+				}
 			}
 		}
 	}
