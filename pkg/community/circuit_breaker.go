@@ -129,21 +129,24 @@ func (cb *ProviderCircuitBreaker) Execute(ctx context.Context, action func(ctx c
 	if cb.state == StateHalfOpen {
 		cb.consecutiveSuccesses++
 		if cb.consecutiveSuccesses >= cb.opts.ProbeSuccessThreshold {
-			cb.state = StateClosed
-			cb.consecutiveSuccesses = 0
+			cb.resetLocked()
 		}
 	}
 
 	return nil
 }
 
-// Reset restores the circuit breaker to closed state with clean failure counts.
-func (cb *ProviderCircuitBreaker) Reset() {
-	cb.mu.Lock()
-	defer cb.mu.Unlock()
+func (cb *ProviderCircuitBreaker) resetLocked() {
 	cb.state = StateClosed
 	cb.consecutiveFailures = 0
 	cb.consecutiveSuccesses = 0
+}
+
+// Reset restores the circuit breaker to closed state with clean failure counts.
+func (cb *ProviderCircuitBreaker) Reset() {
+	cb.mu.Lock()
+	cb.resetLocked()
+	cb.mu.Unlock()
 }
 
 // Trip manually forces the circuit breaker into open state.

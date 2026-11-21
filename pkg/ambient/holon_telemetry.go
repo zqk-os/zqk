@@ -223,8 +223,9 @@ func (a *HolonTelemetryAggregator) HistoryLimit() int {
 		return 0
 	}
 	a.mu.RLock()
-	defer a.mu.RUnlock()
-	return a.limit
+	limit := a.limit
+	a.mu.RUnlock()
+	return limit
 }
 
 // deriveHealthStatus computes health state based on middle-brain operational metrics.
