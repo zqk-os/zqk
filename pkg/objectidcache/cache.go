@@ -398,11 +398,22 @@ func normalizeByKindKeys(byKind map[string][]KindBucketEntry, idToKind map[strin
 	}
 }
 
+func (c *ObjectIDCache) readCacheFilePath(projectRoot string) string {
+	var cachePath string
+	if err := c.withRLockTimeout(LockNameObjectIDCacheLoad, func() error {
+		cachePath = c.getCacheFilePath(projectRoot)
+		return nil
+	}); err != nil {
+		return c.getCacheFilePath(projectRoot)
+	}
+	return cachePath
+}
+
 // LoadCache loads the cache from disk if it exists and is still valid
 // Returns true if cache was successfully loaded, false if cache needs to be rebuilt
 func (c *ObjectIDCache) LoadCache(projectRoot string) (bool, error) {
-	cachePath := c.getCacheFilePath(projectRoot)
-	c.cacheDir = filepath.Dir(cachePath)
+	cachePath := c.readCacheFilePath(projectRoot)
+	cacheDir := filepath.Dir(cachePath)
 
 	data, err := fileutil.ReadFile(cachePath)
 	if fileutil.IsNotExist(err) {
@@ -449,7 +460,9 @@ func (c *ObjectIDCache) LoadCache(projectRoot string) (bool, error) {
 		}
 	}
 
+	buildTimeStr := metadata.BuildTime.Format(time.RFC3339)
 	_ = c.withLockTimeout(LockNameObjectIDCacheLoad, func() error {
+		c.cacheDir = cacheDir
 		c.byKind = byKind
 		c.idToKind = idToKind
 		c.idToIndex = buildIDToIndex(byKind)
@@ -462,7 +475,7 @@ func (c *ObjectIDCache) LoadCache(projectRoot string) (bool, error) {
 	logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 	logging.Fluent(logger).Debug("Loaded object ID cache from disk").
 		EntryCount(entryCount).
-		String("build_time", metadata.BuildTime.Format(time.RFC3339)).
+		String("build_time", buildTimeStr).
 		Log()
 	if entryCount == 0 {
 		logging.Fluent(logger).Warn("Cache loaded from disk but is empty - this may cause validation issues").Log()
@@ -514,7 +527,7 @@ func (c *ObjectIDCache) kindNamesForReverseReferenceScan() []string {
 func (c *ObjectIDCache) SaveCache(projectRoot string) error {
 	saveStart := time.Now()
 	var entryCount int
-	cachePath := c.getCacheFilePath(projectRoot)
+	cachePath := c.readCacheFilePath(projectRoot)
 	if err := fileutil.EnsureDir(filepath.Dir(cachePath)); err != nil {
 		return errfmt.Newf("failed to create cache directory").Wrap(err)
 	}
@@ -547,8 +560,9 @@ func (c *ObjectIDCache) SaveCache(projectRoot string) error {
 				byKindCopy[k] = listCopy
 			}
 			c.countByKind = countByKind
+			metaCopy := *c.metadata
 			v2 = ObjectIDCacheFileV2{
-				Metadata:    c.metadata,
+				Metadata:    &metaCopy,
 				CountByKind: countByKindCopy,
 				ByKind:      byKindCopy,
 			}

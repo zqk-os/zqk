@@ -4,11 +4,13 @@ import (
 	stdcontext "context"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/datacell"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/logging"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -879,4 +881,45 @@ func TestCountByKind_AndClearInMemoryWithRoot(t *testing.T) {
 	if c.metadata != nil || len(c.byKind) != 0 {
 		t.Fatal("expected cache to be cleared after ClearInMemoryCache with matching root")
 	}
+}
+
+func TestObjectIDCache_ConcurrentLoadAndSave_NoRace(t *testing.T) {
+	root := t.TempDir()
+	t.Cleanup(func() {
+		TeardownObjectIDCacheTestRoot(root)
+	})
+	procDir := datacell.ProcessPrimaryDir(root)
+	_ = fileutil.MkdirAll(filepath.Join(procDir, "goals"), paths.DirPerm755)
+	f1 := filepath.Join(procDir, "goals/GOAL-RACE-1.yaml")
+	_ = fileutil.WriteSecureFile(f1, []byte("id: GOAL-RACE-1\n"))
+	info, _ := fileutil.Stat(f1)
+
+	c := NewObjectIDCache()
+	c.Set("GOAL-RACE-1", &ObjectIDCacheEntry{
+		ID:       "GOAL-RACE-1",
+		Kind:     "goal",
+		FilePath: f1,
+		MTime:    info.ModTime(),
+		Exists:   true,
+	})
+	if err := c.SaveCache(root); err != nil {
+		t.Fatalf("initial SaveCache: %v", err)
+	}
+
+	var wg sync.WaitGroup
+	for g := 0; g < 6; g++ {
+		id := g
+		wg.Add(1)
+		goroutinelabels.NewGoroutine("objectidcache_test", "concurrent load and save").StartSimple(func() {
+			defer wg.Done()
+			for i := 0; i < 5; i++ {
+				if id%2 == 0 {
+					_ = c.SaveCache(root)
+				} else {
+					_, _ = c.LoadCache(root)
+				}
+			}
+		})
+	}
+	wg.Wait()
 }
