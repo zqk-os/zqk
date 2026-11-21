@@ -38,13 +38,15 @@ const (
 	defaultSchedulerJobRetentionDays       = 7
 	defaultSchedulerJobRetentionBatchSize  = 100
 	defaultSchedulerJobRetentionMaxBatches = 50
+	autofixJobIDPrefix                     = "SCH-AUTOFIX-"
 )
 
 // schedulerJobRetentionCandidateListFilters is the list surface for one_time jobs
 // the sweeper may delete. IsSchedulerJobMarkedForDeletion already treats lifecycle
 // terminal statuses (archived) as marked, but List only returns rows that match a
 // filter — archived+enabled=true never appeared in the enabled=false / status=disabled
-// passes. TRACK: POL
+// passes. Including trigger_type=manual also surfaces stale SCH-AUTOFIX-* one_time jobs
+// left active+enabled. TRACK: POL
 func schedulerJobRetentionCandidateListFilters(batchSize int) []storagepkg.ListFilter {
 	mk := func(extra map[string]any) storagepkg.ListFilter {
 		filters := map[string]any{objects.FieldKeyExecutionMode: ExecutionModeOneTime}
@@ -61,7 +63,71 @@ func schedulerJobRetentionCandidateListFilters(batchSize int) []storagepkg.ListF
 		mk(map[string]any{objects.FieldKeyEnabled: false}),
 		mk(map[string]any{objects.FieldKeyStatus: StatusDisabled}),
 		mk(map[string]any{objects.FieldKeyStatus: objects.ObjectStatusArchived}),
+		mk(map[string]any{objects.FieldKeyTriggerType: TriggerTypeManual}),
 	}
+}
+
+// activeRunningJobIDs returns the set of job IDs currently executing in-process or recorded
+// in the on-disk running-jobs snapshot so retention never reaps an active job.
+func activeRunningJobIDs(projectRoot string) map[string]bool {
+	running := make(map[string]bool)
+	if sched, ok := GetGlobalSchedulerIfAvailable(); ok && sched != nil && sched.conflictMgr != nil {
+		for _, id := range sched.conflictMgr.GetRunningJobIDs() {
+			if id != emptyValue {
+				running[id] = true
+			}
+		}
+	}
+	if snapIDs, _, ok := LoadRunningJobsSnapshot(projectRoot); ok {
+		for _, id := range snapIDs {
+			if id != emptyValue {
+				running[id] = true
+			}
+		}
+	}
+	return running
+}
+
+// isSchedulerJobRetentionCandidate returns true when a one_time job is not currently running
+// and is either marked for deletion or is a stale SCH-AUTOFIX-* one_time job.
+func isSchedulerJobRetentionCandidate(id string, obj map[string]any, runningIDs map[string]bool) bool {
+	if runningIDs[id] {
+		return false
+	}
+	if IsSchedulerJobMarkedForDeletion(obj) {
+		return true
+	}
+	execMode, _ := obj[objects.FieldKeyExecutionMode].(string)
+	return execMode == ExecutionModeOneTime && strings.HasPrefix(id, autofixJobIDPrefix)
+}
+
+// buildSchedulerJobIDSet returns an O(1) lookup set of existing scheduler_job IDs from the CAS
+// index (or storage.List fallback), avoiding N storage.Read calls during orphan log cleanup.
+func (h *SchedulerJobRetentionHandler) buildSchedulerJobIDSet(ctx context.Context, secCtx *pkgctx.SecurityContext, storageCtx *pkgctx.StorageContext) (map[string]bool, bool) {
+	if fileStorage, ok := h.storage.(*storagepkg.FileObjectStorage); ok {
+		if cas, casErr := fileStorage.GetContentAddressableStorage(objects.KindSchedulerJob); casErr == nil && cas != nil {
+			if ids, listErr := cas.ListIDs(); listErr == nil {
+				idSet := make(map[string]bool, len(ids))
+				for _, id := range ids {
+					if id != emptyValue {
+						idSet[id] = true
+					}
+				}
+				return idSet, true
+			}
+		}
+	}
+	res, err := h.storage.List(ctx, secCtx, storageCtx, storagepkg.ListFilter{Kind: objects.KindSchedulerJob, Limit: 0})
+	if err != nil {
+		return nil, false
+	}
+	idSet := make(map[string]bool, len(res.Objects))
+	for _, obj := range res.Objects {
+		if id, ok := obj[objects.FieldKeyID].(string); ok && id != emptyValue {
+			idSet[id] = true
+		}
+	}
+	return idSet, true
 }
 
 // SchedulerJobRetentionHandler archives and deletes old one_time scheduler jobs that have already run
@@ -163,9 +229,10 @@ func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx cont
 
 	secCtx := pkgctx.NewSystemSecurityContext()
 	storageCtx := &pkgctx.StorageContext{}
+	runningIDs := activeRunningJobIDs(h.projectRoot)
 
-	// List one_time jobs that are done (enabled=false, status=disabled) or archived
-	// (often still enabled=true). Predicate still refuses reusable jobs.
+	// List one_time jobs that are done (enabled=false, status=disabled), archived,
+	// or stale SCH-AUTOFIX-* manual one_time jobs. Predicate still refuses reusable jobs.
 	var totalDeleted int
 	for batchNum := 0; batchNum < maxBatches; batchNum++ {
 		h.emitProgress("Listing and cleaning scheduler_job batch...")
@@ -189,7 +256,7 @@ func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx cont
 		}
 		var toDelete []string
 		for id, obj := range objectsByID {
-			if !IsSchedulerJobMarkedForDeletion(obj) {
+			if !isSchedulerJobRetentionCandidate(id, obj, runningIDs) {
 				continue
 			}
 			var t time.Time
@@ -259,11 +326,12 @@ func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx cont
 		}
 	}
 
-	// Remove orphaned log dirs (job no longer exists).
+	// Remove orphaned log dirs (job no longer exists) using O(1) CAS/index lookup.
 	if h.projectRoot != emptyValue {
 		logRoot := filepath.Join(h.projectRoot, paths.ProjectDataDir, paths.LogsDir, "scheduler")
 		entries, err := fileutil.ReadDir(logRoot)
 		if err == nil {
+			idSet, hasIDSet := h.buildSchedulerJobIDSet(ctx, secCtx, storageCtx)
 			for _, e := range entries {
 				if !e.IsDir() {
 					continue
@@ -272,10 +340,14 @@ func (h *SchedulerJobRetentionHandler) executeSchedulerJobRetentionCore(ctx cont
 				if jobID == emptyValue || jobID == job.ID {
 					continue
 				}
-				// Maintenance runner log dirs removed in V1.0 Hardening.
-				_, getErr := h.storage.Read(ctx, pkgctx.NewSystemSecurityContext(), jobID)
-				isNotFound := getErr != nil && (errors.Is(getErr, storagepkg.ErrObjectNotFound) || strings.Contains(getErr.Error(), "not found"))
-				if isNotFound {
+				isOrphan := false
+				if hasIDSet {
+					isOrphan = !idSet[jobID]
+				} else {
+					_, getErr := h.storage.Read(ctx, secCtx, jobID)
+					isOrphan = getErr != nil && (errors.Is(getErr, storagepkg.ErrObjectNotFound) || strings.Contains(getErr.Error(), "not found"))
+				}
+				if isOrphan {
 					orphanDir := filepath.Join(logRoot, jobID)
 					if rmErr := fileutil.RemoveAll(orphanDir); rmErr != nil && !fileutil.IsNotExist(rmErr) {
 						SLog(h.logger).Warn(LogEventSchedulerJobRetentionRemoveOrphanLogDirFailed).

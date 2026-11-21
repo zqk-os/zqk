@@ -29,8 +29,6 @@ var (
 	ErrConcurrencyLimitReached = errors.New("tenant concurrency limit reached")
 	// ErrInvalidLease indicates an unknown, expired, or mismatched namespace lease.
 	ErrInvalidLease = errors.New("invalid namespace lease")
-	// ErrObjectNotFound indicates the requested key does not exist in the tenant namespace.
-	ErrObjectNotFound = errors.New("namespace object not found")
 )
 
 const (

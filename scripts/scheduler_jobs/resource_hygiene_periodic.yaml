@@ -1,0 +1,22 @@
+id: SCH-resource-hygiene
+title: System Health - Resource Hygiene (hourly)
+description: |
+  Runs `zqk system resource-hygiene` hourly on schedule to reap stale locks,
+  prune orphaned temporary files, and enforce log/artifact retention bounds.
+job_type: run_wrapper
+trigger_type: timer
+schedule_expression: "0 * * * *"
+category: maintenance
+execution_mode: reusable
+max_runtime_seconds: 300
+enabled: true
+status: active
+namespace_id: zqk:kernel
+schema_version: "2.0.0"
+command: /bin/sh
+command_args:
+  - "-c"
+  - |
+    set -e
+    ZQK="${ZQK_BIN:-zqk}"
+    "$ZQK" system resource-hygiene

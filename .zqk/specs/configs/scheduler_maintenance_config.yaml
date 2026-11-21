@@ -44,6 +44,7 @@ jobs_paused_schedule_exempt_job_ids:
   - SCH-autofix-process-pending
   - SCH-scheduler-job-retention
   - SCH-passive-test-sweeper
+  - SCH-resource-hygiene
 
 required_jobs:
   - id: SCH-val
@@ -101,6 +102,9 @@ required_jobs:
   - id: SCH-scheduler-job-retention
     job_type: scheduler_job_retention
     template_file: scripts/scheduler_jobs/retention_scheduler_job_daily.yaml
+  - id: SCH-resource-hygiene
+    job_type: run_wrapper
+    template_file: scripts/scheduler_jobs/resource_hygiene_periodic.yaml
 
 created_at: 2026-07-01T18:00:00Z
 updated_at: 2026-07-03T18:00:00Z

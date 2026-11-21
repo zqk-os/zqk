@@ -36,6 +36,7 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 				"SCH-autofix-process-pending",
 				"SCH-scheduler-job-retention",
 				"SCH-passive-test-sweeper",
+				"SCH-resource-hygiene",
 			},
 			"required_jobs": []any{
 				map[string]any{
@@ -122,6 +123,11 @@ func NewSchedulerMaintenanceConfigBuilder() *SchedulerMaintenanceConfigBuilder {
 					objects.FieldKeyID:      "SCH-scheduler-job-retention",
 					objects.FieldKeyJobType: "scheduler_job_retention",
 					"template_file":         "scripts/scheduler_jobs/retention_scheduler_job_daily.yaml",
+				},
+				map[string]any{
+					objects.FieldKeyID:      "SCH-resource-hygiene",
+					objects.FieldKeyJobType: "run_wrapper",
+					"template_file":         "scripts/scheduler_jobs/resource_hygiene_periodic.yaml",
 				},
 			},
 			"updated_at": "2026-07-03 18:00:00 +0000 UTC",

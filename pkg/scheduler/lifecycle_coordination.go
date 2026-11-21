@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -76,27 +77,70 @@ func (s *Scheduler) maybeReconcileSchedulerJobCASIndexBeforeReload(ctx context.C
 	)
 }
 
-// watchJobChanges watches for changes to scheduler_job objects and reloads schedule.
-// Job definitions (including environment_variables) are re-read from storage every 30s,
-// so config changes (e.g. ARCHIVE_ENABLED, DELETE_ENABLED) take effect without restart.
+// schedulerJobsTreeFingerprint returns a lightweight stat-only fingerprint (entry count and max mtime)
+// of the .zqk/process/scheduler_jobs directory tree without reading or parsing YAML files.
+func schedulerJobsTreeFingerprint(projectRoot string) (string, bool) {
+	if projectRoot == emptyValue {
+		return emptyValue, false
+	}
+	dir := filepath.Join(projectRoot, paths.ProcessDir, "scheduler_jobs")
+	var entryCount int
+	var maxModNano int64
+	err := filepath.WalkDir(dir, func(_ string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		entryCount++
+		if info, infoErr := d.Info(); infoErr == nil {
+			if ns := info.ModTime().UnixNano(); ns > maxModNano {
+				maxModNano = ns
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return emptyValue, false
+	}
+	return fmt.Sprintf("%d:%d", entryCount, maxModNano), true
+}
+
+// maybeReloadJobsOnWatchTick reconciles the CAS index and reloads jobs only when the
+// scheduler_jobs directory tree fingerprint changed since the last observed state.
+func (s *Scheduler) maybeReloadJobsOnWatchTick(ctx context.Context, lastFingerprint *string) bool {
+	if s == nil || !s.IsRunning() {
+		return false
+	}
+	fp, ok := schedulerJobsTreeFingerprint(s.projectRoot)
+	if ok && lastFingerprint != nil && fp == *lastFingerprint {
+		return false
+	}
+	s.maybeReconcileSchedulerJobCASIndexBeforeReload(ctx)
+	if err := s.loadAndScheduleJobs(ctx, true); err != nil {
+		SchedulerLifecycleLog(s.logger).Warn(LogEventSchedulerLifecycleReloadJobsFailed).
+			WithError(err).
+			Log()
+		return false
+	}
+	if ok && lastFingerprint != nil {
+		*lastFingerprint = fp
+	}
+	return true
+}
+
+// watchJobChanges watches for changes to scheduler_job objects and reloads schedule
+// only when the .zqk/process/scheduler_jobs tree fingerprint changes.
 func (s *Scheduler) watchJobChanges(ctx context.Context) {
 	ticker := time.NewTicker(30 * time.Second) // Check every 30 seconds
 	defer ticker.Stop()
+
+	lastFingerprint, _ := schedulerJobsTreeFingerprint(s.projectRoot)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			// Reload jobs if scheduler is running (reload=true: do not re-submit one_time immediate jobs)
-			if s.IsRunning() {
-				s.maybeReconcileSchedulerJobCASIndexBeforeReload(ctx)
-				if err := s.loadAndScheduleJobs(ctx, true); err != nil {
-					SchedulerLifecycleLog(s.logger).Warn(LogEventSchedulerLifecycleReloadJobsFailed).
-						WithError(err).
-						Log()
-				}
-			}
+			s.maybeReloadJobsOnWatchTick(ctx, &lastFingerprint)
 		}
 	}
 }
