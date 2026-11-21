@@ -774,6 +774,10 @@ func isReferenceFieldInfo(fieldName string, fieldDef map[string]any) bool {
 // (both scalar reference fields and slice/array reference entries), preventing downstream
 // CAS corrupted draft states (GH-944).
 func (gv *GoValidator) validateReferenceConstraint(fieldName string, fieldValue any, fieldDef map[string]any) *ValidationError {
+	return validateReferenceConstraintValue(fieldName, fieldValue, fieldDef)
+}
+
+func validateReferenceConstraintValue(fieldName string, fieldValue any, fieldDef map[string]any) *ValidationError {
 	if !isReferenceFieldInfo(fieldName, fieldDef) {
 		return nil
 	}

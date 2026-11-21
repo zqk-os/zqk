@@ -21,9 +21,11 @@ type SupervisorAdapter struct {
 }
 
 type supervisedProc struct {
-	cmd       *exec.Cmd
+	pid       int
+	process   *os.Process
 	startedAt time.Time
 	cancel    context.CancelFunc
+	done      chan struct{}
 }
 
 // NewSupervisorAdapter creates a process-group based supervisor adapter.
@@ -60,7 +62,7 @@ func (s *SupervisorAdapter) Install(ctx context.Context, spec ServiceSpec) error
 		goroutinelabels.NewGoroutine("supervisor_run_at_load", "starting service on load").
 			AsControlPlane().
 			StartSimple(func() {
-				_ = s.startLocked(spec.ID)
+				_ = s.Start(context.Background(), spec.ID)
 			})
 	}
 
@@ -93,8 +95,11 @@ func (s *SupervisorAdapter) startLocked(id string) error {
 		return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
 	}
 
-	if proc, ok := s.processes[id]; ok && proc.cmd != nil && proc.cmd.Process != nil {
-		if proc.cmd.ProcessState == nil || !proc.cmd.ProcessState.Exited() {
+	if proc, ok := s.processes[id]; ok {
+		select {
+		case <-proc.done:
+			delete(s.processes, id)
+		default:
 			return fmt.Errorf("%w: %s", ErrServiceAlreadyActive, id)
 		}
 	}
@@ -131,9 +136,11 @@ func (s *SupervisorAdapter) startLocked(id string) error {
 	}
 
 	proc := &supervisedProc{
-		cmd:       cmd,
+		pid:       cmd.Process.Pid,
+		process:   cmd.Process,
 		startedAt: time.Now(),
 		cancel:    cancel,
+		done:      make(chan struct{}),
 	}
 	s.processes[id] = proc
 
@@ -141,6 +148,7 @@ func (s *SupervisorAdapter) startLocked(id string) error {
 		AsControlPlane().
 		StartSimple(func() {
 			_ = cmd.Wait()
+			close(proc.done)
 			s.mu.Lock()
 			defer s.mu.Unlock()
 			if current, ok := s.processes[id]; ok && current == proc {
@@ -153,20 +161,24 @@ func (s *SupervisorAdapter) startLocked(id string) error {
 
 func (s *SupervisorAdapter) Stop(ctx context.Context, id string) error {
 	s.mu.Lock()
-	defer s.mu.Unlock()
-
 	proc, ok := s.processes[id]
-	if !ok || proc.cmd == nil || proc.cmd.Process == nil {
-		if _, specExists := s.specs[id]; !specExists {
+	if !ok {
+		_, specExists := s.specs[id]
+		s.mu.Unlock()
+		if !specExists {
 			return fmt.Errorf("%w: %s", ErrServiceNotFound, id)
 		}
 		return fmt.Errorf("%w: %s", ErrServiceNotRunning, id)
 	}
 
-	proc.cancel()
-	_ = proc.cmd.Process.Signal(syscall.SIGTERM)
-
 	delete(s.processes, id)
+	s.mu.Unlock()
+
+	proc.cancel()
+	if proc.process != nil {
+		_ = proc.process.Signal(syscall.SIGTERM)
+	}
+
 	return nil
 }
 
@@ -189,12 +201,18 @@ func (s *SupervisorAdapter) Status(ctx context.Context, id string) (ServiceStatu
 	}
 
 	proc, ok := s.processes[id]
-	if !ok || proc.cmd == nil || proc.cmd.Process == nil {
+	if !ok {
 		return st, nil
 	}
 
+	select {
+	case <-proc.done:
+		return st, nil
+	default:
+	}
+
 	st.State = StateRunning
-	st.PID = proc.cmd.Process.Pid
+	st.PID = proc.pid
 	st.Uptime = time.Since(proc.startedAt)
 
 	return st, nil

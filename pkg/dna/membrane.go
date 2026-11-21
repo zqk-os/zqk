@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 )
 
 // IsRequired reports whether this field is marked required in its validation spec or flat attributes.
@@ -499,11 +500,13 @@ func (m *MetaSchema) VetTransition(target any, targetPlane Plane) error {
 	if targetPlane == PlanePromoted || targetPlane == PlaneStaged {
 		if aud, ok := target.(interface{ GetProvenance() Provenance }); ok {
 			prov := aud.GetProvenance()
-			if strings.TrimSpace(prov.Actor()) == "" {
-				return fmt.Errorf("epistemic invariant violation: cannot transition to %s without ActorAttestation (AgentURN required)", targetPlane)
+			if err := strutil.ErrorOnBlank(prov.Actor(), "epistemic invariant violation: cannot transition to %s without ActorAttestation (AgentURN required)", targetPlane); err != nil {
+				return err
 			}
-			if strings.TrimSpace(prov.ParentHash) == "" && targetPlane == PlanePromoted {
-				return fmt.Errorf("epistemic invariant violation: cannot transition to PlanePromoted without causal lineage (ParentHash required)")
+			if targetPlane == PlanePromoted {
+				if err := strutil.ErrorOnBlank(prov.ParentHash, "epistemic invariant violation: cannot transition to PlanePromoted without causal lineage (ParentHash required)"); err != nil {
+					return err
+				}
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -131,8 +132,8 @@ func LoadPipelineTelemetrySummary(projectRoot string) (*PipelineTelemetrySummary
 
 // IngestPipelineTelemetry writes a pipeline telemetry summary atomically into the project state directory.
 func IngestPipelineTelemetry(projectRoot string, summary *PipelineTelemetrySummary) error {
-	if strings.TrimSpace(projectRoot) == "" {
-		return errors.New("telemetry feedback: projectRoot cannot be empty")
+	if err := strutil.ErrorOnBlank(projectRoot, "telemetry feedback: projectRoot cannot be empty"); err != nil {
+		return err
 	}
 	if summary == nil {
 		return errors.New("telemetry feedback: summary cannot be nil")

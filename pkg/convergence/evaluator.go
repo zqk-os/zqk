@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 )
 
 type ImpactClassification string
@@ -69,11 +71,11 @@ func ValidateRule(rule *PolicyRule) error {
 	if rule == nil {
 		return fmt.Errorf("%w: rule cannot be nil", ErrInvalidRuleConfig)
 	}
-	if strings.TrimSpace(rule.ID) == "" {
-		return fmt.Errorf("%w: rule id cannot be empty", ErrInvalidRuleConfig)
+	if err := strutil.ErrorOnBlank(rule.ID, "%w: rule id cannot be empty", ErrInvalidRuleConfig); err != nil {
+		return err
 	}
-	if strings.TrimSpace(rule.Name) == "" {
-		return fmt.Errorf("%w: rule name cannot be empty", ErrInvalidRuleConfig)
+	if err := strutil.ErrorOnBlank(rule.Name, "%w: rule name cannot be empty", ErrInvalidRuleConfig); err != nil {
+		return err
 	}
 	switch rule.Impact {
 	case ImpactCritical, ImpactHigh, ImpactMedium, ImpactLow:
@@ -101,11 +103,11 @@ func ValidateTelemetry(payload *TelemetryPayload) error {
 	if payload == nil {
 		return fmt.Errorf("%w: payload cannot be nil", ErrCorruptedTelemetry)
 	}
-	if strings.TrimSpace(payload.SessionID) == "" {
-		return fmt.Errorf("%w: session_id cannot be empty", ErrCorruptedTelemetry)
+	if err := strutil.ErrorOnBlank(payload.SessionID, "%w: session_id cannot be empty", ErrCorruptedTelemetry); err != nil {
+		return err
 	}
-	if strings.TrimSpace(payload.JobID) == "" {
-		return fmt.Errorf("%w: job_id cannot be empty", ErrCorruptedTelemetry)
+	if err := strutil.ErrorOnBlank(payload.JobID, "%w: job_id cannot be empty", ErrCorruptedTelemetry); err != nil {
+		return err
 	}
 	if payload.ExitCode < 0 {
 		return fmt.Errorf("%w: exit_code cannot be negative: %d", ErrCorruptedTelemetry, payload.ExitCode)

@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 	"sync"
+
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 )
 
 var (
@@ -37,8 +38,8 @@ type RoutingRule struct {
 
 // Validate verifies that rule parameters are within valid logical ranges.
 func (r RoutingRule) Validate() error {
-	if strings.TrimSpace(r.ScenarioID) == "" {
-		return fmt.Errorf("%w: scenario_id cannot be blank", ErrInvalidRule)
+	if err := strutil.ErrorOnBlank(r.ScenarioID, "%w: scenario_id cannot be blank", ErrInvalidRule); err != nil {
+		return err
 	}
 	if r.MinPassRate < 0.0 || r.MinPassRate > 1.0 {
 		return fmt.Errorf("%w: min_pass_rate must be between 0.0 and 1.0", ErrInvalidRule)
@@ -129,7 +130,7 @@ func (r *AdaptiveRouter) RegisterRule(rule RoutingRule) error {
 
 // RegisterModelCost stores the cost profile for a candidate model.
 func (r *AdaptiveRouter) RegisterModelCost(profile ModelCostProfile) error {
-	if strings.TrimSpace(profile.ModelID) == "" {
+	if strutil.IsBlank(profile.ModelID) {
 		return ErrEmptyModel
 	}
 	if profile.CostPer1k < 0.0 {

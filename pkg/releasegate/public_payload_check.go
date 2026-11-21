@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/community"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -64,8 +65,8 @@ func (c *PublicPayloadChecker) Verify() (*PayloadVerificationResult, error) {
 // VerifyPublicReleasePayload ensures that release artifacts are fully verified,
 // hermetic, and valid before any public release, enforcing that no push operations occur.
 func VerifyPublicReleasePayload(opts PayloadVerificationOptions) (*PayloadVerificationResult, error) {
-	if strings.TrimSpace(opts.ReleaseDir) == "" {
-		return nil, errors.New("release directory is required")
+	if err := strutil.ErrorOnBlank(opts.ReleaseDir, "release directory is required"); err != nil {
+		return nil, err
 	}
 
 	info, err := fileutil.Stat(opts.ReleaseDir)

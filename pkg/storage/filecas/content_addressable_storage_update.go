@@ -25,85 +25,86 @@ func (cas *ContentAddressableStorage) Update(objectID string, data []byte, targe
 		return errfmt.Errorf(ConstMiscCannotUpdateObjectWithEmptyContent)
 	}
 
-	oldHash, err := cas.GetHashForID(objectID)
-	objectNotInIndex := err != nil
-
-	// Resolve target directory for "not in index" path (migration / new index entry)
 	var wantTargetDir string
 	if len(targetBucketDir) > 0 && targetBucketDir[0] != emptyValue {
 		wantTargetDir = targetBucketDir[0]
 	}
 
-	if objectNotInIndex {
-
-		newHash := CalculateSHA256Hash(data)
-
-		storageDir := cas.kindDir
-		if wantTargetDir != emptyValue {
-			storageDir = wantTargetDir
-			if mkErr := fileutil.MkdirAll(storageDir, paths.DirPerm755); mkErr != nil {
-				return errfmt.Newf(ConstMiscFailedToCreateTargetBucketDirectory).Wrap(mkErr)
-			}
+	return cas.WithSweepLock(func() error {
+		oldHash, err := cas.GetHashForID(objectID)
+		if err != nil {
+			return cas.updateNewObjectLocked(objectID, data, wantTargetDir)
 		}
-		newHashFile := filepath.Join(storageDir, newHash+".yaml")
+		return cas.updateExistingObjectLocked(objectID, data, oldHash, wantTargetDir)
+	})
+}
 
-		return cas.WithSweepLock(func() error {
-			if _, statErr := fileutil.Stat(newHashFile); statErr == nil {
+func (cas *ContentAddressableStorage) updateNewObjectLocked(objectID string, data []byte, wantTargetDir string) error {
+	newHash := CalculateSHA256Hash(data)
 
-			} else {
+	storageDir := cas.kindDir
+	if wantTargetDir != emptyValue {
+		storageDir = wantTargetDir
+		if mkErr := fileutil.MkdirAll(storageDir, paths.DirPerm755); mkErr != nil {
+			return errfmt.Newf(ConstMiscFailedToCreateTargetBucketDirectory).Wrap(mkErr)
+		}
+	}
+	newHashFile := filepath.Join(storageDir, newHash+".yaml")
 
-				if err := cas.WriteFileWithSync(newHashFile, data); err != nil {
-					return errfmt.Newf(ConstMiscFailedToWriteNewHashFile).Wrap(err)
-				}
-			}
-
-			targetBucketKey := ""
-			if wantTargetDir != emptyValue {
-				targetBucketKey = filepath.Base(wantTargetDir)
-			}
-			cas.SetIndexMappingInMemory(objectID, newHash, targetBucketKey)
-
-			writeQueue := cas.getWriteQueue()
-			var done <-chan error
-			var enqErr error
-			if targetBucketKey != emptyValue {
-				opCallback := cas.getOperationCallback()
-				done, enqErr = writeQueue.EnqueueUpdateWithOperationCallback(cas.kind, objectID, newHash, targetBucketKey, cas, opCallback)
-			} else {
-				done, enqErr = writeQueue.EnqueueUpdateWithCallback(cas.kind, objectID, newHash, cas)
-			}
-			if enqErr != nil {
-				if err := cas.index.SetMapping(objectID, newHash); err != nil {
-					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
-				}
-				if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, targetBucketKey); err != nil {
-					return err
-				}
-				return cas.commitLiveIdentity(objectID, newHash, newHashFile)
-			}
-			var indexErr error
-			select {
-			case indexErr = <-done:
-			case <-time.After(casIndexUpdateWaitTimeout):
-				StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
-					Warn(LogEventStorageCASIndexUpdateNewObjectTimeoutWarn).
-					Kind(cas.kind).
-					ObjectID(objectID).
-					Log()
-				cas.sweepAfterDurableBlob(objectID, newHash)
-				return errfmt.Errorf(ConstMiscCasIndexUpdateDidNotCompleteWithinVQueue, casIndexUpdateWaitTimeout)
-			}
-			if indexErr != nil {
-
-				return errfmt.Newf(ConstMiscFailedToPersistIndexUpdateForNewObject).Wrap(indexErr)
-			}
-			if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, targetBucketKey); err != nil {
-				return err
-			}
-			return cas.commitLiveIdentity(objectID, newHash, newHashFile)
-		})
+	if _, statErr := fileutil.Stat(newHashFile); statErr != nil {
+		if err := cas.WriteFileWithSync(newHashFile, data); err != nil {
+			return errfmt.Newf(ConstMiscFailedToWriteNewHashFile).Wrap(err)
+		}
 	}
 
+	targetBucketKey := ""
+	if wantTargetDir != emptyValue {
+		targetBucketKey = filepath.Base(wantTargetDir)
+	}
+	cas.SetIndexMappingInMemory(objectID, newHash, targetBucketKey)
+
+	writeQueue := cas.getWriteQueue()
+	var done <-chan error
+	var enqErr error
+	if writeQueue == nil {
+		enqErr = errfmt.Errorf("index write queue unavailable")
+	} else if targetBucketKey != emptyValue {
+		opCallback := cas.getOperationCallback()
+		done, enqErr = writeQueue.EnqueueUpdateWithOperationCallback(cas.kind, objectID, newHash, targetBucketKey, cas, opCallback)
+	} else {
+		done, enqErr = writeQueue.EnqueueUpdateWithCallback(cas.kind, objectID, newHash, cas)
+	}
+	if enqErr != nil {
+		if err := cas.index.SetMapping(objectID, newHash); err != nil {
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
+		}
+		if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, targetBucketKey); err != nil {
+			return err
+		}
+		return cas.commitLiveIdentity(objectID, newHash, newHashFile)
+	}
+	var indexErr error
+	select {
+	case indexErr = <-done:
+	case <-time.After(casIndexUpdateWaitTimeout):
+		StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+			Warn(LogEventStorageCASIndexUpdateNewObjectTimeoutWarn).
+			Kind(cas.kind).
+			ObjectID(objectID).
+			Log()
+		cas.sweepAfterDurableBlob(objectID, newHash)
+		return errfmt.Errorf(ConstMiscCasIndexUpdateDidNotCompleteWithinVQueue, casIndexUpdateWaitTimeout)
+	}
+	if indexErr != nil {
+		return errfmt.Newf(ConstMiscFailedToPersistIndexUpdateForNewObject).Wrap(indexErr)
+	}
+	if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, targetBucketKey); err != nil {
+		return err
+	}
+	return cas.commitLiveIdentity(objectID, newHash, newHashFile)
+}
+
+func (cas *ContentAddressableStorage) updateExistingObjectLocked(objectID string, data []byte, oldHash, wantTargetDir string) error {
 	newHash := CalculateSHA256Hash(data)
 
 	if oldHash == newHash {
@@ -114,8 +115,8 @@ func (cas *ContentAddressableStorage) Update(objectID string, data []byte, targe
 
 	storageDir := oldBucketDir
 	indexBucketKey := ""
-	if len(targetBucketDir) > 0 && targetBucketDir[0] != emptyValue && targetBucketDir[0] != oldBucketDir {
-		storageDir = targetBucketDir[0]
+	if wantTargetDir != emptyValue && wantTargetDir != oldBucketDir {
+		storageDir = wantTargetDir
 		if err := fileutil.MkdirAll(storageDir, paths.DirPerm755); err != nil {
 			return errfmt.Newf(ConstMiscFailedToCreateTargetBucketDirectoryForMi).Wrap(err)
 		}
@@ -123,95 +124,92 @@ func (cas *ContentAddressableStorage) Update(objectID string, data []byte, targe
 	}
 	newHashFile := filepath.Join(storageDir, newHash+".yaml")
 
-	return cas.WithSweepLock(func() error {
-		if err := cas.WriteFileWithSync(newHashFile, data); err != nil {
-			return errfmt.Newf(ConstMiscFailedToWriteNewHashFile).Wrap(err)
+	if err := cas.WriteFileWithSync(newHashFile, data); err != nil {
+		return errfmt.Newf(ConstMiscFailedToWriteNewHashFile).Wrap(err)
+	}
+
+	if indexBucketKey != emptyValue {
+		cas.SetIndexMappingInMemory(objectID, newHash, indexBucketKey)
+	} else {
+		cas.SetIndexMappingInMemory(objectID, newHash)
+	}
+
+	pendingCache := GetCASPendingVisibilityCache(projectRootFromCASKindDir(cas.kindDir))
+	if pendingCache != nil {
+		_ = pendingCache.PublishPending(objectID, cas.kind, newHash, indexBucketKey)
+	}
+
+	done, err := cas.enqueueIndexWrite(objectID, newHash, indexBucketKey, "")
+
+	rollbackMutation := func() {
+		if err := fileutil.RemoveFile(newHashFile); err != nil {
+			logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
 		}
-
-		if indexBucketKey != emptyValue {
-			cas.SetIndexMappingInMemory(objectID, newHash, indexBucketKey)
-		} else {
-			cas.SetIndexMappingInMemory(objectID, newHash)
+		cas.SetIndexMappingInMemory(objectID, oldHash)
+		if cas.index != nil {
+			RestorePendingAfterFailedMutation(
+				projectRootFromCASIndexPath(cas.index.FilePath),
+				objectID, cas.kind, oldHash, indexBucketKey,
+			)
 		}
+	}
 
-		pendingCache := GetCASPendingVisibilityCache(projectRootFromCASKindDir(cas.kindDir))
-		if pendingCache != nil {
-			_ = pendingCache.PublishPending(objectID, cas.kind, newHash, indexBucketKey)
+	if err != nil {
+		rollbackMutation()
+		return errfmt.Newf(ConstMiscFailedToQueueIndexUpdate).Wrap(err)
+	}
+
+	if done != nil {
+		// Wait for index update to complete (with timeout so updates don't hang when queue is congested)
+		var indexUpdateErr error
+		select {
+		case indexUpdateErr = <-done:
+		case <-time.After(casIndexUpdateWaitTimeout):
+			StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+				Warn(LogEventStorageCASIndexUpdateTimeoutCongestedWarn).
+				Kind(cas.kind).
+				ObjectID(objectID).
+				String("timeout", casIndexUpdateWaitTimeout.String()).
+				Log()
+
+			cas.sweepAfterDurableBlob(objectID, newHash)
+			return errfmt.Errorf(ConstMiscCasIndexUpdateDidNotCompleteWithinVQueue, casIndexUpdateWaitTimeout)
 		}
-
-		var done <-chan error
-		done, err = cas.enqueueIndexWrite(objectID, newHash, indexBucketKey, "")
-
-		rollbackMutation := func() {
-			if err := fileutil.RemoveFile(newHashFile); err != nil {
-				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).Error(ErrMsgSwallowedError, err).Log()
-			}
-			cas.SetIndexMappingInMemory(objectID, oldHash)
-			if cas.index != nil {
-				RestorePendingAfterFailedMutation(
-					projectRootFromCASIndexPath(cas.index.FilePath),
-					objectID, cas.kind, oldHash, indexBucketKey,
-				)
-			}
-		}
-
-		if err != nil {
+		if indexUpdateErr != nil {
 			rollbackMutation()
-			return errfmt.Newf(ConstMiscFailedToQueueIndexUpdate).Wrap(err)
+			return errfmt.Newf(ConstMiscFailedToUpdateCasIndex).Wrap(indexUpdateErr)
 		}
+	}
 
-		if done != nil {
-			// Wait for index update to complete (with timeout so updates don't hang when queue is congested)
-			var indexUpdateErr error
-			select {
-			case indexUpdateErr = <-done:
-			case <-time.After(casIndexUpdateWaitTimeout):
-				StorageLog(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
-					Warn(LogEventStorageCASIndexUpdateTimeoutCongestedWarn).
-					Kind(cas.kind).
-					ObjectID(objectID).
-					String("timeout", casIndexUpdateWaitTimeout.String()).
-					Log()
-
-				cas.sweepAfterDurableBlob(objectID, newHash)
-				return errfmt.Errorf(ConstMiscCasIndexUpdateDidNotCompleteWithinVQueue, casIndexUpdateWaitTimeout)
-			}
-			if indexUpdateErr != nil {
-				rollbackMutation()
-				return errfmt.Newf(ConstMiscFailedToUpdateCasIndex).Wrap(indexUpdateErr)
-			}
-		}
-
-		// Index update succeeded - now safe to clean up old hash file via callback
-		var cleanupCB OrphanCleanupCallback
-		_ = concurrency.RunInRLockOrLog(&cas.Mu, locknames.LockNameCasGetOrphanCleanupCallback, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-			cleanupCB = cas.orphanCleanupCB
-			return nil
-		})
-
-		if cleanupCB != nil {
-			if cleanupErr := cleanupCB(oldHashFile); cleanupErr != nil {
-				_ = cleanupErr
-			}
-			if oldHash != newHash {
-				EvictCASBlob(oldHash)
-			}
-		} else {
-			if oldHash != newHash {
-				EvictCASBlob(oldHash)
-				if err := RemoveOrphanCASHashFileSync(oldHashFile); err != nil {
-					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
-						Error(ErrMsgSwallowedError, err).Log()
-				}
-			}
-		}
-
-		if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, indexBucketKey); err != nil {
-			return err
-		}
-
-		return cas.commitLiveIdentity(objectID, newHash, newHashFile)
+	// Index update succeeded - now safe to clean up old hash file via callback
+	var cleanupCB OrphanCleanupCallback
+	_ = concurrency.RunInRLockOrLog(&cas.Mu, locknames.LockNameCasGetOrphanCleanupCallback, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
+		cleanupCB = cas.orphanCleanupCB
+		return nil
 	})
+
+	if cleanupCB != nil {
+		if cleanupErr := cleanupCB(oldHashFile); cleanupErr != nil {
+			_ = cleanupErr
+		}
+		if oldHash != newHash {
+			EvictCASBlob(oldHash)
+		}
+	} else {
+		if oldHash != newHash {
+			EvictCASBlob(oldHash)
+			if err := RemoveOrphanCASHashFileSync(oldHashFile); err != nil {
+				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+					Error(ErrMsgSwallowedError, err).Log()
+			}
+		}
+	}
+
+	if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, indexBucketKey); err != nil {
+		return err
+	}
+
+	return cas.commitLiveIdentity(objectID, newHash, newHashFile)
 }
 
 func (cas *ContentAddressableStorage) ensureExactlyOneLiveBlob(objectID, keeperHash string) error {

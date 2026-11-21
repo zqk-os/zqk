@@ -8,6 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/observer"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 )
 
 const (
@@ -205,8 +206,8 @@ func HandleObserverRequestGuidance(ctx context.Context, projectRoot string, args
 			query = q
 		}
 	}
-	if strings.TrimSpace(query) == "" {
-		return nil, fmt.Errorf("query is required: describe what guidance, clarification, or obstacle you need help with")
+	if err := strutil.ErrorOnBlank(query, "query is required: describe what guidance, clarification, or obstacle you need help with"); err != nil {
+		return nil, err
 	}
 
 	taskID, _ := args[objects.FieldKeyID].(string)

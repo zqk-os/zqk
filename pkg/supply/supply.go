@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/security/secretpatterns"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 )
 
 // Verifier provides supply-chain verification and release integrity checks.
@@ -51,11 +52,11 @@ func (v *Verifier) VerifyOpenVEXBytes(data []byte) error {
 	if !strings.HasPrefix(doc.Context, "https://openvex.dev/ns") {
 		return fmt.Errorf("invalid @context: %s (must start with https://openvex.dev/ns)", doc.Context)
 	}
-	if strings.TrimSpace(doc.ID) == "" {
-		return fmt.Errorf("missing @id in OpenVEX document")
+	if err := strutil.ErrorOnBlank(doc.ID, "missing @id in OpenVEX document"); err != nil {
+		return err
 	}
-	if strings.TrimSpace(doc.Author) == "" {
-		return fmt.Errorf("missing author in OpenVEX document")
+	if err := strutil.ErrorOnBlank(doc.Author, "missing author in OpenVEX document"); err != nil {
+		return err
 	}
 	if len(doc.Statements) == 0 {
 		return fmt.Errorf("OpenVEX document must contain at least one statement")
