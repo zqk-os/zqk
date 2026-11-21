@@ -220,6 +220,10 @@ type triggeredJobWork struct {
 // When work.nonBlocking is true, uses SubmitNonBlocking and returns ErrPoolFull when the pool is full.
 // Returns an error if neither pool is started or submit fails.
 func (s *Scheduler) submitTriggeredJob(work triggeredJobWork) error {
+	if work.job != nil {
+		cp := *work.job
+		work.job = &cp
+	}
 	pool := s.triggeredPool
 	if priorityDispatchJob(work.job) && s.triggeredPriorityPool != nil {
 		pool = s.triggeredPriorityPool
