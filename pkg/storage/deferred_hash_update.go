@@ -245,11 +245,11 @@ func (dhm *DeferredHashManager) updateHashAndCache(ctx context.Context, objectID
 // updateIDCache updates the object ID cache for an object
 func (dhm *DeferredHashManager) updateIDCache(ctx context.Context, objectID, objectKind, filePath string) error {
 	// Use existing cache operation handler if available
-	if cacheOperationHandler != nil {
+	if handler := GetCacheOperationHandler(); handler != nil {
 		cacheCtx := pkgctx.WithCacheUpdate(ctx, objectID, objectKind, filePath)
 		// Extract CacheContext from context
 		if cacheCtxValue := pkgctx.GetCacheContext(cacheCtx); cacheCtxValue != nil {
-			return cacheOperationHandler(cacheCtxValue)
+			return handler(cacheCtxValue)
 		}
 	}
 	return nil

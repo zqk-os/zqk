@@ -12,7 +12,9 @@ func EnsureTestIdentityCacheHandler() {
 }
 
 func ensureTestIdentityCacheHandler() {
+	cacheOperationHandlerMu.Lock()
+	defer cacheOperationHandlerMu.Unlock()
 	if cacheOperationHandler == nil {
-		SetCacheOperationHandler(func(*pkgctx.CacheContext) error { return nil })
+		cacheOperationHandler = func(*pkgctx.CacheContext) error { return nil }
 	}
 }

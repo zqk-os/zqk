@@ -24,7 +24,7 @@ func setupBulkCacheChecker() func() {
 			cacheChecker.Store((func(string) (string, bool))(nil))
 		}
 	}
-	if original == nil && cacheOperationHandler != nil {
+	if original == nil && GetCacheOperationHandler() != nil {
 		cacheChecker.Store(func(objectID string) (string, bool) { return "", false })
 	}
 	return cleanup

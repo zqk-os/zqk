@@ -13,10 +13,14 @@ import (
 )
 
 func SetCacheOperationHandler(handler func(*pkgctx.CacheContext) error) {
+	cacheOperationHandlerMu.Lock()
+	defer cacheOperationHandlerMu.Unlock()
 	cacheOperationHandler = handler
 }
 
 func GetCacheOperationHandler() func(*pkgctx.CacheContext) error {
+	cacheOperationHandlerMu.RLock()
+	defer cacheOperationHandlerMu.RUnlock()
 	return cacheOperationHandler
 }
 
@@ -103,17 +107,19 @@ func executeCacheOperationWithID(ctx context.Context, filePath, id string) error
 		NoteObjectIDCachePending(projectRoot, op, noteID, cacheCtx.Kind, cacheCtx.FilePath, "execute_cache_operation")
 	}
 
-	if cacheOperationHandler == nil {
+	handler := GetCacheOperationHandler()
+	if handler == nil {
 		return errfmt.Errorf(ErrMsgIdentityCacheHandlerRequired)
 	}
-	return cacheOperationHandler(cacheCtx)
+	return handler(cacheCtx)
 }
 
 func coupleObjectIDCacheLivePath(id, kind, filePath string) error {
 	if id == emptyValue || kind == emptyValue || filePath == emptyValue {
 		return errfmt.Errorf("couple object-id-cache: missing id, kind, or path")
 	}
-	if cacheOperationHandler == nil {
+	handler := GetCacheOperationHandler()
+	if handler == nil {
 		return errfmt.Errorf(ErrMsgIdentityCacheHandlerRequired)
 	}
 	cacheCtx := &pkgctx.CacheContext{
@@ -122,7 +128,7 @@ func coupleObjectIDCacheLivePath(id, kind, filePath string) error {
 		Kind:      kind,
 		FilePath:  filePath,
 	}
-	if err := cacheOperationHandler(cacheCtx); err != nil {
+	if err := handler(cacheCtx); err != nil {
 		return errfmt.Newf("couple object-id-cache").Wrap(err)
 	}
 	return nil
