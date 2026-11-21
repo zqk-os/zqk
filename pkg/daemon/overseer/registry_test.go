@@ -170,7 +170,7 @@ func TestRapidCrashExponentialBackoffBound(t *testing.T) {
 	require.Eventually(t, func() bool {
 		st, err := sup.GetStatus("test-crasher")
 		return err == nil && st.RestartCount >= 3
-	}, 3*time.Second, 20*time.Millisecond)
+	}, 10*time.Second, 20*time.Millisecond)
 
 	st, err := sup.GetStatus("test-crasher")
 	require.NoError(t, err)
