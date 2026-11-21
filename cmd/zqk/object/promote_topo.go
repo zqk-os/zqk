@@ -241,16 +241,22 @@ func sortObjectIDsForMembranePromotion(ctx context.Context, secCtx *pkgctx.Secur
 		}
 	}
 
-	sortQueue := func(q []string) {
-		sort.SliceStable(q, func(i, j int) bool {
-			idA, idB := q[i], q[j]
+	sortByRank := func(s []string, breakTiesByInDegree bool) {
+		sort.SliceStable(s, func(i, j int) bool {
+			idA, idB := s[i], s[j]
 			rankA := kindPromotionRank(kindsMap[idA])
 			rankB := kindPromotionRank(kindsMap[idB])
 			if rankA != rankB {
 				return rankA < rankB
 			}
+			if breakTiesByInDegree && inDegree[idA] != inDegree[idB] {
+				return inDegree[idA] < inDegree[idB]
+			}
 			return origIndex[idA] < origIndex[idB]
 		})
+	}
+	sortQueue := func(q []string) {
+		sortByRank(q, false)
 	}
 
 	queue := make([]string, 0, len(ids))
@@ -300,18 +306,7 @@ func sortObjectIDsForMembranePromotion(ctx context.Context, secCtx *pkgctx.Secur
 				break
 			}
 
-			sort.SliceStable(remaining, func(i, j int) bool {
-				idA, idB := remaining[i], remaining[j]
-				rankA := kindPromotionRank(kindsMap[idA])
-				rankB := kindPromotionRank(kindsMap[idB])
-				if rankA != rankB {
-					return rankA < rankB
-				}
-				if inDegree[idA] != inDegree[idB] {
-					return inDegree[idA] < inDegree[idB]
-				}
-				return origIndex[idA] < origIndex[idB]
-			})
+			sortByRank(remaining, true)
 
 			best := remaining[0]
 			visited[best] = true
@@ -358,13 +353,10 @@ func preparePromoteTargetObjectIDs(cmd *cobra.Command, proc *cli.Processor, rawA
 		return nil, cmd.Context().Err()
 	}
 
-	args, err := parseTargetObjectIDs(cmd, rawArgs)
+	args, ctx, secCtx, err := parseTargetObjectIDsWithContexts(cmd, proc, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-
-	ctx := proc.OperationContext()
-	secCtx := proc.SecurityContext()
 
 	if isCascadeEnabled(cmd) {
 		cascaded, err := expandCascadeDraftDependencies(ctx, secCtx, proc, args)
