@@ -37,17 +37,14 @@ Examples:
 	return cmd
 }
 
-func runDo(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-	ctx := proc.OperationContext()
-	sec := proc.SecurityContext()
-
+func parseDoOptions(cmd *cobra.Command, args []string, accountID string) (clipkg.AutoExecOptions, error) {
 	var flags clipkg.FlagBag
 	dryRun := flags.Bool(cmd, "dry-run")
 	runVerify := flags.Bool(cmd, "verify")
 	claimant := flags.String(cmd, "by")
 	personaRef := flags.String(cmd, "persona-ref")
 	if err := flags.Err(); err != nil {
-		return err
+		return clipkg.AutoExecOptions{}, err
 	}
 
 	targetID := ""
@@ -58,23 +55,36 @@ func runDo(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 	if who == "" {
 		if v := strings.TrimSpace(zqkenv.AgentID().Get()); v != "" {
 			who = v
-		} else if sec != nil && sec.AccountID != "" {
-			who = sec.AccountID
+		} else if accountID != "" {
+			who = accountID
 		} else {
 			who = "agent:auto-exec"
 		}
 	}
 
-	pipeline := clipkg.NewAutoExecPipeline(proc.Storage())
-	opts := clipkg.AutoExecOptions{
+	return clipkg.AutoExecOptions{
 		TargetID:   targetID,
 		Claimant:   who,
 		PersonaRef: personaRef,
 		DryRun:     dryRun,
 		RunVerify:  runVerify,
+	}, nil
+}
+
+func runDo(cmd *cobra.Command, args []string, proc *cli.Processor) error {
+	sec := proc.SecurityContext()
+	accountID := ""
+	if sec != nil {
+		accountID = sec.AccountID
 	}
 
-	res, err := pipeline.Execute(ctx, sec, opts)
+	opts, err := parseDoOptions(cmd, args, accountID)
+	if err != nil {
+		return err
+	}
+
+	pipeline := clipkg.NewAutoExecPipeline(proc.Storage())
+	res, err := pipeline.Execute(proc.OperationContext(), sec, opts)
 	if err != nil {
 		_ = cli.FormatOutput(cmd, res)
 		return err
