@@ -103,28 +103,7 @@ func CleanLegacyLaunchAgents() ([]string, error) {
 }
 
 func plistWorkingDirectoryHint(plistPath string) string {
-	b, err := fileutil.ReadFile(plistPath)
-	if err != nil {
-		return ""
-	}
-	s := string(b)
-	const key = "<key>WorkingDirectory</key>"
-	i := strings.Index(s, key)
-	if i < 0 {
-		return ""
-	}
-	rest := s[i+len(key):]
-	const open = "<string>"
-	j := strings.Index(rest, open)
-	if j < 0 {
-		return ""
-	}
-	rest = rest[j+len(open):]
-	k := strings.Index(rest, "</string>")
-	if k < 0 {
-		return ""
-	}
-	return strings.TrimSpace(rest[:k])
+	return hostservice.PlistWorkingDirectory(plistPath)
 }
 
 // InstallOverseerLaunchAgent cleans legacy units, generates the com.zqk.overseer.plist,
