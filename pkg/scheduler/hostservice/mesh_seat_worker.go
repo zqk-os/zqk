@@ -185,7 +185,7 @@ func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
 			continue
 		}
 		plistPath := filepath.Join(dir, ent.Name())
-		absRoot := plistWorkingDirectory(plistPath)
+		absRoot := PlistWorkingDirectory(plistPath)
 		reason := ""
 		if parsed.Legacy {
 			reason = "legacy_unscoped_seat_worker"
@@ -212,7 +212,7 @@ func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
 	return removed, nil
 }
 
-func plistWorkingDirectory(plistPath string) string {
+func PlistWorkingDirectory(plistPath string) string {
 	b, err := fileutil.ReadFile(plistPath)
 	if err != nil {
 		return ""
