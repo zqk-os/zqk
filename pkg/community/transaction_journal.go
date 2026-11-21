@@ -207,20 +207,15 @@ func (tx *Transaction) rollbackInternal(ctx context.Context, cause error) error 
 
 // TransactionCoordinator manages transactional journals across providers.
 type TransactionCoordinator struct {
-	mu        sync.RWMutex
-	history   []TransactionRecord
-	maxEvents int
-	counter   uint64
+	mu      sync.RWMutex
+	history boundedHistory[TransactionRecord]
+	counter uint64
 }
 
 // NewTransactionCoordinator initializes a thread-safe TransactionCoordinator.
 func NewTransactionCoordinator(maxHistory int) *TransactionCoordinator {
-	if maxHistory <= 0 {
-		maxHistory = 1000
-	}
 	return &TransactionCoordinator{
-		history:   make([]TransactionRecord, 0, maxHistory),
-		maxEvents: maxHistory,
+		history: newBoundedHistory[TransactionRecord](maxHistory),
 	}
 }
 
@@ -243,22 +238,11 @@ func (c *TransactionCoordinator) Begin(providerID string) *Transaction {
 
 // History returns a copy of recorded transaction telemetry records.
 func (c *TransactionCoordinator) History() []TransactionRecord {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	result := make([]TransactionRecord, len(c.history))
-	copy(result, c.history)
-	return result
+	return c.history.snapshot()
 }
 
 func (c *TransactionCoordinator) recordTransaction(record TransactionRecord) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	if len(c.history) >= c.maxEvents {
-		c.history = c.history[1:]
-	}
-	c.history = append(c.history, record)
+	c.history.record(record)
 }
 
 // SafeRunGoroutine executes an asynchronous worker under POL-CONCURRENCY guidelines.
