@@ -119,23 +119,10 @@ func analyzeTestFunction(fn *ast.FuncDecl, relPath, pkgName string) TestSafetyRe
 	hasOSSetenv := false
 
 	ast.Inspect(fn.Body, func(n ast.Node) bool {
-		call, ok := n.(*ast.CallExpr)
+		receiver, methodName, ok := extractReceiverMethodCall(n)
 		if !ok {
 			return true
 		}
-
-		sel, ok := call.Fun.(*ast.SelectorExpr)
-		if !ok {
-			return true
-		}
-
-		methodName := sel.Sel.Name
-		ident, ok := sel.X.(*ast.Ident)
-		if !ok {
-			return true
-		}
-
-		receiver := ident.Name
 		if (receiver == "t" || receiver == "tb") && methodName == "Parallel" {
 			hasParallel = true
 		}
@@ -207,4 +194,20 @@ func analyzeTestFunction(fn *ast.FuncDecl, relPath, pkgName string) TestSafetyRe
 		Level:    SafetyLevelNeedsReview,
 		Reasons:  reasons,
 	}
+}
+
+func extractReceiverMethodCall(n ast.Node) (receiver, method string, ok bool) {
+	call, ok := n.(*ast.CallExpr)
+	if !ok {
+		return "", "", false
+	}
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return "", "", false
+	}
+	ident, ok := sel.X.(*ast.Ident)
+	if !ok {
+		return "", "", false
+	}
+	return ident.Name, sel.Sel.Name, true
 }

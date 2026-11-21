@@ -61,12 +61,19 @@ func WriteLockMetadata(path string, meta *LockMetadata) error {
 	if meta == nil {
 		return nil
 	}
-	data, err := json.Marshal(meta)
+	data, err := marshalLockMetadata(meta)
 	if err != nil {
 		return err
 	}
-	data = append(data, '\n')
 	return fileutil.WriteFile(path, data, paths.FilePerm644)
+}
+
+func marshalLockMetadata(meta *LockMetadata) ([]byte, error) {
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return nil, err
+	}
+	return append(data, '\n'), nil
 }
 
 // FileLockConfig allows configuring file lock behavior

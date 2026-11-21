@@ -41,36 +41,40 @@ func SnapshotPlane(projectRoot, planePath string) (PlaneSnapshot, error) {
 	}
 
 	snap := make(PlaneSnapshot)
-	err = filepath.WalkDir(fullPlane, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if d.IsDir() {
-			return nil
-		}
-		name := d.Name()
-		if !strings.HasSuffix(name, ".yaml") && !strings.HasSuffix(name, ".yml") && !strings.HasSuffix(name, ".json") {
-			return nil
-		}
-
-		data, err := fileutil.ReadFile(path)
-		if err != nil {
-			return errfmt.Newf("read file %q for snapshot", path).Wrap(err)
-		}
-
-		sum := sha256.Sum256(data)
-		rel, err := filepath.Rel(fullPlane, path)
-		if err != nil {
-			rel = path
-		}
-		snap[rel] = hex.EncodeToString(sum[:])
-		return nil
+	err = filepath.WalkDir(fullPlane, func(path string, d os.DirEntry, walkErr error) error {
+		return snapshotPlaneEntry(fullPlane, path, d, walkErr, snap)
 	})
 	if err != nil {
 		return nil, errfmt.Newf("snapshot plane %q", fullPlane).Wrap(err)
 	}
 
 	return snap, nil
+}
+
+func snapshotPlaneEntry(fullPlane, path string, d os.DirEntry, walkErr error, snap PlaneSnapshot) error {
+	if walkErr != nil {
+		return walkErr
+	}
+	if d.IsDir() || !isSnapshotPlaneExt(d.Name()) {
+		return nil
+	}
+
+	data, err := fileutil.ReadFile(path)
+	if err != nil {
+		return errfmt.Newf("read file %q for snapshot", path).Wrap(err)
+	}
+
+	sum := sha256.Sum256(data)
+	rel, err := filepath.Rel(fullPlane, path)
+	if err != nil {
+		rel = path
+	}
+	snap[rel] = hex.EncodeToString(sum[:])
+	return nil
+}
+
+func isSnapshotPlaneExt(name string) bool {
+	return strings.HasSuffix(name, ".yaml") || strings.HasSuffix(name, ".yml") || strings.HasSuffix(name, ".json")
 }
 
 // ContaminationDiff captures files that changed during command execution.
