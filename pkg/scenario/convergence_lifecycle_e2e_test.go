@@ -98,7 +98,7 @@ func writeHealthJSONLines(t *testing.T, projectRoot string, lines []map[string]a
 // bundle apply → measure from health.jsonl → BuildSuggestedConvergenceSessionFields →
 // persist object_update_body via storage Update (same field contract as zqk object update --file).
 func TestConvergenceLifecycleBundle_MeasureAndApplySuggestedUpdate(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -176,7 +176,7 @@ func TestConvergenceLifecycleBundle_MeasureAndApplySuggestedUpdate(t *testing.T)
 // persists router output (trending_away → c4_act), then appends a passing line for the same
 // fingerprint and verifies neutral + ready → c6_exit (superseded fail) with two measure entries.
 func TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -331,7 +331,7 @@ func TestConvergenceLifecycleBundle_RemediateThenGreenTwoIterations(t *testing.T
 // TestConvergenceLifecycleBundle_StampTombstoneAndDisparity covers --stamp-tombstone persistence
 // and a follow-up measure where scope fingerprint drifts (second fingerprint appears).
 func TestConvergenceLifecycleBundle_StampTombstoneAndDisparity(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -431,7 +431,7 @@ func TestConvergenceLifecycleBundle_StampTombstoneAndDisparity(t *testing.T) {
 // TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes persists predictions.retrospective
 // and top-level debrief_notes (same flags as CLI --finalize-debrief / debrief copy).
 func TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -521,7 +521,7 @@ func TestConvergenceLifecycleBundle_FinalizeDebriefAndDebriefNotes(t *testing.T)
 // TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag ensures flow_variant flag selects
 // the scheduler_fast routing profile (CLI: --flow-variant scheduler_fast).
 func TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -567,7 +567,7 @@ func TestConvergenceLifecycleBundle_SchedulerFastRoutingProfileViaFlag(t *testin
 // TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS matches --skip-session-context:
 // no before_state_snapshot from storage; tombstone_disparity notes missing tombstone.
 func TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -613,7 +613,7 @@ func TestConvergenceLifecycleBundle_SkipSessionContextDoesNotReadCVS(t *testing.
 // TestConvergenceLifecycleBundle_RemediateToExitThreeIterations runs fail → pass (neutral, ready) →
 // clean single-fingerprint window (neutral, ready) ending at c6_exit with three activity entries.
 func TestConvergenceLifecycleBundle_RemediateToExitThreeIterations(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
