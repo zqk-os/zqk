@@ -6,6 +6,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/stampmemo"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -122,9 +123,11 @@ func loadSpecIndexForKernelCritical() *SpecIndex {
 	if idx := TryLoadSpecIndexForProjectRoot(root); idx != nil {
 		return idx
 	}
-	// Tests / early init often lack path-cache entries; read the JSON directly.
+	// Tests / early init often lack path-cache entries; read the JSON directly via stampmemo.
 	p := filepath.Join(root, paths.ProcessInternalDir, "spec_index.json")
-	idx, err := LoadSpecIndex(p)
+	idx, err := specIndexes.Load(p, stampmemo.Of(p), func() (*SpecIndex, error) {
+		return LoadSpecIndex(p)
+	})
 	if err != nil {
 		return nil
 	}
