@@ -1,8 +1,6 @@
 package gate
 
 import (
-	"encoding/json"
-
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/errfmt"
@@ -26,18 +24,11 @@ func NewRejectCmd() *cobra.Command {
 		Long:  "Rejects the staged approval request, marking status rejected with reviewer, timestamp, and reason, recording to audit ledger.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			approvalID := args[0]
-
 			var flagsBag clipkg.FlagBag
-			reviewer := flagsBag.String(cmd, "reviewer")
 			reason := flagsBag.String(cmd, "reason")
-			jsonOutput := flagsBag.Bool(cmd, "json")
-
-			if flagsBag.Err() != nil {
-				return flagsBag.Err()
-			}
-			if reviewer == "" {
-				return errfmt.Errorf("--reviewer is required")
+			reviewer, jsonOutput, err := parseReviewerFlags(cmd, &flagsBag)
+			if err != nil {
+				return err
 			}
 			if reason == "" {
 				return errfmt.Errorf("--reason is required")
@@ -48,18 +39,13 @@ func NewRejectCmd() *cobra.Command {
 				return err
 			}
 
-			req, err := gate.Reject(proc.OperationContext(), store, proc.ProjectRoot(), approvalID, reviewer, reason)
+			req, err := gate.Reject(proc.OperationContext(), store, proc.ProjectRoot(), args[0], reviewer, reason)
 			if err != nil {
 				return err
 			}
 
 			if jsonOutput {
-				out, err := json.MarshalIndent(req, "", "  ")
-				if err != nil {
-					return errfmt.Newf("failed to format json: %v", err)
-				}
-				cmd.Println(string(out))
-				return nil
+				return printGateJSON(cmd, req)
 			}
 
 			cmd.Println("Approval request rejected and recorded to audit ledger.")
