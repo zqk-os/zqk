@@ -61,17 +61,22 @@ func (vc *VectorClock) Clone() *VectorClock {
 	return cpy
 }
 
-// Tick increments the logical clock component for the specified node ID.
-func (vc *VectorClock) Tick(nodeID string) error {
+func (vc *VectorClock) withNodeWriteLock(nodeID string, fn func() error) error {
 	if err := strutil.RequireNonBlank(nodeID, "node ID"); err != nil {
 		return err
 	}
 
 	vc.mu.Lock()
 	defer vc.mu.Unlock()
+	return fn()
+}
 
-	vc.values[nodeID]++
-	return nil
+// Tick increments the logical clock component for the specified node ID.
+func (vc *VectorClock) Tick(nodeID string) error {
+	return vc.withNodeWriteLock(nodeID, func() error {
+		vc.values[nodeID]++
+		return nil
+	})
 }
 
 // Get returns the logical clock value for the specified node.
@@ -83,19 +88,14 @@ func (vc *VectorClock) Get(nodeID string) uint64 {
 
 // Set explicitly sets the logical clock for a node (must be >= current value).
 func (vc *VectorClock) Set(nodeID string, val uint64) error {
-	if err := strutil.RequireNonBlank(nodeID, "node ID"); err != nil {
-		return err
-	}
+	return vc.withNodeWriteLock(nodeID, func() error {
+		if val < vc.values[nodeID] {
+			return fmt.Errorf("vector clock value %d cannot regress current value %d for node %s", val, vc.values[nodeID], nodeID)
+		}
 
-	vc.mu.Lock()
-	defer vc.mu.Unlock()
-
-	if val < vc.values[nodeID] {
-		return fmt.Errorf("vector clock value %d cannot regress current value %d for node %s", val, vc.values[nodeID], nodeID)
-	}
-
-	vc.values[nodeID] = val
-	return nil
+		vc.values[nodeID] = val
+		return nil
+	})
 }
 
 // Merge takes the pairwise maximum of all components between this and another clock.
