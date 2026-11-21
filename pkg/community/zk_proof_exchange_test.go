@@ -81,28 +81,34 @@ func TestZKProofExchange_StaticFloorInvariant(t *testing.T) {
 	}
 }
 
+func mustDeriveBlinding(t *testing.T, seed []byte, domain string) *BlindingFactor {
+	t.Helper()
+	b, err := DeriveBlindingFactor(seed, domain)
+	if err != nil {
+		t.Fatalf("DeriveBlindingFactor failed: %v", err)
+	}
+	return b
+}
+
+func mustGenerateProof(t *testing.T, ex *ZKProofExchange, stmtID, claimType string, artifact, witness []byte, blinding *BlindingFactor, domain TenantDomainBinding) *ZKProof {
+	t.Helper()
+	p, err := ex.GenerateProof(stmtID, claimType, artifact, witness, blinding, domain)
+	if err != nil {
+		t.Fatalf("GenerateProof(%s) failed: %v", stmtID, err)
+	}
+	return p
+}
+
 func TestZKProofExchange_OperationalDynamicProof_Deterministic(t *testing.T) {
 	fixedNow := time.Date(2026, 11, 20, 12, 30, 0, 0, time.UTC)
 	ex, domain, artifact, witness := newTestExchangeFixture(t, fixedNow)
 
 	seed := []byte("deterministic-seed-material-32bt")
-	blinding1, err := DeriveBlindingFactor(seed, domain.FederationDomain)
-	if err != nil {
-		t.Fatalf("DeriveBlindingFactor 1 failed: %v", err)
-	}
-	blinding2, err := DeriveBlindingFactor(seed, domain.FederationDomain)
-	if err != nil {
-		t.Fatalf("DeriveBlindingFactor 2 failed: %v", err)
-	}
+	blinding1 := mustDeriveBlinding(t, seed, domain.FederationDomain)
+	blinding2 := mustDeriveBlinding(t, seed, domain.FederationDomain)
 
-	proof1, err := ex.GenerateProof("stmt-det-01", "artifact_integrity", artifact, witness, blinding1, domain)
-	if err != nil {
-		t.Fatalf("GenerateProof 1 failed: %v", err)
-	}
-	proof2, err := ex.GenerateProof("stmt-det-01", "artifact_integrity", artifact, witness, blinding2, domain)
-	if err != nil {
-		t.Fatalf("GenerateProof 2 failed: %v", err)
-	}
+	proof1 := mustGenerateProof(t, ex, "stmt-det-01", "artifact_integrity", artifact, witness, blinding1, domain)
+	proof2 := mustGenerateProof(t, ex, "stmt-det-01", "artifact_integrity", artifact, witness, blinding2, domain)
 
 	if proof1.ProofID != proof2.ProofID || proof1.Challenge != proof2.Challenge || proof1.Response != proof2.Response {
 		t.Fatalf("expected deterministic proof generation, got %+v vs %+v", proof1, proof2)
