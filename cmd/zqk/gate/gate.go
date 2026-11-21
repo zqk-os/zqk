@@ -1,10 +1,14 @@
 package gate
 
 import (
+	"encoding/json"
+
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/cliapp"
+	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 )
 
 // NewGateCmd creates the 'zqk gate' command group for cryptographic human-in-the-loop mutation approval gates.
@@ -39,4 +43,25 @@ func NewGateCmd() *cobra.Command {
 	cli.RequireStorage(cmd, true)
 
 	return cmd
+}
+
+func openGateStore(cmd *cobra.Command) (*cli.Processor, storage.ObjectStorageProvider, error) {
+	proc, err := cli.NewProcessor(cmd)
+	if err != nil {
+		return nil, nil, errfmt.Newf("failed to initialize processor: %v", err)
+	}
+	store := proc.Storage()
+	if store == nil {
+		return nil, nil, errfmt.Errorf("storage provider unavailable")
+	}
+	return proc, store, nil
+}
+
+func printGateJSON(cmd *cobra.Command, v any) error {
+	out, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return errfmt.Newf("failed to format json: %v", err)
+	}
+	cmd.Println(string(out))
+	return nil
 }
