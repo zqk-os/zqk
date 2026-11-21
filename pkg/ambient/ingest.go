@@ -96,6 +96,22 @@ func (s *AmbientIngestService) MapToSystemObject(event Event) (string, string) {
 	return objects.KindAuditEvent, ""
 }
 
+func (s *AmbientIngestService) emitAuditAndRecordIngested(ctx context.Context, eventType, timestamp, targetKind, targetURI string, metadata map[string]any) error {
+	opts := makeAmbientAuditOpts(eventType, timestamp, targetKind, targetURI, metadata)
+	if err := storage.CreateAuditEventWithBuilder(ctx, s.projectRoot, s.secCtx, nil, opts); err != nil {
+		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)
+	}
+
+	s.mu.Lock()
+	s.ingested++
+	if s.ingestCond != nil {
+		s.ingestCond.Broadcast()
+	}
+	s.mu.Unlock()
+
+	return nil
+}
+
 // Ingest ingests an ambient event into the Knowledge Kernel by mapping to discrete system objects and emitting an audit_event.
 func (s *AmbientIngestService) Ingest(ctx context.Context, event Event) error {
 	s.inFlight.Add(1)
@@ -115,20 +131,7 @@ func (s *AmbientIngestService) Ingest(ctx context.Context, event Event) error {
 	metadata := map[string]any{
 		objects.FieldKeyPayload: event.Payload,
 	}
-	opts := makeAmbientAuditOpts(string(event.Type), event.Timestamp.Format(time.RFC3339), targetKind, targetURI, metadata)
-
-	if err := storage.CreateAuditEventWithBuilder(ctx, s.projectRoot, s.secCtx, nil, opts); err != nil {
-		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)
-	}
-
-	s.mu.Lock()
-	s.ingested++
-	if s.ingestCond != nil {
-		s.ingestCond.Broadcast()
-	}
-	s.mu.Unlock()
-
-	return nil
+	return s.emitAuditAndRecordIngested(ctx, string(event.Type), event.Timestamp.Format(time.RFC3339), targetKind, targetURI, metadata)
 }
 
 // BindToHub binds the service to an EventHub to automatically ingest events.
@@ -166,20 +169,7 @@ func (s *AmbientIngestService) IngestAmbientEvent(ctx context.Context, event amb
 		"ambient_id":            event.ID,
 		objects.FieldKeyPayload: payloadMap,
 	}
-	opts := makeAmbientAuditOpts(string(event.Type), time.Unix(event.Timestamp, 0).Format(time.RFC3339), targetKind, targetURI, metadata)
-
-	if err := storage.CreateAuditEventWithBuilder(ctx, s.projectRoot, s.secCtx, nil, opts); err != nil {
-		return fmt.Errorf("failed to emit audit event for ambient event: %w", err)
-	}
-
-	s.mu.Lock()
-	s.ingested++
-	if s.ingestCond != nil {
-		s.ingestCond.Broadcast()
-	}
-	s.mu.Unlock()
-
-	return nil
+	return s.emitAuditAndRecordIngested(ctx, string(event.Type), time.Unix(event.Timestamp, 0).Format(time.RFC3339), targetKind, targetURI, metadata)
 }
 
 // BindToMesh binds the service to an EventMesh to automatically ingest events using internal lifecycle context.
