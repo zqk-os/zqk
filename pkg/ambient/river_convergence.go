@@ -213,13 +213,22 @@ func (e *RiverConvergenceEngine) GetRiver(riverID string) (*IntentRiver, bool) {
 	return &copyRiver, true
 }
 
-// ListRivers returns a snapshot of all active rivers.
-func (e *RiverConvergenceEngine) ListRivers() []*IntentRiver {
+func withRiverReadLock[T any](e *RiverConvergenceEngine, fn func() T) T {
 	if e == nil {
-		return nil
+		var zero T
+		return zero
 	}
 	e.mu.RLock()
 	defer e.mu.RUnlock()
+	return fn()
+}
+
+// ListRivers returns a snapshot of all active rivers.
+func (e *RiverConvergenceEngine) ListRivers() []*IntentRiver {
+	return withRiverReadLock(e, e.listRiversLocked)
+}
+
+func (e *RiverConvergenceEngine) listRiversLocked() []*IntentRiver {
 	if e.rivers == nil {
 		return nil
 	}
