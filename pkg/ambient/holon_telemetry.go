@@ -466,8 +466,8 @@ func LoadTelemetryStateFile(filePath string) (*MiddleBrainTelemetrySnapshot, err
 		}
 		return nil, fmt.Errorf("%w: failed to read state file: %v", ErrCorruptAmbientState, err)
 	}
-	if strutil.IsBlank(string(data)) {
-		return nil, fmt.Errorf("%w: state file %q is empty", ErrEmptyAmbientState, filePath)
+	if err := strutil.ErrorOnBlank(string(data), "%w: state file %q is empty", ErrEmptyAmbientState, filePath); err != nil {
+		return nil, err
 	}
 
 	var snap MiddleBrainTelemetrySnapshot

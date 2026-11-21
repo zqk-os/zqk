@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -61,8 +62,8 @@ func ComputeHash(r io.Reader, algo HashAlgorithm) (string, error) {
 
 // ComputeFileHash computes the cryptographic hash for a file at path.
 func ComputeFileHash(path string, algo HashAlgorithm) (string, error) {
-	if strings.TrimSpace(path) == "" {
-		return "", fmt.Errorf("file path cannot be empty")
+	if err := strutil.ErrorOnBlank(path, "file path cannot be empty"); err != nil {
+		return "", err
 	}
 	f, err := fileutil.OpenRead(path)
 	if err != nil {

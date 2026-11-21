@@ -119,8 +119,8 @@ func (n *AttestationNotary) Verify(claim *AttestationClaim, payload []byte) erro
 	if err := claim.Validate(); err != nil {
 		return err
 	}
-	if strings.TrimSpace(claim.Signature) == "" {
-		return fmt.Errorf("%w: missing signature", ErrAttestationTampered)
+	if err := strutil.ErrorOnBlank(claim.Signature, "%w: missing signature", ErrAttestationTampered); err != nil {
+		return err
 	}
 
 	hasher := sha256.New()

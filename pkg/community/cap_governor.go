@@ -15,7 +15,6 @@ package community
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -26,6 +25,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -56,8 +56,8 @@ type CAPGovernor struct {
 
 // NewCAPGovernor initializes a new lifecycle governor instance.
 func NewCAPGovernor(opts CAPGovernorOptions) (*CAPGovernor, error) {
-	if strings.TrimSpace(opts.ProjectRoot) == "" {
-		return nil, errors.New("project root is required for CAP governor")
+	if err := strutil.ErrorOnBlank(opts.ProjectRoot, "project root is required for CAP governor"); err != nil {
+		return nil, err
 	}
 	marker := filepath.Join(opts.ProjectRoot, paths.ProjectDataDir, "state", CAPLoopMarkerFileName)
 	vendor := strings.TrimSpace(opts.Vendor)

@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -234,8 +235,8 @@ func WriteVerifiedCoverageArtifact(dir string, report *CoverageRollupReport) (st
 	if report == nil {
 		return "", "", ErrNilCoverageReport
 	}
-	if strings.TrimSpace(dir) == "" {
-		return "", "", fmt.Errorf("coverage rollup: output directory is required")
+	if err := strutil.ErrorOnBlank(dir, "coverage rollup: output directory is required"); err != nil {
+		return "", "", err
 	}
 	if err := fileutil.MkdirAll(dir, paths.DirPerm755); err != nil {
 		return "", "", fmt.Errorf("coverage rollup: mkdir: %w", err)
@@ -332,8 +333,8 @@ func CoverageRollupToStageMetric(report *CoverageRollupReport, jobID, pipelineID
 	if report == nil {
 		return PipelineStageMetric{}, ErrNilCoverageReport
 	}
-	if strings.TrimSpace(jobID) == "" {
-		return PipelineStageMetric{}, fmt.Errorf("%w: job_id is required", ErrMissingRequiredField)
+	if err := strutil.ErrorOnBlank(jobID, "%w: job_id is required", ErrMissingRequiredField); err != nil {
+		return PipelineStageMetric{}, err
 	}
 
 	outcome := OutcomeFailed
