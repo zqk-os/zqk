@@ -166,7 +166,7 @@ func (a DarwinAdapter) prepareUnitControl(e Entry) (plist, domain string, err er
 	return a.plistPath(e), "gui/" + uid(), nil
 }
 
-func (a DarwinAdapter) Start(e Entry) error {
+func (a DarwinAdapter) withUnitControl(e Entry, fn func(plist, domain, target string) error) error {
 	plist, domain, err := a.prepareUnitControl(e)
 	if err != nil {
 		return err
@@ -174,46 +174,46 @@ func (a DarwinAdapter) Start(e Entry) error {
 	if isHostServiceLiveDisabled() && launchctlRunner == nil {
 		return nil
 	}
-	// Stop boots the job out of the domain; Start must bootstrap again.
-	if err := launchctlCmd("bootstrap", domain, plist); err != nil {
-		// Already loaded, or older macOS load path.
-		_ = launchctlCmd("load", "-w", plist)
-	}
-	if err := launchctlCmd("kickstart", "-k", domain+"/"+e.UnitLabel); err != nil {
-		if err2 := launchctlCmd("start", e.UnitLabel); err2 != nil {
-			return errfmt.Newf("launchctl kickstart/start").Wrap(err)
+	return fn(plist, domain, domain+"/"+e.UnitLabel)
+}
+
+func (a DarwinAdapter) Start(e Entry) error {
+	return a.withUnitControl(e, func(plist, domain, target string) error {
+		// Stop boots the job out of the domain; Start must bootstrap again.
+		if err := launchctlCmd("bootstrap", domain, plist); err != nil {
+			// Already loaded, or older macOS load path.
+			_ = launchctlCmd("load", "-w", plist)
 		}
-	}
-	return nil
+		if err := launchctlCmd("kickstart", "-k", target); err != nil {
+			if err2 := launchctlCmd("start", e.UnitLabel); err2 != nil {
+				return errfmt.Newf("launchctl kickstart/start").Wrap(err)
+			}
+		}
+		return nil
+	})
 }
 
 func (a DarwinAdapter) Stop(e Entry) error {
-	plist, domain, err := a.prepareUnitControl(e)
-	if err != nil {
-		return err
-	}
-	if isHostServiceLiveDisabled() && launchctlRunner == nil {
-		return nil
-	}
-	target := domain + "/" + e.UnitLabel
-	// Graceful signal first when the job is still in the domain.
-	_ = launchctlCmd("kill", "SIGTERM", target)
-	// bootout (not launchctl stop): KeepAlive SuccessfulExit=false respawns after
-	// non-zero signal exits, so plain stop looks successful then immediately runs again.
-	// intentional disable vs crash-only KeepAlive.
-	if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
-		if err := launchctlCmd("bootout", domain, plist); err != nil {
+	return a.withUnitControl(e, func(plist, domain, target string) error {
+		// Graceful signal first when the job is still in the domain.
+		_ = launchctlCmd("kill", "SIGTERM", target)
+		// bootout (not launchctl stop): KeepAlive SuccessfulExit=false respawns after
+		// non-zero signal exits, so plain stop looks successful then immediately runs again.
+		// intentional disable vs crash-only KeepAlive.
+		if fi, err := os.Stat(plist); err == nil && !fi.IsDir() {
+			if err := launchctlCmd("bootout", domain, plist); err != nil {
+				_ = launchctlCmd("bootout", target)
+				_ = launchctlCmd("unload", "-w", plist)
+			}
+		} else {
 			_ = launchctlCmd("bootout", target)
-			_ = launchctlCmd("unload", "-w", plist)
 		}
-	} else {
-		_ = launchctlCmd("bootout", target)
-	}
-	st, _ := a.Status(e)
-	if st == "running" {
-		return errfmt.Errorf("scheduler host unit still running after stop: %s", e.UnitLabel)
-	}
-	return nil
+		st, _ := a.Status(e)
+		if st == "running" {
+			return errfmt.Errorf("scheduler host unit still running after stop: %s", e.UnitLabel)
+		}
+		return nil
+	})
 }
 
 func (a DarwinAdapter) Status(e Entry) (string, error) {
