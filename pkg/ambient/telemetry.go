@@ -381,19 +381,16 @@ func (r *AmbientTelemetryReport) GetComponent(name string) (ComponentHealth, boo
 
 // GetComponents returns a copy of all component health records in a thread-safe and nil-safe manner.
 func (r *AmbientTelemetryReport) GetComponents() map[string]ComponentHealth {
-	if r == nil {
-		return nil
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.Components == nil {
-		return nil
-	}
-	comps := make(map[string]ComponentHealth, len(r.Components))
-	for k, v := range r.Components {
-		comps[k] = v
-	}
-	return comps
+	return readTelemetryField(r, func(rep *AmbientTelemetryReport) map[string]ComponentHealth {
+		if rep.Components == nil {
+			return nil
+		}
+		comps := make(map[string]ComponentHealth, len(rep.Components))
+		for k, v := range rep.Components {
+			comps[k] = v
+		}
+		return comps
+	})
 }
 
 // SetComponent safely adds or updates a component's health status.
@@ -470,18 +467,25 @@ func (r *AmbientTelemetryReport) GetMeshMetrics() HolonMeshMetrics {
 	return r.MeshMetrics
 }
 
-func readTelemetryMetric[T comparable](r *AmbientTelemetryReport, read func(*AmbientTelemetryReport) (T, T)) T {
+func readTelemetryField[T any](r *AmbientTelemetryReport, read func(*AmbientTelemetryReport) T) T {
 	var zero T
 	if r == nil {
 		return zero
 	}
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	primary, fallback := read(r)
-	if primary != zero {
-		return primary
-	}
-	return fallback
+	return read(r)
+}
+
+func readTelemetryMetric[T comparable](r *AmbientTelemetryReport, read func(*AmbientTelemetryReport) (T, T)) T {
+	return readTelemetryField(r, func(rep *AmbientTelemetryReport) T {
+		var zero T
+		primary, fallback := read(rep)
+		if primary != zero {
+			return primary
+		}
+		return fallback
+	})
 }
 
 // GetConsensusLeasesActive returns the active consensus lease count in a nil-safe manner.
@@ -521,17 +525,14 @@ func (r *AmbientTelemetryReport) GetReflexRealignCount() uint64 {
 
 // GetWarnings returns a copy of the warnings slice in a thread-safe and nil-safe manner.
 func (r *AmbientTelemetryReport) GetWarnings() []string {
-	if r == nil {
-		return nil
-	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if len(r.Warnings) == 0 {
-		return nil
-	}
-	out := make([]string, len(r.Warnings))
-	copy(out, r.Warnings)
-	return out
+	return readTelemetryField(r, func(rep *AmbientTelemetryReport) []string {
+		if len(rep.Warnings) == 0 {
+			return nil
+		}
+		out := make([]string, len(rep.Warnings))
+		copy(out, rep.Warnings)
+		return out
+	})
 }
 
 // AddWarning appends a warning to the report in a thread-safe and nil-safe manner.
