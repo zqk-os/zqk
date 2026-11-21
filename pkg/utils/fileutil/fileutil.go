@@ -96,7 +96,7 @@ func WriteSecureJSONIndent(path string, v any) error {
 		return err
 	}
 	b = append(b, '\n')
-	return WriteSecureFile(path, b)
+	return WriteDurableSecureFile(path, b)
 }
 
 // WriteStandardFile writes data to a file with standard permissions (0644).
