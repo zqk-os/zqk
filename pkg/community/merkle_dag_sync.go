@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -57,12 +58,13 @@ func ComputeMerkleNodeHash(nodeID, regionID string, seq uint64, contentHash stri
 	sortedParents := append([]string(nil), parentHashes...)
 	sort.Strings(sortedParents)
 
-	h := sha256.New()
-	_, _ = fmt.Fprintf(h, "%s|%s|%d|%s", regionID, nodeID, seq, contentHash)
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("%s|%s|%d|%s", regionID, nodeID, seq, contentHash))
 	for _, p := range sortedParents {
-		_, _ = fmt.Fprintf(h, "|%s", p)
+		b.WriteByte('|')
+		b.WriteString(p)
 	}
-	return hex.EncodeToString(h.Sum(nil))
+	return ComputeSHA256Hex([]byte(b.String()))
 }
 
 // ComputeSHA256Hex returns the lowercase hexadecimal SHA-256 digest of data.
@@ -157,9 +159,7 @@ type RegionState struct {
 }
 
 func merkleHashPair(left, right string) string {
-	h := sha256.New()
-	_, _ = fmt.Fprintf(h, "%s|%s", left, right)
-	return hex.EncodeToString(h.Sum(nil))
+	return ComputeSHA256Hex([]byte(left + "|" + right))
 }
 
 func computeMerkleTreeRoot(leaves []string) string {
