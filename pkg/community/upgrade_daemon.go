@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/strutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -65,11 +66,11 @@ type UpgradeDaemon struct {
 
 // NewUpgradeDaemon constructs a new UpgradeDaemon instance with validated configuration.
 func NewUpgradeDaemon(cfg UpgradeConfig) (*UpgradeDaemon, error) {
-	if strings.TrimSpace(cfg.CurrentVersion) == "" {
-		return nil, fmt.Errorf("current version is required")
+	if err := strutil.ErrorOnBlank(cfg.CurrentVersion, "current version is required"); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(cfg.ManifestURL) == "" {
-		return nil, fmt.Errorf("manifest URL is required")
+	if err := strutil.ErrorOnBlank(cfg.ManifestURL, "manifest URL is required"); err != nil {
+		return nil, err
 	}
 	if cfg.CheckInterval <= 0 {
 		cfg.CheckInterval = 1 * time.Hour
@@ -115,8 +116,8 @@ func (d *UpgradeDaemon) CheckForUpdate(ctx context.Context) (*ReleaseManifest, b
 		return nil, false, fmt.Errorf("invalid manifest JSON: %w", err)
 	}
 
-	if strings.TrimSpace(manifest.Version) == "" {
-		return nil, false, fmt.Errorf("manifest missing version field")
+	if err := strutil.ErrorOnBlank(manifest.Version, "manifest missing version field"); err != nil {
+		return nil, false, err
 	}
 
 	isNewer := isVersionNewer(d.cfg.CurrentVersion, manifest.Version)
@@ -145,11 +146,11 @@ func (d *UpgradeDaemon) DownloadAndVerify(ctx context.Context, platform string) 
 		return nil, fmt.Errorf("platform %q not supported in release %s", platform, manifest.Version)
 	}
 
-	if strings.TrimSpace(asset.DownloadURL) == "" {
-		return nil, fmt.Errorf("asset for platform %q has empty download URL", platform)
+	if err := strutil.ErrorOnBlank(asset.DownloadURL, "asset for platform %q has empty download URL", platform); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(asset.SHA256) == "" {
-		return nil, fmt.Errorf("asset for platform %q has empty SHA256 checksum", platform)
+	if err := strutil.ErrorOnBlank(asset.SHA256, "asset for platform %q has empty SHA256 checksum", platform); err != nil {
+		return nil, err
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, asset.DownloadURL, nil)
@@ -192,8 +193,8 @@ func (d *UpgradeDaemon) ApplyUpgrade(binaryData []byte, targetPath string) error
 	if strings.TrimSpace(targetPath) == "" {
 		targetPath = d.cfg.TargetBinaryPath
 	}
-	if strings.TrimSpace(targetPath) == "" {
-		return fmt.Errorf("target binary path is required")
+	if err := strutil.ErrorOnBlank(targetPath, "target binary path is required"); err != nil {
+		return err
 	}
 
 	if err := fileutil.WriteDurableFile(targetPath, binaryData, fileutil.ExecutableFilePerm); err != nil {

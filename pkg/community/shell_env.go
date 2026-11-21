@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/strutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -83,11 +84,11 @@ func FormatShellSnippet(shell ShellType, binDir string) string {
 
 // InjectPath safely and idempotently appends or updates the zqk PATH snippet in the target profile file.
 func InjectPath(profile ShellProfile) (*InjectionResult, error) {
-	if strings.TrimSpace(profile.BinDir) == "" {
-		return nil, fmt.Errorf("bin directory path cannot be empty")
+	if err := strutil.ErrorOnBlank(profile.BinDir, "bin directory path cannot be empty"); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(profile.ConfigFile) == "" {
-		return nil, fmt.Errorf("configuration file path cannot be empty")
+	if err := strutil.ErrorOnBlank(profile.ConfigFile, "configuration file path cannot be empty"); err != nil {
+		return nil, err
 	}
 
 	result := &InjectionResult{
@@ -139,8 +140,8 @@ func InjectPath(profile ShellProfile) (*InjectionResult, error) {
 
 // RemovePathInjection strips any previously injected zqk environment block from the config file.
 func RemovePathInjection(profile ShellProfile) (*InjectionResult, error) {
-	if strings.TrimSpace(profile.ConfigFile) == "" {
-		return nil, fmt.Errorf("configuration file path cannot be empty")
+	if err := strutil.ErrorOnBlank(profile.ConfigFile, "configuration file path cannot be empty"); err != nil {
+		return nil, err
 	}
 
 	result := &InjectionResult{

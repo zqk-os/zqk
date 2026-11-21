@@ -12,6 +12,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -43,18 +44,18 @@ func (m *ProviderManifest) Validate() error {
 	if strings.TrimSpace(m.ID) == "" || !idRegex.MatchString(m.ID) {
 		return fmt.Errorf("%w: invalid or missing provider id", ErrManifestInvalid)
 	}
-	if strings.TrimSpace(m.Name) == "" {
-		return fmt.Errorf("%w: missing provider name", ErrManifestInvalid)
+	if err := strutil.ErrorOnBlank(m.Name, "%w: missing provider name", ErrManifestInvalid); err != nil {
+		return err
 	}
-	if strings.TrimSpace(m.Version) == "" {
-		return fmt.Errorf("%w: missing provider version", ErrManifestInvalid)
+	if err := strutil.ErrorOnBlank(m.Version, "%w: missing provider version", ErrManifestInvalid); err != nil {
+		return err
 	}
 	if len(m.Capabilities) == 0 {
 		return fmt.Errorf("%w: capabilities must declare at least one capability", ErrManifestInvalid)
 	}
 	for _, cap := range m.Capabilities {
-		if strings.TrimSpace(cap) == "" {
-			return fmt.Errorf("%w: declared capability cannot be empty", ErrManifestInvalid)
+		if err := strutil.ErrorOnBlank(cap, "%w: declared capability cannot be empty", ErrManifestInvalid); err != nil {
+			return err
 		}
 	}
 	return nil
