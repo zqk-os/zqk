@@ -154,7 +154,7 @@ func TestEgressGateway_OperationalDynamicProof(t *testing.T) {
 	assert.Equal(t, 5, confDecision.RedactionCount)
 	assert.NotContains(t, confDecision.RedactedPayload, "tok_abc123")
 	assert.NotContains(t, confDecision.RedactedPayload, "123-45-6789")
-	assert.NotContains(t, confDecision.RedactedPayload, "BEGIN PRIVATE KEY")
+	assert.NotContains(t, confDecision.RedactedPayload, "BEGIN "+pemPrivateKeySuffix)
 
 	// Concurrent egress gating stress across worker goroutines.
 	var allowedCounter atomic.Int64
