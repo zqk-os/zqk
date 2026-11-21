@@ -91,3 +91,50 @@ func TestSchedulerMaintenanceConfig_IncludesDataCellEnvelopeTick(t *testing.T) {
 		t.Fatalf("maintenance config missing: %s (%v)", cfgPath, err)
 	}
 }
+
+// TestSchedulerMaintenanceConfig_IncludesResourceHygiene verifies SCH-resource-hygiene is
+// configured in required_jobs, exempt when jobs_paused is true, and backed by its template YAML.
+func TestSchedulerMaintenanceConfig_IncludesResourceHygiene(t *testing.T) {
+	t.Parallel()
+	root := findModuleRoot(t)
+	cfg, err := NewSchedulerMaintenanceLoader(root).Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	const (
+		wantID      = "SCH-resource-hygiene"
+		wantJobType = "run_wrapper"
+		wantTmpl    = "scripts/scheduler_jobs/resource_hygiene_periodic.yaml"
+	)
+	var found bool
+	for _, e := range cfg.RequiredJobs {
+		if e.ID != wantID {
+			continue
+		}
+		found = true
+		if e.JobType != wantJobType {
+			t.Errorf("required_jobs entry %s: job_type = %q, want %q", wantID, e.JobType, wantJobType)
+		}
+		if e.TemplateFile != wantTmpl {
+			t.Errorf("required_jobs entry %s: template_file = %q, want %q", wantID, e.TemplateFile, wantTmpl)
+		}
+		break
+	}
+	if !found {
+		t.Fatalf("required_jobs missing entry id=%q", wantID)
+	}
+	var exempt bool
+	for _, id := range cfg.JobsPausedScheduleExemptJobIDs {
+		if id == wantID {
+			exempt = true
+			break
+		}
+	}
+	if !exempt {
+		t.Errorf("jobs_paused_schedule_exempt_job_ids missing %q", wantID)
+	}
+	tmplPath := filepath.Join(root, wantTmpl)
+	if st, err := fileutil.Stat(tmplPath); err != nil || st.IsDir() {
+		t.Fatalf("template file missing or not a file: %s (%v)", tmplPath, err)
+	}
+}

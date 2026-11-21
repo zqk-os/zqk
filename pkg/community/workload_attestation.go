@@ -183,7 +183,7 @@ func (a *WorkloadAttestor) RegisterHost(identity HostIdentity) error {
 
 // IssueChallenge mints a monotonic, nonce-chained attestation challenge for a registered host.
 func (a *WorkloadAttestor) IssueChallenge(hostID, taskID string) (*AttestationChallenge, error) {
-	if err := validateNonBlankFields([]blankFieldCheck{
+	if err := validateNonBlankFields([]attestationFieldCheck{
 		{value: hostID, label: "host_id"},
 		{value: taskID, label: "task_id"},
 	}, ErrInvalidHostIdentity); err != nil {
@@ -239,7 +239,7 @@ func (a *WorkloadAttestor) AttestWorkload(challenge *AttestationChallenge, paylo
 	if challenge == nil {
 		return nil, fmt.Errorf("%w: challenge cannot be nil", ErrStaleOrReplayedNonce)
 	}
-	if err := validateNonBlankFields([]blankFieldCheck{
+	if err := validateNonBlankFields([]attestationFieldCheck{
 		{value: challenge.ChallengeID, label: "challenge_id"},
 		{value: challenge.HostID, label: "host_id"},
 		{value: challenge.Nonce, label: "nonce"},
@@ -297,7 +297,7 @@ func (a *WorkloadAttestor) VerifyReceipt(receipt *AttestationReceipt, payload Wo
 	if receipt == nil {
 		return fmt.Errorf("%w: receipt cannot be nil", ErrInvalidAttestationSignature)
 	}
-	if err := validateNonBlankFields([]blankFieldCheck{
+	if err := validateNonBlankFields([]attestationFieldCheck{
 		{value: receipt.ReceiptID, label: "receipt_id"},
 		{value: receipt.HostID, label: "host_id"},
 		{value: receipt.TaskID, label: "task_id"},
@@ -533,12 +533,12 @@ func hashStringsSHA256(parts ...string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-type blankFieldCheck struct {
+type attestationFieldCheck struct {
 	value string
 	label string
 }
 
-func validateNonBlankFields(checks []blankFieldCheck, sentinel error) error {
+func validateNonBlankFields(checks []attestationFieldCheck, sentinel error) error {
 	for _, c := range checks {
 		if err := strutil.ErrorOnBlank(c.value, "%w: %s cannot be blank", sentinel, c.label); err != nil {
 			return err
@@ -553,12 +553,4 @@ func randomBytes(n int) ([]byte, error) {
 		return nil, err
 	}
 	return buf, nil
-}
-
-func randomHex(n int) (string, error) {
-	b, err := randomBytes(n)
-	if err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(b), nil
 }

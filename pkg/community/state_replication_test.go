@@ -16,9 +16,9 @@ const (
 	testKeyAlpha     = "key-alpha"
 	testKeyBeta      = "key-beta"
 	testKeyGamma     = "key-gamma"
-	testValOne       = "value-one"
-	testValTwo       = "value-two"
-	testValThree     = "val-three"
+	testRepValOne    = "value-one"
+	testRepValTwo    = "value-two"
+	testRepValThree  = "val-three"
 	testValCorrupted = "corrupted-val"
 	testSnapID       = "snap-manual-1"
 )
@@ -89,13 +89,13 @@ func TestStateReplication_ConfigAndSchemaValidation(t *testing.T) {
 		t.Fatal("expected error for blank leaderID")
 	}
 
-	if _, err := NewLogEntry(0, OpSet, testKeyAlpha, testValOne); err == nil {
+	if _, err := NewLogEntry(0, OpSet, testKeyAlpha, testRepValOne); err == nil {
 		t.Fatal("expected error for sequence 0")
 	}
-	if _, err := NewLogEntry(1, TransitionOp("noop"), testKeyAlpha, testValOne); err == nil {
+	if _, err := NewLogEntry(1, TransitionOp("noop"), testKeyAlpha, testRepValOne); err == nil {
 		t.Fatal("expected error for unsupported op")
 	}
-	if _, err := NewLogEntry(1, OpSet, "  ", testValOne); err == nil {
+	if _, err := NewLogEntry(1, OpSet, "  ", testRepValOne); err == nil {
 		t.Fatal("expected error for blank key")
 	}
 }
@@ -103,8 +103,8 @@ func TestStateReplication_ConfigAndSchemaValidation(t *testing.T) {
 func TestStateReplication_MonotonicAndIdempotentApply(t *testing.T) {
 	replica := mustNewReplica(t, testReplicaSolo, mustReplicationConfig(4, 8))
 
-	e1 := mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testValOne)
-	e2 := mustNewLogEntry(t, 2, OpSet, testKeyBeta, testValTwo)
+	e1 := mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testRepValOne)
+	e2 := mustNewLogEntry(t, 2, OpSet, testKeyBeta, testRepValTwo)
 	e3 := mustNewLogEntry(t, 3, OpDelete, testKeyAlpha, "")
 
 	mustApplyEntry(t, replica, e1, true)
@@ -118,8 +118,8 @@ func TestStateReplication_MonotonicAndIdempotentApply(t *testing.T) {
 	if val, ok := replica.Get(testKeyAlpha); ok {
 		t.Fatalf("expected %s deleted, got %q", testKeyAlpha, val)
 	}
-	if val, ok := replica.Get(testKeyBeta); !ok || val != testValTwo {
-		t.Fatalf("Get(%s)=(%q, %v), want (%q, true)", testKeyBeta, val, ok, testValTwo)
+	if val, ok := replica.Get(testKeyBeta); !ok || val != testRepValTwo {
+		t.Fatalf("Get(%s)=(%q, %v), want (%q, true)", testKeyBeta, val, ok, testRepValTwo)
 	}
 
 	conflicting := mustNewLogEntry(t, 2, OpSet, testKeyBeta, testValCorrupted)
@@ -131,14 +131,14 @@ func TestStateReplication_MonotonicAndIdempotentApply(t *testing.T) {
 
 func TestStateReplication_DeterministicMerkleRoot(t *testing.T) {
 	stateA := map[string]string{
-		testKeyAlpha: testValOne,
-		testKeyBeta:  testValTwo,
-		testKeyGamma: testValThree,
+		testKeyAlpha: testRepValOne,
+		testKeyBeta:  testRepValTwo,
+		testKeyGamma: testRepValThree,
 	}
 	stateB := map[string]string{
-		testKeyGamma: testValThree,
-		testKeyAlpha: testValOne,
-		testKeyBeta:  testValTwo,
+		testKeyGamma: testRepValThree,
+		testKeyAlpha: testRepValOne,
+		testKeyBeta:  testRepValTwo,
 	}
 	rootA := ComputeMerkleRoot(stateA)
 	rootB := ComputeMerkleRoot(stateB)
@@ -147,9 +147,9 @@ func TestStateReplication_DeterministicMerkleRoot(t *testing.T) {
 	}
 
 	stateC := map[string]string{
-		testKeyAlpha: testValOne,
+		testKeyAlpha: testRepValOne,
 		testKeyBeta:  testValCorrupted,
-		testKeyGamma: testValThree,
+		testKeyGamma: testRepValThree,
 	}
 	if ComputeMerkleRoot(stateC) == rootA {
 		t.Fatal("expected distinct merkle root when value changes")
@@ -249,8 +249,8 @@ func TestStateReplication_ConcurrentReplication(t *testing.T) {
 
 func TestStateReplication_CorruptedAndStaleSnapshotRejection(t *testing.T) {
 	replica := mustNewReplica(t, testReplicaSolo, mustReplicationConfig(2, 4))
-	mustApplyEntry(t, replica, mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testValOne), true)
-	mustApplyEntry(t, replica, mustNewLogEntry(t, 2, OpSet, testKeyBeta, testValTwo), true)
+	mustApplyEntry(t, replica, mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testRepValOne), true)
+	mustApplyEntry(t, replica, mustNewLogEntry(t, 2, OpSet, testKeyBeta, testRepValTwo), true)
 
 	snap, err := replica.ExportSnapshot()
 	if err != nil {
@@ -269,7 +269,7 @@ func TestStateReplication_CorruptedAndStaleSnapshotRejection(t *testing.T) {
 		t.Fatal("expected error when snapshot state does not match merkle root")
 	}
 
-	staleState := map[string]string{testKeyAlpha: testValOne}
+	staleState := map[string]string{testKeyAlpha: testRepValOne}
 	staleSnap := MerkleSnapshot{
 		SnapshotID:    testSnapID,
 		Sequence:      1,
@@ -292,7 +292,7 @@ func TestStateReplication_DivergenceDetectionAndQuarantine(t *testing.T) {
 	evilEntry := mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testValCorrupted)
 	mustApplyEntry(t, diverging, evilEntry, true)
 
-	goodEntry := mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testValOne)
+	goodEntry := mustNewLogEntry(t, 1, OpSet, testKeyAlpha, testRepValOne)
 	leader, err := cluster.GetReplica(testLeaderID)
 	if err != nil {
 		t.Fatalf("GetReplica(%s) failed: %v", testLeaderID, err)
@@ -309,19 +309,19 @@ func TestStateReplication_DivergenceDetectionAndQuarantine(t *testing.T) {
 	if len(cluster.QuarantinedReports()) != 1 {
 		t.Fatalf("expected 1 quarantined report in cluster")
 	}
-	if _, err := diverging.Apply(mustNewLogEntry(t, 2, OpSet, testKeyBeta, testValTwo)); err == nil {
+	if _, err := diverging.Apply(mustNewLogEntry(t, 2, OpSet, testKeyBeta, testRepValTwo)); err == nil {
 		t.Fatal("expected quarantined replica to reject Apply")
 	}
 }
 
 func TestStateReplication_GapAndCompactedRangeRejection(t *testing.T) {
 	replica := mustNewReplica(t, testReplicaSolo, mustReplicationConfig(2, 3))
-	if _, err := replica.Apply(mustNewLogEntry(t, 2, OpSet, testKeyAlpha, testValOne)); err == nil {
+	if _, err := replica.Apply(mustNewLogEntry(t, 2, OpSet, testKeyAlpha, testRepValOne)); err == nil {
 		t.Fatal("expected error for gap sequence 2 when appliedSeq is 0")
 	}
 
 	for i := uint64(1); i <= 4; i++ {
-		mustApplyEntry(t, replica, mustNewLogEntry(t, i, OpSet, fmt.Sprintf("k-%d", i), testValOne), true)
+		mustApplyEntry(t, replica, mustNewLogEntry(t, i, OpSet, fmt.Sprintf("k-%d", i), testRepValOne), true)
 	}
 	report, err := replica.Compact()
 	if err != nil {
@@ -330,7 +330,7 @@ func TestStateReplication_GapAndCompactedRangeRejection(t *testing.T) {
 	if report.CompactedUpTo != 2 {
 		t.Fatalf("CompactedUpTo=%d, want 2", report.CompactedUpTo)
 	}
-	if _, err := replica.Apply(mustNewLogEntry(t, 2, OpSet, "k-2", testValOne)); err == nil {
+	if _, err := replica.Apply(mustNewLogEntry(t, 2, OpSet, "k-2", testRepValOne)); err == nil {
 		t.Fatal("expected error for sequence within compacted range")
 	}
 }

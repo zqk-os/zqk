@@ -78,6 +78,7 @@ var createdJobInfo = map[string]struct {
 	"SCH-pre-commit-integrity":    {"created pre-commit integrity job (SCH-pre-commit-integrity)", func(r *EnsureRetentionJobsResult) { r.PreCommitIntegrityJobCreated = true }},
 	"SCH-cleanup":                 {"created cleanup job (SCH-cleanup)", nil},
 	"SCH-dce-tick":                {"created data_cell_envelope_tick job (SCH-dce-tick)", nil},
+	"SCH-resource-hygiene":        {"created resource_hygiene job (SCH-resource-hygiene)", nil},
 }
 
 // NewEnsureRetentionJobsCmd creates the ensure-retention-jobs command.

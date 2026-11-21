@@ -10,7 +10,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/x509"
-	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -93,13 +92,6 @@ func issueAndVerifyWorkload(t *testing.T, attestor *WorkloadAttestor, hostID, ta
 		t.Fatalf("VerifyReceipt(%s, %s) failed: %v", hostID, taskID, err)
 	}
 	return ch, receipt
-}
-
-func assertErrorIs(t *testing.T, got, want error, label string) {
-	t.Helper()
-	if !errors.Is(got, want) {
-		t.Fatalf("%s: expected error %v, got %v", label, want, got)
-	}
 }
 
 func TestWorkloadAttestation_StaticFloorInvariant(t *testing.T) {

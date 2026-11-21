@@ -35,13 +35,6 @@ func registerAndIssueToken(t *testing.T, mgr *TenantNamespaceManager, tenantID, 
 	return token
 }
 
-func assertErrorIs(t *testing.T, err, target error, context string) {
-	t.Helper()
-	if !errors.Is(err, target) {
-		t.Fatalf("%s: expected error %v, got %v", context, target, err)
-	}
-}
-
 func TestTenantNamespace_StaticFloorInvariant(t *testing.T) {
 	mgr := newTestNamespaceManager(t)
 

@@ -465,11 +465,13 @@ func (s *Scheduler) executeJob(ctx context.Context, job *ScheduledJob, handler J
 		if s.metrics != nil {
 			s.metrics.RecordConflictDetected(job.ID, job.JobType)
 		}
-		// Non-concurrent run_wrappers (e.g. maintenance scripts) serialize globally; timer fires that
-		// lose the slot used to drop silently with no retry. Record dispatch pressure and re-enqueue
-		// like package-concurrency / dispatch-deadline drops so the trigger queue retries.
+		// Non-concurrent run_wrappers (e.g. maintenance scripts) serialize globally; re-enqueue
+		// non-timer triggers on conflict drop. Timer jobs are NOT re-enqueued because their next
+		// periodic cron tick will trigger them without creating trigger-queue churn.
 		s.recordDispatchAttemptDropped("execute_job", jobExecReasonConflict, job)
-		s.reenqueueTriggerAfterDispatchDrop(job, jobExecReasonConflict)
+		if job.TriggerType != TriggerTypeTimer {
+			s.reenqueueTriggerAfterDispatchDrop(job, jobExecReasonConflict)
+		}
 		SchedulerJobExecutionLog(s.logger).Debug(LogEventSchedulerJobExecSkippingConflict).
 			JobID(job.ID).
 			SchedulerJobType(job.JobType).

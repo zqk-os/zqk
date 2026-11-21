@@ -87,7 +87,7 @@ func mustAdvanceToView(t *testing.T, coord *ElectionCoordinator, voters []string
 	return finalCert
 }
 
-func assertErrorIs(t *testing.T, err, want error) {
+func assertBFTErrorIs(t *testing.T, err, want error) {
 	t.Helper()
 	if !errors.Is(err, want) {
 		t.Fatalf(testErrExpectedGot, want, err)
@@ -155,7 +155,7 @@ func verifyInvalidElectionConfigs(t *testing.T) {
 	}
 	for _, tc := range cases {
 		coord, err := NewElectionCoordinator(tc.cfg)
-		assertErrorIs(t, err, tc.want)
+		assertBFTErrorIs(t, err, tc.want)
 		if coord != nil {
 			t.Fatalf("%s: expected nil coordinator", tc.name)
 		}
@@ -303,7 +303,7 @@ func verifyConcurrentClaimSubmission(t *testing.T) {
 		t.Fatalf("expected at least one NewViewCertificate, got 0 (errs=%v)", errs)
 	}
 	for _, err := range errs {
-		assertErrorIs(t, err, ErrStaleViewClaim)
+		assertBFTErrorIs(t, err, ErrStaleViewClaim)
 	}
 }
 
@@ -314,7 +314,7 @@ func TestByzantineLeaderElection_NegativeAdversarialBoundary(t *testing.T) {
 			t.Fatalf("expected nil cert on minority quorum, got %+v", cert)
 		}
 		cert, err := coord.TryFormNewViewCertificate(1)
-		assertErrorIs(t, err, ErrInsufficientViewQuorum)
+		assertBFTErrorIs(t, err, ErrInsufficientViewQuorum)
 		if cert != nil {
 			t.Fatalf("expected nil cert, got %+v", cert)
 		}
@@ -327,9 +327,9 @@ func TestByzantineLeaderElection_NegativeAdversarialBoundary(t *testing.T) {
 		coord := mustNewCoordinator(t, defaultTestValidators(), 1)
 		mustAdvanceToView(t, coord, []string{testValOne, testValTwo, testValThree}, 1)
 
-		assertErrorIs(t, coord.AssertLeader(1, testValOne), ErrSplitBrainLeaderConflict)
+		assertBFTErrorIs(t, coord.AssertLeader(1, testValOne), ErrSplitBrainLeaderConflict)
 		lease, err := coord.IssueLeaderLease(1, testValFour, fixedTestTime())
-		assertErrorIs(t, err, ErrSplitBrainLeaderConflict)
+		assertBFTErrorIs(t, err, ErrSplitBrainLeaderConflict)
 		if lease != nil {
 			t.Fatalf("expected nil lease on split-brain conflict, got %+v", lease)
 		}
@@ -347,7 +347,7 @@ func TestByzantineLeaderElection_NegativeAdversarialBoundary(t *testing.T) {
 func assertClaimRejected(t *testing.T, coord *ElectionCoordinator, claim ViewChangeClaim, want error) {
 	t.Helper()
 	_, err := coord.SubmitViewChangeClaim(claim)
-	assertErrorIs(t, err, want)
+	assertBFTErrorIs(t, err, want)
 }
 
 func verifyStaleAndForgedClaims(t *testing.T) {
@@ -412,6 +412,6 @@ func verifyInvalidConvergenceCertificates(t *testing.T) {
 	for _, tc := range cases {
 		tampered := *cert
 		tc.mutate(&tampered)
-		assertErrorIs(t, lagging.ConvergeToCertificate(tampered), tc.want)
+		assertBFTErrorIs(t, lagging.ConvergeToCertificate(tampered), tc.want)
 	}
 }

@@ -106,8 +106,7 @@ func (s *WorkerSupervisor) RegisterWorker(spec WorkerProcessSpec) error {
 	return nil
 }
 
-// RecordHeartbeat refreshes the last heartbeat timestamp for a worker.
-func (s *WorkerSupervisor) RecordHeartbeat(workerID string) error {
+func (s *WorkerSupervisor) withActiveWorker(workerID string, fn func(w *SupervisedWorker) error) error {
 	if err := strutil.ErrorOnBlank(workerID, "%w: worker_id is required", ErrBlankWorkerID); err != nil {
 		return err
 	}
@@ -122,13 +121,19 @@ func (s *WorkerSupervisor) RecordHeartbeat(workerID string) error {
 	if w.Status == WorkerStatusQuarantined {
 		return ErrWorkerQuarantined
 	}
+	return fn(w)
+}
 
-	w.LastHeartbeat = time.Now()
-	if w.Status == WorkerStatusDegraded || w.Status == WorkerStatusRestarting {
-		w.Status = WorkerStatusHealthy
-		w.CrashCount = 0
-	}
-	return nil
+// RecordHeartbeat refreshes the last heartbeat timestamp for a worker.
+func (s *WorkerSupervisor) RecordHeartbeat(workerID string) error {
+	return s.withActiveWorker(workerID, func(w *SupervisedWorker) error {
+		w.LastHeartbeat = time.Now()
+		if w.Status == WorkerStatusDegraded || w.Status == WorkerStatusRestarting {
+			w.Status = WorkerStatusHealthy
+			w.CrashCount = 0
+		}
+		return nil
+	})
 }
 
 // EvaluateHealth inspects all workers against current time, updating status.
@@ -151,38 +156,30 @@ func (s *WorkerSupervisor) EvaluateHealth(now time.Time) []string {
 
 // ReportCrash handles worker crash events and calculates exponential restart backoff.
 func (s *WorkerSupervisor) ReportCrash(workerID string, now time.Time) (time.Duration, error) {
-	if err := strutil.ErrorOnBlank(workerID, "%w: worker_id is required", ErrBlankWorkerID); err != nil {
-		return 0, err
-	}
+	var backoff time.Duration
+	err := s.withActiveWorker(workerID, func(w *SupervisedWorker) error {
+		w.CrashCount++
+		if w.CrashCount >= w.Spec.MaxCrashLimit {
+			w.Status = WorkerStatusQuarantined
+			return ErrWorkerQuarantined
+		}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+		// Exponential backoff: base * 2^(crashCount - 1)
+		shift := w.CrashCount - 1
+		if shift > 30 {
+			shift = 30
+		}
+		backoff = w.Spec.BaseBackoff * time.Duration(1<<shift)
+		if backoff > w.Spec.MaxBackoff {
+			backoff = w.Spec.MaxBackoff
+		}
 
-	w, exists := s.workers[workerID]
-	if !exists {
-		return 0, ErrWorkerNotFound
-	}
-	if w.Status == WorkerStatusQuarantined {
-		return 0, ErrWorkerQuarantined
-	}
-
-	w.CrashCount++
-	if w.CrashCount >= w.Spec.MaxCrashLimit {
-		w.Status = WorkerStatusQuarantined
-		return 0, ErrWorkerQuarantined
-	}
-
-	// Exponential backoff: base * 2^(crashCount - 1)
-	multiplier := 1 << (w.CrashCount - 1)
-	backoff := w.Spec.BaseBackoff * time.Duration(multiplier)
-	if backoff > w.Spec.MaxBackoff {
-		backoff = w.Spec.MaxBackoff
-	}
-
-	w.Status = WorkerStatusRestarting
-	w.RestartCount++
-	w.NextRestartAt = now.Add(backoff)
-	return backoff, nil
+		w.Status = WorkerStatusRestarting
+		w.RestartCount++
+		w.NextRestartAt = now.Add(backoff)
+		return nil
+	})
+	return backoff, err
 }
 
 // GetWorkerStatus returns a snapshot of a worker's supervised state.

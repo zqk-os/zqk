@@ -819,11 +819,12 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 		}
 
 		inCache := scheduler.JobInCache(request.JobID)
+		if !inCache && scheduler.AdmitJobFromStorage(ctx, request.JobID) {
+			inCache = true
+		}
 		if !inCache && !didReloadForBatch {
-			// Reload jobs once per batch so newly created jobs (SCH-AUTOFIX-*, SCH-run-*, etc.) are visible.
-			// ReloadJobs repopulates cron from storage so timer jobs are preserved.
-			// SCH-run-* must use the same path: previously we set didReloadForBatch without reload, which
-			// left the cache stale and dropped bulk test-bundle triggers (CAS index lag after bulk job create).
+			// Fall back to full ReloadJobs once per batch if single-job AdmitJobFromStorage missed
+			// (e.g. CAS index lag after cross-process bulk job create).
 			scheduler.EmitTriggerQueueEvent(map[string]any{
 				objects.FieldKeyEventType: "trigger_queue_reload_retry",
 				"message":                 "Job not in scheduler cache, reloading jobs from storage then retrying trigger",
@@ -867,10 +868,6 @@ func (q *JobTriggerQueue) drainAndProcessTriggerBatch(ctx context.Context, sched
 			}
 		} else if !inCache && didReloadForBatch {
 			scheduler.RecordTriggerQueueReloadRetry(request.JobID)
-		}
-
-		if !inCache && scheduler.AdmitJobFromStorage(ctx, request.JobID) {
-			inCache = true
 		}
 
 		if !inCache {
