@@ -19,8 +19,8 @@ const (
 )
 
 var (
-	// ErrInvalidThreshold indicates a similarity threshold outside (0, 1].
-	ErrInvalidThreshold = errors.New("similarity threshold must be finite and in (0, 1]")
+	// ErrInvalidSimilarityThreshold indicates a similarity threshold outside (0, 1].
+	ErrInvalidSimilarityThreshold = errors.New("similarity threshold must be finite and in (0, 1]")
 	// ErrInvalidWeights indicates negative, non-finite, or zero-sum similarity weights.
 	ErrInvalidWeights = errors.New("similarity weights must be finite, non-negative, and sum > 0")
 	// ErrNonFiniteEmbedding indicates NaN or Inf values inside a semantic embedding vector.
@@ -102,10 +102,10 @@ func ValidateSemanticEntity(entity SemanticEntity) error {
 // ValidateDedupConfig enforces normalized similarity threshold bounds and valid scoring weights.
 func ValidateDedupConfig(cfg DedupConfig) error {
 	if math.IsNaN(cfg.SimilarityThreshold) || math.IsInf(cfg.SimilarityThreshold, 0) {
-		return ErrInvalidThreshold
+		return ErrInvalidSimilarityThreshold
 	}
 	if cfg.SimilarityThreshold <= 0.0 || cfg.SimilarityThreshold > 1.0 {
-		return ErrInvalidThreshold
+		return ErrInvalidSimilarityThreshold
 	}
 	if math.IsNaN(cfg.CosineWeight) || math.IsInf(cfg.CosineWeight, 0) || cfg.CosineWeight < 0 {
 		return ErrInvalidWeights

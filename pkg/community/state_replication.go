@@ -190,8 +190,8 @@ func (s MerkleSnapshot) Validate() error {
 	return nil
 }
 
-// CompactionReport summarizes a sliding-window log compaction pass on a replica.
-type CompactionReport struct {
+// ReplicationCompactionReport summarizes a sliding-window log compaction pass on a replica.
+type ReplicationCompactionReport struct {
 	ReplicaID        string `json:"replica_id"`
 	CompactedUpTo    uint64 `json:"compacted_up_to"`
 	RetainedFrom     uint64 `json:"retained_from"`
@@ -287,15 +287,15 @@ func (r *StateReplica) applyTransitionLocked(entry LogEntry) {
 }
 
 // Compact trims log entries older than the configured sliding TailWindow and records a snapshot.
-func (r *StateReplica) Compact() (CompactionReport, error) {
+func (r *StateReplica) Compact() (ReplicationCompactionReport, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if r.status == ReplicaQuarantined {
-		return CompactionReport{}, fmt.Errorf(errReplicaQuar, r.nodeID)
+		return ReplicationCompactionReport{}, fmt.Errorf(errReplicaQuar, r.nodeID)
 	}
 	if len(r.log) <= r.cfg.TailWindow {
-		return r.buildNoopCompactionReportLocked(), nil
+		return r.buildNoopReplicationCompactionReportLocked(), nil
 	}
 
 	cutIdx := len(r.log) - r.cfg.TailWindow
@@ -309,7 +309,7 @@ func (r *StateReplica) Compact() (CompactionReport, error) {
 
 	snap := r.buildSnapshotLocked()
 	r.latestSnapshot = &snap
-	return CompactionReport{
+	return ReplicationCompactionReport{
 		ReplicaID:        r.nodeID,
 		CompactedUpTo:    r.compactedUpTo,
 		RetainedFrom:     r.log[0].Sequence,
@@ -320,12 +320,12 @@ func (r *StateReplica) Compact() (CompactionReport, error) {
 	}, nil
 }
 
-func (r *StateReplica) buildNoopCompactionReportLocked() CompactionReport {
+func (r *StateReplica) buildNoopReplicationCompactionReportLocked() ReplicationCompactionReport {
 	var retainedFrom uint64
 	if len(r.log) > 0 {
 		retainedFrom = r.log[0].Sequence
 	}
-	return CompactionReport{
+	return ReplicationCompactionReport{
 		ReplicaID:     r.nodeID,
 		CompactedUpTo: r.compactedUpTo,
 		RetainedFrom:  retainedFrom,
@@ -558,7 +558,7 @@ func (c *ReplicationCluster) ProposeAndReplicate(op TransitionOp, key, value str
 }
 
 // CompactAll runs sliding-window compaction on all active replicas whose log exceeds CompactionThreshold.
-func (c *ReplicationCluster) CompactAll() ([]CompactionReport, error) {
+func (c *ReplicationCluster) CompactAll() ([]ReplicationCompactionReport, error) {
 	c.mu.RLock()
 	ids := make([]string, 0, len(c.replicas))
 	for id := range c.replicas {
@@ -567,7 +567,7 @@ func (c *ReplicationCluster) CompactAll() ([]CompactionReport, error) {
 	sort.Strings(ids)
 	c.mu.RUnlock()
 
-	reports := make([]CompactionReport, 0, len(ids))
+	reports := make([]ReplicationCompactionReport, 0, len(ids))
 	for _, id := range ids {
 		replica, err := c.GetReplica(id)
 		if err != nil || replica.Status() == ReplicaQuarantined {
