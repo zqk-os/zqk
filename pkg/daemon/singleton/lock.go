@@ -2,7 +2,6 @@ package singleton
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +11,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"github.com/zqk-os/zqk/pkg/utils/syscallutil"
 )
@@ -53,11 +53,11 @@ func LockFilePath(projectRoot string, daemonName string) string {
 // If another instance of the daemon is already running, it returns *ErrDaemonAlreadyRunning.
 // Invariant: only a single instance of any particular daemon may run per project root.
 func AcquireDaemonLock(projectRoot string, daemonName string) (*DaemonLock, error) {
-	if strings.TrimSpace(projectRoot) == "" {
-		return nil, errors.New("project root cannot be empty")
+	if err := strutil.ErrorOnBlank(projectRoot, "project root cannot be empty"); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(daemonName) == "" {
-		return nil, errors.New("daemon name cannot be empty")
+	if err := strutil.ErrorOnBlank(daemonName, "daemon name cannot be empty"); err != nil {
+		return nil, err
 	}
 
 	cleanRoot := filepath.Clean(projectRoot)

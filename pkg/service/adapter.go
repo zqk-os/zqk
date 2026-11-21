@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 // Standard error sentinels for service management operations.
@@ -84,13 +85,10 @@ type ServiceSpec struct {
 
 // Validate verifies that required invariants of the ServiceSpec are satisfied.
 func (s ServiceSpec) Validate() error {
-	if strings.TrimSpace(s.ID) == "" {
-		return fmt.Errorf("%w: missing required service ID", ErrInvalidSpec)
+	if err := strutil.ErrorOnBlank(s.ID, "%w: missing required service ID", ErrInvalidSpec); err != nil {
+		return err
 	}
-	if strings.TrimSpace(s.Executable) == "" {
-		return fmt.Errorf("%w: missing required executable path", ErrInvalidSpec)
-	}
-	return nil
+	return strutil.ErrorOnBlank(s.Executable, "%w: missing required executable path", ErrInvalidSpec)
 }
 
 // ServiceStatus reports the live operational state of a managed service.

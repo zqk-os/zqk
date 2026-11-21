@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
@@ -119,17 +120,17 @@ func LoadManifestFile(filePath string) (*SwarmPackage, error) {
 
 // ValidateManifest checks the semantic integrity of the swarm package.
 func ValidateManifest(pkg *SwarmPackage) error {
-	if strings.TrimSpace(pkg.Name) == "" {
-		return fmt.Errorf("swarm package name is required")
+	if err := strutil.ErrorOnBlank(pkg.Name, "swarm package name is required"); err != nil {
+		return err
 	}
-	if strings.TrimSpace(pkg.Version) == "" {
-		return fmt.Errorf("swarm package version is required")
+	if err := strutil.ErrorOnBlank(pkg.Version, "swarm package version is required"); err != nil {
+		return err
 	}
 	if _, err := ParseSemVer(pkg.Version); err != nil {
 		return fmt.Errorf("swarm package version invalid: %w", err)
 	}
-	if strings.TrimSpace(pkg.Description) == "" {
-		return fmt.Errorf("swarm package description is required")
+	if err := strutil.ErrorOnBlank(pkg.Description, "swarm package description is required"); err != nil {
+		return err
 	}
 
 	hasAgents := len(pkg.Agents) > 0
@@ -141,11 +142,11 @@ func ValidateManifest(pkg *SwarmPackage) error {
 	}
 
 	for i, a := range pkg.Agents {
-		if strings.TrimSpace(a.Name) == "" {
-			return fmt.Errorf("agent[%d] name is required", i)
+		if err := strutil.ErrorOnBlank(a.Name, "agent[%d] name is required", i); err != nil {
+			return err
 		}
-		if strings.TrimSpace(a.Role) == "" {
-			return fmt.Errorf("agent[%d] role is required", i)
+		if err := strutil.ErrorOnBlank(a.Role, "agent[%d] role is required", i); err != nil {
+			return err
 		}
 	}
 
@@ -157,8 +158,8 @@ func ValidateManifest(pkg *SwarmPackage) error {
 	}
 
 	for i, m := range pkg.Membranes {
-		if strings.TrimSpace(m.Path) == "" {
-			return fmt.Errorf("membrane[%d] path is required", i)
+		if err := strutil.ErrorOnBlank(m.Path, "membrane[%d] path is required", i); err != nil {
+			return err
 		}
 		mode := strings.ToLower(strings.TrimSpace(m.Mode))
 		if mode != "read_only" && mode != "disallow" && mode != "audit_log" {
