@@ -307,18 +307,21 @@ func (a *RSAAccumulator) Add(element string) error {
 	if err != nil {
 		return err
 	}
+	a.addPrime(element, prime)
+	return nil
+}
 
+func (a *RSAAccumulator) addPrime(element string, prime *big.Int) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
 	if _, exists := a.elements[element]; exists {
-		return nil
+		return
 	}
 
 	a.elements[element] = prime
 	a.current = new(big.Int).Exp(a.current, prime, a.modulus)
 	a.epoch++
-	return nil
 }
 
 // GenerateMembershipWitness constructs a succinct RSA membership witness

@@ -50,17 +50,10 @@ func (r *CommandCheckRunner) Run(ctx context.Context, repoRoot string, entry *Fi
 		}, nil
 	}
 
-	cmd := exec.CommandContext(ctx, parts[0], parts[1:]...)
-	cmd.Dir = repoRoot
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
+	combinedOutput, err := runCommandCaptured(ctx, repoRoot, parts)
 	evaluatedAt := time.Now().UTC()
 
 	if err != nil {
-		combinedOutput := strings.TrimSpace(stdout.String() + "\n" + stderr.String())
 		return CheckResult{
 			CheckID:      r.CheckID,
 			Status:       CheckStatusFailed,
@@ -86,4 +79,15 @@ func (r *CommandCheckRunner) Run(ctx context.Context, repoRoot string, entry *Fi
 		EvaluatedAt:  evaluatedAt,
 		Feedback:     fmt.Sprintf("Command %q completed successfully", cmdStr),
 	}, nil
+}
+
+func runCommandCaptured(ctx context.Context, dir string, args []string) (string, error) {
+	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
+	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	cmd.Dir = dir
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
+	err := cmd.Run()
+	return strings.TrimSpace(stdout.String() + "\n" + stderr.String()), err
 }
