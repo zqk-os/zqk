@@ -258,13 +258,24 @@ func (e *PipelineTelemetryEngine) GetConvergenceMatrix() *ConvergenceTrackingMat
 	return matrix
 }
 
-// ExportMetricEvents converts recorded pipeline metrics into standard community MetricEvent structures.
-func (e *PipelineTelemetryEngine) ExportMetricEvents(clusterHash string) []MetricEvent {
+func withTelemetryReadLock[T any](e *PipelineTelemetryEngine, fn func() T) T {
 	if e == nil {
-		return nil
+		var zero T
+		return zero
 	}
 	e.mu.RLock()
 	defer e.mu.RUnlock()
+	return fn()
+}
+
+// ExportMetricEvents converts recorded pipeline metrics into standard community MetricEvent structures.
+func (e *PipelineTelemetryEngine) ExportMetricEvents(clusterHash string) []MetricEvent {
+	return withTelemetryReadLock(e, func() []MetricEvent {
+		return e.exportMetricEventsLocked(clusterHash)
+	})
+}
+
+func (e *PipelineTelemetryEngine) exportMetricEventsLocked(clusterHash string) []MetricEvent {
 
 	events := make([]MetricEvent, 0, len(e.metrics))
 	for idx, m := range e.metrics {

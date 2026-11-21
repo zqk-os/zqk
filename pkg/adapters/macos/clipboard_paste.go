@@ -82,44 +82,53 @@ func (a *ClipboardPasteAdapter) resolveTargetApp(renderDetails map[string]string
 	return defaultPasteTargetApp
 }
 
+func writeAppleScriptLines(b *strings.Builder, lines ...string) {
+	for _, line := range lines {
+		b.WriteString(line)
+		b.WriteByte('\n')
+	}
+}
+
 func focusedPasteAppleScript(targetApp string) string {
 	app := appleScriptQuoted(targetApp)
 	termList := appleScriptQuotedList([]string{
 		"Terminal", "iTerm2", "iTerm", "Alacritty", "Warp", "Ghostty", "kitty", "Hyper", "WezTerm",
 	})
 	var b strings.Builder
-	b.WriteString(`set zqkWant to ` + app + "\n")
-	b.WriteString(`set zqkGot to false` + "\n")
-	b.WriteString(`repeat 30 times` + "\n")
-	b.WriteString(`	tell application zqkWant to activate` + "\n")
-	b.WriteString(`	delay 0.08` + "\n")
-	b.WriteString(`	tell application "System Events" to set zqkFM to name of first application process whose frontmost is true` + "\n")
-	b.WriteString(`	if zqkFM is zqkWant then` + "\n")
-	b.WriteString(`		set zqkGot to true` + "\n")
-	b.WriteString(`		exit repeat` + "\n")
-	b.WriteString(`	end if` + "\n")
-	b.WriteString(`end repeat` + "\n")
-	b.WriteString(`if zqkGot is false then` + "\n")
-	b.WriteString(`	tell application "System Events" to set zqkFM to name of first application process whose frontmost is true` + "\n")
-	b.WriteString(`	error "macos clipboard-paste: could not frontmost " & zqkWant & " (still " & zqkFM & ")"` + "\n")
-	b.WriteString(`end if` + "\n")
-	b.WriteString(`tell application "System Events"` + "\n")
-	b.WriteString(`	set zqkFM to name of first application process whose frontmost is true` + "\n")
-	b.WriteString(`	if zqkFM is not zqkWant then error "macos clipboard-paste: refuse — frontmost is " & zqkFM & " want " & zqkWant` + "\n")
-	b.WriteString(`	set zqkTermDeny to {` + termList + `}` + "\n")
-	b.WriteString(`	if zqkTermDeny contains zqkFM then error "macos clipboard-paste: refuse terminal mistarget " & zqkFM` + "\n")
-	b.WriteString(`	tell process zqkWant` + "\n")
-	b.WriteString(`		set frontmost to true` + "\n")
-	b.WriteString(`		keystroke "v" using command down` + "\n")
-	b.WriteString(`		delay 0.5` + "\n")
-	b.WriteString(`	end tell` + "\n")
-	b.WriteString(`	set zqkFM to name of first application process whose frontmost is true` + "\n")
-	b.WriteString(`	if zqkFM is not zqkWant then error "macos clipboard-paste: refuse Return — frontmost is " & zqkFM` + "\n")
-	b.WriteString(`	tell process zqkWant` + "\n")
-	b.WriteString(`		set frontmost to true` + "\n")
-	b.WriteString(`		key code 36` + "\n")
-	b.WriteString(`	end tell` + "\n")
-	b.WriteString(`end tell` + "\n")
+	writeAppleScriptLines(&b,
+		`set zqkWant to `+app,
+		`set zqkGot to false`,
+		`repeat 30 times`,
+		`	tell application zqkWant to activate`,
+		`	delay 0.08`,
+		`	tell application "System Events" to set zqkFM to name of first application process whose frontmost is true`,
+		`	if zqkFM is zqkWant then`,
+		`		set zqkGot to true`,
+		`		exit repeat`,
+		`	end if`,
+		`end repeat`,
+		`if zqkGot is false then`,
+		`	tell application "System Events" to set zqkFM to name of first application process whose frontmost is true`,
+		`	error "macos clipboard-paste: could not frontmost " & zqkWant & " (still " & zqkFM & ")"`,
+		`end if`,
+		`tell application "System Events"`,
+		`	set zqkFM to name of first application process whose frontmost is true`,
+		`	if zqkFM is not zqkWant then error "macos clipboard-paste: refuse — frontmost is " & zqkFM & " want " & zqkWant`,
+		`	set zqkTermDeny to {`+termList+`}`,
+		`	if zqkTermDeny contains zqkFM then error "macos clipboard-paste: refuse terminal mistarget " & zqkFM`,
+		`	tell process zqkWant`,
+		`		set frontmost to true`,
+		`		keystroke "v" using command down`,
+		`		delay 0.5`,
+		`	end tell`,
+		`	set zqkFM to name of first application process whose frontmost is true`,
+		`	if zqkFM is not zqkWant then error "macos clipboard-paste: refuse Return — frontmost is " & zqkFM`,
+		`	tell process zqkWant`,
+		`		set frontmost to true`,
+		`		key code 36`,
+		`	end tell`,
+		`end tell`,
+	)
 	return b.String()
 }
 
