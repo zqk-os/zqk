@@ -15,14 +15,14 @@ import (
 )
 
 const (
-	testBFTClusterID   = "cluster-bft-alpha"
-	testBFTForeignClus = "cluster-bft-foreign"
-	testBFTOriginID    = "peer-origin-01"
-	testBFTRelayAID    = "peer-relay-a"
-	testBFTRelayBID    = "peer-relay-b"
-	testBFTLeafCID     = "peer-leaf-c"
-	testBFTMsgID       = "msg-bft-001"
-	testBFTPayload     = "bft-consensus-checkpoint-state"
+	testBFTRelayClusterID = "cluster-bft-alpha"
+	testBFTForeignClus    = "cluster-bft-foreign"
+	testBFTOriginID       = "peer-origin-01"
+	testBFTRelayAID       = "peer-relay-a"
+	testBFTRelayBID       = "peer-relay-b"
+	testBFTLeafCID        = "peer-leaf-c"
+	testBFTMsgID          = "msg-bft-001"
+	testBFTPayload        = "bft-consensus-checkpoint-state"
 )
 
 type bftTestPeer struct {
@@ -55,7 +55,7 @@ func registerPeerMesh(t *testing.T, peers ...bftTestPeer) {
 			if dst.id == src.id {
 				continue
 			}
-			require.NoError(t, dst.node.RegisterPeer(src.id, testBFTClusterID, src.pub))
+			require.NoError(t, dst.node.RegisterPeer(src.id, testBFTRelayClusterID, src.pub))
 		}
 	}
 }
@@ -67,7 +67,7 @@ func TestBFTRelay_StaticFloorInvariant(t *testing.T) {
 	require.NoError(t, err)
 	baseCfg := BFTRelayConfig{
 		LocalPeerID:  testBFTOriginID,
-		ClusterID:    testBFTClusterID,
+		ClusterID:    testBFTRelayClusterID,
 		PrivateKey:   priv,
 		MaxHops:      defaultBFTRelayMaxHops,
 		DefaultTTL:   defaultBFTRelayTTL,
@@ -94,7 +94,7 @@ func TestBFTRelay_StaticFloorInvariant(t *testing.T) {
 		assert.ErrorIs(t, cfgErr, tc.wantErr, tc.name)
 	}
 
-	origin := newTestBFTPeer(t, testBFTOriginID, testBFTClusterID, defaultBFTRelayMaxHops)
+	origin := newTestBFTPeer(t, testBFTOriginID, testBFTRelayClusterID, defaultBFTRelayMaxHops)
 	validEnv, err := origin.node.CreateEnvelope(testBFTMsgID, 1, []byte(testBFTPayload))
 	require.NoError(t, err)
 	require.NoError(t, validEnv.ValidateStatic())
@@ -127,10 +127,10 @@ func TestBFTRelay_StaticFloorInvariant(t *testing.T) {
 func TestBFTRelay_OperationalDynamicProof(t *testing.T) {
 	t.Parallel()
 
-	origin := newTestBFTPeer(t, testBFTOriginID, testBFTClusterID, 4)
-	relayA := newTestBFTPeer(t, testBFTRelayAID, testBFTClusterID, 4)
-	relayB := newTestBFTPeer(t, testBFTRelayBID, testBFTClusterID, 4)
-	leafC := newTestBFTPeer(t, testBFTLeafCID, testBFTClusterID, 4)
+	origin := newTestBFTPeer(t, testBFTOriginID, testBFTRelayClusterID, 4)
+	relayA := newTestBFTPeer(t, testBFTRelayAID, testBFTRelayClusterID, 4)
+	relayB := newTestBFTPeer(t, testBFTRelayBID, testBFTRelayClusterID, 4)
+	leafC := newTestBFTPeer(t, testBFTLeafCID, testBFTRelayClusterID, 4)
 	registerPeerMesh(t, origin, relayA, relayB, leafC)
 
 	ctx := context.Background()
@@ -201,9 +201,9 @@ func TestBFTRelay_OperationalDynamicProof(t *testing.T) {
 func TestBFTRelay_NegativeAdversarialBoundary(t *testing.T) {
 	t.Parallel()
 
-	origin := newTestBFTPeer(t, testBFTOriginID, testBFTClusterID, 2)
-	relayA := newTestBFTPeer(t, testBFTRelayAID, testBFTClusterID, 2)
-	rogue := newTestBFTPeer(t, "peer-rogue-99", testBFTClusterID, 2)
+	origin := newTestBFTPeer(t, testBFTOriginID, testBFTRelayClusterID, 2)
+	relayA := newTestBFTPeer(t, testBFTRelayAID, testBFTRelayClusterID, 2)
+	rogue := newTestBFTPeer(t, "peer-rogue-99", testBFTRelayClusterID, 2)
 	registerPeerMesh(t, origin, relayA)
 
 	now := time.Now().UTC()

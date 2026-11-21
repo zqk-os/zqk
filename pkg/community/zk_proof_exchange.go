@@ -37,12 +37,12 @@ var (
 	ErrProofExpired          = errors.New("zk_exchange: proof has expired")
 )
 
-type fieldCheck struct {
+type zkFieldCheck struct {
 	val  string
 	name string
 }
 
-func validateRequiredFields(sentinel error, checks ...fieldCheck) error {
+func validateZKRequiredFields(sentinel error, checks ...zkFieldCheck) error {
 	for _, c := range checks {
 		if strutil.IsBlank(c.val) {
 			return fmt.Errorf("%w: %s is required", sentinel, c.name)
@@ -102,7 +102,7 @@ type TenantDomainBinding struct {
 
 // Validate checks static invariants of TenantDomainBinding.
 func (b TenantDomainBinding) Validate() error {
-	if err := validateRequiredFields(ErrInvalidDomainBinding, fieldCheck{val: b.SourceTenant, name: "source_tenant"}, fieldCheck{val: b.TargetTenant, name: "target_tenant"}, fieldCheck{val: b.FederationDomain, name: "federation_domain"}); err != nil {
+	if err := validateZKRequiredFields(ErrInvalidDomainBinding, zkFieldCheck{val: b.SourceTenant, name: "source_tenant"}, zkFieldCheck{val: b.TargetTenant, name: "target_tenant"}, zkFieldCheck{val: b.FederationDomain, name: "federation_domain"}); err != nil {
 		return err
 	}
 	if b.SourceTenant == b.TargetTenant {
@@ -193,7 +193,7 @@ func ComputeCommitment(witness []byte, blinding *BlindingFactor) (Commitment, er
 
 // Validate checks static invariants of Commitment.
 func (c Commitment) Validate() error {
-	if err := validateRequiredFields(ErrInvalidCommitment, fieldCheck{val: c.Scheme, name: "scheme"}, fieldCheck{val: c.Digest, name: "digest"}); err != nil {
+	if err := validateZKRequiredFields(ErrInvalidCommitment, zkFieldCheck{val: c.Scheme, name: "scheme"}, zkFieldCheck{val: c.Digest, name: "digest"}); err != nil {
 		return err
 	}
 	raw, err := hex.DecodeString(c.Digest)
@@ -231,7 +231,7 @@ type Statement struct {
 
 // Validate checks static structural invariants of Statement.
 func (s Statement) Validate() error {
-	if err := validateRequiredFields(ErrInvalidStatement, fieldCheck{val: s.StatementID, name: "statement_id"}, fieldCheck{val: s.ClaimType, name: "claim_type"}, fieldCheck{val: s.ArtifactDigest, name: "artifact_digest"}, fieldCheck{val: s.CommitmentDigest, name: "commitment_digest"}); err != nil {
+	if err := validateZKRequiredFields(ErrInvalidStatement, zkFieldCheck{val: s.StatementID, name: "statement_id"}, zkFieldCheck{val: s.ClaimType, name: "claim_type"}, zkFieldCheck{val: s.ArtifactDigest, name: "artifact_digest"}, zkFieldCheck{val: s.CommitmentDigest, name: "commitment_digest"}); err != nil {
 		return err
 	}
 	if err := s.Domain.Validate(); err != nil {
@@ -272,7 +272,7 @@ func (p *ZKProof) Validate() error {
 	if p == nil {
 		return ErrInvalidProof
 	}
-	if err := validateRequiredFields(ErrInvalidProof, fieldCheck{val: p.ProofID, name: "proof_id"}, fieldCheck{val: p.Scheme, name: "scheme"}, fieldCheck{val: p.Challenge, name: "challenge"}, fieldCheck{val: p.Response, name: "response"}); err != nil {
+	if err := validateZKRequiredFields(ErrInvalidProof, zkFieldCheck{val: p.ProofID, name: "proof_id"}, zkFieldCheck{val: p.Scheme, name: "scheme"}, zkFieldCheck{val: p.Challenge, name: "challenge"}, zkFieldCheck{val: p.Response, name: "response"}); err != nil {
 		return err
 	}
 	if err := p.Statement.Validate(); err != nil {
