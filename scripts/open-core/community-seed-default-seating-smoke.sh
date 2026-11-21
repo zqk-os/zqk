@@ -22,12 +22,17 @@ fi
 ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
 
 ZQK=""
-for cand in "$ROOT/bin/zqk" "$ROOT/bin/zqk-community"; do
-  if [[ -x "$cand" ]]; then
-    ZQK=$cand
-    break
-  fi
-done
+if [[ -n "${ZQK_BIN:-}" ]] && [[ -x "${ZQK_BIN}" ]]; then
+  ZQK="${ZQK_BIN}"
+fi
+if [[ -z "$ZQK" ]]; then
+  for cand in "$ROOT/bin/zqk" "$ROOT/bin/zqk-community"; do
+    if [[ -x "$cand" ]]; then
+      ZQK=$cand
+      break
+    fi
+  done
+fi
 if [[ -z "$ZQK" ]]; then
   echo "FAIL: missing executable bin/zqk under $ROOT" >&2
   exit 2

@@ -126,6 +126,20 @@ if [ -f "$ROOT/scripts/open-core/check-bootstrap-seed-impermeability.sh" ] && \
   fi
 fi
 
+POLICE_WORK=$(mktemp -d "${TMPDIR:-/tmp}/zqk-police-tree.XXXXXX")
+trap 'rm -rf "$POLICE_WORK" >/dev/null 2>&1 || true' EXIT HUP INT TERM
+
+# Run independent heavy sub-checks concurrently to keep total wall-clock well under
+# the Go test 10m timeout without weakening any fail-closed check.
+P_JOBS=""
+add_job() {
+  _idx=$1
+  _pid=$2
+  _msg=$3
+  printf '%s\n' "$_msg" >"$POLICE_WORK/${_idx}.msg"
+  P_JOBS="$P_JOBS ${_idx}:${_pid}"
+}
+
 # Default seating seed stranger-clean (no pack ontology leakage in personas/skills).
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — stranger default seating seed
 SEATING_SMOKE=""
@@ -135,20 +149,16 @@ elif [ -f "$(dirname "$0")/community-seed-default-seating-smoke.sh" ]; then
   SEATING_SMOKE="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/community-seed-default-seating-smoke.sh"
 fi
 if [ -n "$SEATING_SMOKE" ] && [ -d "$ROOT/scripts/default_personas" ]; then
-  if ! ZQK_COMMUNITY_ROOT="$ROOT" bash "$SEATING_SMOKE"; then
-    echo "MUST_NOT community default seating seed smoke failed"
-    FAIL=1
-  fi
+  ZQK_COMMUNITY_ROOT="$ROOT" ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$SEATING_SMOKE" >"$POLICE_WORK/1.log" 2>&1 &
+  add_job 1 "$!" "MUST_NOT community default seating seed smoke failed"
 fi
 
 # Virtual-context paging residual: stranger sessions keep local context without Studio paging deps.
 # TRACK: OPEN_CORE_PUBLIC_RELEASE_HYGIENE — community session paging
 if [ -f "$ROOT/scripts/open-core/check-community-session-paging.sh" ] && \
    { [ -d "$ROOT/pkg/sessionpaging" ] || [ -f "$ROOT/docs/strategy/open-core/CONTEXT_PAGING_DESIGN.md" ]; }; then
-  if ! sh "$ROOT/scripts/open-core/check-community-session-paging.sh" "$ROOT"; then
-    echo "MUST_NOT community session paging residual failed"
-    FAIL=1
-  fi
+  ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" sh "$ROOT/scripts/open-core/check-community-session-paging.sh" "$ROOT" >"$POLICE_WORK/2.log" 2>&1 &
+  add_job 2 "$!" "MUST_NOT community session paging residual failed"
 fi
 
 # Bounded stranger whats-next: community starter plan only, no pack ontology leakage.
@@ -160,10 +170,8 @@ elif [ -f "$(dirname "$0")/check-community-whats-next-bounded.sh" ]; then
   WN_BOUNDED="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-community-whats-next-bounded.sh"
 fi
 if [ -n "$WN_BOUNDED" ]; then
-  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$WN_BOUNDED" "$ROOT"; then
-    echo "MUST_NOT community whats-next bounded residual failed"
-    FAIL=1
-  fi
+  ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$WN_BOUNDED" "$ROOT" >"$POLICE_WORK/3.log" 2>&1 &
+  add_job 3 "$!" "MUST_NOT community whats-next bounded residual failed"
 fi
 
 # Bounded stranger feed doctor/status: HOME-isolated greenfield, no pack ontology leakage.
@@ -175,10 +183,8 @@ elif [ -f "$(dirname "$0")/check-community-doctor-bounded.sh" ]; then
   DOCTOR_BOUNDED="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-community-doctor-bounded.sh"
 fi
 if [ -n "$DOCTOR_BOUNDED" ]; then
-  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$DOCTOR_BOUNDED" "$ROOT"; then
-    echo "MUST_NOT community doctor bounded residual failed"
-    FAIL=1
-  fi
+  ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$DOCTOR_BOUNDED" "$ROOT" >"$POLICE_WORK/4.log" 2>&1 &
+  add_job 4 "$!" "MUST_NOT community doctor bounded residual failed"
 fi
 
 # Stranger MCP tools/list: HOME-isolated cell, no pack ontology getters.
@@ -190,10 +196,8 @@ elif [ -f "$(dirname "$0")/mcp-community-tools-list-smoke.sh" ]; then
   MCP_TOOLS="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/mcp-community-tools-list-smoke.sh"
 fi
 if [ -n "$MCP_TOOLS" ]; then
-  if ! ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$MCP_TOOLS" "$ROOT"; then
-    echo "MUST_NOT community MCP tools/list residual failed"
-    FAIL=1
-  fi
+  ZQK_BIN="${ZQK_BIN:-$ROOT/bin/zqk}" bash "$MCP_TOOLS" "$ROOT" >"$POLICE_WORK/5.log" 2>&1 &
+  add_job 5 "$!" "MUST_NOT community MCP tools/list residual failed"
 fi
 
 # G15: fail-closed studio kernel-ID scrub on product Go (non-test).
@@ -206,10 +210,8 @@ elif [ -f "$(dirname "$0")/check-g15-studio-id-scrub.sh" ]; then
   G15_SCRIPT="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-g15-studio-id-scrub.sh"
 fi
 if [ -n "$G15_SCRIPT" ]; then
-  if ! sh "$G15_SCRIPT" "$ROOT"; then
-    echo "MUST_NOT G15 studio-ID scrub failed"
-    FAIL=1
-  fi
+  sh "$G15_SCRIPT" "$ROOT" >"$POLICE_WORK/6.log" 2>&1 &
+  add_job 6 "$!" "MUST_NOT G15 studio-ID scrub failed"
 else
   echo "MUST_NOT missing check-g15-studio-id-scrub.sh (G15 fail-closed)"
   FAIL=1
@@ -224,10 +226,8 @@ elif [ -f "$(dirname "$0")/check-ee-packaging-boundary.sh" ]; then
   EE_SCRIPT="$(CDPATH= cd -- "$(dirname "$0")" && pwd)/check-ee-packaging-boundary.sh"
 fi
 if [ -n "$EE_SCRIPT" ]; then
-  if ! sh "$EE_SCRIPT" "$ROOT" community; then
-    echo "MUST_NOT EE packaging boundary failed"
-    FAIL=1
-  fi
+  sh "$EE_SCRIPT" "$ROOT" community >"$POLICE_WORK/7.log" 2>&1 &
+  add_job 7 "$!" "MUST_NOT EE packaging boundary failed"
 else
   echo "MUST_NOT missing check-ee-packaging-boundary.sh (EE packaging fail-closed)"
   FAIL=1
@@ -245,14 +245,28 @@ if [ "${ZQK_PAYLOAD_POLICE_GUARD:-}" = "payload" ]; then
   # Invoked from check-public-release-payload.sh; that parent already runs the scrub.
   echo "SKIP: payload TRACK/nanos scrub (parent payload gate is running it)"
 elif [ -n "$PAYLOAD_SCRIPT" ]; then
-  if ! ZQK_PAYLOAD_POLICE_GUARD=police sh "$PAYLOAD_SCRIPT" "$ROOT"; then
-    echo "MUST_NOT public-release payload TRACK/nanos scrub failed"
-    FAIL=1
-  fi
+  ZQK_PAYLOAD_POLICE_GUARD=police sh "$PAYLOAD_SCRIPT" "$ROOT" >"$POLICE_WORK/8.log" 2>&1 &
+  add_job 8 "$!" "MUST_NOT public-release payload TRACK/nanos scrub failed"
 else
   echo "MUST_NOT missing check-public-release-payload.sh (payload scrub fail-closed)"
   FAIL=1
 fi
+
+for _job in $P_JOBS; do
+  _idx=${_job%%:*}
+  _pid=${_job#*:}
+  set +e
+  wait "$_pid"
+  _rc=$?
+  set -e
+  if [ -f "$POLICE_WORK/${_idx}.log" ]; then
+    cat "$POLICE_WORK/${_idx}.log"
+  fi
+  if [ "$_rc" -ne 0 ]; then
+    cat "$POLICE_WORK/${_idx}.msg"
+    FAIL=1
+  fi
+done
 
 if [ "$FAIL" -ne 0 ]; then
   echo "POLICE: FAIL"
