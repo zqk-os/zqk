@@ -11,6 +11,7 @@ import (
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/objectidcache"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/storage"
 	"github.com/zqk-os/zqk/pkg/testenvroot"
@@ -32,11 +33,17 @@ func setupRelationalFlagsTestEnv(t *testing.T) string {
 		t.Fatalf("BootstrapRoot: %v", err)
 	}
 	t.Cleanup(func() {
+		waitCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		_ = objectidcache.WaitProjectCacheBackgroundWork(waitCtx, testRoot)
+		cancel()
 		if c, ok := coordination.GetCoordinator().(*coordination.Coordinator); ok && c != nil {
 			_ = c.Drain(5 * time.Second)
 		}
 		if teardownErr := storage.RunProjectTestTeardown(storage.TempProjectTeardown(testRoot, nil)); teardownErr != nil {
 			t.Logf("teardown error: %v", teardownErr)
+		}
+		if c, ok := coordination.GetCoordinator().(*coordination.Coordinator); ok && c != nil {
+			_ = c.Drain(5 * time.Second)
 		}
 		storage.ScrubProjectRootForTempCleanup(testRoot, 30, 25*time.Millisecond)
 	})

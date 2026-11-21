@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 
 	cli "github.com/zqk-os/zqk/pkg/cliapp"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/coordination"
 	"github.com/zqk-os/zqk/pkg/datacell"
 	"github.com/zqk-os/zqk/pkg/migration/parser"
 	"github.com/zqk-os/zqk/pkg/objects"
@@ -35,9 +37,23 @@ import (
 // setupTestProject creates a temporary project structure for testing
 func setupTestProject(t *testing.T) (tempDir string, cleanup func()) {
 	tempDir = t.TempDir()
+	var cleanupOnce sync.Once
 	cleanup = func() {
-		// No-op: t.TempDir() handles cleanup automatically
+		cleanupOnce.Do(func() {
+			waitCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			_ = WaitProjectCacheBackgroundWork(waitCtx, tempDir)
+			cancel()
+			if c, ok := coordination.GetCoordinator().(*coordination.Coordinator); ok && c != nil {
+				_ = c.Drain(5 * time.Second)
+			}
+			_ = storage.RunProjectTestTeardown(storage.TempProjectTeardown(tempDir, nil))
+			if c, ok := coordination.GetCoordinator().(*coordination.Coordinator); ok && c != nil {
+				_ = c.Drain(5 * time.Second)
+			}
+			storage.ScrubProjectRootForTempCleanup(tempDir, 30, 25*time.Millisecond)
+		})
 	}
+	t.Cleanup(cleanup)
 
 	// Create project data directory
 	projectDataDir := filepath.Join(tempDir, paths.ProjectDataDir)
