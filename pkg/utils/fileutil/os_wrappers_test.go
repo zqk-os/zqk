@@ -1,8 +1,10 @@
 package fileutil
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
+	"time"
 )
 
 func TestOSWrappersPanicOnRepoWrite(t *testing.T) {
@@ -25,6 +27,7 @@ func TestOSWrappersPanicOnRepoWrite(t *testing.T) {
 				t.Errorf("MkdirAll to repo process dir did not panic")
 			}
 		}()
-		_ = MkdirAll(filepath.Join(processDir, "new_violation"), 0755)
+		uniqueDir := fmt.Sprintf("new_violation_%d", time.Now().UnixNano())
+		_ = MkdirAll(filepath.Join(processDir, uniqueDir), 0755)
 	}()
 }
