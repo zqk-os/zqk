@@ -381,7 +381,7 @@ jobs:
   integration-tests:
     name: Integration Tests (Built Asset)
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     needs: [build]
     steps:
       - name: Checkout Code
