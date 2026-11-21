@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/gate"
 	"github.com/zqk-os/zqk/pkg/paths"
@@ -55,13 +54,9 @@ func NewStageCmd() *cobra.Command {
 				return errfmt.Errorf("payload file cannot be empty")
 			}
 
-			proc, err := cli.NewProcessor(cmd)
+			proc, store, err := openGateStore(cmd)
 			if err != nil {
-				return errfmt.Newf("failed to initialize processor: %v", err)
-			}
-			store := proc.Storage()
-			if store == nil {
-				return errfmt.Errorf("storage provider unavailable")
+				return err
 			}
 
 			if createdBy == "" {

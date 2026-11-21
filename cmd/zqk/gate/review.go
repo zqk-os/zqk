@@ -1,13 +1,10 @@
 package gate
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/cliapp"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/gate"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
@@ -36,13 +33,9 @@ func NewReviewCmd() *cobra.Command {
 				return flagsBag.Err()
 			}
 
-			proc, err := cli.NewProcessor(cmd)
+			proc, store, err := openGateStore(cmd)
 			if err != nil {
-				return errfmt.Newf("failed to initialize processor: %v", err)
-			}
-			store := proc.Storage()
-			if store == nil {
-				return errfmt.Errorf("storage provider unavailable")
+				return err
 			}
 
 			req, err := gate.GetApproval(proc.OperationContext(), store, approvalID)
@@ -51,12 +44,7 @@ func NewReviewCmd() *cobra.Command {
 			}
 
 			if jsonOutput {
-				out, err := json.MarshalIndent(req, "", "  ")
-				if err != nil {
-					return errfmt.Newf("failed to format json: %v", err)
-				}
-				cmd.Println(string(out))
-				return nil
+				return printGateJSON(cmd, req)
 			}
 
 			cmd.Println("================================================================================")
