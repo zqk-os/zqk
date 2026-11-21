@@ -885,8 +885,7 @@ func (s *Scheduler) lookupJobInCache(jobID string) (*ScheduledJob, bool) {
 		&s.jobsMu, LockNameSchedulerJobInCache, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			if cached, exists := s.jobs[jobID]; exists && cached != nil {
-				cp := *cached
-				job = &cp
+				job = cached.cloneSnapshot()
 				ok = true
 			}
 			return nil
@@ -996,8 +995,7 @@ func (s *Scheduler) TriggerJob(ctx context.Context, jobID string) error {
 		fallbackBuilder = fallbackBuilder.WithBudget(goroutinelabels.DefaultBudget())
 	}
 	if job != nil {
-		cp := *job
-		job = &cp
+		job = job.cloneSnapshot()
 	}
 	fallbackBuilder.StartWithContext(jobCtx, func(execCtx context.Context) error {
 		defer cancel()
@@ -1022,8 +1020,7 @@ func (s *Scheduler) TriggerJobByEvent(ctx context.Context, eventType, eventKind 
 				// Simple event filter matching (can be enhanced)
 				// Format: "event_type:kind" or "event_type" or "*"
 				if s.matchesEventFilter(job.EventFilter, eventType, eventKind) {
-					cp := *job
-					jobsToTrigger = append(jobsToTrigger, &cp)
+					jobsToTrigger = append(jobsToTrigger, job.cloneSnapshot())
 				}
 			}
 			return nil

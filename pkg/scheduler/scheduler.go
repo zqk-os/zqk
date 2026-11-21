@@ -221,8 +221,7 @@ type triggeredJobWork struct {
 // Returns an error if neither pool is started or submit fails.
 func (s *Scheduler) submitTriggeredJob(work triggeredJobWork) error {
 	if work.job != nil {
-		cp := *work.job
-		work.job = &cp
+		work.job = work.job.cloneSnapshot()
 	}
 	pool := s.triggeredPool
 	if priorityDispatchJob(work.job) && s.triggeredPriorityPool != nil {
@@ -358,6 +357,74 @@ func (j *ScheduledJob) ClearExecutionContext() {
 	}
 	j.executionCtx = nil
 	j.executionCancel = nil
+}
+
+// cloneSnapshot returns a shallow copy of the job with a fresh RunningMu and cloned
+// EnvironmentVariables map so concurrent readers/executors do not race on shared fields.
+func (j *ScheduledJob) cloneSnapshot() *ScheduledJob {
+	if j == nil {
+		return nil
+	}
+	j.RunningMu.RLock()
+	running := j.Running
+	execCtx := j.executionCtx
+	execCancel := j.executionCancel
+	j.RunningMu.RUnlock()
+
+	var envCopy map[string]string
+	if j.EnvironmentVariables != nil {
+		envCopy = make(map[string]string, len(j.EnvironmentVariables))
+		for k, v := range j.EnvironmentVariables {
+			envCopy[k] = v
+		}
+	}
+
+	return &ScheduledJob{
+		ID:                     j.ID,
+		JobType:                j.JobType,
+		Category:               j.Category,
+		Title:                  j.Title,
+		Description:            j.Description,
+		TriggerType:            j.TriggerType,
+		ScheduleExpr:           j.ScheduleExpr,
+		WorkflowRef:            j.WorkflowRef,
+		EventFilter:            j.EventFilter,
+		LifecycleFilter:        j.LifecycleFilter,
+		Enabled:                j.Enabled,
+		Status:                 j.Status,
+		ExecutionMode:          j.ExecutionMode,
+		Transactional:          j.Transactional,
+		MaxRuntimeSeconds:      j.MaxRuntimeSeconds,
+		Command:                j.Command,
+		CommandArgs:            j.CommandArgs,
+		WorkingDirectory:       j.WorkingDirectory,
+		EnvironmentVariables:   envCopy,
+		RetryCount:             j.RetryCount,
+		RetryDelaySeconds:      j.RetryDelaySeconds,
+		CallbackOnCompletion:   j.CallbackOnCompletion,
+		CallbackOnError:        j.CallbackOnError,
+		CallbackOnStatus:       j.CallbackOnStatus,
+		CallbackType:           j.CallbackType,
+		ListenerPort:           j.ListenerPort,
+		ListenerPath:           j.ListenerPath,
+		IdleShutdownSeconds:    j.IdleShutdownSeconds,
+		RouteHandlers:          j.RouteHandlers,
+		AuthType:               j.AuthType,
+		AuthConfig:             j.AuthConfig,
+		CreatedAt:              j.CreatedAt,
+		LastRunAt:              j.LastRunAt,
+		NextRunAt:              j.NextRunAt,
+		CronEntryID:            j.CronEntryID,
+		Running:                running,
+		ConcurrentAllowed:      j.ConcurrentAllowed,
+		AllowParallelExecution: j.AllowParallelExecution,
+		LogLevel:               j.LogLevel,
+		Priority:               j.Priority,
+		Metadata:               j.Metadata,
+		ExecutionDepth:         j.ExecutionDepth,
+		executionCtx:           execCtx,
+		executionCancel:        execCancel,
+	}
 }
 
 // ExecutionCancel returns the cancel function for the run in progress.
