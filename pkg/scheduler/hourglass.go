@@ -256,16 +256,7 @@ func (s *Scheduler) handleMissedSeatHeartbeat(ctx context.Context, filePath stri
 	}
 
 	timer.Misses++
-	silentFor := "unknown"
-	if last := timer.LastCheckinAt; last != "" {
-		if parsed, perr := time.Parse(time.RFC3339, last); perr == nil {
-			silentFor = time.Since(parsed).Round(time.Minute).String()
-		}
-	} else if timer.ArmedAt != "" {
-		if parsed, perr := time.Parse(time.RFC3339, timer.ArmedAt); perr == nil {
-			silentFor = time.Since(parsed).Round(time.Minute).String()
-		}
-	}
+	silentFor := computeTimerSilence(timer.LastCheckinAt, timer.ArmedAt)
 
 	SchedulerDaemonLog(s.logger).Warn("hourglass_seat_heartbeat_missed").
 		String("agent_id", seatID).
@@ -336,16 +327,7 @@ func (s *Scheduler) handleMissedCheckin(ctx context.Context, secCtx *pkgctx.Secu
 	}
 
 	timer.Misses++
-	silentFor := "unknown"
-	if last := timer.LastCheckinAt; last != "" {
-		if parsed, perr := time.Parse(time.RFC3339, last); perr == nil {
-			silentFor = time.Since(parsed).Round(time.Minute).String()
-		}
-	} else if timer.ArmedAt != "" {
-		if parsed, perr := time.Parse(time.RFC3339, timer.ArmedAt); perr == nil {
-			silentFor = time.Since(parsed).Round(time.Minute).String()
-		}
-	}
+	silentFor := computeTimerSilence(timer.LastCheckinAt, timer.ArmedAt)
 
 	SchedulerDaemonLog(s.logger).Warn("hourglass_checkin_missed").
 		String("object_id", timer.TaskID).
@@ -384,6 +366,23 @@ func (s *Scheduler) handleMissedCheckin(ctx context.Context, secCtx *pkgctx.Secu
 			String("object_id", timer.TaskID).
 			Log()
 	}
+}
+
+// computeTimerSilence returns a human-readable rounded duration since lastCheckinAt,
+// falling back to armedAt when lastCheckinAt is empty, or "unknown" if neither parses.
+func computeTimerSilence(lastCheckinAt, armedAt string) string {
+	ref := lastCheckinAt
+	if ref == "" {
+		ref = armedAt
+	}
+	if ref == "" {
+		return "unknown"
+	}
+	parsed, err := time.Parse(time.RFC3339, ref)
+	if err != nil {
+		return "unknown"
+	}
+	return time.Since(parsed).Round(time.Minute).String()
 }
 
 // recordSilentClaimBlocker files one durable risk_blocker for a persistently silent claim,
