@@ -44,19 +44,28 @@ func (s *SupervisorAdapter) IsAvailable() bool {
 	return true
 }
 
-func (s *SupervisorAdapter) Install(ctx context.Context, spec ServiceSpec) error {
+func (s *SupervisorAdapter) registerSpec(spec ServiceSpec) error {
 	if err := spec.Validate(); err != nil {
 		return err
 	}
 
 	s.mu.Lock()
-	defer s.mu.Unlock()
+	_, exists := s.specs[spec.ID]
+	if !exists {
+		s.specs[spec.ID] = spec
+	}
+	s.mu.Unlock()
 
-	if _, exists := s.specs[spec.ID]; exists {
+	if exists {
 		return fmt.Errorf("%w: %s", ErrServiceAlreadyExists, spec.ID)
 	}
+	return nil
+}
 
-	s.specs[spec.ID] = spec
+func (s *SupervisorAdapter) Install(ctx context.Context, spec ServiceSpec) error {
+	if err := s.registerSpec(spec); err != nil {
+		return err
+	}
 
 	if spec.RunAtLoad {
 		goroutinelabels.NewGoroutine("supervisor_run_at_load", "starting service on load").
