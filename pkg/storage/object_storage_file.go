@@ -33,7 +33,8 @@ var (
 	// Cache operation handler - set by CLI layer to avoid circular dependency
 	// This function is called with cache context from the operation context
 	// Signature: func(cacheCtx *pkgctx.CacheContext) error
-	cacheOperationHandler func(*pkgctx.CacheContext) error
+	cacheOperationHandlerMu sync.RWMutex
+	cacheOperationHandler   func(*pkgctx.CacheContext) error
 
 	// Cache checker function - set by CLI layer to check if an object exists in cache
 	// This allows reference validation to check the cache for objects created in the same batch

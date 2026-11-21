@@ -163,7 +163,8 @@ func (f *FileObjectStorage) getContentAddressableStorage(kind string) (*filecas.
 
 	// Identity commit: required post-sync so ACK cannot outrun object-id-cache.
 	cas.SetRequiredPostSyncCallback(func(objectID, casKind, hash, filePath string) error {
-		if cacheOperationHandler == nil {
+		handler := GetCacheOperationHandler()
+		if handler == nil {
 			return errfmt.Errorf(ErrMsgIdentityCacheHandlerRequired)
 		}
 
@@ -174,7 +175,7 @@ func (f *FileObjectStorage) getContentAddressableStorage(kind string) (*filecas.
 			FilePath:  filePath,
 		}
 
-		if err := cacheOperationHandler(cacheCtx); err != nil {
+		if err := handler(cacheCtx); err != nil {
 			logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
 			StorageLog(logger).Warn(LogEventStorageObjectCASRegisterCachePostSyncFailedWarn).
 				ObjectID(objectID).
