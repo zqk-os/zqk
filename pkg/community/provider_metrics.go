@@ -115,16 +115,24 @@ func (mc *ProviderMetricsCollector) RecordExecution(metric ProviderExecutionMetr
 	return summary.HealthState
 }
 
+func (mc *ProviderMetricsCollector) lookupSummary(providerID string) (ProviderMetricsSummary, bool) {
+	mc.mu.RLock()
+	defer mc.mu.RUnlock()
+
+	summary, ok := mc.summaries[providerID]
+	if !ok {
+		return ProviderMetricsSummary{}, false
+	}
+	return *summary, true
+}
+
 // CheckInvocationAllowed verifies whether a provider is eligible to execute.
 func (mc *ProviderMetricsCollector) CheckInvocationAllowed(ctx context.Context, providerID string) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
 
-	mc.mu.RLock()
-	defer mc.mu.RUnlock()
-
-	summary, ok := mc.summaries[providerID]
+	summary, ok := mc.lookupSummary(providerID)
 	if !ok {
 		return nil // Provider is fresh and clean
 	}
@@ -157,12 +165,5 @@ func (mc *ProviderMetricsCollector) ResetQuarantine(providerID string) {
 
 // GetSummary retrieves a copy of aggregated metrics for a specific provider.
 func (mc *ProviderMetricsCollector) GetSummary(providerID string) (ProviderMetricsSummary, bool) {
-	mc.mu.RLock()
-	defer mc.mu.RUnlock()
-
-	summary, ok := mc.summaries[providerID]
-	if !ok {
-		return ProviderMetricsSummary{}, false
-	}
-	return *summary, true
+	return mc.lookupSummary(providerID)
 }

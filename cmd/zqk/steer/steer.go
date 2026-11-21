@@ -31,12 +31,18 @@ func NewResetCmd() *cobra.Command {
 	})
 }
 
-func runSteer(cmd *cobra.Command, args []string) error {
+func newSteerMetabolizer(loadRegistry bool) *steerpkg.Metabolizer {
 	projectRoot := paths.ResolveProjectRoot(".")
 	bus := events.GetDefaultBus()
 	reg := vector.NewRegistry(projectRoot, bus)
-	_ = reg.Load()
-	metabolizer := steerpkg.NewMetabolizer(projectRoot, reg, bus)
+	if loadRegistry {
+		_ = reg.Load()
+	}
+	return steerpkg.NewMetabolizer(projectRoot, reg, bus)
+}
+
+func runSteer(cmd *cobra.Command, args []string) error {
+	metabolizer := newSteerMetabolizer(true)
 
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	format, _ := cmd.Flags().GetString("format")
@@ -124,10 +130,7 @@ func runSteer(cmd *cobra.Command, args []string) error {
 }
 
 func runSteerReset(cmd *cobra.Command, args []string) error {
-	projectRoot := paths.ResolveProjectRoot(".")
-	bus := events.GetDefaultBus()
-	reg := vector.NewRegistry(projectRoot, bus)
-	metabolizer := steerpkg.NewMetabolizer(projectRoot, reg, bus)
+	metabolizer := newSteerMetabolizer(false)
 
 	format, _ := cmd.Flags().GetString("format")
 
