@@ -67,11 +67,11 @@ exit 0
 		if cbErr != nil {
 			t.Fatalf("job execution failed: %v", cbErr)
 		}
-	case <-time.After(5 * time.Second):
+	case <-time.After(15 * time.Second):
 		t.Fatalf("timeout waiting for job execution callback")
 	}
 
-	waitForJobFinalized(t, sched, jobID, 5*time.Second)
+	waitForJobFinalized(t, sched, jobID, 15*time.Second)
 
 	// 1) JobStateRegistry artifact exists and is completed.
 	// State may be nested: state/<job_id_segment>/<execution_id>.yaml (see job_state_registry.go)

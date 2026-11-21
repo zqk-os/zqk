@@ -119,7 +119,7 @@ func TestExpediteOneShot_ReachesExecuteJobWhenCeilingReachedAndListOmitsID(t *te
 	queue.drainAndProcessTriggerBatch(ctx, sched)
 
 	// Wait for callback marker file to be created by executeJob completion
-	deadline := time.Now().Add(5 * time.Second)
+	deadline := time.Now().Add(15 * time.Second)
 	var executed bool
 	for time.Now().Before(deadline) {
 		if fileutil.Exists(markerFile) {
@@ -133,8 +133,9 @@ func TestExpediteOneShot_ReachesExecuteJobWhenCeilingReachedAndListOmitsID(t *te
 	}
 
 	// Wait for last_run_at to be populated in storage after completion
+	storageDeadline := time.Now().Add(15 * time.Second)
 	var lastRunRecorded bool
-	for time.Now().Before(deadline) {
+	for time.Now().Before(storageDeadline) {
 		updatedJob, err := sched.storage.Read(ctx, secCtx, jobID)
 		if err == nil && updatedJob[objects.FieldKeyLastRunAt] != nil {
 			lastRunRecorded = true

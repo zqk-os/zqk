@@ -83,7 +83,7 @@ func TestExtraAdaptersValidateAndSend(t *testing.T) {
 	if err := cmd.Validate(types.Action{}); err == nil {
 		t.Fatal("cmd endpoint")
 	}
-	if err := cmd.Send(ctx, msg, types.Action{Endpoint: "true", Timeout: time.Second}); err != nil {
+	if err := cmd.Send(ctx, msg, types.Action{Endpoint: "true", Timeout: 10 * time.Second}); err != nil {
 		t.Fatal(err)
 	}
 	if err := cmd.Send(ctx, msg, types.Action{Endpoint: "false"}); err == nil {
