@@ -13,6 +13,8 @@ import (
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 )
 
+const testClaimType = "ast_digest_membership"
+
 func newTestExchangeFixture(t *testing.T, fixedNow time.Time) (*ZKProofExchange, TenantDomainBinding, []byte, []byte) {
 	t.Helper()
 	fedKey := []byte("federation-shared-secret-key-32b")
@@ -40,22 +42,25 @@ func assertErrorIs(t *testing.T, label string, got, want error) {
 	}
 }
 
+func mustNewBlinding(t *testing.T) *BlindingFactor {
+	t.Helper()
+	b, err := NewBlindingFactor()
+	if err != nil {
+		t.Fatalf("NewBlindingFactor failed: %v", err)
+	}
+	return b
+}
+
 func TestZKProofExchange_StaticFloorInvariant(t *testing.T) {
 	fixedNow := time.Date(2026, 11, 20, 12, 0, 0, 0, time.UTC)
 	ex, domain, artifact, witness := newTestExchangeFixture(t, fixedNow)
 
-	blinding, err := NewBlindingFactor()
-	if err != nil {
-		t.Fatalf("NewBlindingFactor failed: %v", err)
-	}
+	blinding := mustNewBlinding(t)
 	if err := blinding.Validate(); err != nil {
 		t.Fatalf("blinding.Validate failed: %v", err)
 	}
 
-	proof, err := ex.GenerateProof("stmt-static-01", "ast_digest_membership", artifact, witness, blinding, domain)
-	if err != nil {
-		t.Fatalf("GenerateProof failed: %v", err)
-	}
+	proof := mustGenerateProof(t, ex, "stmt-static-01", testClaimType, artifact, witness, blinding, domain)
 	if err := proof.Validate(); err != nil {
 		t.Fatalf("proof.Validate failed: %v", err)
 	}
@@ -139,7 +144,7 @@ func TestZKProofExchange_OperationalDynamicProof_Concurrent(t *testing.T) {
 			return
 		}
 		stmtID := fmt.Sprintf("stmt-concurrent-%d", id)
-		proof, err := ex.GenerateProof(stmtID, "ast_digest_membership", artifact, witness, blinding, workerDomain)
+		proof, err := ex.GenerateProof(stmtID, testClaimType, artifact, witness, blinding, workerDomain)
 		if err != nil {
 			errCh <- err
 			return
@@ -159,14 +164,8 @@ func TestZKProofExchange_OperationalDynamicProof_Concurrent(t *testing.T) {
 func newTestProofFixture(t *testing.T, fixedNow time.Time, stmtID string) (*ZKProofExchange, TenantDomainBinding, *BlindingFactor, *ZKProof, string) {
 	t.Helper()
 	ex, domain, artifact, witness := newTestExchangeFixture(t, fixedNow)
-	blinding, err := NewBlindingFactor()
-	if err != nil {
-		t.Fatalf("NewBlindingFactor failed: %v", err)
-	}
-	proof, err := ex.GenerateProof(stmtID, "ast_digest_membership", artifact, witness, blinding, domain)
-	if err != nil {
-		t.Fatalf("GenerateProof failed: %v", err)
-	}
+	blinding := mustNewBlinding(t)
+	proof := mustGenerateProof(t, ex, stmtID, testClaimType, artifact, witness, blinding, domain)
 	return ex, domain, blinding, proof, ComputeArtifactDigest(artifact)
 }
 

@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
 	"sync"
 	"time"
 
@@ -161,16 +162,19 @@ type Commitment struct {
 	Digest string `json:"digest"`
 }
 
-func sha256DelimitedHex(prefix string, parts ...[]byte) string {
-	h := sha256.New()
-	h.Write([]byte(prefix))
+func writeDelimitedHex(w hash.Hash, prefix string, parts ...[]byte) string {
+	w.Write([]byte(prefix))
 	for i, part := range parts {
 		if i > 0 {
-			h.Write([]byte("|"))
+			w.Write([]byte("|"))
 		}
-		h.Write(part)
+		w.Write(part)
 	}
-	return hex.EncodeToString(h.Sum(nil))
+	return hex.EncodeToString(w.Sum(nil))
+}
+
+func sha256DelimitedHex(prefix string, parts ...[]byte) string {
+	return writeDelimitedHex(sha256.New(), prefix, parts...)
 }
 
 // ComputeCommitment creates a hiding commitment over a secret witness and blinding factor.
@@ -358,28 +362,30 @@ func (ex *ZKProofExchange) assembleProof(stmt Statement, commitment Commitment) 
 
 // VerifyProof validates a ZKProof in constant time for the expected target tenant domain.
 func (ex *ZKProofExchange) VerifyProof(proof *ZKProof, expectedDomain TenantDomainBinding, expectedArtifactDigest string) error {
-	if err := proof.Validate(); err != nil {
-		return err
+	steps := []func() error{
+		proof.Validate,
+		expectedDomain.Validate,
+		func() error { return ex.checkFreshness(proof.Statement) },
+		func() error { return ex.checkDomainBinding(proof.Statement.Domain, expectedDomain) },
+		func() error { return ex.checkDigestInvariants(proof, expectedArtifactDigest) },
+		func() error { return ex.verifyCryptographicProof(proof) },
 	}
-	if err := expectedDomain.Validate(); err != nil {
-		return err
+	for _, step := range steps {
+		if err := step(); err != nil {
+			return err
+		}
 	}
-	if err := ex.checkFreshness(proof.Statement); err != nil {
-		return err
-	}
-	if err := ex.checkDomainBinding(proof.Statement.Domain, expectedDomain); err != nil {
-		return err
-	}
+	return ex.recordProofID(proof.ProofID)
+}
+
+func (ex *ZKProofExchange) checkDigestInvariants(proof *ZKProof, expectedArtifactDigest string) error {
 	if !constantTimeHexEqual(proof.Statement.CommitmentDigest, proof.Commitment.Digest) {
 		return ErrCommitmentMismatch
 	}
 	if !strutil.IsBlank(expectedArtifactDigest) && !constantTimeHexEqual(proof.Statement.ArtifactDigest, expectedArtifactDigest) {
 		return ErrFalsifiedStatement
 	}
-	if err := ex.verifyCryptographicProof(proof); err != nil {
-		return err
-	}
-	return ex.recordProofID(proof.ProofID)
+	return nil
 }
 
 func (ex *ZKProofExchange) checkFreshness(stmt Statement) error {
@@ -449,16 +455,14 @@ func computeChallenge(stmt Statement, commitment Commitment) string {
 }
 
 func (ex *ZKProofExchange) computeResponse(challenge string, stmt Statement, commitment Commitment) string {
-	mac := hmac.New(sha256.New, ex.federationKey)
-	mac.Write([]byte("zqk:zk:response:v1|"))
-	parts := [][]byte{[]byte(challenge), []byte(commitment.Digest), []byte(stmt.ArtifactDigest), stmt.Domain.CanonicalBytes()}
-	for i, p := range parts {
-		if i > 0 {
-			mac.Write([]byte("|"))
-		}
-		mac.Write(p)
-	}
-	return hex.EncodeToString(mac.Sum(nil))
+	return writeDelimitedHex(
+		hmac.New(sha256.New, ex.federationKey),
+		"zqk:zk:response:v1|",
+		[]byte(challenge),
+		[]byte(commitment.Digest),
+		[]byte(stmt.ArtifactDigest),
+		stmt.Domain.CanonicalBytes(),
+	)
 }
 
 func computeProofID(challenge, response string) string {
