@@ -133,6 +133,12 @@ func RequireStorage(cmd *cobra.Command, require bool) {
 	}
 }
 
+// ConfigureRequirements sets both session and storage requirements on a command.
+func ConfigureRequirements(cmd *cobra.Command, requireSession, requireStorage bool) {
+	RequireSession(cmd, requireSession)
+	RequireStorage(cmd, requireStorage)
+}
+
 // RequireSchedulerCheck sets whether root should run the scheduler daemon status check.
 func RequireSchedulerCheck(cmd *cobra.Command, require bool) {
 	if cmd.Annotations == nil {

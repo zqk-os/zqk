@@ -29,8 +29,7 @@ func NewIOCmd() *cobra.Command {
 
 	cmd.AddCommand(NewFetchCmd())
 
-	cli.RequireSession(cmd, false)
-	cli.RequireStorage(cmd, true)
+	cli.ConfigureRequirements(cmd, false, true)
 
 	return cmd
 }

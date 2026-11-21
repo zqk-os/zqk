@@ -51,8 +51,7 @@ func NewGrepCmd() *cobra.Command {
 
 	helpBuilder.ApplyToCommand(cmd)
 	cmd.Flags().Bool("vendor", false, "Include vendor directories in search")
-	cli.RequireSession(cmd, false)
-	cli.RequireStorage(cmd, false)
+	cli.ConfigureRequirements(cmd, false, false)
 	return cmd
 }
 

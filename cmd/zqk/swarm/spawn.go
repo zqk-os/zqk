@@ -1,6 +1,7 @@
 package swarm
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/storage"
 	pkgswarm "github.com/zqk-os/zqk/pkg/swarm"
 )
 
@@ -23,6 +25,30 @@ func NewSpawnCmd() *cobra.Command {
 	return cmd
 }
 
+type swarmExecEnv struct {
+	ctx  context.Context
+	sec  *pkgctx.SecurityContext
+	sp   storage.ObjectStorageProvider
+	root string
+}
+
+func resolveSwarmExecEnv(proc *cli.Processor) swarmExecEnv {
+	sec := proc.ResolvedSecurityContext()
+	if sec == nil {
+		sec = pkgctx.NewSystemSecurityContext()
+	}
+	root := proc.ProjectRoot()
+	if root == "" {
+		root = paths.ResolveProjectRoot(".")
+	}
+	return swarmExecEnv{
+		ctx:  proc.OperationContext(),
+		sec:  sec,
+		sp:   proc.Storage(),
+		root: root,
+	}
+}
+
 func runSpawn(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, _ []string, proc *cli.Processor) error {
 		teamConfigID, _ := cmd.Flags().GetString("team-config")
@@ -32,26 +58,17 @@ func runSpawn(cmd *cobra.Command, args []string) error {
 			return errfmt.Errorf("flag --team-config is required (e.g. %s swarm spawn --team-config TCFG-001)", paths.CLIName())
 		}
 
-		ctx := proc.OperationContext()
-		sec := proc.ResolvedSecurityContext()
-		if sec == nil {
-			sec = pkgctx.NewSystemSecurityContext()
-		}
-		sp := proc.Storage()
-		root := proc.ProjectRoot()
-		if root == "" {
-			root = paths.ResolveProjectRoot(".")
-		}
+		env := resolveSwarmExecEnv(proc)
 
 		opts := pkgswarm.SpawnOptions{
-			ProjectRoot:     root,
+			ProjectRoot:     env.root,
 			TeamConfigID:    teamConfigID,
 			PriorityPlanID:  planID,
-			Storage:         sp,
-			SecurityContext: sec,
+			Storage:         env.sp,
+			SecurityContext: env.sec,
 		}
 
-		manifest, err := pkgswarm.SpawnCellSwarm(ctx, opts)
+		manifest, err := pkgswarm.SpawnCellSwarm(env.ctx, opts)
 		if err != nil {
 			return errfmt.Newf("swarm spawn failed").Wrap(err)
 		}
