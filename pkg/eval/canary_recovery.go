@@ -26,10 +26,7 @@ func (cb *QualityCircuitBreaker) CanaryStatus(customNow ...time.Time) CanaryReco
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 
-	now := time.Now()
-	if len(customNow) > 0 && !customNow[0].IsZero() {
-		now = customNow[0]
-	}
+	now := resolveEvalNow(customNow...)
 
 	state := cb.currentStateLocked(now)
 

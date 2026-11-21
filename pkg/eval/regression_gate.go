@@ -21,6 +21,14 @@ type RegressionEvaluationResult struct {
 	EvaluatedAt   time.Time                  `json:"evaluated_at" yaml:"evaluated_at"`
 }
 
+// resolveEvalNow returns the first non-zero custom timestamp if provided, or time.Now().
+func resolveEvalNow(customNow ...time.Time) time.Time {
+	if len(customNow) > 0 && !customNow[0].IsZero() {
+		return customNow[0]
+	}
+	return time.Now()
+}
+
 // RecordEvaluation evaluates a candidate scorecard against baseline and updates the circuit breaker state.
 func (cb *QualityCircuitBreaker) RecordEvaluation(current *RegressionScorecard, customNow ...time.Time) (*RegressionEvaluationResult, error) {
 	if current == nil {
@@ -33,10 +41,7 @@ func (cb *QualityCircuitBreaker) RecordEvaluation(current *RegressionScorecard, 
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
 
-	now := time.Now()
-	if len(customNow) > 0 && !customNow[0].IsZero() {
-		now = customNow[0]
-	}
+	now := resolveEvalNow(customNow...)
 
 	// Update any open->half-open transition based on elapsed cooldown
 	cb.currentStateLocked(now)
