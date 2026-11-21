@@ -493,41 +493,10 @@ func runOrchestrate(cmd *cobra.Command, planArg string, opts OrchestrateOptions)
 					}
 				}
 
-				itemID := kItem.ID()
-				if itemID == "" {
-					itemID = fmt.Sprintf("generated-%d", time.Now().UnixNano())
-				}
-
-				personaID := state.opts.PersonaID
-				if personaID == "" {
-					if assignee := kItem.GetString(objects.FieldKeyAssigneePersonaRef); assignee != "" {
-						personaID = assignee
-					} else if pRef := kItem.GetString(objects.FieldKeyPersonaRef); pRef != "" {
-						personaID = pRef
-					} else {
-						refs := kItem.GetStringSlice(objects.FieldKeyPersonaRefs)
-						if len(refs) > 0 {
-							personaID = refs[0]
-						}
-					}
-				}
-
-				if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
-					// Pre-flight Graph Validation (CRIT-1)
-					prepared, preFlightErr := AssemblePreparedContext(workerCtx, state.secCtx, state.sp, PreparedContextInput{
-						TaskID:      itemID,
-						ProjectRoot: state.proc.ProjectRoot(),
-						Depth:       5,
-					})
-					if preFlightErr == nil && !prepared.HasSemanticContext() {
-						err := errfmt.Errorf("traceability_gap: Task context for '%s' (ID: %s) lacks concrete semantic instructions (description or criteria). Ensure the graph is linked.", title, itemID)
-						errs[i] = err
-						return err
-					}
-				}
-
-				if personaID == "" {
-					personaID = authcred.DefaultSwarmWorkerAccount
+				itemID, personaID, err := resolveOrchestratedItemAndPreflight(workerCtx, state, kItem, title)
+				if err != nil {
+					errs[i] = err
+					return err
 				}
 
 				upstreamDeliverables, _ := kItem.Raw()["upstream_deliverables_section"].(string)
@@ -1288,6 +1257,44 @@ func resolveVerifiedUpstreamDeliverables(ctx context.Context, sp storage.ObjectS
 	return sb.String()
 }
 
+func resolveOrchestratedItemAndPreflight(ctx context.Context, state *orchestratorState, kItem koi.Inspector, title string) (itemID, personaID string, err error) {
+	itemID = kItem.ID()
+	if itemID == "" {
+		itemID = fmt.Sprintf("generated-%d", time.Now().UnixNano())
+	}
+
+	personaID = state.opts.PersonaID
+	if personaID == "" {
+		if assignee := kItem.GetString(objects.FieldKeyAssigneePersonaRef); assignee != "" {
+			personaID = assignee
+		} else if pRef := kItem.GetString(objects.FieldKeyPersonaRef); pRef != "" {
+			personaID = pRef
+		} else {
+			refs := kItem.GetStringSlice(objects.FieldKeyPersonaRefs)
+			if len(refs) > 0 {
+				personaID = refs[0]
+			}
+		}
+	}
+
+	if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
+		// Pre-flight Graph Validation (CRIT-1)
+		prepared, preFlightErr := AssemblePreparedContext(ctx, state.secCtx, state.sp, PreparedContextInput{
+			TaskID:      itemID,
+			ProjectRoot: state.proc.ProjectRoot(),
+			Depth:       5,
+		})
+		if preFlightErr == nil && !prepared.HasSemanticContext() {
+			return "", "", errfmt.Errorf("traceability_gap: Task context for '%s' (ID: %s) lacks concrete semantic instructions (description or criteria). Ensure the graph is linked.", title, itemID)
+		}
+	}
+
+	if personaID == "" {
+		personaID = authcred.DefaultSwarmWorkerAccount
+	}
+	return itemID, personaID, nil
+}
+
 func mintOrchestratedTaskEnvelope(ctx context.Context, state *orchestratorState, item map[string]any) (string, error) {
 	kItem := koi.Wrap(item)
 	title := kItem.Title()
@@ -1314,38 +1321,9 @@ func mintOrchestratedTaskEnvelope(ctx context.Context, state *orchestratorState,
 		}
 	}
 
-	itemID := kItem.ID()
-	if itemID == "" {
-		itemID = fmt.Sprintf("generated-%d", time.Now().UnixNano())
-	}
-
-	personaID := state.opts.PersonaID
-	if personaID == "" {
-		if assignee := kItem.GetString(objects.FieldKeyAssigneePersonaRef); assignee != "" {
-			personaID = assignee
-		} else if pRef := kItem.GetString(objects.FieldKeyPersonaRef); pRef != "" {
-			personaID = pRef
-		} else {
-			refs := kItem.GetStringSlice(objects.FieldKeyPersonaRefs)
-			if len(refs) > 0 {
-				personaID = refs[0]
-			}
-		}
-	}
-
-	if itemID != "" && !strings.HasPrefix(itemID, "generated-") {
-		prepared, preFlightErr := AssemblePreparedContext(ctx, state.secCtx, state.sp, PreparedContextInput{
-			TaskID:      itemID,
-			ProjectRoot: state.proc.ProjectRoot(),
-			Depth:       5,
-		})
-		if preFlightErr == nil && !prepared.HasSemanticContext() {
-			return "", errfmt.Errorf("traceability_gap: Task context for '%s' (ID: %s) lacks concrete semantic instructions (description or criteria). Ensure the graph is linked.", title, itemID)
-		}
-	}
-
-	if personaID == "" {
-		personaID = authcred.DefaultSwarmWorkerAccount
+	itemID, personaID, err := resolveOrchestratedItemAndPreflight(ctx, state, kItem, title)
+	if err != nil {
+		return "", err
 	}
 
 	upstreamDeliverables, _ := kItem.Raw()["upstream_deliverables_section"].(string)
