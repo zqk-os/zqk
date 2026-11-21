@@ -252,6 +252,16 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 	_, _ = GetOrRecoverPayload(context.Background(), mockSp, tempDir, DefaultStalenessTolerance)
 
 	// 2. Measure read latency over 50 iterations: verify hot path and p95 compliance under concurrent load
+	maxIterLatency := 75 * time.Millisecond
+	slowIterThreshold := 25 * time.Millisecond
+	maxAvgLatency := 15 * time.Millisecond
+	if raceDetectorEnabled {
+		// -race instrumentation adds 5-10x overhead on JSON/filesystem hot paths under CI CPU contention.
+		maxIterLatency = 350 * time.Millisecond
+		slowIterThreshold = 125 * time.Millisecond
+		maxAvgLatency = 100 * time.Millisecond
+	}
+
 	var totalElapsed time.Duration
 	var slowCount int
 	for i := 0; i < 50; i++ {
@@ -263,10 +273,10 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 		if err != nil {
 			t.Fatalf("iteration %d failed: %v", i, err)
 		}
-		// Allow individual iteration scheduling jitter up to 75ms under concurrent CI test processes; track outliers
-		if elapsed > 75*time.Millisecond {
-			t.Errorf("iteration %d exceeded latency threshold: %v", i, elapsed)
-		} else if elapsed > 25*time.Millisecond {
+		// Allow individual iteration scheduling jitter up to maxIterLatency under concurrent CI test processes; track outliers
+		if elapsed > maxIterLatency {
+			t.Errorf("iteration %d exceeded latency threshold (%v): %v", i, maxIterLatency, elapsed)
+		} else if elapsed > slowIterThreshold {
 			slowCount++
 		}
 		if payload.Stale || payload.Recovering {
@@ -277,11 +287,11 @@ func TestWhatsNextMaterializedViewSub5msHotPath(t *testing.T) {
 		}
 	}
 	avg := totalElapsed / 50
-	if avg > 15*time.Millisecond {
-		t.Errorf("average read latency exceeded 15ms under test concurrency: %v", avg)
+	if avg > maxAvgLatency {
+		t.Errorf("average read latency exceeded %v under test concurrency: %v", maxAvgLatency, avg)
 	}
 	if slowCount > 10 {
-		t.Errorf("too many iterations (>10) exceeded 25ms under load: %d", slowCount)
+		t.Errorf("too many iterations (>10) exceeded %v under load: %d", slowIterThreshold, slowCount)
 	}
 }
 
@@ -474,9 +484,13 @@ func TestWhatsNextMaterializedViewAsyncRecoveryCircuitBreaker(t *testing.T) {
 	if err != nil {
 		t.Fatalf("get or recover failed: %v", err)
 	}
-	// Hot path must NOT wait for the 200ms scan delay
-	if elapsed > 25*time.Millisecond {
-		t.Fatalf("hot path blocked on cold boot storage scan: %v (expected <25ms)", elapsed)
+	// Hot path must NOT wait for the 100ms scan delay
+	nonBlockingLimit := 25 * time.Millisecond
+	if raceDetectorEnabled {
+		nonBlockingLimit = 80 * time.Millisecond
+	}
+	if elapsed > nonBlockingLimit {
+		t.Fatalf("hot path blocked on cold boot storage scan: %v (expected <%v)", elapsed, nonBlockingLimit)
 	}
 	if !payload.Stale || !payload.Recovering {
 		t.Fatalf("expected cold boot payload to be marked stale and recovering")
@@ -657,8 +671,12 @@ func TestReactiveViewsAccumulatorConformance(t *testing.T) {
 	if payload.Stale || payload.Recovering {
 		t.Errorf("expected fresh payload, got stale=%v recovering=%v", payload.Stale, payload.Recovering)
 	}
-	if elapsed > 25*time.Millisecond {
-		t.Errorf("hot path read exceeded SLA: %v", elapsed)
+	sla := 25 * time.Millisecond
+	if raceDetectorEnabled {
+		sla = 200 * time.Millisecond
+	}
+	if elapsed > sla {
+		t.Errorf("hot path read exceeded SLA (%v): %v", sla, elapsed)
 	}
 }
 
