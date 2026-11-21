@@ -46,12 +46,19 @@ type transitionContext struct {
 	flushTracker *flushKindTracker
 }
 
-func setupTransitionContext(cmd *cobra.Command, proc *cli.Processor, rawArgs []string) (*transitionContext, error) {
+func parseTargetObjectIDsWithContexts(cmd *cobra.Command, proc *cli.Processor, rawArgs []string) ([]string, context.Context, *pkgctx.SecurityContext, error) {
 	args, err := parseTargetObjectIDs(cmd, rawArgs)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return args, proc.OperationContext(), proc.SecurityContext(), nil
+}
+
+func setupTransitionContext(cmd *cobra.Command, proc *cli.Processor, rawArgs []string) (*transitionContext, error) {
+	args, ctx, secCtx, err := parseTargetObjectIDsWithContexts(cmd, proc, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	ctx := proc.OperationContext()
 	env, err := initObjectTransitionEnv(ctx, proc.ProjectRoot())
 	if err != nil {
 		return nil, err
@@ -59,7 +66,7 @@ func setupTransitionContext(cmd *cobra.Command, proc *cli.Processor, rawArgs []s
 	return &transitionContext{
 		args:         args,
 		ctx:          ctx,
-		secCtx:       proc.SecurityContext(),
+		secCtx:       secCtx,
 		env:          env,
 		flushTracker: newFlushKindTracker(len(args)),
 	}, nil

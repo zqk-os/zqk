@@ -11,7 +11,6 @@ import (
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
 	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/logging"
-	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/storage"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -47,23 +46,9 @@ Examples:
 
 func runExport(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
-		var err error
-		_ = err
-
-		kind := ""
-		if len(args) > 0 {
-			var ok bool
-			kind, ok = kindCanonicalFromPRERun(cmd)
-			if !ok {
-				var rerr error
-				kind, rerr = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
-				if rerr != nil {
-					return cli.Guard(cmd).Err(rerr).Return()
-				}
-			}
-		}
-		if kind == emptyValue {
-			return cli.Guard(cmd).Require(false, "kind is required (e.g. backlog_item)").Return()
+		kind, err := resolveRequiredObjectKind(cmd, proc, args, false, "kind is required (e.g. backlog_item)")
+		if err != nil {
+			return err
 		}
 
 		flags, _, err := parseListFlags(cmd, proc)

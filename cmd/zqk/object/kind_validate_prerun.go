@@ -2,6 +2,7 @@ package object
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/cliapp"
@@ -51,6 +52,32 @@ func resolvePositional0Kind(cmd *cobra.Command, proc *cli.Processor, args []stri
 		return "", nil
 	}
 	return objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), args[0])
+}
+
+// resolveRequiredObjectKind resolves and validates the canonical object kind from
+// PreRun annotations, an optional --kind flag (when allowKindFlag is true), or positional args[0].
+func resolveRequiredObjectKind(cmd *cobra.Command, proc *cli.Processor, args []string, allowKindFlag bool, missingMsg string) (string, error) {
+	if nk, ok := kindCanonicalFromPRERun(cmd); ok && nk != "" {
+		return nk, nil
+	}
+
+	rawKind := ""
+	if allowKindFlag && cmd != nil && cmd.Flags() != nil {
+		kindFlag, _ := cmd.Flags().GetString("kind")
+		rawKind = strings.TrimSpace(kindFlag)
+	}
+	if rawKind == emptyValue && len(args) > 0 {
+		rawKind = strings.TrimSpace(args[0])
+	}
+	if rawKind == emptyValue {
+		return "", cli.Guard(cmd).Require(false, missingMsg).Return()
+	}
+
+	kind, err := objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), rawKind)
+	if err != nil {
+		return "", cli.Guard(cmd).Err(err).Return()
+	}
+	return kind, nil
 }
 
 func validateAnnotatedObjectKind(cmd *cobra.Command, args []string) error {

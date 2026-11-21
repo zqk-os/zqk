@@ -20,28 +20,10 @@ import (
 func runUpdateAll(cmd *cobra.Command, args []string) error {
 	return cli.WithProcessor(func(cmd *cobra.Command, args []string, proc *cli.Processor) error {
 		_ = args // args not used - required by cobra.Command.RunE signature
-		var err error
-		_ = err
 
-		// Get kind flag or positional argument
-		kind := ""
-		if nk, ok := kindCanonicalFromPRERun(cmd); ok && nk != "" {
-			kind = nk
-		} else {
-			kindFlag, _ := cmd.Flags().GetString("kind")
-			if strings.TrimSpace(kindFlag) != "" {
-				kind = strings.TrimSpace(kindFlag)
-			} else if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
-				kind = strings.TrimSpace(args[0])
-			}
-			if kind == emptyValue {
-				return cli.Guard(cmd).Require(false, "--kind is required when using --all").Return()
-			}
-			var err error
-			kind, err = objects.ResolveAndValidateKindForProject(proc.ProjectRoot(), kind)
-			if err != nil {
-				return cli.Guard(cmd).Err(err).Return()
-			}
+		kind, err := resolveRequiredObjectKind(cmd, proc, args, true, "--kind is required when using --all")
+		if err != nil {
+			return err
 		}
 
 		// Get flags
