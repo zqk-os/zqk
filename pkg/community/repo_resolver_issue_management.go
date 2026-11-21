@@ -117,30 +117,12 @@ func (s *RepoResolverConvergenceSession) ensureIssueMapsLocked() {
 	}
 }
 
-// IngestGitHubIssue records or updates a single GitHub issue in the convergence session.
-func (s *RepoResolverConvergenceSession) IngestGitHubIssue(issue GitHubIssue) error {
+func (s *RepoResolverConvergenceSession) withIssueWriteLock(validate func() error, fn func() error) error {
 	if s == nil {
 		return ErrNilConvergenceSession
 	}
-	if err := issue.Validate(); err != nil {
-		return err
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.ensureIssueMapsLocked()
-	s.Issues[issue.IssueNumber] = issue
-	return nil
-}
-
-// IngestGitHubIssues records multiple GitHub issues in the convergence session.
-func (s *RepoResolverConvergenceSession) IngestGitHubIssues(issues []GitHubIssue) error {
-	if s == nil {
-		return ErrNilConvergenceSession
-	}
-	for _, issue := range issues {
-		if err := issue.Validate(); err != nil {
+	if validate != nil {
+		if err := validate(); err != nil {
 			return err
 		}
 	}
@@ -149,59 +131,76 @@ func (s *RepoResolverConvergenceSession) IngestGitHubIssues(issues []GitHubIssue
 	defer s.mu.Unlock()
 
 	s.ensureIssueMapsLocked()
-	for _, issue := range issues {
-		s.Issues[issue.IssueNumber] = issue
-	}
-	return nil
+	return fn()
 }
 
-// ResolveGitHubIssue records a resolution for an existing tracked GitHub issue.
-func (s *RepoResolverConvergenceSession) ResolveGitHubIssue(res GitHubIssueResolution) error {
+func withIssueReadLock[T any](s *RepoResolverConvergenceSession, fn func() T) T {
 	if s == nil {
-		return ErrNilConvergenceSession
-	}
-	if err := res.Validate(); err != nil {
-		return err
-	}
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.ensureIssueMapsLocked()
-
-	issue, exists := s.Issues[res.IssueNumber]
-	if !exists {
-		return fmt.Errorf("%w: issue #%d has not been ingested", ErrIssueNotFound, res.IssueNumber)
-	}
-
-	if res.ResolvedAt.IsZero() {
-		res.ResolvedAt = time.Now().UTC()
-	}
-
-	s.Resolutions[res.IssueNumber] = res
-
-	// If resolved, duplicate, or wontfix, transition issue state to closed
-	if res.ResolutionStatus != IssueResolutionDeferred {
-		issue.State = GitHubIssueStateClosed
-		now := res.ResolvedAt
-		issue.ClosedAt = &now
-		issue.UpdatedAt = now
-		s.Issues[res.IssueNumber] = issue
-	}
-
-	return nil
-}
-
-// ListPendingGitHubIssues returns all open, unresolved issues sorted deterministically by issue number.
-func (s *RepoResolverConvergenceSession) ListPendingGitHubIssues() []GitHubIssue {
-	if s == nil {
-		return nil
+		var zero T
+		return zero
 	}
 
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	return s.listPendingGitHubIssuesLocked()
+	return fn()
+}
+
+// IngestGitHubIssue records or updates a single GitHub issue in the convergence session.
+func (s *RepoResolverConvergenceSession) IngestGitHubIssue(issue GitHubIssue) error {
+	return s.IngestGitHubIssues([]GitHubIssue{issue})
+}
+
+// IngestGitHubIssues records multiple GitHub issues in the convergence session.
+func (s *RepoResolverConvergenceSession) IngestGitHubIssues(issues []GitHubIssue) error {
+	return s.withIssueWriteLock(
+		func() error {
+			for _, issue := range issues {
+				if err := issue.Validate(); err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+		func() error {
+			for _, issue := range issues {
+				s.Issues[issue.IssueNumber] = issue
+			}
+			return nil
+		},
+	)
+}
+
+// ResolveGitHubIssue records a resolution for an existing tracked GitHub issue.
+func (s *RepoResolverConvergenceSession) ResolveGitHubIssue(res GitHubIssueResolution) error {
+	return s.withIssueWriteLock(res.Validate, func() error {
+		issue, exists := s.Issues[res.IssueNumber]
+		if !exists {
+			return fmt.Errorf("%w: issue #%d has not been ingested", ErrIssueNotFound, res.IssueNumber)
+		}
+
+		if res.ResolvedAt.IsZero() {
+			res.ResolvedAt = time.Now().UTC()
+		}
+
+		s.Resolutions[res.IssueNumber] = res
+
+		// If resolved, duplicate, or wontfix, transition issue state to closed
+		if res.ResolutionStatus != IssueResolutionDeferred {
+			issue.State = GitHubIssueStateClosed
+			now := res.ResolvedAt
+			issue.ClosedAt = &now
+			issue.UpdatedAt = now
+			s.Issues[res.IssueNumber] = issue
+		}
+
+		return nil
+	})
+}
+
+// ListPendingGitHubIssues returns all open, unresolved issues sorted deterministically by issue number.
+func (s *RepoResolverConvergenceSession) ListPendingGitHubIssues() []GitHubIssue {
+	return withIssueReadLock(s, s.listPendingGitHubIssuesLocked)
 }
 
 func (s *RepoResolverConvergenceSession) listPendingGitHubIssuesLocked() []GitHubIssue {
@@ -228,14 +227,7 @@ func (s *RepoResolverConvergenceSession) listPendingGitHubIssuesLocked() []GitHu
 
 // ListResolvedGitHubIssues returns all recorded resolutions sorted deterministically by issue number.
 func (s *RepoResolverConvergenceSession) ListResolvedGitHubIssues() []GitHubIssueResolution {
-	if s == nil {
-		return nil
-	}
-
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	return s.listResolvedGitHubIssuesLocked()
+	return withIssueReadLock(s, s.listResolvedGitHubIssuesLocked)
 }
 
 func (s *RepoResolverConvergenceSession) listResolvedGitHubIssuesLocked() []GitHubIssueResolution {
@@ -281,14 +273,7 @@ func (s *RepoResolverConvergenceSession) GetIssueResolution(issueNumber int) (*G
 
 // CountPendingCriticalIssues returns the count of active unresolved critical/blocking issues.
 func (s *RepoResolverConvergenceSession) CountPendingCriticalIssues() int {
-	if s == nil {
-		return 0
-	}
-
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	return s.countPendingCriticalIssuesLocked()
+	return withIssueReadLock(s, s.countPendingCriticalIssuesLocked)
 }
 
 func (s *RepoResolverConvergenceSession) countPendingCriticalIssuesLocked() int {
