@@ -436,14 +436,22 @@ func (s *ToolSensor) Summary() string {
 	return s.Aggregate().SummaryTable()
 }
 
-// SaveToFile serializes all records to disk securely.
-func (s *ToolSensor) SaveToFile(path string) error {
+func (s *ToolSensor) validateFilePath(path string) (string, error) {
 	if s == nil {
-		return ErrNilSensor
+		return "", ErrNilSensor
 	}
 	cleanPath := strings.TrimSpace(path)
 	if cleanPath == "" {
-		return ErrEmptyPayloadPath
+		return "", ErrEmptyPayloadPath
+	}
+	return cleanPath, nil
+}
+
+// SaveToFile serializes all records to disk securely.
+func (s *ToolSensor) SaveToFile(path string) error {
+	cleanPath, err := s.validateFilePath(path)
+	if err != nil {
+		return err
 	}
 
 	records := s.GetRecords()
@@ -462,12 +470,9 @@ func (s *ToolSensor) SaveToFile(path string) error {
 
 // LoadFromFile restores sensor records from disk safely.
 func (s *ToolSensor) LoadFromFile(path string) error {
-	if s == nil {
-		return ErrNilSensor
-	}
-	cleanPath := strings.TrimSpace(path)
-	if cleanPath == "" {
-		return ErrEmptyPayloadPath
+	cleanPath, err := s.validateFilePath(path)
+	if err != nil {
+		return err
 	}
 
 	data, err := fileutil.ReadFile(cleanPath)
