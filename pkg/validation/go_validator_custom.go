@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/kernelcas/compose"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/paths"
+	strutil "github.com/zqk-os/zqk/pkg/stringutil"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -76,8 +77,8 @@ func composeObjectLookup(options *ValidationOptions) compose.ObjectLookup {
 			if err != nil {
 				return nil, err
 			}
-			if strings.TrimSpace(st) == "" {
-				return nil, fmt.Errorf("status empty for %s", id)
+			if err := strutil.ErrorOnBlank(st, "status empty for %s", id); err != nil {
+				return nil, err
 			}
 			return map[string]any{
 				objects.FieldKeyID:     id,
