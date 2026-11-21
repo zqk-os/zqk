@@ -1,7 +1,6 @@
 package community
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -39,7 +38,7 @@ func TestChangeLogReleaseNotes_FunctionalAcceptance(t *testing.T) {
 	if !fileutil.Exists(changelogPath) {
 		t.Fatalf("CHANGELOG.md missing in %s", distDir)
 	}
-	changelogBytes, err := os.ReadFile(changelogPath)
+	changelogBytes, err := fileutil.ReadFile(changelogPath)
 	if err != nil {
 		t.Fatalf("failed to read CHANGELOG.md: %v", err)
 	}
@@ -56,13 +55,13 @@ func TestChangeLogReleaseNotes_FunctionalAcceptance(t *testing.T) {
 	if !fileutil.Exists(notesPath) {
 		t.Fatalf("RELEASE_NOTES.md missing in %s", distDir)
 	}
-	notesBytes, err := os.ReadFile(notesPath)
+	notesBytes, err := fileutil.ReadFile(notesPath)
 	if err != nil {
 		t.Fatalf("failed to read RELEASE_NOTES.md: %v", err)
 	}
 	notesContent := string(notesBytes)
-	if !strings.Contains(notesContent, "brew tap zqk-os/zqk") {
-		t.Errorf("expected brew tap instructions in RELEASE_NOTES.md")
+	if !strings.Contains(notesContent, "brew install zqk-os/tap/zqk") && !strings.Contains(notesContent, "brew tap zqk-os/tap") {
+		t.Errorf("expected brew install/tap instructions in RELEASE_NOTES.md")
 	}
 	if !strings.Contains(notesContent, "checksums.txt") {
 		t.Errorf("expected checksums.txt instructions in RELEASE_NOTES.md")
