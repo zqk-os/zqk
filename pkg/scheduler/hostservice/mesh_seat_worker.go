@@ -154,11 +154,14 @@ type MeshSeatWorkerGCResult struct {
 	Reason  string `json:"reason"`
 }
 
-// GCMeshSeatWorkerZombies removes legacy unscoped seat-worker units and root-scoped
-// units whose WorkingDirectory is missing, under /var/folders|/tmp, or a Go Test path.
-// It never deletes a root-scoped unit that still points at a live non-ephemeral root
-// (protects foreign checkouts during cleanup-legacy / overseer migration).
-func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
+type launchAgentPlist struct {
+	label string
+	path  string
+}
+
+// readLaunchAgentPlists enumerates *.plist files in LaunchAgentsDir when running
+// on Darwin or when ZQK_LAUNCH_AGENTS_DIR is explicitly overridden.
+func readLaunchAgentPlists() ([]launchAgentPlist, error) {
 	// Darwin LaunchAgents by default; ZQK_LAUNCH_AGENTS_DIR enables the same scan in tests on any GOOS.
 	if runtime.GOOS != "darwin" && strings.TrimSpace(zqkenv.LaunchAgentsDir().Get()) == "" {
 		return nil, nil
@@ -174,18 +177,42 @@ func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
 		}
 		return nil, errfmt.Newf("read LaunchAgents").Wrap(err)
 	}
-	var removed []MeshSeatWorkerGCResult
+	var plists []launchAgentPlist
 	for _, ent := range entries {
 		if ent.IsDir() || !strings.HasSuffix(ent.Name(), ".plist") {
 			continue
 		}
-		label := strings.TrimSuffix(ent.Name(), ".plist")
-		parsed := ParseMeshSeatWorkerLabel(label)
+		name := ent.Name()
+		plists = append(plists, launchAgentPlist{
+			label: strings.TrimSuffix(name, ".plist"),
+			path:  filepath.Join(dir, name),
+		})
+	}
+	return plists, nil
+}
+
+func removeLaunchAgentPlist(plistPath string) {
+	_ = launchctlCmd("bootout", "gui/"+uid(), plistPath)
+	_ = launchctlCmd("unload", "-w", plistPath)
+	_ = fileutil.Remove(plistPath)
+}
+
+// GCMeshSeatWorkerZombies removes legacy unscoped seat-worker units and root-scoped
+// units whose WorkingDirectory is missing, under /var/folders|/tmp, or a Go Test path.
+// It never deletes a root-scoped unit that still points at a live non-ephemeral root
+// (protects foreign checkouts during cleanup-legacy / overseer migration).
+func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
+	plists, err := readLaunchAgentPlists()
+	if err != nil {
+		return nil, err
+	}
+	var removed []MeshSeatWorkerGCResult
+	for _, plist := range plists {
+		parsed := ParseMeshSeatWorkerLabel(plist.label)
 		if !parsed.Valid {
 			continue
 		}
-		plistPath := filepath.Join(dir, ent.Name())
-		absRoot := PlistWorkingDirectory(plistPath)
+		absRoot := PlistWorkingDirectory(plist.path)
 		reason := ""
 		if parsed.Legacy {
 			reason = "legacy_unscoped_seat_worker"
@@ -199,10 +226,8 @@ func GCMeshSeatWorkerZombies() ([]MeshSeatWorkerGCResult, error) {
 		if reason == "" {
 			continue
 		}
-		_ = launchctlCmd("bootout", "gui/"+uid(), plistPath)
-		_ = launchctlCmd("unload", "-w", plistPath)
-		_ = fileutil.Remove(plistPath)
-		removed = append(removed, MeshSeatWorkerGCResult{Label: label, AbsRoot: absRoot, Reason: reason})
+		removeLaunchAgentPlist(plist.path)
+		removed = append(removed, MeshSeatWorkerGCResult{Label: plist.label, AbsRoot: absRoot, Reason: reason})
 	}
 	legacyMCPPW, err := GCLegacyHostGlobalMCPAndPW()
 	if err != nil {
