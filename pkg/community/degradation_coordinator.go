@@ -52,23 +52,18 @@ type ProviderDegradationPlan struct {
 
 // DegradationCoordinator coordinates graceful fallbacks and static baseline responses.
 type DegradationCoordinator struct {
-	mu        sync.RWMutex
-	plans     map[string]ProviderDegradationPlan
-	actions   map[string]FallbackAction
-	history   []DegradationEvent
-	maxEvents int
+	mu      sync.RWMutex
+	plans   map[string]ProviderDegradationPlan
+	actions map[string]FallbackAction
+	history boundedHistory[DegradationEvent]
 }
 
 // NewDegradationCoordinator initializes a thread-safe DegradationCoordinator.
 func NewDegradationCoordinator(maxHistory int) *DegradationCoordinator {
-	if maxHistory <= 0 {
-		maxHistory = 1000
-	}
 	return &DegradationCoordinator{
-		plans:     make(map[string]ProviderDegradationPlan),
-		actions:   make(map[string]FallbackAction),
-		history:   make([]DegradationEvent, 0, maxHistory),
-		maxEvents: maxHistory,
+		plans:   make(map[string]ProviderDegradationPlan),
+		actions: make(map[string]FallbackAction),
+		history: newBoundedHistory[DegradationEvent](maxHistory),
 	}
 }
 
@@ -175,23 +170,12 @@ func (c *DegradationCoordinator) Execute(ctx context.Context, primaryID string) 
 
 // EventHistory returns a copy of recorded degradation telemetry events.
 func (c *DegradationCoordinator) EventHistory() []DegradationEvent {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-
-	result := make([]DegradationEvent, len(c.history))
-	copy(result, c.history)
-	return result
+	return c.history.snapshot()
 }
 
 // recordEvent securely logs an event without blocking.
 func (c *DegradationCoordinator) recordEvent(evt DegradationEvent) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	if len(c.history) >= c.maxEvents {
-		c.history = c.history[1:]
-	}
-	c.history = append(c.history, evt)
+	c.history.record(evt)
 }
 
 // SafeRunGoroutine executes an async worker under POL-CONCURRENCY guidelines.
