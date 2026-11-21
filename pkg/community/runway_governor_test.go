@@ -42,7 +42,10 @@ func TestRunwayGovernor_OperationalDynamicProof(t *testing.T) {
 		MaxQueueDepth:        40,
 	}
 
-	gov, _ := NewRunwayGovernor(policy, 5000)
+	gov, err := NewRunwayGovernor(policy, 5000)
+	if err != nil {
+		t.Fatalf("unexpected NewRunwayGovernor error: %v", err)
+	}
 
 	// Admit 12 tasks (each costing 50 tokens) -> 12 tasks / 4 target = 3 workers desired
 	for i := 0; i < 12; i++ {
@@ -59,7 +62,9 @@ func TestRunwayGovernor_OperationalDynamicProof(t *testing.T) {
 
 	// Admit 16 more tasks (total 28 tasks) -> 28 / 4 = 7 workers desired
 	for i := 0; i < 16; i++ {
-		_ = gov.AdmitTask(50)
+		if err := gov.AdmitTask(50); err != nil {
+			t.Fatalf("unexpected AdmitTask error at %d: %v", i, err)
+		}
 	}
 	workers = gov.EvaluateScaling()
 	if workers != 7 {
@@ -99,7 +104,10 @@ func TestRunwayGovernor_NegativeAdversarialBoundary(t *testing.T) {
 	}
 
 	// 2. Negative Token Cost Rejection
-	gov, _ := NewRunwayGovernor(policy, 1000)
+	gov, err := NewRunwayGovernor(policy, 1000)
+	if err != nil {
+		t.Fatalf("unexpected NewRunwayGovernor error: %v", err)
+	}
 	err = gov.AdmitTask(-10)
 	if !errors.Is(err, ErrNegativeCost) {
 		t.Errorf("expected ErrNegativeCost for negative estimated cost, got: %v", err)
@@ -107,7 +115,9 @@ func TestRunwayGovernor_NegativeAdversarialBoundary(t *testing.T) {
 
 	// 3. Queue Saturation Load Shedding
 	for i := 0; i < 5; i++ {
-		_ = gov.AdmitTask(50)
+		if err := gov.AdmitTask(50); err != nil {
+			t.Fatalf("unexpected AdmitTask error at %d: %v", i, err)
+		}
 	}
 	// 6th task exceeds MaxQueueDepth (5) -> ErrAdmissionShed
 	err = gov.AdmitTask(50)
@@ -116,7 +126,10 @@ func TestRunwayGovernor_NegativeAdversarialBoundary(t *testing.T) {
 	}
 
 	// 4. Runway Token Exhaustion
-	govLowRunway, _ := NewRunwayGovernor(policy, 250) // Starting with 250 tokens, min reserve = 200
+	govLowRunway, err := NewRunwayGovernor(policy, 250) // Starting with 250 tokens, min reserve = 200
+	if err != nil {
+		t.Fatalf("unexpected NewRunwayGovernor error: %v", err)
+	}
 	// 1st task costs 40 -> 210 remaining (>= 200 min reserve) -> succeeds
 	err = govLowRunway.AdmitTask(40)
 	if err != nil {
