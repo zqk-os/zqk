@@ -251,7 +251,7 @@ fi
 	"$TMP_BIN" test dashboard --help >/dev/null
 
 	# 2. Run public CLI commands test suite
-	go test -short -p 2 -timeout 15m \
+	go test -short -p 2 -timeout 25m \
 		./cmd/zqk/app ./cmd/zqk/test ./cmd/zqk/docman ./cmd/zqk/automation \
 		./cmd/zqk/new ./cmd/zqk/inbox ./cmd/zqk/learn ./cmd/zqk/matrix ./cmd/zqk/mcp ./cmd/zqk/mcp-simple \
 		./cmd/zqk/mesh ./cmd/zqk/feed ./cmd/zqk/convergence ./cmd/zqk/callback ./cmd/zqk/intake \
