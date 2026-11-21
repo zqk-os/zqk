@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 var (
@@ -35,8 +36,8 @@ func (e *ProviderEvent) Validate() error {
 	if e == nil {
 		return ErrInvalidEvent
 	}
-	if strings.TrimSpace(e.ID) == "" {
-		return fmt.Errorf("%w: missing event id", ErrInvalidEvent)
+	if err := strutil.ErrorOnBlank(e.ID, "%w: missing event id", ErrInvalidEvent); err != nil {
+		return err
 	}
 	if strings.TrimSpace(e.Topic) == "" || !topicRegex.MatchString(e.Topic) || strings.Contains(e.Topic, "*") {
 		return fmt.Errorf("%w: invalid concrete publish topic %q", ErrInvalidTopic, e.Topic)

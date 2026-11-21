@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 	"sync"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/strutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -73,11 +73,11 @@ func (p *ConvergencePolicyOption) Validate() error {
 	if p == nil {
 		return ErrInvalidPolicyConfig
 	}
-	if strings.TrimSpace(p.PolicyID) == "" {
-		return fmt.Errorf("%w: policy_id is required", ErrInvalidPolicyConfig)
+	if err := strutil.ErrorOnBlank(p.PolicyID, "%w: policy_id is required", ErrInvalidPolicyConfig); err != nil {
+		return err
 	}
-	if strings.TrimSpace(p.Name) == "" {
-		return fmt.Errorf("%w: name is required", ErrInvalidPolicyConfig)
+	if err := strutil.ErrorOnBlank(p.Name, "%w: name is required", ErrInvalidPolicyConfig); err != nil {
+		return err
 	}
 	if p.Weight < 0.0 || p.Weight > 1.0 {
 		return fmt.Errorf("%w: weight must be between 0.0 and 1.0", ErrInvalidPolicyConfig)
@@ -208,7 +208,7 @@ func DefaultConvergencePolicies() []ConvergencePolicyOption {
 
 // NewRepoResolverConvergenceSession constructs a new thread-safe convergence session.
 func NewRepoResolverConvergenceSession(sessionID, personaRef string, policies []ConvergencePolicyOption) (*RepoResolverConvergenceSession, error) {
-	if strings.TrimSpace(sessionID) == "" {
+	if strutil.IsBlank(sessionID) {
 		return nil, ErrInvalidSessionID
 	}
 	if len(policies) == 0 {
@@ -242,7 +242,7 @@ func (s *RepoResolverConvergenceSession) Validate() error {
 	if s == nil {
 		return ErrNilConvergenceSession
 	}
-	if strings.TrimSpace(s.SessionID) == "" {
+	if strutil.IsBlank(s.SessionID) {
 		return ErrInvalidSessionID
 	}
 	for _, p := range s.Policies {

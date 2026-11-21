@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 // WorkflowDispatchConfig configures the GitHub Actions workflow dispatcher.
@@ -57,17 +59,17 @@ type WorkflowDispatcher struct {
 
 // NewWorkflowDispatcher constructs a validated WorkflowDispatcher.
 func NewWorkflowDispatcher(cfg WorkflowDispatchConfig) (*WorkflowDispatcher, error) {
-	if strings.TrimSpace(cfg.Owner) == "" {
-		return nil, fmt.Errorf("repository owner is required")
+	if err := strutil.ErrorOnBlank(cfg.Owner, "repository owner is required"); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(cfg.Repo) == "" {
-		return nil, fmt.Errorf("repository name is required")
+	if err := strutil.ErrorOnBlank(cfg.Repo, "repository name is required"); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(cfg.WorkflowID) == "" {
-		return nil, fmt.Errorf("workflow ID is required")
+	if err := strutil.ErrorOnBlank(cfg.WorkflowID, "workflow ID is required"); err != nil {
+		return nil, err
 	}
-	if strings.TrimSpace(cfg.Token) == "" {
-		return nil, fmt.Errorf("authentication token is required")
+	if err := strutil.ErrorOnBlank(cfg.Token, "authentication token is required"); err != nil {
+		return nil, err
 	}
 	if strings.TrimSpace(cfg.Ref) == "" {
 		cfg.Ref = "main"
