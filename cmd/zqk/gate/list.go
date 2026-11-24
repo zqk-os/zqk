@@ -25,23 +25,17 @@ func NewListCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var flagsBag clipkg.FlagBag
 			statusFilter := flagsBag.String(cmd, "status")
-			jsonOutput := flagsBag.Bool(cmd, "json")
-
-			if flagsBag.Err() != nil {
-				return flagsBag.Err()
-			}
-
-			proc, store, err := openGateStore(cmd)
+			gctx, err := openGateContext(cmd, &flagsBag)
 			if err != nil {
 				return err
 			}
 
-			list, err := gate.ListApprovals(proc.OperationContext(), store, statusFilter)
+			list, err := gate.ListApprovals(gctx.proc.OperationContext(), gctx.store, statusFilter)
 			if err != nil {
 				return err
 			}
 
-			if jsonOutput {
+			if gctx.jsonOutput {
 				return printGateJSON(cmd, list)
 			}
 

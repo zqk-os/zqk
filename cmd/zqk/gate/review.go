@@ -25,25 +25,18 @@ func NewReviewCmd() *cobra.Command {
 		Long:  "Displays the staged approval request, showing id, type, target, hash, and payload preview.",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			approvalID := args[0]
-
 			var flagsBag clipkg.FlagBag
-			jsonOutput := flagsBag.Bool(cmd, "json")
-			if flagsBag.Err() != nil {
-				return flagsBag.Err()
-			}
-
-			proc, store, err := openGateStore(cmd)
+			gctx, err := openGateContext(cmd, &flagsBag)
 			if err != nil {
 				return err
 			}
 
-			req, err := gate.GetApproval(proc.OperationContext(), store, approvalID)
+			req, err := gate.GetApproval(gctx.proc.OperationContext(), gctx.store, args[0])
 			if err != nil {
 				return err
 			}
 
-			if jsonOutput {
+			if gctx.jsonOutput {
 				return printGateJSON(cmd, req)
 			}
 

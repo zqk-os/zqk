@@ -1,11 +1,8 @@
 package gate
 
 import (
-	"encoding/json"
-
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
-	"github.com/zqk-os/zqk/pkg/errfmt"
 	"github.com/zqk-os/zqk/pkg/gate"
 	"github.com/zqk-os/zqk/pkg/paths"
 )
@@ -29,14 +26,9 @@ func NewApproveCmd() *cobra.Command {
 			approvalID := args[0]
 
 			var flagsBag clipkg.FlagBag
-			reviewer := flagsBag.String(cmd, "reviewer")
-			jsonOutput := flagsBag.Bool(cmd, "json")
-
-			if flagsBag.Err() != nil {
-				return flagsBag.Err()
-			}
-			if reviewer == "" {
-				return errfmt.Errorf("--reviewer is required")
+			reviewer, jsonOutput, err := parseReviewerFlags(cmd, &flagsBag)
+			if err != nil {
+				return err
 			}
 
 			proc, store, err := openGateStore(cmd)
@@ -50,12 +42,7 @@ func NewApproveCmd() *cobra.Command {
 			}
 
 			if jsonOutput {
-				out, err := json.MarshalIndent(req, "", "  ")
-				if err != nil {
-					return errfmt.Newf("failed to format json: %v", err)
-				}
-				cmd.Println(string(out))
-				return nil
+				return printGateJSON(cmd, req)
 			}
 
 			cmd.Println("Approval successfully granted and recorded to audit ledger.")
