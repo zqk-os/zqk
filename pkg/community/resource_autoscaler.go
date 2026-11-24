@@ -64,8 +64,9 @@ func (r *ResourceAutoscaler) CurrentConcurrency() int {
 // Policy returns a copy of the active autoscaling policy.
 func (r *ResourceAutoscaler) Policy() AutoscalingPolicy {
 	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.policy
+	policy := r.policy
+	r.mu.RUnlock()
+	return policy
 }
 
 // AdjustConcurrency recalculates and updates the target concurrency level

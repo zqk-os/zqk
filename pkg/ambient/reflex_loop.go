@@ -370,8 +370,9 @@ func (e *SpinalCordReflexEngine) History() []ReflexAction {
 		return nil
 	}
 	e.mu.RLock()
-	defer e.mu.RUnlock()
-	return append([]ReflexAction(nil), e.history...)
+	out := append([]ReflexAction(nil), e.history...)
+	e.mu.RUnlock()
+	return out
 }
 
 // Close shuts down the engine and releases buffered channels.
