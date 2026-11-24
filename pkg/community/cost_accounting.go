@@ -83,8 +83,7 @@ func (c *CostLedger) RegisterAccount(accountID string, maxCredits int64, warning
 	return acc, nil
 }
 
-// Debit deducts credits from an account and evaluates threshold statuses.
-func (c *CostLedger) Debit(accountID string, credits int64) (BudgetStatus, error) {
+func (c *CostLedger) withAccountWrite(accountID string, credits int64, fn func(acc *AccountBudget) (BudgetStatus, error)) (BudgetStatus, error) {
 	if strutil.IsBlank(accountID) {
 		return "", ErrInvalidAccountID
 	}
@@ -100,58 +99,45 @@ func (c *CostLedger) Debit(accountID string, credits int64) (BudgetStatus, error
 	if !exists {
 		return "", fmt.Errorf("%w: %s", ErrAccountNotFound, trimmed)
 	}
+	return fn(acc)
+}
 
-	if acc.CurrentCredits+credits > acc.MaxCredits {
-		acc.Status = BudgetStatusExceeded
-		return BudgetStatusExceeded, fmt.Errorf("%w: requested %d, available %d", ErrBudgetExceeded, credits, acc.MaxCredits-acc.CurrentCredits)
-	}
-
-	acc.CurrentCredits += credits
+func updateAccountStatus(acc *AccountBudget) {
 	acc.LastTransaction = time.Now()
-
 	usedPct := int((acc.CurrentCredits * 100) / acc.MaxCredits)
 	if usedPct >= acc.WarningPercent {
 		acc.Status = BudgetStatusWarning
 	} else {
 		acc.Status = BudgetStatusNominal
 	}
+}
 
-	return acc.Status, nil
+// Debit deducts credits from an account and evaluates threshold statuses.
+func (c *CostLedger) Debit(accountID string, credits int64) (BudgetStatus, error) {
+	return c.withAccountWrite(accountID, credits, func(acc *AccountBudget) (BudgetStatus, error) {
+		if acc.CurrentCredits+credits > acc.MaxCredits {
+			acc.Status = BudgetStatusExceeded
+			return BudgetStatusExceeded, fmt.Errorf("%w: requested %d, available %d", ErrBudgetExceeded, credits, acc.MaxCredits-acc.CurrentCredits)
+		}
+
+		acc.CurrentCredits += credits
+		updateAccountStatus(acc)
+		return acc.Status, nil
+	})
 }
 
 // Replenish resets or adds available budget capacity to an account.
 func (c *CostLedger) Replenish(accountID string, credits int64) error {
-	if strutil.IsBlank(accountID) {
-		return ErrInvalidAccountID
-	}
-	trimmed := strings.TrimSpace(accountID)
-	if credits <= 0 {
-		return ErrInvalidDebitAmount
-	}
-
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	acc, exists := c.accounts[trimmed]
-	if !exists {
-		return fmt.Errorf("%w: %s", ErrAccountNotFound, trimmed)
-	}
-
-	if acc.CurrentCredits > credits {
-		acc.CurrentCredits -= credits
-	} else {
-		acc.CurrentCredits = 0
-	}
-	acc.LastTransaction = time.Now()
-
-	usedPct := int((acc.CurrentCredits * 100) / acc.MaxCredits)
-	if usedPct >= acc.WarningPercent {
-		acc.Status = BudgetStatusWarning
-	} else {
-		acc.Status = BudgetStatusNominal
-	}
-
-	return nil
+	_, err := c.withAccountWrite(accountID, credits, func(acc *AccountBudget) (BudgetStatus, error) {
+		if acc.CurrentCredits > credits {
+			acc.CurrentCredits -= credits
+		} else {
+			acc.CurrentCredits = 0
+		}
+		updateAccountStatus(acc)
+		return acc.Status, nil
+	})
+	return err
 }
 
 // GetAccount retrieves a snapshot of the account budget.
