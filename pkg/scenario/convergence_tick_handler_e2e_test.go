@@ -18,7 +18,7 @@ import (
 )
 
 func TestConvergenceSessionTickHandler_Execute_UpdatesSession(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -57,7 +57,7 @@ func TestConvergenceSessionTickHandler_Execute_UpdatesSession(t *testing.T) {
 }
 
 func TestConvergenceSessionTickHandler_SkipsDuplicateWatermark(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -116,7 +116,7 @@ func TestConvergenceSessionTickHandler_SkipsDuplicateWatermark(t *testing.T) {
 }
 
 func TestConvergenceSessionTickHandler_SkipsPersistWhenSessionTerminal(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 
@@ -185,7 +185,7 @@ func TestConvergenceSessionTickHandler_SkipsPersistWhenSessionTerminal(t *testin
 }
 
 func TestConvergenceSessionTickHandler_SpawnsFollowupDraftWhenTerminalAndEnv(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupAppliedConvergenceLifecycleBundle mutates process-global ZQK_TEST_ROOT and storage globals.
 
 	ctx, secCtx, provider, cvsID, projectRoot := setupAppliedConvergenceLifecycleBundle(t)
 

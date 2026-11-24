@@ -49,7 +49,7 @@ func persistenceBundleYAMLPath(t *testing.T) string {
 }
 
 func TestApplyScenarioBundle_CreatesSchedulerJobFixture(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupScenarioCompleteTestEnvironment mutates process-global ZQK_TEST_ROOT.
 
 	// Use the standard test environment helper so directory structure and
 	// config are aligned with storage expectations.
@@ -102,7 +102,7 @@ objects:
 }
 
 func TestApplyScenarioBundle_CreatesTraceabilityObjects(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupScenarioCompleteTestEnvironment mutates process-global ZQK_TEST_ROOT.
 
 	env := setupScenarioCompleteTestEnvironment(t)
 	projectRoot := env.TestRoot
@@ -333,7 +333,7 @@ func TestApplyScenarioBundle_PersistenceBundleLoad(t *testing.T) {
 // TestApplyScenarioBundle_EmitsScenarioSummary asserts that after a successful apply,
 // .zqk/scenarios/<bundle-name>/scenario-summary.json is written with expected shape.
 func TestApplyScenarioBundle_EmitsScenarioSummary(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupScenarioCompleteTestEnvironment mutates process-global ZQK_TEST_ROOT.
 
 	env := setupScenarioCompleteTestEnvironment(t)
 	ctx := stdcontext.Background()
@@ -406,7 +406,7 @@ func convergenceLifecycleBundlePath(t *testing.T) string {
 // TestApplyScenarioBundle_ConvergenceLifecycleBundle applies the full convergence scaffold (goal, criteria,
 // requirement, doc_entry, convergence_session, backlog) in one apply.
 func TestApplyScenarioBundle_ConvergenceLifecycleBundle(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupScenarioCompleteTestEnvironment mutates process-global ZQK_TEST_ROOT.
 
 	env := setupScenarioCompleteTestEnvironment(t)
 	projectRoot := env.TestRoot
@@ -492,7 +492,7 @@ func TestApplyScenarioBundle_ConvergenceLifecycleBundle(t *testing.T) {
 }
 
 func TestApplyScenarioBundle_TraceabilityLinkageQADisparityRemediation(t *testing.T) {
-	t.Parallel()
+	// Sequential: setupScenarioCompleteTestEnvironment mutates process-global ZQK_TEST_ROOT.
 	env := setupScenarioCompleteTestEnvironment(t)
 	bundleYAML := `
 api_version: v1
