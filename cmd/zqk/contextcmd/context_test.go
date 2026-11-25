@@ -67,3 +67,25 @@ func TestNewContextCmdWiresSubcommands(t *testing.T) {
 		t.Fatalf("subcommands=%v", names)
 	}
 }
+
+func TestContextSnapshotRequiresFlags(t *testing.T) {
+	t.Parallel()
+	cmd := newSnapshotCmd()
+	cmd.SetArgs([]string{})
+	if err := cmd.Execute(); err == nil {
+		t.Fatal("expected missing required flags")
+	}
+}
+
+func TestContextRecallMissingEpisode(t *testing.T) {
+	root := t.TempDir()
+	t.Setenv(zqkenv.ProjectRoot().Key, root)
+	cmd := newRecallCmd()
+	cmd.SetArgs([]string{"--session-id", "s1", "--episode-id", "missing"})
+	var out bytes.Buffer
+	cmd.SetOut(&out)
+	cmd.SetErr(&out)
+	if err := cmd.Execute(); err == nil {
+		t.Fatal("expected ErrEpisodeNotFound")
+	}
+}
