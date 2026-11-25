@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -77,25 +78,35 @@ func NewDiscoverCmd() *cobra.Command {
 
 			out := cmd.OutOrStdout()
 
-			if strings.EqualFold(format, "json") {
+			switch strings.ToLower(strings.TrimSpace(format)) {
+			case "json":
 				enc := json.NewEncoder(out)
 				enc.SetIndent("", "  ")
 				return enc.Encode(targets)
-			} else if strings.EqualFold(format, "yaml") {
+			case "yaml":
 				enc := yaml.NewEncoder(out)
 				return enc.Encode(targets)
+			case "markdown", "md":
+				fmt.Fprint(out, testdiscovery.FormatDiscoveredTargetsMarkdown(targets))
+				return nil
 			}
 
 			fmt.Fprintf(out, "🔍 Discovered %d test target(s) across %s in %v\n\n",
 				len(targets), opts.ProjectRoot, duration.Round(time.Millisecond))
 
-			// Group by language
+			// Group by language in deterministic alphabetical order
 			byLang := make(map[string][]testdiscovery.DiscoveredTarget)
 			for _, t := range targets {
 				byLang[t.Language] = append(byLang[t.Language], t)
 			}
+			langs := make([]string, 0, len(byLang))
+			for lang := range byLang {
+				langs = append(langs, lang)
+			}
+			sort.Strings(langs)
 
-			for lang, list := range byLang {
+			for _, lang := range langs {
+				list := byLang[lang]
 				fmt.Fprintf(out, "── %s (%d tests) ──\n", strings.ToUpper(lang), len(list))
 				for _, t := range list {
 					fmt.Fprintf(out, "  • %s:%d  [%s]\n", t.Path, t.Line, t.Function)
