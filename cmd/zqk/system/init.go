@@ -68,12 +68,33 @@ func NewInitCmd() *cobra.Command {
 		Use: "init",
 	})
 	initCmd.Flags().Bool("rules-only", false, "Generate only multi-host IDE rules without creating full kernel directory structure")
+	initCmd.Flags().Bool("lite", false, "Zero-bloat zgrep-first setup (trigram index, compliance telemetry, IDE rules) without seeding .zqk/process CAS")
 	cli.RequireSession(initCmd, false)
 	cli.RequireStorage(initCmd, false)
 	cli.RequireSchedulerCheck(initCmd, false)
 
 	initCmd.RunE = func(cmd *cobra.Command, args []string) error {
-		rulesOnly, _ := cmd.Flags().GetBool("rules-only")
+		var earlyFlags clipkg.FlagBag
+		liteMode := earlyFlags.Bool(cmd, "lite")
+		rulesOnly := earlyFlags.Bool(cmd, "rules-only")
+		if err := earlyFlags.Err(); err != nil {
+			return err
+		}
+		if liteMode {
+			forceFlag := earlyFlags.Bool(cmd, "force")
+			if err := earlyFlags.Err(); err != nil {
+				return err
+			}
+			root := determineProjectRoot()
+			if root == emptyValue {
+				cwd, err := fileutil.Getwd()
+				if err != nil {
+					return errfmt.Newf("failed to get current directory").Wrap(err)
+				}
+				root = cwd
+			}
+			return runLiteInit(cmd, root, forceFlag)
+		}
 		if rulesOnly {
 			force, _ := cmd.Flags().GetBool("force")
 			root, _ := cli.ResolveCommandProjectRoot(cmd)
