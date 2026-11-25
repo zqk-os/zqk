@@ -1,0 +1,28 @@
+# Drop-in GitHub Actions workflow: ZQK zgrep Compliance Gate & Pilot ROI Summary
+# Copy to `.github/workflows/zgrep-compliance-gate.yml` in any polyglot repository.
+name: zgrep Compliance & Pilot ROI Gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zgrep-roi-gate:
+    name: Verify Agent zgrep Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ZQK CLI
+        run: |
+          curl -fsSL https://zqk.dev/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Render Pilot ROI Scorecard & Enforce Threshold
+        run: |
+          # Fails closed if recorded zgrep compliance falls below 80%
+          zqk grep --roi --min-compliance 80 -f markdown | tee -a "$GITHUB_STEP_SUMMARY"
