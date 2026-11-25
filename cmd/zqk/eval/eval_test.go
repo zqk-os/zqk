@@ -93,6 +93,43 @@ func TestEvalCmd_RunCommand_JSON(t *testing.T) {
 	assert.True(t, strings.HasPrefix(strings.TrimSpace(outBuf.String()), "{"))
 }
 
+func TestEvalCmd_RunCommand_FormatMarkdownAndJSON(t *testing.T) {
+	projectRoot := cli.ResolveProjectRoot(".")
+	require.NotEmpty(t, projectRoot)
+
+	templatePath := filepath.Join(projectRoot, ".zqk", "eval", "templates", "go-ast-hygiene.yaml")
+
+	for _, format := range []string{"markdown", "md"} {
+		t.Run("format_"+format, func(t *testing.T) {
+			cmd := evalcmd.NewEvalCmd()
+			cmd.PersistentFlags().StringP("format", "f", "", "Output format")
+			var outBuf bytes.Buffer
+			cmd.SetOut(&outBuf)
+			cmd.SetErr(&outBuf)
+			cmd.SetArgs([]string{"run", "--template", templatePath, "--target", "pkg/eval", "--auto-mint=false", "-f", format})
+
+			err := cmd.Execute()
+			require.NoError(t, err, "eval run -f %s should succeed, out: %s", format, outBuf.String())
+			out := outBuf.String()
+			assert.Contains(t, out, "ZQK Evaluation Scorecard:")
+			assert.Contains(t, out, "| Dimension | Score |")
+		})
+	}
+
+	t.Run("format_json", func(t *testing.T) {
+		cmd := evalcmd.NewEvalCmd()
+		cmd.PersistentFlags().StringP("format", "f", "", "Output format")
+		var outBuf bytes.Buffer
+		cmd.SetOut(&outBuf)
+		cmd.SetErr(&outBuf)
+		cmd.SetArgs([]string{"run", "--template", templatePath, "--target", "pkg/eval", "--auto-mint=false", "-f", "json"})
+
+		err := cmd.Execute()
+		require.NoError(t, err, "eval run -f json should succeed, out: %s", outBuf.String())
+		assert.True(t, strings.HasPrefix(strings.TrimSpace(outBuf.String()), "{"))
+	})
+}
+
 func TestEvalCmd_LLMScrutiny(t *testing.T) {
 	tempDir := t.TempDir()
 	logFile := filepath.Join(tempDir, "transcript.jsonl")
