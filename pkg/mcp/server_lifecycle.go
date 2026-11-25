@@ -164,9 +164,9 @@ func (s *Server) shutdownSequence(reason string) {
 	}
 
 	// 3. Save client metrics before shutdown
-	if s.clientMetricsStore != nil {
+	if metricsStore := s.GetClientMetricsStore(); metricsStore != nil {
 		// Close will perform final save and wait for save worker to finish
-		if err := s.clientMetricsStore.Close(); err != nil {
+		if err := metricsStore.Close(); err != nil {
 			// CRITICAL: Write directly to trace file - avoid SendLogWarn which could acquire locks
 			s.traceLogf("[MCP_WARN] Failed to save client metrics during shutdown: component=mcp_server error=%s", err.Error())
 		} else {

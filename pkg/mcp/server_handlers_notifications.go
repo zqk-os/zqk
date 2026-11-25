@@ -92,8 +92,8 @@ func (s *Server) handleNotificationInitialized(_ context.Context, _ string, para
 	// Flush buffered events now that clientID is available
 	// Get sequenceID for flushing buffered events
 	sequenceID := s.getOrCreateSequenceID()
-	if s.clientMetricsStore != nil {
-		_ = s.clientMetricsStore.UpdateClientID(sequenceID, clientID) //nolint:errcheck // Non-critical
+	if metricsStore := s.GetClientMetricsStore(); metricsStore != nil {
+		_ = metricsStore.UpdateClientID(sequenceID, clientID) //nolint:errcheck // Non-critical
 	}
 
 	// Get client ID with role prefix for logging (may differ from stored clientID if roles changed)
