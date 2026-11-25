@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/llm"
@@ -105,6 +106,7 @@ func (p *ProactiveWorkspaceSeeder) OnSuccess(ctx context.Context, call llm.ToolC
 // failures occur (e.g. fatal authentication/authorization denials, missing accounts, or
 // persistent fatal infrastructure errors), preventing wasteful CPU and token burn.
 type CatastrophicErrorGuard struct {
+	mu                      sync.Mutex
 	consecutiveFailures     int
 	lastErrorSummary        string
 	maxConsecutiveIdentical int
@@ -145,6 +147,8 @@ func (g *CatastrophicErrorGuard) PostTool(ctx context.Context, call llm.ToolCall
 	}
 
 	// Repeated identical execution failures:
+	g.mu.Lock()
+	defer g.mu.Unlock()
 	if err != nil || strings.Contains(lower, "error:") || strings.Contains(lower, "tool execution failed") {
 		currErr := strings.TrimSpace(combined)
 		if len(currErr) > 200 {
@@ -169,6 +173,8 @@ func (g *CatastrophicErrorGuard) PostTool(ctx context.Context, call llm.ToolCall
 }
 
 func (g *CatastrophicErrorGuard) OnSuccess(ctx context.Context, call llm.ToolCall, result string) {
+	g.mu.Lock()
 	g.consecutiveFailures = 0
 	g.lastErrorSummary = ""
+	g.mu.Unlock()
 }
