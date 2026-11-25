@@ -360,10 +360,9 @@ func (sc *ServeCoordinator) handleClientDisconnect(writer *bufio.Writer) error {
 	} else {
 		sc.server.traceLogf("[MCP_INFO] Client disconnected (EOF) - resetting state for re-initialization")
 		sc.resetServerState()
-	}
-
-	if writer != nil {
-		_ = writer.Flush()
+		if writer != nil {
+			_ = writer.Flush()
+		}
 	}
 	// Continue serving loop instead of returning - allows new client to connect
 	// Return a sentinel error that ServeLoop will handle by continuing
