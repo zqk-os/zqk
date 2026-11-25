@@ -34,6 +34,7 @@ The `zqk grep` command group (and alias `zgrep`) provides an integrated suite of
 | `--ext` | - | `[]string` | all code | Comma-separated file extension filter (e.g. `go,txt,md`) | `zqk grep --ext go 'type Client'` |
 | `--format` | `-f` | `string` | `lines` | Output format: `lines` (text), `json`, or `yaml` | `zqk grep 'TODO' -f json` |
 | `--reindex` | - | `bool` | `false` | Force re-indexing of candidate files and update trigram cache | `zqk grep --reindex` |
+| `--bench` | - | `bool` | `false` | Instant in-process self-benchmark: raw search vs token-budgeted zgrep on this repo | `zqk grep --bench "func "` |
 | `--hidden` | - | `bool` | `false` | Include dotfiles and hidden directories in search | `zqk grep --hidden 'config'` |
 | `--use-index` | - | `bool` | `true` | Utilize persistent trigram index cache if available | `zqk grep --use-index=false 'raw'` |
 
@@ -92,6 +93,7 @@ To achieve sub-15ms search latencies on repeated invocations:
 - The index maps 3-byte character sequences to candidate file lists, enabling instantaneous file candidate pruning before inspecting file contents.
 - The cache is automatically persisted at `.zqk/cache/search_trigram.idx`.
 - Developers and agents can force a cache refresh at any time via `zqk grep --reindex`.
+- Use `zqk grep --bench <query>` (and `-f json`) for an instant side-by-side raw vs budgeted search proof on the local tree; `zqk grep --reindex -f json` emits cold-index build telemetry.
 
 ## 3. Go AST Structural Parsing
 
@@ -167,6 +169,20 @@ zqk grep --reindex
 
 # Rebuild trigram index and immediately execute a query
 zqk grep --reindex 'FlagBag'
+```
+
+
+### Recipe 6: Stranger Self-Benchmark & Cold-Index JSON Telemetry
+
+```bash
+# Prove token savings on this repo (table output)
+zqk grep --bench "func "
+
+# Same comparison as structured JSON for harnesses / agents
+zqk grep --bench "func " -f json
+
+# Rebuild index and emit cold-index build timing / disk footprint as JSON
+zqk grep --reindex -f json
 ```
 
 ---
