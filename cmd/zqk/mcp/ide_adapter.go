@@ -62,10 +62,24 @@ func runIDEAdapter(cmd *cobra.Command, _ []string) error {
 	// SIGINT/SIGTERM close stdin to unblock the read loop for hourglass/context-refresh soft drain.
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM) // Background: request-or-shutdown derived
 	defer stop()
+	stdin := os.Stdin
+	runDone := make(chan struct{})
+	watcherDone := make(chan struct{})
 	goroutinelabels.NewGoroutine("mcp_ide_adapter_stdin_close", "close stdin on SIGINT/SIGTERM soft drain").StartSimple(func() {
-		<-ctx.Done()
-		_ = os.Stdin.Close()
+		defer close(watcherDone)
+		select {
+		case <-runDone:
+			// Normal return (e.g. stdin EOF); do not close stdin asynchronously.
+		case <-ctx.Done():
+			if stdin != nil {
+				_ = stdin.Close()
+			}
+		}
 	})
+	defer func() {
+		close(runDone)
+		<-watcherDone
+	}()
 
 	return adapter.Run(ctx)
 }
