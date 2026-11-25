@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -52,6 +53,8 @@ func newRunCmd() *cobra.Command {
 			if tmplErr != nil || targetErr != nil || autoMintErr != nil || jsonErr != nil {
 				return errfmt.Errorf("failed to parse evaluation flags")
 			}
+			formatFlag, _ := cmd.Flags().GetString("format")
+			formatNorm := strings.ToLower(strings.TrimSpace(formatFlag))
 
 			if strings.TrimSpace(tmplFlag) == "" {
 				return errfmt.Errorf("--template is required")
@@ -82,12 +85,14 @@ func newRunCmd() *cobra.Command {
 				return err
 			}
 
-			if outputJSON {
+			if outputJSON || formatNorm == "json" {
 				data, mErr := json.MarshalIndent(result, "", "  ")
 				if mErr != nil {
 					return mErr
 				}
 				fmt.Fprintln(cmd.OutOrStdout(), string(data))
+			} else if formatNorm == "markdown" || formatNorm == "md" {
+				fmt.Fprint(cmd.OutOrStdout(), eval.FormatEvalResultMarkdown(result))
 			} else {
 				fmt.Fprintln(cmd.OutOrStdout(), "================================================================================")
 				fmt.Fprintf(cmd.OutOrStdout(), "  Scenario Evaluation: %s (%s)\n", tmpl.Title, tmpl.TemplateID)
@@ -98,7 +103,13 @@ func newRunCmd() *cobra.Command {
 
 				if len(result.DimensionScores) > 0 {
 					fmt.Fprintln(cmd.OutOrStdout(), "\n--- Quality Dimension Scores ---")
-					for dim, score := range result.DimensionScores {
+					dims := make([]string, 0, len(result.DimensionScores))
+					for dim := range result.DimensionScores {
+						dims = append(dims, dim)
+					}
+					sort.Strings(dims)
+					for _, dim := range dims {
+						score := result.DimensionScores[dim]
 						req := tmpl.Dimensions[dim].Threshold
 						fmt.Fprintf(cmd.OutOrStdout(), "  • %-10s : %0.2f (threshold: %0.2f)\n", dim, score, req)
 					}
