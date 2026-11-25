@@ -12,9 +12,10 @@ import (
 // FSEventsEngine implements AnticipatoryEngine for file system events.
 type FSEventsEngine struct {
 	mesh    EventMesh
+	mu      sync.Mutex
 	running atomic.Bool
 	cancel  context.CancelFunc
-	wg      sync.WaitGroup
+	done    chan struct{}
 }
 
 // NewFSEventsEngine creates a new FSEventsEngine.
@@ -26,22 +27,26 @@ func NewFSEventsEngine(mesh EventMesh) *FSEventsEngine {
 
 // Start begins listening to file modification events to proactively load context.
 func (e *FSEventsEngine) Start(ctx context.Context) error {
-	if !e.running.CompareAndSwap(false, true) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	if e.running.Load() {
 		return nil // Already running
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
-	e.cancel = cancel
-
 	ch, err := e.mesh.Subscribe(ctx, []EventType{EventFileModified})
 	if err != nil {
-		e.running.Store(false)
+		cancel()
 		return err
 	}
 
-	e.wg.Add(1)
+	done := make(chan struct{})
+	e.cancel = cancel
+	e.done = done
+	e.running.Store(true)
 	goroutinelabels.NewGoroutine("ambience.fsevents_loop", "listening for fsevents").StartSimple(func() {
-		defer e.wg.Done()
+		defer close(done)
 		e.loop(ctx, ch)
 	})
 	return nil
@@ -65,9 +70,22 @@ func (e *FSEventsEngine) loop(ctx context.Context, ch <-chan AmbientEvent) {
 
 // Stop gracefully shuts down the engine.
 func (e *FSEventsEngine) Stop() error {
-	if e.running.CompareAndSwap(true, false) && e.cancel != nil {
-		e.cancel()
-		e.wg.Wait()
+	e.mu.Lock()
+	if !e.running.Swap(false) {
+		e.mu.Unlock()
+		return nil
+	}
+	cancel := e.cancel
+	done := e.done
+	e.cancel = nil
+	e.done = nil
+	e.mu.Unlock()
+
+	if cancel != nil {
+		cancel()
+	}
+	if done != nil {
+		<-done
 	}
 	return nil
 }
