@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -53,8 +54,10 @@ func newRunCmd() *cobra.Command {
 			if tmplErr != nil || targetErr != nil || autoMintErr != nil || jsonErr != nil {
 				return errfmt.Errorf("failed to parse evaluation flags")
 			}
-			formatFlag, _ := cmd.Flags().GetString("format")
-			formatNorm := strings.ToLower(strings.TrimSpace(formatFlag))
+			formatNorm := ""
+			if formatFlag := cmd.Flags().Lookup("format"); formatFlag != nil {
+				formatNorm = strings.ToLower(strings.TrimSpace(formatFlag.Value.String()))
+			}
 
 			if strings.TrimSpace(tmplFlag) == "" {
 				return errfmt.Errorf("--template is required")
@@ -85,49 +88,8 @@ func newRunCmd() *cobra.Command {
 				return err
 			}
 
-			if outputJSON || formatNorm == "json" {
-				data, mErr := json.MarshalIndent(result, "", "  ")
-				if mErr != nil {
-					return mErr
-				}
-				fmt.Fprintln(cmd.OutOrStdout(), string(data))
-			} else if formatNorm == "markdown" || formatNorm == "md" {
-				fmt.Fprint(cmd.OutOrStdout(), eval.FormatEvalResultMarkdown(result))
-			} else {
-				fmt.Fprintln(cmd.OutOrStdout(), "================================================================================")
-				fmt.Fprintf(cmd.OutOrStdout(), "  Scenario Evaluation: %s (%s)\n", tmpl.Title, tmpl.TemplateID)
-				fmt.Fprintln(cmd.OutOrStdout(), "================================================================================")
-				fmt.Fprintf(cmd.OutOrStdout(), "Target          : %s\n", result.Target)
-				fmt.Fprintf(cmd.OutOrStdout(), "Composite Score : %0.2f / 5.0\n", result.CompositeScore)
-				fmt.Fprintf(cmd.OutOrStdout(), "Status          : %s\n", evalStatusStr(result.Passed))
-
-				if len(result.DimensionScores) > 0 {
-					fmt.Fprintln(cmd.OutOrStdout(), "\n--- Quality Dimension Scores ---")
-					dims := make([]string, 0, len(result.DimensionScores))
-					for dim := range result.DimensionScores {
-						dims = append(dims, dim)
-					}
-					sort.Strings(dims)
-					for _, dim := range dims {
-						score := result.DimensionScores[dim]
-						req := tmpl.Dimensions[dim].Threshold
-						fmt.Fprintf(cmd.OutOrStdout(), "  • %-10s : %0.2f (threshold: %0.2f)\n", dim, score, req)
-					}
-				}
-
-				if len(result.Violations) > 0 {
-					fmt.Fprintln(cmd.OutOrStdout(), "\n--- Violations ---")
-					for _, v := range result.Violations {
-						fmt.Fprintf(cmd.OutOrStdout(), "  [%s] %s: %s\n", v.Severity, v.Rule, v.Message)
-					}
-				}
-
-				if len(result.Remediations) > 0 {
-					fmt.Fprintln(cmd.OutOrStdout(), "\n--- Minted Remediations ---")
-					for _, rem := range result.Remediations {
-						fmt.Fprintf(cmd.OutOrStdout(), "  • %s\n", rem)
-					}
-				}
+			if renderErr := renderEvalRunOutput(cmd.OutOrStdout(), formatNorm, outputJSON, tmpl, result); renderErr != nil {
+				return renderErr
 			}
 
 			if !result.Passed {
@@ -136,6 +98,60 @@ func newRunCmd() *cobra.Command {
 			return nil
 		},
 	})
+}
+
+func renderEvalRunOutput(out io.Writer, formatNorm string, outputJSON bool, tmpl *eval.EvalTemplate, result *eval.EvalResult) error {
+	if outputJSON {
+		formatNorm = "json"
+	}
+	switch formatNorm {
+	case "json":
+		data, mErr := json.MarshalIndent(result, "", "  ")
+		if mErr != nil {
+			return mErr
+		}
+		fmt.Fprintln(out, string(data))
+		return nil
+	case "markdown", "md":
+		fmt.Fprint(out, eval.FormatEvalResultMarkdown(result))
+		return nil
+	default:
+		fmt.Fprintln(out, "================================================================================")
+		fmt.Fprintf(out, "  Scenario Evaluation: %s (%s)\n", tmpl.Title, tmpl.TemplateID)
+		fmt.Fprintln(out, "================================================================================")
+		fmt.Fprintf(out, "Target          : %s\n", result.Target)
+		fmt.Fprintf(out, "Composite Score : %0.2f / 5.0\n", result.CompositeScore)
+		fmt.Fprintf(out, "Status          : %s\n", evalStatusStr(result.Passed))
+
+		if len(result.DimensionScores) > 0 {
+			fmt.Fprintln(out, "\n--- Quality Dimension Scores ---")
+			dims := make([]string, 0, len(result.DimensionScores))
+			for dim := range result.DimensionScores {
+				dims = append(dims, dim)
+			}
+			sort.Strings(dims)
+			for _, dim := range dims {
+				score := result.DimensionScores[dim]
+				req := tmpl.Dimensions[dim].Threshold
+				fmt.Fprintf(out, "  • %-10s : %0.2f (threshold: %0.2f)\n", dim, score, req)
+			}
+		}
+
+		if len(result.Violations) > 0 {
+			fmt.Fprintln(out, "\n--- Violations ---")
+			for _, v := range result.Violations {
+				fmt.Fprintf(out, "  [%s] %s: %s\n", v.Severity, v.Rule, v.Message)
+			}
+		}
+
+		if len(result.Remediations) > 0 {
+			fmt.Fprintln(out, "\n--- Minted Remediations ---")
+			for _, rem := range result.Remediations {
+				fmt.Fprintf(out, "  • %s\n", rem)
+			}
+		}
+		return nil
+	}
 }
 
 func newValidateCmd() *cobra.Command {
