@@ -137,4 +137,26 @@ func TestGrepROI_ScorecardFormats(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("markdown", func(t *testing.T) {
+		cmd := NewGrepCmd()
+		var buf bytes.Buffer
+		cmd.SetOut(&buf)
+		cmd.SetErr(&buf)
+		cmd.SetArgs([]string{"--roi", "-f", "markdown", root})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("markdown --roi failed: %v", err)
+		}
+		out := buf.String()
+		for _, want := range []string{
+			"## zgrep Pilot ROI Scorecard",
+			"| Total Search Invocations | 4 |",
+			"| **zgrep Compliance Ratio** | **50.0%** |",
+			"| **Estimated Context Tokens Saved** | **18000** |",
+		} {
+			if !strings.Contains(out, want) {
+				t.Errorf("expected markdown output to contain %q, got:\n%s", want, out)
+			}
+		}
+	})
 }

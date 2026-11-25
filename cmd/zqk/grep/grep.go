@@ -273,6 +273,18 @@ func renderComplianceROI(out io.Writer, format, projectRoot string, summary inte
 	case "yaml":
 		enc := yaml.NewEncoder(out)
 		return enc.Encode(summary)
+	case "markdown", "md":
+		fmt.Fprintf(out, "## zgrep Pilot ROI Scorecard\n\n")
+		fmt.Fprintf(out, "- **Repository:** `%s`\n", projectRoot)
+		fmt.Fprintf(out, "- **Telemetry Source:** `%s`\n\n", interceptor.ComplianceLogPath(projectRoot))
+		fmt.Fprintf(out, "| Metric | Value |\n")
+		fmt.Fprintf(out, "|---|---:|\n")
+		fmt.Fprintf(out, "| Total Search Invocations | %d |\n", summary.TotalSearchInvocations)
+		fmt.Fprintf(out, "| zgrep Compliant Invocations | %d |\n", summary.ZgrepCompliantCount)
+		fmt.Fprintf(out, "| Raw Shell Searches Intercepted | %d |\n", summary.RawSearchNonCompliantCount)
+		fmt.Fprintf(out, "| **zgrep Compliance Ratio** | **%.1f%%** |\n", summary.ComplianceRatioPct)
+		fmt.Fprintf(out, "| **Estimated Context Tokens Saved** | **%d** |\n", summary.EstimatedTokensSaved)
+		return nil
 	default:
 		fmt.Fprintf(out, "zgrep Pilot ROI Scorecard (%s)\n", projectRoot)
 		fmt.Fprintf(out, "------------------------------------------------------------\n")
