@@ -86,6 +86,10 @@ func (r *StorageAuditRouter) Emit(ctx context.Context, eventCtx *EventContext) e
 
 	// Extract other metadata fields
 	targetKind, _ := eventCtx.EventData.AuditMetadata[objects.FieldKeyTargetKind].(string)
+	// Guard against recursive audit-on-audit event loops when persisting audit_event objects.
+	if targetKind == objects.KindAuditEvent {
+		return nil
+	}
 	targetID, _ := eventCtx.EventData.AuditMetadata[objects.FieldKeyTargetID].(string)
 	targetPath, _ := eventCtx.EventData.AuditMetadata[objects.FieldKeyTargetPath].(string)
 	sessionID, _ := eventCtx.EventData.AuditMetadata[objects.FieldKeySessionID].(string)
