@@ -359,12 +359,14 @@ func (dkm *DynamicKindMapper) GetDirectoryFromKind(kind string) string {
 
 	var dir string
 	var exists bool
+	var processDir string
 	_ = concurrency.RunInRLockWithLogger(
 		&dkm.mu, LockNameKindMapperGetDirLookup, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)),
 		func() error {
 			var ok bool
 			dir, ok = dkm.cache[kind]
 			exists = ok
+			processDir = dkm.processDir
 			return nil
 		},
 	)
@@ -378,7 +380,7 @@ func (dkm *DynamicKindMapper) GetDirectoryFromKind(kind string) string {
 	inferredDir := dkm.inferDirectoryName(kind, "")
 	if inferredDir != emptyValue {
 		// Verify directory exists (for test environments)
-		potentialPath := filepath.Join(dkm.processDir, inferredDir)
+		potentialPath := filepath.Join(processDir, inferredDir)
 		if _, err := fileutil.Stat(potentialPath); err == nil {
 			return inferredDir
 		}
