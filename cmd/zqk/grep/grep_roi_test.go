@@ -159,4 +159,41 @@ func TestGrepROI_ScorecardFormats(t *testing.T) {
 			}
 		}
 	})
+
+	t.Run("min_compliance_pass", func(t *testing.T) {
+		cmd := NewGrepCmd()
+		var buf bytes.Buffer
+		cmd.SetOut(&buf)
+		cmd.SetErr(&buf)
+		cmd.SetArgs([]string{"--roi", "--min-compliance", "50", root})
+		if err := cmd.Execute(); err != nil {
+			t.Fatalf("expected --min-compliance 50 to pass at 50.0%%, got: %v", err)
+		}
+	})
+
+	t.Run("min_compliance_fail_closed", func(t *testing.T) {
+		cmd := NewGrepCmd()
+		var buf bytes.Buffer
+		cmd.SetOut(&buf)
+		cmd.SetErr(&buf)
+		cmd.SetArgs([]string{"--roi", "--min-compliance", "80", root})
+		err := cmd.Execute()
+		if err == nil || !strings.Contains(err.Error(), "below required --min-compliance threshold 80.0%") {
+			t.Fatalf("expected fail-closed threshold error, got: %v", err)
+		}
+	})
+
+	t.Run("min_compliance_invalid_range", func(t *testing.T) {
+		for _, bad := range []string{"-5", "105"} {
+			cmd := NewGrepCmd()
+			var buf bytes.Buffer
+			cmd.SetOut(&buf)
+			cmd.SetErr(&buf)
+			cmd.SetArgs([]string{"--roi", "--min-compliance", bad, root})
+			err := cmd.Execute()
+			if err == nil || !strings.Contains(err.Error(), "must be between 0 and 100") {
+				t.Fatalf("expected range validation error for %s, got: %v", bad, err)
+			}
+		}
+	})
 }
