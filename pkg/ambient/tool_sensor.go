@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -312,9 +313,10 @@ func (s *ToolSensor) GetRecords() []ToolExecutionRecord {
 	}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	out := make([]ToolExecutionRecord, len(s.records))
-	copy(out, s.records)
-	return out
+	if len(s.records) == 0 {
+		return []ToolExecutionRecord{}
+	}
+	return slices.Clone(s.records)
 }
 
 // Aggregate returns the aggregated metrics across all recorded executions.
