@@ -18,6 +18,7 @@ func TestIDEAdapters_StaticFloorInvariants(t *testing.T) {
 		"anthropic": false,
 		"cline":     false,
 		"roo_code":  false,
+		"zed":       false,
 		"codeium":   false,
 		"google":    false,
 		"generic":   false,
@@ -48,6 +49,7 @@ func TestIDEAdapters_WorkspaceAndGlobalConfigs(t *testing.T) {
 	assert.Contains(t, configs, "Windsurf (Workspace)")
 	assert.Contains(t, configs, "Cline (Workspace)")
 	assert.Contains(t, configs, "Roo Code (Workspace)")
+	assert.Contains(t, configs, "Zed (Workspace)")
 
 	assert.Equal(t, filepath.Join(tmpDir, ".ide", "mcp.json"), configs["IDE (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".cursor", "mcp.json"), configs["Cursor (Workspace)"])
@@ -55,6 +57,7 @@ func TestIDEAdapters_WorkspaceAndGlobalConfigs(t *testing.T) {
 	assert.Equal(t, filepath.Join(tmpDir, ".codeium", "windsurf", "mcp_config.json"), configs["Windsurf (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".cline", "mcp_settings.json"), configs["Cline (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".roo", "mcp.json"), configs["Roo Code (Workspace)"])
+	assert.Equal(t, filepath.Join(tmpDir, ".zed", "settings.json"), configs["Zed (Workspace)"])
 }
 
 func TestIDEAdapters_IsForeignConfig(t *testing.T) {
@@ -67,6 +70,7 @@ func TestIDEAdapters_IsForeignConfig(t *testing.T) {
 		{"Global Daemon (AGY/Windsurf)", "/home/user/.codeium/mcp_config.json", true},
 		{"AGY Host", "/some/path/mcp.json", true},
 		{"Windsurf (Workspace)", "/project/.codeium/windsurf/mcp_config.json", true},
+		{"Zed (Workspace)", "/project/.zed/settings.json", true},
 		{"Cursor (Workspace)", "/project/.cursor/mcp.json", false},
 		{"Claude Code (Workspace)", "/project/.claude.json", false},
 		{"IDE (Workspace)", "/project/.ide/mcp.json", false},
