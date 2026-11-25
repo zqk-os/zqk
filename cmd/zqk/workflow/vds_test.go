@@ -348,6 +348,44 @@ func TestRunVDSEvaluate(t *testing.T) {
 	assert.Contains(t, errFail.Error(), "vds evaluate: FAIL")
 }
 
+func TestRunVDSEvaluate_MarkdownOutput(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
+	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
+	setupVDSTestProject(t, proj.Root)
+
+	chunksPath := filepath.Join(proj.Root, "docs", "quality", "vds_chunks.yaml")
+	chunksYaml := `chunks:
+  - chunk_id: "CHK-MD-1"
+    stage: "operate_release"
+    claim: "Markdown scorecard test"
+    rubric_ref: "docs/rubric.md"
+    dsl_checks:
+      - "path_exists:docs/quality/vds_chunks.yaml"
+    evidence_refs:
+      - "docs/quality/vds_chunks.yaml"
+    independent_verify: "yes"
+`
+	require.NoError(t, fileutil.WriteFile(chunksPath, []byte(chunksYaml), paths.FilePerm644))
+
+	for _, format := range []string{"md", "markdown"} {
+		t.Run("format_"+format, func(t *testing.T) {
+			cmd := NewVDSEvaluateCmd()
+			initTestCmdContext(t, cmd, proj.Root, nil)
+			outPath := filepath.Join(t.TempDir(), "vds-"+format+".md")
+			require.NoError(t, cmd.Flags().Set("format", format))
+			require.NoError(t, cmd.Flags().Set("output", outPath))
+
+			err := runVDSEvaluate(cmd, nil)
+			require.NoError(t, err)
+			data, readErr := fileutil.ReadFile(outPath)
+			require.NoError(t, readErr)
+			out := string(data)
+			assert.Contains(t, out, "## ZQK VDS Done-Gate Report — `PASS`")
+			assert.Contains(t, out, "| `CHK-MD-1` | `operate_release` | **PASS**")
+		})
+	}
+}
+
 func TestRunVDSProject(t *testing.T) {
 	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{})
 	t.Setenv(zqkenv.ProjectRoot().Name(), proj.Root)
