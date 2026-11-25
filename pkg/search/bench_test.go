@@ -49,4 +49,11 @@ func TestEngine_RunSelfBench(t *testing.T) {
 			t.Errorf("expected bench table to contain %q, got:\n%s", want, table)
 		}
 	}
+
+	md := FormatBenchMarkdown(report, "zqk init --lite --with-mcp")
+	for _, want := range []string{"## zgrep Self-Benchmark", "| Metric | Raw Baseline | zgrep (Budgeted) |", "**Token Reduction:**", "`zqk init --lite --with-mcp`"} {
+		if !strings.Contains(md, want) {
+			t.Errorf("expected bench markdown to contain %q, got:\n%s", want, md)
+		}
+	}
 }

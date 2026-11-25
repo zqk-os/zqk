@@ -120,3 +120,23 @@ func FormatBenchTable(report BenchReport, nextStepHint string) string {
 	}
 	return b.String()
 }
+
+// FormatBenchMarkdown renders a GitHub-Flavored Markdown self-benchmark table
+// suitable for PR comments, RFCs, Slack summaries, and CI job summaries.
+func FormatBenchMarkdown(report BenchReport, nextStepHint string) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "## zgrep Self-Benchmark (`%s`)\n\n", report.Repository)
+	fmt.Fprintf(&b, "- **Query:** `%s`\n", report.Query)
+	fmt.Fprintf(&b, "- **Token Reduction:** **%.1f%%**\n", report.TokenReductionPct)
+	fmt.Fprintf(&b, "- **Est. Saved / 100 Turns:** **$%.2f** (at $%.0f/1M input tokens)\n\n", report.EstimatedCostSavedPer100TurnsUS, benchInputCostPerMillionUSD)
+	b.WriteString("| Metric | Raw Baseline | zgrep (Budgeted) |\n")
+	b.WriteString("|---|---:|---:|\n")
+	fmt.Fprintf(&b, "| Wall-Clock Latency | %.2f ms | %.2f ms |\n", report.BaselineLatencyMs, report.ZgrepLatencyMs)
+	fmt.Fprintf(&b, "| Matches Returned | %d | %d |\n", report.BaselineMatches, report.ZgrepMatches)
+	fmt.Fprintf(&b, "| Payload Bytes | %d | %d |\n", report.BaselineBytes, report.ZgrepBytes)
+	fmt.Fprintf(&b, "| Estimated BPE Tokens | %d | %d |\n", report.BaselineEstimatedTokens, report.ZgrepEstimatedTokens)
+	if strings.TrimSpace(nextStepHint) != "" {
+		fmt.Fprintf(&b, "\n> Next step: `%s`\n", nextStepHint)
+	}
+	return b.String()
+}
