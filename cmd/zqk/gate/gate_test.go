@@ -86,7 +86,21 @@ func TestGate_EndToEndLifecycle(t *testing.T) {
 	}
 	require.NotEmpty(t, approvalID, "approval ID should be found in output: %s", out)
 
-	// 2. Review staged approval request
+	// 2. Immediately list staged approval request (must include draft-plane staged APR-* before approve, GH-1250)
+	stagedListOut, err := executeGate(t, proj.Root, "list")
+	require.NoError(t, err, "list immediately after stage failed: %s", stagedListOut)
+	assert.Contains(t, stagedListOut, approvalID)
+	assert.Contains(t, stagedListOut, "staged")
+
+	stagedFilteredOut, err := executeGate(t, proj.Root, "list", "--status", "staged")
+	require.NoError(t, err, "list --status staged failed: %s", stagedFilteredOut)
+	assert.Contains(t, stagedFilteredOut, approvalID)
+
+	approvedEmptyOut, err := executeGate(t, proj.Root, "list", "--status", "approved")
+	require.NoError(t, err, "list --status approved failed: %s", approvedEmptyOut)
+	assert.NotContains(t, approvedEmptyOut, approvalID)
+
+	// 3. Review staged approval request
 	reviewOut, err := executeGate(t, proj.Root, "review", approvalID)
 	require.NoError(t, err, "review failed: %s", reviewOut)
 	assert.Contains(t, reviewOut, approvalID)

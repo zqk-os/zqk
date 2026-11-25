@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"sort"
 	"time"
 
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
@@ -300,15 +301,46 @@ func ListApprovals(
 		return nil, errfmt.Newf("failed to list approvals: %v", err)
 	}
 
+	seen := make(map[string]struct{}, len(res.Objects))
 	var out []*ApprovalRequest
 	for _, raw := range res.Objects {
 		parsed, err := FromMap(raw)
 		if err == nil {
+			seen[parsed.ID] = struct{}{}
 			if statusFilter == "" || parsed.Status == statusFilter {
 				out = append(out, parsed)
 			}
 		}
 	}
+
+	// Include approval requests currently residing on the Draft Plane (.zqk/object_drafts/approval_request/).
+	// Staged approval requests map to preliminary status "proposed", so CAS List() omits them until
+	// approved/promoted while Read() resolves both planes (GH-1250).
+	if fs := storage.UnwrapToFileObjectStorage(store); fs != nil && fs.GetProjectRoot() != "" {
+		if draftIDs, draftErr := storage.ListObjectDraftPlaneIDs(fs.GetProjectRoot(), KindApprovalRequest); draftErr == nil {
+			for _, id := range draftIDs {
+				if _, exists := seen[id]; exists {
+					continue
+				}
+				raw, readErr := store.Read(ctx, secCtx, id)
+				if readErr != nil || raw == nil {
+					continue
+				}
+				parsed, parseErr := FromMap(raw)
+				if parseErr != nil {
+					continue
+				}
+				seen[parsed.ID] = struct{}{}
+				if statusFilter == "" || parsed.Status == statusFilter {
+					out = append(out, parsed)
+				}
+			}
+		}
+	}
+
+	sort.SliceStable(out, func(i, j int) bool {
+		return out[i].CreatedAt > out[j].CreatedAt
+	})
 	return out, nil
 }
 
