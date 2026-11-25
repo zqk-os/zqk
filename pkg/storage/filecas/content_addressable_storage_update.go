@@ -181,22 +181,27 @@ func (cas *ContentAddressableStorage) updateExistingObjectLocked(objectID string
 		}
 	}
 
-	// Index update succeeded - now safe to clean up old hash file via callback
+	// Fail-closed pre-delete gate (GH-1255): verify the new hash blob exists on disk
+	// before deleting the superseded hash file. If a concurrent sweep or race removed
+	// newHashFile, re-materialize it first; never delete oldHashFile without a durable new blob.
+	if err := cas.ensureDurableHashFileOnDisk(newHashFile, data); err != nil {
+		return err
+	}
+
+	// Index update succeeded and new hash blob is verified on disk - safe to clean up old hash file.
 	var cleanupCB OrphanCleanupCallback
 	_ = concurrency.RunInRLockOrLog(&cas.Mu, locknames.LockNameCasGetOrphanCleanupCallback, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
 		cleanupCB = cas.orphanCleanupCB
 		return nil
 	})
 
-	if cleanupCB != nil {
-		if cleanupErr := cleanupCB(oldHashFile); cleanupErr != nil {
-			_ = cleanupErr
-		}
-		if oldHash != newHash {
+	if oldHash != newHash && oldHashFile != newHashFile {
+		if cleanupCB != nil {
+			if cleanupErr := cleanupCB(oldHashFile); cleanupErr != nil {
+				_ = cleanupErr
+			}
 			EvictCASBlob(oldHash)
-		}
-	} else {
-		if oldHash != newHash {
+		} else {
 			EvictCASBlob(oldHash)
 			if err := RemoveOrphanCASHashFileSync(oldHashFile); err != nil {
 				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
@@ -205,11 +210,32 @@ func (cas *ContentAddressableStorage) updateExistingObjectLocked(objectID string
 		}
 	}
 
+	// Fail-closed post-cleanup gate (GH-1255): confirm newHashFile is still present on disk
+	// before committing live identity and returning success.
+	if _, statErr := fileutil.Stat(newHashFile); statErr != nil {
+		return errfmt.Newf("CAS update verification failed: new hash file %s missing after cleanup", newHashFile).Wrap(statErr)
+	}
+
 	if err := cas.EnsureCASIndexMatchesContentHash(objectID, data, indexBucketKey); err != nil {
 		return err
 	}
 
 	return cas.commitLiveIdentity(objectID, newHash, newHashFile)
+}
+
+// ensureDurableHashFileOnDisk verifies newHashFile exists on disk, re-materializing it
+// via WriteFileWithSync if missing, and failing closed if still absent.
+func (cas *ContentAddressableStorage) ensureDurableHashFileOnDisk(newHashFile string, data []byte) error {
+	if _, statErr := fileutil.Stat(newHashFile); statErr == nil {
+		return nil
+	}
+	if err := cas.WriteFileWithSync(newHashFile, data); err != nil {
+		return errfmt.Newf("CAS pre-delete verification failed: could not re-materialize %s", newHashFile).Wrap(err)
+	}
+	if _, statErr := fileutil.Stat(newHashFile); statErr != nil {
+		return errfmt.Newf("CAS pre-delete verification failed: new hash file %s missing on disk", newHashFile).Wrap(statErr)
+	}
+	return nil
 }
 
 func (cas *ContentAddressableStorage) ensureExactlyOneLiveBlob(objectID, keeperHash string) error {

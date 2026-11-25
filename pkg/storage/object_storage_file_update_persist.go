@@ -193,6 +193,7 @@ func (f *FileObjectStorage) persistFileObjectUpdate(p *fileObjectUpdatePrep) err
 								Kind(kind).
 								WithError(err).
 								Log()
+							return errfmt.Newf("failed to persist CAS update for %s", id).Wrap(err)
 						}
 					}
 
