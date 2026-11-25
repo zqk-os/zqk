@@ -140,9 +140,9 @@ func (e *Engine) Search(ctx context.Context, opts SearchOptions) (*SearchResult,
 	}
 
 	if opts.Mode == ModeAST {
-		// AST search requires Go files
+		// Polyglot AST search supports Go, TypeScript/JS, Python, and Rust (GH-1219)
 		if len(opts.FileExtensions) == 0 {
-			opts.FileExtensions = []string{".go"}
+			opts.FileExtensions = SupportedASTExtensions()
 		}
 		return e.searchAST(ctx, targetRoot, opts, start)
 	}

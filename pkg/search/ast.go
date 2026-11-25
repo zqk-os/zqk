@@ -5,8 +5,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"path/filepath"
 	"regexp"
-	"strings"
 
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
@@ -30,7 +30,8 @@ func receiverTypeName(recv *ast.FieldList) string {
 	return ""
 }
 
-// ASTSearchFile inspects a Go file's AST and returns matching structural declarations.
+// ASTSearchFile inspects a supported source file (Go, TypeScript/JS, Python, Rust)
+// and returns matching structural declarations.
 func ASTSearchFile(filePath string, data []byte, opts SearchOptions) ([]Match, error) {
 	if len(data) == 0 {
 		var err error
@@ -38,6 +39,10 @@ func ASTSearchFile(filePath string, data []byte, opts SearchOptions) ([]Match, e
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if ext := filepath.Ext(filePath); isPolyglotASTExt(ext) {
+		return polyglotASTSearchFile(filePath, data, opts)
 	}
 
 	fset := token.NewFileSet()
@@ -62,46 +67,15 @@ func ASTSearchFile(filePath string, data []byte, opts SearchOptions) ([]Match, e
 	var matches []Match
 
 	matchName := func(name string) bool {
-		if opts.Query == "" {
-			return true
-		}
-		if queryRegex != nil {
-			return queryRegex.MatchString(name)
-		}
-		if opts.CaseInsensitive {
-			return strings.Contains(strings.ToLower(name), strings.ToLower(opts.Query))
-		}
-		return strings.Contains(name, opts.Query)
+		return matchASTName(opts.Query, name, queryRegex, opts.CaseInsensitive)
 	}
 
 	matchKind := func(kind string) bool {
-		if opts.ASTKind == "" || strings.EqualFold(opts.ASTKind, "any") {
-			return true
-		}
-		target := strings.ToLower(strings.TrimSpace(opts.ASTKind))
-		kind = strings.ToLower(kind)
-		if target == kind {
-			return true
-		}
-		if target == "func" && kind == "method" {
-			return true
-		}
-		if target == "type" && (kind == "struct" || kind == "interface") {
-			return true
-		}
-		return false
+		return matchASTKind(opts.ASTKind, kind)
 	}
 
 	matchReceiver := func(recv string) bool {
-		if opts.ASTReceiver == "" {
-			return true
-		}
-		target := strings.TrimPrefix(opts.ASTReceiver, "*")
-		recv = strings.TrimPrefix(recv, "*")
-		if opts.CaseInsensitive {
-			return strings.EqualFold(recv, target)
-		}
-		return recv == target
+		return matchASTReceiver(opts.ASTReceiver, recv, opts.CaseInsensitive)
 	}
 
 	for _, decl := range fileNode.Decls {
@@ -132,27 +106,7 @@ func ASTSearchFile(filePath string, data []byte, opts SearchOptions) ([]Match, e
 				lineContent = string(lines[lineIdx])
 			}
 
-			var before []string
-			if opts.ContextLines > 0 {
-				from := lineIdx - opts.ContextLines
-				if from < 0 {
-					from = 0
-				}
-				for i := from; i < lineIdx; i++ {
-					before = append(before, string(lines[i]))
-				}
-			}
-
-			var after []string
-			if opts.ContextLines > 0 {
-				to := lineIdx + opts.ContextLines + 1
-				if to > numLines {
-					to = numLines
-				}
-				for i := lineIdx + 1; i < to; i++ {
-					after = append(after, string(lines[i]))
-				}
-			}
+			before, after := collectASTContext(lines, lineIdx, opts.ContextLines)
 
 			matches = append(matches, Match{
 				File:          filePath,
