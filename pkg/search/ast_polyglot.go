@@ -276,6 +276,15 @@ func matchASTName(query, name string, queryRegex *regexp.Regexp, caseInsensitive
 	return strings.Contains(name, query)
 }
 
+var astKindAliases = map[string]map[string]bool{
+	"func":      {"method": true},
+	"type":      {"struct": true, "interface": true, "class": true, "enum": true, "trait": true},
+	"class":     {"struct": true},
+	"struct":    {"class": true},
+	"trait":     {"interface": true},
+	"interface": {"trait": true},
+}
+
 func matchASTKind(astKind, kind string) bool {
 	if astKind == "" || strings.EqualFold(astKind, "any") {
 		return true
@@ -285,21 +294,7 @@ func matchASTKind(astKind, kind string) bool {
 	if target == kind {
 		return true
 	}
-	switch target {
-	case "func":
-		return kind == "method"
-	case "type":
-		return kind == "struct" || kind == "interface" || kind == "class" || kind == "enum" || kind == "trait"
-	case "class":
-		return kind == "struct"
-	case "struct":
-		return kind == "class"
-	case "trait":
-		return kind == "interface"
-	case "interface":
-		return kind == "trait"
-	}
-	return false
+	return astKindAliases[target][kind]
 }
 
 func matchASTReceiver(target, recv string, caseInsensitive bool) bool {
