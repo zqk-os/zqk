@@ -15,6 +15,9 @@ brew install zqk-os/tap/zqk
 # Zero-bloat zgrep-first setup (creates .zqk/{cache,logs,state}, IDE rules, trigram index;
 # does NOT seed .zqk/process CAS objects)
 zqk init --lite
+
+# Or wire multi-host MCP configs (Cursor, Claude Code, Windsurf, Cline) in the same command:
+zqk init --lite --with-mcp
 ```
 
 When your team is ready to expand into Git-versioned Requirements, Criteria, Verification Done-Gates, and multi-agent swarms, upgrade in place with one command:
@@ -64,9 +67,15 @@ Inspect your repository's `zgrep` compliance ratio and estimated context tokens 
 # Human-readable scorecard
 zqk grep --roi
 
-# Machine-readable JSON / YAML for CI or executive dashboards
+# Executive Markdown table for Slack, Notion, or Day-25 pilot renewal reviews
+zqk grep --roi -f markdown
+
+# Machine-readable JSON / YAML for dashboards
 zqk grep --roi -f json
 zqk grep --roi -f yaml
+
+# Fail-closed CI / PR compliance threshold gate (exits non-zero if below 80%)
+zqk grep --roi --min-compliance 80
 ```
 
 Example output:
