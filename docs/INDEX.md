@@ -60,6 +60,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[Object Inspector & Policy Studio](./manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)** | Reference manual for the interactive object inspector, keybindings, and policy testing. |
 | **[Mission Control UI & Diagnostics Visual Guide](./manual/MISSION_CONTROL_UI_VISUAL_GUIDE.md)** | Complete visual walkthrough of all 8 TUI tabs, Web Studio timeline/DAG, and test dashboards with ASCII captures. |
 | **[Polyglot zgrep AST, Compliance & Pilot ROI Guide](./guides/ZGREP_POLYGLOT_AND_PILOT_ROI_GUIDE.md)** | Zero-bloat `zqk init --lite`, polyglot TypeScript/Python/Rust/Go AST queries, Day-25 ROI scorecards (`--repos`, `--since`, `-f markdown`), and CI compliance gates. |
+| **[Open-Weight Inference & Local-First IDE Ecosystem Guide](./guides/OPEN_WEIGHT_AND_IDE_ECOSYSTEM_GUIDE.md)** | Canonical OpenAI-compatible open-weight presets (`Ollama`, `Together AI`, `Fireworks AI`, `Baseten`, `Groq`), Study 2 portable handoff packets, and multi-host IDE onboarding (`Cursor`, `Claude Code`, `Cline`, `Roo Code`, `Zed`, `Windsurf`, `Gemini CLI`). |
 | **[ZQL & ZPARQL Agent Guide](./guides/ZQL_ZPARQL_AGENT_GUIDE.md)** | Field guide for AI agents executing queries, mutating graph state, and handling errors. |
 
 ---
