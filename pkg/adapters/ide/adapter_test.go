@@ -17,6 +17,7 @@ func TestIDEAdapters_StaticFloorInvariants(t *testing.T) {
 		"cursor":    false,
 		"anthropic": false,
 		"cline":     false,
+		"roo_code":  false,
 		"codeium":   false,
 		"google":    false,
 		"generic":   false,
@@ -46,12 +47,14 @@ func TestIDEAdapters_WorkspaceAndGlobalConfigs(t *testing.T) {
 	assert.Contains(t, configs, "Claude Code (Workspace)")
 	assert.Contains(t, configs, "Windsurf (Workspace)")
 	assert.Contains(t, configs, "Cline (Workspace)")
+	assert.Contains(t, configs, "Roo Code (Workspace)")
 
 	assert.Equal(t, filepath.Join(tmpDir, ".ide", "mcp.json"), configs["IDE (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".cursor", "mcp.json"), configs["Cursor (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".claude.json"), configs["Claude Code (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".codeium", "windsurf", "mcp_config.json"), configs["Windsurf (Workspace)"])
 	assert.Equal(t, filepath.Join(tmpDir, ".cline", "mcp_settings.json"), configs["Cline (Workspace)"])
+	assert.Equal(t, filepath.Join(tmpDir, ".roo", "mcp.json"), configs["Roo Code (Workspace)"])
 }
 
 func TestIDEAdapters_IsForeignConfig(t *testing.T) {
