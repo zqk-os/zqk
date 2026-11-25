@@ -29,6 +29,22 @@ func TestKnownVendors_IncludesRooCodeAndZed(t *testing.T) {
 	if !strings.Contains(BootPayloadFor(zed), "## Vendor: Zed") || !strings.Contains(BootPayloadFor(zed), ".rules") {
 		t.Errorf("unexpected Zed boot payload:\n%s", BootPayloadFor(zed))
 	}
+
+	cont, ok := byID[VendorContinue]
+	if !ok {
+		t.Fatalf("expected VendorContinue in KnownVendors")
+	}
+	if !strings.Contains(BootPayloadFor(cont), "## Vendor: Continue") || !strings.Contains(BootPayloadFor(cont), ".continuerules") {
+		t.Errorf("unexpected Continue boot payload:\n%s", BootPayloadFor(cont))
+	}
+
+	aider, ok := byID[VendorAider]
+	if !ok {
+		t.Fatalf("expected VendorAider in KnownVendors")
+	}
+	if !strings.Contains(BootPayloadFor(aider), "## Vendor: Aider") || !strings.Contains(BootPayloadFor(aider), "CONVENTIONS.md") {
+		t.Errorf("unexpected Aider boot payload:\n%s", BootPayloadFor(aider))
+	}
 }
 
 func TestDetectVendors_RooCodeAndZedMarkers(t *testing.T) {
@@ -38,6 +54,12 @@ func TestDetectVendors_RooCodeAndZedMarkers(t *testing.T) {
 	}
 	if err := fileutil.EnsureDir(filepath.Join(dir, ".zed")); err != nil {
 		t.Fatalf("mkdir .zed: %v", err)
+	}
+	if err := fileutil.EnsureDir(filepath.Join(dir, ".continue")); err != nil {
+		t.Fatalf("mkdir .continue: %v", err)
+	}
+	if err := fileutil.WriteStandardFile(filepath.Join(dir, ".aider.conf.yml"), []byte("read: CONVENTIONS.md\n")); err != nil {
+		t.Fatalf("write .aider.conf.yml: %v", err)
 	}
 
 	detected := DetectVendors(dir)
@@ -50,5 +72,11 @@ func TestDetectVendors_RooCodeAndZedMarkers(t *testing.T) {
 	}
 	if !found[VendorZed] {
 		t.Errorf("expected VendorZed to be detected from .zed/")
+	}
+	if !found[VendorContinue] {
+		t.Errorf("expected VendorContinue to be detected from .continue/")
+	}
+	if !found[VendorAider] {
+		t.Errorf("expected VendorAider to be detected from .aider.conf.yml")
 	}
 }

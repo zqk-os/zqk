@@ -22,6 +22,8 @@ const (
 	VendorCline      VendorID = "cline"
 	VendorRooCode    VendorID = "roo_code"
 	VendorZed        VendorID = "zed"
+	VendorContinue   VendorID = "continue"
+	VendorAider      VendorID = "aider"
 	VendorWindsurf   VendorID = "windsurf"
 	VendorGemini     VendorID = "gemini"
 	VendorAgent      VendorID = "agent"
@@ -78,6 +80,18 @@ func KnownVendors() []Vendor {
 			DisplayName:    "Zed",
 			MarkerRelPaths: []string{".zed", ".rules"},
 			ConfigRelPaths: []string{".rules"},
+		},
+		{
+			ID:             VendorContinue,
+			DisplayName:    "Continue",
+			MarkerRelPaths: []string{".continue", ".continuerules"},
+			ConfigRelPaths: []string{".continuerules"},
+		},
+		{
+			ID:             VendorAider,
+			DisplayName:    "Aider",
+			MarkerRelPaths: []string{".aider.conf.yml", "CONVENTIONS.md"},
+			ConfigRelPaths: []string{"CONVENTIONS.md"},
 		},
 		{
 			ID:             VendorWindsurf,
