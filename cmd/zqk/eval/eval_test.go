@@ -101,13 +101,14 @@ func TestEvalCmd_RunCommand_FormatMarkdownAndJSON(t *testing.T) {
 
 	for _, format := range []string{"markdown", "md"} {
 		t.Run("format_"+format, func(t *testing.T) {
-			rootCmd := app.NewRootCommand()
+			cmd := evalcmd.NewEvalCmd()
+			cmd.PersistentFlags().StringP("format", "f", "", "Output format")
 			var outBuf bytes.Buffer
-			rootCmd.SetOut(&outBuf)
-			rootCmd.SetErr(&outBuf)
-			rootCmd.SetArgs([]string{"eval", "run", "--template", templatePath, "--target", "pkg/eval", "--auto-mint=false", "-f", format})
+			cmd.SetOut(&outBuf)
+			cmd.SetErr(&outBuf)
+			cmd.SetArgs([]string{"run", "--template", templatePath, "--target", "pkg/eval", "--auto-mint=false", "-f", format})
 
-			err := rootCmd.Execute()
+			err := cmd.Execute()
 			require.NoError(t, err, "eval run -f %s should succeed, out: %s", format, outBuf.String())
 			out := outBuf.String()
 			assert.Contains(t, out, "ZQK Evaluation Scorecard:")
@@ -116,13 +117,14 @@ func TestEvalCmd_RunCommand_FormatMarkdownAndJSON(t *testing.T) {
 	}
 
 	t.Run("format_json", func(t *testing.T) {
-		rootCmd := app.NewRootCommand()
+		cmd := evalcmd.NewEvalCmd()
+		cmd.PersistentFlags().StringP("format", "f", "", "Output format")
 		var outBuf bytes.Buffer
-		rootCmd.SetOut(&outBuf)
-		rootCmd.SetErr(&outBuf)
-		rootCmd.SetArgs([]string{"eval", "run", "--template", templatePath, "--target", "pkg/eval", "--auto-mint=false", "-f", "json"})
+		cmd.SetOut(&outBuf)
+		cmd.SetErr(&outBuf)
+		cmd.SetArgs([]string{"run", "--template", templatePath, "--target", "pkg/eval", "--auto-mint=false", "-f", "json"})
 
-		err := rootCmd.Execute()
+		err := cmd.Execute()
 		require.NoError(t, err, "eval run -f json should succeed, out: %s", outBuf.String())
 		assert.True(t, strings.HasPrefix(strings.TrimSpace(outBuf.String()), "{"))
 	})
