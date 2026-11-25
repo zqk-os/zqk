@@ -247,22 +247,24 @@ func (f *FileObjectStorage) writeObjectToCAS(ctx context.Context, id, kind, file
 		kindDir := f.GetKindDir(kind)
 		if kindDir != "" {
 			hashRegistry := f.newHashRegistry(ctx, kind, kindDir)
-			// Load existing registry (ignore error if file doesn't exist yet)
-			if err := hashRegistry.Load(); err != nil && !IsExpectedMissingErr(err) {
-				logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
-					Error(ErrMsgSwallowedError, err).Log()
-			}
+			if hashRegistry != nil {
+				// Load existing registry (ignore error if file doesn't exist yet)
+				if err := hashRegistry.Load(); err != nil && !IsExpectedMissingErr(err) {
+					logging.Fluent(logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))).
+						Error(ErrMsgSwallowedError, err).Log()
+				}
 
-			filename := filepath.Base(filePath)
-			hashRegistry.SetHash(filename, hash)
-			if err := f.saveHashRegistryWithRetry(hashRegistry, id, filename, hash); err != nil {
-				logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
-				StorageLog(logger).Warn(LogEventStorageObjectCreateHashRegistrySaveRetryExceeded).
-					WithError(err).
-					Kind(kind).
-					ObjectID(id).
-					Log()
-				// Do not return error: CAS create succeeded; hash entry will be repaired by system check.
+				filename := filepath.Base(filePath)
+				hashRegistry.SetHash(filename, hash)
+				if err := f.saveHashRegistryWithRetry(hashRegistry, id, filename, hash); err != nil {
+					logger := logging.GetLoggerFromProfile(string(pkgctx.ProfileSystem))
+					StorageLog(logger).Warn(LogEventStorageObjectCreateHashRegistrySaveRetryExceeded).
+						WithError(err).
+						Kind(kind).
+						ObjectID(id).
+						Log()
+					// Do not return error: CAS create succeeded; hash entry will be repaired by system check.
+				}
 			}
 		}
 	}
