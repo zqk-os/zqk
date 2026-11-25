@@ -56,15 +56,17 @@ jobs:
           NOTES_FILE="docs/releases/${GITHUB_REF_NAME}.md"
           gh release edit "${GITHUB_REF_NAME}" --notes-file "${NOTES_FILE}"
 
-      - name: Trigger Homebrew Tap Formula Update
-        if: env.HOMEBREW_TAP_GITHUB_TOKEN != ''
-        continue-on-error: true
+      - name: Update Homebrew Tap Formula Directly
         env:
-          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN || secrets.DOCS_DEPLOY_TOKEN }}
         run: |
-          gh api repos/zqk-os/homebrew-tap/dispatches \
-            --field event_type="release-published" \
-            --raw-field client_payload="{\"tag\":\"${GITHUB_REF_NAME}\",\"repository\":\"${GITHUB_REPOSITORY}\",\"actor\":\"${GITHUB_ACTOR}\"}"
+          if [ -z "${TAP_TOKEN}" ]; then
+            echo "WARN: neither HOMEBREW_TAP_GITHUB_TOKEN nor DOCS_DEPLOY_TOKEN is set; skipping Homebrew tap update" >&2
+            exit 0
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          CHECKSUMS_FILE="dist/zqk_${VERSION}_checksums.txt"
+          GH_TOKEN="${TAP_TOKEN}" bash scripts/open-core/update-homebrew-formula.sh "${GITHUB_REF_NAME}" "${CHECKSUMS_FILE}"
 
   docs-portal:
     name: Build & Verify Docs Portal
