@@ -18,11 +18,36 @@ import (
 var (
 	darwinSyncQueueOnce sync.Once
 	darwinSyncQueue     chan *fileutil.File
-	darwinSyncWG        sync.WaitGroup
+	darwinSyncMu        sync.Mutex
+	darwinSyncDrainedCh chan struct{}
 	darwinSyncPending   atomic.Int64
 	darwinSyncShutdown  atomic.Bool
 	darwinStrictSync    atomic.Bool
 )
+
+func addDarwinSyncPending() {
+	darwinSyncMu.Lock()
+	if darwinSyncPending.Add(1) == 1 {
+		darwinSyncDrainedCh = make(chan struct{})
+	}
+	darwinSyncMu.Unlock()
+}
+
+func doneDarwinSyncPending() {
+	darwinSyncMu.Lock()
+	if darwinSyncPending.Add(-1) == 0 && darwinSyncDrainedCh != nil {
+		close(darwinSyncDrainedCh)
+		darwinSyncDrainedCh = nil
+	}
+	darwinSyncMu.Unlock()
+}
+
+func darwinSyncDrainChan() <-chan struct{} {
+	darwinSyncMu.Lock()
+	ch := darwinSyncDrainedCh
+	darwinSyncMu.Unlock()
+	return ch
+}
 
 // SetDarwinStrictSync configures whether Darwin CAS publishes execute synchronous fsync (TDE-F-REL-001).
 func SetDarwinStrictSync(strict bool) {
@@ -47,8 +72,7 @@ func initDarwinSyncQueue() {
 						logging.LogSwallowedError(err)
 					}
 				}
-				darwinSyncPending.Add(-1)
-				darwinSyncWG.Done()
+				doneDarwinSyncPending()
 			}
 		})
 }
@@ -67,8 +91,7 @@ func queueOrSync(queue chan<- *fileutil.File, f *fileutil.File) error {
 		if darwinSyncShutdown.Load() {
 			return syncAndClose(f)
 		}
-		darwinSyncPending.Add(1)
-		darwinSyncWG.Add(1)
+		addDarwinSyncPending()
 	}
 	select {
 	case queue <- f:
@@ -78,8 +101,7 @@ func queueOrSync(queue chan<- *fileutil.File, f *fileutil.File) error {
 		// synchronous fsync so a successful publish still has crash semantics.
 		err := syncAndClose(f)
 		if isGlobalQueue {
-			darwinSyncPending.Add(-1)
-			darwinSyncWG.Done()
+			doneDarwinSyncPending()
 		}
 		return err
 	}
@@ -112,15 +134,15 @@ func DrainDarwinSyncQueueContext(ctx context.Context) error {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	done := make(chan struct{})
-	goroutinelabels.NewGoroutine("storage.darwin_cas_sync_drain", "await darwin CAS sync queue drain").
-		StartSimple(func() {
-			darwinSyncWG.Wait()
-			close(done)
-		})
-
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	ch := darwinSyncDrainChan()
+	if ch == nil {
+		return nil
+	}
 	select {
-	case <-done:
+	case <-ch:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()

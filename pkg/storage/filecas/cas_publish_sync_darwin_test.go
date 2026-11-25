@@ -6,9 +6,11 @@ import (
 	"context"
 	"errors"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
 
@@ -188,5 +190,50 @@ func TestCasPublishSyncFileOS_StrictSyncDurability(t *testing.T) {
 
 	if err := CasPublishSyncFileOS(f); err != nil {
 		t.Fatalf("strict sync failed: %v", err)
+	}
+}
+
+func TestDrainDarwinSyncQueueContext_ConcurrentPublishAndDrain(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "cas-concurrent-drain.yaml")
+	if err := fileutil.WriteFile(path, []byte("id: CONCURRENT-1\n"), fileutil.StandardFilePerm); err != nil {
+		t.Fatalf("write fixture: %v", err)
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	goroutinelabels.NewGoroutine("test.darwin_sync_publisher", "publish files concurrently with drain").
+		StartSimple(func() {
+			defer wg.Done()
+			for range 20 {
+				f, err := fileutil.Open(path)
+				if err != nil {
+					t.Errorf("open fixture: %v", err)
+					return
+				}
+				if err := CasPublishSyncFileOS(f); err != nil {
+					t.Errorf("CasPublishSyncFileOS: %v", err)
+				}
+				_ = f.Close()
+			}
+		})
+
+	goroutinelabels.NewGoroutine("test.darwin_sync_drainer", "drain darwin sync queue concurrently with publish").
+		StartSimple(func() {
+			defer wg.Done()
+			for range 20 {
+				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+				err := DrainDarwinSyncQueueContext(ctx)
+				cancel()
+				if err != nil {
+					t.Errorf("DrainDarwinSyncQueueContext: %v", err)
+					return
+				}
+			}
+		})
+
+	wg.Wait()
+	if err := DrainDarwinSyncQueue(2 * time.Second); err != nil {
+		t.Fatalf("final DrainDarwinSyncQueue failed: %v", err)
 	}
 }
