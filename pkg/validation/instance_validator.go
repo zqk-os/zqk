@@ -341,6 +341,14 @@ func (iv *InstanceValidator) validateFieldEnum(fieldName string, fieldValue any,
 	return ValidateEnumField(fieldName, fieldValue, enumValues)
 }
 
+func isUnsetOptionalFieldValue(fieldValue any) bool {
+	if fieldValue == nil {
+		return true
+	}
+	str, ok := fieldValue.(string)
+	return ok && strings.TrimSpace(str) == emptyValue
+}
+
 // validateFieldSemanticType validates field semantic type
 func (iv *InstanceValidator) validateFieldSemanticType(fieldName string, fieldValue any, fieldDef map[string]any) *ValidationWarning {
 	semanticType, ok := fieldDef["semantic_type"].(string)
@@ -349,15 +357,8 @@ func (iv *InstanceValidator) validateFieldSemanticType(fieldName string, fieldVa
 	}
 
 	// Optional fields: nil or empty string means unset, not invalid.
-	if fieldValue == nil {
-		if !IsFieldRequired(fieldDef) {
-			return nil
-		}
-	}
-	if str, ok := fieldValue.(string); ok && strings.TrimSpace(str) == emptyValue {
-		if !IsFieldRequired(fieldDef) {
-			return nil
-		}
+	if !IsFieldRequired(fieldDef) && isUnsetOptionalFieldValue(fieldValue) {
+		return nil
 	}
 
 	if err := iv.validateSemanticType(fieldName, fieldValue, semanticType); err != nil {

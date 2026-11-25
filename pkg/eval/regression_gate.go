@@ -38,10 +38,10 @@ func (cb *QualityCircuitBreaker) RecordEvaluation(current *RegressionScorecard, 
 		return nil, ErrInvalidRegressionScore
 	}
 
+	now := resolveEvalNow(customNow...)
+
 	cb.mu.Lock()
 	defer cb.mu.Unlock()
-
-	now := resolveEvalNow(customNow...)
 
 	// Update any open->half-open transition based on elapsed cooldown
 	cb.currentStateLocked(now)
