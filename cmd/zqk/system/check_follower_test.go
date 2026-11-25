@@ -2,10 +2,12 @@ package system
 
 import (
 	"bytes"
+	"sync"
 	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/zqk-os/zqk/pkg/coordination"
+	"github.com/zqk-os/zqk/pkg/goroutinelabels"
 	"github.com/zqk-os/zqk/pkg/objects"
 )
 
@@ -222,5 +224,70 @@ func TestTerminalProgressSubscriber_AggregationPhase(t *testing.T) {
 	out := buf.String()
 	if !bytes.Contains([]byte(out), []byte("Aggregating validation layers and checking CAS membrane...")) {
 		t.Errorf("expected aggregation output, got: %q", out)
+	}
+}
+
+func TestTerminalProgressSubscriber_ConcurrentHandleEventAndStop(t *testing.T) {
+	t.Parallel()
+	opID := "check_concurrent_123"
+	cmd, buf := newTestCmd()
+	sub := NewTerminalProgressSubscriber(opID, cmd)
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
+	goroutinelabels.NewGoroutine("test.terminal_progress_cache", "emit cache phase events concurrently").
+		StartSimple(func() {
+			defer wg.Done()
+			for range 25 {
+				_ = sub.HandleEvent(&coordination.OperationalEvent{
+					Type:          "operation.progress",
+					OperationID:   opID,
+					OperationType: eventTypeSystemCheck,
+					Metadata: map[string]any{
+						objects.FieldKeyPhase: targetKindCache,
+						"message":             "Loading object ID cache...",
+					},
+				})
+			}
+		})
+
+	goroutinelabels.NewGoroutine("test.terminal_progress_agg", "emit aggregation and discovery events concurrently").
+		StartSimple(func() {
+			defer wg.Done()
+			for i := range 25 {
+				_ = sub.HandleEvent(&coordination.OperationalEvent{
+					Type:          "operation.progress",
+					OperationID:   opID,
+					OperationType: eventTypeSystemCheck,
+					Metadata: map[string]any{
+						objects.FieldKeyPhase: "aggregation",
+						"message":             "Aggregating...",
+					},
+				})
+				_ = sub.HandleEvent(&coordination.OperationalEvent{
+					Type:          "operation.progress",
+					OperationID:   opID,
+					OperationType: eventTypeSystemCheck,
+					Metadata: map[string]any{
+						objects.FieldKeyPhase: "discovery",
+						"files_found":         i + 1,
+						"elapsed_seconds":     float64(1),
+					},
+				})
+			}
+		})
+
+	goroutinelabels.NewGoroutine("test.terminal_progress_stop", "stop subscriber concurrently with emitters").
+		StartSimple(func() {
+			defer wg.Done()
+			sub.Stop()
+		})
+
+	wg.Wait()
+	// After Stop() returns, reading buf must not race with any HandleEvent writer.
+	_ = buf.String()
+	if sub.IsActive() {
+		t.Fatal("expected subscriber to be inactive after Stop")
 	}
 }
