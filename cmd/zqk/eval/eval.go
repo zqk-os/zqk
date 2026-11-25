@@ -54,10 +54,7 @@ func newRunCmd() *cobra.Command {
 			if tmplErr != nil || targetErr != nil || autoMintErr != nil || jsonErr != nil {
 				return errfmt.Errorf("failed to parse evaluation flags")
 			}
-			formatNorm := ""
-			if formatFlag := cmd.Flags().Lookup("format"); formatFlag != nil {
-				formatNorm = strings.ToLower(strings.TrimSpace(formatFlag.Value.String()))
-			}
+			formatNorm := resolveOutputFormat(cmd, outputJSON)
 
 			if strings.TrimSpace(tmplFlag) == "" {
 				return errfmt.Errorf("--template is required")
@@ -88,7 +85,7 @@ func newRunCmd() *cobra.Command {
 				return err
 			}
 
-			if renderErr := renderEvalRunOutput(cmd.OutOrStdout(), formatNorm, outputJSON, tmpl, result); renderErr != nil {
+			if renderErr := renderEvalRunOutput(cmd.OutOrStdout(), formatNorm, tmpl, result); renderErr != nil {
 				return renderErr
 			}
 
@@ -100,10 +97,17 @@ func newRunCmd() *cobra.Command {
 	})
 }
 
-func renderEvalRunOutput(out io.Writer, formatNorm string, outputJSON bool, tmpl *eval.EvalTemplate, result *eval.EvalResult) error {
+func resolveOutputFormat(cmd *cobra.Command, outputJSON bool) string {
 	if outputJSON {
-		formatNorm = "json"
+		return "json"
 	}
+	if formatFlag := cmd.Flags().Lookup("format"); formatFlag != nil {
+		return strings.ToLower(strings.TrimSpace(formatFlag.Value.String()))
+	}
+	return ""
+}
+
+func renderEvalRunOutput(out io.Writer, formatNorm string, tmpl *eval.EvalTemplate, result *eval.EvalResult) error {
 	switch formatNorm {
 	case "json":
 		data, mErr := json.MarshalIndent(result, "", "  ")
@@ -206,19 +210,29 @@ func newMatrixCmd() *cobra.Command {
 				return err
 			}
 
-			if outputJSON {
-				data, mErr := json.MarshalIndent(result, "", "  ")
-				if mErr != nil {
-					return mErr
-				}
-				fmt.Fprintln(cmd.OutOrStdout(), string(data))
-			} else {
-				fmt.Fprintf(cmd.OutOrStdout(), "✓ Convergence matrix evaluated for session %s using template %s (scenarios: %d, passed: %d, score: %0.2f)\n",
-					sessionID, tmpl.TemplateID, result.TotalScenarios, result.PassedScenarios, result.AverageCompositeScore)
-			}
-			return nil
+			formatNorm := resolveOutputFormat(cmd, outputJSON)
+			return renderEvalMatrixOutput(cmd.OutOrStdout(), formatNorm, sessionID, tmpl.TemplateID, result)
 		},
 	})
+}
+
+func renderEvalMatrixOutput(out io.Writer, formatNorm, sessionID, templateID string, result *eval.MatrixResult) error {
+	switch formatNorm {
+	case "json":
+		data, mErr := json.MarshalIndent(result, "", "  ")
+		if mErr != nil {
+			return mErr
+		}
+		fmt.Fprintln(out, string(data))
+		return nil
+	case "markdown", "md":
+		fmt.Fprint(out, eval.FormatMatrixResultMarkdown(result))
+		return nil
+	default:
+		fmt.Fprintf(out, "✓ Convergence matrix evaluated for session %s using template %s (scenarios: %d, passed: %d, score: %0.2f)\n",
+			sessionID, templateID, result.TotalScenarios, result.PassedScenarios, result.AverageCompositeScore)
+		return nil
+	}
 }
 
 func evalStatusStr(passed bool) string {
