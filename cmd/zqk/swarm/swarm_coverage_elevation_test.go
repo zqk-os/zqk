@@ -526,9 +526,12 @@ func TestSwarmRun_HelperCoverage(t *testing.T) {
 	accountID := ensureValidSwarmAccount(ctx, sec, store)
 	assert.NotEmpty(t, accountID)
 
-	// Calling again reuses the created/valid account
-	sec.AccountID = accountID
-	accountID2 := ensureValidSwarmAccount(ctx, sec, store)
+	// Calling again reuses the created/valid account.
+	// Copy SecurityContext instead of mutating sec in-place so async change-journal goroutines
+	// holding the original pointer cannot race with this write.
+	secWithAccount := *sec
+	secWithAccount.AccountID = accountID
+	accountID2 := ensureValidSwarmAccount(ctx, &secWithAccount, store)
 	assert.Equal(t, accountID, accountID2)
 
 	// 6. Test launchSwarmBackground
