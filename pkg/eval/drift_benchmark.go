@@ -1,7 +1,10 @@
 package eval
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 )
@@ -211,4 +214,50 @@ func FormatDriftReportMarkdown(report DriftBenchmarkReport) string {
 		)
 	}
 	return b.String()
+}
+
+// WriteDriftObservationJSONL encodes a single DriftTurnObservation as one JSONL line.
+func WriteDriftObservationJSONL(w io.Writer, obs DriftTurnObservation) error {
+	if w == nil {
+		return fmt.Errorf("writer is required")
+	}
+	data, err := json.Marshal(obs)
+	if err != nil {
+		return fmt.Errorf("failed marshaling drift observation: %w", err)
+	}
+	data = append(data, '\n')
+	if _, err := w.Write(data); err != nil {
+		return fmt.Errorf("failed writing drift observation: %w", err)
+	}
+	return nil
+}
+
+// LoadDriftObservationsJSONL parses newline-delimited DriftTurnObservation JSON records,
+// ignoring blank lines and failing closed on malformed JSON lines.
+func LoadDriftObservationsJSONL(r io.Reader) ([]DriftTurnObservation, error) {
+	if r == nil {
+		return nil, fmt.Errorf("reader is required")
+	}
+	scanner := bufio.NewScanner(r)
+	const maxDriftJSONLLineBytes = 1024 * 1024
+	scanner.Buffer(make([]byte, 0, 4096), maxDriftJSONLLineBytes)
+
+	var out []DriftTurnObservation
+	lineNum := 0
+	for scanner.Scan() {
+		lineNum++
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+		var obs DriftTurnObservation
+		if err := json.Unmarshal([]byte(line), &obs); err != nil {
+			return nil, fmt.Errorf("invalid drift observation JSON on line %d: %w", lineNum, err)
+		}
+		out = append(out, obs)
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("failed reading drift observations: %w", err)
+	}
+	return out, nil
 }

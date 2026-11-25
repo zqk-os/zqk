@@ -1,6 +1,8 @@
 package eval
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -83,4 +85,30 @@ func TestSummarizeDriftBenchmark_EmptyAndOutOfRangeTurns(t *testing.T) {
 	for _, b := range report.Arms[0].Buckets {
 		assert.Equal(t, 0, b.TotalTurns)
 	}
+}
+
+func TestDriftObservationsJSONL_RoundTripAndFailClosed(t *testing.T) {
+	var buf bytes.Buffer
+	in := []DriftTurnObservation{
+		{SessionID: "s1", Arm: "control_a", Turn: 12, ViolatedInvariants: []string{"no_raw_grep"}, ClaimedDone: true},
+		{SessionID: "s1", Arm: "treatment_c", Turn: 12, ViolatedInvariants: []string{"no_raw_grep"}, BlockedByGate: true, RecoveryRetries: 1, GateOverheadTokens: 500},
+	}
+	for _, o := range in {
+		require.NoError(t, WriteDriftObservationJSONL(&buf, o))
+	}
+	buf.WriteString("\n   \n")
+
+	loaded, err := LoadDriftObservationsJSONL(&buf)
+	require.NoError(t, err)
+	assert.Equal(t, in, loaded)
+
+	// Fail closed on malformed JSON line
+	_, err = LoadDriftObservationsJSONL(strings.NewReader("{\"arm\":\"a\"}\n{bad-json\n"))
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "line 2")
+
+	// Guard nil writer / reader
+	require.Error(t, WriteDriftObservationJSONL(nil, in[0]))
+	_, err = LoadDriftObservationsJSONL(nil)
+	require.Error(t, err)
 }
