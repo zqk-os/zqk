@@ -118,7 +118,6 @@ fi
 
 # ---------------------------------------------------------------------------
 # Deny-by-default capability proof (not counted toward TTFA wall clock)
-# TRACK: REQ-1795579293940740000-cfa853e4 / BLI-1795579296277002000-a7daabc8
 # ---------------------------------------------------------------------------
 echo ""
 echo "── Capability deny-by-default (demo:safe / demo:forbidden) ──"
