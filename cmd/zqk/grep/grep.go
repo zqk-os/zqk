@@ -13,6 +13,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/cliapp"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/search"
+	"github.com/zqk-os/zqk/pkg/search/interceptor"
 	fileutil "github.com/zqk-os/zqk/pkg/utils/fileutil"
 	"gopkg.in/yaml.v3"
 )
@@ -26,18 +27,19 @@ const (
 // NewGrepCmd creates the 'zqk grep' command for native in-process code search.
 func NewGrepCmd() *cobra.Command {
 	helpBuilder := clipkg.DynamicHelpBuilder(
-		"In-process trigram and AST code search",
-		"Fast in-process pure-Go code search engine with trigram indexing, Go AST structural queries, and token-budgeted JSON output.",
+		"In-process trigram and polyglot AST code search",
+		"Fast in-process pure-Go code search engine with trigram indexing, polyglot AST structural queries (Go, TypeScript/JS, Python, Rust), token-budgeted JSON output, and pilot ROI compliance scorecards.",
 		"",
 		"Executes sub-15ms code searches without external ripgrep/tgrep binaries.",
-		"Supports regular expression, literal text, trigram indexing, and Go AST symbol queries (functions, methods, structs, interfaces).",
+		"Supports regular expression, literal text, trigram indexing, and polyglot AST symbol queries (functions, methods, structs, classes, interfaces, traits, enums).",
 	).
 		AddExample("Literal search", "%s grep 'MaterializedView'").
 		AddExample("Case-insensitive search", "%s grep -i 'wal_subscriber'").
 		AddExample("Regex search", "%s grep -e 'func.*Start\\('").
-		AddExample("AST search for all structs", "%s grep --ast --kind struct").
-		AddExample("AST search for methods on a receiver", "%s grep --ast --recv Engine").
+		AddExample("Polyglot AST search for structs/classes", "%s grep --ast --kind struct").
+		AddExample("Polyglot AST search for methods on a receiver/class", "%s grep --ast --recv Engine").
 		AddExample("Token-budgeted JSON output for AI agents", "%s grep 'error' --max-tokens 2000 -f json").
+		AddExample("Pilot ROI compliance & token savings scorecard", "%s grep --roi").
 		AddExample("Rebuild persistent index cache", "%s grep --reindex")
 
 	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewGrepCommandBuilder(), &cobra.Command{
@@ -51,6 +53,7 @@ func NewGrepCmd() *cobra.Command {
 
 	helpBuilder.ApplyToCommand(cmd)
 	cmd.Flags().Bool("vendor", false, "Include vendor directories in search")
+	cmd.Flags().Bool("roi", false, "Display zgrep compliance ratio and estimated token savings ROI scorecard")
 	cli.ConfigureRequirements(cmd, false, false)
 	return cmd
 }
@@ -155,6 +158,25 @@ func isDirOrPathTarget(target string, astMode bool, astKind, astReceiver string,
 }
 
 func runGrepExecution(cmd *cobra.Command, args []string) error {
+	var roiFlags clipkg.FlagBag
+	roiMode := roiFlags.Bool(cmd, "roi")
+	if err := roiFlags.Err(); err != nil {
+		return err
+	}
+	if roiMode {
+		format := roiFlags.String(cmd, "format")
+		pathFlag := roiFlags.String(cmd, "path")
+		if err := roiFlags.Err(); err != nil {
+			return err
+		}
+		projectRoot := resolveROIProjectRoot(pathFlag, args)
+		summary, err := interceptor.SummarizeCompliance(projectRoot)
+		if err != nil {
+			return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
+		}
+		return renderComplianceROI(cmd.OutOrStdout(), format, projectRoot, summary)
+	}
+
 	opts, reindex, format, err := parseGrepOptions(cmd, args)
 	if err != nil {
 		return err
@@ -227,4 +249,39 @@ func renderTextMatches(out io.Writer, result *search.SearchResult) error {
 	}
 
 	return nil
+}
+
+func resolveROIProjectRoot(pathFlag string, args []string) string {
+	if strings.TrimSpace(pathFlag) != "" {
+		return strings.TrimSpace(pathFlag)
+	}
+	if len(args) > 0 && strings.TrimSpace(args[0]) != "" {
+		return strings.TrimSpace(args[0])
+	}
+	if root := paths.ResolveProjectRoot("."); root != "" {
+		return root
+	}
+	return "."
+}
+
+func renderComplianceROI(out io.Writer, format, projectRoot string, summary interceptor.ComplianceSummary) error {
+	switch strings.ToLower(strings.TrimSpace(format)) {
+	case "json":
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(summary)
+	case "yaml":
+		enc := yaml.NewEncoder(out)
+		return enc.Encode(summary)
+	default:
+		fmt.Fprintf(out, "zgrep Pilot ROI Scorecard (%s)\n", projectRoot)
+		fmt.Fprintf(out, "------------------------------------------------------------\n")
+		fmt.Fprintf(out, "Total Search Invocations:      %d\n", summary.TotalSearchInvocations)
+		fmt.Fprintf(out, "zgrep Compliant Invocations:   %d\n", summary.ZgrepCompliantCount)
+		fmt.Fprintf(out, "Raw Shell Search Intercepted:  %d\n", summary.RawSearchNonCompliantCount)
+		fmt.Fprintf(out, "zgrep Compliance Ratio:        %.1f%%\n", summary.ComplianceRatioPct)
+		fmt.Fprintf(out, "Estimated Tokens Saved:        %d\n", summary.EstimatedTokensSaved)
+		fmt.Fprintf(out, "Telemetry Log:                 %s\n", interceptor.ComplianceLogPath(projectRoot))
+		return nil
+	}
 }
