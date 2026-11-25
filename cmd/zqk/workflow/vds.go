@@ -276,6 +276,11 @@ func emitVDS(cmd *cobra.Command, proc *cli.Processor, payload any, agentBrief st
 	if format == cli.FormatAgentPrompt && strings.TrimSpace(agentBrief) != "" {
 		return cli.WriteOutput(cmd, []byte(agentBrief))
 	}
+	if format == cli.FormatMarkdown || strings.EqualFold(string(format), "markdown") {
+		if rep, ok := payload.(*vds.Report); ok {
+			return cli.WriteOutput(cmd, []byte(vds.FormatReportMarkdown(rep)))
+		}
+	}
 	_ = proc
 	return cli.FormatOutput(cmd, payload)
 }
