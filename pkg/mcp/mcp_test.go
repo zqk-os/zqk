@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -19,6 +20,20 @@ import (
 	"github.com/zqk-os/zqk/pkg/testkit"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
 )
+
+// newOpenTestClient creates a Client backed by an open io.Pipe so readLoop does not
+// immediately hit EOF and race pending request channel sends in unit tests.
+func newOpenTestClient(t *testing.T) *Client {
+	t.Helper()
+	pr, pw := io.Pipe()
+	client := NewClient(pr, bytes.NewBuffer(nil), NewDefaultTransport())
+	t.Cleanup(func() {
+		_ = pw.Close()
+		_ = pr.Close()
+		client.Close()
+	})
+	return client
+}
 
 // TestMCPClient_LifecycleAndTransports exercises client communication, timeout, and cancellation.
 func TestMCPClient_LifecycleAndTransports(t *testing.T) {
@@ -86,8 +101,7 @@ func TestMCPClient_LifecycleAndTransports(t *testing.T) {
 
 	t.Run("wait_response_context_cancelled", func(t *testing.T) {
 		t.Parallel()
-		client := NewClient(bytes.NewBuffer(nil), bytes.NewBuffer(nil), NewDefaultTransport())
-		defer client.Close()
+		client := newOpenTestClient(t)
 
 		reqID, respCh := client.registerPendingRequest()
 		ctx, cancel := context.WithCancel(context.Background())
@@ -101,8 +115,7 @@ func TestMCPClient_LifecycleAndTransports(t *testing.T) {
 
 	t.Run("wait_response_server_error", func(t *testing.T) {
 		t.Parallel()
-		client := NewClient(bytes.NewBuffer(nil), bytes.NewBuffer(nil), NewDefaultTransport())
-		defer client.Close()
+		client := newOpenTestClient(t)
 
 		reqID, respCh := client.registerPendingRequest()
 		respCh <- JSONRPCResponse{
