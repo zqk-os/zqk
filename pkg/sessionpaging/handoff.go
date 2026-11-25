@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/zqk-os/zqk/pkg/paths"
+	"github.com/zqk-os/zqk/pkg/strutil"
 )
 
 const (
@@ -264,8 +265,8 @@ func (p *HandoffPacket) Validate() error {
 	if p.Schema != HandoffSchemaVersion {
 		return fmt.Errorf("unsupported handoff schema %q (expected %q)", p.Schema, HandoffSchemaVersion)
 	}
-	if strings.TrimSpace(p.GeneratedAt) == "" {
-		return fmt.Errorf("handoff packet missing generated_at timestamp")
+	if err := strutil.ErrorOnBlank(p.GeneratedAt, "handoff packet missing generated_at timestamp"); err != nil {
+		return err
 	}
 	if p.MaxTokens <= 0 {
 		return fmt.Errorf("handoff packet max_tokens must be positive, got %d", p.MaxTokens)
