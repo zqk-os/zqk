@@ -119,6 +119,11 @@ func (s *TerminalProgressSubscriber) HandleEvent(event *coordination.Operational
 		if hasPhase && phase == targetKindCache {
 			msgAny := event.Metadata["message"]
 			if msg, ok := msgAny.(string); ok && msg != emptyValue {
+				s.mu.Lock()
+				defer s.mu.Unlock()
+				if !s.active.Load() {
+					return nil
+				}
 				fmt.Fprintf(s.cmd.ErrOrStderr(), "%s\n", msg)
 			}
 			return nil
@@ -234,6 +239,11 @@ func (s *TerminalProgressSubscriber) HandleEvent(event *coordination.Operational
 			if m, ok := msgAny.(string); ok && m != emptyValue {
 				msg = m
 			}
+			s.mu.Lock()
+			defer s.mu.Unlock()
+			if !s.active.Load() {
+				return nil
+			}
 			fmt.Fprintf(s.cmd.ErrOrStderr(), "%s\n", msg)
 			return nil
 		}
@@ -275,11 +285,18 @@ func (s *TerminalProgressSubscriber) HandleEvent(event *coordination.Operational
 		fmt.Fprintf(s.cmd.ErrOrStderr(), "System check progress: %.1f%% (%d/%d, queue: %d)\n", pct, progress, total, queueSize)
 
 	case "operation.complete", "operation.error":
-		// Mark inactive so we stop rendering after completion/error.
-		s.active.Store(false)
+		// Mark inactive under mutex so we synchronize with any in-flight stderr writer.
+		s.Stop()
 	}
 
 	return nil
+}
+
+// Stop marks the subscriber inactive and waits for any in-flight stderr write to finish.
+func (s *TerminalProgressSubscriber) Stop() {
+	s.mu.Lock()
+	s.active.Store(false)
+	s.mu.Unlock()
 }
 
 // EventTypes returns the event types we're interested in.
@@ -398,6 +415,7 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 
 	// Subscribe to coordinator events BEFORE starting background work to avoid missing early events
 	coordinator := coordination.GetCoordinator()
+	var progressSubscriber *TerminalProgressSubscriber
 	var progressSubscriberID string
 	if coordinator != nil {
 		// Completion subscriber (defensive / redundant with checkDone channel).
@@ -407,10 +425,13 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 
 		// Terminal progress subscriber for real-time UX when waiting for completion (default).
 		// Subscribe BEFORE emitting start event to ensure we catch discovery start.
-		progressSubscriber := NewTerminalProgressSubscriber(operationID, cmd)
+		progressSubscriber = NewTerminalProgressSubscriber(operationID, cmd)
 		progressSubscriber.hasShownStart = true
 		progressSubscriberID = coordinator.Subscribe(progressSubscriber)
-		defer coordinator.Unsubscribe(progressSubscriberID)
+		defer func() {
+			progressSubscriber.Stop()
+			coordinator.Unsubscribe(progressSubscriberID)
+		}()
 	}
 
 	// Emit start event immediately (after subscription so subscriber can catch it)
@@ -465,6 +486,9 @@ func runCheckAsyncWithFollow(cmd *cobra.Command, args []string, timeout time.Dur
 	// Wait for check completion, timeout, or interrupt (runCtx cancelled on SIGINT)
 	select {
 	case err := <-checkDone:
+		if progressSubscriber != nil {
+			progressSubscriber.Stop()
+		}
 		if err != nil {
 			return FormatCheckExecutionError(cmd, args, err)
 		}
