@@ -31,14 +31,30 @@ jobs:
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@v0
 
+      - name: Verify Human-Readable Release Notes Exist
+        run: |
+          NOTES_FILE="docs/releases/${GITHUB_REF_NAME}.md"
+          if [ ! -s "${NOTES_FILE}" ]; then
+            echo "FAIL: missing or empty human-readable release notes at ${NOTES_FILE}" >&2
+            exit 1
+          fi
+          echo "Using release notes: ${NOTES_FILE} ($(wc -c < "${NOTES_FILE}") bytes)"
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: release --clean
+          args: release --clean --release-notes "docs/releases/${{ github.ref_name }}.md"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Ensure GitHub Release Contains Human-Readable Notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          NOTES_FILE="docs/releases/${GITHUB_REF_NAME}.md"
+          gh release edit "${GITHUB_REF_NAME}" --notes-file "${NOTES_FILE}"
 
       - name: Trigger Homebrew Tap Formula Update
         if: env.HOMEBREW_TAP_GITHUB_TOKEN != ''
