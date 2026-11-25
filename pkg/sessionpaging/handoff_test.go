@@ -103,3 +103,45 @@ func TestBuildHandoffPacket_GitRepoAndStrictTokenBudget(t *testing.T) {
 		t.Errorf("expected EstimatedTokens (%d) <= MaxTokens (%d)", pkt.EstimatedTokens, pkt.MaxTokens)
 	}
 }
+
+func TestHandoffPacket_JSONRoundTripAndValidation(t *testing.T) {
+	pkt, err := BuildHandoffPacket(HandoffOptions{
+		ProjectRoot: t.TempDir(),
+		MaxTokens:   500,
+		Note:        "Continue Study 2 handoff validation",
+	})
+	if err != nil {
+		t.Fatalf("BuildHandoffPacket failed: %v", err)
+	}
+
+	raw, err := MarshalHandoffPacketJSON(pkt)
+	if err != nil {
+		t.Fatalf("MarshalHandoffPacketJSON failed: %v", err)
+	}
+
+	parsed, err := ParseHandoffPacketJSON(raw)
+	if err != nil {
+		t.Fatalf("ParseHandoffPacketJSON failed: %v", err)
+	}
+	if parsed.Schema != HandoffSchemaVersion || parsed.Note != pkt.Note || parsed.MaxTokens != 500 {
+		t.Errorf("round-trip mismatch: got %+v", parsed)
+	}
+
+	// Fail closed on invalid inputs
+	for _, tc := range []struct {
+		name string
+		raw  string
+	}{
+		{"empty", "   "},
+		{"malformed_json", "{not-json"},
+		{"wrong_schema", `{"schema":"legacy_v0","generated_at":"2026-11-25T00:00:00Z","max_tokens":500}`},
+		{"missing_timestamp", `{"schema":"zqk_context_handoff_v1","max_tokens":500}`},
+		{"non_positive_budget", `{"schema":"zqk_context_handoff_v1","generated_at":"2026-11-25T00:00:00Z","max_tokens":0}`},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if _, err := ParseHandoffPacketJSON([]byte(tc.raw)); err == nil {
+				t.Errorf("expected ParseHandoffPacketJSON(%s) to fail closed", tc.name)
+			}
+		})
+	}
+}

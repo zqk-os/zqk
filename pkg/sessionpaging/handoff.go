@@ -3,6 +3,7 @@ package sessionpaging
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -253,4 +254,52 @@ func parseGitPorcelainFiles(porcelain string) []string {
 		}
 	}
 	return files
+}
+
+// Validate checks that a HandoffPacket conforms to the canonical Study 2 schema contract.
+func (p *HandoffPacket) Validate() error {
+	if p == nil {
+		return fmt.Errorf("handoff packet is nil")
+	}
+	if p.Schema != HandoffSchemaVersion {
+		return fmt.Errorf("unsupported handoff schema %q (expected %q)", p.Schema, HandoffSchemaVersion)
+	}
+	if strings.TrimSpace(p.GeneratedAt) == "" {
+		return fmt.Errorf("handoff packet missing generated_at timestamp")
+	}
+	if p.MaxTokens <= 0 {
+		return fmt.Errorf("handoff packet max_tokens must be positive, got %d", p.MaxTokens)
+	}
+	if p.EstimatedTokens < 0 {
+		return fmt.Errorf("handoff packet estimated_tokens must be non-negative, got %d", p.EstimatedTokens)
+	}
+	return nil
+}
+
+// MarshalHandoffPacketJSON validates and serializes a HandoffPacket to deterministic indented JSON.
+func MarshalHandoffPacketJSON(p *HandoffPacket) ([]byte, error) {
+	if err := p.Validate(); err != nil {
+		return nil, err
+	}
+	data, err := json.MarshalIndent(p, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("failed marshaling handoff packet: %w", err)
+	}
+	return data, nil
+}
+
+// ParseHandoffPacketJSON parses and validates a JSON-encoded HandoffPacket, failing closed on
+// malformed JSON or unsupported schema versions.
+func ParseHandoffPacketJSON(data []byte) (*HandoffPacket, error) {
+	if len(bytes.TrimSpace(data)) == 0 {
+		return nil, fmt.Errorf("empty handoff packet JSON")
+	}
+	var pkt HandoffPacket
+	if err := json.Unmarshal(data, &pkt); err != nil {
+		return nil, fmt.Errorf("invalid handoff packet JSON: %w", err)
+	}
+	if err := pkt.Validate(); err != nil {
+		return nil, err
+	}
+	return &pkt, nil
 }
