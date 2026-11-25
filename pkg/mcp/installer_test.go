@@ -99,7 +99,7 @@ func TestInstallToIDE_ClaudeDesktop(t *testing.T) {
 	serverKey := "zqk-" + filepath.Base(tmpDir)
 	server, exists := config.MCPServers[serverKey]
 	require.True(t, exists, "claude desktop must receive project-specific key: %s", serverKey)
-	assert.Equal(t, "zqk", server.Command)
+	assert.Equal(t, resolvedTestExec(fakeExec), server.Command)
 	assert.Equal(t, []string{"mcp", "serve"}, server.Args)
 }
 
@@ -166,7 +166,7 @@ func TestInstallToIDE_Cline(t *testing.T) {
 	serverKey := "zqk-" + filepath.Base(tmpDir)
 	server, exists := config.MCPServers[serverKey]
 	require.True(t, exists, "cline must receive project-specific key: %s", serverKey)
-	assert.Equal(t, "zqk", server.Command)
+	assert.Equal(t, resolvedTestExec(fakeExec), server.Command)
 	assert.Equal(t, []string{"mcp", "serve"}, server.Args)
 }
 
@@ -196,7 +196,7 @@ func TestInstallToIDE_Windsurf(t *testing.T) {
 	serverKey := "zqk-" + filepath.Base(tmpDir)
 	server, exists := config.MCPServers[serverKey]
 	require.True(t, exists, "windsurf must receive project-specific key: %s", serverKey)
-	assert.Equal(t, "zqk", server.Command)
+	assert.Equal(t, resolvedTestExec(fakeExec), server.Command)
 	assert.Equal(t, []string{"mcp", "serve"}, server.Args)
 }
 
@@ -295,11 +295,15 @@ func TestInstallToIDE_ClaudeCode(t *testing.T) {
 	// GH-1216: Project-local executable must be preserved instead of bare "zqk"
 	zqkSrv, ok := servers["zqk"].(map[string]any)
 	require.True(t, ok)
-	expectedExec, _ := filepath.Abs(fakeExec)
+	assert.Equal(t, resolvedTestExec(fakeExec), zqkSrv["command"])
+}
+
+func resolvedTestExec(execPath string) string {
+	expectedExec, _ := filepath.Abs(execPath)
 	if resolved, rErr := filepath.EvalSymlinks(expectedExec); rErr == nil {
-		expectedExec = resolved
+		return resolved
 	}
-	assert.Equal(t, expectedExec, zqkSrv["command"])
+	return expectedExec
 }
 
 func TestAutoInstall_AllHosts(t *testing.T) {
