@@ -60,6 +60,25 @@ func TestGrepBench_TableAndJSON(t *testing.T) {
 			}
 		}
 	})
+
+	for _, format := range []string{"markdown", "md"} {
+		t.Run("format_"+format, func(t *testing.T) {
+			cmd := NewGrepCmd()
+			var buf bytes.Buffer
+			cmd.SetOut(&buf)
+			cmd.SetErr(&buf)
+			cmd.SetArgs([]string{"--bench", "SelfBenchSymbol", root, "--max-tokens", "300", "-f", format})
+			if err := cmd.Execute(); err != nil {
+				t.Fatalf("zqk grep --bench -f %s failed: %v", format, err)
+			}
+			out := buf.String()
+			for _, want := range []string{"## zgrep Self-Benchmark", "| Metric | Raw Baseline | zgrep (Budgeted) |", "**Token Reduction:**", "init --lite --with-mcp --with-hooks"} {
+				if !strings.Contains(out, want) {
+					t.Errorf("expected markdown output to contain %q, got:\n%s", want, out)
+				}
+			}
+		})
+	}
 }
 
 func TestGrepReindex_JSONStats(t *testing.T) {

@@ -316,6 +316,10 @@ func renderBenchReport(out io.Writer, format string, report search.BenchReport) 
 		return enc.Encode(report)
 	case "yaml":
 		return yaml.NewEncoder(out).Encode(report)
+	case "markdown", "md":
+		hint := paths.CLIUsage("init --lite --with-mcp --with-hooks")
+		_, err := fmt.Fprint(out, search.FormatBenchMarkdown(report, hint))
+		return err
 	default:
 		hint := paths.CLIUsage("init --lite --with-mcp --with-hooks")
 		_, err := fmt.Fprint(out, search.FormatBenchTable(report, hint))
