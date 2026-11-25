@@ -116,6 +116,30 @@ if [ "$ELAPSED" -gt "$MAX_SECONDS" ]; then
   exit 1
 fi
 
+# ---------------------------------------------------------------------------
+# Deny-by-default capability proof (not counted toward TTFA wall clock)
+# TRACK: REQ-1795579293940740000-cfa853e4 / BLI-1795579296277002000-a7daabc8
+# ---------------------------------------------------------------------------
+echo ""
+echo "── Capability deny-by-default (demo:safe / demo:forbidden) ──"
+(
+  cd "$PROJECT_DIR"
+  unset ZQK_PROJECT_ROOT || true
+  export ZQK_PROJECT_ROOT="${PROJECT_DIR}"
+  "$ZQK_BIN" capability list >/dev/null
+  SAFE_OUT="$("$ZQK_BIN" capability authorize --name demo:safe --agent-id stranger -f json)"
+  echo "$SAFE_OUT" | grep -q '"allowed": true' \
+    || { echo "FAIL: demo:safe must be allowed" >&2; echo "$SAFE_OUT" >&2; exit 1; }
+  set +e
+  FORBIDDEN_OUT="$("$ZQK_BIN" capability authorize --name demo:forbidden --agent-id stranger -f json 2>&1)"
+  FORBIDDEN_RC=$?
+  set -e
+  echo "$FORBIDDEN_OUT" | grep -q '"policy_rejected": true' \
+    || { echo "FAIL: demo:forbidden must set policy_rejected=true" >&2; echo "$FORBIDDEN_OUT" >&2; exit 1; }
+  echo "✓ capability deny-by-default: demo:safe allowed; demo:forbidden policy_rejected (rc=${FORBIDDEN_RC})"
+  echo "TTFA_CAPABILITY_RESULT ok demo_forbidden_policy_rejected=true"
+)
+
 echo "PASS: TTFA unauth init+smoke ${ELAPSED}s ≤ ${MAX_SECONDS}s (no GITHUB_TOKEN)"
 # Machine-readable footer for evidence capture
 echo "TTFA_RESULT ok elapsed_seconds=${ELAPSED} max_seconds=${MAX_SECONDS} method=${INSTALL_METHOD}"
