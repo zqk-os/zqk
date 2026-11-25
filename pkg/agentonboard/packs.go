@@ -47,6 +47,16 @@ func vendorAddendum(v Vendor) string {
 - Regenerable .rules must not become a second source of truth outside the kernel.
 - Route code discovery through %s grep (--ast --max-tokens 2000 -f json) and connect MCP via %s mcp serve.
 `, exe, exe)
+	case VendorContinue:
+		return fmt.Sprintf(`## Vendor: Continue
+- Regenerable .continuerules must not become a second source of truth outside the kernel.
+- Route code discovery through %s grep (--ast --max-tokens 2000 -f json) and connect MCP via %s mcp serve.
+`, exe, exe)
+	case VendorAider:
+		return fmt.Sprintf(`## Vendor: Aider
+- Treat CONVENTIONS.md as regenerable from agent-onboard; durable intent and criteria stay in the kernel.
+- Route code discovery through %s grep (--ast --max-tokens 2000 -f json) before adding files to chat.
+`, exe)
 	case VendorWindsurf:
 		return `## Vendor: Windsurf
 - Regenerable .windsurfrules must not become a second source of truth outside the kernel.
