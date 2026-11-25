@@ -398,12 +398,12 @@ func (r *AmbientTelemetryReport) SetComponent(comp ComponentHealth) {
 	if r == nil {
 		return
 	}
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	if r.Components == nil {
-		r.Components = make(map[string]ComponentHealth)
-	}
-	r.Components[comp.Name] = comp
+	withWLock(&r.mu, func() {
+		if r.Components == nil {
+			r.Components = make(map[string]ComponentHealth)
+		}
+		r.Components[comp.Name] = comp
+	})
 }
 
 // GetStatus returns the report status string in a nil-safe manner.
