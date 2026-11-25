@@ -291,6 +291,15 @@ func TestInstallToIDE_ClaudeCode(t *testing.T) {
 	require.True(t, ok)
 	assert.Contains(t, servers, "existing-server")
 	assert.Contains(t, servers, "zqk")
+
+	// GH-1216: Project-local executable must be preserved instead of bare "zqk"
+	zqkSrv, ok := servers["zqk"].(map[string]any)
+	require.True(t, ok)
+	expectedExec, _ := filepath.Abs(fakeExec)
+	if resolved, rErr := filepath.EvalSymlinks(expectedExec); rErr == nil {
+		expectedExec = resolved
+	}
+	assert.Equal(t, expectedExec, zqkSrv["command"])
 }
 
 func TestAutoInstall_AllHosts(t *testing.T) {

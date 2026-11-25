@@ -108,6 +108,12 @@ func newKindConvenienceCmd(kind string, aliases ...string) *cobra.Command {
 	if kind == objects.KindCriteria {
 		cmd.Flags().String("category", "functional", "Criteria category (default: functional)")
 	}
+	if kind == objects.KindVision {
+		cmd.Flags().String("narrative", "", "Vision narrative statement (defaults to --description/--content or --title)")
+	}
+	if kind == objects.KindMission {
+		cmd.Flags().String("mission-statement", "", "Mission statement (defaults to --description/--content or --title)")
+	}
 	cmd.Flags().String("req", "", "Parent requirement id (sets requirement_refs; required for backlog_item with --promote/--cas unless --goal)")
 	cmd.Flags().String("goal", "", "Parent goal id (sets goal_refs; required for backlog_item with --promote/--cas unless --req)")
 	if cmd.Flags().Lookup("estimated-effort") == nil {
@@ -151,6 +157,12 @@ func newObjectCmd() *cobra.Command {
 	}
 	if cmd.Flags().Lookup("effort") == nil {
 		cmd.Flags().String("effort", "", "Alias for --estimated-effort")
+	}
+	if cmd.Flags().Lookup("narrative") == nil {
+		cmd.Flags().String("narrative", "", "Vision narrative statement (defaults to --description/--content or --title)")
+	}
+	if cmd.Flags().Lookup("mission-statement") == nil {
+		cmd.Flags().String("mission-statement", "", "Mission statement (defaults to --description/--content or --title)")
 	}
 	return cmd
 }
@@ -201,6 +213,7 @@ func runNewObject(cmd *cobra.Command, args []string) (err error) {
 		objData[objects.FieldKeyDescription] = body
 	}
 	applyCriteriaDefaultCategory(cmd, kind, objData)
+	applyStrategicStatementDefaults(cmd, kind, title, body, objData)
 	// --req/--goal lineage refs are persisted by applyRelationalFlags, which
 	// honours per-kind forbidden fields (GH-946); here they only gate CAS crossing.
 	reqID, _ := cmd.Flags().GetString("req")
@@ -268,6 +281,42 @@ func applyCriteriaDefaultCategory(cmd *cobra.Command, kind string, objData map[s
 		}
 	}
 	objData[objects.FieldKeyCategory] = category
+}
+
+// applyStrategicStatementDefaults ensures vision (narrative) and mission
+// (mission_statement) objects always carry their required statement fields
+// when minted via `zqk new vision|mission [--cas]` (GH-1213).
+func applyStrategicStatementDefaults(cmd *cobra.Command, kind, title, body string, objData map[string]any) {
+	if objData == nil {
+		return
+	}
+	var flagName, fieldKey string
+	switch kind {
+	case objects.KindVision:
+		flagName = "narrative"
+		fieldKey = "narrative"
+	case objects.KindMission:
+		flagName = "mission-statement"
+		fieldKey = "mission_statement"
+	default:
+		return
+	}
+	var val string
+	if cmd != nil && cmd.Flags().Lookup(flagName) != nil {
+		if flagVal, _ := cmd.Flags().GetString(flagName); strings.TrimSpace(flagVal) != emptyValue {
+			val = strings.TrimSpace(flagVal)
+		}
+	}
+	if val == emptyValue {
+		if strings.TrimSpace(body) != emptyValue {
+			val = strings.TrimSpace(body)
+		} else {
+			val = strings.TrimSpace(title)
+		}
+	}
+	if val != emptyValue {
+		objData[fieldKey] = val
+	}
 }
 
 func handleMintPromote(cmd *cobra.Command, projectRoot, id, kind string) error {

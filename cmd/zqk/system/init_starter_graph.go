@@ -187,7 +187,7 @@ schema_version: 2.0.0
 namespace_id: zqk:kernel
 category: functional
 title: User intent objectified and initial MMOrch swarm execution verified
-description: Verify that the user's project intent is captured in kernel objects and that the autonomous agent loop (zqk do) has executed its first verified task.
+description: Verify that the user's project intent is captured in kernel objects, project documentation is aligned, and the autonomous agent loop (zqk do) has executed its first verified task.
 priority: critical
 validation_method: automated_test
 status: awaiting_verification
