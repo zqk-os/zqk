@@ -15,7 +15,7 @@ func TestOpenWeightPresets_ValidateAndRegister(t *testing.T) {
 		t.Fatalf("RegisterOpenWeightPresets failed: %v", err)
 	}
 
-	for _, eng := range []ProviderEngineType{EngineOllama, EngineTogether, EngineFireworks, EngineBaseten, EngineGroq} {
+	for _, eng := range []ProviderEngineType{EngineOllama, EngineTogether, EngineFireworks, EngineBaseten, EngineGroq, EngineOpenRouter, EngineDeepSeek} {
 		preset, ok := LookupOpenWeightPreset(eng)
 		if !ok {
 			t.Fatalf("expected preset %q to be discoverable", eng)
