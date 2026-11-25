@@ -122,6 +122,17 @@ func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext,
 		return emitPreCommandDecision(out, "allow", "", nil)
 	}
 
+	if interceptor.DetectZgrepCompliant(commandLine) {
+		_ = interceptor.RecordComplianceEvent(resolvedRoot, interceptor.ComplianceEvent{
+			Kind:                 interceptor.ComplianceKindZgrep,
+			Tool:                 "zgrep",
+			Compliant:            true,
+			CommandLine:          commandLine,
+			EstimatedTokensSaved: interceptor.DefaultEstimatedRawSearchTokens - interceptor.DefaultBudgetedSearchTokens,
+		})
+		return emitPreCommandDecision(out, "allow", "", nil)
+	}
+
 	cwd := extractCwd(raw, projectRoot)
 
 	// Combine explicit options with any payload-specified settings
@@ -141,6 +152,16 @@ func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext,
 		ProjectRoot: projectRoot,
 	}, effectiveOpts...)
 	if err != nil || res == nil || !res.Intercepted {
+		if isRawFind, nudge := interceptor.DetectRawFindNonCompliance(commandLine, resolvedRoot); isRawFind {
+			_ = interceptor.RecordComplianceEvent(resolvedRoot, interceptor.ComplianceEvent{
+				Kind:          interceptor.ComplianceKindRawFindNudge,
+				Tool:          "find",
+				Compliant:     false,
+				CommandLine:   commandLine,
+				SteeringNudge: nudge,
+			})
+			return emitPreCommandDecision(out, "allow", nudge, nil)
+		}
 		return emitPreCommandDecision(out, "allow", "", nil)
 	}
 
@@ -152,6 +173,16 @@ func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext,
 	if reason == "" || reason == interceptor.ReasonRewritten {
 		reason = paths.RewriteCanonicalCLIInvocations("Intercepted search: redirected to token-budgeted zqk grep trigram engine")
 	}
+
+	_ = interceptor.RecordComplianceEvent(resolvedRoot, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindRawSearchIntercepted,
+		Tool:                 "grep",
+		Compliant:            false,
+		CommandLine:          commandLine,
+		RewrittenCommand:     res.RewrittenCommand,
+		SteeringNudge:        interceptor.FormatSteeringNudge(res.RewrittenCommand),
+		EstimatedTokensSaved: interceptor.DefaultEstimatedRawSearchTokens - interceptor.DefaultBudgetedSearchTokens,
+	})
 
 	return emitPreCommandDecision(out, "allow", reason, overwrite)
 }
