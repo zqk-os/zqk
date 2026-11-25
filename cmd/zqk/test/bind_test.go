@@ -169,3 +169,36 @@ func TestCalculateWordOverlap(t *testing.T) {
 		t.Errorf("expected score1 (%d) > score2 (%d)", score1, score2)
 	}
 }
+
+type stubUpdateVerifyStorage struct {
+	storage.ObjectStorageProvider
+	updateErr error
+	readObj   map[string]any
+	readErr   error
+}
+
+func (s *stubUpdateVerifyStorage) Update(_ context.Context, _ *pkgctx.SecurityContext, _ string, _ map[string]any) error {
+	return s.updateErr
+}
+
+func (s *stubUpdateVerifyStorage) Read(_ context.Context, _ *pkgctx.SecurityContext, _ string) (map[string]any, error) {
+	return s.readObj, s.readErr
+}
+
+func TestUpdateAndVerifyBoundObject_FailsClosedWhenPostUpdateReadFails(t *testing.T) {
+	sp := &stubUpdateVerifyStorage{
+		updateErr: nil,
+		readObj:   nil,
+		readErr:   fmt.Errorf("object not found"),
+	}
+	err := updateAndVerifyBoundObject(
+		context.Background(),
+		sp,
+		&pkgctx.SecurityContext{},
+		"TST-MISSING-001",
+		map[string]any{objects.FieldKeyID: "TST-MISSING-001"},
+	)
+	if err == nil {
+		t.Fatalf("expected post-bind verification error when object is unreadable after Update")
+	}
+}

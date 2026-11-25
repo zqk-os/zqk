@@ -96,8 +96,7 @@ func executeExplicitBinding(
 			curReqs = append(curReqs, reqID)
 			tcObj[objects.FieldKeyRequirementRefs] = curReqs
 			if !dryRun {
-				cleanLegacyFields(tcObj)
-				if err := sp.Update(ctx, secCtx, tcID, tcObj); err != nil {
+				if err := updateAndVerifyBoundObject(ctx, sp, secCtx, tcID, tcObj); err != nil {
 					return fmt.Errorf("failed to update test case %s: %w", tcID, err)
 				}
 			}
@@ -111,8 +110,7 @@ func executeExplicitBinding(
 			curBLIs = append(curBLIs, bliID)
 			tcObj[objects.FieldKeyBacklogItemRefs] = curBLIs
 			if !dryRun {
-				cleanLegacyFields(tcObj)
-				if err := sp.Update(ctx, secCtx, tcID, tcObj); err != nil {
+				if err := updateAndVerifyBoundObject(ctx, sp, secCtx, tcID, tcObj); err != nil {
 					return fmt.Errorf("failed to update test case %s with backlog item: %w", tcID, err)
 				}
 			}
@@ -129,8 +127,7 @@ func executeExplicitBinding(
 				curGoals = append(curGoals, goalID)
 				reqObj[objects.FieldKeyGoalRefs] = curGoals
 				if !dryRun {
-					cleanLegacyFields(reqObj)
-					if err := sp.Update(ctx, secCtx, reqID, reqObj); err != nil {
+					if err := updateAndVerifyBoundObject(ctx, sp, secCtx, reqID, reqObj); err != nil {
 						return fmt.Errorf("failed to update requirement %s with goal: %w", reqID, err)
 					}
 				}
@@ -286,8 +283,7 @@ func executeAutoBinding(
 			if len(resolvedReqs) > 0 {
 				tcObj[objects.FieldKeyRequirementRefs] = resolvedReqs
 				if !dryRun {
-					cleanLegacyFields(tcObj)
-					if err := sp.Update(ctx, secCtx, tcID, tcObj); err != nil {
+					if err := updateAndVerifyBoundObject(ctx, sp, secCtx, tcID, tcObj); err != nil {
 						fmt.Fprintf(cmd.ErrOrStderr(), "  ⚠️ Failed to update test case %s: %v\n", tcID, err)
 						continue
 					}
@@ -314,8 +310,7 @@ func executeAutoBinding(
 						topGoal := candidates[0].ID
 						reqObj[objects.FieldKeyGoalRefs] = []string{topGoal}
 						if !dryRun {
-							cleanLegacyFields(reqObj)
-							if err := sp.Update(ctx, secCtx, reqID, reqObj); err != nil {
+							if err := updateAndVerifyBoundObject(ctx, sp, secCtx, reqID, reqObj); err != nil {
 								fmt.Fprintf(cmd.ErrOrStderr(), "  ⚠️ Failed to update requirement %s: %v\n", reqID, err)
 								continue
 							}
@@ -339,6 +334,26 @@ func executeAutoBinding(
 	_ = stateRefresh.SaveToLiteFile(projectRoot)
 
 	fmt.Fprintf(cmd.OutOrStdout(), "\n%s Successfully applied %d lineage binding(s)! Working set is now closed.\n", green("✓"), boundCount)
+	return nil
+}
+
+// updateAndVerifyBoundObject persists a bound object update and immediately verifies
+// the updated object is readable from storage before returning success (GH-1255).
+func updateAndVerifyBoundObject(
+	ctx context.Context,
+	sp storage.ObjectStorageProvider,
+	secCtx *pkgctx.SecurityContext,
+	objID string,
+	obj map[string]any,
+) error {
+	cleanLegacyFields(obj)
+	if err := sp.Update(ctx, secCtx, objID, obj); err != nil {
+		return err
+	}
+	readBack, err := sp.Read(ctx, secCtx, objID)
+	if err != nil || readBack == nil {
+		return fmt.Errorf("post-bind read verification failed for %s: %w", objID, err)
+	}
 	return nil
 }
 
