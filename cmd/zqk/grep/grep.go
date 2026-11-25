@@ -55,6 +55,7 @@ func NewGrepCmd() *cobra.Command {
 	cmd.Flags().Bool("vendor", false, "Include vendor directories in search")
 	cmd.Flags().Bool("roi", false, "Display zgrep compliance ratio and estimated token savings ROI scorecard")
 	cmd.Flags().Float64("min-compliance", 0, "With --roi, fail closed if zgrep compliance ratio is below this percentage (0-100)")
+	cmd.Flags().StringSlice("repos", nil, "With --roi, aggregate compliance telemetry across multiple repository root paths")
 	cli.ConfigureRequirements(cmd, false, false)
 	return cmd
 }
@@ -177,12 +178,32 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 		if minCompliance < 0 || minCompliance > 100 {
 			return fmt.Errorf("--min-compliance must be between 0 and 100 (got %.2f)", minCompliance)
 		}
-		projectRoot := resolveROIProjectRoot(pathFlag, args)
-		summary, err := interceptor.SummarizeCompliance(projectRoot)
+		repos, err := cmd.Flags().GetStringSlice("repos")
 		if err != nil {
-			return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
+			return err
 		}
-		if err := renderComplianceROI(cmd.OutOrStdout(), format, projectRoot, summary); err != nil {
+		var (
+			summary         interceptor.ComplianceSummary
+			displayRoot     string
+			telemetrySource string
+		)
+		if len(repos) > 0 {
+			summary, err = interceptor.SummarizeComplianceMulti(repos)
+			if err != nil {
+				return fmt.Errorf("failed computing multi-repo zgrep ROI compliance summary: %w", err)
+			}
+			displayRoot = fmt.Sprintf("%d repositories (%s)", len(repos), strings.Join(repos, ", "))
+			telemetrySource = fmt.Sprintf("multi-repo rollup (%d repositories)", len(repos))
+		} else {
+			projectRoot := resolveROIProjectRoot(pathFlag, args)
+			summary, err = interceptor.SummarizeCompliance(projectRoot)
+			if err != nil {
+				return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
+			}
+			displayRoot = projectRoot
+			telemetrySource = interceptor.ComplianceLogPath(projectRoot)
+		}
+		if err := renderComplianceROI(cmd.OutOrStdout(), format, displayRoot, telemetrySource, summary); err != nil {
 			return err
 		}
 		if minCompliance > 0 && summary.TotalSearchInvocations > 0 && summary.ComplianceRatioPct < minCompliance {
@@ -278,7 +299,7 @@ func resolveROIProjectRoot(pathFlag string, args []string) string {
 	return "."
 }
 
-func renderComplianceROI(out io.Writer, format, projectRoot string, summary interceptor.ComplianceSummary) error {
+func renderComplianceROI(out io.Writer, format, projectRoot, telemetrySource string, summary interceptor.ComplianceSummary) error {
 	switch strings.ToLower(strings.TrimSpace(format)) {
 	case "json":
 		enc := json.NewEncoder(out)
@@ -290,7 +311,7 @@ func renderComplianceROI(out io.Writer, format, projectRoot string, summary inte
 	case "markdown", "md":
 		fmt.Fprintf(out, "## zgrep Pilot ROI Scorecard\n\n")
 		fmt.Fprintf(out, "- **Repository:** `%s`\n", projectRoot)
-		fmt.Fprintf(out, "- **Telemetry Source:** `%s`\n\n", interceptor.ComplianceLogPath(projectRoot))
+		fmt.Fprintf(out, "- **Telemetry Source:** `%s`\n\n", telemetrySource)
 		fmt.Fprintf(out, "| Metric | Value |\n")
 		fmt.Fprintf(out, "|---|---:|\n")
 		fmt.Fprintf(out, "| Total Search Invocations | %d |\n", summary.TotalSearchInvocations)
@@ -307,7 +328,7 @@ func renderComplianceROI(out io.Writer, format, projectRoot string, summary inte
 		fmt.Fprintf(out, "Raw Shell Search Intercepted:  %d\n", summary.RawSearchNonCompliantCount)
 		fmt.Fprintf(out, "zgrep Compliance Ratio:        %.1f%%\n", summary.ComplianceRatioPct)
 		fmt.Fprintf(out, "Estimated Tokens Saved:        %d\n", summary.EstimatedTokensSaved)
-		fmt.Fprintf(out, "Telemetry Log:                 %s\n", interceptor.ComplianceLogPath(projectRoot))
+		fmt.Fprintf(out, "Telemetry Log:                 %s\n", telemetrySource)
 		return nil
 	}
 }

@@ -197,3 +197,53 @@ func TestGrepROI_ScorecardFormats(t *testing.T) {
 		}
 	})
 }
+
+func TestGrepROI_MultiRepoRollup(t *testing.T) {
+	t.Parallel()
+	repoA := t.TempDir()
+	repoB := t.TempDir()
+
+	if err := interceptor.RecordComplianceEvent(repoA, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindZgrep,
+		Compliant:            true,
+		CommandLine:          "zqk grep --ast --kind struct",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record repoA failed: %v", err)
+	}
+	if err := interceptor.RecordComplianceEvent(repoB, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindZgrep,
+		Compliant:            true,
+		CommandLine:          "zgrep Engine pkg/search",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record repoB compliant failed: %v", err)
+	}
+	if err := interceptor.RecordComplianceEvent(repoB, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindRawSearchIntercepted,
+		Compliant:            false,
+		CommandLine:          "grep -rn foo .",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record repoB non-compliant failed: %v", err)
+	}
+
+	cmd := NewGrepCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{"--roi", "--repos", repoA + "," + repoB, "-f", "json", "--min-compliance", "60"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("multi-repo --roi failed: %v", err)
+	}
+	var got interceptor.ComplianceSummary
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("invalid json: %v\n%s", err, buf.String())
+	}
+	if got.TotalSearchInvocations != 3 || got.ZgrepCompliantCount != 2 || got.RawSearchNonCompliantCount != 1 {
+		t.Fatalf("unexpected multi-repo rollup counts: %+v", got)
+	}
+	if got.EstimatedTokensSaved != 18000 {
+		t.Errorf("expected 18000 tokens saved across 2 repos, got %d", got.EstimatedTokensSaved)
+	}
+}

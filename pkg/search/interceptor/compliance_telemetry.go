@@ -231,3 +231,26 @@ func SummarizeCompliance(projectRoot string) (ComplianceSummary, error) {
 	}
 	return summary, nil
 }
+
+// SummarizeComplianceMulti aggregates zgrep compliance telemetry across multiple repository roots.
+func SummarizeComplianceMulti(projectRoots []string) (ComplianceSummary, error) {
+	var total ComplianceSummary
+	for _, root := range projectRoots {
+		trimmed := strings.TrimSpace(root)
+		if trimmed == "" {
+			continue
+		}
+		sub, err := SummarizeCompliance(trimmed)
+		if err != nil {
+			return total, err
+		}
+		total.TotalSearchInvocations += sub.TotalSearchInvocations
+		total.ZgrepCompliantCount += sub.ZgrepCompliantCount
+		total.RawSearchNonCompliantCount += sub.RawSearchNonCompliantCount
+		total.EstimatedTokensSaved += sub.EstimatedTokensSaved
+	}
+	if total.TotalSearchInvocations > 0 {
+		total.ComplianceRatioPct = float64(total.ZgrepCompliantCount) * 100.0 / float64(total.TotalSearchInvocations)
+	}
+	return total, nil
+}
