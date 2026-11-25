@@ -196,7 +196,7 @@ func SummarizeCompliance(projectRoot string) (ComplianceSummary, error) {
 		return summary, nil
 	}
 	logPath := ComplianceLogPath(projectRoot)
-	f, err := os.Open(logPath)
+	f, err := fileutil.OpenFile(logPath, os.O_RDONLY, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return summary, nil
