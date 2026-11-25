@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"path/filepath"
 	"sync"
 	"testing"
@@ -64,7 +65,7 @@ func (m *cycle207StorageMock) List(_ context.Context, _ *pkgctx.SecurityContext,
 			}
 		}
 		if match {
-			result = append(result, obj)
+			result = append(result, maps.Clone(obj))
 		}
 	}
 	return &storage.QueryResult{Objects: result}, nil
