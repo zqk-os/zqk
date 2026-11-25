@@ -1,6 +1,8 @@
 package gate
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
 	"github.com/zqk-os/zqk/pkg/gate"
@@ -35,21 +37,32 @@ func NewListCmd() *cobra.Command {
 				return err
 			}
 
+			formatNorm := ""
+			if formatFlag := cmd.Flags().Lookup("format"); formatFlag != nil {
+				formatNorm = strings.ToLower(strings.TrimSpace(formatFlag.Value.String()))
+			}
 			if gctx.jsonOutput {
-				return printGateJSON(cmd, list)
+				formatNorm = "json"
 			}
 
-			if len(list) == 0 {
-				cmd.Println("No approval requests found.")
+			switch formatNorm {
+			case "json":
+				return printGateJSON(cmd, list)
+			case "markdown", "md":
+				cmd.Print(gate.FormatApprovalsMarkdown(list))
+				return nil
+			default:
+				if len(list) == 0 {
+					cmd.Println("No approval requests found.")
+					return nil
+				}
+
+				cmd.Printf("%-24s  %-12s  %-16s  %-10s  %-20s\n", "ID", "TYPE", "TARGET", "STATUS", "CREATED_AT")
+				for _, item := range list {
+					cmd.Printf("%-24s  %-12s  %-16s  %-10s  %-20s\n", item.ID, item.Type, item.Target, item.Status, item.CreatedAt)
+				}
 				return nil
 			}
-
-			cmd.Printf("%-24s  %-12s  %-16s  %-10s  %-20s\n", "ID", "TYPE", "TARGET", "STATUS", "CREATED_AT")
-			for _, item := range list {
-				cmd.Printf("%-24s  %-12s  %-16s  %-10s  %-20s\n", item.ID, item.Type, item.Target, item.Status, item.CreatedAt)
-			}
-
-			return nil
 		},
 	}
 
