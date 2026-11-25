@@ -51,13 +51,7 @@ func FormatEvalResultMarkdown(res *EvalResult) string {
 		}
 	}
 
-	if len(res.Remediations) > 0 {
-		b.WriteString("\n### Remediations\n\n")
-		for _, r := range res.Remediations {
-			fmt.Fprintf(&b, "- %s\n", r)
-		}
-	}
-
+	writeMarkdownRemediations(&b, res.Remediations)
 	return b.String()
 }
 
@@ -100,12 +94,16 @@ func FormatMatrixResultMarkdown(res *MatrixResult) string {
 		}
 	}
 
-	if len(res.Remediations) > 0 {
-		b.WriteString("\n### Remediations\n\n")
-		for _, r := range res.Remediations {
-			fmt.Fprintf(&b, "- %s\n", r)
-		}
-	}
-
+	writeMarkdownRemediations(&b, res.Remediations)
 	return b.String()
+}
+
+func writeMarkdownRemediations(b *strings.Builder, remediations []string) {
+	if len(remediations) == 0 {
+		return
+	}
+	b.WriteString("\n### Remediations\n\n")
+	for _, r := range remediations {
+		fmt.Fprintf(b, "- %s\n", r)
+	}
 }
