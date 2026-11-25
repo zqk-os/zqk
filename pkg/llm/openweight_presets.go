@@ -7,10 +7,12 @@ import (
 
 const (
 	// OpenAI-compatible open-weight inference providers (Engine 3 Category 1 Ecosystem Playbook).
-	EngineTogether  ProviderEngineType = "together"
-	EngineFireworks ProviderEngineType = "fireworks"
-	EngineBaseten   ProviderEngineType = "baseten"
-	EngineGroq      ProviderEngineType = "groq"
+	EngineTogether   ProviderEngineType = "together"
+	EngineFireworks  ProviderEngineType = "fireworks"
+	EngineBaseten    ProviderEngineType = "baseten"
+	EngineGroq       ProviderEngineType = "groq"
+	EngineOpenRouter ProviderEngineType = "openrouter"
+	EngineDeepSeek   ProviderEngineType = "deepseek"
 )
 
 // OpenWeightProviderPreset defines a canonical OpenAI-compatible open-weight inference endpoint
@@ -87,6 +89,26 @@ func OpenWeightPresets() []OpenWeightProviderPreset {
 			AuthEnvVar:       "GROQ_API_KEY",
 			DefaultModel:     "llama-3.3-70b-versatile",
 			MaxContextTokens: 32768,
+			SupportsTools:    true,
+			LocalAirGapped:   false,
+		},
+		{
+			EngineType:       EngineOpenRouter,
+			DisplayName:      "OpenRouter",
+			BaseURL:          "https://openrouter.ai/api/v1",
+			AuthEnvVar:       "OPENROUTER_API_KEY",
+			DefaultModel:     "qwen/qwen-2.5-coder-32b-instruct",
+			MaxContextTokens: 32768,
+			SupportsTools:    true,
+			LocalAirGapped:   false,
+		},
+		{
+			EngineType:       EngineDeepSeek,
+			DisplayName:      "DeepSeek",
+			BaseURL:          "https://api.deepseek.com/v1",
+			AuthEnvVar:       "DEEPSEEK_API_KEY",
+			DefaultModel:     "deepseek-chat",
+			MaxContextTokens: 65536,
 			SupportsTools:    true,
 			LocalAirGapped:   false,
 		},
