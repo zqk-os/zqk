@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -189,8 +191,40 @@ func appendLineToFile(path string, line []byte) error {
 	return closeErr
 }
 
+// ParseSinceWindow parses a relative duration ("7d", "24h", "30m") or RFC3339 timestamp
+// into a UTC lower-bound timestamp relative to now. An empty input returns the zero Time.
+func ParseSinceWindow(raw string, now time.Time) (time.Time, error) {
+	trimmed := strings.TrimSpace(raw)
+	if trimmed == "" {
+		return time.Time{}, nil
+	}
+	if strings.HasSuffix(trimmed, "d") && len(trimmed) > 1 {
+		days, err := strconv.Atoi(strings.TrimSuffix(trimmed, "d"))
+		if err != nil || days <= 0 {
+			return time.Time{}, fmt.Errorf("invalid --since day duration %q (expected positive integer like 7d)", raw)
+		}
+		return now.UTC().Add(-time.Duration(days) * 24 * time.Hour), nil
+	}
+	if dur, err := time.ParseDuration(trimmed); err == nil {
+		if dur <= 0 {
+			return time.Time{}, fmt.Errorf("invalid --since duration %q (must be positive)", raw)
+		}
+		return now.UTC().Add(-dur), nil
+	}
+	if ts, err := time.Parse(time.RFC3339, trimmed); err == nil {
+		return ts.UTC(), nil
+	}
+	return time.Time{}, fmt.Errorf("invalid --since value %q (use duration like 7d, 24h, or RFC3339 timestamp)", raw)
+}
+
 // SummarizeCompliance computes aggregate zgrep compliance ratio and estimated token savings.
 func SummarizeCompliance(projectRoot string) (ComplianceSummary, error) {
+	return SummarizeComplianceSince(projectRoot, time.Time{})
+}
+
+// SummarizeComplianceSince computes zgrep compliance metrics for events at or after since.
+// When since is zero, all recorded events are included.
+func SummarizeComplianceSince(projectRoot string, since time.Time) (ComplianceSummary, error) {
 	var summary ComplianceSummary
 	if strings.TrimSpace(projectRoot) == "" {
 		return summary, nil
@@ -215,6 +249,12 @@ func SummarizeCompliance(projectRoot string) (ComplianceSummary, error) {
 		if err := json.Unmarshal([]byte(line), &ev); err != nil {
 			continue
 		}
+		if !since.IsZero() {
+			evTime, tsErr := time.Parse(time.RFC3339, ev.Timestamp)
+			if tsErr != nil || evTime.Before(since) {
+				continue
+			}
+		}
 		summary.TotalSearchInvocations++
 		if ev.Compliant {
 			summary.ZgrepCompliantCount++
@@ -230,4 +270,33 @@ func SummarizeCompliance(projectRoot string) (ComplianceSummary, error) {
 		summary.ComplianceRatioPct = float64(summary.ZgrepCompliantCount) * 100.0 / float64(summary.TotalSearchInvocations)
 	}
 	return summary, nil
+}
+
+// SummarizeComplianceMulti aggregates zgrep compliance telemetry across multiple repository roots.
+func SummarizeComplianceMulti(projectRoots []string) (ComplianceSummary, error) {
+	return SummarizeComplianceMultiSince(projectRoots, time.Time{})
+}
+
+// SummarizeComplianceMultiSince aggregates zgrep compliance telemetry across multiple repository roots
+// filtered to events at or after since.
+func SummarizeComplianceMultiSince(projectRoots []string, since time.Time) (ComplianceSummary, error) {
+	var total ComplianceSummary
+	for _, root := range projectRoots {
+		trimmed := strings.TrimSpace(root)
+		if trimmed == "" {
+			continue
+		}
+		sub, err := SummarizeComplianceSince(trimmed, since)
+		if err != nil {
+			return total, err
+		}
+		total.TotalSearchInvocations += sub.TotalSearchInvocations
+		total.ZgrepCompliantCount += sub.ZgrepCompliantCount
+		total.RawSearchNonCompliantCount += sub.RawSearchNonCompliantCount
+		total.EstimatedTokensSaved += sub.EstimatedTokensSaved
+	}
+	if total.TotalSearchInvocations > 0 {
+		total.ComplianceRatioPct = float64(total.ZgrepCompliantCount) * 100.0 / float64(total.TotalSearchInvocations)
+	}
+	return total, nil
 }

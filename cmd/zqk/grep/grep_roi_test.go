@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zqk-os/zqk/pkg/search/interceptor"
 	"gopkg.in/yaml.v3"
@@ -196,4 +197,107 @@ func TestGrepROI_ScorecardFormats(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestGrepROI_MultiRepoRollup(t *testing.T) {
+	t.Parallel()
+	repoA := t.TempDir()
+	repoB := t.TempDir()
+
+	if err := interceptor.RecordComplianceEvent(repoA, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindZgrep,
+		Compliant:            true,
+		CommandLine:          "zqk grep --ast --kind struct",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record repoA failed: %v", err)
+	}
+	if err := interceptor.RecordComplianceEvent(repoB, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindZgrep,
+		Compliant:            true,
+		CommandLine:          "zgrep Engine pkg/search",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record repoB compliant failed: %v", err)
+	}
+	if err := interceptor.RecordComplianceEvent(repoB, interceptor.ComplianceEvent{
+		Kind:                 interceptor.ComplianceKindRawSearchIntercepted,
+		Compliant:            false,
+		CommandLine:          "grep -rn foo .",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record repoB non-compliant failed: %v", err)
+	}
+
+	cmd := NewGrepCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{"--roi", "--repos", repoA + "," + repoB, "-f", "json", "--min-compliance", "60"})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("multi-repo --roi failed: %v", err)
+	}
+	var got interceptor.ComplianceSummary
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("invalid json: %v\n%s", err, buf.String())
+	}
+	if got.TotalSearchInvocations != 3 || got.ZgrepCompliantCount != 2 || got.RawSearchNonCompliantCount != 1 {
+		t.Fatalf("unexpected multi-repo rollup counts: %+v", got)
+	}
+	if got.EstimatedTokensSaved != 18000 {
+		t.Errorf("expected 18000 tokens saved across 2 repos, got %d", got.EstimatedTokensSaved)
+	}
+}
+
+func TestGrepROI_SinceWindowFiltering(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	now := time.Now().UTC()
+
+	// Week-1 old non-compliant event (14 days ago) should be excluded by --since 7d.
+	if err := interceptor.RecordComplianceEvent(root, interceptor.ComplianceEvent{
+		Timestamp:            now.Add(-14 * 24 * time.Hour).Format(time.RFC3339),
+		Kind:                 interceptor.ComplianceKindRawSearchIntercepted,
+		Compliant:            false,
+		CommandLine:          "grep -rn legacy .",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record old event failed: %v", err)
+	}
+	// Recent compliant event (2 hours ago) should be included by --since 7d.
+	if err := interceptor.RecordComplianceEvent(root, interceptor.ComplianceEvent{
+		Timestamp:            now.Add(-2 * time.Hour).Format(time.RFC3339),
+		Kind:                 interceptor.ComplianceKindZgrep,
+		Compliant:            true,
+		CommandLine:          "zqk grep --ast --kind struct",
+		EstimatedTokensSaved: 6000,
+	}); err != nil {
+		t.Fatalf("record recent event failed: %v", err)
+	}
+
+	// Rolling 7-day window sees 100% compliance and passes --min-compliance 90.
+	cmd := NewGrepCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{"--roi", "--since", "7d", "--min-compliance", "90", "-f", "json", root})
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("expected --since 7d --min-compliance 90 to pass, got: %v", err)
+	}
+	var got interceptor.ComplianceSummary
+	if err := json.Unmarshal(buf.Bytes(), &got); err != nil {
+		t.Fatalf("invalid json: %v\n%s", err, buf.String())
+	}
+	if got.TotalSearchInvocations != 1 || got.ZgrepCompliantCount != 1 || got.ComplianceRatioPct != 100.0 {
+		t.Fatalf("expected only recent event inside 7d window, got: %+v", got)
+	}
+
+	// Invalid --since fails closed.
+	badCmd := NewGrepCmd()
+	badCmd.SetOut(&bytes.Buffer{})
+	badCmd.SetErr(&bytes.Buffer{})
+	badCmd.SetArgs([]string{"--roi", "--since", "not-a-duration", root})
+	if err := badCmd.Execute(); err == nil || !strings.Contains(err.Error(), "invalid --since") {
+		t.Fatalf("expected invalid --since error, got: %v", err)
+	}
 }
