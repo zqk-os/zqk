@@ -16,6 +16,7 @@ import (
 
 	"github.com/zqk-os/zqk/pkg/agentfeed"
 	pkgctx "github.com/zqk-os/zqk/pkg/context"
+	"github.com/zqk-os/zqk/pkg/interactionpolicy"
 	"github.com/zqk-os/zqk/pkg/objects"
 	"github.com/zqk-os/zqk/pkg/objects/koi"
 	observerpkg "github.com/zqk-os/zqk/pkg/observer"
@@ -225,6 +226,7 @@ func resolvePriorityPlanForWhatsNext(ctx context.Context, sp storage.ObjectStora
 		}
 		// Lower active_order wins (unset ⇒ lowest priority).
 		score -= activeOrderPenalty(obj)
+		score -= residualTheaterLeadPenaltyFor(obj)
 		if score > bestScore {
 			bestScore = score
 			bestPlan = obj
@@ -261,6 +263,17 @@ func planStatusExecutionReady(st string) bool {
 
 func planExecutionStatusBonus(st string) int {
 	return objects.PlanWhatsNextStatusBonus(objects.KindPriorityPlan, st)
+}
+
+func residualTheaterLeadPenaltyFor(obj map[string]any) int {
+	if obj == nil {
+		return 0
+	}
+	title, _ := obj[objects.FieldKeyTitle].(string)
+	if interactionpolicy.TitleLooksLikeResidualTheater(title) {
+		return residualTheaterLeadPenalty
+	}
+	return 0
 }
 
 // activeOrderPenalty returns a score penalty so lower active_order ranks higher.
@@ -433,6 +446,12 @@ func deriveAgentInstructionFromBacklog(counts map[string]int) string {
 
 // priorityPlanScoreBonus biases selection toward execution priority_plan objects.
 const priorityPlanScoreBonus = 1_000_000
+
+// residualTheaterLeadPenalty demotes residual/reaffirm PASS-seal columns so an
+// unlocked product PRI (active/shovel-ready) can become lead under CAP.
+// Must exceed PlanWhatsNextStatusBonus(in_progress)−PlanWhatsNextStatusBonus(active).
+// TRACK: follow-up in kernel backlog — remove when residual theater columns are gone.
+const residualTheaterLeadPenalty = 600_000
 
 func planStatusEligible(st string) bool {
 	return objects.PlanStatusEligibleForWhatsNext(objects.KindPriorityPlan, st)

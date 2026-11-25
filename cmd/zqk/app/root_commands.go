@@ -15,6 +15,7 @@ import (
 	"github.com/zqk-os/zqk/cmd/zqk/callback"
 	capabilitycmd "github.com/zqk-os/zqk/cmd/zqk/capability"
 	cicmd "github.com/zqk-os/zqk/cmd/zqk/ci"
+	contextcmd "github.com/zqk-os/zqk/cmd/zqk/contextcmd"
 	"github.com/zqk-os/zqk/cmd/zqk/convergence"
 	"github.com/zqk-os/zqk/cmd/zqk/daemon"
 	"github.com/zqk-os/zqk/cmd/zqk/demo"
@@ -231,6 +232,12 @@ func registerCommands() {
 	demoCmdInst := demo.NewDemoCmd()
 	demoCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(demoCmdInst)
+
+	// Cold episodic snapshot/recall (CONTEXT_PAGING_DESIGN v0.2)
+	// TRACK: https://github.com/zqk-os/zqk/pull/1215
+	contextCmdInst := contextcmd.NewContextCmd()
+	contextCmdInst.GroupID = "getting_started"
+	rootCmd.AddCommand(contextCmdInst)
 
 	// Top-level test-drive command (interactive developer onboarding walkthrough)
 	testDriveCmdInst := system.NewTestDriveCmd()

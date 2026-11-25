@@ -29,9 +29,9 @@ The naive fix — truncation — loses state. The ZQK fix: treat the kernel as t
 | Graph state lock | `pkg/graph/state_lock.go` | ✅ |
 | Object persistence (CAS) | `pkg/storage/` | ✅ (all kernel objects persist) |
 | `high_volume_event_cache.go` | `pkg/storage/` | ✅ (write-behind cache) |
-| Cold episodic store API | — | ❌ Not implemented |
-| Token budget enforcement | — | ❌ Not implemented |
-| Hot→cold eviction policy | — | ❌ Not implemented (local LRU bound only) |
+| Cold episodic store API | `pkg/sessionpaging` (`ColdStore`) + `zqk context snapshot\|recall` | ✅ v0.2 thin surface |
+| Token budget enforcement | `pkg/context/token_budget.go` | ✅ soft/hard + eviction signal |
+| Hot→cold eviction policy | `sessionpaging.EvictHotToCold` | ✅ page move; graph-backed episodes still deferred |
 
 **Key insight:** ZQK already avoids the worst-case. Since agent state lives in kernel objects (not prompt text), `zqk workflow whats-next` always reconstructs accurate current state in ~50 tokens — the agent queries the kernel rather than reconstructing from conversation history. This is a partial solution to window blowup without a full pager. Stranger sessions also keep hot snippets via `pkg/sessionpaging` under `.zqk/state/session_pages/` without Studio-only paging modules.
 

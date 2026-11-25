@@ -1,0 +1,19 @@
+$schema: ../schemas/command_spec.schema.json
+name: recall
+short: Recall a cold episodic fact by session and episode id
+description: |-
+  Reads a previously snapshotted cold episode and prints its payload.
+flags:
+  - name: session-id
+    type: string
+    required: true
+    description: Session id that owns the cold episode
+  - name: episode-id
+    type: string
+    required: true
+    description: Cold episode id (often the former hot page id)
+help:
+  examples:
+    - comment: Recall a cold episode
+      command: "%s context recall --session-id agent-a --episode-id page-0"
+common_flags: false

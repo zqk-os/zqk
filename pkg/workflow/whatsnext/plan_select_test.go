@@ -82,6 +82,28 @@ func TestInProgressPlanRanksAboveShovelReadyActive(t *testing.T) {
 	}
 }
 
+func TestResidualTheaterInProgressLosesToProductActive(t *testing.T) {
+	t.Parallel()
+	// CAP: residual theater in_progress must not starve an unlocked product active column.
+	residual := map[string]any{
+		objects.FieldKeyStatus: "in_progress",
+		objects.FieldKeyTitle:  "Grooming — Stranger greenfield residual (Post-3386 column)",
+	}
+	product := map[string]any{
+		objects.FieldKeyStatus:      "active",
+		objects.FieldKeyActiveOrder: 1,
+		objects.FieldKeyTitle:       "Grooming — Cold episodic store + token-budget eviction (product)",
+	}
+	residualScore := 3 + planExecutionStatusBonus("in_progress") - activeOrderPenalty(residual) - residualTheaterLeadPenaltyFor(residual)
+	productScore := 3 + planExecutionStatusBonus("active") - activeOrderPenalty(product) - residualTheaterLeadPenaltyFor(product)
+	if residualScore >= productScore {
+		t.Fatalf("product active score %d should beat residual in_progress score %d", productScore, residualScore)
+	}
+	if residualTheaterLeadPenaltyFor(product) != 0 {
+		t.Fatal("product title must not take residual theater penalty")
+	}
+}
+
 func TestCountOpenLinkedBLIs_IgnoresTerminal(t *testing.T) {
 	t.Parallel()
 	mock := &mockStorageForTest{
