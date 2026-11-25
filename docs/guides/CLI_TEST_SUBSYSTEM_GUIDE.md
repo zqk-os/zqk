@@ -209,7 +209,7 @@ zqk test bind
 # Explicitly bind a test case to requirement and root goal
 zqk test bind TST-001 --req REQ-001 --goal GOAL-001
 
-# Automatically bind all broken chains using heuristic matching
+# Automatically bind broken chains (prefers deterministic TST.criteria_refs -> CRIT.requirement_refs graph traversal before lexical fallback)
 zqk test bind --auto
 ```
 
