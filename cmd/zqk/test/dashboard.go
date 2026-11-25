@@ -392,7 +392,10 @@ func (s *DashboardState) buildPayloadLocked() *DashboardLitePayload {
 // SaveToLiteFile atomically persists the current dashboard state as a materialized lite-file via accumulator Engine.
 func (s *DashboardState) SaveToLiteFile(projectRoot string) error {
 	eng := s.EnsureEngine(projectRoot)
-	eng.SetLastUpdated(s.LastUpdated)
+	s.mu.RLock()
+	lastUpdated := s.LastUpdated
+	s.mu.RUnlock()
+	eng.SetLastUpdated(lastUpdated)
 	return eng.SaveToLiteFile()
 }
 
