@@ -60,8 +60,10 @@ func BootPayload() string {
      - **P1/P2 (Non-blocking):** File into the backlog or upcoming cycle.
   3. **Resume Program Trajectory:** Immediately output the minted object receipt (TD-xxx / BLI-xxx), query `+"`"+paths.RewriteCanonicalCLIInvocations(`./bin/zqk workflow whats-next`)+"`"+`, and continue tracking the active priority plan without yielding or getting distracted.
 
-## Code Search & Token Conservation (`+"`"+`%s grep`+"`"+`)
-- **Prefer `+"`"+`%s grep`+"`"+` (alias `+"`zgrep`"+`) over raw shell `+"`grep`"+` or `+"`find`"+`:** `+"`"+`%s grep`+"`"+` provides sub-15ms trigram indexing, Go AST structural queries (`+"`--ast --kind struct|func`"+`, `+"`--ast --recv <Type>`"+`), and strict token budgeting (`+"`--max-tokens 2000 -f json`"+`). Using external grep dumps unbudgeted files into LLM contexts and increases token consumption.
+## Code Search & Token Conservation (`+"`"+`%s grep`+"`"+` / `+"`zgrep`"+`)
+- **Default-On `+"`zgrep`"+` Decision Rubric (When to Use vs. When NOT to Use):**
+  - **MUST use `+"`"+`%s grep`+"`"+` (alias `+"`zgrep`"+`):** Multi-file code search, symbol/definition/reference lookup, exploring unfamiliar packages, or gathering bounded context (`+"`--max-tokens 2000 -f json`"+`). `+"`"+`%s grep`+"`"+` provides sub-15ms trigram indexing, AST structural queries (`+"`--ast --kind struct|func`"+`, `+"`--ast --recv <Type>`"+`), and strict token budgeting so raw shell `+"`grep`"+`/`+"`rg`"+`/`+"`find`"+` never floods your context window.
+  - **Do NOT use `+"`zgrep`"+`:** Reading a single known file or exact line range directly, inspecting binary/media files, or searching ephemeral temp paths outside the repository root.
 `, brand.ProductName(), brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, brand.ProductName(), exe, exe, exe, exe, exe, exe, exe, exe, exe, exe)
 }
 
