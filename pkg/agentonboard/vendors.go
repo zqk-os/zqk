@@ -20,6 +20,8 @@ const (
 	VendorIDE        VendorID = "ide"
 	VendorClaudeCode VendorID = "claude_code"
 	VendorCline      VendorID = "cline"
+	VendorRooCode    VendorID = "roo_code"
+	VendorZed        VendorID = "zed"
 	VendorWindsurf   VendorID = "windsurf"
 	VendorGemini     VendorID = "gemini"
 	VendorAgent      VendorID = "agent"
@@ -64,6 +66,18 @@ func KnownVendors() []Vendor {
 			DisplayName:    "Cline",
 			MarkerRelPaths: []string{".clinerules", ".cline"},
 			ConfigRelPaths: []string{".clinerules"},
+		},
+		{
+			ID:             VendorRooCode,
+			DisplayName:    "Roo Code",
+			MarkerRelPaths: []string{".roorules", ".roo"},
+			ConfigRelPaths: []string{".roorules"},
+		},
+		{
+			ID:             VendorZed,
+			DisplayName:    "Zed",
+			MarkerRelPaths: []string{".zed", ".rules"},
+			ConfigRelPaths: []string{".rules"},
 		},
 		{
 			ID:             VendorWindsurf,

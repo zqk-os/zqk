@@ -37,6 +37,16 @@ func vendorAddendum(v Vendor) string {
 		return `## Vendor: Cline
 - Regenerable .clinerules must not become a second source of truth outside the kernel.
 `
+	case VendorRooCode:
+		return fmt.Sprintf(`## Vendor: Roo Code
+- Regenerable .roorules must not become a second source of truth outside the kernel.
+- Route code discovery through %s grep (--ast --max-tokens 2000 -f json) and connect MCP via %s mcp serve.
+`, exe, exe)
+	case VendorZed:
+		return fmt.Sprintf(`## Vendor: Zed
+- Regenerable .rules must not become a second source of truth outside the kernel.
+- Route code discovery through %s grep (--ast --max-tokens 2000 -f json) and connect MCP via %s mcp serve.
+`, exe, exe)
 	case VendorWindsurf:
 		return `## Vendor: Windsurf
 - Regenerable .windsurfrules must not become a second source of truth outside the kernel.
