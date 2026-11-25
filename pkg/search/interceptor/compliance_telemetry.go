@@ -2,6 +2,7 @@ package interceptor
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -164,16 +165,15 @@ func RecordComplianceEvent(projectRoot string, ev ComplianceEvent) error {
 	if err := fileutil.EnsureDir(filepath.Dir(logPath)); err != nil {
 		return err
 	}
-	data, err := json.Marshal(ev)
-	if err != nil {
+	var lineBuf bytes.Buffer
+	if err := json.NewEncoder(&lineBuf).Encode(ev); err != nil {
 		return err
 	}
-	data = append(data, '\n')
 
 	complianceWriteMu.Lock()
 	defer complianceWriteMu.Unlock()
 
-	return appendLineToFile(logPath, data)
+	return appendLineToFile(logPath, lineBuf.Bytes())
 }
 
 func appendLineToFile(path string, line []byte) error {

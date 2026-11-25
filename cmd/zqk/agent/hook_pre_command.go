@@ -187,30 +187,27 @@ func runPreCommandHookWithDeps(ctx context.Context, sec *pkgctx.SecurityContext,
 	return emitPreCommandDecision(out, "allow", reason, overwrite)
 }
 
+// mapField safely extracts a typed field from a map, returning the zero value when absent or mismatched.
+func mapField[T any](m map[string]any, key string) T {
+	var zero T
+	if m == nil {
+		return zero
+	}
+	v, ok := m[key].(T)
+	if !ok {
+		return zero
+	}
+	return v
+}
+
 // mapString safely extracts a string field from a map.
 func mapString(m map[string]any, key string) string {
-	if m == nil {
-		return ""
-	}
-	if v, ok := m[key]; ok {
-		if s, ok := v.(string); ok {
-			return s
-		}
-	}
-	return ""
+	return mapField[string](m, key)
 }
 
 // mapSubMap safely extracts a nested map[string]any from a map.
 func mapSubMap(m map[string]any, key string) map[string]any {
-	if m == nil {
-		return nil
-	}
-	if v, ok := m[key]; ok {
-		if sm, ok := v.(map[string]any); ok {
-			return sm
-		}
-	}
-	return nil
+	return mapField[map[string]any](m, key)
 }
 
 // mapFirstStringSliceElement safely extracts the first string from a slice field in a map.
