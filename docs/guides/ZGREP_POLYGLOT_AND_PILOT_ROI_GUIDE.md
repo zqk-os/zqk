@@ -16,8 +16,8 @@ brew install zqk-os/tap/zqk
 # does NOT seed .zqk/process CAS objects)
 zqk init --lite
 
-# Or wire multi-host MCP configs (Cursor, Claude Code, Windsurf, Cline) in the same command:
-zqk init --lite --with-mcp
+# Or wire multi-host MCP configs AND PreToolUse compliance hooks in one command:
+zqk init --lite --with-mcp --with-hooks
 ```
 
 When your team is ready to expand into Git-versioned Requirements, Criteria, Verification Done-Gates, and multi-agent swarms, upgrade in place with one command:
@@ -76,7 +76,12 @@ zqk grep --roi -f yaml
 
 # Fail-closed CI / PR compliance threshold gate (exits non-zero if below 80%)
 zqk grep --roi --min-compliance 80
+
+# Rolling 7-day window across multiple repositories (ideal for Week-4 vs. Week-1 reviews)
+zqk grep --roi --repos ./svc-api,./svc-billing --since 7d -f markdown --min-compliance 80
 ```
+
+For drop-in GitHub Actions PR enforcement with automatic `GITHUB_STEP_SUMMARY` scorecards, copy [`docs/guides/examples/zgrep-compliance-gate.yml`](./examples/zgrep-compliance-gate.yml) into `.github/workflows/`.
 
 Example output:
 
