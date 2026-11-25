@@ -4,14 +4,24 @@
 
 ---
 
-## 1. 60-Second Zero-Bloat Setup (`zqk init --lite`)
+## 1. Zero-Pollution Standalone `zgrep` & 60-Second Setup (`zqk init --lite`)
 
-You do not need to adopt the full Knowledge Kernel ontology on Day 1. Land with sub-15ms polyglot `zgrep` and compliance telemetry first:
+You do not need to initialize a repository at all to try `zgrep` or prove token savings on your own codebase:
 
 ```bash
 # Install ZQK (Homebrew or direct installer)
 brew install zqk-os/tap/zqk
 
+# Zero-pollution standalone mode (no .zqk/ created; trigram cache lives in
+# $XDG_CACHE_HOME/zqk/<repo-hash>/trigram.idx, keeping git status 100% clean)
+zqk grep --bench "func "
+zqk grep --bench "func " -f json
+zqk grep --reindex -f json
+```
+
+When you want persistent IDE rules, MCP wiring, and PreToolUse compliance telemetry, run `zqk init --lite` (zero `.zqk/process` CAS bloat):
+
+```bash
 # Zero-bloat zgrep-first setup (creates .zqk/{cache,logs,state}, IDE rules, trigram index;
 # does NOT seed .zqk/process CAS objects)
 zqk init --lite
@@ -39,7 +49,8 @@ zqk init --merge
 | Find methods belonging to a class, struct, or Rust `impl` | `zqk grep --ast --recv OrderService` |
 | Find functions/methods matching a symbol name | `zqk grep --ast --kind func "Validate"` |
 | Token-budgeted JSON output for AI coding agents | `zqk grep "payment" --max-tokens 2000 -f json` |
-| Rebuild persistent trigram index cache | `zqk grep --reindex` |
+| Instant side-by-side token & latency self-benchmark | `zqk grep --bench "payment"` (or `-f json`) |
+| Rebuild persistent trigram index cache (with cold-index stats) | `zqk grep --reindex -f json` |
 
 ---
 
