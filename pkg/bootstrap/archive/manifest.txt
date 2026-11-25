@@ -103,6 +103,10 @@
 ./cli_specs/callback/
 ./cli_specs/callback/notify_command.yaml
 ./cli_specs/callback_command.yaml
+./cli_specs/capability/
+./cli_specs/capability/authorize_command.yaml
+./cli_specs/capability/list_command.yaml
+./cli_specs/capability_command.yaml
 ./cli_specs/ci/
 ./cli_specs/ci/checkout_command.yaml
 ./cli_specs/ci/demote_command.yaml
@@ -1061,6 +1065,7 @@
 ./scripts/scheduler_jobs/peer_ack_timeout_audit.yaml
 ./scripts/scheduler_jobs/pre_commit_integrity.yaml
 ./scripts/scheduler_jobs/pre_commit_policy.yaml
+./scripts/scheduler_jobs/resource_hygiene_periodic.yaml
 ./scripts/scheduler_jobs/retention_scheduler_job_daily.yaml
 ./scripts/scheduler_jobs/retention_tolerance_agent_instruction.yaml
 ./scripts/scheduler_jobs/retention_tolerance_catchall.yaml

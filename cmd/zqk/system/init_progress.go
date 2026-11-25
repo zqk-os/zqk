@@ -107,7 +107,7 @@ func (p *initProgress) Summary(projectRoot string) {
 		fmt.Fprintln(p.out, "────────────────────────────────────────────────────────────────────────────────")
 		fmt.Fprintln(p.out, "Decommission Guarantee:")
 		fmt.Fprintln(p.out, "  Once onboarding is complete, remove starter admin objects cleanly via:")
-		fmt.Fprintf(p.out, "  $ %s object delete PRI-STARTER-COMMUNITY-001 --cascade\n\n", brand.ExecutableName())
+		fmt.Fprintf(p.out, "  $ %s object delete PRI-STARTER-COMMUNITY-001 --cascade --reason-code \"Onboarding complete; replacing starter onboarding spine with project plan\"\n\n", brand.ExecutableName())
 		fmt.Fprintln(p.out, "Optional Controls:")
 		fmt.Fprintf(p.out, "  • Launch Visual Web Studio:  $ %s ui -w  (http://127.0.0.1:8080)\n", brand.ExecutableName())
 		fmt.Fprintf(p.out, "  • Execute Autonomously:       $ %s do\n", brand.ExecutableName())

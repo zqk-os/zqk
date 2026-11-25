@@ -374,3 +374,35 @@ func TestNewCriteria_ExplicitCategoryTrimmedAndRespected(t *testing.T) {
 		t.Fatalf("expected category %q, got %q", explicitCriteriaCategoryName, cat)
 	}
 }
+
+// GH-1213: `zqk new vision` and `zqk new mission` must populate required
+// narrative / mission_statement fields from explicit flags or description/title.
+func TestNewVisionAndMission_PopulatesRequiredStatements(t *testing.T) {
+	testRoot := setupRelationalFlagsTestEnv(t)
+
+	var buf bytes.Buffer
+	ctx := pkgctx.WithCommandOutputWriter(context.Background(), &buf)
+
+	cmdVis := NewNewCmd()
+	cmdVis.SetContext(ctx)
+	cmdVis.SetArgs([]string{objects.KindVision, "-t", "Example Vision", "-d", "Vision narrative from description"})
+	if err := cmdVis.Execute(); err != nil {
+		t.Fatalf("new vision failed: %v", err)
+	}
+	visObj := readLatestDraft(t, testRoot, objects.KindVision)
+	if got, _ := visObj["narrative"].(string); got != "Vision narrative from description" {
+		t.Fatalf("expected vision narrative from description, got %q", got)
+	}
+
+	buf.Reset()
+	cmdMis := NewNewCmd()
+	cmdMis.SetContext(ctx)
+	cmdMis.SetArgs([]string{objects.KindMission, "-t", "Example Mission", "--mission-statement", "Explicit mission statement"})
+	if err := cmdMis.Execute(); err != nil {
+		t.Fatalf("new mission failed: %v", err)
+	}
+	misObj := readLatestDraft(t, testRoot, objects.KindMission)
+	if got, _ := misObj["mission_statement"].(string); got != "Explicit mission statement" {
+		t.Fatalf("expected explicit mission_statement, got %q", got)
+	}
+}

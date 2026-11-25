@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -220,7 +221,7 @@ func buildMCPServerConfig(ideName, configPath, execPath, projectRoot string, exi
 				serverName = exeName + "-" + filepath.Base(projectRoot)
 			}
 			cwd = projectRoot
-			command = filepath.Base(execPath)
+			command = resolveMCPServerCommand(execPath, projectRoot)
 			args = []string{"mcp", "serve"}
 			env = mcpEnv
 		}
@@ -245,4 +246,38 @@ func buildMCPServerConfig(ideName, configPath, execPath, projectRoot string, exi
 		}
 	}
 	return serverName, entry
+}
+
+// resolveMCPServerCommand preserves project-local executable isolation (GH-1216):
+// when execPath resides inside projectRoot or does not match the first matching
+// binary on $PATH, return the resolved absolute executable path instead of a bare
+// basename that could leak to a different host binary.
+func resolveMCPServerCommand(execPath, projectRoot string) string {
+	base := filepath.Base(execPath)
+	if strings.TrimSpace(execPath) == "" || strings.TrimSpace(projectRoot) == "" {
+		return base
+	}
+	absExec, errExec := filepath.Abs(execPath)
+	absRoot, errRoot := filepath.Abs(projectRoot)
+	if errExec != nil || errRoot != nil {
+		return base
+	}
+	if resolved, err := filepath.EvalSymlinks(absExec); err == nil {
+		absExec = resolved
+	}
+	if resolvedRoot, err := filepath.EvalSymlinks(absRoot); err == nil {
+		absRoot = resolvedRoot
+	}
+	if rel, err := filepath.Rel(absRoot, absExec); err == nil && rel != "." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != ".." {
+		return absExec
+	}
+	if pathBin, err := exec.LookPath(base); err == nil {
+		if resolvedPath, err := filepath.EvalSymlinks(pathBin); err == nil {
+			pathBin = resolvedPath
+		}
+		if absPathBin, err := filepath.Abs(pathBin); err == nil && absPathBin == absExec {
+			return base
+		}
+	}
+	return absExec
 }
