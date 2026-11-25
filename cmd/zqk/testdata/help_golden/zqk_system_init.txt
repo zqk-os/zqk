@@ -52,6 +52,9 @@ Flags:
       After init, ensure retention and audit-aggregation scheduler jobs exist
       (same as running 'zqk system ensure-retention-jobs'). Puts the project in
       optimal maintenance configuration.
+    --with-mcp
+      With --lite, also wire ZQK MCP server configuration for detected IDEs
+      (Cursor, Claude Code, Windsurf, Cline)
     --with-onboarding-roadmap
       After init, create the onboarding roadmap seed scheduler job. Start the
       scheduler to run it once and create the priority plan, workstream, and
@@ -100,6 +103,7 @@ Flags:
   -v, --verbose[=true|false]                   Verbose output
       --wipe[=true|false]                      Wipe existing data before restoring snapshot (requires --force)
       --with-maintenance-jobs[=true|false]     After init, ensure retention and audit-aggregation scheduler jobs exist (same as running 'zqk system ensure-retention-jobs'). Puts the project in optimal maintenance configuration.
+      --with-mcp[=true|false]                  With --lite, also wire ZQK MCP server configuration for detected IDEs (Cursor, Claude Code, Windsurf, Cline)
       --with-onboarding-roadmap[=true|false]   After init, create the onboarding roadmap seed scheduler job. Start the scheduler to run it once and create the priority plan, workstream, and backlog items.
 
 Global Flags:

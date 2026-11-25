@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
+	"github.com/zqk-os/zqk/pkg/logging"
+	"github.com/zqk-os/zqk/pkg/mcp"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/search"
 	"github.com/zqk-os/zqk/pkg/utils/fileutil"
@@ -15,7 +17,7 @@ import (
 // runLiteInit executes the zero-bloat Progressive Disclosure onboarding path ("Land with zgrep, Expand to Kernel").
 // It creates minimal .zqk/{cache,logs,state} directories, generates multi-host IDE rules, and builds the
 // persistent trigram index without seeding the full .zqk/process CAS ontology.
-func runLiteInit(cmd *cobra.Command, projectRoot string, force bool) error {
+func runLiteInit(cmd *cobra.Command, projectRoot string, force, withMCP bool) error {
 	if projectRoot == "" {
 		cwd, err := fileutil.Getwd()
 		if err != nil {
@@ -50,10 +52,22 @@ func runLiteInit(cmd *cobra.Command, projectRoot string, force bool) error {
 		return fmt.Errorf("failed building initial trigram index: %w", idxErr)
 	}
 
+	mcpWired := false
+	if withMCP {
+		logger := logging.GetLoggerFromProfile(systemProfileHuman)
+		if err := mcp.AutoInstall(projectRoot, logger); err != nil {
+			return fmt.Errorf("failed wiring multi-host MCP configuration: %w", err)
+		}
+		mcpWired = true
+	}
+
 	out := cmd.OutOrStdout()
 	fmt.Fprintf(out, "✓ Initialized ZQK Lite (zgrep-first) workspace in %s\n", projectRoot)
 	fmt.Fprintf(out, "  • Zero-bloat footprint: created %s/{cache,logs,state} (no .zqk/process CAS objects seeded)\n", paths.ProjectDataDir)
 	fmt.Fprintf(out, "  • Trigram search index warmed and cached for sub-15ms queries\n")
+	if mcpWired {
+		fmt.Fprintf(out, "  • Multi-host MCP server configuration wired (restart IDE(s) to activate)\n")
+	}
 	for _, file := range res.Written {
 		fmt.Fprintf(out, "  • Wrote IDE rule: %s\n", file)
 	}

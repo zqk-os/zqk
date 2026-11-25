@@ -69,6 +69,7 @@ func NewInitCmd() *cobra.Command {
 	})
 	initCmd.Flags().Bool("rules-only", false, "Generate only multi-host IDE rules without creating full kernel directory structure")
 	initCmd.Flags().Bool("lite", false, "Zero-bloat zgrep-first setup (trigram index, compliance telemetry, IDE rules) without seeding .zqk/process CAS")
+	initCmd.Flags().Bool("with-mcp", false, "With --lite, also wire ZQK MCP server configuration for detected IDEs (Cursor, Claude Code, Windsurf, Cline)")
 	cli.RequireSession(initCmd, false)
 	cli.RequireStorage(initCmd, false)
 	cli.RequireSchedulerCheck(initCmd, false)
@@ -82,6 +83,7 @@ func NewInitCmd() *cobra.Command {
 		}
 		if liteMode {
 			forceFlag := earlyFlags.Bool(cmd, "force")
+			withMCP := earlyFlags.Bool(cmd, "with-mcp")
 			if err := earlyFlags.Err(); err != nil {
 				return err
 			}
@@ -93,7 +95,7 @@ func NewInitCmd() *cobra.Command {
 				}
 				root = cwd
 			}
-			return runLiteInit(cmd, root, forceFlag)
+			return runLiteInit(cmd, root, forceFlag, withMCP)
 		}
 		if rulesOnly {
 			force, _ := cmd.Flags().GetBool("force")
