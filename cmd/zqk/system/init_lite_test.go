@@ -60,3 +60,28 @@ func TestInitLite_ZeroBloatFootprintAndQuickstart(t *testing.T) {
 		}
 	}
 }
+
+func TestInitLite_WithMCPFlag(t *testing.T) {
+	root := t.TempDir()
+	srcFile := filepath.Join(root, "service.py")
+	if err := fileutil.WriteFile(srcFile, []byte("class BillingService:\n    def charge(self): pass\n"), paths.FilePerm644); err != nil {
+		t.Fatalf("failed writing sample python file: %v", err)
+	}
+
+	t.Setenv("ZQK_TEST_ROOT", root)
+	cmd := NewInitCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{"--lite", "--with-mcp"})
+
+	if err := cmd.Execute(); err != nil {
+		t.Fatalf("zqk init --lite --with-mcp failed: %v", err)
+	}
+	if fileutil.Exists(filepath.Join(root, paths.ProcessDir)) {
+		t.Errorf("expected --lite --with-mcp NOT to seed %s", paths.ProcessDir)
+	}
+	if !strings.Contains(buf.String(), "Multi-host MCP server configuration wired") {
+		t.Errorf("expected MCP wiring confirmation in output, got:\n%s", buf.String())
+	}
+}
