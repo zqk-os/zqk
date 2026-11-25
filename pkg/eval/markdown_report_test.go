@@ -51,3 +51,39 @@ func TestFormatEvalResultMarkdown_PassAndFail(t *testing.T) {
 		}
 	}
 }
+
+func TestFormatMatrixResultMarkdown_DeterministicModelOrder(t *testing.T) {
+	if got := FormatMatrixResultMarkdown(nil); got != "" {
+		t.Fatalf("expected empty string for nil MatrixResult, got %q", got)
+	}
+
+	res := &MatrixResult{
+		SessionID:             "SES-MATRIX-001",
+		AssessedAt:            time.Date(2026, 11, 25, 8, 0, 0, 0, time.UTC),
+		TotalScenarios:        4,
+		PassedScenarios:       3,
+		AverageCompositeScore: 4.50,
+		ModelConvergence: map[string]*ModelScoreSummary{
+			"qwen2.5-coder:32b": {Model: "qwen2.5-coder:32b", RunsCount: 2, PassedCount: 2, PassRate: 1.0, MeanScore: 4.80, ScoreVariance: 0.010},
+			"claude-sonnet-4":   {Model: "claude-sonnet-4", RunsCount: 2, PassedCount: 1, PassRate: 0.5, MeanScore: 4.20, ScoreVariance: 0.120},
+		},
+		Remediations: []string{"Tighten boundary test coverage"},
+	}
+
+	md := FormatMatrixResultMarkdown(res)
+	for _, want := range []string{
+		"ZQK Evaluation Matrix Convergence Report (`SES-MATRIX-001`)",
+		"`3 / 4`",
+		"`4.50`",
+		"| `claude-sonnet-4` | 2 | 1 | 50.0% | 4.20 | 0.120 |",
+		"| `qwen2.5-coder:32b` | 2 | 2 | 100.0% | 4.80 | 0.010 |",
+		"Tighten boundary test coverage",
+	} {
+		if !strings.Contains(md, want) {
+			t.Errorf("matrix markdown missing %q:\n%s", want, md)
+		}
+	}
+	if strings.Index(md, "`claude-sonnet-4`") > strings.Index(md, "`qwen2.5-coder:32b`") {
+		t.Errorf("expected models sorted alphabetically:\n%s", md)
+	}
+}
