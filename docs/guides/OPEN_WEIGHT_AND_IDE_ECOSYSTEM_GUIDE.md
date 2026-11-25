@@ -1,6 +1,6 @@
 # Open-Weight Inference & Local-First IDE Ecosystem Guide
 
-> **Audience:** Engineering teams running local/air-gapped open-weight models (`Ollama`, `Together AI`, `Fireworks AI`, `Baseten`, `Groq`) or open/local-first coding harnesses (`Cline`, `Roo Code`, `Zed`, `Cursor`, `Claude Code`, `Windsurf`, `Gemini CLI`) with ZQK.
+> **Audience:** Engineering teams running local/air-gapped open-weight models (`Ollama`, `Together AI`, `Fireworks AI`, `Baseten`, `Groq`) or open/local-first coding harnesses (`Cline`, `Roo Code`, `Zed`, `Continue`, `Aider`, `Cursor`, `Claude Code`, `Windsurf`, `Gemini CLI`) with ZQK.
 
 ---
 
@@ -48,8 +48,24 @@ zqk system agent-onboard
 | **Claude Code** | `.claude`, `CLAUDE.md` | `CLAUDE.md` | `.claude.json` |
 | **Cline** | `.cline`, `.clinerules` | `.clinerules` | `.cline/mcp_settings.json` |
 | **Roo Code** | `.roo`, `.roorules` | `.roorules` | `.roo/mcp.json` |
-| **Zed** | `.zed`, `.rules` | `.rules` | `zqk mcp serve` |
+| **Zed** | `.zed`, `.rules` | `.rules` | `.zed/settings.json` (`context_servers`) |
+| **Continue** | `.continue`, `.continuerules` | `.continuerules` | `zqk mcp serve` |
+| **Aider** | `.aider.conf.yml`, `CONVENTIONS.md` | `CONVENTIONS.md` | `zqk grep --ast --max-tokens 2000 -f json` |
 | **Windsurf** | `.windsurf`, `.windsurfrules` | `.windsurfrules` | `.codeium/windsurf/mcp_config.json` |
 | **Gemini CLI** | `.gemini`, `GEMINI.md` | `GEMINI.md` | `zqk mcp serve` |
 | **Ollama** | `.ollama`, `OLLAMA.md` | `OLLAMA.md` | `127.0.0.1:11434` |
 | **Headless / Universal** | `AGENTS.md`, `.agents/AGENTS.md` | `.agents/AGENTS.md` | `zqk mcp serve` |
+
+---
+
+## 4. CI & PR Markdown Scorecards
+
+Emit deterministic GitHub-Flavored Markdown reports directly into PR comments or `$GITHUB_STEP_SUMMARY`:
+
+```bash
+# Self-benchmark token savings on your own repo in Markdown
+zqk grep --bench "func " -f markdown >> "$GITHUB_STEP_SUMMARY"
+
+# Run an evaluation template and emit a Markdown scorecard
+zqk eval run --template .zqk/eval/templates/go-ast-hygiene.yaml --target pkg/eval --auto-mint=false -f markdown >> "$GITHUB_STEP_SUMMARY"
+```
