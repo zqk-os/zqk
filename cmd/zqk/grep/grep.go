@@ -54,6 +54,7 @@ func NewGrepCmd() *cobra.Command {
 	helpBuilder.ApplyToCommand(cmd)
 	cmd.Flags().Bool("vendor", false, "Include vendor directories in search")
 	cmd.Flags().Bool("roi", false, "Display zgrep compliance ratio and estimated token savings ROI scorecard")
+	cmd.Flags().Float64("min-compliance", 0, "With --roi, fail closed if zgrep compliance ratio is below this percentage (0-100)")
 	cli.ConfigureRequirements(cmd, false, false)
 	return cmd
 }
@@ -169,12 +170,25 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 		if err := roiFlags.Err(); err != nil {
 			return err
 		}
+		minCompliance, err := cmd.Flags().GetFloat64("min-compliance")
+		if err != nil {
+			return err
+		}
+		if minCompliance < 0 || minCompliance > 100 {
+			return fmt.Errorf("--min-compliance must be between 0 and 100 (got %.2f)", minCompliance)
+		}
 		projectRoot := resolveROIProjectRoot(pathFlag, args)
 		summary, err := interceptor.SummarizeCompliance(projectRoot)
 		if err != nil {
 			return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
 		}
-		return renderComplianceROI(cmd.OutOrStdout(), format, projectRoot, summary)
+		if err := renderComplianceROI(cmd.OutOrStdout(), format, projectRoot, summary); err != nil {
+			return err
+		}
+		if minCompliance > 0 && summary.TotalSearchInvocations > 0 && summary.ComplianceRatioPct < minCompliance {
+			return fmt.Errorf("zgrep compliance %.1f%% is below required --min-compliance threshold %.1f%%", summary.ComplianceRatioPct, minCompliance)
+		}
+		return nil
 	}
 
 	opts, reindex, format, err := parseGrepOptions(cmd, args)
