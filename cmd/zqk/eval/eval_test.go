@@ -130,6 +130,55 @@ func TestEvalCmd_RunCommand_FormatMarkdownAndJSON(t *testing.T) {
 	})
 }
 
+func TestEvalCmd_MatrixCommand_FormatMarkdownAndJSON(t *testing.T) {
+	projectRoot := cli.ResolveProjectRoot(".")
+	require.NotEmpty(t, projectRoot)
+
+	templatePath := filepath.Join(projectRoot, ".zqk", "eval", "templates", "go-ast-hygiene.yaml")
+	tempDir := t.TempDir()
+	sampleDir := filepath.Join(tempDir, "pkg", "sample")
+	require.NoError(t, fileutil.MkdirAll(sampleDir, 0755))
+	require.NoError(t, fileutil.WriteFile(
+		filepath.Join(sampleDir, "sample.go"),
+		[]byte("package sample\n\n// Add returns a + b.\nfunc Add(a, b int) int { return a + b }\n"),
+		0644,
+	))
+
+	for _, format := range []string{"markdown", "md"} {
+		t.Run("format_"+format, func(t *testing.T) {
+			cmd := evalcmd.NewEvalCmd()
+			cmd.PersistentFlags().StringP("format", "f", "", "Output format")
+			cli.SetContext(cmd, cli.ContextForProjectRoot(tempDir))
+			var outBuf bytes.Buffer
+			cmd.SetOut(&outBuf)
+			cmd.SetErr(&outBuf)
+			cmd.SetArgs([]string{"matrix", "--session-id", "sess-md-1", "--template", templatePath, "-f", format})
+
+			err := cmd.Execute()
+			require.NoError(t, err, "eval matrix -f %s should succeed, out: %s", format, outBuf.String())
+			out := outBuf.String()
+			assert.Contains(t, out, "ZQK Evaluation Matrix Convergence Report")
+			assert.Contains(t, out, "| Model | Runs | Passed | Pass Rate | Mean Score | Variance |")
+			assert.Contains(t, out, "sess-md-1")
+		})
+	}
+
+	t.Run("format_json", func(t *testing.T) {
+		cmd := evalcmd.NewEvalCmd()
+		cmd.PersistentFlags().StringP("format", "f", "", "Output format")
+		cli.SetContext(cmd, cli.ContextForProjectRoot(tempDir))
+		var outBuf bytes.Buffer
+		cmd.SetOut(&outBuf)
+		cmd.SetErr(&outBuf)
+		cmd.SetArgs([]string{"matrix", "--session-id", "sess-json-1", "--template", templatePath, "-f", "json"})
+
+		err := cmd.Execute()
+		require.NoError(t, err, "eval matrix -f json should succeed, out: %s", outBuf.String())
+		assert.True(t, strings.HasPrefix(strings.TrimSpace(outBuf.String()), "{"))
+		assert.Contains(t, outBuf.String(), "sess-json-1")
+	})
+}
+
 func TestEvalCmd_LLMScrutiny(t *testing.T) {
 	tempDir := t.TempDir()
 	logFile := filepath.Join(tempDir, "transcript.jsonl")
