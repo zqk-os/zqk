@@ -1,7 +1,7 @@
 // Plane: core
 // Cold episodic pages — durable store for facts evicted from the hot window.
 //
-// TRACK: REQ-1795567911727690000-ba7f856d — remove when: cold episodic CLI/MCP ships.
+// TRACK: https://github.com/zqk-os/zqk/pull/1215 — remove when: cold episodic MCP ships.
 package sessionpaging
 
 import (

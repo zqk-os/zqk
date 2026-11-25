@@ -7,57 +7,51 @@ import (
 
 	"github.com/spf13/cobra"
 
+	clipkg "github.com/zqk-os/zqk/pkg/cli"
+	"github.com/zqk-os/zqk/pkg/cli/bldr_cli_cmd_v1"
 	"github.com/zqk-os/zqk/pkg/paths"
 	"github.com/zqk-os/zqk/pkg/sessionpaging"
 )
 
 // NewContextCmd creates stranger-facing cold episodic snapshot/recall commands.
-// TRACK: REQ-1795568387221360000-3729129a — cold episodic CLI surface.
+// TRACK: https://github.com/zqk-os/zqk/pull/1215 — cold episodic CLI surface.
 func NewContextCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "context",
-		Short: "Cold episodic context snapshot and recall",
-		Long: `Snapshot hot session pages into the cold episodic store, and recall
-facts after soft-limit eviction (CONTEXT_PAGING_DESIGN.md v0.2).
-
-Examples:
-  zqk context snapshot --session-id agent-a --page-id page-0
-  zqk context recall --session-id agent-a --episode-id page-0
-`,
-	}
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewContextCommandBuilder(), &cobra.Command{})
 	cmd.AddCommand(newSnapshotCmd())
 	cmd.AddCommand(newRecallCmd())
 	return cmd
 }
 
 func newSnapshotCmd() *cobra.Command {
-	var sessionID, pageID, note string
-	cmd := &cobra.Command{
-		Use:   "snapshot",
-		Short: "Evict a hot session page into cold episodic storage",
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewContextSnapshotCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			var flags clipkg.FlagBag
+			sessionID := flags.String(cmd, "session-id")
+			pageID := flags.String(cmd, "page-id")
+			note := flags.String(cmd, "note")
+			if err := flags.Err(); err != nil {
+				return err
+			}
 			return runSnapshot(cmd, sessionID, pageID, note)
 		},
-	}
-	cmd.Flags().StringVar(&sessionID, "session-id", "", "Session id owning the hot page")
-	cmd.Flags().StringVar(&pageID, "page-id", "", "Hot page id to snapshot into cold storage")
-	cmd.Flags().StringVar(&note, "note", "", "Optional note appended to the cold payload")
+	})
 	_ = cmd.MarkFlagRequired("session-id")
 	_ = cmd.MarkFlagRequired("page-id")
 	return cmd
 }
 
 func newRecallCmd() *cobra.Command {
-	var sessionID, episodeID string
-	cmd := &cobra.Command{
-		Use:   "recall",
-		Short: "Recall a cold episodic fact by session and episode id",
+	cmd := clipkg.ApplyBuilder(bldr_cli_cmd_v1.NewContextRecallCommandBuilder(), &cobra.Command{
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			var flags clipkg.FlagBag
+			sessionID := flags.String(cmd, "session-id")
+			episodeID := flags.String(cmd, "episode-id")
+			if err := flags.Err(); err != nil {
+				return err
+			}
 			return runRecall(cmd, sessionID, episodeID)
 		},
-	}
-	cmd.Flags().StringVar(&sessionID, "session-id", "", "Session id that owns the cold episode")
-	cmd.Flags().StringVar(&episodeID, "episode-id", "", "Cold episode id (often the former hot page id)")
+	})
 	_ = cmd.MarkFlagRequired("session-id")
 	_ = cmd.MarkFlagRequired("episode-id")
 	return cmd

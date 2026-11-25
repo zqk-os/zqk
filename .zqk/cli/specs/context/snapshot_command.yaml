@@ -1,0 +1,25 @@
+$schema: ../schemas/command_spec.schema.json
+name: snapshot
+short: Evict a hot session page into cold episodic storage
+description: |-
+  Moves a hot session page into the cold episodic store (and removes the hot page).
+flags:
+  - name: session-id
+    type: string
+    required: true
+    description: Session id owning the hot page
+  - name: page-id
+    type: string
+    required: true
+    description: Hot page id to snapshot into cold storage
+  - name: note
+    type: string
+    default: ""
+    description: Optional note appended to the cold payload
+help:
+  examples:
+    - comment: Snapshot a hot page
+      command: "%s context snapshot --session-id agent-a --page-id page-0"
+    - comment: Snapshot with a note
+      command: "%s context snapshot --session-id agent-a --page-id page-0 --note \"phase 1\""
+common_flags: false

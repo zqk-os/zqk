@@ -450,7 +450,7 @@ const priorityPlanScoreBonus = 1_000_000
 // residualTheaterLeadPenalty demotes residual/reaffirm PASS-seal columns so an
 // unlocked product PRI (active/shovel-ready) can become lead under CAP.
 // Must exceed PlanWhatsNextStatusBonus(in_progress)−PlanWhatsNextStatusBonus(active).
-// TRACK: POL-AGENT-CAP-PRODUCT-ALIGNMENT-001 — remove when residual theater columns are gone.
+// TRACK: follow-up in kernel backlog — remove when residual theater columns are gone.
 const residualTheaterLeadPenalty = 600_000
 
 func planStatusEligible(st string) bool {

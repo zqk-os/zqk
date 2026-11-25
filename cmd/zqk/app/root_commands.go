@@ -234,7 +234,7 @@ func registerCommands() {
 	rootCmd.AddCommand(demoCmdInst)
 
 	// Cold episodic snapshot/recall (CONTEXT_PAGING_DESIGN v0.2)
-	// TRACK: REQ-1795568387221360000-3729129a
+	// TRACK: https://github.com/zqk-os/zqk/pull/1215
 	contextCmdInst := contextcmd.NewContextCmd()
 	contextCmdInst.GroupID = "getting_started"
 	rootCmd.AddCommand(contextCmdInst)

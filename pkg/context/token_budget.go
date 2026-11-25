@@ -1,7 +1,7 @@
 // Plane: core
 // Package context — token budget for hot→cold episodic eviction (stranger paging v0.2).
 //
-// TRACK: REQ-1795567911727690000-ba7f856d — cold episodic + token-budget eviction.
+// TRACK: https://github.com/zqk-os/zqk/pull/1215 — cold episodic + token-budget eviction.
 package context
 
 import (

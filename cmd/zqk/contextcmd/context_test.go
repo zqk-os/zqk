@@ -8,7 +8,7 @@ import (
 	"github.com/zqk-os/zqk/pkg/zqkenv"
 )
 
-// TRACK: REQ-1795568387221360000-3729129a — cold episodic CLI
+// TRACK: https://github.com/zqk-os/zqk/pull/1215 — cold episodic CLI
 func TestContextSnapshotRecallRoundTrip(t *testing.T) {
 	root := t.TempDir()
 	t.Setenv(zqkenv.ProjectRoot().Key, root)

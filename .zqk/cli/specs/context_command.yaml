@@ -1,0 +1,18 @@
+$schema: schemas/command_spec.schema.json
+name: context
+short: Cold episodic context snapshot and recall
+description: |-
+  Snapshot hot session pages into the cold episodic store and recall facts after
+  soft-limit eviction (CONTEXT_PAGING_DESIGN.md v0.2).
+help:
+  examples:
+    - comment: Evict a hot page into cold storage
+      command: "%s context snapshot --session-id agent-a --page-id page-0"
+    - comment: Recall a cold episodic fact
+      command: "%s context recall --session-id agent-a --episode-id page-0"
+common_flags: false
+subcommands:
+  - name: snapshot
+    spec_ref: context/snapshot_command.yaml
+  - name: recall
+    spec_ref: context/recall_command.yaml
