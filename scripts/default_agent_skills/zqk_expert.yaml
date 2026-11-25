@@ -18,3 +18,4 @@ instructions: |
   3. **VDS Done-Gates**: Mark backlog items complete only after running deterministic verification (`zqk do <id> --verify` or `zqk workflow vds evaluate`).
   4. **Fail-Closed Operations**: If any verification or schema check fails, emit explicit failure context and halt. Narrative hand-waving is strictly forbidden.
   5. **Timeline & Gantt**: Workstreams are long-lived reporting lanes, priority plans are scoped execution bundles, milestones provide temporal anchors, and backlog items are atomic tasks.
+  6. **Native-First Anti-Reinvention**: Always check `zqk --help` before writing custom Python/shell harnesses. Use native `zqk eval validate|run|matrix` for rubrics/evals, `zqk gate stage|review|approve|reject` for SHA-256 human approval gates, `zqk test discover|bind|run|dashboard` for test lineage and execution, and `zqk new object-spec` / `zqk pack` for custom domain schemas.

@@ -11,6 +11,7 @@ needs:
   - Backlog hygiene and priority tiering
   - Multi-agent coordination via agent chat feed
   - Clear milestone and priority plan tracking
+  - Native kernel gates, evals, and test lineage (`zqk gate`, `zqk eval`, `zqk test discover|bind`)
 agent_skill_refs:
   - ASK-COMMUNITY-ZQK-EXPERT
   - ASK-COMMUNITY-OBJECT-STEWARD

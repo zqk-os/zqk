@@ -78,6 +78,17 @@ For manual/scripted operations where `zqk do` is not used, wrap work in strict c
   - `zqk grep`: Sub-15ms Go AST and trigram code search.
   - `zqk intake`: Direct semantic requirement intake.
 
+## 4. Native-First / Anti-Reinvention Rule (Check `zqk --help` First)
+
+Before writing any custom Python or shell harness, ALWAYS check `zqk --help` (`eval`, `gate`, `test`, `new object-spec`, `pack`) and use the native kernel primitive:
+
+| Need | Native ZQK Command | Do NOT Reinvent |
+|------|--------------------|-----------------|
+| Evaluation & scoring rubrics | `zqk eval validate\|run\|matrix` (declarative YAML templates) | Custom Python scoring/rubric scripts |
+| Human-in-the-loop SHA-256 approval & tamper gates | `zqk gate stage\|review\|approve\|reject` | Custom JSON receipt / approval scripts |
+| Test registration, lineage binding & execution | `zqk test discover`, `zqk test bind`, `zqk test run --all`, `zqk test dashboard` | Unbound `python3 -m unittest` / ad-hoc runners |
+| Custom domain schemas & packs | `zqk new object-spec`, `zqk pack` | Ad-hoc schema/validator scripts |
+
 ## Session boot (do this first)
 
 ```bash

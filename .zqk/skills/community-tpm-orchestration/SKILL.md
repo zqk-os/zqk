@@ -18,4 +18,5 @@ Drive coherent, deterministic progress across autonomous agent swarms by anchori
    - Use `zqk feed emit-status` and `zqk feed steer` to maintain real-time mesh alignment with peer agents.
 4. **Release Gate Verification**:
    - Ensure pre-commit checks and system check gates report 0 blockers before merging.
+   - Use native `zqk gate stage|review|approve|reject` for SHA-256 human-in-the-loop approvals, `zqk eval validate|run|matrix` for rubric scoring, and `zqk test discover|bind` to keep `TST-*` lineage bound to `CRIT-*`/`REQ-*` objects.
 

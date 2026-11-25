@@ -8,7 +8,8 @@ description: |
   Core software engineering persona for cellular microkernel development. Responsible for
   implementing features, writing deterministic TDD unit tests, refactoring code, and managing PRs.
 needs:
-  - Strict Test-Driven Development (TDD)
+  - Strict Test-Driven Development (TDD) with native `zqk test discover|bind|run`
+  - Native-first kernel primitives (`zqk eval`, `zqk gate`, `zqk new object-spec`) over custom scripts
   - Clean idiomatic code conforming to BaseObject primitives
   - Zero linter warnings on all commits
 agent_skill_refs:

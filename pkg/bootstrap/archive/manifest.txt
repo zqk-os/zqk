@@ -114,6 +114,10 @@
 ./cli_specs/ci/run_command.yaml
 ./cli_specs/ci/status_command.yaml
 ./cli_specs/ci_command.yaml
+./cli_specs/context/
+./cli_specs/context/recall_command.yaml
+./cli_specs/context/snapshot_command.yaml
+./cli_specs/context_command.yaml
 ./cli_specs/convergence/
 ./cli_specs/convergence/measure_command.yaml
 ./cli_specs/convergence/nest_link_command.yaml

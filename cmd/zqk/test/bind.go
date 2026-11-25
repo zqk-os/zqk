@@ -282,10 +282,9 @@ func executeAutoBinding(
 
 		reqRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyRequirementRefs])
 		if len(reqRefs) == 0 {
-			candidates := rankCandidates(tc.Title, reqList.Objects)
-			if len(candidates) > 0 {
-				topReq := candidates[0].ID
-				tcObj[objects.FieldKeyRequirementRefs] = []string{topReq}
+			resolvedReqs, viaCriteria := resolveAutoBindRequirements(ctx, sp, secCtx, tc.Title, tcObj, reqList.Objects)
+			if len(resolvedReqs) > 0 {
+				tcObj[objects.FieldKeyRequirementRefs] = resolvedReqs
 				if !dryRun {
 					cleanLegacyFields(tcObj)
 					if err := sp.Update(ctx, secCtx, tcID, tcObj); err != nil {
@@ -293,9 +292,13 @@ func executeAutoBinding(
 						continue
 					}
 				}
-				fmt.Fprintf(cmd.OutOrStdout(), "  ✓ Bound %s ➔ %s\n", bold(tcID), cyan(topReq))
+				suffix := ""
+				if viaCriteria {
+					suffix = " (via criteria_refs)"
+				}
+				fmt.Fprintf(cmd.OutOrStdout(), "  ✓ Bound %s ➔ %s%s\n", bold(tcID), cyan(strings.Join(resolvedReqs, ", ")), suffix)
 				boundCount++
-				reqRefs = []string{topReq}
+				reqRefs = resolvedReqs
 			}
 		}
 
@@ -337,6 +340,63 @@ func executeAutoBinding(
 
 	fmt.Fprintf(cmd.OutOrStdout(), "\n%s Successfully applied %d lineage binding(s)! Working set is now closed.\n", green("✓"), boundCount)
 	return nil
+}
+
+// resolveAutoBindRequirements determines requirement refs for an unbound test case.
+// It prefers deterministic graph-edge traversal (TST.criteria_refs -> CRIT.requirement_refs)
+// before falling back to lexical title similarity against active requirements.
+func resolveAutoBindRequirements(
+	ctx context.Context,
+	sp storage.ObjectStorageProvider,
+	secCtx *pkgctx.SecurityContext,
+	tcTitle string,
+	tcObj map[string]any,
+	reqObjects []map[string]any,
+) ([]string, bool) {
+	criteriaRefs := lifecycle.StringRefsFromAny(tcObj[objects.FieldKeyCriteriaRefs])
+	if critReqs := resolveRequirementsFromCriteria(ctx, sp, secCtx, criteriaRefs); len(critReqs) > 0 {
+		return critReqs, true
+	}
+	candidates := rankCandidates(tcTitle, reqObjects)
+	if len(candidates) > 0 {
+		return []string{candidates[0].ID}, false
+	}
+	return nil, false
+}
+
+// resolveRequirementsFromCriteria deterministically traverses TST.criteria_refs -> CRIT.requirement_refs
+// and returns deduplicated requirement IDs in traversal order.
+func resolveRequirementsFromCriteria(
+	ctx context.Context,
+	sp storage.ObjectStorageProvider,
+	secCtx *pkgctx.SecurityContext,
+	criteriaRefs []string,
+) []string {
+	if sp == nil || len(criteriaRefs) == 0 {
+		return nil
+	}
+	seen := make(map[string]struct{}, len(criteriaRefs))
+	var resolved []string
+	for _, critID := range criteriaRefs {
+		if critID == "" {
+			continue
+		}
+		critObj, err := sp.Read(ctx, secCtx, critID)
+		if err != nil || critObj == nil {
+			continue
+		}
+		for _, reqID := range lifecycle.StringRefsFromAny(critObj[objects.FieldKeyRequirementRefs]) {
+			if reqID == "" {
+				continue
+			}
+			if _, ok := seen[reqID]; ok {
+				continue
+			}
+			seen[reqID] = struct{}{}
+			resolved = append(resolved, reqID)
+		}
+	}
+	return resolved
 }
 
 func rankCandidates(targetTitle string, candidates []map[string]any) []CandidateMatch {
