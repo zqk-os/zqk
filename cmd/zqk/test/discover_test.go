@@ -68,3 +68,31 @@ func TestDummyJson(t *testing.T) {}
 		t.Errorf("expected JSON output with function TestDummyJson, got:\n%s", out)
 	}
 }
+
+func TestDiscoverCmd_MarkdownFormat(t *testing.T) {
+	proj := testkit.PrepareIsolatedTempProject(t, &testkit.IsolatedTempProjectOptions{Kind: "cmd.test.discover.markdown"})
+
+	testFile := `package dummy_test
+import "testing"
+func TestDummyMarkdown(t *testing.T) {}
+`
+	if err := fileutil.WriteFile(filepath.Join(proj.Root, "dummy_test.go"), []byte(testFile), paths.FilePerm600); err != nil {
+		t.Fatalf("failed to write test file: %v", err)
+	}
+
+	cmd := test.NewDiscoverCmd()
+	var buf bytes.Buffer
+	cmd.SetOut(&buf)
+	cmd.SetErr(&buf)
+	cmd.SetArgs([]string{proj.Root, "--format", "markdown"})
+
+	err := cmd.ExecuteContext(context.Background())
+	if err != nil {
+		t.Fatalf("discover command failed: %v", err)
+	}
+
+	out := buf.String()
+	if !strings.Contains(out, "## ZQK Discovered Test Inventory") || !strings.Contains(out, "`TestDummyMarkdown`") {
+		t.Errorf("expected Markdown inventory output with TestDummyMarkdown, got:\n%s", out)
+	}
+}
