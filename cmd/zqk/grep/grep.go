@@ -58,6 +58,7 @@ func NewGrepCmd() *cobra.Command {
 	cmd.Flags().Float64("min-compliance", 0, "With --roi, fail closed if zgrep compliance ratio is below this percentage (0-100)")
 	cmd.Flags().StringSlice("repos", nil, "With --roi, aggregate compliance telemetry across multiple repository root paths")
 	cmd.Flags().String("since", "", "With --roi, filter telemetry to events within a rolling window (e.g. 7d, 24h, or RFC3339 timestamp)")
+	cmd.Flags().Bool("bench", false, "Run instant in-process self-benchmark comparing raw search vs. token-budgeted zgrep on this repo")
 	cli.ConfigureRequirements(cmd, false, false)
 	return cmd
 }
@@ -161,6 +162,84 @@ func isDirOrPathTarget(target string, astMode bool, astKind, astReceiver string,
 	return (isStructural || isDir) && (fileutil.Exists(target) || hasSlash)
 }
 
+func runGrepROI(cmd *cobra.Command, args []string) error {
+	var roiFlags clipkg.FlagBag
+	format := roiFlags.String(cmd, "format")
+	pathFlag := roiFlags.String(cmd, "path")
+	if err := roiFlags.Err(); err != nil {
+		return err
+	}
+	minCompliance, err := cmd.Flags().GetFloat64("min-compliance")
+	if err != nil {
+		return err
+	}
+	if minCompliance < 0 || minCompliance > 100 {
+		return fmt.Errorf("--min-compliance must be between 0 and 100 (got %.2f)", minCompliance)
+	}
+	repos, err := cmd.Flags().GetStringSlice("repos")
+	if err != nil {
+		return err
+	}
+	sinceRaw, err := cmd.Flags().GetString("since")
+	if err != nil {
+		return err
+	}
+	sinceTime, err := interceptor.ParseSinceWindow(sinceRaw, time.Now())
+	if err != nil {
+		return err
+	}
+	var (
+		summary         interceptor.ComplianceSummary
+		displayRoot     string
+		telemetrySource string
+	)
+	if len(repos) > 0 {
+		summary, err = interceptor.SummarizeComplianceMultiSince(repos, sinceTime)
+		if err != nil {
+			return fmt.Errorf("failed computing multi-repo zgrep ROI compliance summary: %w", err)
+		}
+		displayRoot = fmt.Sprintf("%d repositories (%s)", len(repos), strings.Join(repos, ", "))
+		telemetrySource = fmt.Sprintf("multi-repo rollup (%d repositories)", len(repos))
+	} else {
+		projectRoot := resolveROIProjectRoot(pathFlag, args)
+		summary, err = interceptor.SummarizeComplianceSince(projectRoot, sinceTime)
+		if err != nil {
+			return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
+		}
+		displayRoot = projectRoot
+		telemetrySource = interceptor.ComplianceLogPath(projectRoot)
+	}
+	if err := renderComplianceROI(cmd.OutOrStdout(), format, displayRoot, telemetrySource, summary); err != nil {
+		return err
+	}
+	if minCompliance > 0 && summary.TotalSearchInvocations > 0 && summary.ComplianceRatioPct < minCompliance {
+		return fmt.Errorf("zgrep compliance %.1f%% is below required --min-compliance threshold %.1f%%", summary.ComplianceRatioPct, minCompliance)
+	}
+	return nil
+}
+
+func runGrepReindex(out io.Writer, engine *search.Engine, opts search.SearchOptions, format string) (bool, error) {
+	stats, idxErr := engine.BuildTrigramIndexStats(opts)
+	if idxErr != nil {
+		return false, fmt.Errorf("failed rebuilding trigram index: %w", idxErr)
+	}
+	if opts.Query == "" && opts.Mode != search.ModeAST && opts.ASTKind == "" && opts.ASTReceiver == "" {
+		switch strings.ToLower(strings.TrimSpace(format)) {
+		case "json":
+			enc := json.NewEncoder(out)
+			enc.SetIndent("", "  ")
+			return true, enc.Encode(stats)
+		case "yaml":
+			return true, yaml.NewEncoder(out).Encode(stats)
+		default:
+			fmt.Fprintln(out, "✓ Trigram index successfully rebuilt and cached.")
+			return true, nil
+		}
+	}
+	fmt.Fprintln(out, "✓ Trigram index successfully rebuilt and cached.")
+	return false, nil
+}
+
 func runGrepExecution(cmd *cobra.Command, args []string) error {
 	var roiFlags clipkg.FlagBag
 	roiMode := roiFlags.Bool(cmd, "roi")
@@ -168,61 +247,14 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	if roiMode {
-		format := roiFlags.String(cmd, "format")
-		pathFlag := roiFlags.String(cmd, "path")
-		if err := roiFlags.Err(); err != nil {
-			return err
-		}
-		minCompliance, err := cmd.Flags().GetFloat64("min-compliance")
-		if err != nil {
-			return err
-		}
-		if minCompliance < 0 || minCompliance > 100 {
-			return fmt.Errorf("--min-compliance must be between 0 and 100 (got %.2f)", minCompliance)
-		}
-		repos, err := cmd.Flags().GetStringSlice("repos")
-		if err != nil {
-			return err
-		}
-		sinceRaw, err := cmd.Flags().GetString("since")
-		if err != nil {
-			return err
-		}
-		sinceTime, err := interceptor.ParseSinceWindow(sinceRaw, time.Now())
-		if err != nil {
-			return err
-		}
-		var (
-			summary         interceptor.ComplianceSummary
-			displayRoot     string
-			telemetrySource string
-		)
-		if len(repos) > 0 {
-			summary, err = interceptor.SummarizeComplianceMultiSince(repos, sinceTime)
-			if err != nil {
-				return fmt.Errorf("failed computing multi-repo zgrep ROI compliance summary: %w", err)
-			}
-			displayRoot = fmt.Sprintf("%d repositories (%s)", len(repos), strings.Join(repos, ", "))
-			telemetrySource = fmt.Sprintf("multi-repo rollup (%d repositories)", len(repos))
-		} else {
-			projectRoot := resolveROIProjectRoot(pathFlag, args)
-			summary, err = interceptor.SummarizeComplianceSince(projectRoot, sinceTime)
-			if err != nil {
-				return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
-			}
-			displayRoot = projectRoot
-			telemetrySource = interceptor.ComplianceLogPath(projectRoot)
-		}
-		if err := renderComplianceROI(cmd.OutOrStdout(), format, displayRoot, telemetrySource, summary); err != nil {
-			return err
-		}
-		if minCompliance > 0 && summary.TotalSearchInvocations > 0 && summary.ComplianceRatioPct < minCompliance {
-			return fmt.Errorf("zgrep compliance %.1f%% is below required --min-compliance threshold %.1f%%", summary.ComplianceRatioPct, minCompliance)
-		}
-		return nil
+		return runGrepROI(cmd, args)
 	}
 
 	opts, reindex, format, err := parseGrepOptions(cmd, args)
+	if err != nil {
+		return err
+	}
+	benchMode, err := cmd.Flags().GetBool("bench")
 	if err != nil {
 		return err
 	}
@@ -237,13 +269,18 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 	}
 	engine := search.NewEngine(engineRoot)
 
-	if reindex {
-		if idxErr := engine.BuildTrigramIndex(opts); idxErr != nil {
-			return fmt.Errorf("failed rebuilding trigram index: %w", idxErr)
+	if benchMode {
+		report, benchErr := engine.RunSelfBench(cmd.Context(), opts)
+		if benchErr != nil {
+			return benchErr
 		}
-		fmt.Fprintln(cmd.OutOrStdout(), "✓ Trigram index successfully rebuilt and cached.")
-		if opts.Query == "" && opts.Mode != search.ModeAST && opts.ASTKind == "" && opts.ASTReceiver == "" {
-			return nil
+		return renderBenchReport(cmd.OutOrStdout(), format, report)
+	}
+
+	if reindex {
+		done, idxErr := runGrepReindex(cmd.OutOrStdout(), engine, opts, format)
+		if idxErr != nil || done {
+			return idxErr
 		}
 	}
 
@@ -268,6 +305,21 @@ func renderGrepResult(out io.Writer, format string, result *search.SearchResult)
 
 	default:
 		return renderTextMatches(out, result)
+	}
+}
+
+func renderBenchReport(out io.Writer, format string, report search.BenchReport) error {
+	switch strings.ToLower(strings.TrimSpace(format)) {
+	case "json":
+		enc := json.NewEncoder(out)
+		enc.SetIndent("", "  ")
+		return enc.Encode(report)
+	case "yaml":
+		return yaml.NewEncoder(out).Encode(report)
+	default:
+		hint := paths.CLIUsage("init --lite --with-mcp --with-hooks")
+		_, err := fmt.Fprint(out, search.FormatBenchTable(report, hint))
+		return err
 	}
 }
 
