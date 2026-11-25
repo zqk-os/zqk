@@ -27,7 +27,11 @@ func (f *FileObjectStorage) newHashRegistry(ctx context.Context, kind, dir strin
 		return nil
 	}
 	key := hashRegistryCacheKey(kind, dir)
-	hr, err := f.hashRegistryCache.GetOrCreate(ctx, key, func(regCtx context.Context, cacheKey string) (*HashRegistry, error) {
+	cacheCtx := context.Background()
+	if ctx != nil {
+		cacheCtx = context.WithoutCancel(ctx)
+	}
+	hr, err := f.hashRegistryCache.GetOrCreate(cacheCtx, key, func(regCtx context.Context, cacheKey string) (*HashRegistry, error) {
 		parts := strings.SplitN(cacheKey, "\x00", 2)
 		if len(parts) != 2 {
 			return nil, errfmt.Errorf(ConstStreamHashRegistryCacheKeyInvalidExpectedKind0dirQuote, cacheKey)
