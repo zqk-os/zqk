@@ -94,3 +94,11 @@ type SearchResult struct {
 	// TruncateReason indicates why results were truncated ("max_matches", "max_tokens", "").
 	TruncateReason string `json:"truncate_reason,omitempty" yaml:"truncate_reason,omitempty"`
 }
+
+// IndexBuildStats reports cold trigram index build cost for empirical benchmarking and honest cost accounting.
+type IndexBuildStats struct {
+	IndexedFiles    int     `json:"indexed_files" yaml:"indexed_files"`
+	BuildDurationMs float64 `json:"build_duration_ms" yaml:"build_duration_ms"`
+	IndexBytes      int64   `json:"index_bytes" yaml:"index_bytes"`
+	CachePath       string  `json:"cache_path,omitempty" yaml:"cache_path,omitempty"`
+}

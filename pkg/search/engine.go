@@ -38,6 +38,16 @@ func (e *Engine) CachePath() string {
 
 // BuildTrigramIndex explicitly builds and caches an in-memory and on-disk trigram index.
 func (e *Engine) BuildTrigramIndex(opts SearchOptions) error {
+	_, err := e.BuildTrigramIndexStats(opts)
+	return err
+}
+
+// BuildTrigramIndexStats builds and caches the trigram index and returns cold-build cost telemetry
+// (indexed file count, wall-clock duration in milliseconds, and persisted index disk footprint in bytes).
+func (e *Engine) BuildTrigramIndexStats(opts SearchOptions) (IndexBuildStats, error) {
+	start := time.Now()
+	var stats IndexBuildStats
+
 	root := e.projectRoot
 	if opts.Path != "" {
 		if filepath.IsAbs(opts.Path) {
@@ -49,24 +59,31 @@ func (e *Engine) BuildTrigramIndex(opts SearchOptions) error {
 
 	files, err := CollectFiles(root, opts)
 	if err != nil {
-		return err
+		return stats, err
 	}
 
 	idx, err := BuildIndex(files)
 	if err != nil {
-		return err
+		return stats, err
 	}
 
 	e.indexMu.Lock()
 	e.cachedIndex = idx
 	e.indexMu.Unlock()
 
+	stats.IndexedFiles = len(files)
 	if e.projectRoot != "" {
 		cachePath := e.CachePath()
+		stats.CachePath = cachePath
 		_ = fileutil.EnsureDir(filepath.Dir(cachePath))
-		_ = idx.SaveToFile(cachePath)
+		if saveErr := idx.SaveToFile(cachePath); saveErr == nil {
+			if info, statErr := fileutil.Stat(cachePath); statErr == nil {
+				stats.IndexBytes = info.Size()
+			}
+		}
 	}
-	return nil
+	stats.BuildDurationMs = float64(time.Since(start).Microseconds()) / 1000.0
+	return stats, nil
 }
 
 // LoadOrBuildIndex loads the index from memory or disk cache, or builds and saves it if absent.
