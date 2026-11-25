@@ -45,7 +45,9 @@ func createMockAgentAPIScript(t *testing.T, mode string) string {
 }
 
 func TestCycle217_ConversationProbe_Scenarios(t *testing.T) {
-	t.Parallel()
+	// Intentionally non-parallel: writing and immediately executing ephemeral shell
+	// scripts concurrently with other tests that fork/exec triggers Linux ETXTBSY
+	// ("text file busy", Go issue #22315).
 	ctx := context.Background()
 
 	errEmptyBin := ProbeConversationViaAgentAPI(ctx, "", "127.0.0.1:9000", "c-1")
