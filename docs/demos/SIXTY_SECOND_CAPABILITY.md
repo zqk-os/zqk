@@ -37,11 +37,18 @@ zqk workflow whats-next
 # T3 — object graph is real (list kinds / counts) (~1–3s)
 zqk object count
 
-# T4 — optional interactive tour (same product surface as first-run)
+# T4 — deny-by-default capability (buyer differentiator) (~2–5s)
+zqk capability list
+zqk capability authorize --name demo:safe --agent-id stranger -f json
+# Expect allowed=true. Then prove the forbidden path is blocked:
+zqk capability authorize --name demo:forbidden --agent-id stranger -f json
+# Expect allowed=false / policy_rejected=true (non-zero exit is OK)
+
+# T5 — optional interactive tour (same product surface as first-run)
 # zqk test-drive
 ```
 
-**Pass signal:** `whats-next` returns structured mission/plan context (not an empty chat reconstruction), and `object count` shows kernel kinds after `init`.
+**Pass signal:** `whats-next` returns structured mission/plan context (not an empty chat reconstruction), `object count` shows kernel kinds after `init`, and `capability authorize` allows `demo:safe` while rejecting `demo:forbidden` with a typed policy denial.
 
 **Timed stranger path (CI / unattended):** from a clone of the public candidate / community tree:
 
@@ -59,6 +66,7 @@ That script unsets GitHub tokens, installs from local source when needed, times 
 | :--- | :--- |
 | Local-first kernel | `zqk init` wrote project state under `.zqk/` with no cloud account |
 | Task truth ≠ prompt memory | `whats-next` reads the kernel graph |
+| Deny-by-default capability | `demo:safe` authorized; `demo:forbidden` returns typed `policy_rejected` |
 | Open-core boundary | You exercised **community** single-cell CLI only — no Enterprise fleet mesh APIs |
 | Apache surface | Commands above ship in the Apache-2.0 community tree (`LICENSE` / `NOTICE`) |
 
