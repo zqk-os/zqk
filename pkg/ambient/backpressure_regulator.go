@@ -500,9 +500,9 @@ func (r *BackpressureRegulator) CurrentCapacity() int {
 	if r == nil {
 		return 0
 	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.currentCapacity
+	return withRLock(&r.mu, func() int {
+		return r.currentCapacity
+	})
 }
 
 // AvailableTokens returns the currently available tokens in the regulator.

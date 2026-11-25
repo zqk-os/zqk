@@ -311,12 +311,12 @@ func (s *ToolSensor) GetRecords() []ToolExecutionRecord {
 	if s == nil {
 		return nil
 	}
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	if len(s.records) == 0 {
-		return []ToolExecutionRecord{}
-	}
-	return slices.Clone(s.records)
+	return withRLock(&s.mu, func() []ToolExecutionRecord {
+		if len(s.records) == 0 {
+			return []ToolExecutionRecord{}
+		}
+		return slices.Clone(s.records)
+	})
 }
 
 // Aggregate returns the aggregated metrics across all recorded executions.
