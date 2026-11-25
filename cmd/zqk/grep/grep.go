@@ -6,6 +6,7 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 	clipkg "github.com/zqk-os/zqk/pkg/cli"
@@ -56,6 +57,7 @@ func NewGrepCmd() *cobra.Command {
 	cmd.Flags().Bool("roi", false, "Display zgrep compliance ratio and estimated token savings ROI scorecard")
 	cmd.Flags().Float64("min-compliance", 0, "With --roi, fail closed if zgrep compliance ratio is below this percentage (0-100)")
 	cmd.Flags().StringSlice("repos", nil, "With --roi, aggregate compliance telemetry across multiple repository root paths")
+	cmd.Flags().String("since", "", "With --roi, filter telemetry to events within a rolling window (e.g. 7d, 24h, or RFC3339 timestamp)")
 	cli.ConfigureRequirements(cmd, false, false)
 	return cmd
 }
@@ -182,13 +184,21 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
+		sinceRaw, err := cmd.Flags().GetString("since")
+		if err != nil {
+			return err
+		}
+		sinceTime, err := interceptor.ParseSinceWindow(sinceRaw, time.Now())
+		if err != nil {
+			return err
+		}
 		var (
 			summary         interceptor.ComplianceSummary
 			displayRoot     string
 			telemetrySource string
 		)
 		if len(repos) > 0 {
-			summary, err = interceptor.SummarizeComplianceMulti(repos)
+			summary, err = interceptor.SummarizeComplianceMultiSince(repos, sinceTime)
 			if err != nil {
 				return fmt.Errorf("failed computing multi-repo zgrep ROI compliance summary: %w", err)
 			}
@@ -196,7 +206,7 @@ func runGrepExecution(cmd *cobra.Command, args []string) error {
 			telemetrySource = fmt.Sprintf("multi-repo rollup (%d repositories)", len(repos))
 		} else {
 			projectRoot := resolveROIProjectRoot(pathFlag, args)
-			summary, err = interceptor.SummarizeCompliance(projectRoot)
+			summary, err = interceptor.SummarizeComplianceSince(projectRoot, sinceTime)
 			if err != nil {
 				return fmt.Errorf("failed computing zgrep ROI compliance summary: %w", err)
 			}
