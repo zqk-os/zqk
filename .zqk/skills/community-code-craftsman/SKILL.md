@@ -18,8 +18,10 @@ Execute implementation tasks with high structural rigor, complete test coverage,
 3. **Resource Hygiene**:
    - Ensure all acquired files, sockets, and channels are explicitly closed using `defer`.
    - Avoid unbounded goroutines; verify leak freedom.
-4. **Code Quality Gates**:
+4. **Code Quality Gates & Native Primitives**:
    - Run `golangci-lint run ./...` and resolve any flagged issues.
+   - Register and bind tests natively via `zqk test discover`, `zqk test bind`, and `zqk test run --all` instead of unbound scripts.
+   - Use native `zqk eval validate|run|matrix`, `zqk gate stage|review|approve|reject`, and `zqk new object-spec` before writing custom Python/shell harnesses.
    - Stage changes on plan-scoped integration branches.
 5. **Declarative Kernel Operations**:
    - Leverage `zqk query` (ZPARQL) for cycle-safe topological queries across kernel dependencies rather than implementing custom graph search in Go scripts.

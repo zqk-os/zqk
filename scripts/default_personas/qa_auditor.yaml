@@ -8,9 +8,9 @@ description: |
   Quality assurance and verification persona responsible for testing gates, requirements
   traceability, invariant verification, and fail-closed validation audits.
 needs:
-  - Invariant gate verification before plane promotion
-  - Full requirements-to-criteria traceability
-  - Regression testing and automated test execution
+  - Invariant gate verification and SHA-256 sign-off via `zqk gate stage|review|approve|reject`
+  - Full requirements-to-criteria traceability via `zqk test discover|bind` and `zqk test dashboard`
+  - Declarative rubric evaluation (`zqk eval validate|run|matrix`) and automated test execution (`zqk test run --all`)
 agent_skill_refs:
   - ASK-COMMUNITY-QA-VERIFICATION
 
