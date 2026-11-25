@@ -32,6 +32,9 @@ Flags:
       Import an external ontology during initialization (requires --advanced)
     --legacy
       Legacy project mode (preserve existing files)
+    --lite
+      Zero-bloat zgrep-first setup (trigram index, compliance telemetry, IDE
+      rules) without seeding .zqk/process CAS
     --merge
       Merge snapshot data with existing (snapshot mode only)
     --project-name <string>
@@ -85,6 +88,7 @@ Flags:
       --ignore-scheduler-down[=true|false]     Ignore scheduler down warning/lockdown
       --import-ontology string                 Import an external ontology during initialization (requires --advanced)
       --legacy[=true|false]                    Legacy project mode (preserve existing files)
+      --lite[=true|false]                      Zero-bloat zgrep-first setup (trigram index, compliance telemetry, IDE rules) without seeding .zqk/process CAS
       --merge[=true|false]                     Merge snapshot data with existing (snapshot mode only)
   -o, --output string                          Write output to file
       --project-name string                    Project name (defaults to directory name)
