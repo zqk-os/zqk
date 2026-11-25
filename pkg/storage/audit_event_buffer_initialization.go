@@ -88,7 +88,7 @@ func TearDownGlobalAuditBufferForTestProjectRoot(projectRoot, resetRoot string, 
 // goroutine is started (no write to ctx/flushTicker while periodicFlush reads them).
 func InitializeGlobalBufferWithConfig(projectRoot string, secCtx *pkgctx.SecurityContext) error {
 	return concurrency.RunInLockWithLogger(&bufferMu, locknames.LockNameAuditBufferInitGlobal, logging.GetLockLoggerFromProfile(string(pkgctx.ProfileSystem)), func() error {
-		if bufferInitialized && globalBuffer != nil && globalBuffer.projectRoot == projectRoot {
+		if bufferInitialized && globalBuffer != nil && globalBuffer.GetProjectRoot() == projectRoot {
 			return nil
 		}
 
