@@ -59,6 +59,7 @@ Welcome to the canonical documentation for **ZQK Core**, the Cellular Knowledge 
 | **[ZQL Declarative Mutations Manual](./manual/ZQL_MUTATIONS.md)** | Developer manual for crafting declarative atomic mutations and batch updates. |
 | **[Object Inspector & Policy Studio](./manual/OBJECT_INSPECTOR_AND_POLICY_STUDIO.md)** | Reference manual for the interactive object inspector, keybindings, and policy testing. |
 | **[Mission Control UI & Diagnostics Visual Guide](./manual/MISSION_CONTROL_UI_VISUAL_GUIDE.md)** | Complete visual walkthrough of all 8 TUI tabs, Web Studio timeline/DAG, and test dashboards with ASCII captures. |
+| **[Polyglot zgrep AST, Compliance & Pilot ROI Guide](./guides/ZGREP_POLYGLOT_AND_PILOT_ROI_GUIDE.md)** | Zero-bloat `zqk init --lite`, polyglot TypeScript/Python/Rust/Go AST queries, Day-25 ROI scorecards (`--repos`, `--since`, `-f markdown`), and CI compliance gates. |
 | **[ZQL & ZPARQL Agent Guide](./guides/ZQL_ZPARQL_AGENT_GUIDE.md)** | Field guide for AI agents executing queries, mutating graph state, and handling errors. |
 
 ---
